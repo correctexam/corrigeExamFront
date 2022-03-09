@@ -39,7 +39,7 @@
         };
 
         const baseUrl = '/v3/api-docs';
-        let urls;
+        /*let urls;
 
         if (!urls || urls.length === 0) {
           const response = await axios.get('/management/jhiopenapigroups', axiosConfig);
@@ -60,10 +60,10 @@
             return x < y ? -1 : x > y ? 1 : 0;
           });
         }
-
+*/
         // Build a system
         var ui = SwaggerUIBundle({
-          urls: urls,
+          // urls: urls,
           url: baseUrl,
           dom_id: '#swagger-ui',
           deepLinking: true,

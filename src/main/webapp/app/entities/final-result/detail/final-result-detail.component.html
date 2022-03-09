@@ -1,0 +1,44 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <div *ngIf="finalResult">
+      <h2 data-cy="finalResultDetailsHeading"><span jhiTranslate="gradeScopeIsticApp.finalResult.detail.title">Final Result</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dd>
+          <span>{{ finalResult.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.finalResult.note">Note</span></dt>
+        <dd>
+          <span>{{ finalResult.note }}</span>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.finalResult.student">Student</span></dt>
+        <dd>
+          <div *ngIf="finalResult.student">
+            <a [routerLink]="['/student', finalResult.student?.id, 'view']">{{ finalResult.student?.name }}</a>
+          </div>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.finalResult.exam">Exam</span></dt>
+        <dd>
+          <div *ngIf="finalResult.exam">
+            <a [routerLink]="['/exam', finalResult.exam?.id, 'view']">{{ finalResult.exam?.name }}</a>
+          </div>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/final-result', finalResult.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+      </button>
+    </div>
+  </div>
+</div>

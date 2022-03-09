@@ -1,0 +1,141 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-exam-heading" data-cy="ExamCreateUpdateHeading" jhiTranslate="gradeScopeIsticApp.exam.home.createOrEditLabel">
+        Create or edit a Exam
+      </h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        <div class="row mb-3" [hidden]="editForm.get('id')!.value == null">
+          <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.exam.name" for="field_name">Name</label>
+          <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" />
+          <div *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
+            <small class="form-text text-danger" *ngIf="editForm.get('name')?.errors?.required" jhiTranslate="entity.validation.required">
+              This field is required.
+            </small>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.exam.template" for="field_template">Template</label>
+          <select class="form-control" id="field_template" data-cy="template" name="template" formControlName="template">
+            <option [ngValue]="null"></option>
+            <option
+              [ngValue]="templateOption.id === editForm.get('template')!.value?.id ? editForm.get('template')!.value : templateOption"
+              *ngFor="let templateOption of templatesCollection; trackBy: trackTemplateById"
+            >
+              {{ templateOption.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.exam.idzone" for="field_idzone">Idzone</label>
+          <select class="form-control" id="field_idzone" data-cy="idzone" name="idzone" formControlName="idzone">
+            <option [ngValue]="null"></option>
+            <option
+              [ngValue]="zoneOption.id === editForm.get('idzone')!.value?.id ? editForm.get('idzone')!.value : zoneOption"
+              *ngFor="let zoneOption of idzonesCollection; trackBy: trackZoneById"
+            >
+              {{ zoneOption.id }}
+            </option>
+          </select>
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.exam.namezone" for="field_namezone">Namezone</label>
+          <select class="form-control" id="field_namezone" data-cy="namezone" name="namezone" formControlName="namezone">
+            <option [ngValue]="null"></option>
+            <option
+              [ngValue]="zoneOption.id === editForm.get('namezone')!.value?.id ? editForm.get('namezone')!.value : zoneOption"
+              *ngFor="let zoneOption of namezonesCollection; trackBy: trackZoneById"
+            >
+              {{ zoneOption.id }}
+            </option>
+          </select>
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.exam.firstnamezone" for="field_firstnamezone">Firstnamezone</label>
+          <select
+            class="form-control"
+            id="field_firstnamezone"
+            data-cy="firstnamezone"
+            name="firstnamezone"
+            formControlName="firstnamezone"
+          >
+            <option [ngValue]="null"></option>
+            <option
+              [ngValue]="zoneOption.id === editForm.get('firstnamezone')!.value?.id ? editForm.get('firstnamezone')!.value : zoneOption"
+              *ngFor="let zoneOption of firstnamezonesCollection; trackBy: trackZoneById"
+            >
+              {{ zoneOption.id }}
+            </option>
+          </select>
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.exam.notezone" for="field_notezone">Notezone</label>
+          <select class="form-control" id="field_notezone" data-cy="notezone" name="notezone" formControlName="notezone">
+            <option [ngValue]="null"></option>
+            <option
+              [ngValue]="zoneOption.id === editForm.get('notezone')!.value?.id ? editForm.get('notezone')!.value : zoneOption"
+              *ngFor="let zoneOption of notezonesCollection; trackBy: trackZoneById"
+            >
+              {{ zoneOption.id }}
+            </option>
+          </select>
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.exam.scanfile" for="field_scanfile">Scanfile</label>
+          <select class="form-control" id="field_scanfile" data-cy="scanfile" name="scanfile" formControlName="scanfile">
+            <option [ngValue]="null"></option>
+            <option
+              [ngValue]="scanOption.id === editForm.get('scanfile')!.value?.id ? editForm.get('scanfile')!.value : scanOption"
+              *ngFor="let scanOption of scanfilesCollection; trackBy: trackScanById"
+            >
+              {{ scanOption.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.exam.course" for="field_course">Course</label>
+          <select class="form-control" id="field_course" data-cy="course" name="course" formControlName="course">
+            <option [ngValue]="null"></option>
+            <option
+              [ngValue]="courseOption.id === editForm.get('course')!.value?.id ? editForm.get('course')!.value : courseOption"
+              *ngFor="let courseOption of coursesSharedCollection; trackBy: trackCourseById"
+            >
+              {{ courseOption.name }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

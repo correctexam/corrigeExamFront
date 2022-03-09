@@ -7,6 +7,18 @@
       "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
       "entities": {
         "main": "Entités",
+        "course": "Course",
+        "courseGroup": "Course Group",
+        "student": "Student",
+        "exam": "Exam",
+        "template": "Template",
+        "question": "Question",
+        "examSheet": "Exam Sheet",
+        "scan": "Scan",
+        "finalResult": "Final Result",
+        "studentResponse": "Student Response",
+        "comments": "Comments",
+        "zone": "Zone",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {

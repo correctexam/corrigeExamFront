@@ -1,0 +1,26 @@
+{
+  "gradeScopeIsticApp": {
+    "scan": {
+      "home": {
+        "title": "Scans",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Scan",
+        "createOrEditLabel": "Créer ou éditer un Scan",
+        "notFound": "Aucun Scan trouvé"
+      },
+      "created": "Un nouveau Scan a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Scan avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Scan avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Etes-vous certain de vouloir supprimer le Scan {{ id }} ?"
+      },
+      "detail": {
+        "title": "Scan"
+      },
+      "id": "ID",
+      "name": "Name",
+      "content": "Content",
+      "sheets": "Sheets"
+    }
+  }
+}

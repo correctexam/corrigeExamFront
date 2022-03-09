@@ -1,0 +1,114 @@
+<div>
+  <h2 id="page-heading" data-cy="ExamSheetHeading">
+    <span jhiTranslate="gradeScopeIsticApp.examSheet.home.title">Exam Sheets</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="loadPage()" [disabled]="isLoading">
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="gradeScopeIsticApp.examSheet.home.refreshListLabel">Refresh List</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-exam-sheet"
+        [routerLink]="['/exam-sheet/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="gradeScopeIsticApp.examSheet.home.createLabel"> Create a new Exam Sheet </span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  <div class="alert alert-warning" id="no-result" *ngIf="examSheets?.length === 0">
+    <span jhiTranslate="gradeScopeIsticApp.examSheet.home.notFound">No examSheets found</span>
+  </div>
+
+  <div class="table-responsive" id="entities" *ngIf="examSheets && examSheets.length > 0">
+    <table class="table table-striped" aria-describedby="page-heading">
+      <thead>
+        <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="loadPage()">
+          <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
+          <th scope="col" jhiSortBy="name">
+            <span jhiTranslate="gradeScopeIsticApp.examSheet.name">Name</span> <fa-icon icon="sort"></fa-icon>
+          </th>
+          <th scope="col" jhiSortBy="pagemin">
+            <span jhiTranslate="gradeScopeIsticApp.examSheet.pagemin">Pagemin</span> <fa-icon icon="sort"></fa-icon>
+          </th>
+          <th scope="col" jhiSortBy="pagemax">
+            <span jhiTranslate="gradeScopeIsticApp.examSheet.pagemax">Pagemax</span> <fa-icon icon="sort"></fa-icon>
+          </th>
+          <th scope="col" jhiSortBy="scan.name">
+            <span jhiTranslate="gradeScopeIsticApp.examSheet.scan">Scan</span> <fa-icon icon="sort"></fa-icon>
+          </th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let examSheet of examSheets; trackBy: trackId" data-cy="entityTable">
+          <td>
+            <a [routerLink]="['/exam-sheet', examSheet.id, 'view']">{{ examSheet.id }}</a>
+          </td>
+          <td>{{ examSheet.name }}</td>
+          <td>{{ examSheet.pagemin }}</td>
+          <td>{{ examSheet.pagemax }}</td>
+          <td>
+            <div *ngIf="examSheet.scan">
+              <a [routerLink]="['/scan', examSheet.scan?.id, 'view']">{{ examSheet.scan?.name }}</a>
+            </div>
+          </td>
+          <td class="text-end">
+            <div class="btn-group">
+              <button
+                type="submit"
+                [routerLink]="['/exam-sheet', examSheet.id, 'view']"
+                class="btn btn-info btn-sm"
+                data-cy="entityDetailsButton"
+              >
+                <fa-icon icon="eye"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+              </button>
+
+              <button
+                type="submit"
+                [routerLink]="['/exam-sheet', examSheet.id, 'edit']"
+                class="btn btn-primary btn-sm"
+                data-cy="entityEditButton"
+              >
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+              </button>
+
+              <button type="submit" (click)="delete(examSheet)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                <fa-icon icon="times"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="examSheets && examSheets.length > 0">
+    <div class="d-flex justify-content-center">
+      <jhi-item-count [params]="{ page: page, totalItems: totalItems, itemsPerPage: itemsPerPage }"></jhi-item-count>
+    </div>
+
+    <div class="d-flex justify-content-center">
+      <ngb-pagination
+        [collectionSize]="totalItems"
+        [(page)]="ngbPaginationPage"
+        [pageSize]="itemsPerPage"
+        [maxSize]="5"
+        [rotate]="true"
+        [boundaryLinks]="true"
+        (pageChange)="loadPage($event)"
+      ></ngb-pagination>
+    </div>
+  </div>
+</div>

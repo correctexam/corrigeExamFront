@@ -1,0 +1,26 @@
+{
+  "gradeScopeIsticApp": {
+    "template": {
+      "home": {
+        "title": "Templates",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Template",
+        "createOrEditLabel": "Create or edit a Template",
+        "notFound": "No Templates found"
+      },
+      "created": "A new Template is created with identifier {{ param }}",
+      "updated": "A Template is updated with identifier {{ param }}",
+      "deleted": "A Template is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Template {{ id }}?"
+      },
+      "detail": {
+        "title": "Template"
+      },
+      "id": "ID",
+      "name": "Name",
+      "content": "Content",
+      "exam": "Exam"
+    }
+  }
+}

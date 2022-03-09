@@ -1,0 +1,46 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <div *ngIf="studentResponse">
+      <h2 data-cy="studentResponseDetailsHeading">
+        <span jhiTranslate="gradeScopeIsticApp.studentResponse.detail.title">Student Response</span>
+      </h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dd>
+          <span>{{ studentResponse.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.studentResponse.note">Note</span></dt>
+        <dd>
+          <span>{{ studentResponse.note }}</span>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.studentResponse.question">Question</span></dt>
+        <dd>
+          <div *ngIf="studentResponse.question">
+            <a [routerLink]="['/question', studentResponse.question?.id, 'view']">{{ studentResponse.question?.numero }}</a>
+          </div>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.studentResponse.student">Student</span></dt>
+        <dd>
+          <div *ngIf="studentResponse.student">
+            <a [routerLink]="['/student', studentResponse.student?.id, 'view']">{{ studentResponse.student?.name }}</a>
+          </div>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/student-response', studentResponse.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+      </button>
+    </div>
+  </div>
+</div>

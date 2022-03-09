@@ -1,0 +1,30 @@
+{
+  "gradeScopeIsticApp": {
+    "student": {
+      "home": {
+        "title": "Students",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Student",
+        "createOrEditLabel": "Créer ou éditer un Student",
+        "notFound": "Aucun Student trouvé"
+      },
+      "created": "Un nouveau Student a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Student avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Student avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Etes-vous certain de vouloir supprimer le Student {{ id }} ?"
+      },
+      "detail": {
+        "title": "Student"
+      },
+      "id": "ID",
+      "name": "Name",
+      "firstname": "Firstname",
+      "ine": "Ine",
+      "caslogin": "Caslogin",
+      "mail": "Mail",
+      "examSheets": "Exam Sheets",
+      "groups": "Groups"
+    }
+  }
+}

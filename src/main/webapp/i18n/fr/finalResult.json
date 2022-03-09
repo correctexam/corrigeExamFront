@@ -1,0 +1,26 @@
+{
+  "gradeScopeIsticApp": {
+    "finalResult": {
+      "home": {
+        "title": "FinalResults",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Final Result",
+        "createOrEditLabel": "Créer ou éditer un Final Result",
+        "notFound": "Aucun Final Result trouvé"
+      },
+      "created": "Un nouveau Final Result a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Final Result avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Final Result avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Etes-vous certain de vouloir supprimer le Final Result {{ id }} ?"
+      },
+      "detail": {
+        "title": "Final Result"
+      },
+      "id": "ID",
+      "note": "Note",
+      "student": "Student",
+      "exam": "Exam"
+    }
+  }
+}

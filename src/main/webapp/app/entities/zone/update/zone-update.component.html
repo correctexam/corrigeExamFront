@@ -1,0 +1,54 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-zone-heading" data-cy="ZoneCreateUpdateHeading" jhiTranslate="gradeScopeIsticApp.zone.home.createOrEditLabel">
+        Create or edit a Zone
+      </h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        <div class="row mb-3" [hidden]="editForm.get('id')!.value == null">
+          <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.zone.xInit" for="field_xInit">X Init</label>
+          <input type="number" class="form-control" name="xInit" id="field_xInit" data-cy="xInit" formControlName="xInit" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.zone.yInit" for="field_yInit">Y Init</label>
+          <input type="number" class="form-control" name="yInit" id="field_yInit" data-cy="yInit" formControlName="yInit" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.zone.xFinal" for="field_xFinal">X Final</label>
+          <input type="number" class="form-control" name="xFinal" id="field_xFinal" data-cy="xFinal" formControlName="xFinal" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.zone.yFinal" for="field_yFinal">Y Final</label>
+          <input type="number" class="form-control" name="yFinal" id="field_yFinal" data-cy="yFinal" formControlName="yFinal" />
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

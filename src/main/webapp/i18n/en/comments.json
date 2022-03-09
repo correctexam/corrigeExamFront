@@ -1,0 +1,25 @@
+{
+  "gradeScopeIsticApp": {
+    "comments": {
+      "home": {
+        "title": "Comments",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Comments",
+        "createOrEditLabel": "Create or edit a Comments",
+        "notFound": "No Comments found"
+      },
+      "created": "A new Comments is created with identifier {{ param }}",
+      "updated": "A Comments is updated with identifier {{ param }}",
+      "deleted": "A Comments is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Comments {{ id }}?"
+      },
+      "detail": {
+        "title": "Comments"
+      },
+      "id": "ID",
+      "jsonData": "Json Data",
+      "studentResponse": "Student Response"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "gradeScopeIsticApp": {
+    "comments": {
+      "home": {
+        "title": "Comments",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Comments",
+        "createOrEditLabel": "Créer ou éditer un Comments",
+        "notFound": "Aucun Comments trouvé"
+      },
+      "created": "Un nouveau Comments a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Comments avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Comments avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Etes-vous certain de vouloir supprimer le Comments {{ id }} ?"
+      },
+      "detail": {
+        "title": "Comments"
+      },
+      "id": "ID",
+      "jsonData": "Json Data",
+      "studentResponse": "Student Response"
+    }
+  }
+}

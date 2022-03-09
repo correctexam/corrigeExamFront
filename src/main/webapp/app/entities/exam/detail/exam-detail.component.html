@@ -1,0 +1,74 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <div *ngIf="exam">
+      <h2 data-cy="examDetailsHeading"><span jhiTranslate="gradeScopeIsticApp.exam.detail.title">Exam</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dd>
+          <span>{{ exam.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.exam.name">Name</span></dt>
+        <dd>
+          <span>{{ exam.name }}</span>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.exam.template">Template</span></dt>
+        <dd>
+          <div *ngIf="exam.template">
+            <a [routerLink]="['/template', exam.template?.id, 'view']">{{ exam.template?.name }}</a>
+          </div>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.exam.idzone">Idzone</span></dt>
+        <dd>
+          <div *ngIf="exam.idzone">
+            <a [routerLink]="['/zone', exam.idzone?.id, 'view']">{{ exam.idzone?.id }}</a>
+          </div>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.exam.namezone">Namezone</span></dt>
+        <dd>
+          <div *ngIf="exam.namezone">
+            <a [routerLink]="['/zone', exam.namezone?.id, 'view']">{{ exam.namezone?.id }}</a>
+          </div>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.exam.firstnamezone">Firstnamezone</span></dt>
+        <dd>
+          <div *ngIf="exam.firstnamezone">
+            <a [routerLink]="['/zone', exam.firstnamezone?.id, 'view']">{{ exam.firstnamezone?.id }}</a>
+          </div>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.exam.notezone">Notezone</span></dt>
+        <dd>
+          <div *ngIf="exam.notezone">
+            <a [routerLink]="['/zone', exam.notezone?.id, 'view']">{{ exam.notezone?.id }}</a>
+          </div>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.exam.scanfile">Scanfile</span></dt>
+        <dd>
+          <div *ngIf="exam.scanfile">
+            <a [routerLink]="['/scan', exam.scanfile?.id, 'view']">{{ exam.scanfile?.name }}</a>
+          </div>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.exam.course">Course</span></dt>
+        <dd>
+          <div *ngIf="exam.course">
+            <a [routerLink]="['/course', exam.course?.id, 'view']">{{ exam.course?.name }}</a>
+          </div>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/exam', exam.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+      </button>
+    </div>
+  </div>
+</div>

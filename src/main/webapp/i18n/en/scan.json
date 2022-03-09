@@ -1,0 +1,26 @@
+{
+  "gradeScopeIsticApp": {
+    "scan": {
+      "home": {
+        "title": "Scans",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Scan",
+        "createOrEditLabel": "Create or edit a Scan",
+        "notFound": "No Scans found"
+      },
+      "created": "A new Scan is created with identifier {{ param }}",
+      "updated": "A Scan is updated with identifier {{ param }}",
+      "deleted": "A Scan is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Scan {{ id }}?"
+      },
+      "detail": {
+        "title": "Scan"
+      },
+      "id": "ID",
+      "name": "Name",
+      "content": "Content",
+      "sheets": "Sheets"
+    }
+  }
+}

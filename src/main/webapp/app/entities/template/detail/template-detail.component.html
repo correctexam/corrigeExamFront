@@ -1,0 +1,39 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <div *ngIf="template">
+      <h2 data-cy="templateDetailsHeading"><span jhiTranslate="gradeScopeIsticApp.template.detail.title">Template</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dd>
+          <span>{{ template.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.template.name">Name</span></dt>
+        <dd>
+          <span>{{ template.name }}</span>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.template.content">Content</span></dt>
+        <dd>
+          <div *ngIf="template.content">
+            <a (click)="openFile(template.content, template.contentContentType)" jhiTranslate="entity.action.open">open</a>
+            {{ template.contentContentType }}, {{ byteSize(template.content) }}
+          </div>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/template', template.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+      </button>
+    </div>
+  </div>
+</div>

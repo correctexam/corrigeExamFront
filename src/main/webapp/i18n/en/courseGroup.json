@@ -1,0 +1,26 @@
+{
+  "gradeScopeIsticApp": {
+    "courseGroup": {
+      "home": {
+        "title": "Course Groups",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Course Group",
+        "createOrEditLabel": "Create or edit a Course Group",
+        "notFound": "No Course Groups found"
+      },
+      "created": "A new Course Group is created with identifier {{ param }}",
+      "updated": "A Course Group is updated with identifier {{ param }}",
+      "deleted": "A Course Group is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Course Group {{ id }}?"
+      },
+      "detail": {
+        "title": "Course Group"
+      },
+      "id": "ID",
+      "groupName": "Group Name",
+      "students": "Students",
+      "course": "Course"
+    }
+  }
+}

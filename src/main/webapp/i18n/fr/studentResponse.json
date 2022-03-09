@@ -1,0 +1,27 @@
+{
+  "gradeScopeIsticApp": {
+    "studentResponse": {
+      "home": {
+        "title": "StudentResponses",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Student Response",
+        "createOrEditLabel": "Créer ou éditer un Student Response",
+        "notFound": "Aucun Student Response trouvé"
+      },
+      "created": "Un nouveau Student Response a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Student Response avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Student Response avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Etes-vous certain de vouloir supprimer le Student Response {{ id }} ?"
+      },
+      "detail": {
+        "title": "Student Response"
+      },
+      "id": "ID",
+      "note": "Note",
+      "comments": "Comments",
+      "question": "Question",
+      "student": "Student"
+    }
+  }
+}

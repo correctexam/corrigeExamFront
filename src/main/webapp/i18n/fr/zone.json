@@ -1,0 +1,27 @@
+{
+  "gradeScopeIsticApp": {
+    "zone": {
+      "home": {
+        "title": "Zones",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Zone",
+        "createOrEditLabel": "Créer ou éditer un Zone",
+        "notFound": "Aucun Zone trouvé"
+      },
+      "created": "Un nouveau Zone a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Zone avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Zone avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Etes-vous certain de vouloir supprimer le Zone {{ id }} ?"
+      },
+      "detail": {
+        "title": "Zone"
+      },
+      "id": "ID",
+      "xInit": "X Init",
+      "yInit": "Y Init",
+      "xFinal": "X Final",
+      "yFinal": "Y Final"
+    }
+  }
+}

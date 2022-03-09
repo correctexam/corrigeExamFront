@@ -1,0 +1,32 @@
+{
+  "gradeScopeIsticApp": {
+    "exam": {
+      "home": {
+        "title": "Exams",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Exam",
+        "createOrEditLabel": "Create or edit a Exam",
+        "notFound": "No Exams found"
+      },
+      "created": "A new Exam is created with identifier {{ param }}",
+      "updated": "A Exam is updated with identifier {{ param }}",
+      "deleted": "A Exam is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Exam {{ id }}?"
+      },
+      "detail": {
+        "title": "Exam"
+      },
+      "id": "ID",
+      "name": "Name",
+      "template": "Template",
+      "idzone": "Idzone",
+      "namezone": "Namezone",
+      "firstnamezone": "Firstnamezone",
+      "notezone": "Notezone",
+      "scanfile": "Scanfile",
+      "question": "Question",
+      "course": "Course"
+    }
+  }
+}

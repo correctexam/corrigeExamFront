@@ -1,0 +1,28 @@
+{
+  "gradeScopeIsticApp": {
+    "examSheet": {
+      "home": {
+        "title": "ExamSheets",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Exam Sheet",
+        "createOrEditLabel": "Créer ou éditer un Exam Sheet",
+        "notFound": "Aucun Exam Sheet trouvé"
+      },
+      "created": "Un nouveau Exam Sheet a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Exam Sheet avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Exam Sheet avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Etes-vous certain de vouloir supprimer le Exam Sheet {{ id }} ?"
+      },
+      "detail": {
+        "title": "Exam Sheet"
+      },
+      "id": "ID",
+      "name": "Name",
+      "pagemin": "Pagemin",
+      "pagemax": "Pagemax",
+      "scan": "Scan",
+      "students": "Students"
+    }
+  }
+}
