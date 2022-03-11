@@ -9,6 +9,8 @@ import { IQuestion, Question } from '../question.model';
 import { QuestionService } from '../service/question.service';
 import { IZone } from 'app/entities/zone/zone.model';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
+import { IQuestionType } from 'app/entities/question-type/question-type.model';
+import { QuestionTypeService } from 'app/entities/question-type/service/question-type.service';
 import { IExam } from 'app/entities/exam/exam.model';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 
@@ -20,6 +22,7 @@ export class QuestionUpdateComponent implements OnInit {
   isSaving = false;
 
   zonesCollection: IZone[] = [];
+  questionTypesSharedCollection: IQuestionType[] = [];
   examsSharedCollection: IExam[] = [];
 
   editForm = this.fb.group({
@@ -27,12 +30,14 @@ export class QuestionUpdateComponent implements OnInit {
     numero: [null, [Validators.required]],
     point: [],
     zone: [],
+    type: [],
     exam: [],
   });
 
   constructor(
     protected questionService: QuestionService,
     protected zoneService: ZoneService,
+    protected questionTypeService: QuestionTypeService,
     protected examService: ExamService,
     protected activatedRoute: ActivatedRoute,
     protected fb: FormBuilder
@@ -61,6 +66,10 @@ export class QuestionUpdateComponent implements OnInit {
   }
 
   trackZoneById(index: number, item: IZone): number {
+    return item.id!;
+  }
+
+  trackQuestionTypeById(index: number, item: IQuestionType): number {
     return item.id!;
   }
 
@@ -93,10 +102,15 @@ export class QuestionUpdateComponent implements OnInit {
       numero: question.numero,
       point: question.point,
       zone: question.zone,
+      type: question.type,
       exam: question.exam,
     });
 
     this.zonesCollection = this.zoneService.addZoneToCollectionIfMissing(this.zonesCollection, question.zone);
+    this.questionTypesSharedCollection = this.questionTypeService.addQuestionTypeToCollectionIfMissing(
+      this.questionTypesSharedCollection,
+      question.type
+    );
     this.examsSharedCollection = this.examService.addExamToCollectionIfMissing(this.examsSharedCollection, question.exam);
   }
 
@@ -106,6 +120,16 @@ export class QuestionUpdateComponent implements OnInit {
       .pipe(map((res: HttpResponse<IZone[]>) => res.body ?? []))
       .pipe(map((zones: IZone[]) => this.zoneService.addZoneToCollectionIfMissing(zones, this.editForm.get('zone')!.value)))
       .subscribe((zones: IZone[]) => (this.zonesCollection = zones));
+
+    this.questionTypeService
+      .query()
+      .pipe(map((res: HttpResponse<IQuestionType[]>) => res.body ?? []))
+      .pipe(
+        map((questionTypes: IQuestionType[]) =>
+          this.questionTypeService.addQuestionTypeToCollectionIfMissing(questionTypes, this.editForm.get('type')!.value)
+        )
+      )
+      .subscribe((questionTypes: IQuestionType[]) => (this.questionTypesSharedCollection = questionTypes));
 
     this.examService
       .query()
@@ -121,6 +145,7 @@ export class QuestionUpdateComponent implements OnInit {
       numero: this.editForm.get(['numero'])!.value,
       point: this.editForm.get(['point'])!.value,
       zone: this.editForm.get(['zone'])!.value,
+      type: this.editForm.get(['type'])!.value,
       exam: this.editForm.get(['exam'])!.value,
     };
   }

@@ -1,0 +1,26 @@
+{
+  "gradeScopeIsticApp": {
+    "questionType": {
+      "home": {
+        "title": "QuestionTypes",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Question Type",
+        "createOrEditLabel": "Créer ou éditer un Question Type",
+        "notFound": "Aucun Question Type trouvé"
+      },
+      "created": "Un nouveau Question Type a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Question Type avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Question Type avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Etes-vous certain de vouloir supprimer le Question Type {{ id }} ?"
+      },
+      "detail": {
+        "title": "Question Type"
+      },
+      "id": "ID",
+      "algoName": "Algo Name",
+      "endpoint": "Endpoint",
+      "jsFunction": "Js Function"
+    }
+  }
+}

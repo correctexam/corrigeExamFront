@@ -28,6 +28,12 @@
             <a [routerLink]="['/zone', question.zone?.id, 'view']">{{ question.zone?.id }}</a>
           </div>
         </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.question.type">Type</span></dt>
+        <dd>
+          <div *ngIf="question.type">
+            <a [routerLink]="['/question-type', question.type?.id, 'view']">{{ question.type?.algoName }}</a>
+          </div>
+        </dd>
         <dt><span jhiTranslate="gradeScopeIsticApp.question.exam">Exam</span></dt>
         <dd>
           <div *ngIf="question.exam">

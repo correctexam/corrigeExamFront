@@ -45,6 +45,19 @@
         </div>
 
         <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.type" for="field_type">Type</label>
+          <select class="form-control" id="field_type" data-cy="type" name="type" formControlName="type">
+            <option [ngValue]="null"></option>
+            <option
+              [ngValue]="questionTypeOption.id === editForm.get('type')!.value?.id ? editForm.get('type')!.value : questionTypeOption"
+              *ngFor="let questionTypeOption of questionTypesSharedCollection; trackBy: trackQuestionTypeById"
+            >
+              {{ questionTypeOption.algoName }}
+            </option>
+          </select>
+        </div>
+
+        <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.exam" for="field_exam">Exam</label>
           <select class="form-control" id="field_exam" data-cy="exam" name="exam" formControlName="exam">
             <option [ngValue]="null"></option>

@@ -10,6 +10,8 @@ import { QuestionService } from '../service/question.service';
 import { IQuestion, Question } from '../question.model';
 import { IZone } from 'app/entities/zone/zone.model';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
+import { IQuestionType } from 'app/entities/question-type/question-type.model';
+import { QuestionTypeService } from 'app/entities/question-type/service/question-type.service';
 import { IExam } from 'app/entities/exam/exam.model';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 
@@ -21,6 +23,7 @@ describe('Question Management Update Component', () => {
   let activatedRoute: ActivatedRoute;
   let questionService: QuestionService;
   let zoneService: ZoneService;
+  let questionTypeService: QuestionTypeService;
   let examService: ExamService;
 
   beforeEach(() => {
@@ -44,6 +47,7 @@ describe('Question Management Update Component', () => {
     activatedRoute = TestBed.inject(ActivatedRoute);
     questionService = TestBed.inject(QuestionService);
     zoneService = TestBed.inject(ZoneService);
+    questionTypeService = TestBed.inject(QuestionTypeService);
     examService = TestBed.inject(ExamService);
 
     comp = fixture.componentInstance;
@@ -66,6 +70,28 @@ describe('Question Management Update Component', () => {
       expect(zoneService.query).toHaveBeenCalled();
       expect(zoneService.addZoneToCollectionIfMissing).toHaveBeenCalledWith(zoneCollection, zone);
       expect(comp.zonesCollection).toEqual(expectedCollection);
+    });
+
+    it('Should call QuestionType query and add missing value', () => {
+      const question: IQuestion = { id: 456 };
+      const type: IQuestionType = { id: 38666 };
+      question.type = type;
+
+      const questionTypeCollection: IQuestionType[] = [{ id: 48615 }];
+      jest.spyOn(questionTypeService, 'query').mockReturnValue(of(new HttpResponse({ body: questionTypeCollection })));
+      const additionalQuestionTypes = [type];
+      const expectedCollection: IQuestionType[] = [...additionalQuestionTypes, ...questionTypeCollection];
+      jest.spyOn(questionTypeService, 'addQuestionTypeToCollectionIfMissing').mockReturnValue(expectedCollection);
+
+      activatedRoute.data = of({ question });
+      comp.ngOnInit();
+
+      expect(questionTypeService.query).toHaveBeenCalled();
+      expect(questionTypeService.addQuestionTypeToCollectionIfMissing).toHaveBeenCalledWith(
+        questionTypeCollection,
+        ...additionalQuestionTypes
+      );
+      expect(comp.questionTypesSharedCollection).toEqual(expectedCollection);
     });
 
     it('Should call Exam query and add missing value', () => {
@@ -91,6 +117,8 @@ describe('Question Management Update Component', () => {
       const question: IQuestion = { id: 456 };
       const zone: IZone = { id: 14056 };
       question.zone = zone;
+      const type: IQuestionType = { id: 6851 };
+      question.type = type;
       const exam: IExam = { id: 87918 };
       question.exam = exam;
 
@@ -99,6 +127,7 @@ describe('Question Management Update Component', () => {
 
       expect(comp.editForm.value).toEqual(expect.objectContaining(question));
       expect(comp.zonesCollection).toContain(zone);
+      expect(comp.questionTypesSharedCollection).toContain(type);
       expect(comp.examsSharedCollection).toContain(exam);
     });
   });
@@ -172,6 +201,14 @@ describe('Question Management Update Component', () => {
       it('Should return tracked Zone primary key', () => {
         const entity = { id: 123 };
         const trackResult = comp.trackZoneById(0, entity);
+        expect(trackResult).toEqual(entity.id);
+      });
+    });
+
+    describe('trackQuestionTypeById', () => {
+      it('Should return tracked QuestionType primary key', () => {
+        const entity = { id: 123 };
+        const trackResult = comp.trackQuestionTypeById(0, entity);
         expect(trackResult).toEqual(entity.id);
       });
     });

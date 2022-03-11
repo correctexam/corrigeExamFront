@@ -64,6 +64,11 @@ import { RouterModule } from '@angular/router';
         data: { pageTitle: 'gradeScopeIsticApp.zone.home.title' },
         loadChildren: () => import('./zone/zone.module').then(m => m.ZoneModule),
       },
+      {
+        path: 'question-type',
+        data: { pageTitle: 'gradeScopeIsticApp.questionType.home.title' },
+        loadChildren: () => import('./question-type/question-type.module').then(m => m.QuestionTypeModule),
+      },
       /* jhipster-needle-add-entity-route - JHipster will add entity modules routes here */
     ]),
   ],

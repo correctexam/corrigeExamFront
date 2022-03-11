@@ -1,4 +1,5 @@
 import { IZone } from 'app/entities/zone/zone.model';
+import { IQuestionType } from 'app/entities/question-type/question-type.model';
 import { IExam } from 'app/entities/exam/exam.model';
 
 export interface IQuestion {
@@ -6,6 +7,7 @@ export interface IQuestion {
   numero?: number;
   point?: number | null;
   zone?: IZone | null;
+  type?: IQuestionType | null;
   exam?: IExam | null;
 }
 
@@ -15,6 +17,7 @@ export class Question implements IQuestion {
     public numero?: number,
     public point?: number | null,
     public zone?: IZone | null,
+    public type?: IQuestionType | null,
     public exam?: IExam | null
   ) {}
 }

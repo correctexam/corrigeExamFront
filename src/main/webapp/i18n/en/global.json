@@ -19,6 +19,7 @@
         "studentResponse": "Student Response",
         "comments": "Comments",
         "zone": "Zone",
+        "questionType": "Question Type",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {

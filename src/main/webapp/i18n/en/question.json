@@ -21,6 +21,7 @@
       "numero": "Numero",
       "point": "Point",
       "zone": "Zone",
+      "type": "Type",
       "exam": "Exam"
     }
   }
