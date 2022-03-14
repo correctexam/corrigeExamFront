@@ -1,0 +1,35 @@
+<div>
+  <p-dock [model]="dockItems" position="top">
+    <ng-template pTemplate="item" let-item>
+
+      <a *ngIf="item.route" [routerLink]="item.route"><img [src]="item.icon" [alt]="item.label" width="100%" [pTooltip]="item.title" /></a>
+      <a *ngIf="item.command1" (click)="item.command1()"><img [src]="item.icon" [alt]="item.label" width="100%" [pTooltip]="item.title" /></a>
+    </ng-template>
+  </p-dock>
+  <p-confirmDialog header="Confirmation suppression" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+
+<div class="wizard-v2-content">
+  <div class="wizard-image">
+  </div>
+  <div class="wizard-form">
+    <div class="wizard-header">
+      <h3>{{course?.name}}</h3>
+      <p>Vos exams accessible en un clic</p>
+    </div>
+    <div id="form-total" #formTotal>
+      <div class="inner" [style]="{'text-align':'center'}">
+        <button *ngFor="let exam of exams"
+        [style]="{width: '20em', marginBottom: '1em', margin: '1em'}" class="p-element p-ripple " pButton pRipple type="button" [routerLink]="'course/'+exam.id">
+          <fa-stack>
+            <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
+            <fa-icon [icon]="faBookOpenReader" stackItemSize="1x" [inverse]="false"></fa-icon>
+          </fa-stack><BR>
+          <span>{{exam.name}}</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
