@@ -4,6 +4,7 @@ import { HomeComponent } from './home.component';
 import { CreercoursComponent } from '../creercours/creercours.component';
 import { CoursdetailsComponent } from '../coursdetail/coursdetails.component';
 import { ImportStudentComponent } from '../import-student/import-student.component';
+import { ListstudentcourseComponent } from '../liststudentcourse/liststudentcourse.component';
 
 export const HOME_ROUTE: Route = {
   path: '',
@@ -33,6 +34,15 @@ export const CREERCOURS_ROUTE: Route = {
 export const REGISTERSTUDENT_ROUTE: Route = {
   path: 'registerstudents/:courseid',
   component: ImportStudentComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.creercours',
+  },
+};
+
+export const LISTESTUDENT_ROUTE: Route = {
+  path: 'liststudents/:courseid',
+  component: ListstudentcourseComponent,
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.creercours',

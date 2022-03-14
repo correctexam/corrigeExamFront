@@ -1,0 +1,80 @@
+
+
+
+<div  class="grid">
+  <p-toast></p-toast>
+  <p-blockUI [blocked]="blocked">
+    <i class="pi pi-lock" style="font-size: 3rem"></i>
+</p-blockUI>
+
+<p-confirmDialog header="Confirmation suppression" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+  <div class="col-8">
+    <div  class="grid grid-nogutter">
+      <div class="col-8">
+            <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">
+              Liste étudiants
+            </h2>
+            </div>
+          <div class="col-4  flex flex-row-reverse">
+
+
+          <button
+          [disabled]="!this.courseid"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="btn btn-primary"
+          (click)="gotoUE()"
+        >
+          <fa-icon icon="check"></fa-icon>&nbsp;<span >Retourner au module</span>
+        </button>
+        <button (click)="reset()"
+        type="submit"
+        id="save-entity"
+        data-cy="entityCreateSaveButton"
+        class="btn btn-danger"
+      >
+      <fa-icon icon="times"></fa-icon>&nbsp;<span >Vider</span>
+    </button>
+          </div>
+
+        </div>
+            <div class="col-12 md:col-12">
+
+
+
+<p-table [value]="students">
+  <ng-template pTemplate="header">
+      <tr>
+          <th>INE</th>
+          <th>NOM</th>
+          <th>PRENOM</th>
+          <th>MAIL</th>
+          <th>GROUPE</th>
+      </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-student>
+      <tr>
+          <td>{{student.ine}}</td>
+          <td>{{student.nom}}</td>
+          <td>{{student.prenom}}</td>
+          <td>{{student.mail}}</td>
+          <td>{{student.groupe}}</td>
+      </tr>
+  </ng-template>
+</p-table>
+
+      </div>
+  </div>
+  <div class="col-4 md:col-4 overflow-hidden">
+    <img
+      src="/content/images/piqsels.com-id-frfkz.jpg"
+      alt="Image"
+      class="md:ml-auto block md:h-full"
+      style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
+    />
+  </div>
+  </div>
+
+

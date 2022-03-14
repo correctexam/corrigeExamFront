@@ -56,6 +56,13 @@ export class CoursdetailsComponent implements OnInit {
             icon: "content/images/students.svg",
             title: "Enregistrer liste étudiants",
             route: "/registerstudents/" + params.get('courseid')
+        }
+        ,
+          {
+            label: 'Voir liste étudiants',
+            icon: "content/images/studentslist.svg",
+            title: "Voir liste étudiants",
+            route: "/liststudents/" + params.get('courseid')
         },
         {
           label: 'Supprimer UE',
@@ -73,11 +80,6 @@ export class CoursdetailsComponent implements OnInit {
   }
 
   confirmeDelete():any{
-    // eslint-disable-next-line no-console
-    console.log(this.confirmationService)
-    // eslint-disable-next-line no-console
-    console.log(this.course)
-    // eslint-disable-next-line no-console
     this.confirmationService.confirm({
       message: 'Etes vous sur de vouloir supprimer ce module, les exams, les groupes d\'étudiants et les templates associés',
       accept: () => {

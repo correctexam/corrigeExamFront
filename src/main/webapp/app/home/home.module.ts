@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { SharedModule } from 'app/shared/shared.module';
-import { COURSMAIN_ROUTE, CREERCOURS_ROUTE, HOME_ROUTE, REGISTERSTUDENT_ROUTE } from './home.route';
+import { COURSMAIN_ROUTE, CREERCOURS_ROUTE, HOME_ROUTE, LISTESTUDENT_ROUTE, REGISTERSTUDENT_ROUTE } from './home.route';
 import { HomeComponent } from './home.component';
 import { MesCoursComponent } from '../mes-cours/mes-cours.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -20,8 +20,10 @@ import {SliderModule} from 'primeng/slider';
 import {ToastModule} from 'primeng/toast';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
-
+import {TableModule} from 'primeng/table';
 registerAllModules();
+import { ListstudentcourseComponent } from '../liststudentcourse/liststudentcourse.component';
+
 
 @NgModule({
   imports: [BrowserAnimationsModule,ButtonModule,
@@ -29,8 +31,9 @@ registerAllModules();
     ToastModule,
     SliderModule,
     HotTableModule,
+    TableModule,
     ConfirmDialogModule,
-    RouterModule.forChild([HOME_ROUTE,CREERCOURS_ROUTE,COURSMAIN_ROUTE,REGISTERSTUDENT_ROUTE ])],
-  declarations: [HomeComponent, MesCoursComponent,CreercoursComponent,CoursdetailsComponent,ImportStudentComponent],
+    RouterModule.forChild([HOME_ROUTE,CREERCOURS_ROUTE,COURSMAIN_ROUTE,REGISTERSTUDENT_ROUTE,LISTESTUDENT_ROUTE ])],
+  declarations: [HomeComponent, MesCoursComponent,CreercoursComponent,CoursdetailsComponent,ImportStudentComponent,ListstudentcourseComponent],
 })
 export class HomeModule {}
