@@ -8,6 +8,8 @@ export interface ICourse {
   exams?: IExam[] | null;
   groups?: ICourseGroup[] | null;
   prof?: IUser;
+  profId?: number,
+  profLogin?: string
 }
 
 export class Course implements ICourse {
@@ -16,8 +18,10 @@ export class Course implements ICourse {
     public name?: string,
     public exams?: IExam[] | null,
     public groups?: ICourseGroup[] | null,
-    public prof?: IUser
-  ) {}
+    public prof?: IUser,
+    public profId?: number,
+    public profLogin?: string
+    ) {}
 }
 
 export function getCourseIdentifier(course: ICourse): number | undefined {

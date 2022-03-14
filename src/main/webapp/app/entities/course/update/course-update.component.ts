@@ -96,11 +96,14 @@ export class CourseUpdateComponent implements OnInit {
   }
 
   protected createFromForm(): ICourse {
+    // eslint-disable-next-line no-console
+    console.log(this.editForm.get(['prof'])!.value.id);
     return {
       ...new Course(),
       id: this.editForm.get(['id'])!.value,
       name: this.editForm.get(['name'])!.value,
-      prof: this.editForm.get(['prof'])!.value,
+//      prof: this.editForm.get(['prof'])!.value,
+      profId: this.editForm.get(['prof'])!.value.id
     };
   }
 }

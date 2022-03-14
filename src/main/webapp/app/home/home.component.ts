@@ -1,10 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import {MenuItem} from 'primeng/api';
+
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
+
+import {  faPlus } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'jhi-home',
@@ -13,6 +16,10 @@ import { Account } from 'app/core/auth/account.model';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   account: Account | null = null;
+
+  dockItems!: any[];
+
+  faPlus = faPlus;
 
   private readonly destroy$ = new Subject<void>();
 
@@ -23,6 +30,15 @@ export class HomeComponent implements OnInit, OnDestroy {
       .getAuthenticationState()
       .pipe(takeUntil(this.destroy$))
       .subscribe(account => (this.account = account));
+
+      this.dockItems = [
+        {
+            label: 'Créer cours',
+            icon: "content/images/plus.svg",
+            title: "Créer cours",
+            route: "creercours"
+        }
+    ];
   }
 
   login(): void {

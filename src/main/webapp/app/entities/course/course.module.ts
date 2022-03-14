@@ -8,6 +8,7 @@ import { CourseRoutingModule } from './route/course-routing.module';
 
 @NgModule({
   imports: [SharedModule, CourseRoutingModule],
+//  exports:[CourseUpdateComponent],
   declarations: [CourseComponent, CourseDetailComponent, CourseUpdateComponent, CourseDeleteDialogComponent],
   entryComponents: [CourseDeleteDialogComponent],
 })

@@ -15,6 +15,8 @@ describe('Home Component', () => {
   let fixture: ComponentFixture<HomeComponent>;
   let mockAccountService: AccountService;
   let mockRouter: Router;
+
+
   const account: Account = {
     activated: true,
     authorities: [],
