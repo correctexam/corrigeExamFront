@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import {MenuItem} from 'primeng/api';
 
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -16,7 +15,6 @@ import {  faPlus } from '@fortawesome/free-solid-svg-icons';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   account: Account | null = null;
-
   dockItems!: any[];
 
   faPlus = faPlus;
@@ -48,5 +46,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+
   }
+
+
+
+
 }

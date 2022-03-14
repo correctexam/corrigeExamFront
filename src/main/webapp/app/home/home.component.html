@@ -1,15 +1,15 @@
 <div *ngIf="account == null" class="grid grid-nogutter surface-section text-800">
   <div class="col-12 md:col-6 p-6 text-center md:text-left flex align-items-center">
     <section>
-      <span class="block text-6xl font-bold mb-1">Create the screens your</span>
-      <div class="text-6xl text-primary font-bold mb-3">your visitors deserve to see</div>
+      <span class="block text-6xl font-bold mb-1">Corriger vos copies plus efficacement ✔️</span>
+      <div class="text-6xl text-primary font-bold mb-3">un retour à vos étudiants en moins d'une journée</div>
       <p class="mt-0 mb-4 text-700 line-height-3">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        Scanner, corriger par lots, soyez assisté par de l'IA, faites un retour précis à vos étudiants, depuis un PC ou une tablette
       </p>
-      <button pbutton="" pripple="" label="Learn More" type="button" class="p-element p-ripple mr-3 p-button-raised p-button p-component">
-        <span class="p-button-label">Learn More</span><span class="p-ink"></span></button
-      ><button pbutton="" pripple="" label="Live Demo" type="button" class="p-element p-ripple p-button-outlined p-button p-component">
-        <span class="p-button-label">Live Demo</span><span class="p-ink"></span>
+      <button (click)="login()" pbutton="" pripple="" label="Learn More" type="button" class="p-element p-ripple mr-3 p-button-raised p-button p-component">
+        <span class="p-button-label">Authentifier vous</span><span class="p-ink"></span></button
+      ><button  routerLink="account/register" pbutton="" pripple="" label="Live Demo" type="button" class="p-element p-ripple p-button-outlined p-button p-component">
+        <span class="p-button-label">Vous voulez créer un compte</span><span class="p-ink"></span>
       </button>
     </section>
   </div>
