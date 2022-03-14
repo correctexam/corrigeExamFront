@@ -6,6 +6,8 @@ import { Component, OnInit } from '@angular/core';
 import {  faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 import {  faMotorcycle as fasMotorcycle } from '@fortawesome/free-solid-svg-icons';
 import {  faGraduationCap as faGraduationCap } from '@fortawesome/free-solid-svg-icons';
+import { CourseService } from '../entities/course/service/course.service';
+import { ICourse } from '../entities/course/course.model';
 
 @Component({
   selector: 'jhi-mes-cours',
@@ -18,11 +20,14 @@ export class MesCoursComponent implements OnInit {
   farCircle = farCircle
   fasMotorcycle =fasMotorcycle
   faGraduationCap = faGraduationCap
-  constructor() { }
-
+  courses !: ICourse[]
+  constructor(public courseService: CourseService ) { }
 
 
   ngOnInit(): void {
+    this.courseService.query().subscribe(data => {
+      this.courses = data.body!;
+    })
   }
 
 

@@ -8,37 +8,13 @@
     </div>
     <div id="form-total" #formTotal>
       <div class="inner" [style]="{'text-align':'center'}">
-        <button [style]="{width: '20em', marginBottom: '1em'}" class="p-element p-ripple " pButton pRipple type="button"
-          (click)="accederCours($event)">
+        <button *ngFor="let course of courses"
+        [style]="{width: '20em', marginBottom: '1em', margin: '1em'}" class="p-element p-ripple " pButton pRipple type="button" [routerLink]="'course/'+course.id">
           <fa-stack>
             <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
             <fa-icon [icon]="faGraduationCap" stackItemSize="1x" [inverse]="false"></fa-icon>
           </fa-stack><BR>
-          <span>Moto</span>
-        </button>
-        <button [style]="{width: '20em', marginBottom: '1em'}" class="p-button-outlined" pButton pRipple type="button"
-          (click)="accederCours($event)">
-          <fa-stack>
-            <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
-            <fa-icon [icon]="faGraduationCap" stackItemSize="1x" [inverse]="false"></fa-icon>
-          </fa-stack><BR>
-          <span>Moto</span>
-        </button>
-        <button [style]="{width: '20em', marginBottom: '1em'}" class="p-button-outlined" pButton pRipple type="button"
-          (click)="accederCours($event)">
-          <fa-stack>
-            <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
-            <fa-icon [icon]="faGraduationCap" stackItemSize="1x" [inverse]="false"></fa-icon>
-          </fa-stack><BR>
-          <span>Moto</span>
-        </button>
-        <button [style]="{width: '20em', marginBottom: '1em'}" class="p-button-outlined" pButton pRipple type="button"
-          (click)="accederCours($event)">
-          <fa-stack>
-            <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
-            <fa-icon [icon]="faGraduationCap" stackItemSize="1x" [inverse]="false"></fa-icon>
-          </fa-stack><BR>
-          <span>Moto</span>
+          <span>{{course.name}}</span>
         </button>
       </div>
 

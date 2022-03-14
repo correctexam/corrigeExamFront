@@ -36,13 +36,13 @@
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="entity-menu" data-cy="entity">
+          <a *jhiHasAnyAuthority="'ROLE_ADMIN'" class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="entity-menu" data-cy="entity">
             <span>
               <fa-icon icon="th-list"></fa-icon>
               <span jhiTranslate="global.menu.entities.main">Entities</span>
             </span>
           </a>
-          <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="entity-menu">
+          <ul *jhiHasAnyAuthority="'ROLE_ADMIN'" class="dropdown-menu" ngbDropdownMenu aria-labelledby="entity-menu">
             <li>
               <a
                 class="dropdown-item"

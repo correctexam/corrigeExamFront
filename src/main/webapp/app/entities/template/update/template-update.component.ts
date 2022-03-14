@@ -97,6 +97,18 @@ export class TemplateUpdateComponent implements OnInit {
   }
 
   protected createFromForm(): ITemplate {
+    // eslint-disable-next-line no-console
+    console.log( {
+      ...new Template(),
+      id: this.editForm.get(['id'])!.value,
+      name: this.editForm.get(['name'])!.value,
+      contentContentType: this.editForm.get(['contentContentType'])!.value,
+      content: this.editForm.get(['content'])!.value,
+    }
+
+    );
+
+
     return {
       ...new Template(),
       id: this.editForm.get(['id'])!.value,
