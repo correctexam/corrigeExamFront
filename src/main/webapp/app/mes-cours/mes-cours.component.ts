@@ -29,8 +29,4 @@ export class MesCoursComponent implements OnInit {
       this.courses = data.body!;
     })
   }
-
-
-  accederCours(e:any):void {
-  }
 }
