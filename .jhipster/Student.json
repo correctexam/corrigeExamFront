@@ -1,0 +1,56 @@
+{
+  "applications": "*",
+  "changelogDate": "20220309165611",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "student",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "firstname",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "ine",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "caslogin",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "mail",
+      "fieldType": "String"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Student",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "name",
+      "otherEntityName": "examSheet",
+      "otherEntityRelationshipName": "students",
+      "ownerSide": true,
+      "relationshipName": "examSheets",
+      "relationshipType": "many-to-many"
+    },
+    {
+      "otherEntityField": "groupName",
+      "otherEntityName": "courseGroup",
+      "otherEntityRelationshipName": "students",
+      "ownerSide": false,
+      "relationshipName": "groups",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "service": "serviceClass",
+  "skipServer": true
+}

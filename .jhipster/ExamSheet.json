@@ -1,0 +1,46 @@
+{
+  "applications": "*",
+  "changelogDate": "20220309165615",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "exam_sheet",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "pagemin",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "pagemax",
+      "fieldType": "Integer"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "ExamSheet",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "name",
+      "otherEntityName": "scan",
+      "otherEntityRelationshipName": "sheets",
+      "relationshipName": "scan",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "name",
+      "otherEntityName": "student",
+      "otherEntityRelationshipName": "examSheets",
+      "ownerSide": false,
+      "relationshipName": "students",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "service": "serviceClass",
+  "skipServer": true
+}

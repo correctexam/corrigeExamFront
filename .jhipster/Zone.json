@@ -1,0 +1,33 @@
+{
+  "applications": "*",
+  "changelogDate": "20220309165620",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "zone",
+  "fields": [
+    {
+      "fieldName": "xInit",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "yInit",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "xFinal",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "yFinal",
+      "fieldType": "Integer"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Zone",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [],
+  "service": "serviceClass",
+  "skipServer": true
+}

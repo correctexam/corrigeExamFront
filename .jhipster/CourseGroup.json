@@ -1,0 +1,38 @@
+{
+  "applications": "*",
+  "changelogDate": "20220309165610",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "course_group",
+  "fields": [
+    {
+      "fieldName": "groupName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "CourseGroup",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "name",
+      "otherEntityName": "student",
+      "otherEntityRelationshipName": "groups",
+      "ownerSide": true,
+      "relationshipName": "students",
+      "relationshipType": "many-to-many"
+    },
+    {
+      "otherEntityField": "name",
+      "otherEntityName": "course",
+      "otherEntityRelationshipName": "groups",
+      "relationshipName": "course",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceClass",
+  "skipServer": true
+}

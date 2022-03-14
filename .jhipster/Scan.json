@@ -1,0 +1,34 @@
+{
+  "applications": "*",
+  "changelogDate": "20220309165616",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "scan",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "content",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "any"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Scan",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "examSheet",
+      "otherEntityRelationshipName": "scan",
+      "relationshipName": "sheets",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "serviceClass",
+  "skipServer": true
+}

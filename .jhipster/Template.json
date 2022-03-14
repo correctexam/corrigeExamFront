@@ -1,0 +1,36 @@
+{
+  "applications": "*",
+  "changelogDate": "20220309165613",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "template",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "content",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "any"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Template",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "name",
+      "otherEntityName": "exam",
+      "otherEntityRelationshipName": "template",
+      "ownerSide": false,
+      "relationshipName": "exam",
+      "relationshipType": "one-to-one"
+    }
+  ],
+  "service": "serviceClass",
+  "skipServer": true
+}

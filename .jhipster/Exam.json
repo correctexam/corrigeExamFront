@@ -1,0 +1,81 @@
+{
+  "applications": "*",
+  "changelogDate": "20220309165612",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "exam",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Exam",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "name",
+      "otherEntityName": "template",
+      "otherEntityRelationshipName": "exam",
+      "ownerSide": true,
+      "relationshipName": "template",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "zone",
+      "otherEntityRelationshipName": "exam",
+      "ownerSide": true,
+      "relationshipName": "idzone",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "zone",
+      "otherEntityRelationshipName": "exam",
+      "ownerSide": true,
+      "relationshipName": "namezone",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "zone",
+      "otherEntityRelationshipName": "exam",
+      "ownerSide": true,
+      "relationshipName": "firstnamezone",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "zone",
+      "otherEntityRelationshipName": "exam",
+      "ownerSide": true,
+      "relationshipName": "notezone",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityField": "name",
+      "otherEntityName": "scan",
+      "otherEntityRelationshipName": "exam",
+      "ownerSide": true,
+      "relationshipName": "scanfile",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityField": "numero",
+      "otherEntityName": "question",
+      "otherEntityRelationshipName": "exam",
+      "relationshipName": "question",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityField": "name",
+      "otherEntityName": "course",
+      "otherEntityRelationshipName": "exam",
+      "relationshipName": "course",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceClass",
+  "skipServer": true
+}

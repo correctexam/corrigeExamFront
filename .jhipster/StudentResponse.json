@@ -1,0 +1,42 @@
+{
+  "applications": "*",
+  "changelogDate": "20220309165618",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "student_response",
+  "fields": [
+    {
+      "fieldName": "note",
+      "fieldType": "Integer"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "StudentResponse",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "comments",
+      "otherEntityRelationshipName": "studentResponse",
+      "relationshipName": "comments",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityField": "numero",
+      "otherEntityName": "question",
+      "otherEntityRelationshipName": "studentResponse",
+      "relationshipName": "question",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "name",
+      "otherEntityName": "student",
+      "otherEntityRelationshipName": "studentResponse",
+      "relationshipName": "student",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceClass",
+  "skipServer": true
+}

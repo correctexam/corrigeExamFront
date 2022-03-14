@@ -1,0 +1,30 @@
+{
+  "applications": "*",
+  "changelogDate": "20220311140202",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "question_type",
+  "fields": [
+    {
+      "fieldName": "algoName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "endpoint",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "jsFunction",
+      "fieldType": "String"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "QuestionType",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [],
+  "service": "serviceClass",
+  "skipServer": true
+}
