@@ -49,8 +49,8 @@
           </td>
           <td>{{ comments.jsonData }}</td>
           <td>
-            <div *ngIf="comments.studentResponse">
-              <a [routerLink]="['/student-response', comments.studentResponse?.id, 'view']">{{ comments.studentResponse?.id }}</a>
+            <div *ngIf="comments.studentResponseId">
+              <a [routerLink]="['/student-response', comments.studentResponseId, 'view']">{{ comments.studentResponseId }}</a>
             </div>
           </td>
           <td class="text-end">

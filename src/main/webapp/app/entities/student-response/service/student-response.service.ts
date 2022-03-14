@@ -22,7 +22,7 @@ export class StudentResponseService {
 
   update(studentResponse: IStudentResponse): Observable<EntityResponseType> {
     return this.http.put<IStudentResponse>(
-      `${this.resourceUrl}/${getStudentResponseIdentifier(studentResponse) as number}`,
+      `${this.resourceUrl}`,
       studentResponse,
       { observe: 'response' }
     );

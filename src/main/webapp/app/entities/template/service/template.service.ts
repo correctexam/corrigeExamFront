@@ -21,7 +21,7 @@ export class TemplateService {
   }
 
   update(template: ITemplate): Observable<EntityResponseType> {
-    return this.http.put<ITemplate>(`${this.resourceUrl}/${getTemplateIdentifier(template) as number}`, template, { observe: 'response' });
+    return this.http.put<ITemplate>(`${this.resourceUrl}`, template, { observe: 'response' });
   }
 
   partialUpdate(template: ITemplate): Observable<EntityResponseType> {

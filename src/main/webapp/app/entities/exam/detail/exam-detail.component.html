@@ -20,44 +20,44 @@
         </dd>
         <dt><span jhiTranslate="gradeScopeIsticApp.exam.template">Template</span></dt>
         <dd>
-          <div *ngIf="exam.template">
-            <a [routerLink]="['/template', exam.template?.id, 'view']">{{ exam.template?.name }}</a>
+          <div *ngIf="exam.templateId">
+            <a [routerLink]="['/template', exam.templateId, 'view']">{{ exam.templateName }}</a>
           </div>
         </dd>
         <dt><span jhiTranslate="gradeScopeIsticApp.exam.idzone">Idzone</span></dt>
         <dd>
-          <div *ngIf="exam.idzone">
-            <a [routerLink]="['/zone', exam.idzone?.id, 'view']">{{ exam.idzone?.id }}</a>
+          <div *ngIf="exam.idzoneId">
+            <a [routerLink]="['/zone', exam.idzoneId, 'view']">{{ exam.idzoneId }}</a>
           </div>
         </dd>
         <dt><span jhiTranslate="gradeScopeIsticApp.exam.namezone">Namezone</span></dt>
         <dd>
-          <div *ngIf="exam.namezone">
-            <a [routerLink]="['/zone', exam.namezone?.id, 'view']">{{ exam.namezone?.id }}</a>
+          <div *ngIf="exam.namezoneId">
+            <a [routerLink]="['/zone', exam.namezoneId, 'view']">{{ exam.namezoneId }}</a>
           </div>
         </dd>
         <dt><span jhiTranslate="gradeScopeIsticApp.exam.firstnamezone">Firstnamezone</span></dt>
         <dd>
-          <div *ngIf="exam.firstnamezone">
-            <a [routerLink]="['/zone', exam.firstnamezone?.id, 'view']">{{ exam.firstnamezone?.id }}</a>
+          <div *ngIf="exam.firstnamezoneId">
+            <a [routerLink]="['/zone', exam.firstnamezoneId, 'view']">{{ exam.firstnamezoneId }}</a>
           </div>
         </dd>
         <dt><span jhiTranslate="gradeScopeIsticApp.exam.notezone">Notezone</span></dt>
         <dd>
-          <div *ngIf="exam.notezone">
-            <a [routerLink]="['/zone', exam.notezone?.id, 'view']">{{ exam.notezone?.id }}</a>
+          <div *ngIf="exam.notezoneId">
+            <a [routerLink]="['/zone', exam.notezoneId, 'view']">{{ exam.notezoneId }}</a>
           </div>
         </dd>
         <dt><span jhiTranslate="gradeScopeIsticApp.exam.scanfile">Scanfile</span></dt>
         <dd>
-          <div *ngIf="exam.scanfile">
-            <a [routerLink]="['/scan', exam.scanfile?.id, 'view']">{{ exam.scanfile?.name }}</a>
+          <div *ngIf="exam.scanfileId">
+            <a [routerLink]="['/scan', exam.scanfileId, 'view']">{{ exam.scanfileName }}</a>
           </div>
         </dd>
         <dt><span jhiTranslate="gradeScopeIsticApp.exam.course">Course</span></dt>
         <dd>
-          <div *ngIf="exam.course">
-            <a [routerLink]="['/course', exam.course?.id, 'view']">{{ exam.course?.name }}</a>
+          <div *ngIf="exam.courseId">
+            <a [routerLink]="['/course', exam.courseId, 'view']">{{ exam.courseName }}</a>
           </div>
         </dd>
       </dl>

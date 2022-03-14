@@ -21,7 +21,7 @@ export class QuestionService {
   }
 
   update(question: IQuestion): Observable<EntityResponseType> {
-    return this.http.put<IQuestion>(`${this.resourceUrl}/${getQuestionIdentifier(question) as number}`, question, { observe: 'response' });
+    return this.http.put<IQuestion>(`${this.resourceUrl}`, question, { observe: 'response' });
   }
 
   partialUpdate(question: IQuestion): Observable<EntityResponseType> {

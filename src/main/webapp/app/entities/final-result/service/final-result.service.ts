@@ -21,7 +21,7 @@ export class FinalResultService {
   }
 
   update(finalResult: IFinalResult): Observable<EntityResponseType> {
-    return this.http.put<IFinalResult>(`${this.resourceUrl}/${getFinalResultIdentifier(finalResult) as number}`, finalResult, {
+    return this.http.put<IFinalResult>(`${this.resourceUrl}`, finalResult, {
       observe: 'response',
     });
   }

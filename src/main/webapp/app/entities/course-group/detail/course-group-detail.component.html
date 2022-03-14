@@ -27,8 +27,8 @@
         </dd>
         <dt><span jhiTranslate="gradeScopeIsticApp.courseGroup.course">Course</span></dt>
         <dd>
-          <div *ngIf="courseGroup.course">
-            <a [routerLink]="['/course', courseGroup.course?.id, 'view']">{{ courseGroup.course?.name }}</a>
+          <div *ngIf="courseGroup.courseId">
+            <a [routerLink]="['/course', courseGroup.courseId, 'view']">{{ courseGroup.courseName }}</a>
           </div>
         </dd>
       </dl>

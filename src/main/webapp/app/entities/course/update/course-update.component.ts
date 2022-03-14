@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize, map } from 'rxjs/operators';
 
 import { ICourse, Course } from '../course.model';
 import { CourseService } from '../service/course.service';
@@ -16,27 +16,38 @@ import { UserService } from 'app/entities/user/user.service';
 })
 export class CourseUpdateComponent implements OnInit {
   isSaving = false;
-
-  usersSharedCollection: IUser[] = [];
+  users: IUser[] = [];
 
   editForm = this.fb.group({
     id: [],
     name: [null, [Validators.required]],
-    prof: [null, Validators.required],
+    profId: [null, Validators.required],
   });
 
   constructor(
     protected courseService: CourseService,
     protected userService: UserService,
     protected activatedRoute: ActivatedRoute,
-    protected fb: FormBuilder
+    private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ course }) => {
       this.updateForm(course);
 
-      this.loadRelationshipsOptions();
+      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+      this.userService.query().subscribe((res: HttpResponse<IUser[]>) => {(this.users = res.body || []);
+      // eslint-disable-next-line no-console
+      console.log(this.users)
+      });
+    });
+  }
+
+  updateForm(course: ICourse): void {
+    this.editForm.patchValue({
+      id: course.id,
+      name: course.name,
+      profId: course.profId,
     });
   }
 
@@ -54,56 +65,34 @@ export class CourseUpdateComponent implements OnInit {
     }
   }
 
-  trackUserById(index: number, item: IUser): number {
-    return item.id!;
-  }
-
-  protected subscribeToSaveResponse(result: Observable<HttpResponse<ICourse>>): void {
-    result.pipe(finalize(() => this.onSaveFinalize())).subscribe({
-      next: () => this.onSaveSuccess(),
-      error: () => this.onSaveError(),
-    });
-  }
-
-  protected onSaveSuccess(): void {
-    this.previousState();
-  }
-
-  protected onSaveError(): void {
-    // Api for inheritance.
-  }
-
-  protected onSaveFinalize(): void {
-    this.isSaving = false;
-  }
-
-  protected updateForm(course: ICourse): void {
-    this.editForm.patchValue({
-      id: course.id,
-      name: course.name,
-      prof: course.prof,
-    });
-
-    this.usersSharedCollection = this.userService.addUserToCollectionIfMissing(this.usersSharedCollection, course.prof);
-  }
-
-  protected loadRelationshipsOptions(): void {
-    this.userService
-      .query()
-      .pipe(map((res: HttpResponse<IUser[]>) => res.body ?? []))
-      .pipe(map((users: IUser[]) => this.userService.addUserToCollectionIfMissing(users, this.editForm.get('prof')!.value)))
-      .subscribe((users: IUser[]) => (this.usersSharedCollection = users));
-  }
-
-  protected createFromForm(): ICourse {
-    // eslint-disable-next-line no-console
-    console.log(this.editForm.get(['prof'])!.value.id);
+  private createFromForm(): ICourse {
     return {
       ...new Course(),
       id: this.editForm.get(['id'])!.value,
       name: this.editForm.get(['name'])!.value,
-//      prof: this.editForm.get(['prof'])!.value,
-      profId: this.editForm.get(['prof'])!.value.id
+      profId: this.editForm.get(['profId'])!.value,
     };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  protected subscribeToSaveResponse(result: Observable<HttpResponse<ICourse>>): void {
+    result.subscribe(
+      () => this.onSaveSuccess(),
+      () => this.onSaveError()
+    );
+  }
+
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  protected onSaveSuccess(): void {
+    this.isSaving = false;
+    this.previousState();
+  }
+
+  protected onSaveError(): void {
+    this.isSaving = false;
+  }
+
+  trackById(index: number, item: IUser): any {
+    return item.id;
   }
 }

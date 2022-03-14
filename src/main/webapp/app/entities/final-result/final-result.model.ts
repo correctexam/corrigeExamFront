@@ -1,16 +1,24 @@
-import { IStudent } from 'app/entities/student/student.model';
-import { IExam } from 'app/entities/exam/exam.model';
 
 export interface IFinalResult {
   id?: number;
-  note?: number | null;
-  student?: IStudent | null;
-  exam?: IExam | null;
+  note?: number;
+  studentName?: string;
+  studentId?: number;
+  examName?: string;
+  examId?: number;
 }
 
 export class FinalResult implements IFinalResult {
-  constructor(public id?: number, public note?: number | null, public student?: IStudent | null, public exam?: IExam | null) {}
+  constructor(
+    public id?: number,
+    public note?: number,
+    public studentName?: string,
+    public studentId?: number,
+    public examName?: string,
+    public examId?: number
+  ) {}
 }
+
 
 export function getFinalResultIdentifier(finalResult: IFinalResult): number | undefined {
   return finalResult.id;

@@ -57,8 +57,8 @@
           <td>{{ examSheet.pagemin }}</td>
           <td>{{ examSheet.pagemax }}</td>
           <td>
-            <div *ngIf="examSheet.scan">
-              <a [routerLink]="['/scan', examSheet.scan?.id, 'view']">{{ examSheet.scan?.name }}</a>
+            <div *ngIf="examSheet.scanId">
+              <a [routerLink]="['/scan', examSheet.scanId, 'view']">{{ examSheet.scanName }}</a>
             </div>
           </td>
           <td class="text-end">

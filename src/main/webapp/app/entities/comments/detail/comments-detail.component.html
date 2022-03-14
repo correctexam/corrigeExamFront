@@ -20,8 +20,8 @@
         </dd>
         <dt><span jhiTranslate="gradeScopeIsticApp.comments.studentResponse">Student Response</span></dt>
         <dd>
-          <div *ngIf="comments.studentResponse">
-            <a [routerLink]="['/student-response', comments.studentResponse?.id, 'view']">{{ comments.studentResponse?.id }}</a>
+          <div *ngIf="comments.studentResponseId">
+            <a [routerLink]="['/student-response', comments.studentResponseId, 'view']">{{ comments.studentResponseId }}</a>
           </div>
         </dd>
       </dl>

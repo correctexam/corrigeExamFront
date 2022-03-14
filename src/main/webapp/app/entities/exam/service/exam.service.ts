@@ -21,7 +21,7 @@ export class ExamService {
   }
 
   update(exam: IExam): Observable<EntityResponseType> {
-    return this.http.put<IExam>(`${this.resourceUrl}/${getExamIdentifier(exam) as number}`, exam, { observe: 'response' });
+    return this.http.put<IExam>(`${this.resourceUrl}`, exam, { observe: 'response' });
   }
 
   partialUpdate(exam: IExam): Observable<EntityResponseType> {

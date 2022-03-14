@@ -22,25 +22,10 @@
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.comments.studentResponse" for="field_studentResponse"
             >Student Response</label
           >
-          <select
-            class="form-control"
-            id="field_studentResponse"
-            data-cy="studentResponse"
-            name="studentResponse"
-            formControlName="studentResponse"
-          >
+          <select class="form-control" id="field_studentResponse" name="studentResponse" formControlName="studentResponseId">
             <option [ngValue]="null"></option>
-            <option
-              [ngValue]="
-                studentResponseOption.id === editForm.get('studentResponse')!.value?.id
-                  ? editForm.get('studentResponse')!.value
-                  : studentResponseOption
-              "
-              *ngFor="let studentResponseOption of studentResponsesSharedCollection; trackBy: trackStudentResponseById"
-            >
-              {{ studentResponseOption.id }}
-            </option>
-          </select>
+            <option [ngValue]="studentResponseOption.id" *ngFor="let studentResponseOption of studentresponses; trackBy: trackById">{{ studentResponseOption.id }}</option>
+        </select>
         </div>
       </div>
 

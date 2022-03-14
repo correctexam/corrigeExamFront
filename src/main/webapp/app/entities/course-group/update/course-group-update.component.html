@@ -33,27 +33,17 @@
 
         <div class="row mb-3">
           <label jhiTranslate="gradeScopeIsticApp.courseGroup.students" for="field_students">Students</label>
-          <select class="form-control" id="field_students" data-cy="students" multiple name="students" formControlName="students">
-            <option
-              [ngValue]="getSelectedStudent(studentOption, editForm.get('students')!.value)"
-              *ngFor="let studentOption of studentsSharedCollection; trackBy: trackStudentById"
-            >
-              {{ studentOption.name }}
-            </option>
-          </select>
+          <select class="form-control" id="field_students" multiple name="students" formControlName="students">
+            <option [ngValue]="getSelected(editForm.get('students')!.value, studentOption)" *ngFor="let studentOption of students; trackBy: trackById">{{ studentOption.name }}</option>
+        </select>
         </div>
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.courseGroup.course" for="field_course">Course</label>
-          <select class="form-control" id="field_course" data-cy="course" name="course" formControlName="course">
+          <select class="form-control" id="field_course" name="course" formControlName="courseId">
             <option [ngValue]="null"></option>
-            <option
-              [ngValue]="courseOption.id === editForm.get('course')!.value?.id ? editForm.get('course')!.value : courseOption"
-              *ngFor="let courseOption of coursesSharedCollection; trackBy: trackCourseById"
-            >
-              {{ courseOption.name }}
-            </option>
-          </select>
+            <option [ngValue]="courseOption.id" *ngFor="let courseOption of courses; trackBy: trackById">{{ courseOption.name }}</option>
+        </select>
         </div>
       </div>
 

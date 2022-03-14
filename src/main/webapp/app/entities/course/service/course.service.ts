@@ -21,12 +21,10 @@ export class CourseService {
   }
 
   update(course: ICourse): Observable<EntityResponseType> {
-    return this.http.put<ICourse>(`${this.resourceUrl}/${getCourseIdentifier(course) as number}`, course, { observe: 'response' });
+    return this.http.put<ICourse>(`${this.resourceUrl}`, course, { observe: 'response' });
   }
 
-  partialUpdate(course: ICourse): Observable<EntityResponseType> {
-    return this.http.patch<ICourse>(`${this.resourceUrl}/${getCourseIdentifier(course) as number}`, course, { observe: 'response' });
-  }
+
 
   find(id: number): Observable<EntityResponseType> {
     return this.http.get<ICourse>(`${this.resourceUrl}/${id}`, { observe: 'response' });

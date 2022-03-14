@@ -21,7 +21,7 @@ export class CommentsService {
   }
 
   update(comments: IComments): Observable<EntityResponseType> {
-    return this.http.put<IComments>(`${this.resourceUrl}/${getCommentsIdentifier(comments) as number}`, comments, { observe: 'response' });
+    return this.http.put<IComments>(`${this.resourceUrl}`, comments, { observe: 'response' });
   }
 
   partialUpdate(comments: IComments): Observable<EntityResponseType> {

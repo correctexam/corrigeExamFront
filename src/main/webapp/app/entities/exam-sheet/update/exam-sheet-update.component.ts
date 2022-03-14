@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+/* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize, map } from 'rxjs/operators';
 
 import { IExamSheet, ExamSheet } from '../exam-sheet.model';
 import { ExamSheetService } from '../service/exam-sheet.service';
@@ -16,29 +17,38 @@ import { ScanService } from 'app/entities/scan/service/scan.service';
 })
 export class ExamSheetUpdateComponent implements OnInit {
   isSaving = false;
-
-  scansSharedCollection: IScan[] = [];
+  scans: IScan[] = [];
 
   editForm = this.fb.group({
     id: [],
     name: [null, [Validators.required]],
     pagemin: [],
     pagemax: [],
-    scan: [],
+    scanId: [],
   });
 
   constructor(
     protected examSheetService: ExamSheetService,
     protected scanService: ScanService,
     protected activatedRoute: ActivatedRoute,
-    protected fb: FormBuilder
+    private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ examSheet }) => {
       this.updateForm(examSheet);
 
-      this.loadRelationshipsOptions();
+      this.scanService.query().subscribe((res: HttpResponse<IScan[]>) => (this.scans = res.body || []));
+    });
+  }
+
+  updateForm(examSheet: IExamSheet): void {
+    this.editForm.patchValue({
+      id: examSheet.id,
+      name: examSheet.name,
+      pagemin: examSheet.pagemin,
+      pagemax: examSheet.pagemax,
+      scanId: examSheet.scanId,
     });
   }
 
@@ -56,57 +66,34 @@ export class ExamSheetUpdateComponent implements OnInit {
     }
   }
 
-  trackScanById(index: number, item: IScan): number {
-    return item.id!;
-  }
-
-  protected subscribeToSaveResponse(result: Observable<HttpResponse<IExamSheet>>): void {
-    result.pipe(finalize(() => this.onSaveFinalize())).subscribe({
-      next: () => this.onSaveSuccess(),
-      error: () => this.onSaveError(),
-    });
-  }
-
-  protected onSaveSuccess(): void {
-    this.previousState();
-  }
-
-  protected onSaveError(): void {
-    // Api for inheritance.
-  }
-
-  protected onSaveFinalize(): void {
-    this.isSaving = false;
-  }
-
-  protected updateForm(examSheet: IExamSheet): void {
-    this.editForm.patchValue({
-      id: examSheet.id,
-      name: examSheet.name,
-      pagemin: examSheet.pagemin,
-      pagemax: examSheet.pagemax,
-      scan: examSheet.scan,
-    });
-
-    this.scansSharedCollection = this.scanService.addScanToCollectionIfMissing(this.scansSharedCollection, examSheet.scan);
-  }
-
-  protected loadRelationshipsOptions(): void {
-    this.scanService
-      .query()
-      .pipe(map((res: HttpResponse<IScan[]>) => res.body ?? []))
-      .pipe(map((scans: IScan[]) => this.scanService.addScanToCollectionIfMissing(scans, this.editForm.get('scan')!.value)))
-      .subscribe((scans: IScan[]) => (this.scansSharedCollection = scans));
-  }
-
-  protected createFromForm(): IExamSheet {
+  private createFromForm(): IExamSheet {
     return {
       ...new ExamSheet(),
       id: this.editForm.get(['id'])!.value,
       name: this.editForm.get(['name'])!.value,
       pagemin: this.editForm.get(['pagemin'])!.value,
       pagemax: this.editForm.get(['pagemax'])!.value,
-      scan: this.editForm.get(['scan'])!.value,
+      scanId: this.editForm.get(['scanId'])!.value,
     };
+  }
+
+  protected subscribeToSaveResponse(result: Observable<HttpResponse<IExamSheet>>): void {
+    result.subscribe(
+      () => this.onSaveSuccess(),
+      () => this.onSaveError()
+    );
+  }
+
+  protected onSaveSuccess(): void {
+    this.isSaving = false;
+    this.previousState();
+  }
+
+  protected onSaveError(): void {
+    this.isSaving = false;
+  }
+
+  trackById(index: number, item: IScan): any {
+    return item.id;
   }
 }

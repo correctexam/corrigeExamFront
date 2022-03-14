@@ -21,7 +21,7 @@ export class QuestionTypeService {
   }
 
   update(questionType: IQuestionType): Observable<EntityResponseType> {
-    return this.http.put<IQuestionType>(`${this.resourceUrl}/${getQuestionTypeIdentifier(questionType) as number}`, questionType, {
+    return this.http.put<IQuestionType>(`${this.resourceUrl}`, questionType, {
       observe: 'response',
     });
   }

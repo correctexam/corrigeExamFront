@@ -59,18 +59,18 @@
           <td>{{ question.numero }}</td>
           <td>{{ question.point }}</td>
           <td>
-            <div *ngIf="question.zone">
-              <a [routerLink]="['/zone', question.zone?.id, 'view']">{{ question.zone?.id }}</a>
+            <div *ngIf="question.zoneId">
+              <a [routerLink]="['/zone', question.zoneId, 'view']">{{ question.zoneId }}</a>
             </div>
           </td>
           <td>
-            <div *ngIf="question.type">
-              <a [routerLink]="['/question-type', question.type?.id, 'view']">{{ question.type?.algoName }}</a>
+            <div *ngIf="question.typeId">
+              <a [routerLink]="['/question-type', question.typeId, 'view']">{{ question.typeAlgoName }}</a>
             </div>
           </td>
           <td>
-            <div *ngIf="question.exam">
-              <a [routerLink]="['/exam', question.exam?.id, 'view']">{{ question.exam?.name }}</a>
+            <div *ngIf="question.examId">
+              <a [routerLink]="['/exam', question.examId, 'view']">{{ question.examName }}</a>
             </div>
           </td>
           <td class="text-end">

@@ -21,7 +21,7 @@ export class ScanService {
   }
 
   update(scan: IScan): Observable<EntityResponseType> {
-    return this.http.put<IScan>(`${this.resourceUrl}/${getScanIdentifier(scan) as number}`, scan, { observe: 'response' });
+    return this.http.put<IScan>(`${this.resourceUrl}`, scan, { observe: 'response' });
   }
 
   partialUpdate(scan: IScan): Observable<EntityResponseType> {

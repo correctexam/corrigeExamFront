@@ -24,20 +24,20 @@
         </dd>
         <dt><span jhiTranslate="gradeScopeIsticApp.question.zone">Zone</span></dt>
         <dd>
-          <div *ngIf="question.zone">
-            <a [routerLink]="['/zone', question.zone?.id, 'view']">{{ question.zone?.id }}</a>
+          <div *ngIf="question.zoneId">
+            <a [routerLink]="['/zone', question.zoneId, 'view']">{{ question.zoneId }}</a>
           </div>
         </dd>
         <dt><span jhiTranslate="gradeScopeIsticApp.question.type">Type</span></dt>
         <dd>
-          <div *ngIf="question.type">
-            <a [routerLink]="['/question-type', question.type?.id, 'view']">{{ question.type?.algoName }}</a>
+          <div *ngIf="question.typeId">
+            <a [routerLink]="['/question-type', question.typeId, 'view']">{{ question.typeAlgoName }}</a>
           </div>
         </dd>
         <dt><span jhiTranslate="gradeScopeIsticApp.question.exam">Exam</span></dt>
         <dd>
-          <div *ngIf="question.exam">
-            <a [routerLink]="['/exam', question.exam?.id, 'view']">{{ question.exam?.name }}</a>
+          <div *ngIf="question.examId">
+            <a [routerLink]="['/exam', question.examId, 'view']">{{ question.examName }}</a>
           </div>
         </dd>
       </dl>

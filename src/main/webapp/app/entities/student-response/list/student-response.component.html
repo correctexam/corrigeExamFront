@@ -52,13 +52,13 @@
           </td>
           <td>{{ studentResponse.note }}</td>
           <td>
-            <div *ngIf="studentResponse.question">
-              <a [routerLink]="['/question', studentResponse.question?.id, 'view']">{{ studentResponse.question?.numero }}</a>
+            <div *ngIf="studentResponse.questionId">
+              <a [routerLink]="['/question', studentResponse.questionId, 'view']">{{ studentResponse.questionNumero }}</a>
             </div>
           </td>
           <td>
-            <div *ngIf="studentResponse.student">
-              <a [routerLink]="['/student', studentResponse.student?.id, 'view']">{{ studentResponse.student?.name }}</a>
+            <div *ngIf="studentResponse.studentId">
+              <a [routerLink]="['/student', studentResponse.studentId, 'view']">{{ studentResponse.studentName }}</a>
             </div>
           </td>
           <td class="text-end">

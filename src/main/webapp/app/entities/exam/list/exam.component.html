@@ -67,38 +67,38 @@
           </td>
           <td>{{ exam.name }}</td>
           <td>
-            <div *ngIf="exam.template">
-              <a [routerLink]="['/template', exam.template?.id, 'view']">{{ exam.template?.name }}</a>
+            <div *ngIf="exam.templateId">
+              <a [routerLink]="['/template', exam.templateId, 'view']">{{ exam.templateName }}</a>
             </div>
           </td>
           <td>
-            <div *ngIf="exam.idzone">
-              <a [routerLink]="['/zone', exam.idzone?.id, 'view']">{{ exam.idzone?.id }}</a>
+            <div *ngIf="exam.idzoneId">
+              <a [routerLink]="['/zone', exam.idzoneId, 'view']">{{ exam.idzoneId }}</a>
             </div>
           </td>
           <td>
-            <div *ngIf="exam.namezone">
-              <a [routerLink]="['/zone', exam.namezone?.id, 'view']">{{ exam.namezone?.id }}</a>
+            <div *ngIf="exam.namezoneId">
+              <a [routerLink]="['/zone', exam.namezoneId, 'view']">{{ exam.namezoneId }}</a>
             </div>
           </td>
           <td>
-            <div *ngIf="exam.firstnamezone">
-              <a [routerLink]="['/zone', exam.firstnamezone?.id, 'view']">{{ exam.firstnamezone?.id }}</a>
+            <div *ngIf="exam.firstnamezoneId">
+              <a [routerLink]="['/zone', exam.firstnamezoneId, 'view']">{{ exam.firstnamezoneId }}</a>
             </div>
           </td>
           <td>
-            <div *ngIf="exam.notezone">
-              <a [routerLink]="['/zone', exam.notezone?.id, 'view']">{{ exam.notezone?.id }}</a>
+            <div *ngIf="exam.notezoneId">
+              <a [routerLink]="['/zone', exam.notezoneId, 'view']">{{ exam.notezoneId }}</a>
             </div>
           </td>
           <td>
-            <div *ngIf="exam.scanfile">
-              <a [routerLink]="['/scan', exam.scanfile?.id, 'view']">{{ exam.scanfile?.name }}</a>
+            <div *ngIf="exam.scanfileId">
+              <a [routerLink]="['/scan', exam.scanfileId, 'view']">{{ exam.scanfileName }}</a>
             </div>
           </td>
           <td>
-            <div *ngIf="exam.course">
-              <a [routerLink]="['/course', exam.course?.id, 'view']">{{ exam.course?.name }}</a>
+            <div *ngIf="exam.courseId">
+              <a [routerLink]="['/course', exam.courseId, 'view']">{{ exam.courseName }}</a>
             </div>
           </td>
           <td class="text-end">

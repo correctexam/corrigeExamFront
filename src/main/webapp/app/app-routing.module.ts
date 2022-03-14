@@ -1,3 +1,4 @@
+/* eslint-disable spaced-comment */
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 

@@ -21,7 +21,7 @@ export class ZoneService {
   }
 
   update(zone: IZone): Observable<EntityResponseType> {
-    return this.http.put<IZone>(`${this.resourceUrl}/${getZoneIdentifier(zone) as number}`, zone, { observe: 'response' });
+    return this.http.put<IZone>(`${this.resourceUrl}`, zone, { observe: 'response' });
   }
 
   partialUpdate(zone: IZone): Observable<EntityResponseType> {

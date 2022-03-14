@@ -21,7 +21,7 @@ export class StudentService {
   }
 
   update(student: IStudent): Observable<EntityResponseType> {
-    return this.http.put<IStudent>(`${this.resourceUrl}/${getStudentIdentifier(student) as number}`, student, { observe: 'response' });
+    return this.http.put<IStudent>(`${this.resourceUrl}`, student, { observe: 'response' });
   }
 
   partialUpdate(student: IStudent): Observable<EntityResponseType> {

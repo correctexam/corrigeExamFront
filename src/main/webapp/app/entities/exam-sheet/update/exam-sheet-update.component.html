@@ -39,15 +39,10 @@
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.examSheet.scan" for="field_scan">Scan</label>
-          <select class="form-control" id="field_scan" data-cy="scan" name="scan" formControlName="scan">
+          <select class="form-control" id="field_scan" name="scan" formControlName="scanId">
             <option [ngValue]="null"></option>
-            <option
-              [ngValue]="scanOption.id === editForm.get('scan')!.value?.id ? editForm.get('scan')!.value : scanOption"
-              *ngFor="let scanOption of scansSharedCollection; trackBy: trackScanById"
-            >
-              {{ scanOption.name }}
-            </option>
-          </select>
+            <option [ngValue]="scanOption.id" *ngFor="let scanOption of scans; trackBy: trackById">{{ scanOption.name }}</option>
+        </select>
         </div>
       </div>
 

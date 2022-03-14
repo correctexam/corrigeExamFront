@@ -1,13 +1,11 @@
-import { IStudentResponse } from 'app/entities/student-response/student-response.model';
-
 export interface IComments {
   id?: number;
-  jsonData?: string | null;
-  studentResponse?: IStudentResponse | null;
+  jsonData?: string;
+  studentResponseId?: number;
 }
 
 export class Comments implements IComments {
-  constructor(public id?: number, public jsonData?: string | null, public studentResponse?: IStudentResponse | null) {}
+  constructor(public id?: number, public jsonData?: string, public studentResponseId?: number) {}
 }
 
 export function getCommentsIdentifier(comments: IComments): number | undefined {

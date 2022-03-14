@@ -21,7 +21,7 @@ export class ExamSheetService {
   }
 
   update(examSheet: IExamSheet): Observable<EntityResponseType> {
-    return this.http.put<IExamSheet>(`${this.resourceUrl}/${getExamSheetIdentifier(examSheet) as number}`, examSheet, {
+    return this.http.put<IExamSheet>(`${this.resourceUrl}`, examSheet, {
       observe: 'response',
     });
   }

@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+/* eslint-disable arrow-body-style */
+/* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize, map } from 'rxjs/operators';
+import {  map } from 'rxjs/operators';
 
 import { IQuestion, Question } from '../question.model';
 import { QuestionService } from '../service/question.service';
@@ -14,24 +17,26 @@ import { QuestionTypeService } from 'app/entities/question-type/service/question
 import { IExam } from 'app/entities/exam/exam.model';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 
+
+type SelectableEntity = IZone | IQuestionType | IExam;
+
 @Component({
   selector: 'jhi-question-update',
   templateUrl: './question-update.component.html',
 })
 export class QuestionUpdateComponent implements OnInit {
   isSaving = false;
-
-  zonesCollection: IZone[] = [];
-  questionTypesSharedCollection: IQuestionType[] = [];
-  examsSharedCollection: IExam[] = [];
+  zones: IZone[] = [];
+  questiontypes: IQuestionType[] = [];
+  exams: IExam[] = [];
 
   editForm = this.fb.group({
     id: [],
     numero: [null, [Validators.required]],
     point: [],
-    zone: [],
-    type: [],
-    exam: [],
+    zoneId: [],
+    typeId: [],
+    examId: [],
   });
 
   constructor(
@@ -40,14 +45,49 @@ export class QuestionUpdateComponent implements OnInit {
     protected questionTypeService: QuestionTypeService,
     protected examService: ExamService,
     protected activatedRoute: ActivatedRoute,
-    protected fb: FormBuilder
+    private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ question }) => {
       this.updateForm(question);
 
-      this.loadRelationshipsOptions();
+      this.zoneService
+        .query({ filter: 'question-is-null' })
+        .pipe(
+          map((res: HttpResponse<IZone[]>) => {
+            return res.body || [];
+          })
+        )
+        .subscribe((resBody: IZone[]) => {
+          if (!question.zoneId) {
+            this.zones = resBody;
+          } else {
+            this.zoneService
+              .find(question.zoneId)
+              .pipe(
+                map((subRes: HttpResponse<IZone>) => {
+                  return subRes.body ? [subRes.body].concat(resBody) : resBody;
+                })
+              )
+              .subscribe((concatRes: IZone[]) => (this.zones = concatRes));
+          }
+        });
+
+      this.questionTypeService.query().subscribe((res: HttpResponse<IQuestionType[]>) => (this.questiontypes = res.body || []));
+
+      this.examService.query().subscribe((res: HttpResponse<IExam[]>) => (this.exams = res.body || []));
+    });
+  }
+
+  updateForm(question: IQuestion): void {
+    this.editForm.patchValue({
+      id: question.id,
+      numero: question.numero,
+      point: question.point,
+      zoneId: question.zoneId,
+      typeId: question.typeId,
+      examId: question.examId,
     });
   }
 
@@ -65,88 +105,35 @@ export class QuestionUpdateComponent implements OnInit {
     }
   }
 
-  trackZoneById(index: number, item: IZone): number {
-    return item.id!;
-  }
-
-  trackQuestionTypeById(index: number, item: IQuestionType): number {
-    return item.id!;
-  }
-
-  trackExamById(index: number, item: IExam): number {
-    return item.id!;
-  }
-
-  protected subscribeToSaveResponse(result: Observable<HttpResponse<IQuestion>>): void {
-    result.pipe(finalize(() => this.onSaveFinalize())).subscribe({
-      next: () => this.onSaveSuccess(),
-      error: () => this.onSaveError(),
-    });
-  }
-
-  protected onSaveSuccess(): void {
-    this.previousState();
-  }
-
-  protected onSaveError(): void {
-    // Api for inheritance.
-  }
-
-  protected onSaveFinalize(): void {
-    this.isSaving = false;
-  }
-
-  protected updateForm(question: IQuestion): void {
-    this.editForm.patchValue({
-      id: question.id,
-      numero: question.numero,
-      point: question.point,
-      zone: question.zone,
-      type: question.type,
-      exam: question.exam,
-    });
-
-    this.zonesCollection = this.zoneService.addZoneToCollectionIfMissing(this.zonesCollection, question.zone);
-    this.questionTypesSharedCollection = this.questionTypeService.addQuestionTypeToCollectionIfMissing(
-      this.questionTypesSharedCollection,
-      question.type
-    );
-    this.examsSharedCollection = this.examService.addExamToCollectionIfMissing(this.examsSharedCollection, question.exam);
-  }
-
-  protected loadRelationshipsOptions(): void {
-    this.zoneService
-      .query({ filter: 'question-is-null' })
-      .pipe(map((res: HttpResponse<IZone[]>) => res.body ?? []))
-      .pipe(map((zones: IZone[]) => this.zoneService.addZoneToCollectionIfMissing(zones, this.editForm.get('zone')!.value)))
-      .subscribe((zones: IZone[]) => (this.zonesCollection = zones));
-
-    this.questionTypeService
-      .query()
-      .pipe(map((res: HttpResponse<IQuestionType[]>) => res.body ?? []))
-      .pipe(
-        map((questionTypes: IQuestionType[]) =>
-          this.questionTypeService.addQuestionTypeToCollectionIfMissing(questionTypes, this.editForm.get('type')!.value)
-        )
-      )
-      .subscribe((questionTypes: IQuestionType[]) => (this.questionTypesSharedCollection = questionTypes));
-
-    this.examService
-      .query()
-      .pipe(map((res: HttpResponse<IExam[]>) => res.body ?? []))
-      .pipe(map((exams: IExam[]) => this.examService.addExamToCollectionIfMissing(exams, this.editForm.get('exam')!.value)))
-      .subscribe((exams: IExam[]) => (this.examsSharedCollection = exams));
-  }
-
-  protected createFromForm(): IQuestion {
+  private createFromForm(): IQuestion {
     return {
       ...new Question(),
       id: this.editForm.get(['id'])!.value,
       numero: this.editForm.get(['numero'])!.value,
       point: this.editForm.get(['point'])!.value,
-      zone: this.editForm.get(['zone'])!.value,
-      type: this.editForm.get(['type'])!.value,
-      exam: this.editForm.get(['exam'])!.value,
+      zoneId: this.editForm.get(['zoneId'])!.value,
+      typeId: this.editForm.get(['typeId'])!.value,
+      examId: this.editForm.get(['examId'])!.value,
     };
+  }
+
+  protected subscribeToSaveResponse(result: Observable<HttpResponse<IQuestion>>): void {
+    result.subscribe(
+      () => this.onSaveSuccess(),
+      () => this.onSaveError()
+    );
+  }
+
+  protected onSaveSuccess(): void {
+    this.isSaving = false;
+    this.previousState();
+  }
+
+  protected onSaveError(): void {
+    this.isSaving = false;
+  }
+
+  trackById(index: number, item: SelectableEntity): any {
+    return item.id;
   }
 }
