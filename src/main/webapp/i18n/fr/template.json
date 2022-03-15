@@ -2,25 +2,25 @@
   "gradeScopeIsticApp": {
     "template": {
       "home": {
-        "title": "Templates",
+        "title": "Modèles d'examen",
         "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Template",
-        "createOrEditLabel": "Créer ou éditer un Template",
-        "notFound": "Aucun Template trouvé"
+        "createLabel": "Créer un nouveau modèle d'examen",
+        "createOrEditLabel": "Créer ou éditer un modèle d'examen",
+        "notFound": "Aucun modèle d'examen trouvé"
       },
-      "created": "Un nouveau Template a été créé avec l'identifiant {{ param }}",
-      "updated": "Le Template avec l'identifiant {{ param }} a été mis à jour",
-      "deleted": "Le Template avec l'identifiant {{ param }} a été supprimé",
+      "created": "Un nouveau modèle d'examen a été créé avec l'identifiant {{ param }}",
+      "updated": "Le modèle d'examen avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le modèle d'examen avec l'identifiant {{ param }} a été supprimé",
       "delete": {
-        "question": "Etes-vous certain de vouloir supprimer le Template {{ id }} ?"
+        "question": "Etes-vous certain de vouloir supprimer le modèle d'examen {{ id }} ?"
       },
       "detail": {
-        "title": "Template"
+        "title": "Modèle d'examen"
       },
       "id": "ID",
-      "name": "Name",
-      "content": "Content",
-      "exam": "Exam"
+      "name": "Nom",
+      "content": "Contenu",
+      "exam": "Examen"
     }
   }
 }

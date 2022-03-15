@@ -2,31 +2,31 @@
   "gradeScopeIsticApp": {
     "exam": {
       "home": {
-        "title": "Exams",
+        "title": "Examens",
         "refreshListLabel": "Actualiser la liste",
-        "createLabel": "Créer un nouveau Exam",
-        "createOrEditLabel": "Créer ou éditer un Exam",
-        "notFound": "Aucun Exam trouvé"
+        "createLabel": "Créer un nouvel Examen",
+        "createOrEditLabel": "Créer ou éditer un Examen",
+        "notFound": "Aucun Examen trouvé"
       },
-      "created": "Un nouveau Exam a été créé avec l'identifiant {{ param }}",
-      "updated": "Le Exam avec l'identifiant {{ param }} a été mis à jour",
-      "deleted": "Le Exam avec l'identifiant {{ param }} a été supprimé",
+      "created": "Un nouvel Examen a été créé avec l'identifiant {{ param }}",
+      "updated": "L'Examen avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "L'Examens avec l'identifiant {{ param }} a été supprimé",
       "delete": {
         "question": "Etes-vous certain de vouloir supprimer le Exam {{ id }} ?"
       },
       "detail": {
-        "title": "Exam"
+        "title": "Examen"
       },
-      "id": "ID",
-      "name": "Name",
-      "template": "Template",
+      "id": "Id",
+      "name": "Nom de l'examen",
+      "template": "Modèle d'examen",
       "idzone": "Idzone",
-      "namezone": "Namezone",
-      "firstnamezone": "Firstnamezone",
-      "notezone": "Notezone",
-      "scanfile": "Scanfile",
+      "namezone": "Zone du nom",
+      "firstnamezone": "Zone du prénom",
+      "notezone": "Zone de la note",
+      "scanfile": "Fichier étudiants scanné",
       "question": "Question",
-      "course": "Course"
+      "course": "Cours"
     }
   }
 }

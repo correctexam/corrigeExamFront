@@ -1,0 +1,119 @@
+
+
+
+<div  class="grid">
+  <p-toast></p-toast>
+  <p-blockUI [blocked]="blocked">
+    <i class="pi pi-lock" style="font-size: 3rem"></i>
+</p-blockUI>
+
+
+  <div class="col-8">
+    <div  class="grid grid-nogutter">
+      <div class="col-8">
+            <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">
+              Créer un examen pour le cours {{coursName}}
+            </h2>
+            </div>
+          <div class="col-4  flex flex-row-reverse">
+
+
+          <button
+          [disabled]="!this.courseid"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="btn btn-primary"
+          (click)="gotoUE()"
+        >
+        <fa-icon icon="check"></fa-icon>&nbsp;<span >Retourner au module</span>
+        </button>
+
+          </div>
+
+        </div>
+        <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+
+
+          <div class="col-12 md:col-12">
+
+              <div class="row mb-3">
+                <label class="form-label" jhiTranslate="gradeScopeIsticApp.exam.name" for="field_name">Name</label>
+                <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" />
+                <div *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
+                  <small class="form-text text-danger" *ngIf="editForm.get('name')?.errors?.required" jhiTranslate="entity.validation.required">
+                    This field is required.
+                  </small>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="form-label" jhiTranslate="gradeScopeIsticApp.template.content" for="field_content">Content</label>
+                <div>
+                  <div *ngIf="editForm.get('content')!.value" class="form-text text-danger clearfix">
+                    <a
+                      class="pull-start"
+                      (click)="openFile(editForm.get('content')!.value, editForm.get('contentContentType')!.value)"
+                      jhiTranslate="entity.action.open"
+                      >open</a
+                    ><br />
+                    <span class="pull-start"
+                      >{{ editForm.get('contentContentType')!.value }}, {{ byteSize(editForm.get('content')!.value) }}</span
+                    >
+                    <button
+                      type="button"
+                      (click)="editForm.patchValue({ content: null }); editForm.patchValue({ contentContentType: null })"
+                      class="btn btn-secondary btn-xs pull-end"
+                    >
+                      <fa-icon icon="times"></fa-icon>
+                    </button>
+                  </div>
+                  <input
+                    type="file"
+                    id="file_content"
+                    data-cy="content"
+                    (change)="setFileData($event, 'content', false)"
+                    jhiTranslate="entity.action.addblob"
+                  />
+                </div>
+                <input type="hidden" class="form-control" name="content" id="field_content" data-cy="content" formControlName="content" />
+                <input
+                  type="hidden"
+                  class="form-control"
+                  name="contentContentType"
+                  id="field_contentContentType"
+                  formControlName="contentContentType"
+                />
+              </div>
+
+
+              <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="gotoUE()">
+                <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+              </button>
+
+              <button
+                type="submit"
+                id="save-entity"
+                data-cy="entityCreateSaveButton"
+                [disabled]="editForm.invalid || isSaving"
+                class="btn btn-primary"
+              >
+                <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+              </button>
+
+
+            </div>
+
+      </form>
+  </div>
+  <div class="col-4 md:col-4 overflow-hidden">
+    <img
+      src="/content/images/piqsels.com-id-frfkz.jpg"
+      alt="Image"
+      class="md:ml-auto block md:h-full"
+      style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
+    />
+  </div>
+  </div>
+
+

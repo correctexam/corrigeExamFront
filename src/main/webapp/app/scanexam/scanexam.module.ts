@@ -21,6 +21,7 @@ import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {TableModule} from 'primeng/table';
 import { SharedModule } from 'app/shared/shared.module';
 import { Route, RouterModule } from '@angular/router';
+import { CreerexamComponent } from './creerexam/creerexam.component';
 
 
 registerAllModules();
@@ -61,9 +62,18 @@ export const LISTESTUDENT_ROUTE: Route = {
   },
 };
 
+export const CREEREXAM_ROUTE: Route = {
+  path: 'creerexam/:courseid',
+  component: CreerexamComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.creercours',
+  },
+};
+
 
 @NgModule({
-  declarations: [ MesCoursComponent,CreercoursComponent,CoursdetailsComponent,ImportStudentComponent,ListstudentcourseComponent],
+  declarations: [ MesCoursComponent,CreercoursComponent,CoursdetailsComponent,ImportStudentComponent,ListstudentcourseComponent, CreerexamComponent],
   imports: [
     CommonModule,
     BrowserAnimationsModule,ButtonModule,
@@ -73,7 +83,7 @@ export const LISTESTUDENT_ROUTE: Route = {
     HotTableModule,
     TableModule,
     ConfirmDialogModule,
-    RouterModule.forChild([CREERCOURS_ROUTE,COURSMAIN_ROUTE,REGISTERSTUDENT_ROUTE,LISTESTUDENT_ROUTE ])
+    RouterModule.forChild([CREERCOURS_ROUTE,COURSMAIN_ROUTE,REGISTERSTUDENT_ROUTE,LISTESTUDENT_ROUTE,CREEREXAM_ROUTE ])
   ],
   exports:[ MesCoursComponent,CreercoursComponent,CoursdetailsComponent,ImportStudentComponent,ListstudentcourseComponent]
 })

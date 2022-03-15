@@ -2,26 +2,26 @@
   "gradeScopeIsticApp": {
     "course": {
       "home": {
-        "title": "Courses",
+        "title": "Cours",
         "refreshListLabel": "Actualiser la liste",
         "createLabel": "Créer un nouveau Course",
-        "createOrEditLabel": "Créer ou éditer un Course",
-        "notFound": "Aucun Course trouvé"
+        "createOrEditLabel": "Créer ou éditer un Cours",
+        "notFound": "Aucun Cours trouvé"
       },
-      "created": "Un nouveau Course a été créé avec l'identifiant {{ param }}",
-      "updated": "Le Course avec l'identifiant {{ param }} a été mis à jour",
-      "deleted": "Le Course avec l'identifiant {{ param }} a été supprimé",
+      "created": "Un nouveau Cours a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Cours avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Cours avec l'identifiant {{ param }} a été supprimé",
       "delete": {
-        "question": "Etes-vous certain de vouloir supprimer le Course {{ id }} ?"
+        "question": "Etes-vous certain de vouloir supprimer le Cours {{ id }} ?"
       },
       "detail": {
-        "title": "Course"
+        "title": "Cours"
       },
-      "id": "ID",
-      "name": "Name",
-      "exam": "Exam",
-      "groups": "Groups",
-      "prof": "Prof"
+      "id": "Id",
+      "name": "Nom du cours",
+      "exam": "Examen",
+      "groups": "groupe d'étudiants",
+      "prof": "Professeur"
     }
   }
 }
