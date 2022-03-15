@@ -1,0 +1,485 @@
+.p-tooltip > .p-tooltip-text {
+  width: 600px !important;
+}
+.ui-tooltip > .ui-tooltip-text {
+  width: 600px !important;
+}
+.ui-tooltip {
+  width: 600px !important;
+}
+.ui-tooltip-text {
+  width: 600px !important;
+}
+
+.tooltip {
+  width: 600px !important;
+}
+
+body {
+  margin: 0;
+}
+
+.switch1 {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch1 input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider1 {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.slider1:before {
+  position: absolute;
+  content: '';
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked + .slider1 {
+  background-color: #2196f3;
+}
+
+input:focus + .slider1 {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+input:checked + .slider1:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider1.round {
+  border-radius: 34px;
+}
+
+.slider1.round:before {
+  border-radius: 50%;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 25px;
+  border-radius: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: 0.2s;
+  transition: opacity 0.2s;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #2196f3;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #4caf50;
+  cursor: pointer;
+}
+
+.page-content {
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  display: -webkit-flex;
+  justify-content: center;
+  -o-justify-content: center;
+  -ms-justify-content: center;
+  -moz-justify-content: center;
+  -webkit-justify-content: center;
+  align-items: center;
+  -o-align-items: center;
+  -ms-align-items: center;
+  -moz-align-items: center;
+  -webkit-align-items: center;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  -o-background-size: cover;
+  -ms-background-size: cover;
+  -moz-background-size: cover;
+  -webkit-background-size: cover;
+}
+.wizard-v2-content {
+  background: #fff;
+  width: 100%;
+  box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
+  -o-box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
+  -ms-box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
+  -webkit-box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  -o-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  margin: 10px 0;
+  font-family: 'Muli', sans-serif;
+  position: relative;
+  display: flex;
+  display: -webkit-flex;
+}
+
+.wizard-v2-content .wizard-image {
+  background: url('/content/images/scholar.svg') center center no-repeat;
+  width: 33.31%;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  background-size: cover;
+  -o-background-size: cover;
+  -ms-background-size: cover;
+  -moz-background-size: cover;
+  -webkit-background-size: cover;
+}
+.wizard-v2-content .wizard-form {
+  width: 100%;
+  padding: 40px 73px 40px 52px;
+}
+.wizard-form .wizard-header h3 {
+  color: #333;
+  font-size: 36px;
+  font-weight: 800;
+  margin: 0;
+}
+.wizard-form .wizard-header p {
+  color: #666;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 6px 0 26px;
+}
+.form-register .steps {
+  margin-bottom: 36px;
+}
+.form-register .steps ul {
+  display: flex;
+  display: -webkit-flex;
+  list-style: none;
+  padding-left: 0;
+}
+.form-register .steps li,
+.form-register .steps li.current {
+  outline: none;
+  -o-outline: none;
+  -ms-outline: none;
+  -moz-outline: none;
+  -webkit-outline: none;
+}
+.form-register .steps li a {
+  display: inline-block;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  -o-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  background: #ccc;
+  margin-right: 30px;
+  position: relative;
+  outline: none;
+}
+.form-register .steps li a::before {
+  position: absolute;
+  content: '';
+  background: #e5e5e5;
+  width: 30px;
+  height: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+  left: 100%;
+}
+.form-register .steps li.last a::before {
+  content: none;
+}
+.form-register .steps li.current a,
+.form-register .steps li.current a:active,
+.form-register .steps li.done a::before,
+.form-register .steps li.done a,
+.form-register .steps li.done a:active {
+  background: #56a3f2;
+}
+.form-register .steps li .current-info {
+  display: none;
+}
+.form-register .steps li .title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  font-family: 'Muli', sans-serif;
+}
+.form-register .content h2 {
+  display: none;
+}
+.inner .form-row {
+  display: flex;
+  margin: 0 -10px;
+  position: relative;
+}
+.inner .form-row .form-holder {
+  width: 50%;
+  padding: 0 10px;
+  margin-bottom: 20px;
+  position: relative;
+}
+.inner .form-row .form-holder.form-holder-2 {
+  width: 100%;
+  position: relative;
+}
+.inner .form-row .form-holder input,
+.inner .form-row .form-holder select {
+  width: 100%;
+  padding: 14px 15px;
+  border: 1px solid #e5e5e5;
+  border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  appearance: unset;
+  -moz-appearance: unset;
+  -webkit-appearance: unset;
+  -o-appearance: unset;
+  -ms-appearance: unset;
+  outline: none;
+  -moz-outline: none;
+  -webkit-outline: none;
+  -o-outline: none;
+  -ms-outline: none;
+  font-family: 'Muli', sans-serif;
+  font-size: 16px;
+  color: #333;
+  font-weight: 600;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+}
+.inner .form-row .form-holder input::-webkit-input-placeholder {
+  color: #666;
+  font-size: 16px;
+}
+.inner .form-row .form-holder input::-moz-placeholder {
+  color: #666;
+  font-size: 16px;
+}
+.inner .form-row .form-holder input:-ms-input-placeholder {
+  color: #666;
+  font-size: 16px;
+}
+.inner .form-row .form-holder input:-moz-placeholder {
+  color: #666;
+  font-size: 16px;
+}
+.inner .form-row .form-holder select {
+  background: 0 0;
+  z-index: 1;
+  cursor: pointer;
+  color: #666;
+  position: relative;
+}
+.inner .form-row .form-holder .select-btn {
+  z-index: 0;
+  position: absolute;
+  top: 27.5%;
+  right: 12.5%;
+  font-size: 19px;
+  cursor: pointer;
+  color: #666;
+}
+.inner .form-row .form-holder.form-holder-2 .select-btn {
+  top: 27%;
+  right: 6.5%;
+}
+.inner .form-row .form-holder .ui-datepicker-trigger {
+  background: transparent;
+  border: none;
+  color: #666;
+  font-size: 19px;
+  position: absolute;
+  cursor: pointer;
+  right: 10.5%;
+  top: 27.5%;
+  outline: none;
+  -o-outline: none;
+  -ms-outline: none;
+  -moz-outline: none;
+  -webkit-outline: none;
+}
+.inner .form-row.table-responsive {
+  border: 1px solid #e5e5e5;
+  border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  padding: 22px 26px 16px;
+  margin: 0;
+  margin-bottom: 35px;
+}
+.inner .table-responsive .table {
+  width: 100%;
+}
+.inner .table-responsive tbody {
+  text-align: left;
+}
+.inner .table-responsive tr.space-row > td,
+.inner .table-responsive tr.space-row > th {
+  padding-bottom: 18px;
+}
+.inner .table-responsive tbody th {
+  color: #666;
+  font-size: 15px;
+  font-weight: 600;
+}
+.inner .table-responsive tbody td {
+  color: #333;
+  font-size: 18px;
+  font-weight: 700;
+}
+.actions ul {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 15px;
+}
+.actions ul li.disabled,
+.actions ul li:first-child {
+  display: none;
+}
+.actions ul li {
+  padding: 0;
+  border: none;
+  border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  display: inline-flex;
+  height: 50px;
+  width: 250px;
+  justify-content: center;
+  -o-justify-content: center;
+  -ms-justify-content: center;
+  -moz-justify-content: center;
+  -webkit-justify-content: center;
+  -o-align-items: center;
+  -ms-align-items: center;
+  -moz-align-items: center;
+  -webkit-align-items: center;
+  align-items: center;
+  background: #56a3f2;
+  font-family: 'Muli', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.actions ul li:hover {
+  background: #4582bf;
+}
+.actions ul li a {
+  color: #fff;
+  text-decoration: none;
+  padding: 15px 42px;
+}
+
+/* Responsive */
+@media screen and (max-width: 1199px) {
+  .wizard-v2-content {
+    // margin: 180px 20px;
+  }
+  .wizard-v2-content .wizard-form {
+    padding: 40px;
+  }
+}
+@media screen and (max-width: 991px) {
+  .inner .form-row {
+    flex-direction: column;
+    -o-flex-direction: column;
+    -ms-flex-direction: column;
+    -moz-flex-direction: column;
+    -webkit-flex-direction: column;
+    margin: 0;
+  }
+  .inner .form-row .form-holder {
+    padding: 0;
+    width: 100%;
+  }
+  .inner .form-row .form-holder .ui-datepicker-trigger {
+    right: 5%;
+  }
+  .inner .form-row .form-holder .select-btn {
+    right: 6%;
+  }
+}
+@media screen and (max-width: 575px) {
+  .wizard-v2-content .wizard-form {
+    padding: 40px 20px;
+    width: auto;
+  }
+  .wizard-v2-content .wizard-image {
+    display: none;
+  }
+  .inner .form-row .form-holder .ui-datepicker-trigger {
+    right: 0;
+  }
+  .inner .form-row .form-holder .select-btn {
+    right: 6.5%;
+  }
+  .inner .table-responsive tr.space-row,
+  .inner .table-responsive tbody th {
+    display: block;
+  }
+  .inner .table-responsive tr.space-row > th {
+    padding-bottom: 10px;
+  }
+  .inner .table-responsive tr.space-row > td {
+    padding-bottom: 30px;
+  }
+}
+.treetableDate .ui-widget-content {
+  width: 100%; // or in pixel depends how much width you want.
+}

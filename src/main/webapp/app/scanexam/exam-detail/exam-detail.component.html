@@ -12,25 +12,24 @@
     <div class="wizard-image"></div>
     <div class="wizard-form">
       <div class="wizard-header">
-        <h3>{{ course?.name }}</h3>
+        <h3>{{ exam?.name }}</h3>
         <p>Vos exams accessible en un clic</p>
       </div>
       <div id="form-total" #formTotal>
         <div class="inner" [style]="{ 'text-align': 'center' }">
           <button
-            *ngFor="let exam of exams"
+            [routerLink]="'/exam/annotate/' + this.examId"
             [style]="{ width: '20em', marginBottom: '1em', margin: '1em' }"
             class="p-element p-ripple"
             pButton
             pRipple
             type="button"
-            [routerLink]="'/exam/' + exam.id"
           >
             <fa-stack>
               <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
               <fa-icon [icon]="faBookOpenReader" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
             ><BR />
-            <span>{{ exam.name }}</span>
+            <span>Annoter template</span>
           </button>
         </div>
       </div>

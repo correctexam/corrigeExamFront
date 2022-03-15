@@ -7,25 +7,25 @@ import { CoursdetailsComponent } from './coursdetail/coursdetails.component';
 import { ImportStudentComponent } from './import-student/import-student.component';
 import { ListstudentcourseComponent } from './liststudentcourse/liststudentcourse.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import {ButtonModule} from 'primeng/button';
-import {BlockUIModule} from 'primeng/blockui';
+import { ButtonModule } from 'primeng/button';
+import { BlockUIModule } from 'primeng/blockui';
 import { MenuModule } from 'primeng/menu';
-import {TooltipModule} from 'primeng/tooltip';
-import {DockModule} from 'primeng/dock';
+import { TooltipModule } from 'primeng/tooltip';
+import { DockModule } from 'primeng/dock';
 import { HotTableModule } from '@handsontable/angular';
 import { registerAllModules } from 'handsontable/registry';
-import {SliderModule} from 'primeng/slider';
-import {ToastModule} from 'primeng/toast';
+import { SliderModule } from 'primeng/slider';
+import { ToastModule } from 'primeng/toast';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {ConfirmDialogModule} from 'primeng/confirmdialog';
-import {TableModule} from 'primeng/table';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TableModule } from 'primeng/table';
 import { SharedModule } from 'app/shared/shared.module';
 import { Route, RouterModule } from '@angular/router';
 import { CreerexamComponent } from './creerexam/creerexam.component';
-
+import { ExamDetailComponent } from './exam-detail/exam-detail.component';
+import { AnnotateTemplateComponent } from './annotate-template/annotate-template.component';
 
 registerAllModules();
-
 
 export const COURSMAIN_ROUTE: Route = {
   path: 'course/:courseid',
@@ -71,20 +71,60 @@ export const CREEREXAM_ROUTE: Route = {
   },
 };
 
+export const EXAMDETAIL_ROUTE: Route = {
+  path: 'exam/:examid',
+  component: ExamDetailComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.creercours',
+  },
+};
+
+export const ANNOTATETEMPLATE_ROUTE: Route = {
+  path: 'exam/annotate/:examid',
+  component: AnnotateTemplateComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.creercours',
+  },
+};
 
 @NgModule({
-  declarations: [ MesCoursComponent,CreercoursComponent,CoursdetailsComponent,ImportStudentComponent,ListstudentcourseComponent, CreerexamComponent],
+  declarations: [
+    MesCoursComponent,
+    CreercoursComponent,
+    CoursdetailsComponent,
+    ImportStudentComponent,
+    ListstudentcourseComponent,
+    CreerexamComponent,
+    ExamDetailComponent,
+    AnnotateTemplateComponent,
+  ],
   imports: [
     CommonModule,
-    BrowserAnimationsModule,ButtonModule,
-    SharedModule, FontAwesomeModule, BlockUIModule, MenuModule, DockModule, TooltipModule,
+    BrowserAnimationsModule,
+    ButtonModule,
+    SharedModule,
+    FontAwesomeModule,
+    BlockUIModule,
+    MenuModule,
+    DockModule,
+    TooltipModule,
     ToastModule,
     SliderModule,
     HotTableModule,
     TableModule,
     ConfirmDialogModule,
-    RouterModule.forChild([CREERCOURS_ROUTE,COURSMAIN_ROUTE,REGISTERSTUDENT_ROUTE,LISTESTUDENT_ROUTE,CREEREXAM_ROUTE ])
+    RouterModule.forChild([
+      CREERCOURS_ROUTE,
+      COURSMAIN_ROUTE,
+      REGISTERSTUDENT_ROUTE,
+      LISTESTUDENT_ROUTE,
+      CREEREXAM_ROUTE,
+      EXAMDETAIL_ROUTE,
+      ANNOTATETEMPLATE_ROUTE,
+    ]),
   ],
-  exports:[ MesCoursComponent,CreercoursComponent,CoursdetailsComponent,ImportStudentComponent,ListstudentcourseComponent]
+  exports: [MesCoursComponent, CreercoursComponent, CoursdetailsComponent, ImportStudentComponent, ListstudentcourseComponent],
 })
-export class ScanexamModule { }
+export class ScanexamModule {}
