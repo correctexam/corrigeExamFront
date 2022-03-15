@@ -9,7 +9,7 @@ import { CourseService } from 'app/entities/course/service/course.service';
 import { IUser } from 'app/entities/user/user.model';
 import { UserService } from 'app/entities/user/user.service';
 import { finalize, Observable } from 'rxjs';
-import { AccountService } from '../core/auth/account.service';
+import { AccountService } from '../../core/auth/account.service';
 
 
 @Component({

@@ -9,10 +9,10 @@ import {  faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 import {  faMotorcycle as fasMotorcycle } from '@fortawesome/free-solid-svg-icons';
 import {  faGraduationCap as faGraduationCap } from '@fortawesome/free-solid-svg-icons';
 import {  faBookOpenReader as faBookOpenReader } from '@fortawesome/free-solid-svg-icons';
-import { CourseService } from '../entities/course/service/course.service';
-import { ICourse } from '../entities/course/course.model';
-import { IExam } from '../entities/exam/exam.model';
-import { ExamService } from '../entities/exam/service/exam.service';
+import { CourseService } from '../../entities/course/service/course.service';
+import { ICourse } from '../../entities/course/course.model';
+import { IExam } from '../../entities/exam/exam.model';
+import { ExamService } from '../../entities/exam/service/exam.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 

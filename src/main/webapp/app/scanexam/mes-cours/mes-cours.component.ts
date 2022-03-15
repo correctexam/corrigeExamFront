@@ -6,13 +6,14 @@ import { Component, OnInit } from '@angular/core';
 import {  faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 import {  faMotorcycle as fasMotorcycle } from '@fortawesome/free-solid-svg-icons';
 import {  faGraduationCap as faGraduationCap } from '@fortawesome/free-solid-svg-icons';
-import { CourseService } from '../entities/course/service/course.service';
-import { ICourse } from '../entities/course/course.model';
+import { CourseService } from '../../entities/course/service/course.service';
+import { ICourse } from '../../entities/course/course.model';
 
 @Component({
   selector: 'jhi-mes-cours',
   templateUrl: './mes-cours.component.html',
-  styleUrls: ['./mes-cours.component.scss']
+  styleUrls: ['./mes-cours.component.scss'],
+  providers: [CourseService]
 })
 export class MesCoursComponent implements OnInit {
 
