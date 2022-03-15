@@ -25,6 +25,17 @@ import { CreerexamComponent } from './creerexam/creerexam.component';
 import { ExamDetailComponent } from './exam-detail/exam-detail.component';
 import { AnnotateTemplateComponent } from './annotate-template/annotate-template.component';
 
+import { PaintComponent } from './annotate-template/paint/paint.component';
+import { GraphicalToolbarComponent } from './annotate-template/paint/toolbar/toolbar.component';
+import { FormsModule } from '@angular/forms';
+import { EventHandlerService } from './annotate-template/paint/event-handler.service';
+import { FabricShapeService } from './annotate-template/paint/shape.service';
+import { ColourPaletteComponent } from './annotate-template/paint/toolbar/colour-palette/colour-palette.component';
+import { FabricCanvasComponent } from './annotate-template/paint/fabric-canvas/fabric-canvas.component';
+import { ThicknessSliderComponent } from './annotate-template/paint/toolbar/thickness-slider/thickness-slider.component';
+
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+
 registerAllModules();
 
 export const COURSMAIN_ROUTE: Route = {
@@ -99,6 +110,11 @@ export const ANNOTATETEMPLATE_ROUTE: Route = {
     CreerexamComponent,
     ExamDetailComponent,
     AnnotateTemplateComponent,
+    PaintComponent,
+    GraphicalToolbarComponent,
+    ColourPaletteComponent,
+    FabricCanvasComponent,
+    ThicknessSliderComponent,
   ],
   imports: [
     CommonModule,
@@ -115,6 +131,9 @@ export const ANNOTATETEMPLATE_ROUTE: Route = {
     HotTableModule,
     TableModule,
     ConfirmDialogModule,
+    FormsModule,
+    NgxExtendedPdfViewerModule,
+
     RouterModule.forChild([
       CREERCOURS_ROUTE,
       COURSMAIN_ROUTE,
@@ -126,5 +145,6 @@ export const ANNOTATETEMPLATE_ROUTE: Route = {
     ]),
   ],
   exports: [MesCoursComponent, CreercoursComponent, CoursdetailsComponent, ImportStudentComponent, ListstudentcourseComponent],
+  providers: [EventHandlerService, FabricShapeService],
 })
 export class ScanexamModule {}

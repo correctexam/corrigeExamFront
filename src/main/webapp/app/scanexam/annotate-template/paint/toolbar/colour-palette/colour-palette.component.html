@@ -1,0 +1,9 @@
+<div class="d-flex container">
+  <div
+    *ngFor="let colour of colours; index as i"
+    [ngStyle]="{ 'background-color': colour }"
+    [ngClass]="{ selected: colour === selectedColour }"
+    class="colour-picker ml-1 mb-1"
+    (click)="onSelect(colour)"
+  ></div>
+</div>

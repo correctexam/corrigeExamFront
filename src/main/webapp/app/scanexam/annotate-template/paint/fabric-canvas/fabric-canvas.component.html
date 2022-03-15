@@ -1,0 +1,21 @@
+<div class="canvas-wrapper">
+  <ngx-extended-pdf-viewer
+    [base64Src]="content"
+    [useBrowserLocale]="true"
+    style="flex: 1 1 100%"
+    #viewer
+    [useBrowserLocale]="true"
+    [height]="'100vh'"
+    [page]="1"
+    [handTool]="false"
+    [showHandToolButton]="false"
+    [textLayer]="false"
+    [(scrollMode)]="scrollMode"
+    [handTool]="false"
+    [showToolbar]="false"
+    [pageViewMode]="'infinite-scroll'"
+    [showSecondaryToolbarButton]="false"
+    (pageRendered)="pageRendered($event)"
+    backgroundColor="#ffffff"
+  ></ngx-extended-pdf-viewer>
+</div>

@@ -1,0 +1,14 @@
+.container {
+  width: 100%;
+}
+
+.colour-picker {
+  width: 20px;
+  height: 20px;
+  border: 1px solid lightgrey;
+  cursor: pointer;
+}
+
+.selected {
+  outline: 2px solid black;
+}

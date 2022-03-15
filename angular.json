@@ -35,6 +35,11 @@
               "src/main/webapp/manifest.webapp",
               "src/main/webapp/robots.txt",
               {
+                "glob": "**/*",
+                "input": "node_modules/ngx-extended-pdf-viewer/assets/",
+                "output": "/assets/"
+              },
+              {
                 "glob": "*.{js,css,html,png}",
                 "input": "./node_modules/swagger-ui-dist",
                 "output": "swagger-ui",
@@ -49,7 +54,8 @@
               "node_modules/primeicons/primeicons.css",
               "node_modules/handsontable/dist/handsontable.full.css",
               "src/main/webapp/content/scss/vendor.scss",
-              "src/main/webapp/content/scss/global.scss"],
+              "src/main/webapp/content/scss/global.scss"
+            ],
             "scripts": []
           },
           "configurations": {
