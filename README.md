@@ -1,6 +1,8 @@
 # gradeScopeIstic
 
-This application was generated using JHipster 7.7.0, you can find documentation and help at [https://www.jhipster.tech](https://www.jhipster.tech).
+This application front was generated using JHipster 7.7.0, you can find documentation and help at [https://www.jhipster.tech](https://www.jhipster.tech).
+
+Note on the project could be found [here](https://hackmd.diverse-team.fr/s/HkFi-Um-c)
 
 ## Project Structure
 
@@ -90,6 +92,7 @@ Edit [src/main/webapp/content/scss/vendor.scss](src/main/webapp/content/scss/ven
 Note: There are still a few other things remaining to do for Leaflet that we won't detail here.
 
 For further instructions on how to develop with JHipster, have a look at [Using JHipster in development][].
+Note on the project could be found [here](https://hackmd.diverse-team.fr/s/HkFi-Um-c)
 
 ### Using Angular CLI
 
@@ -197,7 +200,8 @@ You can use Docker to improve your JHipster development experience. A number of 
 For example, to start a postgresql database in a docker container, run:
 
 ```
-docker-compose -f src/main/docker/postgresql.yml up -d
+docker-compose -f src/main/docker/postgresql.yml up -dNote on the project could be found [here](https://hackmd.diverse-team.fr/s/HkFi-Um-c)
+
 ```
 
 To stop it and remove the container, run:
