@@ -22,7 +22,8 @@
     />
   </div>
 </div>
-<div *ngIf="account != null">
+<div  *jhiHasAnyAuthority="'ROLE_USER'">
+  <div *ngIf="!this.account?.authorities?.includes('ROLE_ADMIN')" >
   <p-dock [model]="dockItems" position="top">
     <ng-template pTemplate="item" let-item>
       <a [routerLink]="item.route"><img [src]="item.icon" [alt]="item.label" width="100%" [pTooltip]="item.title" /></a>
@@ -31,4 +32,5 @@
 
 
   <jhi-mes-cours></jhi-mes-cours>
+</div>
 </div>

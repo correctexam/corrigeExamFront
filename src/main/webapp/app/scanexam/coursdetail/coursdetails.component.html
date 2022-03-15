@@ -20,7 +20,7 @@
     <div id="form-total" #formTotal>
       <div class="inner" [style]="{'text-align':'center'}">
         <button *ngFor="let exam of exams"
-        [style]="{width: '20em', marginBottom: '1em', margin: '1em'}" class="p-element p-ripple " pButton pRipple type="button" [routerLink]="'course/'+exam.id">
+        [style]="{width: '20em', marginBottom: '1em', margin: '1em'}" class="p-element p-ripple " pButton pRipple type="button" [routerLink]="'/exam/'+exam.id">
           <fa-stack>
             <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
             <fa-icon [icon]="faBookOpenReader" stackItemSize="1x" [inverse]="false"></fa-icon>

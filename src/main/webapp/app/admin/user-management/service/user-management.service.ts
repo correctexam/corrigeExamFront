@@ -35,6 +35,6 @@ export class UserManagementService {
   }
 
   authorities(): Observable<string[]> {
-    return this.http.get<string[]>(this.applicationConfigService.getEndpointFor('api/authorities'));
+    return this.http.get<string[]>(this.applicationConfigService.getEndpointFor('api/users/authorities'));
   }
 }
