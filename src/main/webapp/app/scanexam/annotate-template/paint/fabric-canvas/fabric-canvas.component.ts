@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
@@ -8,14 +9,22 @@
 import { AfterViewInit, Component, Inject, Input, NgZone } from '@angular/core';
 import { NgxExtendedPdfViewerService, ScrollModeType } from 'ngx-extended-pdf-viewer';
 import { EventHandlerService } from '../event-handler.service';
-import { CustomFabricObject } from '../models';
+import { CustomFabricObject, DrawingTools, DrawingColours } from '../models';
 import { PageHandler } from './PageHandler';
 import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import PerfectScrollbar from 'perfect-scrollbar';
+import { IExam } from 'app/entities/exam/exam.model';
+import { ZoneService } from '../../../../entities/zone/service/zone.service';
+import { IZone } from 'app/entities/zone/zone.model';
+import { FabricShapeService } from '../shape.service';
+import { QuestionService } from '../../../../entities/question/service/question.service';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
 };
+
+export type CustomZone = IZone & { type: DrawingTools };
+
 @Component({
   selector: 'jhi-fabric-canvas',
   templateUrl: './fabric-canvas.component.html',
@@ -31,6 +40,11 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 export class FabricCanvasComponent implements AfterViewInit {
   @Input()
   content: any;
+  @Input()
+  exam!: IExam;
+  pages: { [page: number]: PageHandler } = {};
+  zones: { [page: number]: CustomZone[] } = {};
+
   title = 'gradeScopeFree';
   public scrollbar: any = undefined;
 
@@ -39,11 +53,58 @@ export class FabricCanvasComponent implements AfterViewInit {
     private eventHandler: EventHandlerService,
     private ngZone: NgZone,
     @Inject(PERFECT_SCROLLBAR_CONFIG)
-    public config: PerfectScrollbarConfigInterface
+    public config: PerfectScrollbarConfigInterface,
+    public zoneService: ZoneService,
+    public fabricShapeService: FabricShapeService,
+    public questionService: QuestionService
   ) {}
 
   public scrollMode: ScrollModeType = ScrollModeType.vertical;
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.eventHandler.exam = this.exam;
+    if (this.exam.namezoneId !== undefined) {
+      this.zoneService.find(this.exam.namezoneId!).subscribe(z => {
+        const ezone = z.body as CustomZone;
+        ezone.type = DrawingTools.NOMBOX;
+        if (!this.zones[z.body!.page!]) {
+          this.zones[ezone.page!] = [];
+        }
+        this.zones[ezone.page!].push(ezone);
+      });
+    }
+    if (this.exam.firstnamezoneId !== undefined) {
+      this.zoneService.find(this.exam.firstnamezoneId!).subscribe(z => {
+        const ezone = z.body as CustomZone;
+        ezone.type = DrawingTools.PRENOMBOX;
+        if (!this.zones[z.body!.page!]) {
+          this.zones[ezone.page!] = [];
+        }
+        this.zones[ezone.page!].push(ezone);
+      });
+    }
+    if (this.exam.idzoneId !== undefined) {
+      this.zoneService.find(this.exam.idzoneId!).subscribe(z => {
+        const ezone = z.body as CustomZone;
+        ezone.type = DrawingTools.INEBOX;
+        if (!this.zones[z.body!.page!]) {
+          this.zones[ezone.page!] = [];
+        }
+        this.zones[ezone.page!].push(ezone);
+      });
+    }
+    this.questionService.query({ examId: this.exam.id! }).subscribe(qs => {
+      qs.body?.forEach(q => {
+        this.zoneService.find(q.zoneId!).subscribe(z => {
+          const ezone = z.body as CustomZone;
+          ezone.type = DrawingTools.QUESTIONBOX;
+          if (!this.zones[z.body!.page!]) {
+            this.zones[ezone.page!] = [];
+          }
+          this.zones[ezone.page!].push(ezone);
+        });
+      });
+    });
+  }
   public ngAfterViewInit(): void {
     const container = document.querySelector('#viewerContainer');
     this.scrollbar = new PerfectScrollbar(container!, this.config);
@@ -54,8 +115,6 @@ export class FabricCanvasComponent implements AfterViewInit {
     }
   }
 
-  pages: { [page: number]: PageHandler } = {};
-
   pageRendered(evt: any) {
     const page = evt.pageNumber;
     if (!this.pages[page]) {
@@ -63,7 +122,73 @@ export class FabricCanvasComponent implements AfterViewInit {
       this.pages[page] = pageHandler;
     }
 
-    this.pages[page].updateCanvas(evt.source);
+    const canvas = this.pages[page].updateCanvas(evt.source);
+    if (this.zones[page] !== undefined) {
+      this.zones[page].forEach(z => {
+        switch (z.type) {
+          case DrawingTools.NOMBOX: {
+            const r = this.fabricShapeService.createBoxFromScratch(
+              canvas,
+              {
+                x: z.xInit! / 100,
+                y: z.yInit! / 100,
+              },
+              z.width! / 100,
+              z.height! / 100,
+              'Nom',
+              DrawingColours.RED
+            );
+            this.eventHandler.modelViewpping.set(r.id, z.id!);
+            break;
+          }
+          case DrawingTools.PRENOMBOX: {
+            const r = this.fabricShapeService.createBoxFromScratch(
+              canvas,
+              {
+                x: z.xInit! / 100,
+                y: z.yInit! / 100,
+              },
+              z.width! / 100,
+              z.height! / 100,
+              'Prénom',
+              DrawingColours.RED
+            );
+            this.eventHandler.modelViewpping.set(r.id, z.id!);
+            break;
+          }
+          case DrawingTools.INEBOX: {
+            const r = this.fabricShapeService.createBoxFromScratch(
+              canvas,
+              {
+                x: z.xInit! / 100,
+                y: z.yInit! / 100,
+              },
+              z.width! / 100,
+              z.height! / 100,
+              'INE',
+              DrawingColours.RED
+            );
+            this.eventHandler.modelViewpping.set(r.id, z.id!);
+            break;
+          }
+          case DrawingTools.QUESTIONBOX: {
+            const r = this.fabricShapeService.createBoxFromScratch(
+              canvas,
+              {
+                x: z.xInit! / 100,
+                y: z.yInit! / 100,
+              },
+              z.width! / 100,
+              z.height! / 100,
+              'Question',
+              DrawingColours.GREEN
+            );
+            this.eventHandler.modelViewpping.set(r.id, z.id!);
+            break;
+          }
+        }
+      });
+    }
   }
 
   private addEventListeners(canvas: any) {

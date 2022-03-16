@@ -5,6 +5,7 @@
 import { fabric } from 'fabric';
 import {
   CustomFabricEllipse,
+  CustomFabricGroup,
   CustomFabricIText,
   CustomFabricLine,
   CustomFabricObject,
@@ -17,10 +18,12 @@ import {
   Pointer,
 } from './models';
 import { v4 as uuid } from 'uuid';
+import { Injectable } from '@angular/core';
 
 const DEFAULT_OPACITY = 0.2;
 const FILLED_WITH_COLOUR_OPACITY = 0.4;
 
+@Injectable()
 export class FabricShapeService {
   fillShape(object: CustomFabricObject, colour: DrawingColours) {
     switch (object.type) {
@@ -71,22 +74,102 @@ export class FabricShapeService {
     return ellipse;
   }
 
-  createRectangle(canvas: fabric.Canvas, thickness: DrawingThickness, colour: DrawingColours, pointer: Pointer): CustomFabricRect {
+  createRectangle(
+    canvas: fabric.Canvas,
+    thickness: DrawingThickness,
+    colour: DrawingColours,
+    fillcolour: DrawingColours,
+    pointer: Pointer
+  ): CustomFabricRect {
     const rect = new fabric.Rect({
       left: pointer.x,
       top: pointer.y,
       strokeWidth: thickness,
       stroke: colour,
-      fill: this.setOpacity(DrawingColours.RED, DEFAULT_OPACITY),
+      fill: this.setOpacity(fillcolour, DEFAULT_OPACITY),
       width: 0,
       height: 0,
       selectable: false,
       hasRotatingPoint: false,
+      lockRotation: true,
     }) as CustomFabricRect;
     rect.id = uuid();
     canvas.add(rect);
     //    canvas.renderAll();
     return rect;
+  }
+
+  createBoxFromScratch(canvas: fabric.Canvas, p: Pointer, w: number, h: number, text: string, color: DrawingColours): CustomFabricGroup {
+    const rect = new fabric.Rect({
+      left: p.x,
+      top: p.y,
+      strokeWidth: 1,
+      stroke: DrawingColours.BLACK,
+      fill: this.setOpacity(color, DEFAULT_OPACITY),
+      width: w,
+      height: h,
+      selectable: false,
+      hasRotatingPoint: false,
+      lockRotation: true,
+    });
+
+    const t = this.createIText(canvas, {
+      content: text,
+      thickness: DrawingThickness.THIN,
+      colour: DrawingColours.BLUE,
+      pointer: p,
+      fontSize: 18,
+    });
+    const objs: any[] = [];
+    objs.push(rect, t);
+    // group all the objects
+    const alltogetherObj = new fabric.Group(objs, {
+      top: rect.top!,
+      left: rect.left!,
+      originX: 'left',
+      originY: 'top',
+      selectable: false,
+      hasRotatingPoint: false,
+      lockRotation: true,
+    }) as CustomFabricGroup;
+
+    canvas.add(alltogetherObj);
+    alltogetherObj.setCoords();
+    alltogetherObj.id = uuid();
+    canvas.renderAll();
+    // eslint-disable-next-line no-console
+    return alltogetherObj;
+  }
+
+  createBox(canvas: fabric.Canvas, rect: CustomFabricRect, text: string, color: DrawingColours): CustomFabricGroup {
+    const t = this.createIText(canvas, {
+      content: text,
+      thickness: DrawingThickness.THIN,
+      colour: color,
+      pointer: { x: rect.left!, y: rect.top! },
+      fontSize: 18,
+    });
+    canvas.remove(t);
+    canvas.remove(rect);
+    const objs: any[] = [];
+    objs.push(rect, t);
+    // group all the objects
+    const alltogetherObj = new fabric.Group(objs, {
+      top: rect.top!,
+      left: rect.left!,
+      originX: 'left',
+      originY: 'top',
+      selectable: false,
+      hasRotatingPoint: false,
+      lockRotation: true,
+    }) as CustomFabricGroup;
+
+    canvas.add(alltogetherObj);
+    alltogetherObj.setCoords();
+    alltogetherObj.id = uuid();
+    canvas.renderAll();
+    // eslint-disable-next-line no-console
+    return alltogetherObj;
   }
 
   createPath(

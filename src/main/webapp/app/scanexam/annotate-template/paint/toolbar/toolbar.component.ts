@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
+/* eslint-disable @angular-eslint/use-lifecycle-interface */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Component } from '@angular/core';
@@ -11,12 +14,18 @@ import { DrawingTools } from '../models';
 })
 export class GraphicalToolbarComponent {
   DrawingTools = DrawingTools;
-  selected = this.fabricService.selectedTool;
+  selected = this.eventService.selectedTool;
 
-  constructor(private fabricService: EventHandlerService) {}
+  constructor(private eventService: EventHandlerService) {}
+
+  ngOnInit(): void {
+    this.eventService.registerSelectedToolObserver(s => {
+      this.selected = s;
+    });
+  }
 
   async select(tool: DrawingTools) {
-    this.fabricService.selectedTool = tool;
-    this.selected = this.fabricService.selectedTool;
+    this.eventService.selectedTool = tool;
+    this.selected = this.eventService.selectedTool;
   }
 }

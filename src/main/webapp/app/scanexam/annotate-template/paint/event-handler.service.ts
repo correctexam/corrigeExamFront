@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
@@ -22,6 +25,14 @@ import {
   Pointer,
 } from './models';
 import { Injectable } from '@angular/core';
+import { Rect } from 'fabric/fabric-impl';
+import { CustomFabricGroup } from './models';
+import { IZone } from '../../../entities/zone/zone.model';
+import { ZoneService } from '../../../entities/zone/service/zone.service';
+import { ExamService } from '../../../entities/exam/service/exam.service';
+import { IExam } from '../../../entities/exam/exam.model';
+import { Question } from '../../../entities/question/question.model';
+import { QuestionService } from '../../../entities/question/service/question.service';
 
 const RANGE_AROUND_CENTER = 20;
 
@@ -34,9 +45,14 @@ export class EventHandlerService {
   private previousLeft!: number;
   private previousScaleX!: number;
   private previousScaleY!: number;
+  public modelViewpping = new Map<string, number>();
+
   set selectedTool(t: DrawingTools) {
     this.canvas.discardActiveObject();
     this.canvas.renderAll();
+    if (this.drawingToolObserver) {
+      this.drawingToolObserver(t);
+    }
     this._selectedTool = t;
     if (
       this._selectedTool === DrawingTools.SELECT ||
@@ -51,6 +67,11 @@ export class EventHandlerService {
       const background = this.canvas.backgroundImage;
       this.canvas.clear();
       this.canvas.setBackgroundImage(background!, () => {});
+      this.modelViewpping.forEach((e, id1) => {
+        // eslint-disable-next-line no-console
+        console.log(id1);
+        this.zoneService.delete(e).subscribe();
+      });
     }
   }
   get selectedTool(): DrawingTools {
@@ -67,16 +88,34 @@ export class EventHandlerService {
   }
   selectedThickness: DrawingThickness = DrawingThickness.THIN;
   private _isMouseDown = false;
-  private _elementUnderDrawing:
+  public _elementUnderDrawing:
     | CustomFabricEllipse
     | CustomFabricRect
+    | CustomFabricGroup
     | CustomFabricPath
     | CustomFabricLine
+    | CustomFabricGroup
     | CustomFabricPolygon
     | undefined;
   private _initPositionOfElement!: Pointer;
 
-  constructor(private fabricShapeService: FabricShapeService) {}
+  private _exam!: IExam;
+  set exam(c: IExam) {
+    this._exam = c;
+  }
+
+  drawingToolObserver!: (d: DrawingTools) => void;
+
+  constructor(
+    private fabricShapeService: FabricShapeService,
+    private zoneService: ZoneService,
+    private examService: ExamService,
+    private questionService: QuestionService
+  ) {}
+
+  registerSelectedToolObserver(f: (d: DrawingTools) => void): any {
+    this.drawingToolObserver = f;
+  }
 
   addBGImageSrcToCanvas(): Promise<void> {
     if (!this.imageDataUrl) {
@@ -113,11 +152,24 @@ export class EventHandlerService {
           pointer
         );
         break;
+      case DrawingTools.NOMBOX:
+      case DrawingTools.PRENOMBOX:
+      case DrawingTools.INEBOX:
       case DrawingTools.RECTANGLE:
         this._elementUnderDrawing = this.fabricShapeService.createRectangle(
           this.canvas,
           this.selectedThickness,
           this._selectedColour,
+          DrawingColours.RED,
+          pointer
+        );
+        break;
+      case DrawingTools.QUESTIONBOX:
+        this._elementUnderDrawing = this.fabricShapeService.createRectangle(
+          this.canvas,
+          this.selectedThickness,
+          this._selectedColour,
+          DrawingColours.GREEN,
           pointer
         );
         break;
@@ -183,6 +235,10 @@ export class EventHandlerService {
       case DrawingTools.ELLIPSE:
         this.fabricShapeService.formEllipse(this._elementUnderDrawing as CustomFabricEllipse, this._initPositionOfElement, pointer);
         break;
+      case DrawingTools.NOMBOX:
+      case DrawingTools.PRENOMBOX:
+      case DrawingTools.INEBOX:
+      case DrawingTools.QUESTIONBOX:
       case DrawingTools.RECTANGLE:
         this.fabricShapeService.formRectangle(this._elementUnderDrawing as CustomFabricRect, this._initPositionOfElement, pointer);
         break;
@@ -208,6 +264,103 @@ export class EventHandlerService {
     this._isMouseDown = false;
     if (this._selectedTool === DrawingTools.PENCIL) {
       this._elementUnderDrawing = this.fabricShapeService.finishPath(this.canvas, this._elementUnderDrawing as CustomFabricPath);
+    } else if (this._selectedTool === DrawingTools.NOMBOX) {
+      this._elementUnderDrawing = this.fabricShapeService.createBox(
+        this.canvas,
+        this._elementUnderDrawing as CustomFabricRect,
+        'Nom',
+        DrawingColours.BLUE
+      );
+      const z: IZone = {
+        page: (this.canvas as any).page,
+        xInit: Math.trunc(this._elementUnderDrawing.left! * 100),
+        yInit: Math.trunc(this._elementUnderDrawing.top! * 100),
+        width: Math.trunc(this._elementUnderDrawing.width! * 100),
+        height: Math.trunc(this._elementUnderDrawing.height! * 100),
+      };
+      const uid = this._elementUnderDrawing.id;
+      this.zoneService.create(z).subscribe(z1 => {
+        this.modelViewpping.set(uid, z1.body!.id!);
+        this._exam.namezoneId = z1.body!.id!;
+        this.examService.update(this._exam).subscribe(e => {
+          this.exam = e.body!;
+          this.selectedTool = DrawingTools.SELECT;
+        });
+      });
+    } else if (this._selectedTool === DrawingTools.PRENOMBOX) {
+      this._elementUnderDrawing = this.fabricShapeService.createBox(
+        this.canvas,
+        this._elementUnderDrawing as CustomFabricRect,
+        'Prénom',
+        DrawingColours.BLUE
+      );
+      const z: IZone = {
+        page: (this.canvas as any).page,
+        xInit: Math.trunc(this._elementUnderDrawing.left! * 100),
+        yInit: Math.trunc(this._elementUnderDrawing.top! * 100),
+        width: Math.trunc(this._elementUnderDrawing.width! * 100),
+        height: Math.trunc(this._elementUnderDrawing.height! * 100),
+      };
+      const uid = this._elementUnderDrawing.id;
+      this.zoneService.create(z).subscribe(z1 => {
+        this.modelViewpping.set(uid, z1.body!.id!);
+        this._exam.firstnamezoneId = z1.body!.id!;
+        this.examService.update(this._exam).subscribe(e => {
+          this.exam = e.body!;
+          this.selectedTool = DrawingTools.SELECT;
+        });
+      });
+    } else if (this._selectedTool === DrawingTools.INEBOX) {
+      this._elementUnderDrawing = this.fabricShapeService.createBox(
+        this.canvas,
+        this._elementUnderDrawing as CustomFabricRect,
+        'INE',
+        DrawingColours.BLUE
+      );
+      const z: IZone = {
+        page: (this.canvas as any).page,
+        xInit: Math.trunc(this._elementUnderDrawing.left! * 100),
+        yInit: Math.trunc(this._elementUnderDrawing.top! * 100),
+        width: Math.trunc(this._elementUnderDrawing.width! * 100),
+        height: Math.trunc(this._elementUnderDrawing.height! * 100),
+      };
+      const uid = this._elementUnderDrawing.id;
+      this.zoneService.create(z).subscribe(z1 => {
+        this.modelViewpping.set(uid, z1.body!.id!);
+        this._exam.idzoneId = z1.body!.id!;
+        this.examService.update(this._exam).subscribe(e => {
+          this.exam = e.body!;
+          this.selectedTool = DrawingTools.SELECT;
+        });
+      });
+    } else if (this._selectedTool === DrawingTools.QUESTIONBOX) {
+      this._elementUnderDrawing = this.fabricShapeService.createBox(
+        this.canvas,
+        this._elementUnderDrawing as CustomFabricRect,
+        'Question',
+        DrawingColours.BLUE
+      );
+
+      const z: IZone = {
+        page: (this.canvas as any).page,
+        xInit: Math.trunc(this._elementUnderDrawing.left! * 100),
+        yInit: Math.trunc(this._elementUnderDrawing.top! * 100),
+        width: Math.trunc(this._elementUnderDrawing.width! * 100),
+        height: Math.trunc(this._elementUnderDrawing.height! * 100),
+      };
+      const uid = this._elementUnderDrawing.id;
+      this.zoneService.create(z).subscribe(z1 => {
+        this.modelViewpping.set(uid, z1.body!.id!);
+        const q = new Question();
+        q.zoneId = z1.body!.id!;
+        q.examId = this._exam.id;
+        q.typeId = 2;
+        q.numero = 1;
+        q.point = 2;
+        this.questionService.create(q).subscribe(e => {
+          this.selectedTool = DrawingTools.SELECT;
+        });
+      });
     }
     if (this._selectedTool !== DrawingTools.POLYGON) {
       this._elementUnderDrawing = undefined;
@@ -239,6 +392,8 @@ export class EventHandlerService {
           otherEllipses.forEach(e => this.canvas.remove(e));
         }
         this.canvas.remove(object);
+        this.zoneService.delete(this.modelViewpping.get(object.id)!).subscribe();
+
         break;
       case DrawingTools.FILL:
         this.fabricShapeService.fillShape(object, this._selectedColour);
@@ -247,6 +402,16 @@ export class EventHandlerService {
   }
 
   objectMoving(id: string, type: FabricObjectType, newLeft: number, newTop: number) {
+    const l = newLeft;
+    const t = newLeft;
+    const nid = id;
+    this.zoneService
+      .partialUpdate({
+        id: this.modelViewpping.get(nid),
+        xInit: Math.trunc(l! * 100),
+        yInit: Math.trunc(t! * 100),
+      })
+      .subscribe();
     if (type !== FabricObjectType.ELLIPSE) {
       return;
     }
@@ -263,6 +428,28 @@ export class EventHandlerService {
   }
 
   objectScaling(id: string, type: FabricObjectType, newScales: { x: number; y: number }, newCoords: { left: number; top: number }) {
+    const o1 = this.canvas.getObjects().filter(o => (o as any).id === id)[0];
+    const l = o1.aCoords?.tl.x;
+    const t = o1.aCoords?.tl.y;
+    const w = o1.aCoords?.br.x! - o1.aCoords?.tl.x!;
+    const h = o1.aCoords?.br.y! - o1.aCoords?.tl.y!;
+    this.zoneService
+      .partialUpdate({
+        id: this.modelViewpping.get(id),
+        xInit: Math.trunc(l! * 100),
+        yInit: Math.trunc(t! * 100),
+        width: Math.trunc(w! * 100),
+        height: Math.trunc(h! * 100),
+      })
+      .subscribe();
+    /* this.zoneService.objectScaling({
+      left : Math.trunc(newCoords.left * 100),
+      top : Math.trunc(newCoords.top * 100),
+      x : newScales.x,
+      y : newScales.y
+    },
+    this.modelViewpping.get(id)!).subscribe(z => console.log(z.body)  )*/
+
     if (type !== FabricObjectType.ELLIPSE) {
       return;
     }

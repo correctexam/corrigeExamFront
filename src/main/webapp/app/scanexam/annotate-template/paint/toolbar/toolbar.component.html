@@ -16,46 +16,69 @@
     >
       <img src="/content/images/toolbar-images/eraser.png" />
     </div>
-    <div
+    <!--<div
       title="Straight Line"
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'LINE' }"
       (click)="select(DrawingTools.LINE)"
     >
       <img src="/content/images/toolbar-images/line.png" />
-    </div>
-    <div
+    </div>-->
+    <!--<div
       title="Dashed line"
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'DASHED_LINE' }"
       (click)="select(DrawingTools.DASHED_LINE)"
     >
       <img src="/content/images/toolbar-images/dashed-line.png" />
-    </div>
-    <div
+    </div>-->
+    <!--<div
       title="Ellipse"
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'ELLIPSE' }"
       (click)="select(DrawingTools.ELLIPSE)"
     >
       <img src="/content/images/toolbar-images/ellipse.png" />
-    </div>
-    <div
+    </div>-->
+    <!--<div
       title="Rectangle"
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'RECTANGLE' }"
       (click)="select(DrawingTools.RECTANGLE)"
     >
       <img src="/content/images/toolbar-images/rectangle.png" />
+    </div>-->
+    <div title="NOM" class="toolbox-item ml-1 mt-1" [ngClass]="{ selected: selected === 'NOMBOX' }" (click)="select(DrawingTools.NOMBOX)">
+      <img src="/content/images/toolbar-images/rectangle.png" />
     </div>
     <div
+      title="PRENOM"
+      class="toolbox-item ml-1 mt-1"
+      [ngClass]="{ selected: selected === 'PRENOMBOX' }"
+      (click)="select(DrawingTools.PRENOMBOX)"
+    >
+      <img src="/content/images/toolbar-images/rectangle.png" />
+    </div>
+    <div title="INE" class="toolbox-item ml-1 mt-1" [ngClass]="{ selected: selected === 'INEBOX' }" (click)="select(DrawingTools.INEBOX)">
+      <img src="/content/images/toolbar-images/rectangle.png" />
+    </div>
+    <div
+      title="QUESTION"
+      class="toolbox-item ml-1 mt-1"
+      [ngClass]="{ selected: selected === 'QUESTIONBOX' }"
+      (click)="select(DrawingTools.QUESTIONBOX)"
+    >
+      <img src="/content/images/toolbar-images/rectangle.png" />
+    </div>
+
+    <!--<div
       title="Polygon, first line drag, additionals click, click center to finish"
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'POLYGON' }"
       (click)="select(DrawingTools.POLYGON)"
     >
       <img src="/content/images/toolbar-images/polygon.png" />
-    </div>
+    </div>-->
     <div
       title="Free hand drawing"
       class="toolbox-item ml-1 mt-1"
@@ -64,22 +87,22 @@
     >
       <img src="/content/images/toolbar-images/pencil.png" />
     </div>
-    <div
+    <!--<div
       title="Editable textfield"
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'TEXT' }"
       (click)="select(DrawingTools.TEXT)"
     >
       <img src="/content/images/toolbar-images/text.png" />
-    </div>
-    <div
+    </div>-->
+    <!--<div
       title="Fill/paint with colour"
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'FILL' }"
       (click)="select(DrawingTools.FILL)"
     >
       <img src="/content/images/toolbar-images/fill.png" />
-    </div>
+    </div>-->
     <div
       title="Clear canvas, remove all shapes/texts"
       class="toolbox-item ml-1 mt-1"
@@ -89,6 +112,6 @@
       <img src="/content/images/toolbar-images/garbage.png" />
     </div>
   </div>
-  <jhi-colour-palette></jhi-colour-palette>
-  <jhi-thickness-slider></jhi-thickness-slider>
+  <!--<jhi-colour-palette></jhi-colour-palette>
+  <jhi-thickness-slider></jhi-thickness-slider>-->
 </div>

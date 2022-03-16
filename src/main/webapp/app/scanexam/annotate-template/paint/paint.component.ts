@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { IExam } from '../../../entities/exam/exam.model';
 
 @Component({
   selector: 'jhi-paint',
@@ -8,4 +9,6 @@ import { Component, Input } from '@angular/core';
 export class PaintComponent {
   @Input()
   content: any;
+  @Input()
+  exam!: IExam;
 }

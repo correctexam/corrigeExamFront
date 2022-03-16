@@ -10,6 +10,12 @@ import { IZone, getZoneIdentifier } from '../zone.model';
 export type EntityResponseType = HttpResponse<IZone>;
 export type EntityArrayResponseType = HttpResponse<IZone[]>;
 
+export interface ResizeBoxDTO {
+  left: number;
+  top: number;
+  x: any;
+  y: any;
+}
 @Injectable({ providedIn: 'root' })
 export class ZoneService {
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/zones');
@@ -26,6 +32,12 @@ export class ZoneService {
 
   partialUpdate(zone: IZone): Observable<EntityResponseType> {
     return this.http.patch<IZone>(`${this.resourceUrl}/${getZoneIdentifier(zone) as number}`, zone, { observe: 'response' });
+  }
+
+  objectScaling(zone: ResizeBoxDTO, id: number): Observable<EntityResponseType> {
+    // eslint-disable-next-line no-console
+    console.log(zone);
+    return this.http.patch<IZone>(`${this.resourceUrl}/scaling/${id}`, zone, { observe: 'response' });
   }
 
   find(id: number): Observable<EntityResponseType> {

@@ -17,10 +17,11 @@ export class ZoneUpdateComponent implements OnInit {
 
   editForm = this.fb.group({
     id: [],
+    page: [],
     xInit: [],
     yInit: [],
-    xFinal: [],
-    yFinal: [],
+    width: [],
+    height: [],
   });
 
   constructor(protected zoneService: ZoneService, protected activatedRoute: ActivatedRoute, protected fb: FormBuilder) {}
@@ -67,10 +68,11 @@ export class ZoneUpdateComponent implements OnInit {
   protected updateForm(zone: IZone): void {
     this.editForm.patchValue({
       id: zone.id,
+      page: zone.page,
       xInit: zone.xInit,
       yInit: zone.yInit,
-      xFinal: zone.xFinal,
-      yFinal: zone.yFinal,
+      width: zone.width,
+      height: zone.height,
     });
   }
 
@@ -78,10 +80,11 @@ export class ZoneUpdateComponent implements OnInit {
     return {
       ...new Zone(),
       id: this.editForm.get(['id'])!.value,
+      page: this.editForm.get(['page'])!.value,
       xInit: this.editForm.get(['xInit'])!.value,
       yInit: this.editForm.get(['yInit'])!.value,
-      xFinal: this.editForm.get(['xFinal'])!.value,
-      yFinal: this.editForm.get(['yFinal'])!.value,
+      width: this.editForm.get(['width'])!.value,
+      height: this.editForm.get(['height'])!.value,
     };
   }
 }

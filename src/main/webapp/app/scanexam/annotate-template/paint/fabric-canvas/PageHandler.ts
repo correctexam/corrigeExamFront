@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 /* eslint-disable @typescript-eslint/prefer-optional-chain */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
@@ -94,7 +95,7 @@ export class PageHandler {
     };
   }
 
-  updateCanvas(pageViewer: any) {
+  updateCanvas(pageViewer: any): fabric.Canvas {
     // Add the event listeners for mousedown, mousemove, and mouseup
 
     // console.log(' UPDATE CANVAS ');
@@ -128,6 +129,7 @@ export class PageHandler {
       selection: false,
       preserveObjectStacking: true,
     });
+    (canvas as any).page = this.page;
 
     this.eventHandler.canvas = canvas;
     this.eventHandler.extendToObjectWithId();
@@ -151,6 +153,7 @@ export class PageHandler {
       console.log(this);*/
 
     this.addEventListeners(canvas);
+    return canvas;
   }
 
   private addEventListeners(canvas: any) {
@@ -161,7 +164,7 @@ export class PageHandler {
     canvas.on('selection:created', (e: any) => this.onSelectionCreated(e as any));
     canvas.on('selection:updated', (e: any) => this.onSelectionUpdated(e as any));
     canvas.on('object:moving', (e: any) => this.onObjectMoving(e as any));
-    //  canvas.on('object:scaling', (e:any) => () => this.onObjectScaling(e as any));
+    canvas.on('object:scaling', (e: any) => this.onObjectScaling(e as any));
   }
 
   private onCanvasMouseDown(event: { e: Event }) {
@@ -214,6 +217,7 @@ export class PageHandler {
   // console.log(this.canvas);
 
   public clear() {
+    // eslint-disable-next-line no-console
     const context = this.annotationCanvas.getContext('2d');
     context!.clearRect(0, 0, this.annotationCanvas.width, this.annotationCanvas.height);
 

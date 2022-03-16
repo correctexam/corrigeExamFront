@@ -39,11 +39,11 @@
           <th scope="col" jhiSortBy="yInit">
             <span jhiTranslate="gradeScopeIsticApp.zone.yInit">Y Init</span> <fa-icon icon="sort"></fa-icon>
           </th>
-          <th scope="col" jhiSortBy="xFinal">
-            <span jhiTranslate="gradeScopeIsticApp.zone.xFinal">X Final</span> <fa-icon icon="sort"></fa-icon>
+          <th scope="col" jhiSortBy="width">
+            <span jhiTranslate="gradeScopeIsticApp.zone.width">width</span> <fa-icon icon="sort"></fa-icon>
           </th>
-          <th scope="col" jhiSortBy="yFinal">
-            <span jhiTranslate="gradeScopeIsticApp.zone.yFinal">Y Final</span> <fa-icon icon="sort"></fa-icon>
+          <th scope="col" jhiSortBy="height">
+            <span jhiTranslate="gradeScopeIsticApp.zone.height">height</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col"></th>
         </tr>
@@ -55,8 +55,8 @@
           </td>
           <td>{{ zone.xInit }}</td>
           <td>{{ zone.yInit }}</td>
-          <td>{{ zone.xFinal }}</td>
-          <td>{{ zone.yFinal }}</td>
+          <td>{{ zone.width }}</td>
+          <td>{{ zone.height }}</td>
           <td class="text-end">
             <div class="btn-group">
               <button type="submit" [routerLink]="['/zone', zone.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
