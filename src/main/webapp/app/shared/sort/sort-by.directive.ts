@@ -2,9 +2,10 @@ import { AfterContentInit, ContentChild, Directive, Host, HostListener, Input, O
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { faSort, faSortDown, faSortUp, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
 
 import { SortDirective } from './sort.directive';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 @Directive({
   selector: '[jhiSortBy]',
@@ -15,9 +16,9 @@ export class SortByDirective<T> implements AfterContentInit, OnDestroy {
   @ContentChild(FaIconComponent, { static: false })
   iconComponent?: FaIconComponent;
 
-  sortIcon = faSort;
-  sortAscIcon = faSortUp;
-  sortDescIcon = faSortDown;
+  sortIcon = faSort as IconProp;
+  sortAscIcon = faSortUp as IconProp;
+  sortDescIcon = faSortDown as IconProp;
 
   private readonly destroy$ = new Subject<void>();
 
@@ -44,11 +45,11 @@ export class SortByDirective<T> implements AfterContentInit, OnDestroy {
 
   private updateIconDefinition(): void {
     if (this.iconComponent) {
-      let icon: IconDefinition = this.sortIcon;
+      let icon = this.sortIcon;
       if (this.sort.predicate === this.jhiSortBy) {
         icon = this.sort.ascending ? this.sortAscIcon : this.sortDescIcon;
       }
-      this.iconComponent.icon = icon.iconName;
+      this.iconComponent.icon = icon;
       this.iconComponent.render();
     }
   }

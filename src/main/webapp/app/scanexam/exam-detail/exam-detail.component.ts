@@ -13,6 +13,7 @@ import { IExam } from '../../entities/exam/exam.model';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 @Component({
   selector: 'jhi-exam-detail',
   templateUrl: './exam-detail.component.html',
@@ -20,10 +21,10 @@ import { ConfirmationService } from 'primeng/api';
   providers: [ConfirmationService],
 })
 export class ExamDetailComponent implements OnInit {
-  farCircle = farCircle;
-  fasMotorcycle = fasMotorcycle;
-  faGraduationCap = faGraduationCap;
-  faBookOpenReader = faBookOpenReader;
+  farCircle = farCircle as IconProp;
+  fasMotorcycle = fasMotorcycle as IconProp;
+  faGraduationCap = faGraduationCap as IconProp;
+  faBookOpenReader = faBookOpenReader as IconProp;
   examId = '';
   exam!: IExam;
   course!: ICourse;
