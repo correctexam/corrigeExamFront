@@ -4,6 +4,17 @@
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Component } from '@angular/core';
+import {
+  faFileSignature,
+  faQuestion,
+  faSignature,
+  faUserGraduate,
+  faHashtag,
+  faEraser,
+  faHandPointer,
+  faTrash,
+  faPencil,
+} from '@fortawesome/free-solid-svg-icons';
 import { EventHandlerService } from '../event-handler.service';
 import { DrawingTools } from '../models';
 
@@ -13,6 +24,16 @@ import { DrawingTools } from '../models';
   styleUrls: ['./toolbar.component.scss'],
 })
 export class GraphicalToolbarComponent {
+  faNom = faFileSignature;
+  faPrenom = faSignature;
+  faQuestion = faQuestion;
+  faNote = faUserGraduate;
+  faHashtagLock = faHashtag;
+  faEraser = faEraser;
+  faHandPointer = faHandPointer;
+  faTrash = faTrash;
+  faPencil = faPencil;
+
   DrawingTools = DrawingTools;
   selected = this.eventService.selectedTool;
 

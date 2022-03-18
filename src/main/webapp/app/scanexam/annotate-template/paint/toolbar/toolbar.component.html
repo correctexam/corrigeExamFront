@@ -6,7 +6,7 @@
       [ngClass]="{ selected: selected === 'SELECT' }"
       (click)="select(DrawingTools.SELECT)"
     >
-      <img src="/content/images/toolbar-images/select.png" />
+      <fa-icon [icon]="faHandPointer"></fa-icon>
     </div>
     <div
       title="Erase shape/text on click"
@@ -14,7 +14,7 @@
       [ngClass]="{ selected: selected === 'ERASER' }"
       (click)="select(DrawingTools.ERASER)"
     >
-      <img src="/content/images/toolbar-images/eraser.png" />
+      <fa-icon [icon]="faEraser"></fa-icon>
     </div>
     <!--<div
       title="Straight Line"
@@ -49,7 +49,7 @@
       <img src="/content/images/toolbar-images/rectangle.png" />
     </div>-->
     <div title="NOM" class="toolbox-item ml-1 mt-1" [ngClass]="{ selected: selected === 'NOMBOX' }" (click)="select(DrawingTools.NOMBOX)">
-      <img src="/content/images/toolbar-images/rectangle.png" />
+      <fa-icon [icon]="faNom"></fa-icon>
     </div>
     <div
       title="PRENOM"
@@ -57,10 +57,10 @@
       [ngClass]="{ selected: selected === 'PRENOMBOX' }"
       (click)="select(DrawingTools.PRENOMBOX)"
     >
-      <img src="/content/images/toolbar-images/rectangle.png" />
+      <fa-icon [icon]="faPrenom"></fa-icon>
     </div>
     <div title="INE" class="toolbox-item ml-1 mt-1" [ngClass]="{ selected: selected === 'INEBOX' }" (click)="select(DrawingTools.INEBOX)">
-      <img src="/content/images/toolbar-images/rectangle.png" />
+      <fa-icon [icon]="faHashtagLock"></fa-icon>
     </div>
     <div
       title="QUESTION"
@@ -68,7 +68,7 @@
       [ngClass]="{ selected: selected === 'QUESTIONBOX' }"
       (click)="select(DrawingTools.QUESTIONBOX)"
     >
-      <img src="/content/images/toolbar-images/rectangle.png" />
+      <fa-icon [icon]="faQuestion"></fa-icon>
     </div>
 
     <!--<div
@@ -85,7 +85,7 @@
       [ngClass]="{ selected: selected === 'PENCIL' }"
       (click)="select(DrawingTools.PENCIL)"
     >
-      <img src="/content/images/toolbar-images/pencil.png" />
+      <fa-icon [icon]="faPencil"></fa-icon>
     </div>
     <!--<div
       title="Editable textfield"
@@ -109,7 +109,7 @@
       [ngClass]="{ selected: selected === 'GARBAGE' }"
       (click)="select(DrawingTools.GARBAGE)"
     >
-      <img src="/content/images/toolbar-images/garbage.png" />
+      <fa-icon [icon]="faTrash"></fa-icon>
     </div>
   </div>
   <!--<jhi-colour-palette></jhi-colour-palette>
