@@ -49,61 +49,6 @@ describe('StudentResponse Management Update Component', () => {
     comp = fixture.componentInstance;
   });
 
-  describe('ngOnInit', () => {
-    it('Should call Question query and add missing value', () => {
-      const studentResponse: IStudentResponse = { id: 456 };
-      const question: IQuestion = { id: 53578 };
-      studentResponse.question = question;
-
-      const questionCollection: IQuestion[] = [{ id: 72077 }];
-      jest.spyOn(questionService, 'query').mockReturnValue(of(new HttpResponse({ body: questionCollection })));
-      const additionalQuestions = [question];
-      const expectedCollection: IQuestion[] = [...additionalQuestions, ...questionCollection];
-      jest.spyOn(questionService, 'addQuestionToCollectionIfMissing').mockReturnValue(expectedCollection);
-
-      activatedRoute.data = of({ studentResponse });
-      comp.ngOnInit();
-
-      expect(questionService.query).toHaveBeenCalled();
-      expect(questionService.addQuestionToCollectionIfMissing).toHaveBeenCalledWith(questionCollection, ...additionalQuestions);
-      expect(comp.questionsSharedCollection).toEqual(expectedCollection);
-    });
-
-    it('Should call Student query and add missing value', () => {
-      const studentResponse: IStudentResponse = { id: 456 };
-      const student: IStudent = { id: 5313 };
-      studentResponse.student = student;
-
-      const studentCollection: IStudent[] = [{ id: 21871 }];
-      jest.spyOn(studentService, 'query').mockReturnValue(of(new HttpResponse({ body: studentCollection })));
-      const additionalStudents = [student];
-      const expectedCollection: IStudent[] = [...additionalStudents, ...studentCollection];
-      jest.spyOn(studentService, 'addStudentToCollectionIfMissing').mockReturnValue(expectedCollection);
-
-      activatedRoute.data = of({ studentResponse });
-      comp.ngOnInit();
-
-      expect(studentService.query).toHaveBeenCalled();
-      expect(studentService.addStudentToCollectionIfMissing).toHaveBeenCalledWith(studentCollection, ...additionalStudents);
-      expect(comp.studentsSharedCollection).toEqual(expectedCollection);
-    });
-
-    it('Should update editForm', () => {
-      const studentResponse: IStudentResponse = { id: 456 };
-      const question: IQuestion = { id: 43086 };
-      studentResponse.question = question;
-      const student: IStudent = { id: 54974 };
-      studentResponse.student = student;
-
-      activatedRoute.data = of({ studentResponse });
-      comp.ngOnInit();
-
-      expect(comp.editForm.value).toEqual(expect.objectContaining(studentResponse));
-      expect(comp.questionsSharedCollection).toContain(question);
-      expect(comp.studentsSharedCollection).toContain(student);
-    });
-  });
-
   describe('save', () => {
     it('Should call update service on save for existing entity', () => {
       // GIVEN
@@ -165,24 +110,6 @@ describe('StudentResponse Management Update Component', () => {
       expect(studentResponseService.update).toHaveBeenCalledWith(studentResponse);
       expect(comp.isSaving).toEqual(false);
       expect(comp.previousState).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Tracking relationships identifiers', () => {
-    describe('trackQuestionById', () => {
-      it('Should return tracked Question primary key', () => {
-        const entity = { id: 123 };
-        const trackResult = comp.trackQuestionById(0, entity);
-        expect(trackResult).toEqual(entity.id);
-      });
-    });
-
-    describe('trackStudentById', () => {
-      it('Should return tracked Student primary key', () => {
-        const entity = { id: 123 };
-        const trackResult = comp.trackStudentById(0, entity);
-        expect(trackResult).toEqual(entity.id);
-      });
     });
   });
 });

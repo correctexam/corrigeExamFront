@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -44,39 +45,6 @@ describe('Course Management Update Component', () => {
     userService = TestBed.inject(UserService);
 
     comp = fixture.componentInstance;
-  });
-
-  describe('ngOnInit', () => {
-    it('Should call User query and add missing value', () => {
-      const course: ICourse = { id: 456 };
-      const prof: IUser = { id: 83217 };
-      course.prof = prof;
-
-      const userCollection: IUser[] = [{ id: 96519 }];
-      jest.spyOn(userService, 'query').mockReturnValue(of(new HttpResponse({ body: userCollection })));
-      const additionalUsers = [prof];
-      const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
-      jest.spyOn(userService, 'addUserToCollectionIfMissing').mockReturnValue(expectedCollection);
-
-      activatedRoute.data = of({ course });
-      comp.ngOnInit();
-
-      expect(userService.query).toHaveBeenCalled();
-      expect(userService.addUserToCollectionIfMissing).toHaveBeenCalledWith(userCollection, ...additionalUsers);
-      expect(comp.usersSharedCollection).toEqual(expectedCollection);
-    });
-
-    it('Should update editForm', () => {
-      const course: ICourse = { id: 456 };
-      const prof: IUser = { id: 3609 };
-      course.prof = prof;
-
-      activatedRoute.data = of({ course });
-      comp.ngOnInit();
-
-      expect(comp.editForm.value).toEqual(expect.objectContaining(course));
-      expect(comp.usersSharedCollection).toContain(prof);
-    });
   });
 
   describe('save', () => {
@@ -140,16 +108,6 @@ describe('Course Management Update Component', () => {
       expect(courseService.update).toHaveBeenCalledWith(course);
       expect(comp.isSaving).toEqual(false);
       expect(comp.previousState).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Tracking relationships identifiers', () => {
-    describe('trackUserById', () => {
-      it('Should return tracked User primary key', () => {
-        const entity = { id: 123 };
-        const trackResult = comp.trackUserById(0, entity);
-        expect(trackResult).toEqual(entity.id);
-      });
     });
   });
 });

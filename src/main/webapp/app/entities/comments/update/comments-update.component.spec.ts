@@ -45,42 +45,6 @@ describe('Comments Management Update Component', () => {
     comp = fixture.componentInstance;
   });
 
-  describe('ngOnInit', () => {
-    it('Should call StudentResponse query and add missing value', () => {
-      const comments: IComments = { id: 456 };
-      const studentResponse: IStudentResponse = { id: 87940 };
-      comments.studentResponse = studentResponse;
-
-      const studentResponseCollection: IStudentResponse[] = [{ id: 94867 }];
-      jest.spyOn(studentResponseService, 'query').mockReturnValue(of(new HttpResponse({ body: studentResponseCollection })));
-      const additionalStudentResponses = [studentResponse];
-      const expectedCollection: IStudentResponse[] = [...additionalStudentResponses, ...studentResponseCollection];
-      jest.spyOn(studentResponseService, 'addStudentResponseToCollectionIfMissing').mockReturnValue(expectedCollection);
-
-      activatedRoute.data = of({ comments });
-      comp.ngOnInit();
-
-      expect(studentResponseService.query).toHaveBeenCalled();
-      expect(studentResponseService.addStudentResponseToCollectionIfMissing).toHaveBeenCalledWith(
-        studentResponseCollection,
-        ...additionalStudentResponses
-      );
-      expect(comp.studentResponsesSharedCollection).toEqual(expectedCollection);
-    });
-
-    it('Should update editForm', () => {
-      const comments: IComments = { id: 456 };
-      const studentResponse: IStudentResponse = { id: 45308 };
-      comments.studentResponse = studentResponse;
-
-      activatedRoute.data = of({ comments });
-      comp.ngOnInit();
-
-      expect(comp.editForm.value).toEqual(expect.objectContaining(comments));
-      expect(comp.studentResponsesSharedCollection).toContain(studentResponse);
-    });
-  });
-
   describe('save', () => {
     it('Should call update service on save for existing entity', () => {
       // GIVEN
@@ -142,16 +106,6 @@ describe('Comments Management Update Component', () => {
       expect(commentsService.update).toHaveBeenCalledWith(comments);
       expect(comp.isSaving).toEqual(false);
       expect(comp.previousState).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Tracking relationships identifiers', () => {
-    describe('trackStudentResponseById', () => {
-      it('Should return tracked StudentResponse primary key', () => {
-        const entity = { id: 123 };
-        const trackResult = comp.trackStudentResponseById(0, entity);
-        expect(trackResult).toEqual(entity.id);
-      });
     });
   });
 });

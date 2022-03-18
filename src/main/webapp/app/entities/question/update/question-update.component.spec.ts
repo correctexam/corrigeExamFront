@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -51,85 +52,6 @@ describe('Question Management Update Component', () => {
     examService = TestBed.inject(ExamService);
 
     comp = fixture.componentInstance;
-  });
-
-  describe('ngOnInit', () => {
-    it('Should call zone query and add missing value', () => {
-      const question: IQuestion = { id: 456 };
-      const zone: IZone = { id: 4840 };
-      question.zone = zone;
-
-      const zoneCollection: IZone[] = [{ id: 36337 }];
-      jest.spyOn(zoneService, 'query').mockReturnValue(of(new HttpResponse({ body: zoneCollection })));
-      const expectedCollection: IZone[] = [zone, ...zoneCollection];
-      jest.spyOn(zoneService, 'addZoneToCollectionIfMissing').mockReturnValue(expectedCollection);
-
-      activatedRoute.data = of({ question });
-      comp.ngOnInit();
-
-      expect(zoneService.query).toHaveBeenCalled();
-      expect(zoneService.addZoneToCollectionIfMissing).toHaveBeenCalledWith(zoneCollection, zone);
-      expect(comp.zonesCollection).toEqual(expectedCollection);
-    });
-
-    it('Should call QuestionType query and add missing value', () => {
-      const question: IQuestion = { id: 456 };
-      const type: IQuestionType = { id: 38666 };
-      question.type = type;
-
-      const questionTypeCollection: IQuestionType[] = [{ id: 48615 }];
-      jest.spyOn(questionTypeService, 'query').mockReturnValue(of(new HttpResponse({ body: questionTypeCollection })));
-      const additionalQuestionTypes = [type];
-      const expectedCollection: IQuestionType[] = [...additionalQuestionTypes, ...questionTypeCollection];
-      jest.spyOn(questionTypeService, 'addQuestionTypeToCollectionIfMissing').mockReturnValue(expectedCollection);
-
-      activatedRoute.data = of({ question });
-      comp.ngOnInit();
-
-      expect(questionTypeService.query).toHaveBeenCalled();
-      expect(questionTypeService.addQuestionTypeToCollectionIfMissing).toHaveBeenCalledWith(
-        questionTypeCollection,
-        ...additionalQuestionTypes
-      );
-      expect(comp.questionTypesSharedCollection).toEqual(expectedCollection);
-    });
-
-    it('Should call Exam query and add missing value', () => {
-      const question: IQuestion = { id: 456 };
-      const exam: IExam = { id: 49062 };
-      question.exam = exam;
-
-      const examCollection: IExam[] = [{ id: 91987 }];
-      jest.spyOn(examService, 'query').mockReturnValue(of(new HttpResponse({ body: examCollection })));
-      const additionalExams = [exam];
-      const expectedCollection: IExam[] = [...additionalExams, ...examCollection];
-      jest.spyOn(examService, 'addExamToCollectionIfMissing').mockReturnValue(expectedCollection);
-
-      activatedRoute.data = of({ question });
-      comp.ngOnInit();
-
-      expect(examService.query).toHaveBeenCalled();
-      expect(examService.addExamToCollectionIfMissing).toHaveBeenCalledWith(examCollection, ...additionalExams);
-      expect(comp.examsSharedCollection).toEqual(expectedCollection);
-    });
-
-    it('Should update editForm', () => {
-      const question: IQuestion = { id: 456 };
-      const zone: IZone = { id: 14056 };
-      question.zone = zone;
-      const type: IQuestionType = { id: 6851 };
-      question.type = type;
-      const exam: IExam = { id: 87918 };
-      question.exam = exam;
-
-      activatedRoute.data = of({ question });
-      comp.ngOnInit();
-
-      expect(comp.editForm.value).toEqual(expect.objectContaining(question));
-      expect(comp.zonesCollection).toContain(zone);
-      expect(comp.questionTypesSharedCollection).toContain(type);
-      expect(comp.examsSharedCollection).toContain(exam);
-    });
   });
 
   describe('save', () => {
@@ -193,32 +115,6 @@ describe('Question Management Update Component', () => {
       expect(questionService.update).toHaveBeenCalledWith(question);
       expect(comp.isSaving).toEqual(false);
       expect(comp.previousState).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Tracking relationships identifiers', () => {
-    describe('trackZoneById', () => {
-      it('Should return tracked Zone primary key', () => {
-        const entity = { id: 123 };
-        const trackResult = comp.trackZoneById(0, entity);
-        expect(trackResult).toEqual(entity.id);
-      });
-    });
-
-    describe('trackQuestionTypeById', () => {
-      it('Should return tracked QuestionType primary key', () => {
-        const entity = { id: 123 };
-        const trackResult = comp.trackQuestionTypeById(0, entity);
-        expect(trackResult).toEqual(entity.id);
-      });
-    });
-
-    describe('trackExamById', () => {
-      it('Should return tracked Exam primary key', () => {
-        const entity = { id: 123 };
-        const trackResult = comp.trackExamById(0, entity);
-        expect(trackResult).toEqual(entity.id);
-      });
     });
   });
 });

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -7,8 +8,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { of, Subject, from } from 'rxjs';
 
 import { ExamSheetService } from '../service/exam-sheet.service';
-import { IExamSheet, ExamSheet } from '../exam-sheet.model';
-import { IScan } from 'app/entities/scan/scan.model';
+import { ExamSheet } from '../exam-sheet.model';
 import { ScanService } from 'app/entities/scan/service/scan.service';
 
 import { ExamSheetUpdateComponent } from './exam-sheet-update.component';
@@ -43,39 +43,6 @@ describe('ExamSheet Management Update Component', () => {
     scanService = TestBed.inject(ScanService);
 
     comp = fixture.componentInstance;
-  });
-
-  describe('ngOnInit', () => {
-    it('Should call Scan query and add missing value', () => {
-      const examSheet: IExamSheet = { id: 456 };
-      const scan: IScan = { id: 59367 };
-      examSheet.scan = scan;
-
-      const scanCollection: IScan[] = [{ id: 52831 }];
-      jest.spyOn(scanService, 'query').mockReturnValue(of(new HttpResponse({ body: scanCollection })));
-      const additionalScans = [scan];
-      const expectedCollection: IScan[] = [...additionalScans, ...scanCollection];
-      jest.spyOn(scanService, 'addScanToCollectionIfMissing').mockReturnValue(expectedCollection);
-
-      activatedRoute.data = of({ examSheet });
-      comp.ngOnInit();
-
-      expect(scanService.query).toHaveBeenCalled();
-      expect(scanService.addScanToCollectionIfMissing).toHaveBeenCalledWith(scanCollection, ...additionalScans);
-      expect(comp.scansSharedCollection).toEqual(expectedCollection);
-    });
-
-    it('Should update editForm', () => {
-      const examSheet: IExamSheet = { id: 456 };
-      const scan: IScan = { id: 98551 };
-      examSheet.scan = scan;
-
-      activatedRoute.data = of({ examSheet });
-      comp.ngOnInit();
-
-      expect(comp.editForm.value).toEqual(expect.objectContaining(examSheet));
-      expect(comp.scansSharedCollection).toContain(scan);
-    });
   });
 
   describe('save', () => {
@@ -139,16 +106,6 @@ describe('ExamSheet Management Update Component', () => {
       expect(examSheetService.update).toHaveBeenCalledWith(examSheet);
       expect(comp.isSaving).toEqual(false);
       expect(comp.previousState).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Tracking relationships identifiers', () => {
-    describe('trackScanById', () => {
-      it('Should return tracked Scan primary key', () => {
-        const entity = { id: 123 };
-        const trackResult = comp.trackScanById(0, entity);
-        expect(trackResult).toEqual(entity.id);
-      });
     });
   });
 });

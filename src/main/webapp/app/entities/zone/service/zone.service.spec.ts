@@ -23,8 +23,8 @@ describe('Zone Service', () => {
       id: 0,
       xInit: 0,
       yInit: 0,
-      xFinal: 0,
-      yFinal: 0,
+      width: 0,
+      height: 0,
     };
   });
 
