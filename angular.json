@@ -114,6 +114,9 @@
           "options": {
             "configPath": "jest.conf.js"
           }
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy"
         }
       }
     }
