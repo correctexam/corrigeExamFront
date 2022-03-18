@@ -71,25 +71,6 @@ describe('Course Service', () => {
       expect(expectedResult).toMatchObject(expected);
     });
 
-    it('should partial update a Course', () => {
-      const patchObject = Object.assign(
-        {
-          name: 'BBBBBB',
-        },
-        new Course()
-      );
-
-      const returnedFromService = Object.assign(patchObject, elemDefault);
-
-      const expected = Object.assign({}, returnedFromService);
-
-      service.partialUpdate(patchObject).subscribe(resp => (expectedResult = resp.body));
-
-      const req = httpMock.expectOne({ method: 'PATCH' });
-      req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
-    });
-
     it('should return a list of Course', () => {
       const returnedFromService = Object.assign(
         {

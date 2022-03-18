@@ -10,7 +10,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x, 16.x]
+        node-version: [16.x]
 
     steps:
       - uses: actions/checkout@v2
@@ -46,3 +46,6 @@ jobs:
       - name: Test
         run: |
           npm run test -- --prod
+      - name: Deploy
+        run: |
+          npm run deploy

@@ -11,6 +11,7 @@
     "ci:frontend:test": "npm run ci:frontend:build && npm test",
     "clean-www": "rimraf target/classes/static/app/{src,target/}",
     "cleanup": "rimraf target/classes/static/",
+    "deploy": "ng deploy --base-href=/corrigeExamFront/",
     "jest": "jest --coverage --logHeapUsage --maxWorkers=2 --config jest.conf.js",
     "lint": "eslint . --ext .js,.ts",
     "lint:fix": "npm run lint -- --fix",
