@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
@@ -67,25 +68,6 @@ describe('CourseGroup Service', () => {
       service.update(expected).subscribe(resp => (expectedResult = resp.body));
 
       const req = httpMock.expectOne({ method: 'PUT' });
-      req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
-    });
-
-    it('should partial update a CourseGroup', () => {
-      const patchObject = Object.assign(
-        {
-          groupName: 'BBBBBB',
-        },
-        new CourseGroup()
-      );
-
-      const returnedFromService = Object.assign(patchObject, elemDefault);
-
-      const expected = Object.assign({}, returnedFromService);
-
-      service.partialUpdate(patchObject).subscribe(resp => (expectedResult = resp.body));
-
-      const req = httpMock.expectOne({ method: 'PATCH' });
       req.flush(returnedFromService);
       expect(expectedResult).toMatchObject(expected);
     });
