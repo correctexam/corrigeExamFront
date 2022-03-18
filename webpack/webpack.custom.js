@@ -28,6 +28,17 @@ module.exports = async (config, options, targetOptions) => {
       new WebpackNotifierPlugin({
         title: 'Grade Scope Istic',
         contentImage: path.join(__dirname, 'logo-jhipster.png'),
+      }),
+      new webpack.DefinePlugin({
+        I18N_HASH: JSON.stringify(languagesHash.hash),
+        // APP_VERSION is passed as an environment variable from the Gradle / Maven build tasks.
+        __VERSION__: JSON.stringify(environment.__VERSION__),
+        __DEBUG_INFO_ENABLED__: environment.__DEBUG_INFO_ENABLED__ || config.mode === 'development',
+        // The root URL for API calls, ending with a '/' - for example: `"https://www.jhipster.tech:8081/myservice/"`.
+        // If this URL is left empty (""), then it will be relative to the current context.
+        // If you use an API server, in `prod` mode, you will need to enable CORS
+        // (see the `jhipster.cors` common JHipster property in the `application-*.yml` configurations)
+        SERVER_API_URL: JSON.stringify(environment.SERVER_API_URLDEV),
       })
     );
   }
@@ -80,6 +91,17 @@ module.exports = async (config, options, targetOptions) => {
         openAnalyzer: false,
         // Webpack statistics in target folder
         reportFilename: '../stats.html',
+      }),
+      new webpack.DefinePlugin({
+        I18N_HASH: JSON.stringify(languagesHash.hash),
+        // APP_VERSION is passed as an environment variable from the Gradle / Maven build tasks.
+        __VERSION__: JSON.stringify(environment.__VERSION__),
+        __DEBUG_INFO_ENABLED__: environment.__DEBUG_INFO_ENABLED__ || config.mode === 'development',
+        // The root URL for API calls, ending with a '/' - for example: `"https://www.jhipster.tech:8081/myservice/"`.
+        // If this URL is left empty (""), then it will be relative to the current context.
+        // If you use an API server, in `prod` mode, you will need to enable CORS
+        // (see the `jhipster.cors` common JHipster property in the `application-*.yml` configurations)
+        SERVER_API_URL: JSON.stringify(environment.SERVER_API_URLPROD),
       })
     );
   }
@@ -93,7 +115,7 @@ module.exports = async (config, options, targetOptions) => {
   }
 
   config.plugins.push(
-    new webpack.DefinePlugin({
+    /*new webpack.DefinePlugin({
       I18N_HASH: JSON.stringify(languagesHash.hash),
       // APP_VERSION is passed as an environment variable from the Gradle / Maven build tasks.
       __VERSION__: JSON.stringify(environment.__VERSION__),
@@ -102,8 +124,8 @@ module.exports = async (config, options, targetOptions) => {
       // If this URL is left empty (""), then it will be relative to the current context.
       // If you use an API server, in `prod` mode, you will need to enable CORS
       // (see the `jhipster.cors` common JHipster property in the `application-*.yml` configurations)
-      SERVER_API_URL: config.mode === 'development' ? JSON.stringify('') : JSON.stringify(environment.SERVER_API_URL),
-    }),
+      SERVER_API_URL: JSON.stringify(environment.SERVER_API_URL),
+    }),*/
     new MergeJsonWebpackPlugin({
       output: {
         groupBy: [

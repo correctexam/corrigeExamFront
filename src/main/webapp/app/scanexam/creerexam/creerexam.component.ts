@@ -3,7 +3,6 @@
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -22,45 +21,44 @@ import { Template } from '../../entities/template/template.model';
   selector: 'jhi-creerexam',
   templateUrl: './creerexam.component.html',
   styleUrls: ['./creerexam.component.scss'],
-  providers:[MessageService,ConfirmationService]
+  providers: [MessageService, ConfirmationService],
 })
 export class CreerexamComponent implements OnInit {
-
   blocked = false;
-  courseid: string | undefined = undefined
+  courseid: string | undefined = undefined;
   isSaving = false;
-  coursName ='';
+  coursName = '';
   editForm = this.fb.group({
     name: [null, [Validators.required]],
     content: [],
     contentContentType: [null, [Validators.required]],
-
   });
 
-  constructor(private http: HttpClient, private translate: TranslateService, private messageService: MessageService,protected activatedRoute: ActivatedRoute,
+  constructor(
+    private translate: TranslateService,
+    private messageService: MessageService,
+    protected activatedRoute: ActivatedRoute,
     protected router: Router,
-    public confirmationService:ConfirmationService,     private fb: FormBuilder,
+    public confirmationService: ConfirmationService,
+    private fb: FormBuilder,
     protected dataUtils: DataUtils,
     protected eventManager: EventManager,
-    protected courseService:CourseService,
-    protected examService : ExamService,
-    protected templateService :TemplateService
-    ) { }
-
-
-
+    protected courseService: CourseService,
+    protected examService: ExamService,
+    protected templateService: TemplateService
+  ) {}
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('courseid') !== null) {
         this.courseid = params.get('courseid')!;
-          this.courseService.find(+this.courseid).subscribe(c=> this.coursName  = c.body?.name!)
-      }});
+        this.courseService.find(+this.courseid).subscribe(c => (this.coursName = c.body?.name!));
+      }
+    });
   }
 
   gotoUE(): void {
-    this.router.navigateByUrl('/course/'+ this.courseid);
-
+    this.router.navigateByUrl('/course/' + this.courseid);
   }
 
   byteSize(base64String: string): string {
@@ -78,37 +76,34 @@ export class CreerexamComponent implements OnInit {
     });
   }
 
-  save():void{
+  save(): void {
     this.isSaving = true;
-
     const template = new Template();
-    template.name =this.editForm.get(['name'])!.value + 'Template'
-    template.content= this.editForm.get(['content'])!.value;
-    template.contentContentType= this.editForm.get(['contentContentType'])!.value;
-    this.templateService.create(template).subscribe((res)=> {
-      const exam = new Exam();
-      exam.name = this.editForm.get(['name'])!.value
-      exam.templateId = res.body?.id;
-      exam.courseId = +this.courseid!;
-      this.examService.create(exam).subscribe(()=> {
-        this.isSaving =false;
-        // TODO
-        this.router.navigateByUrl("/course/"+ this.courseid)
-      }, ()=> {
+    template.name = this.editForm.get(['name'])!.value + 'Template';
+    template.content = this.editForm.get(['content'])!.value;
+    template.contentContentType = this.editForm.get(['contentContentType'])!.value;
+    this.templateService.create(template).subscribe(
+      res => {
+        const exam = new Exam();
+        exam.name = this.editForm.get(['name'])!.value;
+        exam.templateId = res.body?.id;
+        exam.courseId = +this.courseid!;
+        this.examService.create(exam).subscribe(
+          () => {
+            this.isSaving = false;
+            // TODO
+            this.router.navigateByUrl('/course/' + this.courseid);
+          },
+          () => {
+            // TODO add error message
+            this.isSaving = false;
+          }
+        );
+      },
+      () => {
         // TODO add error message
-        this.isSaving =false;
-      })
-
-
-
-    },()=>{
-        // TODO add error message
-        this.isSaving =false;
-    });
-
-
-
-
+        this.isSaving = false;
+      }
+    );
   }
-
 }
