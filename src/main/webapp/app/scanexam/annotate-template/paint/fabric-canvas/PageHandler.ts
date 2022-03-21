@@ -168,6 +168,8 @@ export class PageHandler {
   }
 
   private onCanvasMouseDown(event: { e: Event }) {
+    // eslint-disable-next-line no-console
+    console.log('mouse down');
     this.eventHandler.canvas = this.canvas;
     this.eventHandler.mouseDown(event.e);
     this.avoidDragAndClickEventsOfOtherUILibs(event.e);

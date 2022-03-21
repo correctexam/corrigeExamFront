@@ -35,6 +35,7 @@ import { FabricCanvasComponent } from './annotate-template/paint/fabric-canvas/f
 import { ThicknessSliderComponent } from './annotate-template/paint/toolbar/thickness-slider/thickness-slider.component';
 
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+import { QuestionpropertiesviewComponent } from './annotate-template/paint/questionpropertiesview/questionpropertiesview.component';
 
 registerAllModules();
 
@@ -115,6 +116,7 @@ export const ANNOTATETEMPLATE_ROUTE: Route = {
     ColourPaletteComponent,
     FabricCanvasComponent,
     ThicknessSliderComponent,
+    QuestionpropertiesviewComponent,
   ],
   imports: [
     CommonModule,

@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
@@ -25,18 +26,20 @@ import {
   Pointer,
 } from './models';
 import { Injectable } from '@angular/core';
-import { Rect } from 'fabric/fabric-impl';
+import { Group, Rect } from 'fabric/fabric-impl';
 import { CustomFabricGroup } from './models';
 import { IZone } from '../../../entities/zone/zone.model';
 import { ZoneService } from '../../../entities/zone/service/zone.service';
 import { ExamService } from '../../../entities/exam/service/exam.service';
 import { IExam } from '../../../entities/exam/exam.model';
-import { Question } from '../../../entities/question/question.model';
+import { IQuestion, Question } from '../../../entities/question/question.model';
 import { QuestionService } from '../../../entities/question/service/question.service';
 
 const RANGE_AROUND_CENTER = 20;
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class EventHandlerService {
   public imageDataUrl!: string;
   public canvas!: fabric.Canvas;
@@ -46,6 +49,8 @@ export class EventHandlerService {
   private previousScaleX!: number;
   private previousScaleY!: number;
   public modelViewpping = new Map<string, number>();
+
+  private cb!: (qid: number | undefined) => void;
 
   set selectedTool(t: DrawingTools) {
     this.canvas.discardActiveObject();
@@ -381,11 +386,23 @@ export class EventHandlerService {
   }
 
   objectSelected(object: CustomFabricObject): void {
+    this.cb(undefined);
     this.previousLeft = object.left!;
     this.previousTop = object.top!;
     this.previousScaleX = object.scaleX!;
     this.previousScaleY = object.scaleY!;
     switch (this._selectedTool) {
+      case DrawingTools.SELECT:
+        console.log(object.type);
+        if (object.type === FabricObjectType.GROUP) {
+          if (((object as CustomFabricGroup).getObjects()[1] as any).text.startsWith('Question')) {
+            console.log(this.modelViewpping.get(object.id));
+            this.cb(this.modelViewpping.get(object.id));
+          }
+        }
+
+        break;
+
       case DrawingTools.ERASER:
         if (object.type === FabricObjectType.ELLIPSE) {
           const otherEllipses = this.getOtherEllipses(object.id);
@@ -476,5 +493,9 @@ export class EventHandlerService {
     return this.canvas
       .getObjects(FabricObjectType.ELLIPSE)
       .filter(e => (e as CustomFabricEllipse).id !== notIncludedId) as CustomFabricEllipse[];
+  }
+
+  registerQuestionCallBack(cb: (qid: number | undefined) => void) {
+    this.cb = cb;
   }
 }

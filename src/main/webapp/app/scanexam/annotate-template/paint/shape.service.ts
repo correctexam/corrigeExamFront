@@ -128,7 +128,7 @@ export class FabricShapeService {
       left: rect.left!,
       originX: 'left',
       originY: 'top',
-      selectable: false,
+      selectable: true,
       hasRotatingPoint: false,
       lockRotation: true,
     }) as CustomFabricGroup;

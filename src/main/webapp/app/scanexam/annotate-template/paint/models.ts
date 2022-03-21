@@ -57,4 +57,9 @@ export enum FabricObjectType {
   LINE = 'line',
   POLYGON = 'polygon',
   PATH = 'path',
+  GROUP = 'group',
+  NOM = 'nom',
+  PRENOM = 'prenom',
+  INE = 'ine',
+  QUESTION = 'question',
 }
