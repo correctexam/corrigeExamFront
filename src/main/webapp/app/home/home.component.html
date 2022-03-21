@@ -6,9 +6,23 @@
       <p class="mt-0 mb-4 text-700 line-height-3">
         Scanner, corriger par lots, soyez assisté par de l'IA, faites un retour précis à vos étudiants, depuis un PC ou une tablette
       </p>
-      <button (click)="login()" pbutton="" pripple="" label="Learn More" type="button" class="p-element p-ripple mr-3 p-button-raised p-button p-component">
+      <button
+        (click)="login()"
+        pbutton=""
+        pripple=""
+        label="Learn More"
+        type="button"
+        class="p-element p-ripple mr-3 p-button-raised p-button p-component"
+      >
         <span class="p-button-label">Authentifier vous</span><span class="p-ink"></span></button
-      ><button  routerLink="account/register" pbutton="" pripple="" label="Live Demo" type="button" class="p-element p-ripple p-button-outlined p-button p-component">
+      ><button
+        routerLink="account/register"
+        pbutton=""
+        pripple=""
+        label="Live Demo"
+        type="button"
+        class="p-element p-ripple p-button-outlined p-button p-component"
+      >
         <span class="p-button-label">Créer un compte</span><span class="p-ink"></span>
       </button>
     </section>
@@ -22,15 +36,27 @@
     />
   </div>
 </div>
-<div  *jhiHasAnyAuthority="'ROLE_USER'">
-  <div *ngIf="!this.account?.authorities?.includes('ROLE_ADMIN')" >
-  <p-dock [model]="dockItems" position="top">
-    <ng-template pTemplate="item" let-item>
-      <a [routerLink]="item.route"><img [src]="item.icon" [alt]="item.label" width="100%" [pTooltip]="item.title" /></a>
-    </ng-template>
-  </p-dock>
+<div *jhiHasAnyAuthority="'ROLE_USER'">
+  <div *ngIf="!this.account?.authorities?.includes('ROLE_ADMIN')">
+    <p-dock [model]="dockItems" position="top">
+      <ng-template pTemplate="item" let-item>
+        <a [routerLink]="item.route"><img [src]="item.icon" [alt]="item.label" width="100%" [pTooltip]="item.title" /></a>
+      </ng-template>
+    </p-dock>
+    <jhi-mes-cours></jhi-mes-cours>
+  </div>
+  <div *ngIf="this.account?.authorities?.includes('ROLE_ADMIN')" class="row">
+    <div class="col-md-3">
+      <span class="hipster img-fluid rounded"></span>
+    </div>
+    <div class="col-md-9">
+      <h1 class="display-4"><span>Bienvenue sur la page d'administration de cette application</span></h1>
 
-
-  <jhi-mes-cours></jhi-mes-cours>
-</div>
+      <p class="lead">Vous pouvez accéder aux données depuis le menu entité</p>
+      <BR />
+      <BR />
+      <p>Vous pouvez gérer les utilsiateurs et les services depuis le menu administration.</p>
+      <BR />
+    </div>
+  </div>
 </div>

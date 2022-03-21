@@ -132,6 +132,8 @@ export class PageHandler {
     (canvas as any).page = this.page;
 
     this.eventHandler.canvas = canvas;
+    this.eventHandler.allcanvas.push(canvas);
+
     this.eventHandler.extendToObjectWithId();
     this.canvas = canvas;
     fabric.Object.prototype.objectCaching = false;
@@ -168,8 +170,6 @@ export class PageHandler {
   }
 
   private onCanvasMouseDown(event: { e: Event }) {
-    // eslint-disable-next-line no-console
-    console.log('mouse down');
     this.eventHandler.canvas = this.canvas;
     this.eventHandler.mouseDown(event.e);
     this.avoidDragAndClickEventsOfOtherUILibs(event.e);
@@ -185,15 +185,11 @@ export class PageHandler {
   private onSelectionCreated(e: any) {
     this.eventHandler.canvas = this.canvas;
 
-    // eslint-disable-next-line no-console
-    console.log(e.selected[0]);
     this.eventHandler.objectSelected(e.selected[0]);
   }
   private onSelectionUpdated(e: any) {
     this.eventHandler.canvas = this.canvas;
 
-    // eslint-disable-next-line no-console
-    console.log(e);
     this.eventHandler.objectSelected(e.selected[0]);
   }
   private onObjectMoving(e: any) {

@@ -11,24 +11,21 @@ import { UserService } from 'app/entities/user/user.service';
 import { finalize, Observable } from 'rxjs';
 import { AccountService } from '../../core/auth/account.service';
 
-
 @Component({
   selector: 'jhi-creercours',
   templateUrl: './creercours.component.html',
-  styleUrls: ['./creercours.component.scss']
+  styleUrls: ['./creercours.component.scss'],
 })
 export class CreercoursComponent implements OnInit {
-
   isSaving = false;
 
   usersSharedCollection: IUser[] = [];
 
-
-  login :string|undefined;
+  login: string | undefined;
   editForm = this.fb.group({
     id: [],
     name: [null, [Validators.required]],
-  //  prof: [null, Validators.required],
+    //  prof: [null, Validators.required],
   });
 
   constructor(
@@ -42,11 +39,10 @@ export class CreercoursComponent implements OnInit {
 
   ngOnInit(): void {
     this.createFromForm();
-    this.userService.query
+    this.userService.query;
     this.accountService.getAuthenticationState().subscribe(e => {
-
-      this.login = e?.login
-    })
+      this.login = e?.login;
+    });
   }
 
   previousState(): void {
@@ -56,7 +52,7 @@ export class CreercoursComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     const course = this.createFromForm();
-      this.subscribeToSaveResponse(this.courseService.create(course));
+    this.subscribeToSaveResponse(this.courseService.create(course));
   }
 
   trackUserById(index: number, item: IUser): number {
@@ -82,16 +78,14 @@ export class CreercoursComponent implements OnInit {
     this.isSaving = false;
   }
 
-
   protected createFromForm(): ICourse {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return {
       ...new Course(),
       id: this.editForm.get(['id'])!.value,
       name: this.editForm.get(['name'])!.value,
-    //  prof: {new User(id:null, }this.login!)
-     // prof: this.editForm.get(['prof'])!.value,
+      //  prof: {new User(id:null, }this.login!)
+      // prof: this.editForm.get(['prof'])!.value,
     };
   }
-
 }

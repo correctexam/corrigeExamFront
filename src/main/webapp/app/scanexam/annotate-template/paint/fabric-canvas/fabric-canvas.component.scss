@@ -1,5 +1,6 @@
 .canvas-wrapper {
-  overflow: scroll;
+  overflow-y: scroll;
+  overflow-x: hidden;
   width: 80vw;
-  height: 100vh;
+  height: 80vh;
 }

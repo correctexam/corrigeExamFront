@@ -36,6 +36,7 @@ import { ThicknessSliderComponent } from './annotate-template/paint/toolbar/thic
 
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { QuestionpropertiesviewComponent } from './annotate-template/paint/questionpropertiesview/questionpropertiesview.component';
+import { ChargerscanComponent } from './chargerscan/chargerscan.component';
 
 registerAllModules();
 
@@ -83,6 +84,15 @@ export const CREEREXAM_ROUTE: Route = {
   },
 };
 
+export const CHARGERSCAN_ROUTE: Route = {
+  path: 'loadscan/:examid',
+  component: ChargerscanComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.creercours',
+  },
+};
+
 export const EXAMDETAIL_ROUTE: Route = {
   path: 'exam/:examid',
   component: ExamDetailComponent,
@@ -117,6 +127,7 @@ export const ANNOTATETEMPLATE_ROUTE: Route = {
     FabricCanvasComponent,
     ThicknessSliderComponent,
     QuestionpropertiesviewComponent,
+    ChargerscanComponent,
   ],
   imports: [
     CommonModule,
@@ -144,6 +155,7 @@ export const ANNOTATETEMPLATE_ROUTE: Route = {
       CREEREXAM_ROUTE,
       EXAMDETAIL_ROUTE,
       ANNOTATETEMPLATE_ROUTE,
+      CHARGERSCAN_ROUTE,
     ]),
   ],
   exports: [MesCoursComponent, CreercoursComponent, CoursdetailsComponent, ImportStudentComponent, ListstudentcourseComponent],

@@ -31,6 +31,20 @@
             ><BR />
             <span>Annoter template</span>
           </button>
+          <button
+            [routerLink]="'/loadscan/' + this.examId"
+            [style]="{ width: '20em', marginBottom: '1em', margin: '1em' }"
+            class="p-element p-ripple"
+            pButton
+            pRipple
+            type="button"
+          >
+            <fa-stack>
+              <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
+              <fa-icon [icon]="faBookOpenReader" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
+            ><BR />
+            <span>Charger scan étudiants</span>
+          </button>
         </div>
       </div>
     </div>

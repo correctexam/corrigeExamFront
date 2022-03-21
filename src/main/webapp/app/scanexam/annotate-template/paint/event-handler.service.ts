@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable no-empty */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable no-console */
@@ -43,12 +44,14 @@ const RANGE_AROUND_CENTER = 20;
 export class EventHandlerService {
   public imageDataUrl!: string;
   public canvas!: fabric.Canvas;
+  public allcanvas: fabric.Canvas[] = [];
   private _selectedTool: DrawingTools = DrawingTools.SELECT;
   private previousTop!: number;
   private previousLeft!: number;
   private previousScaleX!: number;
   private previousScaleY!: number;
   public modelViewpping = new Map<string, number>();
+  public nextQuestionNumero = 1;
 
   private cb!: (qid: number | undefined) => void;
 
@@ -69,14 +72,16 @@ export class EventHandlerService {
       this.objectsSelectable(false);
     }
     if (this.selectedTool === DrawingTools.GARBAGE) {
-      const background = this.canvas.backgroundImage;
-      this.canvas.clear();
-      this.canvas.setBackgroundImage(background!, () => {});
+      //      const background = this.canvas.backgroundImage;
+      this.allcanvas.forEach(c => {
+        c.getObjects().forEach(o => this.canvas.remove(o));
+        c.clear();
+        c.renderAll();
+      });
       this.modelViewpping.forEach((e, id1) => {
-        // eslint-disable-next-line no-console
-        console.log(id1);
         this.zoneService.delete(e).subscribe();
       });
+      this.modelViewpping.clear();
     }
   }
   get selectedTool(): DrawingTools {
@@ -339,10 +344,13 @@ export class EventHandlerService {
         });
       });
     } else if (this._selectedTool === DrawingTools.QUESTIONBOX) {
+      const numero = this.nextQuestionNumero;
+      this.nextQuestionNumero = this.nextQuestionNumero + 1;
+
       this._elementUnderDrawing = this.fabricShapeService.createBox(
         this.canvas,
         this._elementUnderDrawing as CustomFabricRect,
-        'Question',
+        'Question ' + numero,
         DrawingColours.BLUE
       );
 
@@ -360,10 +368,11 @@ export class EventHandlerService {
         q.zoneId = z1.body!.id!;
         q.examId = this._exam.id;
         q.typeId = 2;
-        q.numero = 1;
+        q.numero = numero;
         q.point = 2;
         this.questionService.create(q).subscribe(e => {
           this.selectedTool = DrawingTools.SELECT;
+          this.cb(z1.body!.id!);
         });
       });
     }
@@ -393,10 +402,8 @@ export class EventHandlerService {
     this.previousScaleY = object.scaleY!;
     switch (this._selectedTool) {
       case DrawingTools.SELECT:
-        console.log(object.type);
         if (object.type === FabricObjectType.GROUP) {
           if (((object as CustomFabricGroup).getObjects()[1] as any).text.startsWith('Question')) {
-            console.log(this.modelViewpping.get(object.id));
             this.cb(this.modelViewpping.get(object.id));
           }
         }
@@ -408,8 +415,9 @@ export class EventHandlerService {
           const otherEllipses = this.getOtherEllipses(object.id);
           otherEllipses.forEach(e => this.canvas.remove(e));
         }
-        this.canvas.remove(object);
         this.zoneService.delete(this.modelViewpping.get(object.id)!).subscribe();
+        this.modelViewpping.delete(object.id);
+        this.canvas.remove(object);
 
         break;
       case DrawingTools.FILL:
@@ -420,7 +428,7 @@ export class EventHandlerService {
 
   objectMoving(id: string, type: FabricObjectType, newLeft: number, newTop: number) {
     const l = newLeft;
-    const t = newLeft;
+    const t = newTop;
     const nid = id;
     this.zoneService
       .partialUpdate({

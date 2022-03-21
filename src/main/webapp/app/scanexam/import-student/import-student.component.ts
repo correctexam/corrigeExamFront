@@ -75,6 +75,9 @@ export class ImportStudentComponent implements OnInit {
     this.hotRegisterer.getInstance(this.id).render();
   }
 
+  gotoUE(): void {
+    this.router.navigateByUrl('/course/' + this.courseid);
+  }
   envoiEtudiants(): void {
     const c = {
       course: this.courseid,

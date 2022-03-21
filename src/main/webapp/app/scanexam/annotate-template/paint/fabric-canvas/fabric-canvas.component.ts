@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
@@ -172,18 +173,26 @@ export class FabricCanvasComponent implements AfterViewInit {
             break;
           }
           case DrawingTools.QUESTIONBOX: {
-            const r = this.fabricShapeService.createBoxFromScratch(
-              canvas,
-              {
-                x: z.xInit! / 100,
-                y: z.yInit! / 100,
-              },
-              z.width! / 100,
-              z.height! / 100,
-              'Question',
-              DrawingColours.GREEN
-            );
-            this.eventHandler.modelViewpping.set(r.id, z.id!);
+            this.questionService.query({ zoneId: z.id }).subscribe(e => {
+              if (e.body !== undefined && e.body!.length > 0) {
+                const r = this.fabricShapeService.createBoxFromScratch(
+                  canvas,
+                  {
+                    x: z.xInit! / 100,
+                    y: z.yInit! / 100,
+                  },
+                  z.width! / 100,
+                  z.height! / 100,
+                  'Question ' + e.body![0].numero,
+                  DrawingColours.GREEN
+                );
+                this.eventHandler.modelViewpping.set(r.id, z.id!);
+                if (this.eventHandler.nextQuestionNumero <= e.body![0].numero!) {
+                  this.eventHandler.nextQuestionNumero = this.eventHandler.nextQuestionNumero + 1;
+                }
+              }
+            });
+
             break;
           }
         }

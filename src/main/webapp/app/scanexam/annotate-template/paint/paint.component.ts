@@ -11,4 +11,8 @@ export class PaintComponent {
   content: any;
   @Input()
   exam!: IExam;
+
+  previousState(): void {
+    window.history.back();
+  }
 }
