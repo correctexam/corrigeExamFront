@@ -39,7 +39,7 @@ jobs:
           npm ci
       - name: Build
         run: |
-          npm run build
+          npm run webapp:build:prodgithubpage
       - name: Lint
         run: |
           npm run lint
