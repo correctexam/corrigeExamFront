@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1647977565310,
+  "timestamp": 1647978329415,
   "index": "/corrigeExamFront/index.html",
   "assetGroups": [
     {
@@ -27,7 +27,7 @@
         "/corrigeExamFront/534.48e114c863a75adf.js",
         "/corrigeExamFront/569.2845205888105e07.js",
         "/corrigeExamFront/619.1bfda7d13833c4bb.js",
-        "/corrigeExamFront/712.965a35c708fb1313.js",
+        "/corrigeExamFront/712.69726b1b9dbbbc6c.js",
         "/corrigeExamFront/765.b3614d1fe8f88d25.js",
         "/corrigeExamFront/802.2de7e4a7952ab589.js",
         "/corrigeExamFront/855.ce8353930ad56abb.js",
@@ -41,7 +41,7 @@
         "/corrigeExamFront/main.42832b28725225c0.js",
         "/corrigeExamFront/manifest.webapp",
         "/corrigeExamFront/polyfills.75eec14e8d1fe63d.js",
-        "/corrigeExamFront/runtime.44b9b8f3d4be00a9.js",
+        "/corrigeExamFront/runtime.9050c9060bd0f938.js",
         "/corrigeExamFront/styles.debe3be5ac28f5ef.css"
       ],
       "patterns": []
@@ -58,6 +58,7 @@
         "/corrigeExamFront/content/css/loading.css",
         "/corrigeExamFront/content/example.pdf",
         "/corrigeExamFront/content/images/appstore.svg",
+        "/corrigeExamFront/content/images/bannerright.jpg",
         "/corrigeExamFront/content/images/exam.svg",
         "/corrigeExamFront/content/images/finder.svg",
         "/corrigeExamFront/content/images/hero-1.png",
@@ -83,7 +84,6 @@
         "/corrigeExamFront/content/images/jhipster_family_member_3_head-512.png",
         "/corrigeExamFront/content/images/logo-jhipster.png",
         "/corrigeExamFront/content/images/photos.svg",
-        "/corrigeExamFront/content/images/piqsels.com-id-frfkz.jpg",
         "/corrigeExamFront/content/images/plus.svg",
         "/corrigeExamFront/content/images/remove-rubbish.svg",
         "/corrigeExamFront/content/images/scholar.svg",
@@ -136,7 +136,7 @@
     "/corrigeExamFront/534.48e114c863a75adf.js": "dc4300aee973a8d8a9bc364df75b114eafdc036f",
     "/corrigeExamFront/569.2845205888105e07.js": "cb30ee5eab7876667326c93c24e2d27eafdaf14d",
     "/corrigeExamFront/619.1bfda7d13833c4bb.js": "8e6a13c22347ee610bc8adec200f69b286468379",
-    "/corrigeExamFront/712.965a35c708fb1313.js": "9e4fa32278f86aea2bb0d0e7324512c537de5f56",
+    "/corrigeExamFront/712.69726b1b9dbbbc6c.js": "c8f7573dc69794835d3560a4f0a998c4001b00b1",
     "/corrigeExamFront/765.b3614d1fe8f88d25.js": "e830f07a2cf7e68345037272e17957a8b4914376",
     "/corrigeExamFront/802.2de7e4a7952ab589.js": "1fe6932a79dc6af784bba59f5c15ee23cf3aa424",
     "/corrigeExamFront/855.ce8353930ad56abb.js": "85b7ff591bc0fbb1b1f990cec6fb94176f6a72d6",
@@ -149,6 +149,7 @@
     "/corrigeExamFront/content/css/loading.css": "013e341c9cb1e6abb93f94924af393026311511d",
     "/corrigeExamFront/content/example.pdf": "3d7747788f29264e3f1a61bfb69aa91b45efef50",
     "/corrigeExamFront/content/images/appstore.svg": "bfdf0fd0d00aea1017bfc87f93cb4cac7790fad6",
+    "/corrigeExamFront/content/images/bannerright.jpg": "64a6ceac5a9cd038bee09da12f8599f180f6e291",
     "/corrigeExamFront/content/images/exam.svg": "553883ab9cdf41048c17ad0b76ebdef3f97509cb",
     "/corrigeExamFront/content/images/finder.svg": "7a205f2fb1b4fe00bcaa111271ea86ae3dffc6c9",
     "/corrigeExamFront/content/images/hero-1.png": "b772448e6bf23674acde465a4d196ffbb692b621",
@@ -174,7 +175,6 @@
     "/corrigeExamFront/content/images/jhipster_family_member_3_head-512.png": "97e81d97579be35f112fa057028887fbb80f962c",
     "/corrigeExamFront/content/images/logo-jhipster.png": "e1e46028ec092ca351425b07707fcdd52146b0b3",
     "/corrigeExamFront/content/images/photos.svg": "7e77297062b81fcf64e4454d66b7bb43fc1ac69d",
-    "/corrigeExamFront/content/images/piqsels.com-id-frfkz.jpg": "64a6ceac5a9cd038bee09da12f8599f180f6e291",
     "/corrigeExamFront/content/images/plus.svg": "2154fce5705be21ceec0af820130a24ca8d8fe9b",
     "/corrigeExamFront/content/images/remove-rubbish.svg": "9000f36fdd82d46ee27a1dac3ae2568dda909e6f",
     "/corrigeExamFront/content/images/scholar.svg": "f209bee39d583876623062129b455355884a53d0",
@@ -200,7 +200,7 @@
     "/corrigeExamFront/content/templateExample.docx": "4ccd98a94108f497187a1be4312ade0703e4f9b6",
     "/corrigeExamFront/favicon.ico": "69547cd4a95b59ac7e6818b6eb82befa061d0c16",
     "/corrigeExamFront/hue.8b1818380241e6ac.png": "f81ae627637a684614aa726e206c73ce099a01fd",
-    "/corrigeExamFront/index.html": "4b8a5bd47092e5af0f53cbdeba01fbcdacceffcb",
+    "/corrigeExamFront/index.html": "714e6d83367ee271e08d6e866a7bff6f4563791c",
     "/corrigeExamFront/jhipster_family_member_3.87663f884fcea614.svg": "0690f4141a25d739ed9429b0b315cc94196a3644",
     "/corrigeExamFront/logo-jhipster.6125d9b31ded8344.png": "e1e46028ec092ca351425b07707fcdd52146b0b3",
     "/corrigeExamFront/main.42832b28725225c0.js": "8af646161e7228227f75b85f4b9174a5a29ac402",
@@ -210,7 +210,7 @@
     "/corrigeExamFront/primeicons.5f5d08cd089b4e5d.ttf": "e6c86ca90a9fb4282fb35523d56fde00e78a1416",
     "/corrigeExamFront/primeicons.76044b1c189cc4d7.svg": "621775b2ec555fd2dd152a24390cf6dfeee168b1",
     "/corrigeExamFront/primeicons.964f445f3ea9db80.eot": "ccf65e40680b0ede6ab46939d421c831ae6afcf4",
-    "/corrigeExamFront/runtime.44b9b8f3d4be00a9.js": "e2316efeaefc64a280f07ce805ecec12bde9dc8f",
+    "/corrigeExamFront/runtime.9050c9060bd0f938.js": "dd19e5f7b312fe8784521ec0b8a1066c09cc76ea",
     "/corrigeExamFront/styles.debe3be5ac28f5ef.css": "a1fe8a9f80134b3574ace2ae8cc4f2f5680f490e"
   },
   "navigationUrls": [
