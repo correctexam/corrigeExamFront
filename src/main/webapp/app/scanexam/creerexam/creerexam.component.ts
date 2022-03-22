@@ -110,6 +110,6 @@ export class CreerexamComponent implements OnInit {
   }
 
   downloadTemplate(): void {
-    window.open('/content/templateExample.docx', '_blank');
+    window.open('content/templateExample.docx', '_blank');
   }
 }
