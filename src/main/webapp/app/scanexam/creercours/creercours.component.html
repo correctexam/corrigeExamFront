@@ -1,33 +1,34 @@
-<div  class="grid grid-nogutter surface-section text-800">
+<div class="grid grid-nogutter surface-section text-800">
+  <div class="col-12 md:col-6 p-6 text-center md:text-left flex align-items-center">
+    <section>
+      <div class="d-flex justify-content-center">
+        <div class="col-8">
+          <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+            <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">Créer un cours</h2>
 
-<div class="col-12 md:col-6 p-6 text-center md:text-left flex align-items-center">
-  <section>
-    <div class="d-flex justify-content-center">
-      <div class="col-8">
-        <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-          <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">
-            Créer un cours
-          </h2>
+            <div>
+              <jhi-alert-error></jhi-alert-error>
 
-          <div>
-            <jhi-alert-error></jhi-alert-error>
-
-            <div class="row mb-3" [hidden]="editForm.get('id')!.value == null">
-              <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
-              <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-            </div>
-
-            <div class="row mb-3">
-              <label class="form-label"  for="field_name">Nom du cours</label>
-              <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" />
-              <div *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
-                <small class="form-text text-danger" *ngIf="editForm.get('name')?.errors?.required" jhiTranslate="entity.validation.required">
-                  This field is required.
-                </small>
+              <div class="row mb-3" [hidden]="editForm.get('id')!.value == null">
+                <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+                <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
               </div>
-            </div>
 
-           <!-- <div class="row mb-3">
+              <div class="row mb-3">
+                <label class="form-label" for="field_name">Nom du cours</label>
+                <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" />
+                <div *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
+                  <small
+                    class="form-text text-danger"
+                    *ngIf="editForm.get('name')?.errors?.required"
+                    jhiTranslate="entity.validation.required"
+                  >
+                    This field is required.
+                  </small>
+                </div>
+              </div>
+
+              <!-- <div class="row mb-3">
               <label class="form-label" jhiTranslate="gradeScopeIsticApp.course.prof" for="field_prof">Prof</label>
               <select class="form-control" id="field_prof" data-cy="prof" name="prof" formControlName="prof">
                 <option *ngIf="!editForm.get('prof')!.value" [ngValue]="null" selected></option>
@@ -45,35 +46,34 @@
               </small>
             </div>
 -->
-          </div>
+            </div>
 
-          <div>
-            <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-              <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-            </button>
+            <div>
+              <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+                <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+              </button>
 
-            <button
-              type="submit"
-              id="save-entity"
-              data-cy="entityCreateSaveButton"
-              [disabled]="editForm.invalid || isSaving"
-              class="btn btn-primary"
-            >
-              <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-            </button>
-          </div>
-        </form>
+              <button
+                type="submit"
+                id="save-entity"
+                data-cy="entityCreateSaveButton"
+                [disabled]="editForm.invalid || isSaving"
+                class="btn btn-primary"
+              >
+                <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
-
-  </section>
-</div>
-<div class="col-12 md:col-6 overflow-hidden">
-  <img
-    src="/content/images/piqsels.com-id-frfkz.jpg"
-    alt="Image"
-    class="md:ml-auto block md:h-full"
-    style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
-  />
-</div>
+    </section>
+  </div>
+  <div class="col-12 md:col-6 overflow-hidden">
+    <img
+      src="content/images/bannerright.jpg"
+      alt="Image"
+      class="md:ml-auto block md:h-full"
+      style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
+    />
+  </div>
 </div>
