@@ -46,6 +46,14 @@ jobs:
       - name: Test
         run: |
           npm run test
+#      - name: Deploy
+#        run: |
+#          npm run deploy
       - name: Deploy
-        run: |
-          npm run deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.ref == 'refs/heads/main' }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/classes/static
+
+
