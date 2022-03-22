@@ -37,7 +37,16 @@ import { ThicknessSliderComponent } from './annotate-template/paint/toolbar/thic
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { QuestionpropertiesviewComponent } from './annotate-template/paint/questionpropertiesview/questionpropertiesview.component';
 import { ChargerscanComponent } from './chargerscan/chargerscan.component';
+import { ShowextractImageComponent } from './showextract-image/showextract-image.component';
+import { ImageCropperModule } from 'ngx-image-cropper';
+import { ImageExtractorComponent } from './image-extractor/image-extractor.component';
+import { AssocierCopiesEtudiantsComponent } from './associer-copies-etudiants/associer-copies-etudiants.component';
+import { NgxOpenCVModule } from 'ngx-opencv';
 
+// set the location of the OpenCV files
+const openCVConfig = {
+  openCVDirPath: '/content/opencv',
+};
 registerAllModules();
 
 export const COURSMAIN_ROUTE: Route = {
@@ -111,6 +120,33 @@ export const ANNOTATETEMPLATE_ROUTE: Route = {
   },
 };
 
+export const SHOWIMAGE_ROUTE: Route = {
+  path: 'showimage/:examid',
+  component: ShowextractImageComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.creercours',
+  },
+};
+
+export const AssocierCopiesEtudiants_ROUTE: Route = {
+  path: 'studentbindings/:examid',
+  component: AssocierCopiesEtudiantsComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.creercours',
+  },
+};
+
+export const CorrigerCopiesEtudiants_ROUTE: Route = {
+  path: 'answer/:examid',
+  component: AssocierCopiesEtudiantsComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.creercours',
+  },
+};
+
 @NgModule({
   declarations: [
     MesCoursComponent,
@@ -128,6 +164,9 @@ export const ANNOTATETEMPLATE_ROUTE: Route = {
     ThicknessSliderComponent,
     QuestionpropertiesviewComponent,
     ChargerscanComponent,
+    ShowextractImageComponent,
+    ImageExtractorComponent,
+    AssocierCopiesEtudiantsComponent,
   ],
   imports: [
     CommonModule,
@@ -137,6 +176,8 @@ export const ANNOTATETEMPLATE_ROUTE: Route = {
     FontAwesomeModule,
     BlockUIModule,
     MenuModule,
+    NgxOpenCVModule.forRoot(openCVConfig),
+    ImageCropperModule,
     DockModule,
     TooltipModule,
     ToastModule,
@@ -156,6 +197,9 @@ export const ANNOTATETEMPLATE_ROUTE: Route = {
       EXAMDETAIL_ROUTE,
       ANNOTATETEMPLATE_ROUTE,
       CHARGERSCAN_ROUTE,
+      SHOWIMAGE_ROUTE,
+      AssocierCopiesEtudiants_ROUTE,
+      CorrigerCopiesEtudiants_ROUTE,
     ]),
   ],
   exports: [MesCoursComponent, CreercoursComponent, CoursdetailsComponent, ImportStudentComponent, ListstudentcourseComponent],

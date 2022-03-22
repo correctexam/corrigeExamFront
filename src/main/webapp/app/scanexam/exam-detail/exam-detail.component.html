@@ -45,6 +45,50 @@
             ><BR />
             <span>Charger scan étudiants</span>
           </button>
+          <button
+            [style]="{ width: '20em', marginBottom: '1em', margin: '1em' }"
+            class="p-element p-ripple"
+            pButton
+            pRipple
+            type="button"
+            [disabled]="true"
+          >
+            <fa-stack>
+              <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
+              <fa-icon [icon]="faBookOpenReader" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
+            ><BR />
+            <span>Redresser scan</span>
+          </button>
+          <button
+            [routerLink]="'/studentbindings/' + this.examId"
+            [style]="{ width: '20em', marginBottom: '1em', margin: '1em' }"
+            class="p-element p-ripple"
+            pButton
+            pRipple
+            type="button"
+            [disabled]="!exam?.scanfileId"
+          >
+            <fa-stack>
+              <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
+              <fa-icon [icon]="faBookOpenReader" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
+            ><BR />
+            <span>Associer copies/étudiants</span>
+          </button>
+          <button
+            [routerLink]="'/answer/' + this.examId"
+            [style]="{ width: '20em', marginBottom: '1em', margin: '1em' }"
+            class="p-element p-ripple"
+            pButton
+            pRipple
+            type="button"
+            [disabled]="true"
+          >
+            <fa-stack>
+              <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
+              <fa-icon [icon]="faBookOpenReader" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
+            ><BR />
+            <span>Corriger copies</span>
+          </button>
         </div>
       </div>
     </div>

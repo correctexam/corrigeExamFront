@@ -6,6 +6,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { TranslateService } from '@ngx-translate/core';
 import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
@@ -28,6 +29,7 @@ export class CreerexamComponent implements OnInit {
   courseid: string | undefined = undefined;
   isSaving = false;
   coursName = '';
+  faDownload = faDownload;
   editForm = this.fb.group({
     name: [null, [Validators.required]],
     content: [],
@@ -105,5 +107,9 @@ export class CreerexamComponent implements OnInit {
         this.isSaving = false;
       }
     );
+  }
+
+  downloadTemplate(): void {
+    window.open('/content/templateExample.docx', '_blank');
   }
 }

@@ -35,6 +35,7 @@ import { ExamService } from '../../../entities/exam/service/exam.service';
 import { IExam } from '../../../entities/exam/exam.model';
 import { IQuestion, Question } from '../../../entities/question/question.model';
 import { QuestionService } from '../../../entities/question/service/question.service';
+import { PageHandler } from './fabric-canvas/PageHandler';
 
 const RANGE_AROUND_CENTER = 20;
 
@@ -52,6 +53,7 @@ export class EventHandlerService {
   private previousScaleY!: number;
   public modelViewpping = new Map<string, number>();
   public nextQuestionNumero = 1;
+  pages: { [page: number]: PageHandler } = {};
 
   private cb!: (qid: number | undefined) => void;
 
@@ -281,12 +283,29 @@ export class EventHandlerService {
         'Nom',
         DrawingColours.BLUE
       );
+      /*  const r =  this.pages[(this.canvas as any).page].cursorToReal({
+          x:this._elementUnderDrawing.left,
+        y: this._elementUnderDrawing.top
+      });
+      console.log(r)*/
+      console.log(this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight);
+      console.log(this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth);
+      /*   const r1 =  this.pages[(this.canvas as any).page].realToCanvas({
+        x:this._elementUnderDrawing.left!,
+        y: this._elementUnderDrawing.top!
+    });
+    console.log(r1)*/
+
       const z: IZone = {
         page: (this.canvas as any).page,
-        xInit: Math.trunc(this._elementUnderDrawing.left! * 100),
-        yInit: Math.trunc(this._elementUnderDrawing.top! * 100),
-        width: Math.trunc(this._elementUnderDrawing.width! * 100),
-        height: Math.trunc(this._elementUnderDrawing.height! * 100),
+        xInit: Math.trunc((this._elementUnderDrawing.left! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth),
+        yInit: Math.trunc((this._elementUnderDrawing.top! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight),
+        width: Math.trunc(
+          (this._elementUnderDrawing.width! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth
+        ),
+        height: Math.trunc(
+          (this._elementUnderDrawing.height! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight
+        ),
       };
       const uid = this._elementUnderDrawing.id;
       this.zoneService.create(z).subscribe(z1 => {
@@ -306,10 +325,14 @@ export class EventHandlerService {
       );
       const z: IZone = {
         page: (this.canvas as any).page,
-        xInit: Math.trunc(this._elementUnderDrawing.left! * 100),
-        yInit: Math.trunc(this._elementUnderDrawing.top! * 100),
-        width: Math.trunc(this._elementUnderDrawing.width! * 100),
-        height: Math.trunc(this._elementUnderDrawing.height! * 100),
+        xInit: Math.trunc((this._elementUnderDrawing.left! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth),
+        yInit: Math.trunc((this._elementUnderDrawing.top! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight),
+        width: Math.trunc(
+          (this._elementUnderDrawing.width! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth
+        ),
+        height: Math.trunc(
+          (this._elementUnderDrawing.height! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight
+        ),
       };
       const uid = this._elementUnderDrawing.id;
       this.zoneService.create(z).subscribe(z1 => {
@@ -329,10 +352,14 @@ export class EventHandlerService {
       );
       const z: IZone = {
         page: (this.canvas as any).page,
-        xInit: Math.trunc(this._elementUnderDrawing.left! * 100),
-        yInit: Math.trunc(this._elementUnderDrawing.top! * 100),
-        width: Math.trunc(this._elementUnderDrawing.width! * 100),
-        height: Math.trunc(this._elementUnderDrawing.height! * 100),
+        xInit: Math.trunc((this._elementUnderDrawing.left! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth),
+        yInit: Math.trunc((this._elementUnderDrawing.top! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight),
+        width: Math.trunc(
+          (this._elementUnderDrawing.width! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth
+        ),
+        height: Math.trunc(
+          (this._elementUnderDrawing.height! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight
+        ),
       };
       const uid = this._elementUnderDrawing.id;
       this.zoneService.create(z).subscribe(z1 => {
@@ -356,10 +383,14 @@ export class EventHandlerService {
 
       const z: IZone = {
         page: (this.canvas as any).page,
-        xInit: Math.trunc(this._elementUnderDrawing.left! * 100),
-        yInit: Math.trunc(this._elementUnderDrawing.top! * 100),
-        width: Math.trunc(this._elementUnderDrawing.width! * 100),
-        height: Math.trunc(this._elementUnderDrawing.height! * 100),
+        xInit: Math.trunc((this._elementUnderDrawing.left! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth),
+        yInit: Math.trunc((this._elementUnderDrawing.top! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight),
+        width: Math.trunc(
+          (this._elementUnderDrawing.width! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth
+        ),
+        height: Math.trunc(
+          (this._elementUnderDrawing.height! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight
+        ),
       };
       const uid = this._elementUnderDrawing.id;
       this.zoneService.create(z).subscribe(z1 => {
@@ -433,10 +464,17 @@ export class EventHandlerService {
     this.zoneService
       .partialUpdate({
         id: this.modelViewpping.get(nid),
-        xInit: Math.trunc(l! * 100),
-        yInit: Math.trunc(t! * 100),
+        xInit: Math.trunc((l! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth),
+        yInit: Math.trunc((t! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight),
       })
       .subscribe();
+    console.log({
+      xInit: Math.trunc((l! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth),
+      yInit: Math.trunc((t! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight),
+    });
+
+    console.log(this.pages[(this.canvas as any).page].pageViewer);
+
     if (type !== FabricObjectType.ELLIPSE) {
       return;
     }
@@ -461,10 +499,10 @@ export class EventHandlerService {
     this.zoneService
       .partialUpdate({
         id: this.modelViewpping.get(id),
-        xInit: Math.trunc(l! * 100),
-        yInit: Math.trunc(t! * 100),
-        width: Math.trunc(w! * 100),
-        height: Math.trunc(h! * 100),
+        xInit: Math.trunc((l! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth),
+        yInit: Math.trunc((t! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight),
+        width: Math.trunc((w! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth),
+        height: Math.trunc((h! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight),
       })
       .subscribe();
     /* this.zoneService.objectScaling({

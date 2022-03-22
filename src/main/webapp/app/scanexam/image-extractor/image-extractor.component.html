@@ -1,0 +1,13 @@
+<div style="background-color: black">
+  <div style="background-color: black">
+    <image-cropper
+      *ngIf="cropvisible"
+      #ImageCropperComponent
+      [imageBase64]="srcb64"
+      [autoCrop]="false"
+      [alignImage]="'left'"
+      (imageLoaded)="loaded()"
+    ></image-cropper>
+  </div>
+  <img [src]="imageCropPath" [style.width]="w" [style.height]="h" />
+</div>

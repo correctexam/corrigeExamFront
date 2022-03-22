@@ -20,6 +20,16 @@
         >
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Retourner au module</span>
         </button>
+        <button
+          [disabled]="!this.courseid"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="btn btn-primary"
+          (click)="downloadTemplate()"
+        >
+          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span>Exemple de sujet</span>
+        </button>
       </div>
     </div>
     <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">

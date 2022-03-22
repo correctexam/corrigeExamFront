@@ -1,0 +1,27 @@
+<div class="canvas-wrapper foo">
+  <ngx-extended-pdf-viewer
+    [hidden]="'true'"
+    [src]="'content/images/example.pdf'"
+    [useBrowserLocale]="true"
+    style="flex: 1 1 100%"
+    #viewer
+    [height]="'90vh'"
+    [page]="1"
+    [handTool]="false"
+    [showHandToolButton]="false"
+    [textLayer]="false"
+    [(scrollMode)]="scrollMode"
+    [handTool]="false"
+    [showToolbar]="false"
+    [pageViewMode]="'infinite-scroll'"
+    [showSecondaryToolbarButton]="false"
+    backgroundColor="#ffffff"
+    [zoom]="'100%'"
+    [minZoom]="1"
+    [maxZoom]="1"
+    (pdfLoaded)="exportAsImage()"
+  ></ngx-extended-pdf-viewer>
+
+  <jhi-image-extractor *ngIf="dataURL" [left]="100" [top]="100" [width]="200" [height]="300" [srcb64]="dataURL"></jhi-image-extractor>
+  <jhi-image-extractor *ngIf="dataURL1" [left]="100" [top]="100" [width]="200" [height]="100" [srcb64]="dataURL1"></jhi-image-extractor>
+</div>

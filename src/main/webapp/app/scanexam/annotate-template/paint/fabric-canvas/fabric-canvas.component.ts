@@ -43,7 +43,6 @@ export class FabricCanvasComponent implements AfterViewInit {
   content: any;
   @Input()
   exam!: IExam;
-  pages: { [page: number]: PageHandler } = {};
   zones: { [page: number]: CustomZone[] } = {};
 
   title = 'gradeScopeFree';
@@ -118,12 +117,12 @@ export class FabricCanvasComponent implements AfterViewInit {
 
   pageRendered(evt: any) {
     const page = evt.pageNumber;
-    if (!this.pages[page]) {
+    if (!this.eventHandler.pages[page]) {
       const pageHandler = new PageHandler(evt.source, page, this.eventHandler);
-      this.pages[page] = pageHandler;
+      this.eventHandler.pages[page] = pageHandler;
     }
 
-    const canvas = this.pages[page].updateCanvas(evt.source);
+    const canvas = this.eventHandler.pages[page].updateCanvas(evt.source);
     if (this.zones[page] !== undefined) {
       this.zones[page].forEach(z => {
         switch (z.type) {
@@ -131,11 +130,11 @@ export class FabricCanvasComponent implements AfterViewInit {
             const r = this.fabricShapeService.createBoxFromScratch(
               canvas,
               {
-                x: z.xInit! / 100,
-                y: z.yInit! / 100,
+                x: (z.xInit! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
+                y: (z.yInit! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
               },
-              z.width! / 100,
-              z.height! / 100,
+              (z.width! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
+              (z.height! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
               'Nom',
               DrawingColours.RED
             );
@@ -146,11 +145,11 @@ export class FabricCanvasComponent implements AfterViewInit {
             const r = this.fabricShapeService.createBoxFromScratch(
               canvas,
               {
-                x: z.xInit! / 100,
-                y: z.yInit! / 100,
+                x: (z.xInit! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
+                y: (z.yInit! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
               },
-              z.width! / 100,
-              z.height! / 100,
+              (z.width! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
+              (z.height! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
               'Prénom',
               DrawingColours.RED
             );
@@ -161,11 +160,11 @@ export class FabricCanvasComponent implements AfterViewInit {
             const r = this.fabricShapeService.createBoxFromScratch(
               canvas,
               {
-                x: z.xInit! / 100,
-                y: z.yInit! / 100,
+                x: (z.xInit! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
+                y: (z.yInit! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
               },
-              z.width! / 100,
-              z.height! / 100,
+              (z.width! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
+              (z.height! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
               'INE',
               DrawingColours.RED
             );
@@ -178,11 +177,11 @@ export class FabricCanvasComponent implements AfterViewInit {
                 const r = this.fabricShapeService.createBoxFromScratch(
                   canvas,
                   {
-                    x: z.xInit! / 100,
-                    y: z.yInit! / 100,
+                    x: (z.xInit! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
+                    y: (z.yInit! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
                   },
-                  z.width! / 100,
-                  z.height! / 100,
+                  (z.width! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
+                  (z.height! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
                   'Question ' + e.body![0].numero,
                   DrawingColours.GREEN
                 );
