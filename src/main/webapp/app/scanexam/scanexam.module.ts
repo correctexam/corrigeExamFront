@@ -45,7 +45,7 @@ import { NgxOpenCVModule } from 'ngx-opencv';
 
 // set the location of the OpenCV files
 const openCVConfig = {
-  openCVDirPath: '/content/opencv',
+  openCVDirPath: 'content/opencv',
 };
 registerAllModules();
 
