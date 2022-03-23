@@ -17,9 +17,7 @@ import { ICourse } from 'app/entities/course/course.model';
 import { IScan } from '../../entities/scan/scan.model';
 import { IZone } from 'app/entities/zone/zone.model';
 import { ScrollModeType, NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
-import { NgxOpenCVService, OpenCVState } from 'ngx-opencv';
-
-declare let cv: any;
+import { AlignImagesService } from '../services/align-images.service';
 
 @Component({
   selector: 'jhi-associer-copies-etudiants',
@@ -61,29 +59,10 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     protected activatedRoute: ActivatedRoute,
     public confirmationService: ConfirmationService,
     public router: Router,
-    private ngxOpenCv: NgxOpenCVService
+    private alignImagesService: AlignImagesService
   ) {}
 
   ngOnInit(): void {
-    // subscribe to status of OpenCV module
-    this.ngxOpenCv.cvState.subscribe((cvState: OpenCVState) => {
-      // do something with the state string
-      this.cvState = cvState.state;
-      if (cvState.error) {
-        console.log('error');
-        console.log(cvState);
-      } else if (cvState.loading) {
-        console.log('loading');
-        console.log(cvState);
-        // e.g. show loading indicator
-      } else if (cvState.ready) {
-        console.log('ready');
-        //          const imgData = this.ctx!.getImageData(0, 0, this.canvas!.nativeElement.width, this.canvas!.nativeElement.height);
-        //          const src = cv.matFromImageData(imgData);
-        // do image processing stuff
-      }
-    });
-
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('examid') !== null) {
         this.examId = params.get('examid')!;
@@ -114,13 +93,14 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         this.widthnom = x;
         this.heightnom = y;
         this.nomDataURL = dataURL;
-        const img = cv.imread(this.editedImage);
+
+        //        const img = cv.imread(this.editedImage);
         // cv.imshow(this.outputCanvas?.nativeElement, img);
-        let dst = new cv.Mat();
-        cv.cvtColor(img, dst, cv.COLOR_RGBA2GRAY);
-        cv.imshow(this.outputCanvas?.nativeElement, dst);
-        img.delete();
-        dst.delete();
+        //        let dst = new cv.Mat();
+        //        cv.cvtColor(img, dst, cv.COLOR_RGBA2GRAY);
+        //        cv.imshow(this.outputCanvas?.nativeElement, dst);
+        //        img.delete();
+        //        dst.delete();
       });
     });
     this.pdfService.getPageAsImage(this.zoneprenom.page!, scale).then(dataURL => {
@@ -157,6 +137,11 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         this.editedImage.height = i.height;
         const ctx = this.editedImage.getContext('2d');
         ctx!.drawImage(i, 0, 0);
+        const image = ctx!.getImageData(0, 0, i.width, i.height);
+        this.alignImagesService.imageProcessing(image).subscribe(e => {
+          const ctx1 = this.outputCanvas?.nativeElement.getContext('2d');
+          ctx1.putImageData(e, 0, 0);
+        });
         this.outputCanvas!.nativeElement.width = i.width;
         this.outputCanvas!.nativeElement.height = i.height;
       }

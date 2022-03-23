@@ -56,7 +56,8 @@
               "src/main/webapp/content/scss/vendor.scss",
               "src/main/webapp/content/scss/global.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "webWorkerTsConfig": "tsconfig.worker.json"
           },
           "configurations": {
             "production": {
@@ -112,7 +113,8 @@
         "test": {
           "builder": "@angular-builders/jest:run",
           "options": {
-            "configPath": "jest.conf.js"
+            "configPath": "jest.conf.js",
+            "webWorkerTsConfig": "tsconfig.worker.json"
           }
         },
         "deploy": {

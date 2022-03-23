@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable no-console */
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { Router } from '@angular/router';
@@ -6,7 +8,8 @@ import { takeUntil } from 'rxjs/operators';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 
-import {  faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { AlignImagesService } from 'app/scanexam/services/align-images.service';
 
 @Component({
   selector: 'jhi-home',
@@ -21,7 +24,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private readonly destroy$ = new Subject<void>();
 
-  constructor(private accountService: AccountService, private router: Router) {}
+  constructor(private accountService: AccountService, private router: Router, private alignImagesService: AlignImagesService) {}
 
   ngOnInit(): void {
     this.accountService
@@ -29,13 +32,13 @@ export class HomeComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(account => (this.account = account));
 
-      this.dockItems = [
-        {
-            label: 'Créer cours',
-            icon: "content/images/plus.svg",
-            title: "Créer cours",
-            route: "creercours"
-        }
+    this.dockItems = [
+      {
+        label: 'Créer cours',
+        icon: 'content/images/plus.svg',
+        title: 'Créer cours',
+        route: 'creercours',
+      },
     ];
   }
 
@@ -46,10 +49,5 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-
   }
-
-
-
-
 }
