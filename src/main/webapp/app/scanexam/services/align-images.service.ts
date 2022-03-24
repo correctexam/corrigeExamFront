@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable no-var */
@@ -8,6 +9,42 @@
 import { Injectable } from '@angular/core';
 import { v4 as uuid } from 'uuid';
 import { Subject, Observable } from 'rxjs';
+import { worker } from './workerimport';
+
+export interface IImageAlignement {
+  imageCompareMatches?: ImageData;
+  keypoints1?: ImageData;
+  keypoints2?: ImageData;
+  imageAligned?: ImageData;
+  imageCompareMatchesWidth?: number;
+  imageCompareMatchesHeight?: number;
+  keypoints1Width?: number;
+  keypoints1Height?: number;
+  keypoints2Width?: number;
+  keypoints2Height?: number;
+  imageAlignedWidth?: number;
+  imageAlignedHeight?: number;
+}
+
+export interface IImageAlignementInput {
+  imageA?: ImageData;
+  imageB?: ImageData;
+}
+export interface IImageCropInput {
+  image?: ImageData;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+}
+
+export interface IImageCropOutput {
+  image?: ImageData;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +56,7 @@ export class AlignImagesService {
   constructor() {
     if (typeof Worker !== 'undefined') {
       // Create a new
-      this.worker = new Worker(new URL('../../opencv.worker', import.meta.url));
+      this.worker = worker;
       this.worker.onmessage = ({ data }) => {
         if (this.subjects.has(data.uid)) {
           this.subjects.get(data.uid)?.next(data.payload);
@@ -59,18 +96,22 @@ export class AlignImagesService {
    * return a promise with the result of the event. This way we can call
    * the worker asynchronously.
    */
-  private _dispatch(msg1: any, pay: any): Observable<any> {
+  private _dispatch<T>(msg1: any, pay: any): Observable<T> {
     const uuid1 = uuid(); // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
     this.ready.then(() => this.worker.postMessage({ msg: msg1, uid: uuid1, payload: pay }));
-    const p = new Subject();
+    const p = new Subject<T>();
     this.subjects.set(uuid1, p);
     return p.asObservable();
   }
-  public imageProcessing(payload: any): Observable<any> {
-    return this._dispatch('imageProcessing', payload);
+  public imageProcessing(image: ImageData): Observable<ImageData> {
+    return this._dispatch('imageProcessing', image);
   }
 
-  public imageAlignement(payload: any): Observable<any> {
+  public imageAlignement(payload: IImageAlignementInput): Observable<IImageAlignement> {
     return this._dispatch('imageAlignement', payload);
+  }
+
+  public imageCrop(payload: IImageCropInput): Observable<ImageData> {
+    return this._dispatch('imageCrop', payload);
   }
 }

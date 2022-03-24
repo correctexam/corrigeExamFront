@@ -43,6 +43,8 @@ addEventListener('message', e => {
       return imageProcessing(e.data);
     case 'imageAlignement':
       return imageAlignement(e.data);
+    case 'imageCrop':
+      return imageCrop(e.data);
     default:
       break;
   }
@@ -61,6 +63,7 @@ function imageProcessing(p: { msg: any; payload: any; uid: string }): void {
   cv.cvtColor(img, result, cv.COLOR_BGR2GRAY);
   postMessage({ msg: p.msg, payload: imageDataFromMat(result), uid: p.uid });
   img.delete();
+  result.delete();
 }
 
 /**
@@ -74,6 +77,17 @@ function imageAlignement(p: { msg: any; payload: any; uid: string }): void {
   postMessage({ msg: p.msg, payload: resultat, uid: p.uid });
 }
 
+function imageCrop(p: { msg: any; payload: any; uid: string }): void {
+  // You can try more different parameters
+  let rect = new cv.Rect(p.payload.x, p.payload.y, p.payload.width, p.payload.height);
+  let dst = new cv.Mat();
+  let src = cv.matFromImageData(p.payload.image);
+
+  dst = src.roi(rect);
+  postMessage({ msg: p.msg, payload: imageDataFromMat(dst), uid: p.uid });
+  dst.delete();
+  src.delete();
+}
 /**
  * This function is to convert again from cv.Mat to ImageData
  */
@@ -131,14 +145,14 @@ function alignImage(image_A: any, image_B: any): any {
   orb.detectAndCompute(im1Gray, tmp1, keypoints1, descriptors1);
   orb.detectAndCompute(im2Gray, tmp2, keypoints2, descriptors2);
 
-  console.log('Total of ', keypoints1.size(), ' keypoints1 (img to align) and ', keypoints2.size(), ' keypoints2 (reference)');
+  /*console.log('Total of ', keypoints1.size(), ' keypoints1 (img to align) and ', keypoints2.size(), ' keypoints2 (reference)');
   console.log('here are the first 5 keypoints for keypoints1:');
   for (let i = 0; i < keypoints1.size(); i++) {
     console.log('keypoints1: [', i, ']', keypoints1.get(i).pt.x, keypoints1.get(i).pt.y);
     if (i === 5) {
       break;
     }
-  }
+  }*/
 
   //31    Match features.
   //32    std::vector<DMatch> matches;
@@ -159,7 +173,7 @@ function alignImage(image_A: any, image_B: any): any {
 
   bf.knnMatch(descriptors1, descriptors2, matches, 2);
 
-  let counter = 0;
+  //  let counter = 0;
   for (let i = 0; i < matches.size(); ++i) {
     let match = matches.get(i);
     let dMatch1 = match.get(0);
@@ -169,11 +183,11 @@ function alignImage(image_A: any, image_B: any): any {
     if (dMatch1.distance <= dMatch2.distance * parseFloat(knnDistance_option)) {
       //console.log("***Good Match***", "dMatch1.distance: ", dMatch1.distance, "was less than or = to: ", "dMatch2.distance * parseFloat(knnDistance_option)", dMatch2.distance * parseFloat(knnDistance_option), "dMatch2.distance: ", dMatch2.distance, "knnDistance", knnDistance_option);
       good_matches.push_back(dMatch1);
-      counter++;
+      //     counter++;
     }
   }
 
-  console.log('keeping ', counter, ' points in good_matches vector out of ', matches.size(), ' contained in this match vector:', matches);
+  /*  console.log('keeping ', counter, ' points in good_matches vector out of ', matches.size(), ' contained in this match vector:', matches);
   console.log('here are first 5 matches');
   for (let t = 0; t < matches.size(); ++t) {
     console.log('[' + t + ']', 'matches: ', matches.get(t));
@@ -189,7 +203,7 @@ function alignImage(image_A: any, image_B: any): any {
       break;
     }
   }
-
+*/
   //44    Draw top matches
   //45    Mat imMatches;
   //46    drawMatches(im1, keypoints1, im2, keypoints2, matches, imMatches);
@@ -202,6 +216,8 @@ function alignImage(image_A: any, image_B: any): any {
   let result = {} as any;
 
   result['imageCompareMatches'] = imageDataFromMat(imMatches);
+  result['imageCompareMatchesWidth'] = imMatches.size().width;
+  result['imageCompareMatchesHeight'] = imMatches.size().height;
 
   let keypoints1_img = new cv.Mat();
   let keypoints2_img = new cv.Mat();
@@ -210,7 +226,11 @@ function alignImage(image_A: any, image_B: any): any {
   cv.drawKeypoints(im2Gray, keypoints2, keypoints2_img, keypointcolor);
 
   result['keypoints1'] = imageDataFromMat(keypoints1_img);
+  result['keypoints1Width'] = keypoints1_img.size().width;
+  result['keypoints1Height'] = keypoints1_img.size().height;
   result['keypoints2'] = imageDataFromMat(keypoints2_img);
+  result['keypoints2Width'] = keypoints2_img.size().width;
+  result['keypoints2Height'] = keypoints2_img.size().height;
 
   //50    Extract location of good matches
   //51    std::vector<Point2f> points1, points2;
@@ -228,7 +248,7 @@ function alignImage(image_A: any, image_B: any): any {
     points2.push(keypoints2.get(good_matches.get(i).trainIdx).pt.y);
   }
 
-  console.log('points1:', points1, 'points2:', points2);
+  //  console.log('points1:', points1, 'points2:', points2);
 
   let mat1 = new cv.Mat(points1.length, 1, cv.CV_32FC2);
   mat1.data32F.set(points1);
@@ -244,9 +264,9 @@ function alignImage(image_A: any, image_B: any): any {
     return;
   } else {
     console.log('h:', h);
-    console.log('[', h.data64F[0], ',', h.data64F[1], ',', h.data64F[2]);
-    console.log('', h.data64F[3], ',', h.data64F[4], ',', h.data64F[5]);
-    console.log('', h.data64F[6], ',', h.data64F[7], ',', h.data64F[8], ']');
+    //    console.log('[', h.data64F[0], ',', h.data64F[1], ',', h.data64F[2]);
+    //    console.log('', h.data64F[3], ',', h.data64F[4], ',', h.data64F[5]);
+    //    console.log('', h.data64F[6], ',', h.data64F[7], ',', h.data64F[8], ']');
   }
 
   //62  Use homography to warp image
@@ -256,14 +276,15 @@ function alignImage(image_A: any, image_B: any): any {
   cv.warpPerspective(im1, image_B_final_result, h, im2.size());
 
   result['imageAligned'] = imageDataFromMat(image_B_final_result);
+  result['imageAlignedWidth'] = image_B_final_result.size().width;
+  result['imageAlignedHeight'] = image_B_final_result.size().height;
+
   image_B_final_result.delete();
   mat1.delete();
   mat2.delete();
   keypoints1_img.delete();
   keypoints2_img.delete();
-  keypointcolor.delete();
   imMatches.delete();
-  color.delete();
   matches.delete();
   bf.delete();
   good_matches.delete();
@@ -276,4 +297,6 @@ function alignImage(image_A: any, image_B: any): any {
   descriptors2.delete();
   tmp1.delete();
   tmp2.delete();
+  //h.delete();
+  return result;
 }

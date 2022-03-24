@@ -3,7 +3,7 @@
 
   <ngx-extended-pdf-viewer
     [hidden]="'true'"
-    [base64Src]="this.scan?.content"
+    [base64Src]="pdfcontent"
     [useBrowserLocale]="true"
     style="flex: 1 1 100%"
     #viewer
@@ -21,19 +21,27 @@
     [zoom]="'100%'"
     [minZoom]="1"
     [maxZoom]="1"
-    (pdfLoaded)="exportAsImage()"
+    (pdfLoaded)="pdfloaded()"
   ></ngx-extended-pdf-viewer>
 
-  <jhi-image-extractor
+  <canvas [hidden]="!showNomImage" #nomImage></canvas>
+  <canvas [hidden]="!showPrenomImage" #prenomImage></canvas>
+  <canvas [hidden]="!showINEImage" #ineImage></canvas>
+  <canvas [style.visivle]="'none'" [hidden]="true" #keypoints1></canvas>
+  <canvas [style.visivle]="'none'" [hidden]="true" #keypoints2></canvas>
+  <canvas [style.visivle]="'none'" [hidden]="true" #imageCompareMatches></canvas>
+  <canvas [style.visivle]="'none'" [hidden]="true" #imageAligned></canvas>
+
+  <!--  <jhi-image-extractor
     *ngIf="nomDataURL"
     [left]="(this.zonenom.xInit! * widthnom) / 100000"
     [top]="(this.zonenom.yInit! * heightnom) / 100000"
     [width]="(this.zonenom.width! * widthnom) / 100000"
     [height]="(this.zonenom.height! * heightnom) / 100000"
     [srcb64]="nomDataURL"
-  ></jhi-image-extractor>
+  ></jhi-image-extractor>-->
 
-  <jhi-image-extractor
+  <!--<jhi-image-extractor
     *ngIf="prenomDataURL"
     [left]="(this.zoneprenom.xInit! * widthprenom) / 100000"
     [top]="(this.zoneprenom.yInit! * heightprenom) / 100000"
@@ -49,5 +57,5 @@
     [width]="(this.zoneine.width! * widthine) / 100000"
     [height]="(this.zoneine.height! * heightine) / 100000"
     [srcb64]="ineDataURL"
-  ></jhi-image-extractor>
+  ></jhi-image-extractor>-->
 </div>
