@@ -300,3 +300,149 @@ function alignImage(image_A: any, image_B: any): any {
   //h.delete();
   return result;
 }
+
+/*function detectLetters( img : any): any{
+  let src = cv.matFromImageData(img);
+  let dst = new cv.Mat() //.zeros(src.rows, src.cols, cv.CV_8UC3);
+  let grey = new cv.Mat() //.zeros(src.rows, src.cols, cv.CV_8UC3);
+  cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY);
+  cv.cvtColor(src, grey, cv.COLOR_RGBA2GRAY);
+  cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY);
+  let ksize = new cv.Size(5,5)
+//  cv.GaussianBlur(src, src, ksize, 0, 0, cv.BORDER_DEFAULT);
+let fillColor = new cv.Scalar(255, 255, 255);
+
+cv.adaptiveThreshold(grey, grey, 255, cv.THRESH_BINARY_INV, cv.THRESH_OTSU, 11, 2);
+// thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+
+// # Remove horizontal lines
+let ksize1 = new cv.Size(40, 1);
+// You can try more different parameters
+let horizontal_kernel = cv.getStructuringElement(cv.MORPH_RECT, ksize1);
+cv.morphologyEx(grey, grey, cv.MORPH_OPEN, horizontal_kernel,2);
+let contours1 = new cv.MatVector();
+let hierarchy1 = new cv.Mat();
+cv.findContours(src, contours1, hierarchy1, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+let contour1
+if (contours1.size() ===2){
+  contour1 = contours1.get(0)
+}else {
+  contour1 = contours1.get(1)
+}
+
+for (let i = 0; i < contour1.size(); ++i) {
+  let cnt = contour1.get(i);
+  cv.drawContours(grey, cnt,-1,fillColor,5)
+}
+
+
+
+
+// Remove vertical lines
+let ksize2 = new cv.Size(1, 40);
+// You can try more different parameters
+let vertical_kernel = cv.getStructuringElement(cv.MORPH_RECT, ksize2);
+cv.morphologyEx(grey, grey, cv.MORPH_OPEN, vertical_kernel,2);
+let contours2 = new cv.MatVector();
+let hierarchy2 = new cv.Mat();
+cv.findContours(src, contours2, hierarchy2, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+let contour2
+if (contours1.size() ===2){
+  contour2 = contours2.get(0)
+}else {
+  contour2 = contours2.get(1)
+}
+
+for (let i = 0; i < contour2.size(); ++i) {
+  let cnt = contour2.get(i);
+  cv.drawContours(grey, cnt,-1,fillColor,5)
+}
+
+
+
+  cv.adaptiveThreshold(grey, grey, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 11, 2);
+  let contours = new cv.MatVector();
+  let hierarchy = new cv.Mat();
+  cv.findContours(src, contours, hierarchy, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE);
+  let rectangleColor = new cv.Scalar(0, 0, 0);
+
+
+  for (let i = 0; i < contours.size(); ++i) {
+  let cnt = contours.get(i);
+  let rect = cv.boundingRect(cnt);
+  if (rect.width*rect.height >= 200){
+
+  let point1 = new cv.Point(rect.x, rect.y);
+  let point2 = new cv.Point(rect.x + rect.width, rect.y + rect.height);
+  cv.rectangle(dst, point1, point2, rectangleColor, 2, cv.LINE_AA, 0);
+  }
+  cnt.delete();
+  }
+
+
+  const res = imageDataFromMat(dst);
+  src.delete(); dst.delete(); contours.delete(); hierarchy.delete();
+  return res;
+
+}*/
+
+/*let src = cv.imread('canvasInput');
+  let dst = new cv.Mat() //.zeros(src.rows, src.cols, cv.CV_8UC3);
+  let grey = new cv.Mat() //.zeros(src.rows, src.cols, cv.CV_8UC3);
+  cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY);
+  cv.cvtColor(src, grey, cv.COLOR_RGBA2GRAY);
+  cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY);
+  let ksize = new cv.Size(5,5)
+//  cv.GaussianBlur(src, src, ksize, 0, 0, cv.BORDER_DEFAULT);
+let fillColor = new cv.Scalar(255, 255, 255);
+
+cv.threshold(grey, grey, 0, 255, cv.THRESH_OTSU + cv.THRESH_BINARY_INV);
+
+// thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+
+// # Remove horizontal lines
+let ksize1 = new cv.Size(15, 1);
+// You can try more different parameters
+let horizontal_kernel = cv.getStructuringElement(cv.MORPH_RECT, ksize1);
+let removeh = new cv.Mat();
+cv.morphologyEx(grey, removeh, cv.MORPH_OPEN, horizontal_kernel);
+let contours1 = new cv.MatVector();
+let hierarchy1 = new cv.Mat();
+cv.findContours(removeh, contours1, hierarchy1, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
+cv.drawContours(dst, contours1,-1,fillColor, 1, 20, hierarchy1, 20)
+
+// # Remove vertical lines
+let ksize2 = new cv.Size(1, 20);
+// You can try more different parameters
+let vertical_kernel = cv.getStructuringElement(cv.MORPH_RECT, ksize2);
+let removev = new cv.Mat();
+cv.morphologyEx(grey, removev, cv.MORPH_OPEN, vertical_kernel);
+let contours2 = new cv.MatVector();
+let hierarchy2 = new cv.Mat();
+cv.findContours(removev, contours2, hierarchy2, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
+cv.drawContours(dst, contours2,-1,fillColor, 1, 20, hierarchy2, 20)
+
+
+
+  /*cv.adaptiveThreshold(grey, grey, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 11, 2);
+  let contours = new cv.MatVector();
+  let hierarchy = new cv.Mat();
+  cv.findContours(src, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
+  let rectangleColor = new cv.Scalar(0, 0, 0);
+
+
+  for (let i = 0; i < contours.size(); ++i) {
+  let cnt = contours.get(i);
+  let rect = cv.boundingRect(cnt);
+  if (rect.width*rect.height >= 200){
+
+  let point1 = new cv.Point(rect.x, rect.y);
+  let point2 = new cv.Point(rect.x + rect.width, rect.y + rect.height);
+  cv.rectangle(dst, point1, point2, rectangleColor, 2, cv.LINE_AA, 0);
+  }
+  cnt.delete();
+  }
+
+cv.imshow('canvasOutput', dst);
+//src.delete(); dst.delete(); contours.delete(); hierarchy.delete();
+*/

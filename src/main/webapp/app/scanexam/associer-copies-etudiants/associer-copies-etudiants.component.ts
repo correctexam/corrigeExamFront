@@ -157,7 +157,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
 
   public exportAsImage(): void {
     const scale = { scale: 2 };
-    console.log(this.zonenom);
     this.pdfService.getPageAsImage(this.zonenom.page!, scale).then(dataURL => {
       this.aligneImages(dataURL, this.zonenom.page!, (p: IPage) => {
         this.nomImage!.nativeElement.width = (this.zonenom.width! * p.width!) / 100000;
@@ -179,10 +178,23 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
       });
     });
     this.pdfService.getPageAsImage(this.zoneprenom.page!, scale).then(dataURL => {
-      this.getImageDimensions(dataURL, false, (x: number, y: number) => {
-        this.widthprenom = x;
-        this.heightprenom = y;
-        this.prenomDataURL = dataURL;
+      this.aligneImages(dataURL, this.zoneprenom.page!, (p: IPage) => {
+        this.prenomImage!.nativeElement.width = (this.zoneprenom.width! * p.width!) / 100000;
+        this.prenomImage!.nativeElement.height = (this.zoneprenom.height! * p.height!) / 100000;
+
+        this.alignImagesService
+          .imageCrop({
+            image: p.image,
+            x: (this.zoneprenom.xInit! * p.width!) / 100000,
+            y: (this.zoneprenom.yInit! * p.height!) / 100000,
+            width: (this.zoneprenom.width! * p.width!) / 100000,
+            height: (this.zoneprenom.height! * p.height!) / 100000,
+          })
+          .subscribe(res => {
+            const ctx1 = this.prenomImage?.nativeElement.getContext('2d');
+            ctx1.putImageData(res, 0, 0);
+            this.showPrenomImage = true;
+          });
       });
     });
     if (this.zoneine !== undefined) {

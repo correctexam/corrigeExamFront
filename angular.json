@@ -57,7 +57,7 @@
               "src/main/webapp/content/scss/global.scss"
             ],
             "scripts": [],
-            "webWorkerTsConfig": ["tsconfig.worker.json"]
+            "webWorkerTsConfig": "tsconfig.worker.json"
           },
           "configurations": {
             "production": {
