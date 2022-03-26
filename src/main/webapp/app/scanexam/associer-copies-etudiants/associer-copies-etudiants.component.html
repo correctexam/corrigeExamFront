@@ -1,6 +1,26 @@
+<h5>Alignement</h5>
+<p-selectButton
+  [disabled]="!phase1"
+  [options]="alignementOptions"
+  [(ngModel)]="alignement"
+  (onChange)="alignementChange()"
+  optionLabel="label"
+  optionValue="value"
+></p-selectButton>
+
+<h5>Debug</h5>
+<p-selectButton [options]="debugOptions" [(ngModel)]="debug" optionLabel="label" optionValue="value"></p-selectButton>
+<button pButton type="button" label="Previous" [disabled]="!phase1 || currentStudent === 0" (click)="previousStudent()"></button>
+<button
+  pButton
+  type="button"
+  label="Next"
+  [disabled]="!phase1 || (currentStudent + 1) * nbreFeuilleParCopie >= numberPagesInScan"
+  (click)="nextStudent()"
+></button>
+
 <div class="canvas-wrapper foo">
   <canvas #outputImage></canvas>
-
   <ngx-extended-pdf-viewer
     [hidden]="'true'"
     [base64Src]="pdfcontent"
@@ -27,35 +47,10 @@
   <canvas [hidden]="!showNomImage" #nomImage></canvas>
   <canvas [hidden]="!showPrenomImage" #prenomImage></canvas>
   <canvas [hidden]="!showINEImage" #ineImage></canvas>
-  <canvas [style.visivle]="'none'" [hidden]="true" #keypoints1></canvas>
-  <canvas [style.visivle]="'none'" [hidden]="true" #keypoints2></canvas>
-  <canvas [style.visivle]="'none'" [hidden]="true" #imageCompareMatches></canvas>
-  <canvas [style.visivle]="'none'" [hidden]="true" #imageAligned></canvas>
 
-  <!--  <jhi-image-extractor
-    *ngIf="nomDataURL"
-    [left]="(this.zonenom.xInit! * widthnom) / 100000"
-    [top]="(this.zonenom.yInit! * heightnom) / 100000"
-    [width]="(this.zonenom.width! * widthnom) / 100000"
-    [height]="(this.zonenom.height! * heightnom) / 100000"
-    [srcb64]="nomDataURL"
-  ></jhi-image-extractor>-->
+  <canvas [hidden]="!debug" #imageAligned></canvas>
 
-  <!--<jhi-image-extractor
-    *ngIf="prenomDataURL"
-    [left]="(this.zoneprenom.xInit! * widthprenom) / 100000"
-    [top]="(this.zoneprenom.yInit! * heightprenom) / 100000"
-    [width]="(this.zoneprenom.width! * widthprenom) / 100000"
-    [height]="(this.zoneprenom.height! * heightprenom) / 100000"
-    [srcb64]="prenomDataURL"
-  ></jhi-image-extractor>
-
-  <jhi-image-extractor
-    *ngIf="ineDataURL"
-    [left]="(this.zoneine.xInit! * widthine) / 100000"
-    [top]="(this.zoneine.yInit! * heightine) / 100000"
-    [width]="(this.zoneine.width! * widthine) / 100000"
-    [height]="(this.zoneine.height! * heightine) / 100000"
-    [srcb64]="ineDataURL"
-  ></jhi-image-extractor>-->
+  <canvas [hidden]="!debug" #keypoints1></canvas>
+  <canvas [hidden]="!debug" #keypoints2></canvas>
+  <canvas [hidden]="!debug" #imageCompareMatches></canvas>
 </div>

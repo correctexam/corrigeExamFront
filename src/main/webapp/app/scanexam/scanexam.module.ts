@@ -24,7 +24,6 @@ import { Route, RouterModule } from '@angular/router';
 import { CreerexamComponent } from './creerexam/creerexam.component';
 import { ExamDetailComponent } from './exam-detail/exam-detail.component';
 import { AnnotateTemplateComponent } from './annotate-template/annotate-template.component';
-
 import { PaintComponent } from './annotate-template/paint/paint.component';
 import { GraphicalToolbarComponent } from './annotate-template/paint/toolbar/toolbar.component';
 import { FormsModule } from '@angular/forms';
@@ -42,6 +41,7 @@ import { ImageCropperModule } from 'ngx-image-cropper';
 import { ImageExtractorComponent } from './image-extractor/image-extractor.component';
 import { AssocierCopiesEtudiantsComponent } from './associer-copies-etudiants/associer-copies-etudiants.component';
 import { NgxOpenCVModule } from 'ngx-opencv';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 // set the location of the OpenCV files
 const openCVConfig = {
@@ -187,6 +187,7 @@ export const CorrigerCopiesEtudiants_ROUTE: Route = {
     ConfirmDialogModule,
     FormsModule,
     NgxExtendedPdfViewerModule,
+    SelectButtonModule,
 
     RouterModule.forChild([
       CREERCOURS_ROUTE,

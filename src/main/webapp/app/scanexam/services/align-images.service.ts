@@ -29,6 +29,11 @@ export interface IImageAlignement {
 export interface IImageAlignementInput {
   imageA?: ImageData;
   imageB?: ImageData;
+  marker?: boolean;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
 }
 export interface IImageCropInput {
   image?: ImageData;
@@ -59,6 +64,8 @@ export class AlignImagesService {
       this.worker = worker;
       this.worker.onmessage = ({ data }) => {
         if (this.subjects.has(data.uid)) {
+          // console.log( ' receive message '  + data.uid)
+
           this.subjects.get(data.uid)?.next(data.payload);
           this.subjects.get(data.uid)?.complete();
         }
@@ -98,9 +105,23 @@ export class AlignImagesService {
    */
   private _dispatch<T>(msg1: any, pay: any): Observable<T> {
     const uuid1 = uuid(); // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
-    this.ready.then(() => this.worker.postMessage({ msg: msg1, uid: uuid1, payload: pay }));
+    this.ready.then(() => {
+      // console.log( ' send message ' + msg1 + ' ' + uuid1)
+      this.worker.postMessage({ msg: msg1, uid: uuid1, payload: pay });
+    });
     const p = new Subject<T>();
     this.subjects.set(uuid1, p);
+    this.ready = new Promise((res, rej) => {
+      this.subjects
+        .get(uuid1)
+        ?.asObservable()
+        .subscribe(
+          () => {
+            res();
+          },
+          () => rej()
+        );
+    });
     return p.asObservable();
   }
   public imageProcessing(image: ImageData): Observable<ImageData> {

@@ -73,8 +73,13 @@ function imageProcessing(p: { msg: any; payload: any; uid: string }): void {
  */
 function imageAlignement(p: { msg: any; payload: any; uid: string }): void {
   // What this does is convert the image to a grey scale.
-  const resultat = alignImage(p.payload.imageA, p.payload.imageB);
-  postMessage({ msg: p.msg, payload: resultat, uid: p.uid });
+  if (p.payload.marker) {
+    const resultat = alignImageBasedOnCircle(p.payload);
+    postMessage({ msg: p.msg, payload: resultat, uid: p.uid });
+  } else {
+    const resultat = alignImage(p.payload.imageA, p.payload.imageB);
+    postMessage({ msg: p.msg, payload: resultat, uid: p.uid });
+  }
 }
 
 function imageCrop(p: { msg: any; payload: any; uid: string }): void {
@@ -115,6 +120,209 @@ function imageDataFromMat(mat: any): any {
   const clampedArray = new ImageData(new Uint8ClampedArray(img.data), img.cols, img.rows);
   img.delete();
   return clampedArray;
+}
+function alignImageBasedOnCircle(payload: any): any {
+  let srcMat = cv.matFromImageData(payload.imageA);
+  let dst = new cv.Mat(); ///cv.Mat.zeros(srcMat.rows, srcMat.cols, cv.CV_8U);
+  // let color = new cv.Scalar(255, 0, 0);
+  // let displayMat = srcMat.clone();
+  let circlesMat = new cv.Mat();
+  cv.cvtColor(srcMat, srcMat, cv.COLOR_RGBA2GRAY);
+  //  cv.HoughCircles(srcMat, circlesMat, cv.HOUGH_GRADIENT, 1, 45, 75, 40, 0, 0);
+  let minCircle = (srcMat.cols * 6) / 1000;
+  let maxCircle = (srcMat.cols * 20) / 1000;
+
+  cv.HoughCircles(srcMat, circlesMat, cv.HOUGH_GRADIENT, 1, 45, 75, 20, minCircle, maxCircle);
+  let x1, y1, r1;
+  let x2, y2, r2;
+  let x3, y3, r3;
+  let x4, y4, r4;
+  if (circlesMat.cols > 0) {
+    x1 = circlesMat.data32F[0];
+    y1 = circlesMat.data32F[1];
+    r1 = circlesMat.data32F[2];
+    x2 = circlesMat.data32F[0];
+    y2 = circlesMat.data32F[1];
+    r2 = circlesMat.data32F[2];
+    x3 = circlesMat.data32F[0];
+    y3 = circlesMat.data32F[1];
+    r3 = circlesMat.data32F[2];
+    x4 = circlesMat.data32F[0];
+    y4 = circlesMat.data32F[1];
+    r4 = circlesMat.data32F[2];
+  }
+
+  const srcMWidth = srcMat.size().width;
+  const srcMHeight = srcMat.size().height;
+  if (circlesMat.cols > 0) {
+    for (let i = 1; i < circlesMat.cols; i++) {
+      let x = circlesMat.data32F[i * 3];
+      let y = circlesMat.data32F[i * 3 + 1];
+      let radius = circlesMat.data32F[i * 3 + 2];
+      if (x * x + y * y <= x1 * x1 + y1 * y1) {
+        x1 = x;
+        y1 = y;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        r1 = radius;
+      }
+      if (x * x + y * y >= x4 * x4 + y4 * y4) {
+        x4 = x;
+        y4 = y;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        r4 = radius;
+      }
+      if ((srcMWidth - x) * (srcMWidth - x) + y * y <= (srcMWidth - x2) * (srcMWidth - x2) + y2 * y2) {
+        x2 = x;
+        y2 = y;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        r2 = radius;
+      }
+      if (x * x + (srcMHeight - y) * (srcMHeight - y) <= x3 * x3 + (srcMHeight - y3) * (srcMHeight - y3)) {
+        x3 = x;
+        y3 = y;
+        r3 = radius;
+      }
+    }
+  }
+
+  let srcMat2 = cv.matFromImageData(payload.imageB);
+  let srcMat1 = new cv.Mat();
+  let circlesMat1 = new cv.Mat();
+  cv.cvtColor(srcMat2, srcMat1, cv.COLOR_RGBA2GRAY);
+  const srcMWidth1 = srcMat1.size().width;
+  const srcMHeight1 = srcMat1.size().height;
+
+  //  cv.HoughCircles(srcMat, circlesMat, cv.HOUGH_GRADIENT, 1, 45, 75, 40, 0, 0);
+  cv.HoughCircles(srcMat1, circlesMat1, cv.HOUGH_GRADIENT, 1, 45, 75, 15, r3 - 3, r3 + 3);
+  let goodpointsx = [];
+  let goodpointsy = [];
+  const seuil = ((4 * r3 * r3 - 3.14159 * r3 * r3) * 150) / 100;
+  for (let i = 0; i < circlesMat1.cols; i++) {
+    let x = circlesMat1.data32F[i * 3];
+    let y = circlesMat1.data32F[i * 3 + 1];
+    let rect1 = new cv.Rect(x - r3, y - r3, 2 * r3, 2 * r3);
+    let dstrect1 = new cv.Mat();
+    dstrect1 = srcMat1.roi(rect1);
+    cv.threshold(dstrect1, dstrect1, 0, 255, cv.THRESH_OTSU + cv.THRESH_BINARY);
+    if (cv.countNonZero(dstrect1) < seuil) {
+      goodpointsx.push(x);
+      goodpointsy.push(y);
+    }
+    dstrect1.delete();
+  }
+
+  let x5, y5;
+  let x6, y6;
+  let x7, y7;
+  let x8, y8;
+  if (goodpointsx.length > 0) {
+    x5 = goodpointsx[0];
+    y5 = goodpointsy[1];
+    x6 = goodpointsx[0];
+    y6 = goodpointsy[1];
+    x7 = goodpointsx[0];
+    y7 = goodpointsy[1];
+    x8 = goodpointsx[0];
+    y8 = goodpointsy[1];
+  }
+
+  if (goodpointsx.length > 1) {
+    for (let i = 0; i < goodpointsx.length; i++) {
+      let x = goodpointsx[i];
+      let y = goodpointsy[i];
+      if (x * x + y * y <= x5 * x5 + y5 * y5) {
+        x5 = x;
+        y5 = y;
+      }
+      if (x * x + y * y >= x8 * x8 + y8 * y8) {
+        x8 = x;
+        y8 = y;
+      }
+      if ((srcMWidth1 - x) * (srcMWidth1 - x) + y * y <= (srcMWidth1 - x6) * (srcMWidth1 - x6) + y6 * y6) {
+        x6 = x;
+        y6 = y;
+      }
+      if (x * x + (srcMHeight1 - y) * (srcMHeight1 - y) <= x7 * x7 + (srcMHeight1 - y7) * (srcMHeight1 - y7)) {
+        x7 = x;
+        y7 = y;
+      }
+    }
+  }
+
+  let srcTri = cv.matFromArray(4, 1, cv.CV_32FC2, [x1, y1, x2, y2, x3, y3, x4, y4]);
+  let dstTri = cv.matFromArray(4, 1, cv.CV_32FC2, [x5, y5, x6, y6, x7, y7, x8, y8]);
+  //  let srcTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x4, y4, x2, y2, x3, y3]);
+  //  let dstTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x8, y8, x6, y6, x7, y7]);
+  /*  let M = cv.getPerspectiveTransform(dstTri,srcTri);
+//  let M = cv.getAffineTransform(srcTri, dstTri);
+//  console.log(M)
+  let dsize = new cv.Size(srcMat1.rows, srcMat1.cols);
+
+  cv.warpPerspective(srcMat1, dst, M, dsize, cv.BORDER_CONSTANT , cv.BORDER_REPLICATE, new cv.Scalar());*/
+
+  //59    Find homography
+  //60    h = findHomography( points1, points2, RANSAC );
+  let h = cv.findHomography(dstTri, srcTri, cv.RANSAC);
+  let dsize = new cv.Size(srcMat.cols, srcMat.rows);
+
+  if (h.empty()) {
+    console.log('homography matrix empty!');
+    return;
+  }
+
+  //62  Use homography to warp image
+  //63  warpPerspective(im1, im1Reg, h, im2.size());
+
+  cv.warpPerspective(srcMat2, dst, h, dsize);
+
+  let dst1 = dst.clone();
+
+  for (let i = 0; i < dstTri.rows; ++i) {
+    let x = dstTri.data32F[i * 2];
+    let y = dstTri.data32F[i * 2 + 1];
+    let radius = 15;
+    let center = new cv.Point(x, y);
+    cv.circle(srcMat2, center, radius, [0, 0, 255, 255], 1);
+  }
+  for (let i = 0; i < srcTri.rows; ++i) {
+    let x = srcTri.data32F[i * 2];
+    let y = srcTri.data32F[i * 2 + 1];
+    let radius = 15;
+    let center = new cv.Point(x, y);
+    cv.circle(srcMat, center, radius, [0, 0, 255, 255], 1);
+    cv.circle(dst1, center, radius, [0, 0, 255, 255], 1);
+  }
+
+  /*
+let point1 = new cv.Point(payload.x, payload.y);
+let point2 = new cv.Point(payload.x + payload.width, payload.y + payload.height);
+cv.rectangle(dst1, point1, point2,  [0, 0, 255, 255], 2, cv.LINE_AA, 0);
+cv.rectangle(srcMat, point1, point2,  [0, 0, 255, 255], 2, cv.LINE_AA, 0);*/
+
+  let result = {} as any;
+  result['keypoints1'] = imageDataFromMat(srcMat);
+  result['keypoints1Width'] = srcMat.size().width;
+  result['keypoints1Height'] = srcMat.size().height;
+  result['keypoints2'] = imageDataFromMat(dst);
+  result['keypoints2Width'] = dst.size().width;
+  result['keypoints2Height'] = dst.size().height;
+  result['imageCompareMatches'] = imageDataFromMat(srcMat2);
+  result['imageCompareMatchesWidth'] = srcMat2.size().width;
+  result['imageCompareMatchesHeight'] = srcMat2.size().height;
+  result['imageAligned'] = imageDataFromMat(dst1);
+  result['imageAlignedWidth'] = dst1.size().width;
+  result['imageAlignedHeight'] = dst1.size().height;
+
+  srcMat.delete();
+  dst.delete();
+  circlesMat.delete();
+  srcMat1.delete();
+  srcMat2.delete();
+  circlesMat1.delete();
+  srcTri.delete();
+  dstTri.delete();
+  dst1.delete();
+  return result;
 }
 
 function alignImage(image_A: any, image_B: any): any {
