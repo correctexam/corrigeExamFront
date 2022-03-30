@@ -1,15 +1,15 @@
-<h5>Alignement</h5>
-<!--<p-selectButton
-  [disabled]="!phase1"
-  [options]="alignementOptions"
-  [(ngModel)]="alignement"
-  (onChange)="alignementChange()"
-  optionLabel="label"
-  optionValue="value"
-></p-selectButton>
-
+<div *ngIf="debug">
+  <h5>Alignement</h5>
+  <p-selectButton
+    [options]="alignementOptions"
+    [(ngModel)]="alignement"
+    (onChange)="alignementChange()"
+    optionLabel="label"
+    optionValue="value"
+  ></p-selectButton>
+</div>
 <h5>Debug</h5>
-<p-selectButton [options]="debugOptions" [(ngModel)]="debug" optionLabel="label" optionValue="value"></p-selectButton>-->
+<p-selectButton [options]="debugOptions" [(ngModel)]="debug" optionLabel="label" optionValue="value"></p-selectButton>
 <button pButton type="button" label="Previous" [disabled]="currentStudent === 0" (click)="previousStudent()"></button>
 <button
   pButton

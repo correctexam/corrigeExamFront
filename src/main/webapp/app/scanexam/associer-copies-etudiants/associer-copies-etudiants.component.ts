@@ -16,7 +16,6 @@ import { IExam } from 'app/entities/exam/exam.model';
 import { ICourse } from 'app/entities/course/course.model';
 import { IScan } from '../../entities/scan/scan.model';
 import { IZone } from 'app/entities/zone/zone.model';
-import { ScrollModeType, NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 import { AlignImagesService } from '../services/align-images.service';
 import { ITemplate } from 'app/entities/template/template.model';
 import { db } from '../db/db';
@@ -47,7 +46,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   nomDataURL: any;
   prenomDataURL: any;
   ineDataURL: any;
-  public scrollMode: ScrollModeType = ScrollModeType.vertical;
   widthnom = 0;
   heightnom = 0;
   widthprenom = 0;
@@ -76,11 +74,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   imageCompareMatches: ElementRef | undefined;
   @ViewChild('imageAligned')
   imageAligned: ElementRef | undefined;
-  templatePages: Map<number, IPage> = new Map();
-  alignPages: Map<number, IPage> = new Map();
-  nomPages: Map<number, IPage> = new Map();
-  prenomPages: Map<number, IPage> = new Map();
-  inePages: Map<number, IPage> = new Map();
   debug = false;
   phase1 = false;
 
@@ -96,7 +89,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   ];
 
   constructor(
-    private pdfService: NgxExtendedPdfViewerService,
     public examService: ExamService,
     public zoneService: ZoneService,
     public courseService: CourseService,
@@ -252,18 +244,19 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   }
 
   public exportAsImage(): void {
-    const scale = { scale: 2 };
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
     if (this.zonenom !== undefined) {
-      this.pdfService.getPageAsImage(this.zonenom.page! + this.currentStudent * this.nbreFeuilleParCopie, scale).then(dataURL => {
-        this.aligneImages(dataURL, this.zonenom.page! + this.currentStudent * this.nbreFeuilleParCopie, (p: IPage) => {
-          this.nomImage!.nativeElement.width = (this.zonenom.width! * p.width!) / 100000;
-          this.nomImage!.nativeElement.height = (this.zonenom.height! * p.height!) / 100000;
-          if (this.nomPages.has(this.zonenom.page! + this.currentStudent * this.nbreFeuilleParCopie)) {
-            const ctx2 = this.nomImage?.nativeElement.getContext('2d');
-            ctx2.putImageData(this.nomPages.get(this.zonenom.page! + this.currentStudent * this.nbreFeuilleParCopie)?.image, 0, 0);
-            this.showNomImage = true;
-          } else {
+      db.nonAlignImages
+        .where('examId')
+        .equals(+this.examId)
+        .and(e1 => e1!.id === this.zonenom.page! + this.currentStudent * this.nbreFeuilleParCopie)
+        .first()
+        .then(e2 => {
+          const image = JSON.parse(e2!.value, this.reviver);
+
+          this.aligneImages(image.pages, this.zonenom.page! + this.currentStudent * this.nbreFeuilleParCopie, (p: IPage) => {
+            this.nomImage!.nativeElement.width = (this.zonenom.width! * p.width!) / 100000;
+            this.nomImage!.nativeElement.height = (this.zonenom.height! * p.height!) / 100000;
+
             this.alignImagesService
               .imageCrop({
                 image: p.image,
@@ -276,17 +269,22 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                 const ctx1 = this.nomImage?.nativeElement.getContext('2d');
                 ctx1.putImageData(res, 0, 0);
                 this.showNomImage = true;
-                this.nomPages.set(this.zonenom.page! + this.currentStudent * this.nbreFeuilleParCopie, { image: res });
 
                 if (this.zoneprenom !== undefined) {
-                  this.pdfService
-                    .getPageAsImage(this.zoneprenom.page! + this.currentStudent * this.nbreFeuilleParCopie, scale)
-                    .then(dataURL1 => {
-                      this.aligneImages(dataURL1, this.zoneprenom.page! + this.currentStudent * this.nbreFeuilleParCopie, (p1: IPage) => {
-                        this.prenomImage!.nativeElement.width = (this.zoneprenom.width! * p1.width!) / 100000;
-                        this.prenomImage!.nativeElement.height = (this.zoneprenom.height! * p1.height!) / 100000;
+                  db.nonAlignImages
+                    .where('examId')
+                    .equals(+this.examId)
+                    .and(e1 => e1!.id === this.zoneprenom.page! + this.currentStudent * this.nbreFeuilleParCopie)
+                    .first()
+                    .then(e3 => {
+                      const image1 = JSON.parse(e3!.value, this.reviver);
+                      this.aligneImages(
+                        image1.pages,
+                        this.zoneprenom.page! + this.currentStudent * this.nbreFeuilleParCopie,
+                        (p1: IPage) => {
+                          this.prenomImage!.nativeElement.width = (this.zoneprenom.width! * p1.width!) / 100000;
+                          this.prenomImage!.nativeElement.height = (this.zoneprenom.height! * p1.height!) / 100000;
 
-                        if (!this.prenomPages.has(this.zoneprenom.page! + this.currentStudent * this.nbreFeuilleParCopie)) {
                           this.alignImagesService
                             .imageCrop({
                               image: p1.image,
@@ -299,55 +297,42 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                               const ctx2 = this.prenomImage?.nativeElement.getContext('2d');
                               ctx2.putImageData(res1, 0, 0);
                               this.showPrenomImage = true;
-                              this.prenomPages.set(this.zoneprenom.page! + this.currentStudent * this.nbreFeuilleParCopie, { image: res1 });
                             });
                         }
-                      });
+                      );
                     });
                 }
                 if (this.zoneine !== undefined) {
-                  this.pdfService
-                    .getPageAsImage(this.zoneine.page! + this.currentStudent * this.nbreFeuilleParCopie, scale)
-                    .then(dataURL1 => {
-                      this.aligneImages(dataURL1, this.zoneine.page! + this.currentStudent * this.nbreFeuilleParCopie, (p1: IPage) => {
+                  db.nonAlignImages
+                    .where('examId')
+                    .equals(+this.examId)
+                    .and(e1 => e1!.id === this.zoneine.page! + this.currentStudent * this.nbreFeuilleParCopie)
+                    .first()
+                    .then(e3 => {
+                      const image1 = JSON.parse(e3!.value, this.reviver);
+
+                      this.aligneImages(image1.pages, this.zoneine.page! + this.currentStudent * this.nbreFeuilleParCopie, (p1: IPage) => {
                         this.ineImage!.nativeElement.width = (this.zoneine.width! * p1.width!) / 100000;
                         this.ineImage!.nativeElement.height = (this.zoneine.height! * p1.height!) / 100000;
-                        if (!this.inePages.has(this.zoneine.page! + this.currentStudent * this.nbreFeuilleParCopie)) {
-                          this.alignImagesService
-                            .imageCrop({
-                              image: p1.image,
-                              x: (this.zoneine.xInit! * p1.width!) / 100000,
-                              y: (this.zoneine.yInit! * p1.height!) / 100000,
-                              width: (this.zoneine.width! * p1.width!) / 100000,
-                              height: (this.zoneine.height! * p1.height!) / 100000,
-                            })
-                            .subscribe(res1 => {
-                              const ctx2 = this.ineImage?.nativeElement.getContext('2d');
-                              ctx2.putImageData(res1, 0, 0);
-                              this.showINEImage = true;
-                              this.inePages.set(this.zoneine.page! + this.currentStudent * this.nbreFeuilleParCopie, { image: res1 });
-                            });
-                        }
+                        this.alignImagesService
+                          .imageCrop({
+                            image: p1.image,
+                            x: (this.zoneine.xInit! * p1.width!) / 100000,
+                            y: (this.zoneine.yInit! * p1.height!) / 100000,
+                            width: (this.zoneine.width! * p1.width!) / 100000,
+                            height: (this.zoneine.height! * p1.height!) / 100000,
+                          })
+                          .subscribe(res1 => {
+                            const ctx2 = this.ineImage?.nativeElement.getContext('2d');
+                            ctx2.putImageData(res1, 0, 0);
+                            this.showINEImage = true;
+                          });
                       });
                     });
                 }
               });
-          }
-          if (
-            this.zoneprenom !== undefined &&
-            this.prenomPages.has(this.zoneprenom.page! + this.currentStudent * this.nbreFeuilleParCopie)
-          ) {
-            const ctx2 = this.prenomImage?.nativeElement.getContext('2d');
-            ctx2.putImageData(this.prenomPages.get(this.zoneprenom.page! + this.currentStudent * this.nbreFeuilleParCopie)?.image, 0, 0);
-            this.showPrenomImage = true;
-          }
-          if (this.zoneine !== undefined && this.inePages.has(this.zoneine.page! + this.currentStudent * this.nbreFeuilleParCopie)) {
-            const ctx2 = this.ineImage?.nativeElement.getContext('2d');
-            ctx2.putImageData(this.inePages.get(this.zoneine.page! + this.currentStudent * this.nbreFeuilleParCopie)?.image, 0, 0);
-            this.showINEImage = true;
-          }
+          });
         });
-      });
     }
   }
 
@@ -366,76 +351,77 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   }
 
   aligneImages(file: any, pagen: number, cb: (page: IPage) => void): void {
-    if (this.alignPages.has(pagen)) {
-      cb(this.alignPages.get(pagen)!);
-    } else {
-      const i = new Image();
-      i.onload = () => {
-        this.editedImage = <HTMLCanvasElement>document.createElement('canvas');
-        this.editedImage.width = i.width;
-        this.editedImage.height = i.height;
-        const ctx = this.editedImage.getContext('2d');
-        ctx!.drawImage(i, 0, 0);
-        const inputimage1 = ctx!.getImageData(0, 0, i.width, i.height);
-        if (this.alignement !== 'off') {
-          this.alignImagesService
-            .imageAlignement({
-              imageA: this.templatePages.get(pagen % this.nbreFeuilleParCopie)?.image,
-              imageB: inputimage1,
-              marker: this.alignement === 'marker',
-              x: (this.zoneine.xInit! * i.width!) / 100000,
-              y: (this.zoneine.yInit! * i.height) / 100000,
-              width: (this.zoneine.width! * i.width) / 100000,
-              height: (this.zoneine.height! * i.height) / 100000,
-            })
-            .subscribe(e => {
-              if (this.debug) {
-                const ctx1 = this.imageCompareMatches?.nativeElement.getContext('2d');
-                this.imageCompareMatches!.nativeElement.width = e.imageCompareMatchesWidth;
-                this.imageCompareMatches!.nativeElement.height = e.imageCompareMatchesHeight;
-                ctx1.putImageData(e.imageCompareMatches, 0, 0);
-                const ctx2 = this.keypoints1?.nativeElement.getContext('2d');
-                this.keypoints1!.nativeElement.width = e.keypoints1Width;
-                this.keypoints1!.nativeElement.height = e.keypoints1Height;
-                ctx2.putImageData(e.keypoints1, 0, 0);
-                const ctx3 = this.keypoints2?.nativeElement.getContext('2d');
-                this.keypoints2!.nativeElement.width = e.keypoints2Width;
-                this.keypoints2!.nativeElement.height = e.keypoints2Height;
-                ctx3.putImageData(e.keypoints2, 0, 0);
-                const ctx4 = this.imageAligned?.nativeElement.getContext('2d');
-                this.imageAligned!.nativeElement.width = e.imageAlignedWidth;
-                this.imageAligned!.nativeElement.height = e.imageAlignedHeight;
-                ctx4.putImageData(e.imageAligned, 0, 0);
-              }
-              const apage = {
-                image: e.imageAligned,
-                page: pagen,
-                width: i.width!,
-                height: i.height,
-              };
-              this.alignPages.set(pagen, apage);
-              cb(apage);
+    const i = new Image();
+    i.onload = () => {
+      this.editedImage = <HTMLCanvasElement>document.createElement('canvas');
+      this.editedImage.width = i.width;
+      this.editedImage.height = i.height;
+      const ctx = this.editedImage.getContext('2d');
+      ctx!.drawImage(i, 0, 0);
+      const inputimage1 = ctx!.getImageData(0, 0, i.width, i.height);
+      if (this.alignement !== 'off') {
+        db.templates
+          .where('examId')
+          .equals(+this.examId)
+          .and(e1 => e1!.id === pagen % this.nbreFeuilleParCopie)
+          .first()
+          .then(e1 => {
+            const image1 = JSON.parse(e1!.value, this.reviver);
+
+            this.loadImage(image1.pages, pagen % this.nbreFeuilleParCopie, (image2: ImageData, page: number, w: number, h: number) => {
+              this.alignImagesService
+                .imageAlignement({
+                  imageA: image2,
+                  imageB: inputimage1,
+                  marker: this.alignement === 'marker',
+                  x: (this.zoneine.xInit! * w!) / 100000,
+                  y: (this.zoneine.yInit! * h) / 100000,
+                  width: (this.zoneine.width! * w) / 100000,
+                  height: (this.zoneine.height! * h) / 100000,
+                })
+                .subscribe(e => {
+                  if (this.debug) {
+                    const ctx1 = this.imageCompareMatches?.nativeElement.getContext('2d');
+                    this.imageCompareMatches!.nativeElement.width = e.imageCompareMatchesWidth;
+                    this.imageCompareMatches!.nativeElement.height = e.imageCompareMatchesHeight;
+                    ctx1.putImageData(e.imageCompareMatches, 0, 0);
+                    const ctx2 = this.keypoints1?.nativeElement.getContext('2d');
+                    this.keypoints1!.nativeElement.width = e.keypoints1Width;
+                    this.keypoints1!.nativeElement.height = e.keypoints1Height;
+                    ctx2.putImageData(e.keypoints1, 0, 0);
+                    const ctx3 = this.keypoints2?.nativeElement.getContext('2d');
+                    this.keypoints2!.nativeElement.width = e.keypoints2Width;
+                    this.keypoints2!.nativeElement.height = e.keypoints2Height;
+                    ctx3.putImageData(e.keypoints2, 0, 0);
+                    const ctx4 = this.imageAligned?.nativeElement.getContext('2d');
+                    this.imageAligned!.nativeElement.width = e.imageAlignedWidth;
+                    this.imageAligned!.nativeElement.height = e.imageAlignedHeight;
+                    ctx4.putImageData(e.imageAligned, 0, 0);
+                  }
+                  const apage = {
+                    image: e.imageAligned,
+                    page: pagen,
+                    width: i.width!,
+                    height: i.height,
+                  };
+                  cb(apage);
+                });
             });
-        } else {
-          const apage = {
-            image: inputimage1,
-            page: pagen,
-            width: i.width,
-            height: i.height,
-          };
-          this.alignPages.set(pagen, apage);
-          cb(apage);
-        }
-      };
-      i.src = file;
-    }
+          });
+      } else {
+        const apage = {
+          image: inputimage1,
+          page: pagen,
+          width: i.width,
+          height: i.height,
+        };
+        cb(apage);
+      }
+    };
+    i.src = file;
   }
 
   public alignementChange(): any {
-    this.alignPages.clear();
-    this.nomPages.clear();
-    this.prenomPages.clear();
-    this.inePages.clear();
     this.exportAsImage();
   }
 
