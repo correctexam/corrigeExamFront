@@ -46,12 +46,13 @@
             <span>Charger scan étudiants</span>
           </button>
           <button
+            [routerLink]="'/imagealign/' + this.examId"
             [style]="{ width: '20em', marginBottom: '1em', margin: '1em' }"
             class="p-element p-ripple"
             pButton
             pRipple
             type="button"
-            [disabled]="true"
+            [disabled]="!exam?.scanfileId"
           >
             <fa-stack>
               <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
@@ -66,7 +67,7 @@
             pButton
             pRipple
             type="button"
-            [disabled]="!exam?.scanfileId"
+            [disabled]="!showAssociation"
           >
             <fa-stack>
               <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>

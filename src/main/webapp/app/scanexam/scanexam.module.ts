@@ -42,6 +42,21 @@ import { ImageExtractorComponent } from './image-extractor/image-extractor.compo
 import { AssocierCopiesEtudiantsComponent } from './associer-copies-etudiants/associer-copies-etudiants.component';
 import { NgxOpenCVModule } from 'ngx-opencv';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { AlignScanComponent } from './alignscan/alignscan.component';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { DBConfig, NgxIndexedDBModule } from 'ngx-indexed-db';
+
+const dbConfig: DBConfig = {
+  name: 'MyDb',
+  version: 1,
+  objectStoresMeta: [
+    {
+      store: 'keyvalue',
+      storeConfig: { keyPath: 'id', autoIncrement: true },
+      storeSchema: [{ name: 'value', keypath: 'value', options: { unique: false } }],
+    },
+  ],
+};
 
 // set the location of the OpenCV files
 const openCVConfig = {
@@ -129,6 +144,15 @@ export const SHOWIMAGE_ROUTE: Route = {
   },
 };
 
+export const AlignerCopiesEtudiants_ROUTE: Route = {
+  path: 'imagealign/:examid',
+  component: AlignScanComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.creercours',
+  },
+};
+
 export const AssocierCopiesEtudiants_ROUTE: Route = {
   path: 'studentbindings/:examid',
   component: AssocierCopiesEtudiantsComponent,
@@ -167,6 +191,7 @@ export const CorrigerCopiesEtudiants_ROUTE: Route = {
     ShowextractImageComponent,
     ImageExtractorComponent,
     AssocierCopiesEtudiantsComponent,
+    AlignScanComponent,
   ],
   imports: [
     CommonModule,
@@ -188,6 +213,8 @@ export const CorrigerCopiesEtudiants_ROUTE: Route = {
     FormsModule,
     NgxExtendedPdfViewerModule,
     SelectButtonModule,
+    InputNumberModule,
+    NgxIndexedDBModule.forRoot(dbConfig),
 
     RouterModule.forChild([
       CREERCOURS_ROUTE,
@@ -201,6 +228,7 @@ export const CorrigerCopiesEtudiants_ROUTE: Route = {
       SHOWIMAGE_ROUTE,
       AssocierCopiesEtudiants_ROUTE,
       CorrigerCopiesEtudiants_ROUTE,
+      AlignerCopiesEtudiants_ROUTE,
     ]),
   ],
   exports: [MesCoursComponent, CreercoursComponent, CoursdetailsComponent, ImportStudentComponent, ListstudentcourseComponent],

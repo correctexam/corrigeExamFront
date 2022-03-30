@@ -122,6 +122,7 @@ function imageDataFromMat(mat: any): any {
   return clampedArray;
 }
 function alignImageBasedOnCircle(payload: any): any {
+  console.log(payload.imageA);
   let srcMat = cv.matFromImageData(payload.imageA);
   let dst = new cv.Mat(); ///cv.Mat.zeros(srcMat.rows, srcMat.cols, cv.CV_8U);
   // let color = new cv.Scalar(255, 0, 0);
@@ -249,80 +250,184 @@ function alignImageBasedOnCircle(payload: any): any {
     }
   }
 
-  let srcTri = cv.matFromArray(4, 1, cv.CV_32FC2, [x1, y1, x2, y2, x3, y3, x4, y4]);
-  let dstTri = cv.matFromArray(4, 1, cv.CV_32FC2, [x5, y5, x6, y6, x7, y7, x8, y8]);
-  //  let srcTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x4, y4, x2, y2, x3, y3]);
-  //  let dstTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x8, y8, x6, y6, x7, y7]);
-  /*  let M = cv.getPerspectiveTransform(dstTri,srcTri);
+  if (goodpointsx.length >= 4) {
+    let srcTri = cv.matFromArray(4, 1, cv.CV_32FC2, [x1, y1, x2, y2, x3, y3, x4, y4]);
+    let dstTri = cv.matFromArray(4, 1, cv.CV_32FC2, [x5, y5, x6, y6, x7, y7, x8, y8]);
+    //  let srcTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x4, y4, x2, y2, x3, y3]);
+    //  let dstTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x8, y8, x6, y6, x7, y7]);
+    /*  let M = cv.getPerspectiveTransform(dstTri,srcTri);
 //  let M = cv.getAffineTransform(srcTri, dstTri);
 //  console.log(M)
   let dsize = new cv.Size(srcMat1.rows, srcMat1.cols);
 
   cv.warpPerspective(srcMat1, dst, M, dsize, cv.BORDER_CONSTANT , cv.BORDER_REPLICATE, new cv.Scalar());*/
 
-  //59    Find homography
-  //60    h = findHomography( points1, points2, RANSAC );
-  let h = cv.findHomography(dstTri, srcTri, cv.RANSAC);
-  let dsize = new cv.Size(srcMat.cols, srcMat.rows);
+    //59    Find homography
+    //60    h = findHomography( points1, points2, RANSAC );
+    let h = cv.findHomography(dstTri, srcTri, cv.RANSAC);
+    let dsize = new cv.Size(srcMat.cols, srcMat.rows);
 
-  if (h.empty()) {
-    console.log('homography matrix empty!');
-    return;
-  }
+    if (h.empty()) {
+      console.log('homography matrix empty!');
+      return;
+    }
 
-  //62  Use homography to warp image
-  //63  warpPerspective(im1, im1Reg, h, im2.size());
+    //62  Use homography to warp image
+    //63  warpPerspective(im1, im1Reg, h, im2.size());
 
-  cv.warpPerspective(srcMat2, dst, h, dsize);
+    cv.warpPerspective(srcMat2, dst, h, dsize);
 
-  let dst1 = dst.clone();
+    let dst1 = dst.clone();
 
-  for (let i = 0; i < dstTri.rows; ++i) {
-    let x = dstTri.data32F[i * 2];
-    let y = dstTri.data32F[i * 2 + 1];
-    let radius = 15;
-    let center = new cv.Point(x, y);
-    cv.circle(srcMat2, center, radius, [0, 0, 255, 255], 1);
-  }
-  for (let i = 0; i < srcTri.rows; ++i) {
-    let x = srcTri.data32F[i * 2];
-    let y = srcTri.data32F[i * 2 + 1];
-    let radius = 15;
-    let center = new cv.Point(x, y);
-    cv.circle(srcMat, center, radius, [0, 0, 255, 255], 1);
-    cv.circle(dst1, center, radius, [0, 0, 255, 255], 1);
-  }
-
-  /*
+    for (let i = 0; i < dstTri.rows; ++i) {
+      let x = dstTri.data32F[i * 2];
+      let y = dstTri.data32F[i * 2 + 1];
+      let radius = 15;
+      let center = new cv.Point(x, y);
+      cv.circle(srcMat2, center, radius, [0, 0, 255, 255], 1);
+    }
+    for (let i = 0; i < srcTri.rows; ++i) {
+      let x = srcTri.data32F[i * 2];
+      let y = srcTri.data32F[i * 2 + 1];
+      let radius = 15;
+      let center = new cv.Point(x, y);
+      cv.circle(srcMat, center, radius, [0, 0, 255, 255], 1);
+      cv.circle(dst1, center, radius, [0, 0, 255, 255], 1);
+    }
+    /*
 let point1 = new cv.Point(payload.x, payload.y);
 let point2 = new cv.Point(payload.x + payload.width, payload.y + payload.height);
 cv.rectangle(dst1, point1, point2,  [0, 0, 255, 255], 2, cv.LINE_AA, 0);
 cv.rectangle(srcMat, point1, point2,  [0, 0, 255, 255], 2, cv.LINE_AA, 0);*/
 
-  let result = {} as any;
-  result['keypoints1'] = imageDataFromMat(srcMat);
-  result['keypoints1Width'] = srcMat.size().width;
-  result['keypoints1Height'] = srcMat.size().height;
-  result['keypoints2'] = imageDataFromMat(dst);
-  result['keypoints2Width'] = dst.size().width;
-  result['keypoints2Height'] = dst.size().height;
-  result['imageCompareMatches'] = imageDataFromMat(srcMat2);
-  result['imageCompareMatchesWidth'] = srcMat2.size().width;
-  result['imageCompareMatchesHeight'] = srcMat2.size().height;
-  result['imageAligned'] = imageDataFromMat(dst1);
-  result['imageAlignedWidth'] = dst1.size().width;
-  result['imageAlignedHeight'] = dst1.size().height;
+    let result = {} as any;
+    result['keypoints1'] = imageDataFromMat(srcMat);
+    result['keypoints1Width'] = srcMat.size().width;
+    result['keypoints1Height'] = srcMat.size().height;
+    result['keypoints2'] = imageDataFromMat(dst);
+    result['keypoints2Width'] = dst.size().width;
+    result['keypoints2Height'] = dst.size().height;
+    result['imageCompareMatches'] = imageDataFromMat(srcMat2);
+    result['imageCompareMatchesWidth'] = srcMat2.size().width;
+    result['imageCompareMatchesHeight'] = srcMat2.size().height;
+    result['imageAligned'] = imageDataFromMat(dst1);
+    result['imageAlignedWidth'] = dst1.size().width;
+    result['imageAlignedHeight'] = dst1.size().height;
 
-  srcMat.delete();
-  dst.delete();
-  circlesMat.delete();
-  srcMat1.delete();
-  srcMat2.delete();
-  circlesMat1.delete();
-  srcTri.delete();
-  dstTri.delete();
-  dst1.delete();
-  return result;
+    srcMat.delete();
+    dst.delete();
+    circlesMat.delete();
+    srcMat1.delete();
+    srcMat2.delete();
+    circlesMat1.delete();
+    srcTri.delete();
+    dstTri.delete();
+    dst1.delete();
+
+    return result;
+  } else {
+    //22    Variables to store keypoints and descriptors
+    //23    std::vector<KeyPoint> keypoints1, keypoints2;
+    //24    Mat descriptors1, descriptors2;
+    let keypoints1 = new cv.KeyPointVector();
+    let keypoints2 = new cv.KeyPointVector();
+    let descriptors1 = new cv.Mat();
+    let descriptors2 = new cv.Mat();
+
+    let orb = new cv.AKAZE();
+    let tmp1 = new cv.Mat();
+    let tmp2 = new cv.Mat();
+    orb.detectAndCompute(srcMat1, tmp1, keypoints1, descriptors1);
+    orb.detectAndCompute(srcMat, tmp2, keypoints2, descriptors2);
+
+    let good_matches = new cv.DMatchVector();
+    let bf = new cv.BFMatcher();
+    let matches = new cv.DMatchVectorVector();
+    bf.knnMatch(descriptors1, descriptors2, matches, 2);
+
+    for (let i = 0; i < matches.size(); ++i) {
+      let match = matches.get(i);
+      let dMatch1 = match.get(0);
+      let dMatch2 = match.get(1);
+      let knnDistance_option = '0.7';
+      if (dMatch1.distance <= dMatch2.distance * parseFloat(knnDistance_option)) {
+        good_matches.push_back(dMatch1);
+      }
+    }
+    let imMatches = new cv.Mat();
+    let color = new cv.Scalar(0, 255, 0, 255);
+
+    cv.drawMatches(srcMat2, keypoints1, srcMat, keypoints2, good_matches, imMatches, color);
+    let result = {} as any;
+    result['imageCompareMatches'] = imageDataFromMat(imMatches);
+    result['imageCompareMatchesWidth'] = imMatches.size().width;
+    result['imageCompareMatchesHeight'] = imMatches.size().height;
+    let keypoints1_img = new cv.Mat();
+    let keypoints2_img = new cv.Mat();
+    let keypointcolor = new cv.Scalar(0, 255, 0, 255);
+    cv.drawKeypoints(srcMat1, keypoints1, keypoints1_img, keypointcolor);
+    cv.drawKeypoints(srcMat, keypoints2, keypoints2_img, keypointcolor);
+
+    result['keypoints1'] = imageDataFromMat(keypoints1_img);
+    result['keypoints1Width'] = keypoints1_img.size().width;
+    result['keypoints1Height'] = keypoints1_img.size().height;
+    result['keypoints2'] = imageDataFromMat(keypoints2_img);
+    result['keypoints2Width'] = keypoints2_img.size().width;
+    result['keypoints2Height'] = keypoints2_img.size().height;
+
+    let points1 = [];
+    let points2 = [];
+    for (let i = 0; i < good_matches.size(); i++) {
+      points1.push(keypoints1.get(good_matches.get(i).queryIdx).pt.x);
+      points1.push(keypoints1.get(good_matches.get(i).queryIdx).pt.y);
+      points2.push(keypoints2.get(good_matches.get(i).trainIdx).pt.x);
+      points2.push(keypoints2.get(good_matches.get(i).trainIdx).pt.y);
+    }
+
+    let mat1 = new cv.Mat(points1.length, 1, cv.CV_32FC2);
+    mat1.data32F.set(points1);
+    let mat2 = new cv.Mat(points2.length, 1, cv.CV_32FC2);
+    mat2.data32F.set(points2);
+
+    let h = cv.findHomography(mat1, mat2, cv.RANSAC);
+
+    if (h.empty()) {
+      console.log('homography matrix empty!');
+      return;
+    } else {
+      console.log('h:', h);
+    }
+
+    let image_B_final_result = new cv.Mat();
+    cv.warpPerspective(srcMat1, image_B_final_result, h, srcMat.size());
+
+    result['imageAligned'] = imageDataFromMat(image_B_final_result);
+    result['imageAlignedWidth'] = image_B_final_result.size().width;
+    result['imageAlignedHeight'] = image_B_final_result.size().height;
+
+    image_B_final_result.delete();
+    mat1.delete();
+    mat2.delete();
+    keypoints1_img.delete();
+    keypoints2_img.delete();
+    imMatches.delete();
+    matches.delete();
+    bf.delete();
+    good_matches.delete();
+    orb.delete();
+    keypoints1.delete();
+    keypoints2.delete();
+    descriptors1.delete();
+    descriptors2.delete();
+    tmp1.delete();
+    tmp2.delete();
+    srcMat.delete();
+    dst.delete();
+    circlesMat.delete();
+    srcMat1.delete();
+    srcMat2.delete();
+    circlesMat1.delete();
+  }
 }
 
 function alignImage(image_A: any, image_B: any): any {
@@ -378,7 +483,6 @@ function alignImage(image_A: any, image_B: any): any {
 
   let bf = new cv.BFMatcher();
   let matches = new cv.DMatchVectorVector();
-
   bf.knnMatch(descriptors1, descriptors2, matches, 2);
 
   //  let counter = 0;

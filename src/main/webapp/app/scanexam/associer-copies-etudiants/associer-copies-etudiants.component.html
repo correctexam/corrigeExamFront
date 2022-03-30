@@ -1,5 +1,5 @@
 <h5>Alignement</h5>
-<p-selectButton
+<!--<p-selectButton
   [disabled]="!phase1"
   [options]="alignementOptions"
   [(ngModel)]="alignement"
@@ -9,41 +9,18 @@
 ></p-selectButton>
 
 <h5>Debug</h5>
-<p-selectButton [options]="debugOptions" [(ngModel)]="debug" optionLabel="label" optionValue="value"></p-selectButton>
-<button pButton type="button" label="Previous" [disabled]="!phase1 || currentStudent === 0" (click)="previousStudent()"></button>
+<p-selectButton [options]="debugOptions" [(ngModel)]="debug" optionLabel="label" optionValue="value"></p-selectButton>-->
+<button pButton type="button" label="Previous" [disabled]="currentStudent === 0" (click)="previousStudent()"></button>
 <button
   pButton
   type="button"
   label="Next"
-  [disabled]="!phase1 || (currentStudent + 1) * nbreFeuilleParCopie >= numberPagesInScan"
+  [disabled]="(currentStudent + 1) * nbreFeuilleParCopie >= numberPagesInScan"
   (click)="nextStudent()"
 ></button>
-
+<BR />
+<BR />
 <div class="canvas-wrapper foo">
-  <canvas #outputImage></canvas>
-  <ngx-extended-pdf-viewer
-    [hidden]="'true'"
-    [base64Src]="pdfcontent"
-    [useBrowserLocale]="true"
-    style="flex: 1 1 100%"
-    #viewer
-    [height]="'90vh'"
-    [page]="1"
-    [handTool]="false"
-    [showHandToolButton]="false"
-    [textLayer]="false"
-    [(scrollMode)]="scrollMode"
-    [handTool]="false"
-    [showToolbar]="false"
-    [pageViewMode]="'infinite-scroll'"
-    [showSecondaryToolbarButton]="false"
-    backgroundColor="#ffffff"
-    [zoom]="'100%'"
-    [minZoom]="1"
-    [maxZoom]="1"
-    (pdfLoaded)="pdfloaded()"
-  ></ngx-extended-pdf-viewer>
-
   <canvas [hidden]="!showNomImage" #nomImage></canvas>
   <canvas [hidden]="!showPrenomImage" #prenomImage></canvas>
   <canvas [hidden]="!showINEImage" #ineImage></canvas>

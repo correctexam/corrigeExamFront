@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
@@ -14,6 +15,8 @@ import { ExamService } from '../../entities/exam/service/exam.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { db } from '../db/db';
+
 @Component({
   selector: 'jhi-exam-detail',
   templateUrl: './exam-detail.component.html',
@@ -29,7 +32,7 @@ export class ExamDetailComponent implements OnInit {
   exam!: IExam;
   course!: ICourse;
   dockItems!: any[];
-
+  showAssociation = false;
   constructor(
     public courseService: CourseService,
     public examService: ExamService,
@@ -42,6 +45,15 @@ export class ExamDetailComponent implements OnInit {
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('examid') !== null) {
         this.examId = params.get('examid')!;
+        db.exams
+          .where('id')
+          .equals(+this.examId)
+          .count()
+          .then(c => {
+            if (c !== 0) {
+              this.showAssociation = true;
+            }
+          });
         this.examService.find(+this.examId).subscribe(data => {
           this.exam = data.body!;
           this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
@@ -69,5 +81,8 @@ export class ExamDetailComponent implements OnInit {
         });
       },
     });
+  }
+  hasCache(): boolean {
+    return true;
   }
 }
