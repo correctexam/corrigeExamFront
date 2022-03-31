@@ -11,7 +11,7 @@ import { ExamService } from '../../entities/exam/service/exam.service';
 import { ZoneService } from '../../entities/zone/service/zone.service';
 import { CourseService } from 'app/entities/course/service/course.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { IExam } from 'app/entities/exam/exam.model';
 import { ICourse } from 'app/entities/course/course.model';
 import { IScan } from '../../entities/scan/scan.model';
@@ -31,9 +31,10 @@ export interface IPage {
   selector: 'jhi-associer-copies-etudiants',
   templateUrl: './associer-copies-etudiants.component.html',
   styleUrls: ['./associer-copies-etudiants.component.scss'],
-  providers: [ConfirmationService],
+  providers: [ConfirmationService, MessageService],
 })
 export class AssocierCopiesEtudiantsComponent implements OnInit {
+  blocked = false;
   examId = '';
   exam!: IExam;
   course!: ICourse;
@@ -95,7 +96,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     protected activatedRoute: ActivatedRoute,
     public confirmationService: ConfirmationService,
     public router: Router,
-    private alignImagesService: AlignImagesService
+    private alignImagesService: AlignImagesService,
+    public messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -432,5 +434,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
       }
     }
     return value;
+  }
+
+  gotoUE(): any {
+    this.router.navigateByUrl('/exam/' + this.examId);
   }
 }

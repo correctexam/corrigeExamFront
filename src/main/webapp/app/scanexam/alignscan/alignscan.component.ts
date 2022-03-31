@@ -11,7 +11,7 @@ import { ExamService } from '../../entities/exam/service/exam.service';
 import { ScanService } from '../../entities/scan/service/scan.service';
 import { CourseService } from 'app/entities/course/service/course.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { IExam } from 'app/entities/exam/exam.model';
 import { ICourse } from 'app/entities/course/course.model';
 import { IScan } from '../../entities/scan/scan.model';
@@ -19,8 +19,10 @@ import { ScrollModeType, NgxExtendedPdfViewerService } from 'ngx-extended-pdf-vi
 import { AlignImagesService } from '../services/align-images.service';
 import { TemplateService } from '../../entities/template/service/template.service';
 import { ITemplate } from 'app/entities/template/template.model';
+import { faObjectGroup } from '@fortawesome/free-solid-svg-icons';
 
 import { db } from '../db/db';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 export interface IPage {
   image?: ImageData;
@@ -33,9 +35,10 @@ export interface IPage {
   selector: 'jhi-align-scan',
   templateUrl: './alignscan.component.html',
   styleUrls: ['./alignscan.component.scss'],
-  providers: [ConfirmationService],
+  providers: [ConfirmationService, MessageService],
 })
 export class AlignScanComponent implements OnInit {
+  faObjectGroup = faObjectGroup as IconProp;
   examId = '';
   exam!: IExam;
   course!: ICourse;
@@ -82,7 +85,8 @@ export class AlignScanComponent implements OnInit {
     protected activatedRoute: ActivatedRoute,
     public confirmationService: ConfirmationService,
     public router: Router,
-    private alignImagesService: AlignImagesService
+    private alignImagesService: AlignImagesService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -225,6 +229,10 @@ export class AlignScanComponent implements OnInit {
             });*/
     }
     this.blocked = false;
+  }
+
+  gotoUE(): any {
+    this.router.navigateByUrl('/exam/' + this.examId);
   }
 
   public exportAsImage(): void {

@@ -1,47 +1,89 @@
-<p-blockUI [blocked]="blocked"></p-blockUI>
+<div class="grid">
+  <p-toast></p-toast>
+  <p-blockUI [blocked]="blocked">
+    <i class="pi pi-lock" style="font-size: 3rem"></i>
+  </p-blockUI>
 
-<h5>Alignement</h5>
-<p-selectButton
-  [options]="alignementOptions"
-  [(ngModel)]="alignement"
-  (onChange)="alignementChange()"
-  optionLabel="label"
-  optionValue="value"
-></p-selectButton>
+  <div class="col-8">
+    <div class="grid grid-nogutter">
+      <div class="col-8">
+        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">Aligner scans</h2>
+      </div>
+      <div class="col-4 flex flex-row-reverse">
+        <button
+          [disabled]="!this.examId"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="btn btn-primary"
+          (click)="gotoUE()"
+        >
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Retourner à l'exam</span>
+        </button>
 
-<p-selectButton [options]="debugOptions" [(ngModel)]="debug" optionLabel="label" optionValue="value"></p-selectButton>
+        <button (click)="process()" class="btn btn-primary" [disabled]="!loaded">
+          <fa-icon [icon]="faObjectGroup"></fa-icon>&nbsp;<span>Alignement des scans</span>
+        </button>
+      </div>
+      <!--      <div class="col-offset-8 col-4">
+        <label for="slider">Nombre de lignes dans le tableau (entre 100 et 300)</label>
+        <p-slider id="slider" [(ngModel)]="val" (onChange)="updateTableSize()" [step]="20" [min]="100" [max]="300"></p-slider>
+      </div>-->
+    </div>
+    <div class="col-12 md:col-12">
+      <h5>Algorithme d'alignement</h5>
+      <p-selectButton
+        [options]="alignementOptions"
+        [(ngModel)]="alignement"
+        (onChange)="alignementChange()"
+        optionLabel="label"
+        optionValue="value"
+      ></p-selectButton>
 
-<p-inputNumber [(ngModel)]="nbreFeuilleParCopie" [showButtons]="true"></p-inputNumber>
+      <h5>Debug</h5>
+      <p-selectButton [options]="debugOptions" [(ngModel)]="debug" optionLabel="label" optionValue="value"></p-selectButton>
 
-<p-button (onClick)="process()" [disabled]="!loaded">Alignement des scans</p-button>
+      <h5>Nombre de page à utiliser dans le template d'exam</h5>
+      <p-inputNumber [(ngModel)]="nbreFeuilleParCopie" [showButtons]="true"></p-inputNumber>
 
-<div class="canvas-wrapper foo">
-  <ngx-extended-pdf-viewer
-    [hidden]="'true'"
-    [base64Src]="pdfcontent"
-    [useBrowserLocale]="true"
-    style="flex: 1 1 100%"
-    #viewer
-    [height]="'90vh'"
-    [page]="1"
-    [handTool]="false"
-    [showHandToolButton]="false"
-    [textLayer]="false"
-    [(scrollMode)]="scrollMode"
-    [handTool]="false"
-    [showToolbar]="false"
-    [pageViewMode]="'infinite-scroll'"
-    [showSecondaryToolbarButton]="false"
-    backgroundColor="#ffffff"
-    [zoom]="'100%'"
-    [minZoom]="1"
-    [maxZoom]="1"
-    (pdfLoaded)="pdfloaded()"
-  ></ngx-extended-pdf-viewer>
+      <div class="canvas-wrapper foo">
+        <ngx-extended-pdf-viewer
+          [hidden]="'true'"
+          [base64Src]="pdfcontent"
+          [useBrowserLocale]="true"
+          style="flex: 1 1 100%"
+          #viewer
+          [height]="'90vh'"
+          [page]="1"
+          [handTool]="false"
+          [showHandToolButton]="false"
+          [textLayer]="false"
+          [(scrollMode)]="scrollMode"
+          [handTool]="false"
+          [showToolbar]="false"
+          [pageViewMode]="'infinite-scroll'"
+          [showSecondaryToolbarButton]="false"
+          backgroundColor="#ffffff"
+          [zoom]="'100%'"
+          [minZoom]="1"
+          [maxZoom]="1"
+          (pdfLoaded)="pdfloaded()"
+        ></ngx-extended-pdf-viewer>
 
-  <canvas [hidden]="!debug" #imageAligned></canvas>
+        <canvas [hidden]="!debug" #imageAligned></canvas>
 
-  <canvas [hidden]="!debug" #keypoints1></canvas>
-  <canvas [hidden]="!debug" #keypoints2></canvas>
-  <canvas [hidden]="!debug" #imageCompareMatches></canvas>
+        <canvas [hidden]="!debug" #keypoints1></canvas>
+        <canvas [hidden]="!debug" #keypoints2></canvas>
+        <canvas [hidden]="!debug" #imageCompareMatches></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-4 md:col-4 overflow-hidden">
+    <img
+      src="content/images/bannerright.jpg"
+      alt="Image"
+      class="md:ml-auto block md:h-full"
+      style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
+    />
+  </div>
 </div>
