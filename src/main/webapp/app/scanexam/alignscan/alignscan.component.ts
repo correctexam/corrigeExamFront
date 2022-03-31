@@ -214,6 +214,8 @@ export class AlignScanComponent implements OnInit {
         ),
       });
 
+      this.router.navigateByUrl('/exam/' + this.examId);
+
       /* this.dbService.add('keyvalue', {
               key: 'nonalignPages_' +this.examId+ '_' + e, value : JSON.stringify({
                 pages : nonalignPages64.get(e)!
@@ -277,7 +279,7 @@ export class AlignScanComponent implements OnInit {
         if (this.alignement !== 'off') {
           let paget = pagen % this.nbreFeuilleParCopie;
           if (paget === 0) {
-            paget = 6;
+            paget = this.nbreFeuilleParCopie;
           }
           this.alignImagesService
             .imageAlignement({

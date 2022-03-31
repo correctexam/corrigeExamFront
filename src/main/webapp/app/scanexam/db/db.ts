@@ -62,18 +62,21 @@ export class AppDB extends Dexie {
         .where('examId')
         .equals(examId)
         .toArray()
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         .then(templates => this.templates.bulkDelete(templates.map(t => t.id!)));
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       db.alignImages
         .where('examId')
         .equals(examId)
         .toArray()
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         .then(a => this.alignImages.bulkDelete(a.map(t => t.id!)));
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       db.nonAlignImages
         .where('examId')
         .equals(examId)
         .toArray()
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         .then(a => this.nonAlignImages.bulkDelete(a.map(t => t.id!)));
       //      this.populate();
     });
