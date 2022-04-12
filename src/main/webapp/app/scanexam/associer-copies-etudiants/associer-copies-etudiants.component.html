@@ -58,6 +58,24 @@
       <p-selectButton [options]="debugOptions" [(ngModel)]="debug" optionLabel="label" optionValue="value"></p-selectButton>
       <BR />
       <BR />
+      <div class="grid align-items-center">
+        <div class="col-1">
+          <p-button icon="pi pi-refresh" (onClick)="reShow()"></p-button>
+        </div>
+        <div class="col-10">
+          <p-paginator
+            [rows]="1"
+            [totalRecords]="numberPagesInScan / nbreFeuilleParCopie"
+            (onPageChange)="onPageChange($event)"
+            [showJumpToPageDropdown]="true"
+            [showPageLinks]="false"
+          ></p-paginator>
+        </div>
+        <div class="col-1 grid justify-content-end">
+          <p-button icon="pi pi-search"></p-button>
+        </div>
+      </div>
+
       <div class="canvas-wrapper foo">
         <canvas [hidden]="!showNomImage" #nomImage></canvas>
         <canvas [hidden]="!showPrenomImage" #prenomImage></canvas>
@@ -69,9 +87,24 @@
         <canvas [hidden]="!debug" #keypoints2></canvas>
         <canvas [hidden]="!debug" #imageCompareMatches></canvas>
       </div>
+      <p-orderList
+        [value]="students!"
+        filterBy="name,firstname"
+        (onSelectionChange)="selectStudent4Copie($event)"
+        [metaKeySelection]="true"
+        [(selection)]="selectionStudents"
+      >
+        <ng-template let-student pTemplate="item">
+          <div>
+            <p>{{ student.name }} - {{ student.firstname }}</p>
+            <!--                <img src="assets/showcase/images/demo/car/{{car.brand}}.png" style="display:inline-block;margin:2px 0 2px 2px" width="48">-->
+            <div style="font-size: 14px; float: right; margin: 15px 5px 0 0">{{ student.mail }} - {{ student.ine }}</div>
+          </div>
+        </ng-template>
+      </p-orderList>
     </div>
   </div>
-  <div class="col-4 md:col-4 overflow-hidden">
+  <div [hidden]="debug" class="col-4 md:col-4 overflow-hidden">
     <img
       src="content/images/bannerright.jpg"
       alt="Image"

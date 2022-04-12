@@ -1,8 +1,11 @@
+/* eslint-disable object-shorthand */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable no-console */
 /* eslint-disable prefer-const */
 /* eslint-disable spaced-comment */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
+
+import { MLModel } from './scanexam/ml/model';
 
 /// <reference lib="webworker" />
 declare let cv: any;
@@ -35,7 +38,7 @@ addEventListener('message', e => {
       };
 
       //Load and await the .js OpenCV
-      self.importScripts(self1['Module'].scriptUrl);
+      self1.importScripts(self1['Module'].scriptUrl);
 
       break;
     }
@@ -45,6 +48,10 @@ addEventListener('message', e => {
       return imageAlignement(e.data);
     case 'imageCrop':
       return imageCrop(e.data);
+    case 'nameprediction':
+      return doPrediction(e.data, true);
+    case 'ineprediction':
+      return doPrediction(e.data, false);
     default:
       break;
   }
@@ -93,6 +100,42 @@ function imageCrop(p: { msg: any; payload: any; uid: string }): void {
   dst.delete();
   src.delete();
 }
+
+function doPrediction(p: { msg: any; payload: any; uid: string }, letter: boolean): void {
+  // You can try more different parameters
+  let src = cv.matFromImageData(p.payload.image);
+  const m = new MLModel(letter);
+  m.isWarmedUp.then(() => {
+    const res1 = fprediction(src, p.payload.candidates, m, true);
+    const res2 = fprediction(src, p.payload.candidates, m, true);
+    if (res1.solution[1] > res2.solution[1]) {
+      postMessage({
+        msg: p.msg,
+        payload: {
+          debug: imageDataFromMat(res1.debug),
+          solution: res1.solution,
+        },
+        uid: p.uid,
+      });
+      res1.debug.delete();
+      res2.debug.delete();
+      src.delete();
+    } else {
+      postMessage({
+        msg: p.msg,
+        payload: {
+          debug: imageDataFromMat(res2.debug),
+          solution: res2.solution,
+        },
+        uid: p.uid,
+      });
+      res1.debug.delete();
+      res2.debug.delete();
+      src.delete();
+    }
+  });
+}
+
 /**
  * This function is to convert again from cv.Mat to ImageData
  */
@@ -613,148 +656,287 @@ function alignImage(image_A: any, image_B: any): any {
   return result;
 }
 
-/*function detectLetters( img : any): any{
-  let src = cv.matFromImageData(img);
-  let dst = new cv.Mat() //.zeros(src.rows, src.cols, cv.CV_8UC3);
-  let grey = new cv.Mat() //.zeros(src.rows, src.cols, cv.CV_8UC3);
-  cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY);
-  cv.cvtColor(src, grey, cv.COLOR_RGBA2GRAY);
-  cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY);
-  let ksize = new cv.Size(5,5)
-//  cv.GaussianBlur(src, src, ksize, 0, 0, cv.BORDER_DEFAULT);
-let fillColor = new cv.Scalar(255, 255, 255);
+function fprediction(src: any, cand: string[], m: MLModel, lookingForMissingLetter: boolean): any {
+  const res = extractImage(src, false, lookingForMissingLetter);
 
-cv.adaptiveThreshold(grey, grey, 255, cv.THRESH_BINARY_INV, cv.THRESH_OTSU, 11, 2);
-// thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+  let candidate: any[] = [];
+  cand.forEach(e => {
+    candidate.push([e.padEnd(13, ' '), 0.0]);
+  });
+  const predict = [];
+  for (let i = 0; i < res.letter.length; i++) {
+    let res1 = m.predict(imageDataFromMat(res.letter[i][1]));
+    predict.push(res1);
+  }
+  for (let k = 0; k < candidate.length; k++) {
+    for (let j = 0; j < 13; j++) {
+      if (j < predict.length) {
+        let letter = candidate[k][0].substring(j, j + 1).toLowerCase();
 
-// # Remove horizontal lines
-let ksize1 = new cv.Size(40, 1);
-// You can try more different parameters
-let horizontal_kernel = cv.getStructuringElement(cv.MORPH_RECT, ksize1);
-cv.morphologyEx(grey, grey, cv.MORPH_OPEN, horizontal_kernel,2);
-let contours1 = new cv.MatVector();
-let hierarchy1 = new cv.Mat();
-cv.findContours(src, contours1, hierarchy1, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-let contour1
-if (contours1.size() ===2){
-  contour1 = contours1.get(0)
-}else {
-  contour1 = contours1.get(1)
+        if (letter === predict[j][0].toLowerCase()) {
+          candidate[k][1] = candidate[k][1] + predict[j][1];
+        } else {
+          candidate[k][1] = candidate[k][1] + (1 - predict[j][1]) / 35;
+        }
+      }
+    }
+    candidate[k][1] = candidate[k][1] / predict.length;
+  }
+  candidate.sort((a, b) => {
+    if (a[1] < b[1]) {
+      return 1;
+    } else {
+      return -1;
+    }
+  });
+
+  return {
+    debug: res.invert_final,
+    solution: candidate[0],
+  };
 }
 
-for (let i = 0; i < contour1.size(); ++i) {
-  let cnt = contour1.get(i);
-  cv.drawContours(grey, cnt,-1,fillColor,5)
-}
+function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingForMissingLetter: boolean): any {
+  const linelength = 15;
+  const repairsize = 1;
+  const dilatesize = 1;
+  const morphsize = 1;
+  const drawcontoursizeh = 4;
+  const drawcontoursizev = 4;
 
+  //  let src = cv.imread(inputid);
+  let dst = src.clone();
+  let gray = new cv.Mat();
+  false;
+  cv.cvtColor(src, gray, cv.COLOR_BGR2GRAY, 0);
+  let thresh = new cv.Mat();
+  cv.threshold(gray, thresh, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
+  let anchor = new cv.Point(-1, -1);
 
+  if (removeHorizonzalAndVertical) {
+    // Step 1 remove vertical lines
+    let remove_vertical = new cv.Mat();
+    let ksize2 = new cv.Size(1, linelength);
+    // You can try more different parameters
+    let vertical_kernel = cv.getStructuringElement(cv.MORPH_RECT, ksize2);
+    cv.morphologyEx(
+      thresh,
+      remove_vertical,
+      cv.MORPH_OPEN,
+      vertical_kernel,
+      anchor,
+      2,
+      cv.BORDER_CONSTANT,
+      cv.morphologyDefaultBorderValue()
+    );
+    let contours2 = new cv.MatVector();
+    let hierarchy2 = new cv.Mat();
+    cv.findContours(remove_vertical, contours2, hierarchy2, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+    let fillColor = new cv.Scalar(255, 255, 255);
+    cv.drawContours(dst, contours2, -1, fillColor, drawcontoursizev);
 
+    // Step 1 remove horizontal lines
 
-// Remove vertical lines
-let ksize2 = new cv.Size(1, 40);
-// You can try more different parameters
-let vertical_kernel = cv.getStructuringElement(cv.MORPH_RECT, ksize2);
-cv.morphologyEx(grey, grey, cv.MORPH_OPEN, vertical_kernel,2);
-let contours2 = new cv.MatVector();
-let hierarchy2 = new cv.Mat();
-cv.findContours(src, contours2, hierarchy2, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-let contour2
-if (contours1.size() ===2){
-  contour2 = contours2.get(0)
-}else {
-  contour2 = contours2.get(1)
-}
+    let remove_horizontal = new cv.Mat();
+    let ksize3 = new cv.Size(linelength, 1);
+    // You can try more different parameters
+    let horizontal_kernel = cv.getStructuringElement(cv.MORPH_RECT, ksize3);
+    let anchor1 = new cv.Point(-1, -1);
+    cv.morphologyEx(
+      thresh,
+      remove_horizontal,
+      cv.MORPH_OPEN,
+      horizontal_kernel,
+      anchor1,
+      2,
+      cv.BORDER_CONSTANT,
+      cv.morphologyDefaultBorderValue()
+    );
+    let contours3 = new cv.MatVector();
+    let hierarchy3 = new cv.Mat();
+    cv.findContours(remove_horizontal, contours3, hierarchy3, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+    let fillColor1 = new cv.Scalar(255, 255, 255);
+    cv.drawContours(dst, contours3, -1, fillColor1, drawcontoursizeh);
 
-for (let i = 0; i < contour2.size(); ++i) {
-  let cnt = contour2.get(i);
-  cv.drawContours(grey, cnt,-1,fillColor,5)
-}
+    remove_vertical.delete();
+    contours2.delete();
+    hierarchy2.delete();
+    vertical_kernel.delete();
+    remove_horizontal.delete();
+    contours3.delete();
+    hierarchy3.delete();
+    horizontal_kernel.delete();
+  }
 
+  // Step 3 Repair kernel
+  let ksize4 = new cv.Size(repairsize, repairsize);
+  let repair_kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, ksize4);
+  let mask = new cv.Mat();
+  let dtype = -1;
+  // 1. Create a Mat which is full of zeros
+  let img = cv.Mat.ones(src.rows, src.cols, cv.CV_8UC3);
+  img.setTo(new cv.Scalar(255, 255, 255));
+  cv.cvtColor(img, img, cv.COLOR_BGR2GRAY, 0);
+  // 2. Create a Mat which is full of ones
+  // let mat = cv.Mat.ones(rows, cols, type);
+  let gray1 = new cv.Mat();
+  cv.cvtColor(dst, gray1, cv.COLOR_BGR2GRAY, 0);
+  // let img = cv.zeros(src.rows, src.cols, cv.CV_8UC3);
+  let dst1 = new cv.Mat();
+  cv.subtract(img, gray1, dst1, mask, dtype);
+  //cv.subtract(img, dst, dst1);
+  let dilate = new cv.Mat();
+  cv.dilate(dst1, dilate, repair_kernel, anchor, dilatesize, cv.BORDER_CONSTANT, cv.morphologyDefaultBorderValue());
 
+  let pre_result = new cv.Mat();
+  let result = new cv.Mat();
 
-  cv.adaptiveThreshold(grey, grey, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 11, 2);
+  cv.bitwise_and(dilate, thresh, pre_result);
+  cv.morphologyEx(
+    pre_result,
+    result,
+    cv.MORPH_CLOSE,
+    repair_kernel,
+    anchor,
+    morphsize,
+    cv.BORDER_CONSTANT,
+    cv.morphologyDefaultBorderValue()
+  );
+  let final = new cv.Mat();
+
+  cv.bitwise_and(result, thresh, final);
+  let invert_final = new cv.Mat();
+
+  cv.subtract(img, final, invert_final, mask, dtype);
+
+  //        cv.threshold(src, src, 177, 200, cv.THRESH_BINARY);
   let contours = new cv.MatVector();
   let hierarchy = new cv.Mat();
-  cv.findContours(src, contours, hierarchy, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE);
-  let rectangleColor = new cv.Scalar(0, 0, 0);
-
-
-  for (let i = 0; i < contours.size(); ++i) {
-  let cnt = contours.get(i);
-  let rect = cv.boundingRect(cnt);
-  if (rect.width*rect.height >= 200){
-
-  let point1 = new cv.Point(rect.x, rect.y);
-  let point2 = new cv.Point(rect.x + rect.width, rect.y + rect.height);
-  cv.rectangle(dst, point1, point2, rectangleColor, 2, cv.LINE_AA, 0);
-  }
-  cnt.delete();
+  cv.findContours(final, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+  const letters = new Map();
+  let rects = [];
+  for (let ct = 0; ct < contours.size(); ct++) {
+    let cnt = contours.get(ct);
+    // You can try more different parameters
+    let rect = cv.boundingRect(cnt);
+    if (rect.width * rect.height > 300) {
+      //} && rect.width < rect.height) {
+      rects.push(rect);
+    }
   }
 
+  // TODO interect on rect
+  rects.forEach(rect => {
+    let rectangleColor = new cv.Scalar(0, 0, 0);
+    let point1 = new cv.Point(rect.x, rect.y);
+    let point2 = new cv.Point(rect.x + rect.width, rect.y + rect.height);
+    let dst4 = new cv.Mat();
+    let dst2 = new cv.Mat();
+    let dst3 = new cv.Mat();
+    dst4 = invert_final.roi(rect); // You can try more different parameters
+    let dsize = new cv.Size(26, 26);
+    cv.resize(dst4, dst2, dsize, 0, 0, cv.INTER_AREA);
+    let s = new cv.Scalar(255, 0, 0, 255);
+    cv.copyMakeBorder(dst2, dst3, 1, 1, 1, 1, cv.BORDER_CONSTANT, s);
+    letters.set(rect, dst3);
+    dst4.delete();
+    dst2.delete();
+    cv.rectangle(invert_final, point1, point2, rectangleColor, 2, cv.LINE_AA, 0);
+  });
 
-  const res = imageDataFromMat(dst);
-  src.delete(); dst.delete(); contours.delete(); hierarchy.delete();
-  return res;
+  src.delete();
+  gray.delete();
+  thresh.delete();
 
-}*/
+  repair_kernel.delete();
+  mask.delete();
+  img.delete();
+  gray1.delete();
+  dst1.delete();
+  dilate.delete();
+  dst.delete();
+  pre_result.delete();
+  result.delete();
 
-/*let src = cv.imread('canvasInput');
-  let dst = new cv.Mat() //.zeros(src.rows, src.cols, cv.CV_8UC3);
-  let grey = new cv.Mat() //.zeros(src.rows, src.cols, cv.CV_8UC3);
-  cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY);
-  cv.cvtColor(src, grey, cv.COLOR_RGBA2GRAY);
-  cv.cvtColor(src, src, cv.COLOR_RGBA2GRAY);
-  let ksize = new cv.Size(5,5)
-//  cv.GaussianBlur(src, src, ksize, 0, 0, cv.BORDER_DEFAULT);
-let fillColor = new cv.Scalar(255, 255, 255);
+  final.delete();
+  //invert_final.delete();
+  contours.delete();
+  hierarchy.delete();
+  let lettersf = [...letters];
+  lettersf.sort((a, b) => {
+    if (a[0].x < b[0].x) {
+      return -1;
+    } else {
+      return 1;
+    }
+  });
 
-cv.threshold(grey, grey, 0, 255, cv.THRESH_OTSU + cv.THRESH_BINARY_INV);
+  if (lookingForMissingLetter && lettersf.length > 3) {
+    const dstavg = (lettersf[lettersf.length - 1][0].x - lettersf[0][0].x) / lettersf.length;
+    let minDiffX = dstavg;
+    let maxHauteur = 0;
+    let maxLargeur = 0;
+    let minY = 800;
+    const nbrMissing = [];
+    for (let i = 0; i < lettersf.length - 1; i++) {
+      let diffXt = lettersf[i + 1][0].x - lettersf[i][0].x;
+      if (diffXt < minDiffX) {
+        minDiffX = diffXt;
+      }
+      if (diffXt > dstavg * 1.7) {
+        nbrMissing.push(i);
+      }
+      if (lettersf[i][0].y < minY) {
+        minY = lettersf[i][0].y;
+      }
+      if (lettersf[i][0].height > maxHauteur) {
+        maxHauteur = lettersf[i][0].height;
+      }
+      if (lettersf[i][0].width > maxLargeur) {
+        maxLargeur = lettersf[i][0].width;
+      }
+    }
 
-// thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+    const dstavg1 = (lettersf[lettersf.length - 1][0].x - lettersf[0][0].x) / (lettersf.length + nbrMissing.length);
+    nbrMissing.forEach(n => {
+      let x = lettersf[n][0].x + dstavg1;
 
-// # Remove horizontal lines
-let ksize1 = new cv.Size(15, 1);
-// You can try more different parameters
-let horizontal_kernel = cv.getStructuringElement(cv.MORPH_RECT, ksize1);
-let removeh = new cv.Mat();
-cv.morphologyEx(grey, removeh, cv.MORPH_OPEN, horizontal_kernel);
-let contours1 = new cv.MatVector();
-let hierarchy1 = new cv.Mat();
-cv.findContours(removeh, contours1, hierarchy1, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
-cv.drawContours(dst, contours1,-1,fillColor, 1, 20, hierarchy1, 20)
+      let rectangleColor = new cv.Scalar(0, 0, 0);
+      let point1 = new cv.Point(x, minY);
+      let point2 = new cv.Point(x + maxLargeur, minY + maxHauteur);
 
-// # Remove vertical lines
-let ksize2 = new cv.Size(1, 20);
-// You can try more different parameters
-let vertical_kernel = cv.getStructuringElement(cv.MORPH_RECT, ksize2);
-let removev = new cv.Mat();
-cv.morphologyEx(grey, removev, cv.MORPH_OPEN, vertical_kernel);
-let contours2 = new cv.MatVector();
-let hierarchy2 = new cv.Mat();
-cv.findContours(removev, contours2, hierarchy2, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
-cv.drawContours(dst, contours2,-1,fillColor, 1, 20, hierarchy2, 20)
+      let rect = new cv.Rect(x, minY, maxLargeur, maxHauteur);
+      let dst4 = new cv.Mat();
+      let dst2 = new cv.Mat();
+      let dst3 = new cv.Mat();
 
+      dst4 = invert_final.roi(rect);
 
-
-  /*cv.adaptiveThreshold(grey, grey, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 11, 2);
-  let contours = new cv.MatVector();
-  let hierarchy = new cv.Mat();
-  cv.findContours(src, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
-  let rectangleColor = new cv.Scalar(0, 0, 0);
-
-
-  for (let i = 0; i < contours.size(); ++i) {
-  let cnt = contours.get(i);
-  let rect = cv.boundingRect(cnt);
-  if (rect.width*rect.height >= 200){
-
-  let point1 = new cv.Point(rect.x, rect.y);
-  let point2 = new cv.Point(rect.x + rect.width, rect.y + rect.height);
-  cv.rectangle(dst, point1, point2, rectangleColor, 2, cv.LINE_AA, 0);
+      let dsize = new cv.Size(26, 26);
+      cv.resize(dst4, dst2, dsize, 0, 0, cv.INTER_AREA);
+      let s = new cv.Scalar(255, 0, 0, 255);
+      cv.copyMakeBorder(dst2, dst3, 1, 1, 1, 1, cv.BORDER_CONSTANT, s);
+      letters.set(rect, dst3);
+      dst4.delete();
+      dst2.delete();
+      cv.rectangle(invert_final, point1, point2, rectangleColor, 2, cv.LINE_AA, 0);
+    });
+    lettersf = [...letters];
+    lettersf.sort((a, b) => {
+      if (a[0].x < b[0].x) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
   }
-  cnt.delete();
-  }
-
-cv.imshow('canvasOutput', dst);
-//src.delete(); dst.delete(); contours.delete(); hierarchy.delete();
-*/
+  return {
+    letter: lettersf,
+    /*    dst: dst,
+    dilate: dilate,
+    pre_result: pre_result,
+    result: result,
+    final: final,*/
+    invert_final: invert_final,
+  };
+}

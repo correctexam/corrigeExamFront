@@ -45,6 +45,8 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { AlignScanComponent } from './alignscan/alignscan.component';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DBConfig, NgxIndexedDBModule } from 'ngx-indexed-db';
+import { PaginatorModule } from 'primeng/paginator';
+import { OrderListModule } from 'primeng/orderlist';
 
 const dbConfig: DBConfig = {
   name: 'MyDb',
@@ -214,6 +216,8 @@ export const CorrigerCopiesEtudiants_ROUTE: Route = {
     NgxExtendedPdfViewerModule,
     SelectButtonModule,
     InputNumberModule,
+    PaginatorModule,
+    OrderListModule,
     NgxIndexedDBModule.forRoot(dbConfig),
 
     RouterModule.forChild([

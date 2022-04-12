@@ -10,6 +10,7 @@ import { Injectable } from '@angular/core';
 import { v4 as uuid } from 'uuid';
 import { Subject, Observable } from 'rxjs';
 import { worker } from './workerimport';
+import { Student, IStudent } from '../../entities/student/student.model';
 
 export interface IImageAlignement {
   imageCompareMatches?: ImageData;
@@ -41,6 +42,15 @@ export interface IImageCropInput {
   y?: number;
   width?: number;
   height?: number;
+}
+
+export interface IImagePredictionInput {
+  image?: ImageData;
+  match?: string[];
+}
+export interface IImagePredictionOutput {
+  match?: string;
+  confidence?: number;
 }
 
 export interface IImageCropOutput {
@@ -134,5 +144,12 @@ export class AlignImagesService {
 
   public imageCrop(payload: IImageCropInput): Observable<ImageData> {
     return this._dispatch('imageCrop', payload);
+  }
+  public prediction(payload: IImagePredictionInput, letter: boolean): Observable<IImagePredictionOutput> {
+    if (letter) {
+      return this._dispatch('nameprediction', payload);
+    } else {
+      return this._dispatch('ineprediction', payload);
+    }
   }
 }
