@@ -20,6 +20,8 @@
       "id": "ID",
       "name": "Nom",
       "content": "Contenu",
+      "mark": "Avec marqueur",
+      "autoMapStudentCopyToList": "Association automatique copie étudiant et Nom",
       "exam": "Examen"
     }
   }

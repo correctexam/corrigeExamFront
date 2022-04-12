@@ -20,6 +20,8 @@
       "id": "ID",
       "name": "Name",
       "content": "Content",
+      "mark": "Mark",
+      "autoMapStudentCopyToList": "Auto Map Student Copy To List",
       "exam": "Exam"
     }
   }

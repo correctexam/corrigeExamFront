@@ -18,10 +18,11 @@
         "title": "Zone"
       },
       "id": "ID",
+      "pageNumber": "Page Number",
       "xInit": "X Init",
       "yInit": "Y Init",
-      "xFinal": "X Final",
-      "yFinal": "Y Final"
+      "width": "Width",
+      "height": "Height"
     }
   }
 }
