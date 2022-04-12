@@ -10,10 +10,10 @@ import { IStudentResponse, StudentResponse } from '../student-response.model';
 import { StudentResponseService } from '../service/student-response.service';
 import { IQuestion } from 'app/entities/question/question.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
-import { IStudent } from 'app/entities/student/student.model';
-import { StudentService } from 'app/entities/student/service/student.service';
+import { IExamSheet } from 'app/entities/exam-sheet/exam-sheet.model';
+import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 
-type SelectableEntity = IQuestion | IStudent;
+type SelectableEntity = IQuestion | IExamSheet;
 
 @Component({
   selector: 'jhi-student-response-update',
@@ -22,21 +22,21 @@ type SelectableEntity = IQuestion | IStudent;
 export class StudentResponseUpdateComponent implements OnInit {
   isSaving = false;
   questions: IQuestion[] = [];
-  students: IStudent[] = [];
+  sheets: IExamSheet[] = [];
 
   editForm = this.fb.group({
     id: [],
     note: [],
     questionId: [],
-    studentId: [],
+    sheetId: [],
   });
 
   constructor(
     protected studentResponseService: StudentResponseService,
     protected questionService: QuestionService,
-    protected studentService: StudentService,
+    protected examSheetService: ExamSheetService,
     protected activatedRoute: ActivatedRoute,
-    private fb: FormBuilder
+    protected fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
@@ -45,7 +45,7 @@ export class StudentResponseUpdateComponent implements OnInit {
 
       this.questionService.query().subscribe((res: HttpResponse<IQuestion[]>) => (this.questions = res.body || []));
 
-      this.studentService.query().subscribe((res: HttpResponse<IStudent[]>) => (this.students = res.body || []));
+      this.examSheetService.query().subscribe((res: HttpResponse<IExamSheet[]>) => (this.sheets = res.body || []));
     });
   }
 
@@ -54,7 +54,7 @@ export class StudentResponseUpdateComponent implements OnInit {
       id: studentResponse.id,
       note: studentResponse.note,
       questionId: studentResponse.questionId,
-      studentId: studentResponse.studentId,
+      sheetId: studentResponse.sheetId,
     });
   }
 
@@ -78,7 +78,7 @@ export class StudentResponseUpdateComponent implements OnInit {
       id: this.editForm.get(['id'])!.value,
       note: this.editForm.get(['note'])!.value,
       questionId: this.editForm.get(['questionId'])!.value,
-      studentId: this.editForm.get(['studentId'])!.value,
+      sheetId: this.editForm.get(['sheetId'])!.value,
     };
   }
 

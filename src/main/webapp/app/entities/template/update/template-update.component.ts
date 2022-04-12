@@ -23,6 +23,8 @@ export class TemplateUpdateComponent implements OnInit {
     name: [null, [Validators.required]],
     content: [],
     contentContentType: [],
+    mark: [],
+    autoMapStudentCopyToList: [],
   });
 
   constructor(
@@ -93,28 +95,20 @@ export class TemplateUpdateComponent implements OnInit {
       name: template.name,
       content: template.content,
       contentContentType: template.contentContentType,
+      mark: template.mark,
+      autoMapStudentCopyToList: template.autoMapStudentCopyToList,
     });
   }
 
   protected createFromForm(): ITemplate {
-    // eslint-disable-next-line no-console
-    console.log( {
-      ...new Template(),
-      id: this.editForm.get(['id'])!.value,
-      name: this.editForm.get(['name'])!.value,
-      contentContentType: this.editForm.get(['contentContentType'])!.value,
-      content: this.editForm.get(['content'])!.value,
-    }
-
-    );
-
-
     return {
       ...new Template(),
       id: this.editForm.get(['id'])!.value,
       name: this.editForm.get(['name'])!.value,
       contentContentType: this.editForm.get(['contentContentType'])!.value,
       content: this.editForm.get(['content'])!.value,
+      mark: this.editForm.get(['mark'])!.value,
+      autoMapStudentCopyToList: this.editForm.get(['autoMapStudentCopyToList'])!.value,
     };
   }
 }

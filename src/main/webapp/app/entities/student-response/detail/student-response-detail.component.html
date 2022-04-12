@@ -26,10 +26,10 @@
             <a [routerLink]="['/question', studentResponse.questionId, 'view']">{{ studentResponse.questionNumero }}</a>
           </div>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.studentResponse.student">Student</span></dt>
+        <dt><span jhiTranslate="gradeScopeIsticApp.studentResponse.sheet">Student sheet</span></dt>
         <dd>
-          <div *ngIf="studentResponse.studentId">
-            <a [routerLink]="['/student', studentResponse.studentId, 'view']">{{ studentResponse.studentName }}</a>
+          <div *ngIf="studentResponse.sheetId">
+            <a [routerLink]="['/sheet', studentResponse.sheetId, 'view']">{{ studentResponse.sheetName }}</a>
           </div>
         </dd>
       </dl>

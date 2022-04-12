@@ -15,7 +15,14 @@
 
         <div class="row mb-3">
           <label class="form-label" for="field_page">Page</label>
-          <input type="number" class="form-control" name="page" id="field_page" data-cy="page" formControlName="page" />
+          <input
+            type="number"
+            class="form-control"
+            name="pageNumber"
+            id="field_pageNumber"
+            data-cy="pageNumber"
+            formControlName="pageNumber"
+          />
         </div>
 
         <div class="row mb-3">
@@ -29,12 +36,12 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.zone.width" for="field_width">X Final</label>
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.zone.width" for="field_width">Width</label>
           <input type="number" class="form-control" name="width" id="field_width" data-cy="width" formControlName="width" />
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.zone.height" for="field_height">height</label>
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.zone.height" for="field_height">Height</label>
           <input type="number" class="form-control" name="height" id="field_height" data-cy="height" formControlName="height" />
         </div>
       </div>

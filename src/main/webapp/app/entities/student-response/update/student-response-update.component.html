@@ -26,16 +26,18 @@
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.studentResponse.question" for="field_question">Question</label>
           <select class="form-control" id="field_question" name="question" formControlName="questionId">
             <option [ngValue]="null"></option>
-            <option [ngValue]="questionOption.id" *ngFor="let questionOption of questions; trackBy: trackById">{{ questionOption.numero }}</option>
-        </select>
+            <option [ngValue]="questionOption.id" *ngFor="let questionOption of questions; trackBy: trackById">
+              {{ questionOption.numero }}
+            </option>
+          </select>
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.studentResponse.student" for="field_student">Student</label>
-          <select class="form-control" id="field_student" name="student" formControlName="studentId">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.studentResponse.sheet" for="field_sheet">Student Sheet</label>
+          <select class="form-control" id="field_sheet" name="sheet" formControlName="sheetId">
             <option [ngValue]="null"></option>
-            <option [ngValue]="studentOption.id" *ngFor="let studentOption of students; trackBy: trackById">{{ studentOption.name }}</option>
-        </select>
+            <option [ngValue]="sheetOption.id" *ngFor="let sheetOption of sheets; trackBy: trackById">{{ sheetOption.name }}</option>
+          </select>
         </div>
       </div>
 

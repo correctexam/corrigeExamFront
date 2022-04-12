@@ -33,6 +33,9 @@
       <thead>
         <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="loadPage()">
           <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
+          <th scope="col" jhiSortBy="pageNumber">
+            <span jhiTranslate="gradeScopeIsticApp.zone.pageNumber">Page Number</span> <fa-icon icon="sort"></fa-icon>
+          </th>
           <th scope="col" jhiSortBy="xInit">
             <span jhiTranslate="gradeScopeIsticApp.zone.xInit">X Init</span> <fa-icon icon="sort"></fa-icon>
           </th>
@@ -40,10 +43,10 @@
             <span jhiTranslate="gradeScopeIsticApp.zone.yInit">Y Init</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="width">
-            <span jhiTranslate="gradeScopeIsticApp.zone.width">width</span> <fa-icon icon="sort"></fa-icon>
+            <span jhiTranslate="gradeScopeIsticApp.zone.width">Width</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="height">
-            <span jhiTranslate="gradeScopeIsticApp.zone.height">height</span> <fa-icon icon="sort"></fa-icon>
+            <span jhiTranslate="gradeScopeIsticApp.zone.height">Height</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col"></th>
         </tr>
@@ -53,6 +56,7 @@
           <td>
             <a [routerLink]="['/zone', zone.id, 'view']">{{ zone.id }}</a>
           </td>
+          <td>{{ zone.pageNumber }}</td>
           <td>{{ zone.xInit }}</td>
           <td>{{ zone.yInit }}</td>
           <td>{{ zone.width }}</td>

@@ -21,6 +21,7 @@ describe('Zone Service', () => {
 
     elemDefault = {
       id: 0,
+      pageNumber: 0,
       xInit: 0,
       yInit: 0,
       width: 0,
@@ -60,10 +61,11 @@ describe('Zone Service', () => {
       const returnedFromService = Object.assign(
         {
           id: 1,
+          pageNumber: 1,
           xInit: 1,
           yInit: 1,
-          xFinal: 1,
-          yFinal: 1,
+          width: 1,
+          height: 1,
         },
         elemDefault
       );
@@ -95,10 +97,11 @@ describe('Zone Service', () => {
       const returnedFromService = Object.assign(
         {
           id: 1,
+          pageNumber: 1,
           xInit: 1,
           yInit: 1,
-          xFinal: 1,
-          yFinal: 1,
+          width: 1,
+          height: 1,
         },
         elemDefault
       );

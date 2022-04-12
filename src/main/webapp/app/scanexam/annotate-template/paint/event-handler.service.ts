@@ -297,7 +297,7 @@ export class EventHandlerService {
     console.log(r1)*/
 
       const z: IZone = {
-        page: (this.canvas as any).page,
+        pageNumber: (this.canvas as any).page,
         xInit: Math.trunc((this._elementUnderDrawing.left! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth),
         yInit: Math.trunc((this._elementUnderDrawing.top! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight),
         width: Math.trunc(
@@ -324,7 +324,7 @@ export class EventHandlerService {
         DrawingColours.BLUE
       );
       const z: IZone = {
-        page: (this.canvas as any).page,
+        pageNumber: (this.canvas as any).page,
         xInit: Math.trunc((this._elementUnderDrawing.left! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth),
         yInit: Math.trunc((this._elementUnderDrawing.top! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight),
         width: Math.trunc(
@@ -351,7 +351,7 @@ export class EventHandlerService {
         DrawingColours.BLUE
       );
       const z: IZone = {
-        page: (this.canvas as any).page,
+        pageNumber: (this.canvas as any).page,
         xInit: Math.trunc((this._elementUnderDrawing.left! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth),
         yInit: Math.trunc((this._elementUnderDrawing.top! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight),
         width: Math.trunc(
@@ -382,7 +382,7 @@ export class EventHandlerService {
       );
 
       const z: IZone = {
-        page: (this.canvas as any).page,
+        pageNumber: (this.canvas as any).page,
         xInit: Math.trunc((this._elementUnderDrawing.left! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth),
         yInit: Math.trunc((this._elementUnderDrawing.top! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight),
         width: Math.trunc(

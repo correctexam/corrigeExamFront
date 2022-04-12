@@ -5,6 +5,8 @@ export interface ITemplate {
   name?: string;
   contentContentType?: string | null;
   content?: string | null;
+  mark?: boolean | null;
+  autoMapStudentCopyToList?: boolean | null;
   exam?: IExam | null;
 }
 
@@ -14,8 +16,13 @@ export class Template implements ITemplate {
     public name?: string,
     public contentContentType?: string | null,
     public content?: string | null,
+    public mark?: boolean | null,
+    public autoMapStudentCopyToList?: boolean | null,
     public exam?: IExam | null
-  ) {}
+  ) {
+    this.mark = this.mark ?? false;
+    this.autoMapStudentCopyToList = this.autoMapStudentCopyToList ?? false;
+  }
 }
 
 export function getTemplateIdentifier(template: ITemplate): number | undefined {

@@ -25,6 +25,14 @@
             {{ template.contentContentType }}, {{ byteSize(template.content) }}
           </div>
         </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.template.mark">Mark</span></dt>
+        <dd>
+          <span>{{ template.mark }}</span>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.template.autoMapStudentCopyToList">Auto Map Student Copy To List</span></dt>
+        <dd>
+          <span>{{ template.autoMapStudentCopyToList }}</span>
+        </dd>
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

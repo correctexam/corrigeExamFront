@@ -39,6 +39,13 @@
           <th scope="col" jhiSortBy="content">
             <span jhiTranslate="gradeScopeIsticApp.template.content">Content</span> <fa-icon icon="sort"></fa-icon>
           </th>
+          <th scope="col" jhiSortBy="mark">
+            <span jhiTranslate="gradeScopeIsticApp.template.mark">Mark</span> <fa-icon icon="sort"></fa-icon>
+          </th>
+          <th scope="col" jhiSortBy="autoMapStudentCopyToList">
+            <span jhiTranslate="gradeScopeIsticApp.template.autoMapStudentCopyToList">Auto Map Student Copy To List</span>
+            <fa-icon icon="sort"></fa-icon>
+          </th>
           <th scope="col"></th>
         </tr>
       </thead>
@@ -54,6 +61,8 @@
             >
             <span *ngIf="template.content">{{ template.contentContentType }}, {{ byteSize(template.content) }}</span>
           </td>
+          <td>{{ template.mark }}</td>
+          <td>{{ template.autoMapStudentCopyToList }}</td>
           <td class="text-end">
             <div class="btn-group">
               <button

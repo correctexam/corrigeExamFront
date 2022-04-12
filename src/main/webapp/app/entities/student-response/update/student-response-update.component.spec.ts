@@ -10,8 +10,8 @@ import { StudentResponseService } from '../service/student-response.service';
 import { IStudentResponse, StudentResponse } from '../student-response.model';
 import { IQuestion } from 'app/entities/question/question.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
-import { IStudent } from 'app/entities/student/student.model';
-import { StudentService } from 'app/entities/student/service/student.service';
+import { IExamSheet } from 'app/entities/exam-sheet/exam-sheet.model';
+import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 
 import { StudentResponseUpdateComponent } from './student-response-update.component';
 
@@ -21,7 +21,7 @@ describe('StudentResponse Management Update Component', () => {
   let activatedRoute: ActivatedRoute;
   let studentResponseService: StudentResponseService;
   let questionService: QuestionService;
-  let studentService: StudentService;
+  let examSheetService: ExamSheetService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -44,7 +44,7 @@ describe('StudentResponse Management Update Component', () => {
     activatedRoute = TestBed.inject(ActivatedRoute);
     studentResponseService = TestBed.inject(StudentResponseService);
     questionService = TestBed.inject(QuestionService);
-    studentService = TestBed.inject(StudentService);
+    examSheetService = TestBed.inject(ExamSheetService);
 
     comp = fixture.componentInstance;
   });

@@ -66,30 +66,30 @@ export class FabricCanvasComponent implements AfterViewInit {
       this.zoneService.find(this.exam.namezoneId!).subscribe(z => {
         const ezone = z.body as CustomZone;
         ezone.type = DrawingTools.NOMBOX;
-        if (!this.zones[z.body!.page!]) {
-          this.zones[ezone.page!] = [];
+        if (!this.zones[z.body!.pageNumber!]) {
+          this.zones[ezone.pageNumber!] = [];
         }
-        this.zones[ezone.page!].push(ezone);
+        this.zones[ezone.pageNumber!].push(ezone);
       });
     }
     if (this.exam.firstnamezoneId !== undefined) {
       this.zoneService.find(this.exam.firstnamezoneId!).subscribe(z => {
         const ezone = z.body as CustomZone;
         ezone.type = DrawingTools.PRENOMBOX;
-        if (!this.zones[z.body!.page!]) {
-          this.zones[ezone.page!] = [];
+        if (!this.zones[z.body!.pageNumber!]) {
+          this.zones[ezone.pageNumber!] = [];
         }
-        this.zones[ezone.page!].push(ezone);
+        this.zones[ezone.pageNumber!].push(ezone);
       });
     }
     if (this.exam.idzoneId !== undefined) {
       this.zoneService.find(this.exam.idzoneId!).subscribe(z => {
         const ezone = z.body as CustomZone;
         ezone.type = DrawingTools.INEBOX;
-        if (!this.zones[z.body!.page!]) {
-          this.zones[ezone.page!] = [];
+        if (!this.zones[z.body!.pageNumber!]) {
+          this.zones[ezone.pageNumber!] = [];
         }
-        this.zones[ezone.page!].push(ezone);
+        this.zones[ezone.pageNumber!].push(ezone);
       });
     }
     this.questionService.query({ examId: this.exam.id! }).subscribe(qs => {
@@ -97,10 +97,10 @@ export class FabricCanvasComponent implements AfterViewInit {
         this.zoneService.find(q.zoneId!).subscribe(z => {
           const ezone = z.body as CustomZone;
           ezone.type = DrawingTools.QUESTIONBOX;
-          if (!this.zones[z.body!.page!]) {
-            this.zones[ezone.page!] = [];
+          if (!this.zones[z.body!.pageNumber!]) {
+            this.zones[ezone.pageNumber!] = [];
           }
-          this.zones[ezone.page!].push(ezone);
+          this.zones[ezone.pageNumber!].push(ezone);
         });
       });
     });

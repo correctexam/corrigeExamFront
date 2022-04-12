@@ -6,8 +6,8 @@ export interface IStudentResponse {
   comments?: IComments[];
   questionNumero?: string;
   questionId?: number;
-  studentName?: string;
-  studentId?: number;
+  sheetName?: string;
+  sheetId?: number;
 }
 
 export class StudentResponse implements IStudentResponse {
@@ -17,11 +17,10 @@ export class StudentResponse implements IStudentResponse {
     public comments?: IComments[],
     public questionNumero?: string,
     public questionId?: number,
-    public studentName?: string,
-    public studentId?: number
+    public sheetName?: string,
+    public sheetId?: number
   ) {}
 }
-
 
 export function getStudentResponseIdentifier(studentResponse: IStudentResponse): number | undefined {
   return studentResponse.id;

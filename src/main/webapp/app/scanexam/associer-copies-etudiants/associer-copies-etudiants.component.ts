@@ -91,7 +91,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     return this._showINEImage;
   }
   public set showINEImage(s: boolean) {
-    console.log('pass par la');
     this._showINEImage = s;
   }
   public setShowINEImage: (s: boolean) => void = s => (this._showINEImage = s);
@@ -213,7 +212,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         z(e.body!);
         if (showImage) {
-          this.displayImage(currentStudent! * this.nbreFeuilleParCopie! + e.body!.page!, e.body!, imageRef, showImageRef);
+          this.displayImage(currentStudent! * this.nbreFeuilleParCopie! + e.body!.pageNumber!, e.body!, imageRef, showImageRef);
         }
         if (next) {
           next();
@@ -226,7 +225,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
 
   bindAllCopies(): void {}
 
-  getAllImage4Zone(pageInscan: number, zone: IZone, rescb: (i: ImageData) => void): void {
+  getAllImage4Zone(pageInscan: number, zone: IZone, rescb: (i: ImageData, w: number, h: number) => void): void {
     db.alignImages
       .where('examId')
       .equals(+this.examId)
@@ -235,25 +234,32 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
       .then(e2 => {
         const image = JSON.parse(e2!.value, this.reviver);
         this.loadImage(image.pages, pageInscan, (image1: ImageData, page: number, w: number, h: number) => {
+          const finalW = (zone.width! * w!) / 100000;
+          const finalH = (zone.height! * h!) / 100000;
           this.alignImagesService
             .imageCrop({
               image: image1,
               x: (zone.xInit! * w!) / 100000,
               y: (zone.yInit! * h!) / 100000,
-              width: (zone.width! * w!) / 100000,
-              height: (zone.height! * h!) / 100000,
+              width: finalW,
+              height: finalH,
             })
-            .subscribe(res => rescb(res));
+            .subscribe(res => rescb(res, finalW, finalH));
         });
       });
   }
 
   displayImage(pageInscan: number, zone: IZone, imageRef: ElementRef<any> | undefined, show: (s: boolean) => void): void {
-    this.getAllImage4Zone(pageInscan, zone, i => {
-      const ctx1 = imageRef?.nativeElement.getContext('2d');
-      ctx1.putImageData(i, 0, 0);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      show(true);
+    this.getAllImage4Zone(pageInscan, zone, (i, w, h) => {
+      if (imageRef !== undefined) {
+        imageRef!.nativeElement.width = w;
+        imageRef!.nativeElement.height = h;
+        const ctx1 = imageRef!.nativeElement.getContext('2d');
+
+        ctx1.putImageData(i, 0, 0);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        show(true);
+      }
     });
   }
 
@@ -276,19 +282,19 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
 
   reShow(): void {
     this.displayImage(
-      this.currentStudent! * this.nbreFeuilleParCopie! + this.zonenom.page!,
+      this.currentStudent! * this.nbreFeuilleParCopie! + this.zonenom.pageNumber!,
       this.zonenom,
       this.nomImage,
       this.setShowNomImage
     );
     this.displayImage(
-      this.currentStudent! * this.nbreFeuilleParCopie! + this.zoneprenom.page!,
+      this.currentStudent! * this.nbreFeuilleParCopie! + this.zoneprenom.pageNumber!,
       this.zoneprenom,
       this.prenomImage,
       this.setShowPrenomImage
     );
     this.displayImage(
-      this.currentStudent! * this.nbreFeuilleParCopie! + this.zoneine.page!,
+      this.currentStudent! * this.nbreFeuilleParCopie! + this.zoneine.pageNumber!,
       this.zoneine,
       this.ineImage,
       this.setShowINEImage
@@ -300,12 +306,12 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
       db.nonAlignImages
         .where('examId')
         .equals(+this.examId)
-        .and(e1 => e1!.id === zone.page! + currentStudent * this.nbreFeuilleParCopie)
+        .and(e1 => e1!.id === zone.pageNumber! + currentStudent * this.nbreFeuilleParCopie)
         .first()
         .then(e2 => {
           const image = JSON.parse(e2!.value, this.reviver);
 
-          this.aligneImages(image.pages, zone.page! + currentStudent * this.nbreFeuilleParCopie, (p: IPage) => {
+          this.aligneImages(image.pages, zone.pageNumber! + currentStudent * this.nbreFeuilleParCopie, (p: IPage) => {
             imageRef!.nativeElement.width = (zone.width! * p.width!) / 100000;
             imageRef!.nativeElement.height = (zone.height! * p.height!) / 100000;
 

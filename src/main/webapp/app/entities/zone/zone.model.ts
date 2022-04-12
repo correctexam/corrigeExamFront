@@ -1,6 +1,6 @@
 export interface IZone {
   id?: number;
-  page?: number | null;
+  pageNumber?: number | null;
   xInit?: number | null;
   yInit?: number | null;
   width?: number | null;
@@ -10,7 +10,7 @@ export interface IZone {
 export class Zone implements IZone {
   constructor(
     public id?: number,
-    public page?: number | null,
+    public pageNumber?: number | null,
     public xInit?: number | null,
     public yInit?: number | null,
     public width?: number | null,

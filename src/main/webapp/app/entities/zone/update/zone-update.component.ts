@@ -17,7 +17,7 @@ export class ZoneUpdateComponent implements OnInit {
 
   editForm = this.fb.group({
     id: [],
-    page: [],
+    pageNumber: [],
     xInit: [],
     yInit: [],
     width: [],
@@ -68,7 +68,7 @@ export class ZoneUpdateComponent implements OnInit {
   protected updateForm(zone: IZone): void {
     this.editForm.patchValue({
       id: zone.id,
-      page: zone.page,
+      pageNumber: zone.pageNumber,
       xInit: zone.xInit,
       yInit: zone.yInit,
       width: zone.width,
@@ -80,7 +80,7 @@ export class ZoneUpdateComponent implements OnInit {
     return {
       ...new Zone(),
       id: this.editForm.get(['id'])!.value,
-      page: this.editForm.get(['page'])!.value,
+      pageNumber: this.editForm.get(['pageNumber'])!.value,
       xInit: this.editForm.get(['xInit'])!.value,
       yInit: this.editForm.get(['yInit'])!.value,
       width: this.editForm.get(['width'])!.value,

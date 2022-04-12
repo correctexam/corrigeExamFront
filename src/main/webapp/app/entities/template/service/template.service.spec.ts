@@ -24,6 +24,8 @@ describe('Template Service', () => {
       name: 'AAAAAAA',
       contentContentType: 'image/png',
       content: 'AAAAAAA',
+      mark: false,
+      autoMapStudentCopyToList: false,
     };
   });
 
@@ -61,6 +63,8 @@ describe('Template Service', () => {
           id: 1,
           name: 'BBBBBB',
           content: 'BBBBBB',
+          mark: true,
+          autoMapStudentCopyToList: true,
         },
         elemDefault
       );
@@ -75,7 +79,13 @@ describe('Template Service', () => {
     });
 
     it('should partial update a Template', () => {
-      const patchObject = Object.assign({}, new Template());
+      const patchObject = Object.assign(
+        {
+          mark: true,
+          autoMapStudentCopyToList: true,
+        },
+        new Template()
+      );
 
       const returnedFromService = Object.assign(patchObject, elemDefault);
 
@@ -94,6 +104,8 @@ describe('Template Service', () => {
           id: 1,
           name: 'BBBBBB',
           content: 'BBBBBB',
+          mark: true,
+          autoMapStudentCopyToList: true,
         },
         elemDefault
       );
@@ -145,7 +157,7 @@ describe('Template Service', () => {
       });
 
       it('should add only unique Template to an array', () => {
-        const templateArray: ITemplate[] = [{ id: 123 }, { id: 456 }, { id: 50345 }];
+        const templateArray: ITemplate[] = [{ id: 123 }, { id: 456 }, { id: 15801 }];
         const templateCollection: ITemplate[] = [{ id: 123 }];
         expectedResult = service.addTemplateToCollectionIfMissing(templateCollection, ...templateArray);
         expect(expectedResult).toHaveLength(3);
