@@ -47,6 +47,8 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { DBConfig, NgxIndexedDBModule } from 'ngx-indexed-db';
 import { PaginatorModule } from 'primeng/paginator';
 import { OrderListModule } from 'primeng/orderlist';
+import { ListboxModule } from 'primeng/listbox';
+import { InputSwitchModule } from 'primeng/inputswitch';
 
 const dbConfig: DBConfig = {
   name: 'MyDb',
@@ -218,6 +220,8 @@ export const CorrigerCopiesEtudiants_ROUTE: Route = {
     InputNumberModule,
     PaginatorModule,
     OrderListModule,
+    ListboxModule,
+    InputSwitchModule,
     NgxIndexedDBModule.forRoot(dbConfig),
 
     RouterModule.forChild([

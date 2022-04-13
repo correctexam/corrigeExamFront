@@ -39,7 +39,7 @@ addEventListener('message', e => {
 
       //Load and await the .js OpenCV
       self1.importScripts(self1['Module'].scriptUrl);
-
+      self1.importScripts('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs');
       break;
     }
     case 'imageProcessing':
@@ -101,13 +101,30 @@ function imageCrop(p: { msg: any; payload: any; uid: string }): void {
   src.delete();
 }
 
+let _letterModel: MLModel | undefined;
+let _digitModel: MLModel | undefined;
+
+function getModel(letter: boolean): MLModel {
+  if (letter) {
+    if (_letterModel === undefined) {
+      _letterModel = new MLModel(letter);
+    }
+    return _letterModel;
+  } else {
+    if (_digitModel === undefined) {
+      _digitModel = new MLModel(letter);
+    }
+    return _digitModel;
+  }
+}
+
 function doPrediction(p: { msg: any; payload: any; uid: string }, letter: boolean): void {
   // You can try more different parameters
   let src = cv.matFromImageData(p.payload.image);
-  const m = new MLModel(letter);
+  const m = getModel(letter);
   m.isWarmedUp.then(() => {
-    const res1 = fprediction(src, p.payload.candidates, m, true);
-    const res2 = fprediction(src, p.payload.candidates, m, true);
+    const res1 = fprediction(src, p.payload.match, m, true, letter);
+    const res2 = fprediction(src, p.payload.match, m, false, letter);
     if (res1.solution[1] > res2.solution[1]) {
       postMessage({
         msg: p.msg,
@@ -165,7 +182,6 @@ function imageDataFromMat(mat: any): any {
   return clampedArray;
 }
 function alignImageBasedOnCircle(payload: any): any {
-  console.log(payload.imageA);
   let srcMat = cv.matFromImageData(payload.imageA);
   let dst = new cv.Mat(); ///cv.Mat.zeros(srcMat.rows, srcMat.cols, cv.CV_8U);
   // let color = new cv.Scalar(255, 0, 0);
@@ -656,7 +672,7 @@ function alignImage(image_A: any, image_B: any): any {
   return result;
 }
 
-function fprediction(src: any, cand: string[], m: MLModel, lookingForMissingLetter: boolean): any {
+function fprediction(src: any, cand: string[], m: MLModel, lookingForMissingLetter: boolean, onlyletter: boolean): any {
   const res = extractImage(src, false, lookingForMissingLetter);
 
   let candidate: any[] = [];
@@ -666,6 +682,23 @@ function fprediction(src: any, cand: string[], m: MLModel, lookingForMissingLett
   const predict = [];
   for (let i = 0; i < res.letter.length; i++) {
     let res1 = m.predict(imageDataFromMat(res.letter[i][1]));
+    if (onlyletter) {
+      if (res1[0] === '1') {
+        res1[0] = 'i';
+      }
+      if (res1[0] === '0') {
+        res1[0] = 'o';
+      }
+      if (res1[0] === '5') {
+        res1[0] = 's';
+      }
+      if (res1[0] === '3') {
+        res1[0] = 'b';
+      }
+      if (res1[0] === '9') {
+        res1[0] = 'g';
+      }
+    }
     predict.push(res1);
   }
   for (let k = 0; k < candidate.length; k++) {
@@ -689,7 +722,9 @@ function fprediction(src: any, cand: string[], m: MLModel, lookingForMissingLett
       return -1;
     }
   });
+  //  console.log(candidate)
 
+  candidate[0][0] = candidate[0][0].trim();
   return {
     debug: res.invert_final,
     solution: candidate[0],
@@ -698,9 +733,9 @@ function fprediction(src: any, cand: string[], m: MLModel, lookingForMissingLett
 
 function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingForMissingLetter: boolean): any {
   const linelength = 15;
-  const repairsize = 1;
-  const dilatesize = 1;
-  const morphsize = 1;
+  const repairsize = 3;
+  const dilatesize = 3;
+  const morphsize = 3;
   const drawcontoursizeh = 4;
   const drawcontoursizev = 4;
 
@@ -819,8 +854,15 @@ function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingFor
     let cnt = contours.get(ct);
     // You can try more different parameters
     let rect = cv.boundingRect(cnt);
-    if (rect.width * rect.height > 300) {
+    if (rect.width * rect.height > 150 || rect.height > 10) {
       //} && rect.width < rect.height) {
+      if (rect.width > rect.height) {
+        rect.y = rect.y - (rect.width - rect.height) / 2;
+        rect.height = rect.width;
+      } else {
+        rect.x = rect.x - (rect.height - rect.width) / 2;
+        rect.width = rect.height;
+      }
       rects.push(rect);
     }
   }
@@ -844,7 +886,7 @@ function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingFor
     cv.rectangle(invert_final, point1, point2, rectangleColor, 2, cv.LINE_AA, 0);
   });
 
-  src.delete();
+  // src.delete();
   gray.delete();
   thresh.delete();
 

@@ -20,6 +20,18 @@
         >
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Retourner à l'exam</span>
         </button>
+        <button
+          [disabled]="!this.examId"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="btn btn-primary"
+          (click)="bindAllCopies()"
+        >
+          <fa-icon [icon]="faHouseSignal"></fa-icon>&nbsp;<span>Reconnaissance noms</span>
+        </button>
+        <p-inputSwitch [(ngModel)]="assisted"></p-inputSwitch>
+        <label>Assistance</label>
 
         <!-- <button
           pButton
@@ -54,13 +66,27 @@
           optionValue="value"
         ></p-selectButton>
       </div>
-      <h5>Debug</h5>
-      <p-selectButton [options]="debugOptions" [(ngModel)]="debug" optionLabel="label" optionValue="value"></p-selectButton>
-      <BR />
-      <BR />
+      <!--      <h5 >Debug</h5>
+      <p-selectButton [options]="debugOptions" [(ngModel)]="debug" optionLabel="label" optionValue="value"></p-selectButton>-->
+      <div class="d-flex justify-content-center">
+        <div>
+          <span>Etudiant(es) Séléctionné(es):</span> {{ selectionStudentsString() }}
+          <BR />
+          <span *ngIf="assisted && recognizedStudent !== undefined && predictionprecision > 0.07"
+            >Etudiant(es) Reconnu(es): {{ showRecognizedStudent() }}</span
+          >
+          <p-button
+            (onClick)="selectRecogniezStudent()"
+            [style.padding]="'0.1rem'"
+            *ngIf="assisted && recognizedStudent !== undefined && predictionprecision > 0.07"
+            >✔️</p-button
+          >
+        </div>
+      </div>
+
       <div class="grid align-items-center">
         <div class="col-1">
-          <p-button icon="pi pi-refresh" (onClick)="reShow()"></p-button>
+          <p-button icon="pi pi-refresh" (onClick)="refresh()"></p-button>
         </div>
         <div class="col-10">
           <p-paginator
@@ -77,7 +103,7 @@
       </div>
 
       <div class="canvas-wrapper foo">
-        <canvas [hidden]="!showNomImage" #nomImage [style.width]="'800px'"></canvas>
+        <canvas [hidden]="!showNomImage" #nomImage></canvas>
         <canvas [hidden]="!showPrenomImage" #prenomImage></canvas>
         <canvas [hidden]="!showINEImage" #ineImage></canvas>
 
@@ -86,8 +112,23 @@
         <canvas [hidden]="!debug" #keypoints1></canvas>
         <canvas [hidden]="!debug" #keypoints2></canvas>
         <canvas [hidden]="!debug" #imageCompareMatches></canvas>
+        <canvas [hidden]="!debug" #nomImageReco></canvas>
+        <canvas [hidden]="!debug" #prenomImageReco></canvas>
+        <canvas [hidden]="!debug" #ineImageReco></canvas>
       </div>
-      <p-orderList
+      <p-listbox
+        [options]="studentsOptions()"
+        [(ngModel)]="selectionStudents"
+        [filter]="true"
+        [multiple]="true"
+        [optionLabel]="'label'"
+        [metaKeySelection]="true"
+        (onClick)="bindStudent()"
+        [optionValue]="'value'"
+      >
+      </p-listbox>
+
+      <!--<p-orderList
         [value]="students!"
         filterBy="name,firstname"
         (onSelectionChange)="selectStudent4Copie($event)"
@@ -100,11 +141,11 @@
             <p style="margin-top: '0'; margin-bottom: '0'; padding-bottom: '0rem'; padding-top: '0rem'">
               {{ student.name }} - {{ student.firstname }}
             </p>
-            <!--                <img src="assets/showcase/images/demo/car/{{car.brand}}.png" style="display:inline-block;margin:2px 0 2px 2px" width="48">-->
-            <!--           <div style="font-size: 14px; float: right; margin: 15px 5px 0 0">{{ student.mail }} - {{ student.ine }}</div>-->
+                  <img src="assets/showcase/images/demo/car/{{car.brand}}.png" style="display:inline-block;margin:2px 0 2px 2px" width="48">-->
+      <!--           <div style="font-size: 14px; float: right; margin: 15px 5px 0 0">{{ student.mail }} - {{ student.ine }}</div>
           </div>
         </ng-template>
-      </p-orderList>
+      </p-orderList>-->
     </div>
   </div>
   <div [hidden]="debug" class="col-4 md:col-4 overflow-hidden">

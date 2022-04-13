@@ -33,12 +33,12 @@ export class MLModel {
   public loadModel(letteranddigit: boolean): Promise<any> {
     console.time('Load model');
     if (letteranddigit) {
-      return tf.loadLayersModel('js/letteranddigitclassifier/model.json').then((model: any) => {
+      return tf.loadLayersModel('content/classifier/letteranddigitclassifier/model.json').then((model: any) => {
         this._model = model;
         console.timeEnd('Load model');
       });
     } else {
-      return tf.loadLayersModel('js/digitclassifier/model.json').then((model: any) => {
+      return tf.loadLayersModel('content/classifier/digitclassifier/model.json').then((model: any) => {
         this._model = model;
         console.timeEnd('Load model');
       });
@@ -127,7 +127,7 @@ export class MLModel {
     // get the character at that index
     const character = this.characters[argMax];
 
-    console.log('Predicted', character, 'Probability', probability);
+    // console.log('Predicted', character, 'Probability', probability);
     // console.timeEnd("Prediction")
     return [character, probability];
   }

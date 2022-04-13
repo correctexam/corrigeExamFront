@@ -49,8 +49,8 @@ export interface IImagePredictionInput {
   match?: string[];
 }
 export interface IImagePredictionOutput {
-  match?: string;
-  confidence?: number;
+  solution?: (string | number)[];
+  debug: ImageData;
 }
 
 export interface IImageCropOutput {
