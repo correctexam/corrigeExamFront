@@ -157,6 +157,15 @@ export const AssocierCopiesEtudiants_ROUTE: Route = {
   },
 };
 
+export const AssocierCopiesEtudiantsToStudent_ROUTE: Route = {
+  path: 'studentbindings/:examid/:currentStudent',
+  component: AssocierCopiesEtudiantsComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.creercours',
+  },
+};
+
 export const CorrigerCopiesEtudiants_ROUTE: Route = {
   path: 'answer/:examid',
   component: CorrigequestionComponent,
@@ -237,6 +246,7 @@ export const CorrigerCopiesEtudiantsToQuestion_ROUTE: Route = {
       CorrigerCopiesEtudiants_ROUTE,
       AlignerCopiesEtudiants_ROUTE,
       CorrigerCopiesEtudiantsToQuestion_ROUTE,
+      AssocierCopiesEtudiantsToStudent_ROUTE,
     ]),
   ],
   exports: [

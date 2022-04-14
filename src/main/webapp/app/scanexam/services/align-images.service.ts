@@ -83,6 +83,7 @@ export class AlignImagesService {
       };
       this.worker.onerror = e => {
         if (this.subjects.has((e as any).uid)) {
+          console.log('get error uid');
           this.subjects.get((e as any).uid)?.error(e);
         }
         console.log(`error on service work: ${JSON.stringify(e)}`);

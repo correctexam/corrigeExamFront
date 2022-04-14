@@ -173,144 +173,176 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
+      this.recognizedStudent = undefined;
+      this.blocked = true;
       if (params.get('examid') !== null) {
         this.examId = params.get('examid')!;
-        // Step 1 Query templates
-        db.templates
-          .where('examId')
-          .equals(+this.examId)
-          .count()
-          .then(e2 => {
-            this.nbreFeuilleParCopie = e2;
-            // Step 2 Query Scan in local DB
+        if (params.get('currentStudent') !== null) {
+          this.currentStudent = +params.get('currentStudent')! - 1;
 
-            db.alignImages
-              .where('examId')
-              .equals(+this.examId)
-              .count()
-              .then(e1 => {
-                this.numberPagesInScan = e1;
-                this.examService.find(+this.examId).subscribe(data => {
-                  this.exam = data.body!;
-                  this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
-                  // Step 3 Query Students for Exam
+          // Step 1 Query templates
+          db.templates
+            .where('examId')
+            .equals(+this.examId)
+            .count()
+            .then(e2 => {
+              this.nbreFeuilleParCopie = e2;
+              // Step 2 Query Scan in local DB
 
-                  this.refreshStudentList().then(() => {
-                    // Step 4 Query zone
+              db.alignImages
+                .where('examId')
+                .equals(+this.examId)
+                .count()
+                .then(e1 => {
+                  this.numberPagesInScan = e1;
+                  this.examService.find(+this.examId).subscribe(data => {
+                    this.exam = data.body!;
+                    this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
+                    // Step 3 Query Students for Exam
 
-                    this.loadZone(
-                      this.exam.namezoneId,
-                      this.setZoneNom,
-                      true,
-                      this.setShowNomImage,
-                      this.nomImage,
-                      this.currentStudent,
-                      true,
-                      this.students.map(student => student.name!),
-                      this.nomImageReco
-                    ).then(solutionName => {
+                    this.refreshStudentList().then(() => {
+                      // Step 4 Query zone
                       this.loadZone(
-                        this.exam.firstnamezoneId,
-                        this.setZonePrenom,
+                        this.exam.namezoneId,
+                        this.setZoneNom,
                         true,
-                        this.setShowPrenomImage,
-                        this.prenomImage,
+                        this.setShowNomImage,
+                        this.nomImage,
                         this.currentStudent,
                         true,
-                        this.students.map(student => student.firstname!),
-                        this.prenomImageReco
-                      ).then(solutionFirstname => {
+                        this.students.map(student => student.name!),
+                        this.nomImageReco
+                      ).then(solutionName => {
                         this.loadZone(
-                          this.exam.idzoneId,
-                          this.setZoneINE,
+                          this.exam.firstnamezoneId,
+                          this.setZonePrenom,
                           true,
-                          this.setShowINEImage,
-                          this.ineImage,
+                          this.setShowPrenomImage,
+                          this.prenomImage,
                           this.currentStudent,
-                          false,
-                          this.students.map(student => student.ine!),
-                          this.ineImageReco
-                        ).then(solutionINE => {
-                          if (solutionName.length > 0 && solutionFirstname.length > 0 && solutionINE.length > 0) {
-                            let sts = this.students.filter(
-                              student =>
-                                (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-                                (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase() &&
-                                (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
-                            );
-                            if (sts.length > 0) {
-                              this.recognizedStudent = sts[0];
-                              this.predictionprecision =
-                                ((solutionName[1] as number) + (solutionFirstname[1] as number) + (solutionINE[1] as number)) / 3;
-                            } else {
-                              if (solutionINE[1] < solutionFirstname[1] && solutionINE[1] < solutionName[1]) {
-                                let sts1 = this.students.filter(
-                                  student =>
-                                    (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-                                    (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase()
-                                );
-                                if (sts1.length > 0) {
-                                  this.recognizedStudent = sts1[0];
-                                  this.predictionprecision = ((solutionName[1] as number) + (solutionFirstname[1] as number)) / 2;
-                                }
-                              } else if (solutionName[1] < solutionFirstname[1] && solutionName[1] < solutionINE[1]) {
-                                let sts1 = this.students.filter(
-                                  student =>
-                                    (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase() &&
-                                    (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
-                                );
-                                if (sts1.length > 0) {
-                                  this.recognizedStudent = sts1[0];
-                                  this.predictionprecision = ((solutionFirstname[1] as number) + (solutionINE[1] as number)) / 2;
-                                }
+                          true,
+                          this.students.map(student => student.firstname!),
+                          this.prenomImageReco
+                        ).then(solutionFirstname => {
+                          this.loadZone(
+                            this.exam.idzoneId,
+                            this.setZoneINE,
+                            true,
+                            this.setShowINEImage,
+                            this.ineImage,
+                            this.currentStudent,
+                            false,
+                            this.students.map(student => student.ine!),
+                            this.ineImageReco
+                          ).then(solutionINE => {
+                            this.blocked = false;
+
+                            console.log(solutionName);
+                            console.log(solutionFirstname);
+                            console.log(solutionINE);
+                            if (solutionName.length > 0 && solutionFirstname.length > 0 && solutionINE.length > 0) {
+                              let sts = this.students.filter(
+                                student =>
+                                  (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
+                                  (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase() &&
+                                  (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
+                              );
+                              if (sts.length > 0) {
+                                this.recognizedStudent = sts[0];
+                                this.predictionprecision =
+                                  ((solutionName[1] as number) + (solutionFirstname[1] as number) + (solutionINE[1] as number)) / 3;
                               } else {
-                                this.students.filter(
-                                  student =>
-                                    (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-                                    (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
-                                );
-                                if (sts.length > 0) {
-                                  this.recognizedStudent = sts[0];
-                                  this.predictionprecision = ((solutionName[1] as number) + (solutionINE[1] as number)) / 2;
+                                if (solutionINE[1] < solutionFirstname[1] && solutionINE[1] < solutionName[1]) {
+                                  let sts1 = this.students.filter(
+                                    student =>
+                                      (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
+                                      (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase()
+                                  );
+                                  if (sts1.length > 0) {
+                                    this.recognizedStudent = sts1[0];
+                                    this.predictionprecision = ((solutionName[1] as number) + (solutionFirstname[1] as number)) / 2;
+                                  }
+                                }
+                                if (
+                                  this.recognizedStudent === undefined &&
+                                  solutionName[1] < solutionFirstname[1] &&
+                                  solutionName[1] < solutionINE[1]
+                                ) {
+                                  let sts1 = this.students.filter(
+                                    student =>
+                                      (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase() &&
+                                      (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
+                                  );
+                                  if (sts1.length > 0) {
+                                    this.recognizedStudent = sts1[0];
+                                    this.predictionprecision = ((solutionFirstname[1] as number) + (solutionINE[1] as number)) / 2;
+                                  }
+                                }
+                                if (
+                                  this.recognizedStudent === undefined &&
+                                  solutionFirstname[1] < solutionName[1] &&
+                                  solutionFirstname[1] < solutionINE[1]
+                                ) {
+                                  sts = this.students.filter(
+                                    student =>
+                                      (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
+                                      (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
+                                  );
+                                  if (sts.length > 0) {
+                                    this.recognizedStudent = sts[0];
+                                    this.predictionprecision = ((solutionName[1] as number) + (solutionINE[1] as number)) / 2;
+                                  }
+                                }
+                                if (this.recognizedStudent === undefined && solutionINE.length > 0 && solutionINE[1] > 0.4) {
+                                  sts = this.students.filter(
+                                    student => (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
+                                  );
+                                  if (sts.length > 0) {
+                                    this.recognizedStudent = sts[0];
+                                    this.predictionprecision = solutionINE[1] as number;
+                                  }
                                 }
                               }
+                            } else if (solutionName.length > 0 && solutionFirstname.length > 0) {
+                              let sts = this.students.filter(
+                                student =>
+                                  (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
+                                  (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase()
+                              );
+                              if (sts.length > 0) {
+                                this.recognizedStudent = sts[0];
+                                this.predictionprecision = ((solutionName[1] as number) + (solutionFirstname[1] as number)) / 2;
+                              }
+                            } else if (solutionName.length > 0 && solutionINE.length > 0) {
+                              let sts = this.students.filter(
+                                student =>
+                                  (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
+                                  (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
+                              );
+                              if (sts.length > 0) {
+                                this.recognizedStudent = sts[0];
+                                this.predictionprecision = ((solutionName[1] as number) + (solutionINE[1] as number)) / 2;
+                              }
+                            } else if (solutionINE.length > 0 && solutionINE[1] > 0.4) {
+                              let sts = this.students.filter(
+                                student => (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
+                              );
+                              if (sts.length > 0) {
+                                this.recognizedStudent = sts[0];
+                                this.predictionprecision = solutionINE[1] as number;
+                              }
                             }
-                          } else if (solutionName.length > 0 && solutionFirstname.length > 0) {
-                            let sts = this.students.filter(
-                              student =>
-                                (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-                                (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase()
-                            );
-                            if (sts.length > 0) {
-                              this.recognizedStudent = sts[0];
-                              this.predictionprecision = ((solutionName[1] as number) + (solutionFirstname[1] as number)) / 2;
-                            }
-                          } else if (solutionName.length > 0 && solutionINE.length > 0) {
-                            let sts = this.students.filter(
-                              student =>
-                                (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-                                (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
-                            );
-                            if (sts.length > 0) {
-                              this.recognizedStudent = sts[0];
-                              this.predictionprecision = ((solutionName[1] as number) + (solutionINE[1] as number)) / 2;
-                            }
-                          } else if (solutionINE.length > 0 && solutionINE[1] > 0.4) {
-                            let sts = this.students.filter(
-                              student => (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
-                            );
-                            if (sts.length > 0) {
-                              this.recognizedStudent = sts[0];
-                              this.predictionprecision = solutionINE[1] as number;
-                            }
-                          }
+                          });
                         });
                       });
                     });
                   });
                 });
-              });
-          });
+            });
+        } else {
+          const c = this.currentStudent + 1;
+          this.router.navigateByUrl('/studentbindings/' + this.examId! + '/' + c);
+        }
       }
     });
   }
@@ -401,11 +433,12 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
 
   goToStudent(i: number): void {
     if (i * this.nbreFeuilleParCopie < this.numberPagesInScan) {
-      this.currentStudent = i;
+      /*      this.currentStudent = i;
       this.selectionStudents = [];
       this.recognizedStudent = undefined;
       this.predictionprecision = 0;
-      this.reShow();
+      this.reShow();*/
+      this.router.navigateByUrl('studentbindings/' + this.examId + '/' + (i + 1));
     }
   }
 

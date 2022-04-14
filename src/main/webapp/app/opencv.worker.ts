@@ -124,20 +124,20 @@ function doPrediction(p: { msg: any; payload: any; uid: string }, letter: boolea
   const m = getModel(letter);
   m.isWarmedUp.then(() => {
     const res1 = fprediction(src, p.payload.match, m, true, letter);
-    const res2 = fprediction(src, p.payload.match, m, false, letter);
-    if (res1.solution[1] > res2.solution[1]) {
-      postMessage({
-        msg: p.msg,
-        payload: {
-          debug: imageDataFromMat(res1.debug),
-          solution: res1.solution,
-        },
-        uid: p.uid,
-      });
-      res1.debug.delete();
-      res2.debug.delete();
-      src.delete();
-    } else {
+    //    const res2 = fprediction(src, p.payload.match, m, false, letter);
+    //    if (res1.solution[1] > res2.solution[1]) {
+    postMessage({
+      msg: p.msg,
+      payload: {
+        debug: imageDataFromMat(res1.debug),
+        solution: res1.solution,
+      },
+      uid: p.uid,
+    });
+    res1.debug.delete();
+    //      res2.debug.delete();
+    src.delete();
+    /* } else {
       postMessage({
         msg: p.msg,
         payload: {
@@ -149,7 +149,7 @@ function doPrediction(p: { msg: any; payload: any; uid: string }, letter: boolea
       res1.debug.delete();
       res2.debug.delete();
       src.delete();
-    }
+    }*/
   });
 }
 
@@ -260,7 +260,19 @@ function alignImageBasedOnCircle(payload: any): any {
   for (let i = 0; i < circlesMat1.cols; i++) {
     let x = circlesMat1.data32F[i * 3];
     let y = circlesMat1.data32F[i * 3 + 1];
-    let rect1 = new cv.Rect(x - r3, y - r3, 2 * r3, 2 * r3);
+
+    const xx1 = x - r3;
+    const yy1 = y - r3;
+    let width1 = 2 * r3;
+    let height1 = 2 * r3;
+    if (xx1 + width1 > srcMWidth1) {
+      width1 = srcMWidth1 - xx1;
+    }
+    if (yy1 + height1 > srcMHeight1) {
+      height1 = srcMHeight1 - yy1;
+    }
+
+    let rect1 = new cv.Rect(x - r3, y - r3, width1, height1);
     let dstrect1 = new cv.Mat();
     dstrect1 = srcMat1.roi(rect1);
     cv.threshold(dstrect1, dstrect1, 0, 255, cv.THRESH_OTSU + cv.THRESH_BINARY);
@@ -674,7 +686,6 @@ function alignImage(image_A: any, image_B: any): any {
 
 function fprediction(src: any, cand: string[], m: MLModel, lookingForMissingLetter: boolean, onlyletter: boolean): any {
   const res = extractImage(src, false, lookingForMissingLetter);
-
   let candidate: any[] = [];
   cand.forEach(e => {
     candidate.push([e.padEnd(13, ' '), 0.0]);
@@ -854,15 +865,15 @@ function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingFor
     let cnt = contours.get(ct);
     // You can try more different parameters
     let rect = cv.boundingRect(cnt);
-    if (rect.width * rect.height > 150 || rect.height > 10) {
+    if (rect.width > 12 || rect.height > 12) {
       //} && rect.width < rect.height) {
-      if (rect.width > rect.height) {
+      /*if (rect.width > rect.height) {
         rect.y = rect.y - (rect.width - rect.height) / 2;
         rect.height = rect.width;
       } else {
         rect.x = rect.x - (rect.height - rect.width) / 2;
         rect.width = rect.height;
-      }
+      }*/
       rects.push(rect);
     }
   }
@@ -875,6 +886,20 @@ function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingFor
     let dst4 = new cv.Mat();
     let dst2 = new cv.Mat();
     let dst3 = new cv.Mat();
+    const srcMWidth = invert_final.size().width;
+    const srcMHeight = invert_final.size().height;
+    if (rect.x + rect.width > srcMWidth) {
+      rect.width = srcMWidth - rect.x;
+    }
+    if (rect.y + rect.height > srcMHeight) {
+      rect.height = srcMHeight - rect.y;
+    }
+    if (rect.x < 0) {
+      rect.x = 0;
+    }
+    if (rect.y < 0) {
+      rect.y = 0;
+    }
     dst4 = invert_final.roi(rect); // You can try more different parameters
     let dsize = new cv.Size(26, 26);
     cv.resize(dst4, dst2, dsize, 0, 0, cv.INTER_AREA);
