@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1649968651521,
+  "timestamp": 1649968678035,
   "index": "/corrigeExamFront/index.html",
   "assetGroups": [
     {
@@ -56,6 +56,7 @@
       },
       "urls": [
         "/corrigeExamFront/color.dae87a04d07ca92b.png",
+        "/corrigeExamFront/content/PDFsam_merge.pdf",
         "/corrigeExamFront/content/classifier/digitclassifier/group1-shard1of1",
         "/corrigeExamFront/content/classifier/digitclassifier/model.json",
         "/corrigeExamFront/content/classifier/letteranddigitclassifier/group1-shard1of1.bin",
@@ -112,6 +113,9 @@
         "/corrigeExamFront/content/opencv/4/opencv_js.wasm",
         "/corrigeExamFront/content/opencv/opencv.js",
         "/corrigeExamFront/content/opencv/opencv_js.wasm",
+        "/corrigeExamFront/content/scan_barais_2022-04-07-18-23-41.pdf",
+        "/corrigeExamFront/content/scan_barais_2022-04-14-18-45-23.pdf",
+        "/corrigeExamFront/content/scan_barais_2022-04-14-18-45-52.pdf",
         "/corrigeExamFront/content/scss/_bootstrap-variables.scss",
         "/corrigeExamFront/content/scss/global.scss",
         "/corrigeExamFront/content/scss/vendor.scss",
@@ -159,6 +163,7 @@
     "/corrigeExamFront/977.0ab9604105ca515e.js": "ad16f5512b2a38410f50b2fff1839c063252cc11",
     "/corrigeExamFront/color.dae87a04d07ca92b.png": "ff4c4bcb2207891b292f544edb4da9d2df5d45cf",
     "/corrigeExamFront/common.ae2af361b4eedba3.js": "5a172a13aa911f2a9ccfa1b21cd73d7ebe82d5b5",
+    "/corrigeExamFront/content/PDFsam_merge.pdf": "89c360f9b1f93bae1663805dbc14deb4a9a0fed7",
     "/corrigeExamFront/content/classifier/digitclassifier/group1-shard1of1": "f3c8eeae53cfa52eb9962bf3a97ac79cac59c44f",
     "/corrigeExamFront/content/classifier/digitclassifier/model.json": "86353d7fede06360ce1d632628583cb6dfed0d2d",
     "/corrigeExamFront/content/classifier/letteranddigitclassifier/group1-shard1of1.bin": "aba030e405910ecf7aac9c5a9835489bfd3b4aaf",
@@ -215,6 +220,9 @@
     "/corrigeExamFront/content/opencv/4/opencv_js.wasm": "c43cf8835d30f1f4ae87ab7be88174976449fe25",
     "/corrigeExamFront/content/opencv/opencv.js": "e97a07a106c7fbb9059df6619e20a61d8f3de3bd",
     "/corrigeExamFront/content/opencv/opencv_js.wasm": "552a0f05faddd81723e1bdf5197d55752ce49caa",
+    "/corrigeExamFront/content/scan_barais_2022-04-07-18-23-41.pdf": "e20abc973eb9b4af4d5af095b7a2a08611679fed",
+    "/corrigeExamFront/content/scan_barais_2022-04-14-18-45-23.pdf": "fab7b4acd9ec13d39805f3cbb637cf40a9f6ebba",
+    "/corrigeExamFront/content/scan_barais_2022-04-14-18-45-52.pdf": "7772f778986408fd8e69f5785bee29e5e7b8b722",
     "/corrigeExamFront/content/scss/_bootstrap-variables.scss": "d4ae52e8d88917653252fa42dc5fc3f320cde121",
     "/corrigeExamFront/content/scss/global.scss": "ee08d80f069d922ba2a72bf80ba27d7785509737",
     "/corrigeExamFront/content/scss/vendor.scss": "97a35ec6d099062c1f4557d24de3e3869546d9c1",
