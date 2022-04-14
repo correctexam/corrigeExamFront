@@ -85,4 +85,8 @@ export class ExamDetailComponent implements OnInit {
   hasCache(): boolean {
     return true;
   }
+
+  couldAnswer(): boolean {
+    return true;
+  }
 }

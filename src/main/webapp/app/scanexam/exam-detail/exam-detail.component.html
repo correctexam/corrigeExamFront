@@ -82,7 +82,7 @@
             pButton
             pRipple
             type="button"
-            [disabled]="true"
+            [disabled]="!couldAnswer()"
           >
             <fa-stack>
               <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>

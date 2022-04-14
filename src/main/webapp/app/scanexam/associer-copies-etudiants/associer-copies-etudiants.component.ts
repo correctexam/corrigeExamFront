@@ -602,7 +602,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         this.students = studentsbody.body!;
         // Step 5 Bind All copies
         const filterStudent = this.students.filter(s =>
-          s.examSheets?.some(ex => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent)
+          s.examSheets?.some(ex => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie)
         );
         this.selectionStudents = filterStudent;
         res();

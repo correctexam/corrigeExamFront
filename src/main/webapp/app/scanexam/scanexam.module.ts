@@ -48,6 +48,7 @@ import { OrderListModule } from 'primeng/orderlist';
 import { ListboxModule } from 'primeng/listbox';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { CorrigequestionComponent } from './corrigequestion/corrigequestion.component';
+import { RatingModule } from 'primeng/rating';
 
 const dbConfig: DBConfig = {
   name: 'MyDb',
@@ -220,6 +221,7 @@ export const CorrigerCopiesEtudiantsToQuestion_ROUTE: Route = {
     OrderListModule,
     ListboxModule,
     InputSwitchModule,
+    RatingModule,
     NgxIndexedDBModule.forRoot(dbConfig),
 
     RouterModule.forChild([

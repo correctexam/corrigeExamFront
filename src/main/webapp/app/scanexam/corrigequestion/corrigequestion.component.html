@@ -1,1 +1,89 @@
-<p>corrigequestion works!</p>
+<div class="grid">
+  <p-toast></p-toast>
+  <p-blockUI [blocked]="blocked">
+    <i class="pi pi-lock" style="font-size: 3rem"></i>
+  </p-blockUI>
+
+  <div class="col-8">
+    <div class="grid grid-nogutter">
+      <div class="col-8">
+        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">Correction</h2>
+      </div>
+      <div class="col-4 flex flex-row-reverse">
+        <button
+          [disabled]="!this.examId"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="btn btn-primary"
+          (click)="gotoUE()"
+        >
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Retourner à l'exam</span>
+        </button>
+      </div>
+    </div>
+    <div class="col-12 md:col-12">
+      <div class="grid align-items-center">
+        <div class="col-1">
+          <!--  <p-button icon="pi pi-refresh"></p-button>-->
+        </div>
+        <div class="col-7">
+          <p-paginator
+            [currentPageReportTemplate]="'{currentPage} étudiant sur {totalPages} étudiant(s)'"
+            [rows]="1"
+            [totalRecords]="numberPagesInScan! / nbreFeuilleParCopie!"
+            (onPageChange)="changeStudent($event)"
+            [showJumpToPageDropdown]="true"
+            [showPageLinks]="false"
+          ></p-paginator>
+        </div>
+        <div class="col-4 grid justify-content-end">
+          <!--<p-button icon="pi pi-search"></p-button>-->
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col-9" style="text-align: center">
+          <h2>Question {{ questionno + 1 }}</h2>
+          <div class="col-12" style="text-align: center" *ngFor="let k of questions; let i = index">
+            <canvas [hidden]="!showImage[i]" #nomImage></canvas>
+          </div>
+        </div>
+        <div class="col-3">
+          <p-rating *ngIf="noteSteps > 0" [stars]="noteSteps" [(ngModel)]="currentNote" (onRate)="changeNote()"></p-rating>
+          <p-slider *ngIf="noteSteps > 0" [(ngModel)]="currentNote" [min]="0" [max]="maxNote * 4" [step]="1" (onChange)="changeNote()">
+          </p-slider>
+          Note attribuée: {{ currentNote / 4 }}
+          <!--  <p-button icon="pi pi-refresh"></p-button>-->
+        </div>
+      </div>
+      <div class="grid align-items-center">
+        <div class="col-1">
+          <!--<p-button icon="pi pi-refresh"></p-button>-->
+        </div>
+        <div class="col-7">
+          <p-paginator
+            [currentPageReportTemplate]="'{currentPage} question sur {totalPages} questions(s)'"
+            [rows]="1"
+            [first]="questionno"
+            [totalRecords]="nbreQuestions!"
+            (onPageChange)="changeQuestion($event)"
+            [showJumpToPageDropdown]="true"
+            [showPageLinks]="false"
+          ></p-paginator>
+        </div>
+        <div class="col-4 grid justify-content-end">
+          <!--<p-button icon="pi pi-search"></p-button>-->
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-4 md:col-4 overflow-hidden">
+    <img
+      src="content/images/bannerright.jpg"
+      alt="Image"
+      class="md:ml-auto block md:h-full"
+      style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
+    />
+  </div>
+</div>
