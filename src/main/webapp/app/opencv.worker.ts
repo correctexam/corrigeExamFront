@@ -867,13 +867,13 @@ function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingFor
     let rect = cv.boundingRect(cnt);
     if (rect.width > 12 || rect.height > 12) {
       //} && rect.width < rect.height) {
-      /*if (rect.width > rect.height) {
+      if (rect.width > rect.height) {
         rect.y = rect.y - (rect.width - rect.height) / 2;
         rect.height = rect.width;
       } else {
         rect.x = rect.x - (rect.height - rect.width) / 2;
         rect.width = rect.height;
-      }*/
+      }
       rects.push(rect);
     }
   }
