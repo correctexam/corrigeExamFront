@@ -34,6 +34,8 @@ export class CreerexamComponent implements OnInit {
     name: [null, [Validators.required]],
     content: [],
     contentContentType: [null, [Validators.required]],
+    mark: [true],
+    autoMapStudentCopyToList: [true],
   });
 
   constructor(
@@ -84,6 +86,8 @@ export class CreerexamComponent implements OnInit {
     template.name = this.editForm.get(['name'])!.value + 'Template';
     template.content = this.editForm.get(['content'])!.value;
     template.contentContentType = this.editForm.get(['contentContentType'])!.value;
+    (template.mark = this.editForm.get(['mark'])!.value), (template.autoMapStudentCopyToList = true);
+
     this.templateService.create(template).subscribe(
       res => {
         const exam = new Exam();
@@ -93,17 +97,14 @@ export class CreerexamComponent implements OnInit {
         this.examService.create(exam).subscribe(
           () => {
             this.isSaving = false;
-            // TODO
             this.router.navigateByUrl('/course/' + this.courseid);
           },
           () => {
-            // TODO add error message
             this.isSaving = false;
           }
         );
       },
       () => {
-        // TODO add error message
         this.isSaving = false;
       }
     );

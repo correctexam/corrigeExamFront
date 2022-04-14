@@ -36,9 +36,7 @@ import { ThicknessSliderComponent } from './annotate-template/paint/toolbar/thic
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { QuestionpropertiesviewComponent } from './annotate-template/paint/questionpropertiesview/questionpropertiesview.component';
 import { ChargerscanComponent } from './chargerscan/chargerscan.component';
-import { ShowextractImageComponent } from './showextract-image/showextract-image.component';
 import { ImageCropperModule } from 'ngx-image-cropper';
-import { ImageExtractorComponent } from './image-extractor/image-extractor.component';
 import { AssocierCopiesEtudiantsComponent } from './associer-copies-etudiants/associer-copies-etudiants.component';
 import { NgxOpenCVModule } from 'ngx-opencv';
 import { SelectButtonModule } from 'primeng/selectbutton';
@@ -49,6 +47,7 @@ import { PaginatorModule } from 'primeng/paginator';
 import { OrderListModule } from 'primeng/orderlist';
 import { ListboxModule } from 'primeng/listbox';
 import { InputSwitchModule } from 'primeng/inputswitch';
+import { CorrigequestionComponent } from './corrigequestion/corrigequestion.component';
 
 const dbConfig: DBConfig = {
   name: 'MyDb',
@@ -139,15 +138,6 @@ export const ANNOTATETEMPLATE_ROUTE: Route = {
   },
 };
 
-export const SHOWIMAGE_ROUTE: Route = {
-  path: 'showimage/:examid',
-  component: ShowextractImageComponent,
-  data: {
-    authorities: ['ROLE_USER'],
-    pageTitle: 'home.creercours',
-  },
-};
-
 export const AlignerCopiesEtudiants_ROUTE: Route = {
   path: 'imagealign/:examid',
   component: AlignScanComponent,
@@ -168,7 +158,16 @@ export const AssocierCopiesEtudiants_ROUTE: Route = {
 
 export const CorrigerCopiesEtudiants_ROUTE: Route = {
   path: 'answer/:examid',
-  component: AssocierCopiesEtudiantsComponent,
+  component: CorrigequestionComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.creercours',
+  },
+};
+
+export const CorrigerCopiesEtudiantsToQuestion_ROUTE: Route = {
+  path: 'answer/:examid/:questionno/:studentid',
+  component: CorrigequestionComponent,
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.creercours',
@@ -192,10 +191,9 @@ export const CorrigerCopiesEtudiants_ROUTE: Route = {
     ThicknessSliderComponent,
     QuestionpropertiesviewComponent,
     ChargerscanComponent,
-    ShowextractImageComponent,
-    ImageExtractorComponent,
     AssocierCopiesEtudiantsComponent,
     AlignScanComponent,
+    CorrigequestionComponent,
   ],
   imports: [
     CommonModule,
@@ -233,13 +231,21 @@ export const CorrigerCopiesEtudiants_ROUTE: Route = {
       EXAMDETAIL_ROUTE,
       ANNOTATETEMPLATE_ROUTE,
       CHARGERSCAN_ROUTE,
-      SHOWIMAGE_ROUTE,
       AssocierCopiesEtudiants_ROUTE,
       CorrigerCopiesEtudiants_ROUTE,
       AlignerCopiesEtudiants_ROUTE,
+      CorrigerCopiesEtudiantsToQuestion_ROUTE,
     ]),
   ],
-  exports: [MesCoursComponent, CreercoursComponent, CoursdetailsComponent, ImportStudentComponent, ListstudentcourseComponent],
+  exports: [
+    MesCoursComponent,
+    CreercoursComponent,
+    CoursdetailsComponent,
+    ImportStudentComponent,
+    ListstudentcourseComponent,
+    CorrigequestionComponent,
+    AssocierCopiesEtudiantsComponent,
+  ],
   providers: [EventHandlerService, FabricShapeService],
 })
 export class ScanexamModule {}

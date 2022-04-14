@@ -19,8 +19,8 @@
       },
       "id": "ID",
       "name": "Nom",
-      "content": "Contenu",
-      "mark": "Avec marqueur",
+      "content": "Enoncé de l'examen",
+      "mark": "Marqueur d'alignement au sein de l'énoncé",
       "autoMapStudentCopyToList": "Association automatique copie étudiant et Nom",
       "exam": "Examen"
     }

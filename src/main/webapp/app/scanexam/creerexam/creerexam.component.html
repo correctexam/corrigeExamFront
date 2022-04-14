@@ -28,7 +28,7 @@
           class="btn btn-primary"
           (click)="downloadTemplate()"
         >
-          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span>Exemple de sujet</span>
+          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span>Modèle de sujet</span>
         </button>
       </div>
     </div>
@@ -45,7 +45,7 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.template.content" for="field_content">Content</label>
+          <label class="form-label" for="field_content">Enoncé de l'examen</label>
           <div>
             <div *ngIf="editForm.get('content')!.value" class="form-text text-danger clearfix">
               <a
@@ -81,6 +81,10 @@
             id="field_contentContentType"
             formControlName="contentContentType"
           />
+        </div>
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.template.mark" for="field_mark">Mark</label>
+          <input type="checkbox" class="form-check" name="mark" id="field_mark" data-cy="mark" formControlName="mark" />
         </div>
 
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="gotoUE()">
