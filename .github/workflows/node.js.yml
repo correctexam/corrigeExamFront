@@ -46,6 +46,9 @@ jobs:
       - name: Test
         run: |
           npm run test
+      - name: Copy 404
+        run: |
+          npm run copy:404
 #      - name: Deploy
 #        run: |
 #          npm run deploy
