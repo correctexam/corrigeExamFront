@@ -436,11 +436,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
 
   goToStudent(i: number): void {
     if (i * this.nbreFeuilleParCopie < this.numberPagesInScan) {
-      /*      this.currentStudent = i;
-      this.selectionStudents = [];
-      this.recognizedStudent = undefined;
-      this.predictionprecision = 0;
-      this.reShow();*/
       this.router.navigateByUrl('studentbindings/' + this.examId + '/' + (i + 1));
     }
   }

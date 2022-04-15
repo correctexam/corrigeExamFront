@@ -36,13 +36,10 @@ import { ThicknessSliderComponent } from './annotate-template/paint/toolbar/thic
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { QuestionpropertiesviewComponent } from './annotate-template/paint/questionpropertiesview/questionpropertiesview.component';
 import { ChargerscanComponent } from './chargerscan/chargerscan.component';
-import { ImageCropperModule } from 'ngx-image-cropper';
 import { AssocierCopiesEtudiantsComponent } from './associer-copies-etudiants/associer-copies-etudiants.component';
-import { NgxOpenCVModule } from 'ngx-opencv';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { AlignScanComponent } from './alignscan/alignscan.component';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { DBConfig, NgxIndexedDBModule } from 'ngx-indexed-db';
 import { PaginatorModule } from 'primeng/paginator';
 import { OrderListModule } from 'primeng/orderlist';
 import { ListboxModule } from 'primeng/listbox';
@@ -50,22 +47,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { CorrigequestionComponent } from './corrigequestion/corrigequestion.component';
 import { RatingModule } from 'primeng/rating';
 
-const dbConfig: DBConfig = {
-  name: 'MyDb',
-  version: 1,
-  objectStoresMeta: [
-    {
-      store: 'keyvalue',
-      storeConfig: { keyPath: 'id', autoIncrement: true },
-      storeSchema: [{ name: 'value', keypath: 'value', options: { unique: false } }],
-    },
-  ],
-};
-
 // set the location of the OpenCV files
-const openCVConfig = {
-  openCVDirPath: 'content/opencv',
-};
 registerAllModules();
 
 export const COURSMAIN_ROUTE: Route = {
@@ -213,8 +195,6 @@ export const CorrigerCopiesEtudiantsToQuestion_ROUTE: Route = {
     FontAwesomeModule,
     BlockUIModule,
     MenuModule,
-    NgxOpenCVModule.forRoot(openCVConfig),
-    ImageCropperModule,
     DockModule,
     TooltipModule,
     ToastModule,
@@ -231,7 +211,6 @@ export const CorrigerCopiesEtudiantsToQuestion_ROUTE: Route = {
     ListboxModule,
     InputSwitchModule,
     RatingModule,
-    NgxIndexedDBModule.forRoot(dbConfig),
 
     RouterModule.forChild([
       CREERCOURS_ROUTE,

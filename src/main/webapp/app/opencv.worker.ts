@@ -95,7 +95,7 @@ function imageCrop(p: { msg: any; payload: any; uid: string }): void {
   let dst = new cv.Mat();
   let src = cv.matFromImageData(p.payload.image);
 
-  dst = src.roi(rect);
+  dst = roi(src, rect, dst);
   postMessage({ msg: p.msg, payload: imageDataFromMat(dst), uid: p.uid });
   dst.delete();
   src.delete();
@@ -274,7 +274,7 @@ function alignImageBasedOnCircle(payload: any): any {
 
     let rect1 = new cv.Rect(x - r3, y - r3, width1, height1);
     let dstrect1 = new cv.Mat();
-    dstrect1 = srcMat1.roi(rect1);
+    dstrect1 = roi(srcMat1, rect1, dstrect1);
     cv.threshold(dstrect1, dstrect1, 0, 255, cv.THRESH_OTSU + cv.THRESH_BINARY);
     if (cv.countNonZero(dstrect1) < seuil) {
       goodpointsx.push(x);
@@ -742,6 +742,25 @@ function fprediction(src: any, cand: string[], m: MLModel, lookingForMissingLett
   };
 }
 
+function roi(src: any, rect: any, dst: any): any {
+  const srcMWidth = src.size().width;
+  const srcMHeight = src.size().height;
+  if (rect.x + rect.width > srcMWidth) {
+    rect.width = srcMWidth - rect.x;
+  }
+  if (rect.y + rect.height > srcMHeight) {
+    rect.height = srcMHeight - rect.y;
+  }
+  if (rect.x < 0) {
+    rect.x = 0;
+  }
+  if (rect.y < 0) {
+    rect.y = 0;
+  }
+  dst = src.roi(rect); // You can try more different parameters
+  return dst;
+}
+
 function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingForMissingLetter: boolean): any {
   const linelength = 15;
   const repairsize = 3;
@@ -886,21 +905,8 @@ function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingFor
     let dst4 = new cv.Mat();
     let dst2 = new cv.Mat();
     let dst3 = new cv.Mat();
-    const srcMWidth = invert_final.size().width;
-    const srcMHeight = invert_final.size().height;
-    if (rect.x + rect.width > srcMWidth) {
-      rect.width = srcMWidth - rect.x;
-    }
-    if (rect.y + rect.height > srcMHeight) {
-      rect.height = srcMHeight - rect.y;
-    }
-    if (rect.x < 0) {
-      rect.x = 0;
-    }
-    if (rect.y < 0) {
-      rect.y = 0;
-    }
-    dst4 = invert_final.roi(rect); // You can try more different parameters
+
+    dst4 = roi(invert_final, rect, dst4); // You can try more different parameters
     let dsize = new cv.Size(26, 26);
     cv.resize(dst4, dst2, dsize, 0, 0, cv.INTER_AREA);
     let s = new cv.Scalar(255, 0, 0, 255);
@@ -977,7 +983,7 @@ function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingFor
       let dst2 = new cv.Mat();
       let dst3 = new cv.Mat();
 
-      dst4 = invert_final.roi(rect);
+      dst4 = roi(invert_final, rect, dst4);
 
       let dsize = new cv.Size(26, 26);
       cv.resize(dst4, dst2, dsize, 0, 0, cv.INTER_AREA);
