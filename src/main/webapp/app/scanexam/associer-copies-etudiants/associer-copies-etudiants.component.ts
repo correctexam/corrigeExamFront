@@ -350,7 +350,10 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   async selectRecogniezStudent(): Promise<void> {
     this.selectionStudents = [this.recognizedStudent];
     await this.bindStudent();
-    this.goToStudent((this.currentStudent = this.currentStudent + 1));
+    if ((this.currentStudent + 1) * this.nbreFeuilleParCopie < this.numberPagesInScan) {
+      this.currentStudent = this.currentStudent + 1;
+      this.goToStudent(this.currentStudent);
+    }
   }
 
   async loadZone(
@@ -454,7 +457,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     );
 
     const filterStudent = this.students.filter(s =>
-      s.examSheets?.some(ex => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent)
+      s.examSheets?.some(ex => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie)
     );
     this.selectionStudents = filterStudent;
   }
@@ -652,7 +655,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         .filter((ex: any) => ex?.scanId === this.exam.scanfileId);
       const examSheet4CurrentPage: IExamSheet[] = (
         this.students
-          .filter(s => s.examSheets?.some(ex => ex?.scanId === this.exam.scanfileId && ex.pagemin === this.currentStudent))
+          .filter(s =>
+            s.examSheets?.some(ex => ex?.scanId === this.exam.scanfileId && ex.pagemin === this.currentStudent * this.nbreFeuilleParCopie)
+          )
           .map(s => s.examSheets) as any
       ).flat();
       let promises: Promise<void>[] = [];
@@ -674,8 +679,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         const examS4Student = student.examSheets?.filter((ex: IExamSheet) => ex?.scanId === this.exam.scanfileId);
         if (examS4Student !== undefined && examS4Student.length > 0) {
           examS4Student.forEach((ex: IExamSheet) => {
-            ex.pagemin = this.currentStudent;
-            ex.pagemax = this.currentStudent + this.nbreFeuilleParCopie;
+            ex.pagemin = this.currentStudent * this.nbreFeuilleParCopie;
+            ex.pagemax = (this.currentStudent + 1) * this.nbreFeuilleParCopie - 1;
             const p1 = new Promise<void>(res => {
               this.sheetService.update(ex).subscribe(() => {
                 res();
@@ -686,8 +691,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         } else {
           const sheet: IExamSheet = {
             name: uuid(),
-            pagemin: this.currentStudent,
-            pagemax: this.currentStudent + this.nbreFeuilleParCopie,
+            pagemin: this.currentStudent * this.nbreFeuilleParCopie,
+            pagemax: (this.currentStudent + 1) * this.nbreFeuilleParCopie - 1,
             scanId: this.exam.scanfileId,
             students: this.selectionStudents,
           };
