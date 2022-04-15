@@ -28,8 +28,7 @@
             <fa-stack>
               <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
               <fa-icon [icon]="faBookOpenReader" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
-            ><BR />
-            <span>Annoter template</span>
+            ><BR /> <span>Annoter template</span><span *ngIf="exam?.namezoneId">✅</span>
           </button>
           <button
             [routerLink]="'/loadscan/' + this.examId"
@@ -42,8 +41,7 @@
             <fa-stack>
               <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
               <fa-icon [icon]="faBookOpenReader" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
-            ><BR />
-            <span>Charger scan étudiants</span>
+            ><BR /> <span>Charger scan étudiants</span> <span *ngIf="exam?.scanfileId">✅</span>
           </button>
           <button
             [routerLink]="'/imagealign/' + this.examId"
@@ -57,8 +55,7 @@
             <fa-stack>
               <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
               <fa-icon [icon]="faBookOpenReader" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
-            ><BR />
-            <span>Redresser scan</span>
+            ><BR /> <span>Redresser scan</span><span *ngIf="showAssociation">✅</span>
           </button>
           <button
             [routerLink]="'/studentbindings/' + this.examId"
@@ -72,8 +69,7 @@
             <fa-stack>
               <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
               <fa-icon [icon]="faBookOpenReader" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
-            ><BR />
-            <span>Associer copies/étudiants</span>
+            ><BR /> <span>Associer copies/étudiants</span><span *ngIf="showCorrection">✅</span>
           </button>
           <button
             [routerLink]="'/answer/' + this.examId"
@@ -82,7 +78,7 @@
             pButton
             pRipple
             type="button"
-            [disabled]="!couldAnswer()"
+            [disabled]="!showCorrection"
           >
             <fa-stack>
               <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>

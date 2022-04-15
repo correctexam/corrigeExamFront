@@ -16,6 +16,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { db } from '../db/db';
+import { ExamSheetService } from '../../entities/exam-sheet/service/exam-sheet.service';
+import { StudentService } from '../../entities/student/service/student.service';
+import { IStudent } from 'app/entities/student/student.model';
 
 @Component({
   selector: 'jhi-exam-detail',
@@ -33,11 +36,17 @@ export class ExamDetailComponent implements OnInit {
   course!: ICourse;
   dockItems!: any[];
   showAssociation = false;
+  showCorrection = false;
+  nbreFeuilleParCopie = 0;
+  numberPagesInScan = 0;
+  students: IStudent[] | undefined;
   constructor(
     public courseService: CourseService,
     public examService: ExamService,
     protected activatedRoute: ActivatedRoute,
     public confirmationService: ConfirmationService,
+    public examSheetService: ExamSheetService,
+    public studentService: StudentService,
     public router: Router
   ) {}
 
@@ -54,9 +63,37 @@ export class ExamDetailComponent implements OnInit {
               this.showAssociation = true;
             }
           });
+
         this.examService.find(+this.examId).subscribe(data => {
           this.exam = data.body!;
           this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
+
+          db.templates
+            .where('examId')
+            .equals(+this.examId)
+            .count()
+            .then(e2 => {
+              this.nbreFeuilleParCopie = e2;
+              // Step 2 Query Scan in local DB
+
+              db.alignImages
+                .where('examId')
+                .equals(+this.examId)
+                .count()
+                .then(e1 => {
+                  this.numberPagesInScan = e1;
+
+                  this.studentService.query({ courseId: this.exam.courseId }).subscribe(studentsbody => {
+                    this.students = studentsbody.body!;
+                    const ex2 = (this.students.map(s => s.examSheets) as any)
+                      .flat()
+                      .filter((ex1: any) => ex1.scanId === this.exam.scanfileId && ex1.pagemin !== -1).length;
+                    this.showCorrection = ex2 === this.numberPagesInScan / this.nbreFeuilleParCopie;
+                  });
+                });
+            });
+
+          //          this.examSheetService.
         });
         this.dockItems = [
           {
