@@ -8,18 +8,21 @@ export interface Exam {
 export interface Template {
   id?: number;
   examId: number;
+  pageNumber: number;
   value: string;
 }
 
 export interface AlignImage {
   id?: number;
   examId: number;
+  pageNumber: number;
   value: string;
 }
 
 export interface NonAlignImage {
   id?: number;
   examId: number;
+  pageNumber: number;
   value: string;
 }
 
@@ -33,9 +36,9 @@ export class AppDB extends Dexie {
     super('ngdexieliveQuery');
     this.version(3).stores({
       exams: '++id',
-      templates: '++id, examId',
-      alignImages: '++id, examId',
-      nonAlignImages: '++id, examId',
+      templates: '++id, examId, [examId+pageNumber]',
+      alignImages: '++id, examId,[examId+pageNumber]',
+      nonAlignImages: '++id, examId,[examId+pageNumber]',
     });
     //    this.on('populate', () => this.populate());
   }

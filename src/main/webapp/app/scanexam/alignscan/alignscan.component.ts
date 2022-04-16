@@ -175,7 +175,7 @@ export class AlignScanComponent implements OnInit {
     for (let e of templatePages64.keys()) {
       await db.templates.add({
         examId: +this.examId,
-        id: e,
+        pageNumber: e,
         value: JSON.stringify(
           {
             pages: templatePages64.get(e)!,
@@ -197,7 +197,7 @@ export class AlignScanComponent implements OnInit {
     for (let e of alignPages64.keys()) {
       await db.alignImages.add({
         examId: +this.examId,
-        id: e,
+        pageNumber: e,
         value: JSON.stringify(
           {
             pages: alignPages64.get(e)!,
@@ -209,7 +209,7 @@ export class AlignScanComponent implements OnInit {
     for (let e of nonalignPages64.keys()) {
       await db.nonAlignImages.add({
         examId: +this.examId,
-        id: e,
+        pageNumber: e,
         value: JSON.stringify(
           {
             pages: nonalignPages64.get(e)!,

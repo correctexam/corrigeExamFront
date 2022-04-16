@@ -258,9 +258,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
     return new Promise(resolve => {
       db.alignImages
-        .where('examId')
-        .equals(+this.examId!)
-        .and(e1 => e1.id === pageInscan)
+        .where({ examId: +this.examId!, pageNumber: pageInscan })
         .first()
         .then(e2 => {
           const image = JSON.parse(e2!.value, this.reviver);

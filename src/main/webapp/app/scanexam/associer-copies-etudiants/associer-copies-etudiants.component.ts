@@ -155,7 +155,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     { label: 'Off', value: false },
     { label: 'On', value: true },
   ];
-
   recognizedStudent: IStudent | undefined;
   predictionprecision = 0;
   constructor(
@@ -179,7 +178,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         this.examId = params.get('examid')!;
         if (params.get('currentStudent') !== null) {
           this.currentStudent = +params.get('currentStudent')! - 1;
-
+          const startTime = performance.now();
           // Step 1 Query templates
           db.templates
             .where('examId')
@@ -188,151 +187,209 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
             .then(e2 => {
               this.nbreFeuilleParCopie = e2;
               // Step 2 Query Scan in local DB
+              let endTime = performance.now();
+              let totalTime = endTime - startTime; // ti
+              console.log(' step 1 ' + totalTime);
 
               db.alignImages
                 .where('examId')
                 .equals(+this.examId)
                 .count()
                 .then(e1 => {
+                  endTime = performance.now();
+                  totalTime = endTime - startTime; // ti
+                  console.log(' step 2 ' + totalTime);
+
                   this.numberPagesInScan = e1;
+                  console.log(this.numberPagesInScan);
                   this.examService.find(+this.examId).subscribe(data => {
+                    // Step 3 Query Exam
+                    endTime = performance.now();
+                    totalTime = endTime - startTime; // ti
+                    console.log(' step 3 ' + totalTime);
+
                     this.exam = data.body!;
                     this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
-                    // Step 3 Query Students for Exam
-
+                    // Step 4 Query Students for Exam
                     this.refreshStudentList().then(() => {
+                      endTime = performance.now();
+                      totalTime = endTime - startTime; // ti
+                      console.log(' step 4 ' + totalTime);
+                      const promiseload: Promise<ImageZone | null>[] = [];
                       // Step 4 Query zone
-                      this.loadZone(
+                      const p0 = this.loadZone(
                         this.exam.namezoneId,
                         this.setZoneNom,
                         true,
                         this.setShowNomImage,
                         this.nomImage,
-                        this.currentStudent,
-                        true,
+                        this.currentStudent
+                      );
+                      /*                        true,
                         this.students.map(student => student.name!),
-                        this.nomImageReco
-                      ).then(solutionName => {
-                        this.loadZone(
-                          this.exam.firstnamezoneId,
-                          this.setZonePrenom,
-                          true,
-                          this.setShowPrenomImage,
-                          this.prenomImage,
-                          this.currentStudent,
-                          true,
-                          this.students.map(student => student.firstname!),
-                          this.prenomImageReco
-                        ).then(solutionFirstname => {
-                          this.loadZone(
-                            this.exam.idzoneId,
-                            this.setZoneINE,
+                        this.nomImageReco*/
+
+                      promiseload.push(p0);
+
+                      const p1 = this.loadZone(
+                        this.exam.firstnamezoneId,
+                        this.setZonePrenom,
+                        true,
+                        this.setShowPrenomImage,
+                        this.prenomImage,
+                        this.currentStudent
+                        /* true,
+                        this.students.map(student => student.firstname!),
+                        this.prenomImageReco*/
+                      );
+                      promiseload.push(p1);
+                      const p2 = this.loadZone(
+                        this.exam.idzoneId,
+                        this.setZoneINE,
+                        true,
+                        this.setShowINEImage,
+                        this.ineImage,
+                        this.currentStudent
+                        /* false,
+                        this.students.map(student => student.ine!),
+                        this.ineImageReco*/
+                      );
+                      promiseload.push(p2);
+
+                      Promise.all(promiseload).then(value => {
+                        endTime = performance.now();
+                        totalTime = endTime - startTime; // ti
+                        console.log(' all image are loaded => start prediction ' + totalTime);
+                        this.blocked = false;
+                        const ppredics: Promise<(string | number)[]>[] = [];
+                        ppredics.push(
+                          this.predictText(
+                            value[0]!,
                             true,
-                            this.setShowINEImage,
-                            this.ineImage,
-                            this.currentStudent,
+                            this.students.map(student => student.name!),
+                            this.nomImageReco!
+                          )
+                        );
+                        ppredics.push(
+                          this.predictText(
+                            value[1]!,
+                            true,
+                            this.students.map(student => student.firstname!),
+                            this.prenomImageReco!
+                          )
+                        );
+
+                        ppredics.push(
+                          this.predictText(
+                            value[2]!,
                             false,
                             this.students.map(student => student.ine!),
-                            this.ineImageReco
-                          ).then(solutionINE => {
-                            this.blocked = false;
+                            this.ineImageReco!
+                          )
+                        );
+                        Promise.all(ppredics).then(predicts => {
+                          endTime = performance.now();
+                          totalTime = endTime - startTime; // ti
+                          console.log(' get prediction ' + totalTime);
 
-                            console.log(solutionName);
-                            console.log(solutionFirstname);
-                            console.log(solutionINE);
-                            if (solutionName.length > 0 && solutionFirstname.length > 0 && solutionINE.length > 0) {
-                              let sts = this.students.filter(
-                                student =>
-                                  (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-                                  (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase() &&
-                                  (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
-                              );
-                              if (sts.length > 0) {
-                                this.recognizedStudent = sts[0];
-                                this.predictionprecision =
-                                  ((solutionName[1] as number) + (solutionFirstname[1] as number) + (solutionINE[1] as number)) / 3;
-                              } else {
-                                if (solutionINE[1] < solutionFirstname[1] && solutionINE[1] < solutionName[1]) {
-                                  let sts1 = this.students.filter(
-                                    student =>
-                                      (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-                                      (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase()
-                                  );
-                                  if (sts1.length > 0) {
-                                    this.recognizedStudent = sts1[0];
-                                    this.predictionprecision = ((solutionName[1] as number) + (solutionFirstname[1] as number)) / 2;
-                                  }
-                                }
-                                if (
-                                  this.recognizedStudent === undefined &&
-                                  solutionName[1] < solutionFirstname[1] &&
-                                  solutionName[1] < solutionINE[1]
-                                ) {
-                                  let sts1 = this.students.filter(
-                                    student =>
-                                      (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase() &&
-                                      (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
-                                  );
-                                  if (sts1.length > 0) {
-                                    this.recognizedStudent = sts1[0];
-                                    this.predictionprecision = ((solutionFirstname[1] as number) + (solutionINE[1] as number)) / 2;
-                                  }
-                                }
-                                if (
-                                  this.recognizedStudent === undefined &&
-                                  solutionFirstname[1] < solutionName[1] &&
-                                  solutionFirstname[1] < solutionINE[1]
-                                ) {
-                                  sts = this.students.filter(
-                                    student =>
-                                      (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-                                      (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
-                                  );
-                                  if (sts.length > 0) {
-                                    this.recognizedStudent = sts[0];
-                                    this.predictionprecision = ((solutionName[1] as number) + (solutionINE[1] as number)) / 2;
-                                  }
-                                }
-                                if (this.recognizedStudent === undefined && solutionINE.length > 0 && solutionINE[1] > 0.4) {
-                                  sts = this.students.filter(
-                                    student => (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
-                                  );
-                                  if (sts.length > 0) {
-                                    this.recognizedStudent = sts[0];
-                                    this.predictionprecision = solutionINE[1] as number;
-                                  }
+                          const solutionName = predicts[0];
+                          const solutionFirstname = predicts[1];
+                          const solutionINE = predicts[2];
+                          console.log(solutionName);
+                          console.log(solutionFirstname);
+                          console.log(solutionINE);
+                          if (solutionName.length > 0 && solutionFirstname.length > 0 && solutionINE.length > 0) {
+                            let sts = this.students.filter(
+                              student =>
+                                (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
+                                (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase() &&
+                                (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
+                            );
+                            if (sts.length > 0) {
+                              this.recognizedStudent = sts[0];
+                              this.predictionprecision =
+                                ((solutionName[1] as number) + (solutionFirstname[1] as number) + (solutionINE[1] as number)) / 3;
+                            } else {
+                              if (solutionINE[1] < solutionFirstname[1] && solutionINE[1] < solutionName[1]) {
+                                let sts1 = this.students.filter(
+                                  student =>
+                                    (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
+                                    (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase()
+                                );
+                                if (sts1.length > 0) {
+                                  this.recognizedStudent = sts1[0];
+                                  this.predictionprecision = ((solutionName[1] as number) + (solutionFirstname[1] as number)) / 2;
                                 }
                               }
-                            } else if (solutionName.length > 0 && solutionFirstname.length > 0) {
-                              let sts = this.students.filter(
-                                student =>
-                                  (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-                                  (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase()
-                              );
-                              if (sts.length > 0) {
-                                this.recognizedStudent = sts[0];
-                                this.predictionprecision = ((solutionName[1] as number) + (solutionFirstname[1] as number)) / 2;
+                              if (
+                                this.recognizedStudent === undefined &&
+                                solutionName[1] < solutionFirstname[1] &&
+                                solutionName[1] < solutionINE[1]
+                              ) {
+                                let sts1 = this.students.filter(
+                                  student =>
+                                    (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase() &&
+                                    (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
+                                );
+                                if (sts1.length > 0) {
+                                  this.recognizedStudent = sts1[0];
+                                  this.predictionprecision = ((solutionFirstname[1] as number) + (solutionINE[1] as number)) / 2;
+                                }
                               }
-                            } else if (solutionName.length > 0 && solutionINE.length > 0) {
-                              let sts = this.students.filter(
-                                student =>
-                                  (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-                                  (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
-                              );
-                              if (sts.length > 0) {
-                                this.recognizedStudent = sts[0];
-                                this.predictionprecision = ((solutionName[1] as number) + (solutionINE[1] as number)) / 2;
+                              if (
+                                this.recognizedStudent === undefined &&
+                                solutionFirstname[1] < solutionName[1] &&
+                                solutionFirstname[1] < solutionINE[1]
+                              ) {
+                                sts = this.students.filter(
+                                  student =>
+                                    (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
+                                    (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
+                                );
+                                if (sts.length > 0) {
+                                  this.recognizedStudent = sts[0];
+                                  this.predictionprecision = ((solutionName[1] as number) + (solutionINE[1] as number)) / 2;
+                                }
                               }
-                            } else if (solutionINE.length > 0 && solutionINE[1] > 0.4) {
-                              let sts = this.students.filter(
-                                student => (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
-                              );
-                              if (sts.length > 0) {
-                                this.recognizedStudent = sts[0];
-                                this.predictionprecision = solutionINE[1] as number;
+                              if (this.recognizedStudent === undefined && solutionINE.length > 0 && solutionINE[1] > 0.4) {
+                                sts = this.students.filter(
+                                  student => (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
+                                );
+                                if (sts.length > 0) {
+                                  this.recognizedStudent = sts[0];
+                                  this.predictionprecision = solutionINE[1] as number;
+                                }
                               }
                             }
-                          });
+                          } else if (solutionName.length > 0 && solutionFirstname.length > 0) {
+                            let sts = this.students.filter(
+                              student =>
+                                (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
+                                (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase()
+                            );
+                            if (sts.length > 0) {
+                              this.recognizedStudent = sts[0];
+                              this.predictionprecision = ((solutionName[1] as number) + (solutionFirstname[1] as number)) / 2;
+                            }
+                          } else if (solutionName.length > 0 && solutionINE.length > 0) {
+                            let sts = this.students.filter(
+                              student =>
+                                (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
+                                (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
+                            );
+                            if (sts.length > 0) {
+                              this.recognizedStudent = sts[0];
+                              this.predictionprecision = ((solutionName[1] as number) + (solutionINE[1] as number)) / 2;
+                            }
+                          } else if (solutionINE.length > 0 && solutionINE[1] > 0.4) {
+                            let sts = this.students.filter(
+                              student => (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
+                            );
+                            if (sts.length > 0) {
+                              this.recognizedStudent = sts[0];
+                              this.predictionprecision = solutionINE[1] as number;
+                            }
+                          }
                         });
                       });
                     });
@@ -343,6 +400,21 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
           const c = this.currentStudent + 1;
           this.router.navigateByUrl('/studentbindings/' + this.examId! + '/' + c);
         }
+      }
+    });
+  }
+
+  async predictText(p: ImageZone, zoneletter: boolean, candidatematch: string[], debugimageRef: ElementRef): Promise<(string | number)[]> {
+    return new Promise<(string | number)[]>(resolve => {
+      if (this.assisted) {
+        const c = { image: p.i, match: candidatematch };
+        this.alignImagesService.prediction(c, zoneletter).subscribe(result => {
+          const ctx2 = debugimageRef?.nativeElement.getContext('2d');
+          ctx2.putImageData(result.debug, 0, 0);
+          resolve(result.solution!);
+        });
+      } else {
+        resolve([]);
       }
     });
   }
@@ -362,12 +434,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     showImage: boolean,
     showImageRef: (s: boolean) => void,
     imageRef: ElementRef<any> | undefined,
-    currentStudent: number,
-    zoneletter: boolean,
-    candidatematch: string[],
-    debugimageRef: ElementRef<any> | undefined
-  ): Promise<Array<string | number>> {
-    return new Promise<Array<string | number>>(resolve => {
+    currentStudent: number
+  ): Promise<ImageZone | null> {
+    return new Promise<ImageZone | null>(resolve => {
       if (zoneId) {
         this.zoneService.find(zoneId).subscribe(e => {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -376,20 +445,11 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
             if (showImage) {
               this.displayImage(p, imageRef, showImageRef);
             }
-            if (this.assisted) {
-              const c = { image: p.i, match: candidatematch };
-              this.alignImagesService.prediction(c, zoneletter).subscribe(result => {
-                const ctx2 = debugimageRef?.nativeElement.getContext('2d');
-                ctx2.putImageData(result.debug, 0, 0);
-                resolve(result.solution!);
-              });
-            } else {
-              resolve([]);
-            }
+            resolve(p);
           });
         });
       } else {
-        resolve([]);
+        resolve(null);
       }
     });
   }
@@ -398,16 +458,27 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
 
   async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
     return new Promise(resolve => {
+      const startTime = performance.now();
       db.alignImages
-        .where('examId')
-        .equals(+this.examId)
-        .and(e1 => e1!.id === pageInscan)
+        .where({ examId: +this.examId, pageNumber: pageInscan })
         .first()
         .then(e2 => {
+          let endTime = performance.now();
+          let totalTime = endTime - startTime; // ti
+          console.log(' Time to get image ' + totalTime);
+
           const image = JSON.parse(e2!.value, this.reviver);
+          endTime = performance.now();
+          totalTime = endTime - startTime; // ti
+          console.log(' Time to parse image ' + totalTime);
+
           this.loadImage(image.pages, pageInscan).then(v => {
             const finalW = (zone.width! * v.width!) / 100000;
             const finalH = (zone.height! * v.height!) / 100000;
+            endTime = performance.now();
+            totalTime = endTime - startTime; // ti
+            console.log(' Time to load image ' + totalTime);
+
             this.alignImagesService
               .imageCrop({
                 image: v.image,
@@ -416,7 +487,12 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                 width: finalW,
                 height: finalH,
               })
-              .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
+              .subscribe(res => {
+                endTime = performance.now();
+                totalTime = endTime - startTime; // ti
+                console.log(' Time to crop image ' + totalTime);
+                resolve({ i: res, w: finalW, h: finalH });
+              });
           });
         });
     });
@@ -466,9 +542,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     return new Promise<ImageData>(resolve => {
       if (zone !== undefined) {
         db.nonAlignImages
-          .where('examId')
-          .equals(+this.examId)
-          .and(e1 => e1!.id === zone.pageNumber! + currentStudent * this.nbreFeuilleParCopie)
+          .where({ examId: +this.examId, pageNumber: zone.pageNumber! + currentStudent * this.nbreFeuilleParCopie })
           .first()
           .then(e2 => {
             const image = JSON.parse(e2!.value, this.reviver);
@@ -540,9 +614,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         const inputimage1 = ctx!.getImageData(0, 0, i.width, i.height);
         if (this.alignement !== 'off') {
           db.templates
-            .where('examId')
-            .equals(+this.examId)
-            .and(e1 => e1!.id === pagen % this.nbreFeuilleParCopie)
+            .where({ examId: +this.examId, pageNumber: pagen % this.nbreFeuilleParCopie })
             .first()
             .then(e1 => {
               const image1 = JSON.parse(e1!.value, this.reviver);
