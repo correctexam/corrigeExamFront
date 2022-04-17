@@ -178,7 +178,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         this.examId = params.get('examid')!;
         if (params.get('currentStudent') !== null) {
           this.currentStudent = +params.get('currentStudent')! - 1;
-          const startTime = performance.now();
+          // const startTime = performance.now();
           // Step 1 Query templates
           db.templates
             .where('examId')
@@ -187,34 +187,33 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
             .then(e2 => {
               this.nbreFeuilleParCopie = e2;
               // Step 2 Query Scan in local DB
-              let endTime = performance.now();
+              /* let endTime = performance.now();
               let totalTime = endTime - startTime; // ti
-              console.log(' step 1 ' + totalTime);
+              console.log(' step 1 ' + totalTime);*/
 
               db.alignImages
                 .where('examId')
                 .equals(+this.examId)
                 .count()
                 .then(e1 => {
-                  endTime = performance.now();
+                  /* endTime = performance.now();
                   totalTime = endTime - startTime; // ti
-                  console.log(' step 2 ' + totalTime);
+                  //   console.log(' step 2 ' + totalTime);*/
 
                   this.numberPagesInScan = e1;
-                  console.log(this.numberPagesInScan);
                   this.examService.find(+this.examId).subscribe(data => {
                     // Step 3 Query Exam
-                    endTime = performance.now();
+                    /* endTime = performance.now();
                     totalTime = endTime - startTime; // ti
-                    console.log(' step 3 ' + totalTime);
+                    //  console.log(' step 3 ' + totalTime);*/
 
                     this.exam = data.body!;
                     this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
                     // Step 4 Query Students for Exam
                     this.refreshStudentList().then(() => {
-                      endTime = performance.now();
+                      /* endTime = performance.now();
                       totalTime = endTime - startTime; // ti
-                      console.log(' step 4 ' + totalTime);
+                      //    console.log(' step 4 ' + totalTime);*/
                       const promiseload: Promise<ImageZone | null>[] = [];
                       // Step 4 Query zone
                       const p0 = this.loadZone(
@@ -257,9 +256,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                       promiseload.push(p2);
 
                       Promise.all(promiseload).then(value => {
-                        endTime = performance.now();
-                        totalTime = endTime - startTime; // ti
-                        console.log(' all image are loaded => start prediction ' + totalTime);
+                        /* endTime = performance.now();
+                        totalTime = endTime - startTime; // ti*/
+                        // console.log(' all image are loaded => start prediction ' + totalTime);
                         this.blocked = false;
                         const ppredics: Promise<(string | number)[]>[] = [];
                         ppredics.push(
@@ -288,16 +287,16 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                           )
                         );
                         Promise.all(ppredics).then(predicts => {
-                          endTime = performance.now();
-                          totalTime = endTime - startTime; // ti
-                          console.log(' get prediction ' + totalTime);
+                          /* endTime = performance.now();
+                          totalTime = endTime - startTime; // ti*/
+                          //  console.log(' get prediction ' + totalTime);
 
                           const solutionName = predicts[0];
                           const solutionFirstname = predicts[1];
                           const solutionINE = predicts[2];
-                          console.log(solutionName);
-                          console.log(solutionFirstname);
-                          console.log(solutionINE);
+                          // console.log(solutionName);
+                          // console.log(solutionFirstname);
+                          // console.log(solutionINE);
                           if (solutionName.length > 0 && solutionFirstname.length > 0 && solutionINE.length > 0) {
                             let sts = this.students.filter(
                               student =>
@@ -458,26 +457,26 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
 
   async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
     return new Promise(resolve => {
-      const startTime = performance.now();
+      // const startTime = performance.now();
       db.alignImages
         .where({ examId: +this.examId, pageNumber: pageInscan })
         .first()
         .then(e2 => {
-          let endTime = performance.now();
-          let totalTime = endTime - startTime; // ti
-          console.log(' Time to get image ' + totalTime);
+          /* let endTime = performance.now();
+          let totalTime = endTime - startTime; // ti*/
+          // console.log(' Time to get image ' + totalTime);
 
           const image = JSON.parse(e2!.value, this.reviver);
-          endTime = performance.now();
-          totalTime = endTime - startTime; // ti
-          console.log(' Time to parse image ' + totalTime);
+          /* endTime = performance.now();
+          totalTime = endTime - startTime; // ti*/
+          // console.log(' Time to parse image ' + totalTime);
 
           this.loadImage(image.pages, pageInscan).then(v => {
             const finalW = (zone.width! * v.width!) / 100000;
             const finalH = (zone.height! * v.height!) / 100000;
-            endTime = performance.now();
+            /* endTime = performance.now();
             totalTime = endTime - startTime; // ti
-            console.log(' Time to load image ' + totalTime);
+            // console.log(' Time to load image ' + totalTime);*/
 
             this.alignImagesService
               .imageCrop({
@@ -488,9 +487,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                 height: finalH,
               })
               .subscribe(res => {
-                endTime = performance.now();
-                totalTime = endTime - startTime; // ti
-                console.log(' Time to crop image ' + totalTime);
+                // endTime = performance.now();
+                // totalTime = endTime - startTime; // ti
+                // console.log(' Time to crop image ' + totalTime);
                 resolve({ i: res, w: finalW, h: finalH });
               });
           });
@@ -783,7 +782,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         }
       });
       Promise.all(promises).then(() => {
-        console.log('all actions done');
+        // console.log('all actions done');
         this.refreshStudentList().then(() => resolve1());
       });
     });

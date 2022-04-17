@@ -716,16 +716,25 @@ function fprediction(src: any, cand: string[], m: MLModel, lookingForMissingLett
     for (let j = 0; j < 13; j++) {
       if (j < predict.length) {
         let letter = candidate[k][0].substring(j, j + 1).toLowerCase();
-
         if (letter === predict[j][0].toLowerCase()) {
           candidate[k][1] = candidate[k][1] + predict[j][1];
         } else {
-          candidate[k][1] = candidate[k][1] + (1 - predict[j][1]) / 35;
+          if (onlyletter) {
+            candidate[k][1] = candidate[k][1] + (1 - predict[j][1]) / 35;
+          } else {
+            candidate[k][1] = candidate[k][1] + (1 - predict[j][1]) / 9;
+          }
         }
       }
     }
     candidate[k][1] = candidate[k][1] / predict.length;
   }
+
+  for (let k = 0; k < candidate.length; k++) {
+    candidate[k][0] = candidate[k][0].trim();
+    candidate[k][1] = candidate[k][1] - Math.abs(candidate[k][0].length - predict.length) / candidate[k][0].length;
+  }
+
   candidate.sort((a, b) => {
     if (a[1] < b[1]) {
       return 1;
@@ -735,7 +744,6 @@ function fprediction(src: any, cand: string[], m: MLModel, lookingForMissingLett
   });
   //  console.log(candidate)
 
-  candidate[0][0] = candidate[0][0].trim();
   return {
     debug: res.invert_final,
     solution: candidate[0],
@@ -886,15 +894,25 @@ function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingFor
     let rect = cv.boundingRect(cnt);
     if (rect.width > 12 || rect.height > 12) {
       //} && rect.width < rect.height) {
-      if (rect.width > rect.height) {
+      /*  if (rect.width > rect.height) {
         rect.y = rect.y - (rect.width - rect.height) / 2;
         rect.height = rect.width;
       } else {
         rect.x = rect.x - (rect.height - rect.width) / 2;
         rect.width = rect.height;
-      }
+      }*/
       rects.push(rect);
     }
+  }
+
+  // fusion entre rect qui intersect
+  let merge = mergeRect(rects);
+  let kk = 0;
+  while (merge !== null && kk < 200) {
+    rects = rects.filter(rect => rect !== merge.toRemove1 && rect !== merge.toRemove2);
+    rects.push(merge.u);
+    merge = mergeRect(rects);
+    kk = kk + 1;
   }
 
   // TODO interect on rect
@@ -905,11 +923,18 @@ function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingFor
     let dst4 = new cv.Mat();
     let dst2 = new cv.Mat();
     let dst3 = new cv.Mat();
+    let s = new cv.Scalar(255, 0, 0, 255);
 
     dst4 = roi(invert_final, rect, dst4); // You can try more different parameters
+
+    if (rect.width > rect.height) {
+      cv.copyMakeBorder(dst4, dst4, (rect.width - rect.height) / 2, (rect.width - rect.height) / 2, 1, 1, cv.BORDER_CONSTANT, s);
+    } else {
+      cv.copyMakeBorder(dst4, dst4, 1, 1, (rect.height - rect.width) / 2, (rect.height - rect.width) / 2, cv.BORDER_CONSTANT, s);
+    }
+
     let dsize = new cv.Size(26, 26);
     cv.resize(dst4, dst2, dsize, 0, 0, cv.INTER_AREA);
-    let s = new cv.Scalar(255, 0, 0, 255);
     cv.copyMakeBorder(dst2, dst3, 1, 1, 1, 1, cv.BORDER_CONSTANT, s);
     letters.set(rect, dst3);
     dst4.delete();
@@ -1012,4 +1037,62 @@ function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingFor
     final: final,*/
     invert_final: invert_final,
   };
+}
+
+function intersect(rect1: any, rect2: any): any {
+  let rightRect = rect2;
+  let leftRect = rect1;
+  let topRect = rect1;
+  let botRect = rect2;
+
+  if (rect1.x > rect2.x) {
+    rightRect = rect1;
+    leftRect = rect2;
+  }
+  if (rect1.y > rect2.y) {
+    topRect = rect2;
+    botRect = rect1;
+  }
+  rect1.right = rect1.x + rect1.width;
+  rect2.right = rect2.x + rect2.width;
+  rect1.bottom = rect1.y + rect1.height;
+  rect2.bottom = rect2.y + rect2.height;
+
+  let furtherRect = rect2;
+  let nearerRect = rect1;
+  let lowerRect = rect2;
+  let upperRect = rect1;
+
+  if (rect1.right > rect2.right) {
+    furtherRect = rect1;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    nearerRect = rect2;
+  }
+  if (rect1.bottom > rect2.bottom) {
+    lowerRect = rect1;
+    upperRect = rect2;
+  }
+  if (rightRect.x < leftRect.right && botRect.y > topRect.y + topRect.height) {
+    return new cv.Rect(leftRect.x, upperRect.y, furtherRect.right - leftRect.x, lowerRect.bottom - topRect.y);
+  }
+
+  if (/*(!rightRect.x<leftRect.right)  ||*/ rightRect.x > leftRect.x + leftRect.width + 5 || botRect.y > topRect.y + topRect.height) {
+    return null;
+  } else {
+    return new cv.Rect(leftRect.x, upperRect.y, furtherRect.right - leftRect.x, lowerRect.bottom - topRect.y);
+  }
+}
+
+function mergeRect(rects: any[]): any {
+  for (let i = 0; i < rects.length - 1; i++) {
+    const rect1 = rects[i];
+    for (let j = i + 1; j < rects.length; j++) {
+      const rect2 = rects[j];
+      const union = intersect(rect1, rect2);
+      if (union !== null) {
+        return { u: union, toRemove1: rect1, toRemove2: rect2 };
+      }
+    }
+  }
+  return null;
 }
