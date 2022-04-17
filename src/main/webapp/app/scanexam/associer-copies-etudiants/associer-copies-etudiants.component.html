@@ -113,9 +113,9 @@
         <canvas [hidden]="!debug" #keypoints1></canvas>
         <canvas [hidden]="!debug" #keypoints2></canvas>
         <canvas [hidden]="!debug" #imageCompareMatches></canvas>
-        <canvas [hidden]="debug" #nomImageReco></canvas>
-        <canvas [hidden]="debug" #prenomImageReco></canvas>
-        <canvas [hidden]="debug" #ineImageReco></canvas>
+        <canvas [hidden]="!debug" #nomImageReco></canvas>
+        <canvas [hidden]="!debug" #prenomImageReco></canvas>
+        <canvas [hidden]="!debug" #ineImageReco></canvas>
       </div>
       <p-listbox
         [options]="studentsOptions()"

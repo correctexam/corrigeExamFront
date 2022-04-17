@@ -294,9 +294,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                           const solutionName = predicts[0];
                           const solutionFirstname = predicts[1];
                           const solutionINE = predicts[2];
-                          // console.log(solutionName);
-                          // console.log(solutionFirstname);
-                          // console.log(solutionINE);
+                          console.log(solutionName);
+                          console.log(solutionFirstname);
+                          console.log(solutionINE);
                           if (solutionName.length > 0 && solutionFirstname.length > 0 && solutionINE.length > 0) {
                             let sts = this.students.filter(
                               student =>
@@ -319,8 +319,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                                   this.recognizedStudent = sts1[0];
                                   this.predictionprecision = ((solutionName[1] as number) + (solutionFirstname[1] as number)) / 2;
                                 }
-                              }
-                              if (
+                              } else if (
                                 this.recognizedStudent === undefined &&
                                 solutionName[1] < solutionFirstname[1] &&
                                 solutionName[1] < solutionINE[1]
@@ -334,8 +333,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                                   this.recognizedStudent = sts1[0];
                                   this.predictionprecision = ((solutionFirstname[1] as number) + (solutionINE[1] as number)) / 2;
                                 }
-                              }
-                              if (
+                              } else if (
                                 this.recognizedStudent === undefined &&
                                 solutionFirstname[1] < solutionName[1] &&
                                 solutionFirstname[1] < solutionINE[1]
@@ -350,13 +348,37 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                                   this.predictionprecision = ((solutionName[1] as number) + (solutionINE[1] as number)) / 2;
                                 }
                               }
-                              if (this.recognizedStudent === undefined && solutionINE.length > 0 && solutionINE[1] > 0.4) {
+                              if (
+                                this.recognizedStudent === undefined &&
+                                solutionINE[1] > solutionName[1] &&
+                                solutionINE[1] > solutionFirstname[1] &&
+                                solutionINE[1] > 0.4
+                              ) {
                                 sts = this.students.filter(
                                   student => (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
                                 );
                                 if (sts.length > 0) {
                                   this.recognizedStudent = sts[0];
                                   this.predictionprecision = solutionINE[1] as number;
+                                }
+                              }
+                              if (
+                                (this.recognizedStudent === undefined &&
+                                  solutionName[1] > solutionINE[1] &&
+                                  solutionName[1] > solutionFirstname[1] &&
+                                  solutionName[1] > 0.4) ||
+                                (solutionFirstname[1] > solutionINE[1] &&
+                                  solutionFirstname[1] > solutionName[1] &&
+                                  solutionFirstname[1] > 0.4)
+                              ) {
+                                sts = this.students.filter(
+                                  student =>
+                                    (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
+                                    (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase()
+                                );
+                                if (sts.length > 0) {
+                                  this.recognizedStudent = sts[0];
+                                  this.predictionprecision = ((solutionName[1] as number) + (solutionFirstname[1] as number)) / 2;
                                 }
                               }
                             }
