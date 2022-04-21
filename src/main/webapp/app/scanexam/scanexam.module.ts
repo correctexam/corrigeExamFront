@@ -46,6 +46,7 @@ import { ListboxModule } from 'primeng/listbox';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { CorrigequestionComponent } from './corrigequestion/corrigequestion.component';
 import { RatingModule } from 'primeng/rating';
+import { GraphicalToolbarCorrectionComponent } from './corrigequestion/toolbar/toolbar.component';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -186,6 +187,7 @@ export const CorrigerCopiesEtudiantsToQuestion_ROUTE: Route = {
     AssocierCopiesEtudiantsComponent,
     AlignScanComponent,
     CorrigequestionComponent,
+    GraphicalToolbarCorrectionComponent,
   ],
   imports: [
     CommonModule,

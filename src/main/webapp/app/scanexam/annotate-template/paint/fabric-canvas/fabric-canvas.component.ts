@@ -10,7 +10,7 @@
 import { AfterViewInit, Component, Inject, Input, NgZone } from '@angular/core';
 import { NgxExtendedPdfViewerService, ScrollModeType } from 'ngx-extended-pdf-viewer';
 import { EventHandlerService } from '../event-handler.service';
-import { CustomFabricObject, DrawingTools, DrawingColours } from '../models';
+import { DrawingTools, DrawingColours } from '../models';
 import { PageHandler } from './PageHandler';
 import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
@@ -49,7 +49,6 @@ export class FabricCanvasComponent implements AfterViewInit {
   public scrollbar: any = undefined;
 
   constructor(
-    private pdfService: NgxExtendedPdfViewerService,
     private eventHandler: EventHandlerService,
     private ngZone: NgZone,
     @Inject(PERFECT_SCROLLBAR_CONFIG)
@@ -199,7 +198,7 @@ export class FabricCanvasComponent implements AfterViewInit {
     }
   }
 
-  private addEventListeners(canvas: any) {
+  /* private addEventListeners(canvas: any) {
     canvas.on('mouse:down', (e: any) => this.ngZone.run(() => this.onCanvasMouseDown(e)));
     canvas.on('mouse:move', (e: any) => this.ngZone.run(() => this.onCanvasMouseMove(e)));
     canvas.on('mouse:up', () => this.ngZone.run(() => this.onCanvasMouseUp()));
@@ -239,5 +238,5 @@ export class FabricCanvasComponent implements AfterViewInit {
 
   private avoidDragAndClickEventsOfOtherUILibs(e: Event) {
     e.stopPropagation();
-  }
+  } */
 }

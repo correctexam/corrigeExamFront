@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, AfterViewInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, AfterViewInit, NgZone } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CourseService } from 'app/entities/course/service/course.service';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
@@ -23,6 +24,8 @@ import { QuestionService } from '../../entities/question/service/question.servic
 import { IQuestion } from '../../entities/question/question.model';
 import { IStudentResponse, StudentResponse } from '../../entities/student-response/student-response.model';
 import { StudentResponseService } from 'app/entities/student-response/service/student-response.service';
+import { EventCanevascorrectionHandlerService } from './event-canevascorrection-handler.service';
+import { ZoneCorrectionHandler } from './ZoneCorrectionHandler';
 
 @Component({
   selector: 'jhi-corrigequestion',
@@ -66,7 +69,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     public sheetService: ExamSheetService,
     public questionService: QuestionService,
     public studentResponseService: StudentResponseService,
-    private changeDetector: ChangeDetectorRef
+    private changeDetector: ChangeDetectorRef,
+    private eventHandler: EventCanevascorrectionHandlerService,
+    private ngZone: NgZone
   ) {}
 
   ngOnInit(): void {
@@ -142,7 +147,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                                 if (sr.body !== null && sr.body.length > 0) {
                                   this.resp = sr.body![0];
                                   this.currentNote = this.resp.note!;
-                                  console.log(this.currentNote);
                                 } else {
                                   this.studentResponseService.create(this.resp!).subscribe(sr1 => (this.resp = sr1.body!));
                                 }
@@ -173,7 +177,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             this.showImage[i] = b;
           },
           this.canvass.get(i),
-          this.currentStudent
+          this.currentStudent,
+          i
         );
       });
       this.changeDetector.detectChanges();
@@ -228,13 +233,14 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     zoneId: number | undefined,
     showImageRef: (s: boolean) => void,
     imageRef: ElementRef<any> | undefined,
-    currentStudent: number
+    currentStudent: number,
+    index: number
   ): Promise<IZone | undefined> {
     return new Promise<IZone | undefined>(resolve => {
       if (zoneId) {
         this.zoneService.find(zoneId).subscribe(e => {
           this.getAllImage4Zone(currentStudent! * this.nbreFeuilleParCopie! + e.body!.pageNumber!, e.body!).then(p => {
-            this.displayImage(p, imageRef, showImageRef);
+            this.displayImage(p, imageRef, showImageRef, index);
             resolve(e.body!);
           });
         });
@@ -244,14 +250,19 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  displayImage(v: ImageZone, imageRef: ElementRef<any> | undefined, show: (s: boolean) => void): void {
+  displayImage(v: ImageZone, imageRef: ElementRef<any> | undefined, show: (s: boolean) => void, index: number): void {
     if (imageRef !== undefined) {
       imageRef!.nativeElement.width = v.w;
       imageRef!.nativeElement.height = v.h;
       const ctx1 = imageRef!.nativeElement.getContext('2d');
-
       ctx1.putImageData(v.i, 0, 0);
+      //  this.addEventListeners( imageRef!.nativeElement)
       show(true);
+      const zh = new ZoneCorrectionHandler(
+        '' + this.examId + '_' + this.studentid + '_' + this.questionno + '_' + index,
+        this.eventHandler
+      );
+      zh.updateCanvas(imageRef!.nativeElement);
     }
   }
 
@@ -294,4 +305,46 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       i.src = file;
     });
   }
+  /*
+  private addEventListeners(canvas: any) {
+    canvas.on('mouse:down', (e: any) => this.ngZone.run(() => this.onCanvasMouseDown(e)));
+    canvas.on('mouse:move', (e: any) => this.ngZone.run(() => this.onCanvasMouseMove(e)));
+    canvas.on('mouse:up', () => this.ngZone.run(() => this.onCanvasMouseUp()));
+    canvas.on('selection:created', (e: any) => this.ngZone.run(() => this.onSelectionCreated(e as any)));
+    canvas.on('selection:updated', (e: any) => this.ngZone.run(() => this.onSelectionUpdated(e as any)));
+    canvas.on('object:moving', (e: any) => this.ngZone.run(() => this.onObjectMoving(e as any)));
+    canvas.on('object:scaling', (e: any) => this.ngZone.run(() => this.onObjectScaling(e as any)));
+  }
+
+  private onCanvasMouseDown(event: { e: Event }) {
+    this.eventHandler.mouseDown(event.e);
+    this.avoidDragAndClickEventsOfOtherUILibs(event.e);
+  }
+  private onCanvasMouseMove(event: { e: Event }) {
+    this.eventHandler.mouseMove(event.e);
+  }
+  private onCanvasMouseUp() {
+    this.eventHandler.mouseUp();
+  }
+  private onSelectionCreated(e: { target: CustomFabricObject }) {
+    this.eventHandler.objectSelected(e.target);
+  }
+  private onSelectionUpdated(e: { target: CustomFabricObject }) {
+    this.eventHandler.objectSelected(e.target);
+  }
+  private onObjectMoving(e: any) {
+    this.eventHandler.objectMoving(e.target.id, e.target.type, e.target.left, e.target.top);
+  }
+  private onObjectScaling(e: any) {
+    this.eventHandler.objectScaling(
+      e.target.id,
+      e.target.type,
+      { x: e.target.scaleX, y: e.target.scaleY },
+      { left: e.target.left, top: e.target.top }
+    );
+  }
+
+  private avoidDragAndClickEventsOfOtherUILibs(e: Event) {
+    e.stopPropagation();
+  } */
 }

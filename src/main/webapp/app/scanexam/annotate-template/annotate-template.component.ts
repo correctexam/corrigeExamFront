@@ -38,7 +38,6 @@ export class AnnotateTemplateComponent implements OnInit {
         this.examId = params.get('examid')!;
         this.examService.find(+this.examId).subscribe(data => {
           this.exam = data.body!;
-          // this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
           this.templateService.find(this.exam.templateId!).subscribe(t => {
             this.template = t.body!;
           });

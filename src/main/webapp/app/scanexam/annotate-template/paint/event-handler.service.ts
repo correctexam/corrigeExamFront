@@ -288,8 +288,6 @@ export class EventHandlerService {
         y: this._elementUnderDrawing.top
       });
       console.log(r)*/
-      console.log(this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight);
-      console.log(this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth);
       /*   const r1 =  this.pages[(this.canvas as any).page].realToCanvas({
         x:this._elementUnderDrawing.left!,
         y: this._elementUnderDrawing.top!
@@ -468,12 +466,6 @@ export class EventHandlerService {
         yInit: Math.trunc((t! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight),
       })
       .subscribe();
-    console.log({
-      xInit: Math.trunc((l! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth),
-      yInit: Math.trunc((t! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight),
-    });
-
-    console.log(this.pages[(this.canvas as any).page].pageViewer);
 
     if (type !== FabricObjectType.ELLIPSE) {
       return;

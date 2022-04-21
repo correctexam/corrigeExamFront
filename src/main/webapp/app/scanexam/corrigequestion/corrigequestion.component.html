@@ -31,6 +31,7 @@
           <p-paginator
             [currentPageReportTemplate]="'{currentPage} étudiant sur {totalPages} étudiant(s)'"
             [rows]="1"
+            [first]="currentStudent"
             [totalRecords]="numberPagesInScan! / nbreFeuilleParCopie!"
             (onPageChange)="changeStudent($event)"
             [showJumpToPageDropdown]="true"
@@ -43,10 +44,14 @@
       </div>
 
       <div class="grid">
-        <div class="col-9" style="text-align: center">
-          <h2>Question {{ questionno + 1 }}</h2>
-          <div class="col-12" style="text-align: center" *ngFor="let k of questions; let i = index">
-            <canvas [hidden]="!showImage[i]" #nomImage></canvas>
+        <div class="col-9">
+          <div class="d-flex justify-content-center">
+            <h2>Question {{ questionno + 1 }}</h2>
+          </div>
+          <div class="d-flex justify-content-center" *ngFor="let k of questions; let i = index">
+            <div>
+              <canvas [hidden]="!showImage[i]" #nomImage></canvas>
+            </div>
           </div>
         </div>
         <div class="col-3">
@@ -55,6 +60,7 @@
           </p-slider>
           Note attribuée: {{ currentNote / 4 }}
           <!--  <p-button icon="pi pi-refresh"></p-button>-->
+          <jhi-graphical-toolbarcorrection></jhi-graphical-toolbarcorrection>
         </div>
       </div>
       <div class="grid align-items-center">
