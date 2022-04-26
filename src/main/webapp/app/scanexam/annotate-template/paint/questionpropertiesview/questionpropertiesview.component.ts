@@ -12,6 +12,7 @@ import { Observable } from 'rxjs';
 import { IQuestion } from '../../../../entities/question/question.model';
 import { EventHandlerService } from '../event-handler.service';
 import { ZoneService } from '../../../../entities/zone/service/zone.service';
+import { GradeType } from 'app/entities/enumerations/grade-type.model';
 
 type SelectableEntity = IQuestionType;
 
@@ -22,6 +23,7 @@ type SelectableEntity = IQuestionType;
 })
 export class QuestionpropertiesviewComponent implements OnInit {
   question: IQuestion | undefined;
+  gradeTypeValues = Object.keys(GradeType);
 
   isSaving = false;
   questiontypes: IQuestionType[] = [];
@@ -30,6 +32,8 @@ export class QuestionpropertiesviewComponent implements OnInit {
     id: [],
     numero: [null, [Validators.required]],
     point: [],
+    step: [],
+    gradeType: [],
     zoneId: [],
     typeId: [],
     examId: [],
@@ -65,6 +69,8 @@ export class QuestionpropertiesviewComponent implements OnInit {
     this.editForm.patchValue({
       numero: question.numero,
       point: question.point,
+      step: question.step,
+      gradeType: question.gradeType,
       typeId: question.typeId,
     });
   }
@@ -82,6 +88,9 @@ export class QuestionpropertiesviewComponent implements OnInit {
   private createFromForm(): IQuestion {
     this.question!.numero = this.editForm.get(['numero'])!.value;
     this.question!.point = this.editForm.get(['point'])!.value;
+    this.question!.step = this.editForm.get(['step'])!.value;
+    this.question!.gradeType = this.editForm.get(['gradeType'])!.value;
+
     this.question!.typeId = this.editForm.get(['typeId'])!.value;
     return this.question!;
   }

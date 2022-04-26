@@ -56,9 +56,16 @@
         </div>
         <div class="col-3">
           <p-rating *ngIf="noteSteps > 0" [stars]="noteSteps" [(ngModel)]="currentNote" (onRate)="changeNote()"></p-rating>
-          <p-slider *ngIf="noteSteps > 0" [(ngModel)]="currentNote" [min]="0" [max]="maxNote * 4" [step]="1" (onChange)="changeNote()">
+          <p-slider
+            *ngIf="noteSteps > 0"
+            [(ngModel)]="currentNote"
+            [min]="0"
+            [max]="maxNote * questionStep"
+            [step]="1"
+            (onChange)="changeNote()"
+          >
           </p-slider>
-          Note attribuée: {{ currentNote / 4 }}
+          Note attribuée: {{ currentNote / questionStep }}
           <!--  <p-button icon="pi pi-refresh"></p-button>-->
           <jhi-graphical-toolbarcorrection></jhi-graphical-toolbarcorrection>
         </div>

@@ -53,6 +53,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   currentNote = 0;
   noteSteps = 0;
   maxNote = 0;
+  questionStep = 0;
   questionno = 0;
   resp: IStudentResponse | undefined;
 
@@ -122,7 +123,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                       this.questionService.query({ examId: this.exam?.id, numero: this.questionno + 1 }).subscribe(q1 => {
                         this.questions = q1.body!;
                         if (this.questions.length > 0) {
-                          this.noteSteps = this.questions[0].point! / 0.25;
+                          this.noteSteps = this.questions[0].point! * this.questions[0].step!;
+                          this.questionStep = this.questions[0].step!;
                           this.maxNote = this.questions[0].point!;
 
                           if (this.resp === undefined) {

@@ -21,6 +21,21 @@
           <input type="number" class="form-control" name="point" id="field_point" data-cy="point" formControlName="point" />
         </div>
         <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.step" for="field_step">Step</label>
+          <input type="number" class="form-control" name="step" id="field_step" data-cy="step" formControlName="step" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.gradeType" for="field_gradeType">Grade Type</label>
+          <select class="form-control" name="gradeType" formControlName="gradeType" id="field_gradeType" data-cy="gradeType">
+            <option [ngValue]="null">{{ 'gradeScopeIsticApp.GradeType.null' | translate }}</option>
+            <option *ngFor="let gradeType of gradeTypeValues" [value]="gradeType">
+              {{ 'gradeScopeIsticApp.GradeType.' + gradeType | translate }}
+            </option>
+          </select>
+        </div>
+
+        <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.type" for="field_type">Type</label>
           <select class="form-control" id="field_type" name="type" formControlName="typeId">
             <option [ngValue]="null"></option>
