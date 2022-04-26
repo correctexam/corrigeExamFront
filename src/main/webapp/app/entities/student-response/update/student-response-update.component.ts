@@ -13,6 +13,11 @@ import { QuestionService } from 'app/entities/question/service/question.service'
 import { IExamSheet } from 'app/entities/exam-sheet/exam-sheet.model';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 
+import { ITextComment } from 'app/entities/text-comment/text-comment.model';
+import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
+import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
+import { GradedCommentService } from 'app/entities/graded-comment/service/graded-comment.service';
+
 type SelectableEntity = IQuestion | IExamSheet;
 
 @Component({
@@ -23,18 +28,24 @@ export class StudentResponseUpdateComponent implements OnInit {
   isSaving = false;
   questions: IQuestion[] = [];
   sheets: IExamSheet[] = [];
+  textCommentsSharedCollection: ITextComment[] = [];
+  gradedCommentsSharedCollection: IGradedComment[] = [];
 
   editForm = this.fb.group({
     id: [],
     note: [],
     questionId: [],
     sheetId: [],
+    textcomments: [],
+    gradedcomments: [],
   });
 
   constructor(
     protected studentResponseService: StudentResponseService,
     protected questionService: QuestionService,
     protected examSheetService: ExamSheetService,
+    protected textCommentService: TextCommentService,
+    protected gradedCommentService: GradedCommentService,
     protected activatedRoute: ActivatedRoute,
     protected fb: FormBuilder
   ) {}
@@ -55,6 +66,8 @@ export class StudentResponseUpdateComponent implements OnInit {
       note: studentResponse.note,
       questionId: studentResponse.questionId,
       sheetId: studentResponse.sheetId,
+      textcomments: studentResponse.textcomments,
+      gradedcomments: studentResponse.gradedcomments,
     });
   }
 
@@ -79,6 +92,8 @@ export class StudentResponseUpdateComponent implements OnInit {
       note: this.editForm.get(['note'])!.value,
       questionId: this.editForm.get(['questionId'])!.value,
       sheetId: this.editForm.get(['sheetId'])!.value,
+      textcomments: this.editForm.get(['textcomments'])!.value,
+      gradedcomments: this.editForm.get(['gradedcomments'])!.value,
     };
   }
 

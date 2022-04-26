@@ -36,6 +36,7 @@ import { IExam } from '../../../entities/exam/exam.model';
 import { IQuestion, Question } from '../../../entities/question/question.model';
 import { QuestionService } from '../../../entities/question/service/question.service';
 import { PageHandler } from './fabric-canvas/PageHandler';
+import { GradeType } from 'app/entities/enumerations/grade-type.model';
 
 const RANGE_AROUND_CENTER = 20;
 
@@ -399,6 +400,7 @@ export class EventHandlerService {
         q.typeId = 2;
         q.numero = numero;
         q.point = 2;
+        q.gradeType = GradeType.DIRECT;
         this.questionService.create(q).subscribe(e => {
           this.selectedTool = DrawingTools.SELECT;
           this.cb(z1.body!.id!);

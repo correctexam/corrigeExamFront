@@ -260,7 +260,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       show(true);
       const zh = new ZoneCorrectionHandler(
         '' + this.examId + '_' + this.studentid + '_' + this.questionno + '_' + index,
-        this.eventHandler
+        this.eventHandler,
+        this.resp?.id
       );
       zh.updateCanvas(imageRef!.nativeElement);
     }

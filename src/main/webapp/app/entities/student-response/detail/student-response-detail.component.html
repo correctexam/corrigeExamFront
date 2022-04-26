@@ -32,6 +32,20 @@
             <a [routerLink]="['/sheet', studentResponse.sheetId, 'view']">{{ studentResponse.sheetName }}</a>
           </div>
         </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.studentResponse.textcomments">Textcomments</span></dt>
+        <dd>
+          <span *ngFor="let textcomments of studentResponse.textcomments; let last = last">
+            <a [routerLink]="['/text-comment', textcomments?.id, 'view']">{{ textcomments.id }}</a
+            >{{ last ? '' : ', ' }}
+          </span>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.studentResponse.gradedcomments">Gradedcomments</span></dt>
+        <dd>
+          <span *ngFor="let gradedcomments of studentResponse.gradedcomments; let last = last">
+            <a [routerLink]="['/graded-comment', gradedcomments?.id, 'view']">{{ gradedcomments.id }}</a
+            >{{ last ? '' : ', ' }}
+          </span>
+        </dd>
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

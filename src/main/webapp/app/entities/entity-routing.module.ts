@@ -69,6 +69,16 @@ import { RouterModule } from '@angular/router';
         data: { pageTitle: 'gradeScopeIsticApp.questionType.home.title' },
         loadChildren: () => import('./question-type/question-type.module').then(m => m.QuestionTypeModule),
       },
+      {
+        path: 'text-comment',
+        data: { pageTitle: 'gradeScopeIsticApp.textComment.home.title' },
+        loadChildren: () => import('./text-comment/text-comment.module').then(m => m.TextCommentModule),
+      },
+      {
+        path: 'graded-comment',
+        data: { pageTitle: 'gradeScopeIsticApp.gradedComment.home.title' },
+        loadChildren: () => import('./graded-comment/graded-comment.module').then(m => m.GradedCommentModule),
+      },
       /* jhipster-needle-add-entity-route - JHipster will add entity modules routes here */
     ]),
   ],

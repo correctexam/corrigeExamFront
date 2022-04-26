@@ -32,19 +32,36 @@
         </div>
 
         <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.step" for="field_step">Step</label>
+          <input type="number" class="form-control" name="step" id="field_step" data-cy="step" formControlName="step" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.gradeType" for="field_gradeType">Grade Type</label>
+          <select class="form-control" name="gradeType" formControlName="gradeType" id="field_gradeType" data-cy="gradeType">
+            <option [ngValue]="null">{{ 'gradeScopeIsticApp.GradeType.null' | translate }}</option>
+            <option *ngFor="let gradeType of gradeTypeValues" [value]="gradeType">
+              {{ 'gradeScopeIsticApp.GradeType.' + gradeType | translate }}
+            </option>
+          </select>
+        </div>
+
+        <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.zone" for="field_zone">Zone</label>
           <select class="form-control" id="field_zone" name="zone" formControlName="zoneId">
             <option [ngValue]="null"></option>
             <option [ngValue]="zoneOption.id" *ngFor="let zoneOption of zones; trackBy: trackById">{{ zoneOption.id }}</option>
-        </select>
+          </select>
         </div>
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.type" for="field_type">Type</label>
           <select class="form-control" id="field_type" name="type" formControlName="typeId">
             <option [ngValue]="null"></option>
-            <option [ngValue]="questionTypeOption.id" *ngFor="let questionTypeOption of questiontypes; trackBy: trackById">{{ questionTypeOption.algoName }}</option>
-        </select>
+            <option [ngValue]="questionTypeOption.id" *ngFor="let questionTypeOption of questiontypes; trackBy: trackById">
+              {{ questionTypeOption.algoName }}
+            </option>
+          </select>
         </div>
 
         <div class="row mb-3">
@@ -52,7 +69,7 @@
           <select class="form-control" id="field_exam" name="exam" formControlName="examId">
             <option [ngValue]="null"></option>
             <option [ngValue]="examOption.id" *ngFor="let examOption of exams; trackBy: trackById">{{ examOption.name }}</option>
-        </select>
+          </select>
         </div>
       </div>
 

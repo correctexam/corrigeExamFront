@@ -20,6 +20,8 @@
         "comments": "Comments",
         "zone": "Zone",
         "questionType": "Question Type",
+        "textComment": "Text Comment",
+        "gradedComment": "Graded Comment",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {

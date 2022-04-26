@@ -6,7 +6,7 @@ import { HttpResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import {  map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { IQuestion, Question } from '../question.model';
 import { QuestionService } from '../service/question.service';
@@ -16,7 +16,7 @@ import { IQuestionType } from 'app/entities/question-type/question-type.model';
 import { QuestionTypeService } from 'app/entities/question-type/service/question-type.service';
 import { IExam } from 'app/entities/exam/exam.model';
 import { ExamService } from 'app/entities/exam/service/exam.service';
-
+import { GradeType } from 'app/entities/enumerations/grade-type.model';
 
 type SelectableEntity = IZone | IQuestionType | IExam;
 
@@ -26,6 +26,7 @@ type SelectableEntity = IZone | IQuestionType | IExam;
 })
 export class QuestionUpdateComponent implements OnInit {
   isSaving = false;
+  gradeTypeValues = Object.keys(GradeType);
   zones: IZone[] = [];
   questiontypes: IQuestionType[] = [];
   exams: IExam[] = [];
@@ -34,6 +35,8 @@ export class QuestionUpdateComponent implements OnInit {
     id: [],
     numero: [null, [Validators.required]],
     point: [],
+    step: [],
+    gradeType: [],
     zoneId: [],
     typeId: [],
     examId: [],
@@ -85,6 +88,8 @@ export class QuestionUpdateComponent implements OnInit {
       id: question.id,
       numero: question.numero,
       point: question.point,
+      step: question.step,
+      gradeType: question.gradeType,
       zoneId: question.zoneId,
       typeId: question.typeId,
       examId: question.examId,
@@ -111,6 +116,8 @@ export class QuestionUpdateComponent implements OnInit {
       id: this.editForm.get(['id'])!.value,
       numero: this.editForm.get(['numero'])!.value,
       point: this.editForm.get(['point'])!.value,
+      step: this.editForm.get(['step'])!.value,
+      gradeType: this.editForm.get(['gradeType'])!.value,
       zoneId: this.editForm.get(['zoneId'])!.value,
       typeId: this.editForm.get(['typeId'])!.value,
       examId: this.editForm.get(['examId'])!.value,

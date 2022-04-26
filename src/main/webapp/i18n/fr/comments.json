@@ -18,6 +18,7 @@
         "title": "Commentaires"
       },
       "id": "Id",
+      "zonegeneratedid": "Zonegeneratedid",
       "jsonData": "Json Data",
       "studentResponse": "Réponse étudiante"
     }

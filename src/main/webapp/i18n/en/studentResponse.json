@@ -21,7 +21,9 @@
       "note": "Note",
       "comments": "Comments",
       "question": "Question",
-      "sheet": "Sheet"
+      "sheet": "Sheet",
+      "textcomments": "Textcomments",
+      "gradedcomments": "Gradedcomments"
     }
   }
 }

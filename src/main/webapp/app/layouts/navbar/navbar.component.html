@@ -36,7 +36,14 @@
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          <a *jhiHasAnyAuthority="'ROLE_ADMIN'" class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="entity-menu" data-cy="entity">
+          <a
+            *jhiHasAnyAuthority="'ROLE_ADMIN'"
+            class="nav-link dropdown-toggle"
+            ngbDropdownToggle
+            href="javascript:void(0);"
+            id="entity-menu"
+            data-cy="entity"
+          >
             <span>
               <fa-icon icon="th-list"></fa-icon>
               <span jhiTranslate="global.menu.entities.main">Entities</span>
@@ -197,6 +204,30 @@
               >
                 <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
                 <span jhiTranslate="global.menu.entities.questionType">Question Type</span>
+              </a>
+            </li>
+            <li>
+              <a
+                class="dropdown-item"
+                routerLink="text-comment"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                (click)="collapseNavbar()"
+              >
+                <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
+                <span jhiTranslate="global.menu.entities.textComment">Text Comment</span>
+              </a>
+            </li>
+            <li>
+              <a
+                class="dropdown-item"
+                routerLink="graded-comment"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                (click)="collapseNavbar()"
+              >
+                <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
+                <span jhiTranslate="global.menu.entities.gradedComment">Graded Comment</span>
               </a>
             </li>
             <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->

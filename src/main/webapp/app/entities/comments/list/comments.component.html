@@ -33,6 +33,9 @@
       <thead>
         <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="loadPage()">
           <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
+          <th scope="col" jhiSortBy="zonegeneratedid">
+            <span jhiTranslate="gradeScopeIsticApp.comments.zonegeneratedid">Zonegeneratedid</span> <fa-icon icon="sort"></fa-icon>
+          </th>
           <th scope="col" jhiSortBy="jsonData">
             <span jhiTranslate="gradeScopeIsticApp.comments.jsonData">Json Data</span> <fa-icon icon="sort"></fa-icon>
           </th>
@@ -47,6 +50,7 @@
           <td>
             <a [routerLink]="['/comments', comments.id, 'view']">{{ comments.id }}</a>
           </td>
+          <td>{{ comments.zonegeneratedid }}</td>
           <td>{{ comments.jsonData }}</td>
           <td>
             <div *ngIf="comments.studentResponseId">

@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
+import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { IQuestion, Question } from '../question.model';
 
 import { QuestionService } from './question.service';
@@ -23,6 +24,8 @@ describe('Question Service', () => {
       id: 0,
       numero: 0,
       point: 0,
+      step: 0,
+      gradeType: GradeType.DIRECT,
     };
   });
 
@@ -60,6 +63,8 @@ describe('Question Service', () => {
           id: 1,
           numero: 1,
           point: 1,
+          step: 1,
+          gradeType: 'BBBBBB',
         },
         elemDefault
       );
@@ -77,6 +82,7 @@ describe('Question Service', () => {
       const patchObject = Object.assign(
         {
           numero: 1,
+          step: 1,
         },
         new Question()
       );
@@ -98,6 +104,8 @@ describe('Question Service', () => {
           id: 1,
           numero: 1,
           point: 1,
+          step: 1,
+          gradeType: 'BBBBBB',
         },
         elemDefault
       );
@@ -149,7 +157,7 @@ describe('Question Service', () => {
       });
 
       it('should add only unique Question to an array', () => {
-        const questionArray: IQuestion[] = [{ id: 123 }, { id: 456 }, { id: 94731 }];
+        const questionArray: IQuestion[] = [{ id: 123 }, { id: 456 }, { id: 25605 }];
         const questionCollection: IQuestion[] = [{ id: 123 }];
         expectedResult = service.addQuestionToCollectionIfMissing(questionCollection, ...questionArray);
         expect(expectedResult).toHaveLength(3);

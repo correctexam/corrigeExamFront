@@ -20,7 +20,11 @@
       "id": "ID",
       "numero": "Numero",
       "point": "Point",
+      "step": "Step",
+      "gradeType": "Grade Type",
       "zone": "Zone",
+      "textcomments": "Textcomments",
+      "gradedcomments": "Gradedcomments",
       "type": "Type",
       "exam": "Exam"
     }

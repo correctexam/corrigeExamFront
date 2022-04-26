@@ -14,6 +14,20 @@
         </div>
 
         <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.comments.zonegeneratedid" for="field_zonegeneratedid"
+            >Zonegeneratedid</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            name="zonegeneratedid"
+            id="field_zonegeneratedid"
+            data-cy="zonegeneratedid"
+            formControlName="zonegeneratedid"
+          />
+        </div>
+
+        <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.comments.jsonData" for="field_jsonData">Json Data</label>
           <input type="text" class="form-control" name="jsonData" id="field_jsonData" data-cy="jsonData" formControlName="jsonData" />
         </div>
@@ -24,8 +38,10 @@
           >
           <select class="form-control" id="field_studentResponse" name="studentResponse" formControlName="studentResponseId">
             <option [ngValue]="null"></option>
-            <option [ngValue]="studentResponseOption.id" *ngFor="let studentResponseOption of studentresponses; trackBy: trackById">{{ studentResponseOption.id }}</option>
-        </select>
+            <option [ngValue]="studentResponseOption.id" *ngFor="let studentResponseOption of studentresponses; trackBy: trackById">
+              {{ studentResponseOption.id }}
+            </option>
+          </select>
         </div>
       </div>
 

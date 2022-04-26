@@ -21,6 +21,7 @@ describe('Comments Service', () => {
 
     elemDefault = {
       id: 0,
+      zonegeneratedid: 'AAAAAAA',
       jsonData: 'AAAAAAA',
     };
   });

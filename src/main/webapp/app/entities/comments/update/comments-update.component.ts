@@ -21,6 +21,7 @@ export class CommentsUpdateComponent implements OnInit {
 
   editForm = this.fb.group({
     id: [],
+    zonegeneratedid: [],
     jsonData: [],
     studentResponseId: [],
   });

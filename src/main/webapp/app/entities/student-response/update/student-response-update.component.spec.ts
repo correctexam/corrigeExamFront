@@ -12,6 +12,10 @@ import { IQuestion } from 'app/entities/question/question.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
 import { IExamSheet } from 'app/entities/exam-sheet/exam-sheet.model';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
+import { ITextComment } from 'app/entities/text-comment/text-comment.model';
+import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
+import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
+import { GradedCommentService } from 'app/entities/graded-comment/service/graded-comment.service';
 
 import { StudentResponseUpdateComponent } from './student-response-update.component';
 
@@ -22,6 +26,8 @@ describe('StudentResponse Management Update Component', () => {
   let studentResponseService: StudentResponseService;
   let questionService: QuestionService;
   let examSheetService: ExamSheetService;
+  let textCommentService: TextCommentService;
+  let gradedCommentService: GradedCommentService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -45,6 +51,8 @@ describe('StudentResponse Management Update Component', () => {
     studentResponseService = TestBed.inject(StudentResponseService);
     questionService = TestBed.inject(QuestionService);
     examSheetService = TestBed.inject(ExamSheetService);
+    textCommentService = TestBed.inject(TextCommentService);
+    gradedCommentService = TestBed.inject(GradedCommentService);
 
     comp = fixture.componentInstance;
   });

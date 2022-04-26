@@ -22,6 +22,14 @@
         <dd>
           <span>{{ question.point }}</span>
         </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.question.step">Step</span></dt>
+        <dd>
+          <span>{{ question.step }}</span>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.question.gradeType">Grade Type</span></dt>
+        <dd>
+          <span jhiTranslate="{{ 'gradeScopeIsticApp.GradeType.' + question.gradeType }}">{{ question.gradeType }}</span>
+        </dd>
         <dt><span jhiTranslate="gradeScopeIsticApp.question.zone">Zone</span></dt>
         <dd>
           <div *ngIf="question.zoneId">

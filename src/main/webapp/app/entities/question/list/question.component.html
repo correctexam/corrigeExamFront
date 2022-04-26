@@ -39,6 +39,12 @@
           <th scope="col" jhiSortBy="point">
             <span jhiTranslate="gradeScopeIsticApp.question.point">Point</span> <fa-icon icon="sort"></fa-icon>
           </th>
+          <th scope="col" jhiSortBy="step">
+            <span jhiTranslate="gradeScopeIsticApp.question.step">Step</span> <fa-icon icon="sort"></fa-icon>
+          </th>
+          <th scope="col" jhiSortBy="gradeType">
+            <span jhiTranslate="gradeScopeIsticApp.question.gradeType">Grade Type</span> <fa-icon icon="sort"></fa-icon>
+          </th>
           <th scope="col" jhiSortBy="zone.id">
             <span jhiTranslate="gradeScopeIsticApp.question.zone">Zone</span> <fa-icon icon="sort"></fa-icon>
           </th>
@@ -52,12 +58,14 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let question of questions; trackBy: trackId" data-cy="entityTable">
+        <tr *ngFor="let question of questions; trackBy: trackId">
           <td>
             <a [routerLink]="['/question', question.id, 'view']">{{ question.id }}</a>
           </td>
           <td>{{ question.numero }}</td>
           <td>{{ question.point }}</td>
+          <td>{{ question.step }}</td>
+          <td jhiTranslate="{{ 'gradeScopeIsticApp.GradeType.' + question.gradeType }}">{{ question.gradeType }}</td>
           <td>
             <div *ngIf="question.zoneId">
               <a [routerLink]="['/zone', question.zoneId, 'view']">{{ question.zoneId }}</a>
@@ -73,29 +81,19 @@
               <a [routerLink]="['/exam', question.examId, 'view']">{{ question.examName }}</a>
             </div>
           </td>
-          <td class="text-end">
+          <td class="text-right">
             <div class="btn-group">
-              <button
-                type="submit"
-                [routerLink]="['/question', question.id, 'view']"
-                class="btn btn-info btn-sm"
-                data-cy="entityDetailsButton"
-              >
+              <button type="submit" [routerLink]="['/question', question.id, 'view']" class="btn btn-info btn-sm">
                 <fa-icon icon="eye"></fa-icon>
                 <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
               </button>
 
-              <button
-                type="submit"
-                [routerLink]="['/question', question.id, 'edit']"
-                class="btn btn-primary btn-sm"
-                data-cy="entityEditButton"
-              >
+              <button type="submit" [routerLink]="['/question', question.id, 'edit']" class="btn btn-primary btn-sm">
                 <fa-icon icon="pencil-alt"></fa-icon>
                 <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
               </button>
 
-              <button type="submit" (click)="delete(question)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+              <button type="submit" (click)="delete(question)" class="btn btn-danger btn-sm">
                 <fa-icon icon="times"></fa-icon>
                 <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
               </button>
