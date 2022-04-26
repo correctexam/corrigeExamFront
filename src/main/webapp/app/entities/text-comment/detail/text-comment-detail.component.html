@@ -1,0 +1,42 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <div *ngIf="textComment">
+      <h2 data-cy="textCommentDetailsHeading"><span jhiTranslate="gradeScopeIsticApp.textComment.detail.title">Text Comment</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dd>
+          <span>{{ textComment.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.textComment.text">Text</span></dt>
+        <dd>
+          <span>{{ textComment.text }}</span>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.textComment.zonegeneratedid">Zonegeneratedid</span></dt>
+        <dd>
+          <span>{{ textComment.zonegeneratedid }}</span>
+        </dd>
+        <dt><span jhiTranslate="gradeScopeIsticApp.textComment.question">Question</span></dt>
+        <dd>
+          <div *ngIf="textComment.questionId">
+            <a [routerLink]="['/question', textComment.questionId, 'view']">{{ textComment.questionId }}</a>
+          </div>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/text-comment', textComment.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+      </button>
+    </div>
+  </div>
+</div>

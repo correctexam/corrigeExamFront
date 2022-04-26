@@ -1,0 +1,28 @@
+{
+  "gradeScopeIsticApp": {
+    "gradedComment": {
+      "home": {
+        "title": "GradedComments",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Graded Comment",
+        "createOrEditLabel": "Créer ou éditer un Graded Comment",
+        "notFound": "Aucun Graded Comment trouvé"
+      },
+      "created": "Un nouveau Graded Comment a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Graded Comment avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Graded Comment avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Etes-vous certain de vouloir supprimer le Graded Comment {{ id }} ?"
+      },
+      "detail": {
+        "title": "Graded Comment"
+      },
+      "id": "ID",
+      "zonegeneratedid": "Zonegeneratedid",
+      "text": "Text",
+      "grade": "Grade",
+      "question": "Question",
+      "studentResponse": "Student Response"
+    }
+  }
+}

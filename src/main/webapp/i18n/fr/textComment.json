@@ -1,0 +1,27 @@
+{
+  "gradeScopeIsticApp": {
+    "textComment": {
+      "home": {
+        "title": "TextComments",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Text Comment",
+        "createOrEditLabel": "Créer ou éditer un Text Comment",
+        "notFound": "Aucun Text Comment trouvé"
+      },
+      "created": "Un nouveau Text Comment a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Text Comment avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Text Comment avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Etes-vous certain de vouloir supprimer le Text Comment {{ id }} ?"
+      },
+      "detail": {
+        "title": "Text Comment"
+      },
+      "id": "ID",
+      "text": "Text",
+      "zonegeneratedid": "Zonegeneratedid",
+      "question": "Question",
+      "studentResponse": "Student Response"
+    }
+  }
+}

@@ -1,0 +1,72 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-graded-comment-heading"
+        data-cy="GradedCommentCreateUpdateHeading"
+        jhiTranslate="gradeScopeIsticApp.gradedComment.home.createOrEditLabel"
+      >
+        Create or edit a Graded Comment
+      </h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        <div class="row mb-3" [hidden]="editForm.get('id')!.value == null">
+          <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.gradedComment.zonegeneratedid" for="field_zonegeneratedid"
+            >Zonegeneratedid</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            name="zonegeneratedid"
+            id="field_zonegeneratedid"
+            data-cy="zonegeneratedid"
+            formControlName="zonegeneratedid"
+          />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.gradedComment.text" for="field_text">Text</label>
+          <input type="text" class="form-control" name="text" id="field_text" data-cy="text" formControlName="text" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.gradedComment.grade" for="field_grade">Grade</label>
+          <input type="number" class="form-control" name="grade" id="field_grade" data-cy="grade" formControlName="grade" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.textComment.question" for="field_question">Question</label>
+          <select class="form-control" id="field_question" name="question" formControlName="questionId">
+            <option [ngValue]="null"></option>
+            <option [ngValue]="questionOption.id" *ngFor="let questionOption of questions; trackBy: trackById">
+              {{ questionOption.id }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
