@@ -400,6 +400,7 @@ export class EventHandlerService {
         q.typeId = 2;
         q.numero = numero;
         q.point = 2;
+        q.step = 4;
         q.gradeType = GradeType.DIRECT;
         this.questionService.create(q).subscribe(e => {
           this.selectedTool = DrawingTools.SELECT;

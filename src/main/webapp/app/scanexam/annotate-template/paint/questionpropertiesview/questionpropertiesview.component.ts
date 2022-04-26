@@ -31,9 +31,9 @@ export class QuestionpropertiesviewComponent implements OnInit {
   editForm = this.fb.group({
     id: [],
     numero: [null, [Validators.required]],
-    point: [],
-    step: [],
-    gradeType: [],
+    point: [2],
+    step: [4],
+    gradeType: [GradeType.DIRECT],
     zoneId: [],
     typeId: [],
     examId: [],
