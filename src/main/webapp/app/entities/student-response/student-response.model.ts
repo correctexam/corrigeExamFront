@@ -5,6 +5,7 @@ import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model
 export interface IStudentResponse {
   id?: number;
   note?: number;
+  star?: boolean;
   comments?: IComments[];
   questionNumero?: string;
   questionId?: number;
@@ -18,6 +19,7 @@ export class StudentResponse implements IStudentResponse {
   constructor(
     public id?: number,
     public note?: number,
+    public star?: boolean,
     public comments?: IComments[],
     public questionNumero?: string,
     public questionId?: number,
@@ -25,7 +27,9 @@ export class StudentResponse implements IStudentResponse {
     public sheetId?: number,
     public textcomments?: ITextComment[] | null,
     public gradedcomments?: IGradedComment[] | null
-  ) {}
+  ) {
+    this.star = this.star ?? false;
+  }
 }
 
 export function getStudentResponseIdentifier(studentResponse: IStudentResponse): number | undefined {

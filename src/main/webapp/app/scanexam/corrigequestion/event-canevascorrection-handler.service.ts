@@ -28,10 +28,9 @@ import {
 } from '../annotate-template/paint/models';
 import { Injectable } from '@angular/core';
 import { CustomFabricGroup } from '../annotate-template/paint/models';
-import { ZoneService } from '../../entities/zone/service/zone.service';
-import { IExam } from '../../entities/exam/exam.model';
 import { ZoneCorrectionHandler } from './ZoneCorrectionHandler';
-import { Comments } from '../../entities/comments/comments.model';
+import { IComments } from '../../entities/comments/comments.model';
+import { CommentsService } from '../../entities/comments/service/comments.service';
 
 const RANGE_AROUND_CENTER = 20;
 
@@ -40,7 +39,30 @@ const RANGE_AROUND_CENTER = 20;
 })
 export class EventCanevascorrectionHandlerService {
   public imageDataUrl!: string;
-  public canvas!: fabric.Canvas;
+  public _canvas!: fabric.Canvas;
+  get canvas(): fabric.Canvas {
+    return this._canvas;
+  }
+  set canvas(c: fabric.Canvas) {
+    const prev = this._canvas;
+    this._canvas = c;
+
+    if (c !== prev) {
+      this.currentComment = null;
+      this.commentsService.query({ zonegeneratedid: (c as any).zoneid }).subscribe(e1 => {
+        if (!(e1!.body === undefined || e1!.body?.length === 0)) {
+          fabric.loadSVGFromString(e1!.body![0].jsonData!, (objects, options) => {
+            // const obj = fabric.util.groupSVGElements(objects, options);
+            if (objects.length > 0) {
+              objects.forEach(obj => c.add(obj));
+              c.renderAll();
+            }
+          });
+        }
+      });
+    }
+  }
+  currentComment: IComments | null = null;
   public allcanvas: fabric.Canvas[] = [];
   private _selectedTool: DrawingTools = DrawingTools.SELECT;
   private previousTop!: number;
@@ -101,14 +123,9 @@ export class EventCanevascorrectionHandlerService {
     | undefined;
   private _initPositionOfElement!: Pointer;
 
-  private _exam!: IExam;
-  set exam(c: IExam) {
-    this._exam = c;
-  }
-
   drawingToolObserver!: (d: DrawingTools) => void;
 
-  constructor(private fabricShapeService: FabricShapeService, private zoneService: ZoneService) {}
+  constructor(private fabricShapeService: FabricShapeService, public commentsService: CommentsService) {}
 
   registerSelectedToolObserver(f: (d: DrawingTools) => void): any {
     this.drawingToolObserver = f;
@@ -210,13 +227,28 @@ export class EventCanevascorrectionHandlerService {
         });
         break;
     }
-
-    const c = new Comments(undefined, this.canvas.toJSON(), (this.canvas as any).respid);
-
-    console.log(this.canvas.toJSON());
   }
 
-  mouseMove(e: Event) {
+  async updateComments() {
+    if (this.currentComment === null) {
+      const e1 = await this.commentsService
+        .query({ zonegeneratedid: (this.canvas as any).zoneid })
+        .pipe()
+        .toPromise();
+      if (e1!.body === undefined || e1!.body?.length === 0) {
+        const c = { jsonData: this.canvas.toSVG(), zonegeneratedid: (this.canvas as any).zoneid };
+        return this.commentsService.create(c);
+      } else {
+        e1!.body![0].jsonData = this.canvas.toSVG();
+        return this.commentsService.update(e1!.body![0]);
+      }
+    } else {
+      this.currentComment.jsonData = this.canvas.toSVG();
+      return this.commentsService.update(this.currentComment);
+    }
+  }
+
+  async mouseMove(e: Event) {
     if (!this._isMouseDown) {
       return;
     }
@@ -251,12 +283,18 @@ export class EventCanevascorrectionHandlerService {
     if (this._selectedTool === DrawingTools.PENCIL) {
       this._elementUnderDrawing = this.fabricShapeService.finishPath(this.canvas, this._elementUnderDrawing as CustomFabricPath);
     }
+
     if (this._selectedTool !== DrawingTools.POLYGON) {
       this._elementUnderDrawing = undefined;
     }
     if (this._selectedTool !== DrawingTools.SELECT) {
       this.canvas.renderAll();
     }
+    this.updateComments().then(e2 =>
+      e2.subscribe(e1 => {
+        this.currentComment = e1.body;
+      })
+    );
   }
 
   extendToObjectWithId(): void {
@@ -270,8 +308,6 @@ export class EventCanevascorrectionHandlerService {
   }
 
   objectSelected(object: CustomFabricObject): void {
-    console.log(this.canvas.toJSON());
-
     this.previousLeft = object.left!;
     this.previousTop = object.top!;
     this.previousScaleX = object.scaleX!;
@@ -290,10 +326,22 @@ export class EventCanevascorrectionHandlerService {
         console.log(object.id);
         this.canvas.remove(object);
         this.canvas.renderAll();
+        this.updateComments().then(e2 =>
+          e2.subscribe(e1 => {
+            this.currentComment = e1.body!;
+          })
+        );
 
         break;
       case DrawingTools.FILL:
         this.fabricShapeService.fillShape(object, this._selectedColour);
+        this.canvas.renderAll();
+        this.updateComments().then(e2 =>
+          e2.subscribe(e1 => {
+            this.currentComment = e1.body!;
+          })
+        );
+
         break;
     }
   }
@@ -302,6 +350,11 @@ export class EventCanevascorrectionHandlerService {
     const l = newLeft;
     const t = newTop;
     const nid = id;
+    this.updateComments().then(e2 =>
+      e2.subscribe(e1 => {
+        this.currentComment = e1.body!;
+      })
+    );
 
     if (type !== FabricObjectType.ELLIPSE) {
       return;
@@ -324,6 +377,11 @@ export class EventCanevascorrectionHandlerService {
     const t = o1.aCoords?.tl.y;
     const w = o1.aCoords?.br.x! - o1.aCoords?.tl.x!;
     const h = o1.aCoords?.br.y! - o1.aCoords?.tl.y!;
+    this.updateComments().then(e2 =>
+      e2.subscribe(e1 => {
+        this.currentComment = e1.body!;
+      })
+    );
 
     if (type !== FabricObjectType.ELLIPSE) {
       return;

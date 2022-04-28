@@ -36,6 +36,9 @@
           <th scope="col" jhiSortBy="note">
             <span jhiTranslate="gradeScopeIsticApp.studentResponse.note">Note</span> <fa-icon icon="sort"></fa-icon>
           </th>
+          <th scope="col" jhiSortBy="star">
+            <span jhiTranslate="gradeScopeIsticApp.studentResponse.star">Star</span> <fa-icon icon="sort"></fa-icon>
+          </th>
           <th scope="col" jhiSortBy="question.numero">
             <span jhiTranslate="gradeScopeIsticApp.studentResponse.question">Question</span> <fa-icon icon="sort"></fa-icon>
           </th>
@@ -51,6 +54,7 @@
             <a [routerLink]="['/student-response', studentResponse.id, 'view']">{{ studentResponse.id }}</a>
           </td>
           <td>{{ studentResponse.note }}</td>
+          <td>{{ studentResponse.star }}</td>
           <td>
             <div *ngIf="studentResponse.questionId">
               <a [routerLink]="['/question', studentResponse.questionId, 'view']">{{ studentResponse.questionNumero }}</a>

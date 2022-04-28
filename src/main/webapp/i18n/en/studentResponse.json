@@ -19,6 +19,7 @@
       },
       "id": "ID",
       "note": "Note",
+      "star": "Star",
       "comments": "Comments",
       "question": "Question",
       "sheet": "Sheet",

@@ -34,6 +34,7 @@ export class StudentResponseUpdateComponent implements OnInit {
   editForm = this.fb.group({
     id: [],
     note: [],
+    star: [],
     questionId: [],
     sheetId: [],
     textcomments: [],
@@ -64,6 +65,7 @@ export class StudentResponseUpdateComponent implements OnInit {
     this.editForm.patchValue({
       id: studentResponse.id,
       note: studentResponse.note,
+      star: studentResponse.star,
       questionId: studentResponse.questionId,
       sheetId: studentResponse.sheetId,
       textcomments: studentResponse.textcomments,
@@ -90,6 +92,7 @@ export class StudentResponseUpdateComponent implements OnInit {
       ...new StudentResponse(),
       id: this.editForm.get(['id'])!.value,
       note: this.editForm.get(['note'])!.value,
+      star: this.editForm.get(['star'])!.value,
       questionId: this.editForm.get(['questionId'])!.value,
       sheetId: this.editForm.get(['sheetId'])!.value,
       textcomments: this.editForm.get(['textcomments'])!.value,
