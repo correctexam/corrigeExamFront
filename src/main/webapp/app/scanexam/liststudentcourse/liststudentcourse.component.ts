@@ -58,7 +58,7 @@ export class ListstudentcourseComponent implements OnInit {
     this.router.navigateByUrl('/course/' + this.courseid);
   }
   loadEtudiants(): void {
-    this.http.get('/api/getstudentcours/' + this.courseid).subscribe(s => {
+    this.http.get('api/getstudentcours/' + this.courseid).subscribe(s => {
       // eslint-disable-next-line no-console
       this.students = s as any;
     });
