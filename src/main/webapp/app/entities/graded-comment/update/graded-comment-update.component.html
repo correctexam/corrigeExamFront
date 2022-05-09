@@ -37,6 +37,17 @@
         </div>
 
         <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.gradedComment.description" for="field_description">Description</label>
+          <textarea
+            class="form-control"
+            name="description"
+            id="field_description"
+            data-cy="description"
+            formControlName="description"
+          ></textarea>
+        </div>
+
+        <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.gradedComment.grade" for="field_grade">Grade</label>
           <input type="number" class="form-control" name="grade" id="field_grade" data-cy="grade" formControlName="grade" />
         </div>

@@ -23,6 +23,7 @@ describe('GradedComment Service', () => {
       id: 0,
       zonegeneratedid: 'AAAAAAA',
       text: 'AAAAAAA',
+      description: 'AAAAAAA',
       grade: 0,
     };
   });
@@ -61,6 +62,7 @@ describe('GradedComment Service', () => {
           id: 1,
           zonegeneratedid: 'BBBBBB',
           text: 'BBBBBB',
+          description: 'BBBBBB',
           grade: 1,
         },
         elemDefault
@@ -79,6 +81,7 @@ describe('GradedComment Service', () => {
       const patchObject = Object.assign(
         {
           zonegeneratedid: 'BBBBBB',
+          grade: 1,
         },
         new GradedComment()
       );
@@ -100,6 +103,7 @@ describe('GradedComment Service', () => {
           id: 1,
           zonegeneratedid: 'BBBBBB',
           text: 'BBBBBB',
+          description: 'BBBBBB',
           grade: 1,
         },
         elemDefault

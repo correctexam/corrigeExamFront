@@ -22,6 +22,7 @@ describe('TextComment Service', () => {
     elemDefault = {
       id: 0,
       text: 'AAAAAAA',
+      description: 'AAAAAAA',
       zonegeneratedid: 'AAAAAAA',
     };
   });
@@ -98,6 +99,7 @@ describe('TextComment Service', () => {
         {
           id: 1,
           text: 'BBBBBB',
+          description: 'BBBBBB',
           zonegeneratedid: 'BBBBBB',
         },
         elemDefault

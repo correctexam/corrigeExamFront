@@ -19,6 +19,7 @@
       },
       "id": "ID",
       "text": "Text",
+      "description": "Description",
       "zonegeneratedid": "Zonegeneratedid",
       "question": "Question",
       "studentResponse": "Student Response"

@@ -36,6 +36,9 @@
           <th scope="col" jhiSortBy="text">
             <span jhiTranslate="gradeScopeIsticApp.textComment.text">Text</span> <fa-icon icon="sort"></fa-icon>
           </th>
+          <th scope="col" jhiSortBy="description">
+            <span jhiTranslate="gradeScopeIsticApp.textComment.description">Description</span> <fa-icon icon="sort"></fa-icon>
+          </th>
           <th scope="col" jhiSortBy="zonegeneratedid">
             <span jhiTranslate="gradeScopeIsticApp.textComment.zonegeneratedid">Zonegeneratedid</span> <fa-icon icon="sort"></fa-icon>
           </th>
@@ -51,6 +54,7 @@
             <a [routerLink]="['/text-comment', textComment.id, 'view']">{{ textComment.id }}</a>
           </td>
           <td>{{ textComment.text }}</td>
+          <td>{{ textComment.description }}</td>
           <td>{{ textComment.zonegeneratedid }}</td>
           <td>
             <div *ngIf="textComment.questionId">

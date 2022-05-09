@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, AfterViewInit, NgZone } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CourseService } from 'app/entities/course/service/course.service';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
@@ -26,6 +26,11 @@ import { IStudentResponse, StudentResponse } from '../../entities/student-respon
 import { StudentResponseService } from 'app/entities/student-response/service/student-response.service';
 import { EventCanevascorrectionHandlerService } from './event-canevascorrection-handler.service';
 import { ZoneCorrectionHandler } from './ZoneCorrectionHandler';
+import { GradeType } from '../../entities/enumerations/grade-type.model';
+import { ITextComment } from '../../entities/text-comment/text-comment.model';
+import { IGradedComment } from '../../entities/graded-comment/graded-comment.model';
+import { GradedCommentService } from '../../entities/graded-comment/service/graded-comment.service';
+import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
 
 @Component({
   selector: 'jhi-corrigequestion',
@@ -56,6 +61,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   questionStep = 0;
   questionno = 0;
   resp: IStudentResponse | undefined;
+  titreCommentaire = '';
+  descCommentaire = '';
+  noteCommentaire = 0;
+  currentQuestion: IQuestion | undefined;
+
+  currentTextComment4Question: ITextComment[] | undefined;
+  currentGradedComment4Question: IGradedComment[] | undefined;
 
   constructor(
     public examService: ExamService,
@@ -69,10 +81,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     public messageService: MessageService,
     public sheetService: ExamSheetService,
     public questionService: QuestionService,
+    public gradedCommentService: GradedCommentService,
+    public textCommentService: TextCommentService,
     public studentResponseService: StudentResponseService,
     private changeDetector: ChangeDetectorRef,
-    private eventHandler: EventCanevascorrectionHandlerService,
-    private ngZone: NgZone
+    private eventHandler: EventCanevascorrectionHandlerService
   ) {}
 
   ngOnInit(): void {
@@ -122,10 +135,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                       );
                       this.questionService.query({ examId: this.exam?.id, numero: this.questionno + 1 }).subscribe(q1 => {
                         this.questions = q1.body!;
+
                         if (this.questions.length > 0) {
                           this.noteSteps = this.questions[0].point! * this.questions[0].step!;
                           this.questionStep = this.questions[0].step!;
                           this.maxNote = this.questions[0].point!;
+                          this.currentQuestion = this.questions[0];
 
                           if (this.resp === undefined) {
                             this.resp = new StudentResponse(undefined, this.currentNote);
@@ -149,8 +164,40 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                                 if (sr.body !== null && sr.body.length > 0) {
                                   this.resp = sr.body![0];
                                   this.currentNote = this.resp.note!;
+                                  if (this.questions![0].gradeType === GradeType.DIRECT) {
+                                    this.textCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
+                                      this.resp?.textcomments!.forEach(com1 => {
+                                        const elt = com.body!.find(com2 => com2.id === com1.id);
+                                        if (elt !== undefined) {
+                                          (elt as any).checked = true;
+                                        }
+                                      });
+                                      this.currentTextComment4Question = com.body!;
+                                    });
+                                  } else {
+                                    this.gradedCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
+                                      this.resp?.gradedcomments!.forEach(com1 => {
+                                        const elt = com.body!.find(com2 => com2.id === com1.id);
+                                        if (elt !== undefined) {
+                                          (elt as any).checked = true;
+                                        }
+                                      });
+                                      this.currentGradedComment4Question = com.body!;
+                                    });
+                                  }
                                 } else {
-                                  this.studentResponseService.create(this.resp!).subscribe(sr1 => (this.resp = sr1.body!));
+                                  this.studentResponseService.create(this.resp!).subscribe(sr1 => {
+                                    this.resp = sr1.body!;
+                                    if (this.questions![0].gradeType === GradeType.DIRECT) {
+                                      this.textCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
+                                        this.currentTextComment4Question = com.body!;
+                                      });
+                                    } else {
+                                      this.gradedCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
+                                        this.currentGradedComment4Question = com.body!;
+                                      });
+                                    }
+                                  });
                                 }
                               });
                           }
@@ -191,6 +238,68 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     if (this.resp !== undefined) {
       this.resp!.note = this.currentNote;
       this.studentResponseService.update(this.resp!).subscribe(sr1 => (this.resp = sr1.body!));
+    }
+  }
+
+  checked(comment: ITextComment | IGradedComment): boolean {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return (comment as any).checked;
+  }
+
+  ajouterTComment(comment: ITextComment): void {
+    this.resp?.textcomments?.push(comment);
+    this.studentResponseService.update(this.resp!).subscribe(() => {
+      (comment as any).checked = true;
+    });
+  }
+  ajouterGComment(comment: IGradedComment): void {
+    console.log(comment);
+    this.resp?.gradedcomments?.push(comment);
+    this.studentResponseService.update(this.resp!).subscribe(() => {
+      (comment as any).checked = true;
+    });
+  }
+  retirerTComment(comment: ITextComment): void {
+    this.resp!.textcomments = this.resp?.textcomments!.filter(e => e.id !== comment.id);
+    this.studentResponseService.update(this.resp!).subscribe(e1 => {
+      (comment as any).checked = false;
+    });
+  }
+  retirerGComment(comment: IGradedComment): void {
+    console.log(comment);
+    this.resp!.gradedcomments = this.resp?.gradedcomments!.filter(e => e.id !== comment.id);
+    this.studentResponseService.update(this.resp!).subscribe(() => {
+      (comment as any).checked = false;
+    });
+  }
+
+  addComment() {
+    if (this.currentQuestion !== undefined && this.currentQuestion.gradeType === GradeType.DIRECT) {
+      const t: ITextComment = {
+        questionId: this.currentQuestion.id,
+        text: this.titreCommentaire,
+        description: this.descCommentaire,
+        // studentResponses : [{id: this.resp?.id}]
+      };
+      this.textCommentService.create(t).subscribe(e => {
+        this.resp?.textcomments?.push(e.body!);
+        const currentComment = e.body!;
+        this.studentResponseService.update(this.resp!).subscribe(() => {
+          (currentComment as any).checked = true;
+          this.currentTextComment4Question?.push(currentComment);
+        });
+      });
+    } else if (this.currentQuestion !== undefined && this.currentQuestion.gradeType !== GradeType.DIRECT) {
+      const t: IGradedComment = {
+        questionId: this.currentQuestion.id,
+        text: this.titreCommentaire,
+        description: this.descCommentaire,
+        grade: this.noteCommentaire,
+        studentResponses: [{ id: this.resp?.id }],
+      };
+      this.gradedCommentService.create(t).subscribe(e => {
+        console.log(e);
+      });
     }
   }
 

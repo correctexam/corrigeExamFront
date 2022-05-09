@@ -55,19 +55,79 @@
           </div>
         </div>
         <div class="col-3">
-          <p-rating *ngIf="noteSteps > 0" [stars]="noteSteps" [(ngModel)]="currentNote" (onRate)="changeNote()"></p-rating>
-          <p-slider
-            *ngIf="noteSteps > 0"
-            [(ngModel)]="currentNote"
-            [min]="0"
-            [max]="maxNote * questionStep"
-            [step]="1"
-            (onChange)="changeNote()"
-          >
-          </p-slider>
-          Note attribuée: {{ currentNote / questionStep }}
-          <!--  <p-button icon="pi pi-refresh"></p-button>-->
-          <jhi-graphical-toolbarcorrection></jhi-graphical-toolbarcorrection>
+          <div>
+            <p-rating
+              [disabled]="currentQuestion !== undefined && currentQuestion?.gradeType !== 'DIRECT'"
+              *ngIf="noteSteps > 0"
+              [stars]="noteSteps"
+              [(ngModel)]="currentNote"
+              (onRate)="changeNote()"
+            ></p-rating>
+            <p-slider
+              [disabled]="currentQuestion !== undefined && currentQuestion?.gradeType !== 'DIRECT'"
+              *ngIf="noteSteps > 0"
+              [(ngModel)]="currentNote"
+              [min]="0"
+              [max]="maxNote * questionStep"
+              [step]="1"
+              (onChange)="changeNote()"
+            >
+            </p-slider>
+            Note attribuée: {{ currentNote / questionStep }}
+            <!--  <p-button icon="pi pi-refresh"></p-button>-->
+            <jhi-graphical-toolbarcorrection></jhi-graphical-toolbarcorrection>
+          </div>
+          <div>
+            <div *ngIf="currentQuestion && currentQuestion?.gradeType === 'DIRECT'">
+              <div *ngFor="let comment of currentTextComment4Question" class="card">
+                <div class="card-body">
+                  <h5 class="card-title">{{ comment.text }}</h5>
+                  <p class="card-text">{{ comment.description }}</p>
+                  <a *ngIf="!checked(comment)" class="btn btn-primary" (click)="ajouterTComment(comment)">Ajouter</a>
+                  <a *ngIf="checked(comment)" class="btn btn-primary" (click)="retirerTComment(comment)">Retirer</a>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
+              <div *ngFor="let comment of currentGradedComment4Question" class="card">
+                <div class="card-body">
+                  <h5 class="card-title">{{ comment.text }}</h5>
+                  <p class="card-text">{{ comment.description }}</p>
+                  <p class="card-text" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
+                    Note associée à ce commentaire : <span *ngIf="currentQuestion && currentQuestion?.gradeType === 'NEGATIVE'"> - </span
+                    >{{ comment.grade! / questionStep }}
+                  </p>
+
+                  <a *ngIf="!checked(comment)" class="btn btn-primary" (click)="ajouterGComment(comment)">Ajouter</a>
+                  <a *ngIf="checked(comment)" class="btn btn-primary" (click)="retirerGComment(comment)">Retirer</a>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Nouveau commentaire</h5>
+                <p class="card-text">
+                  <label>Titre :</label>
+                  <input type="text" pInputText [(ngModel)]="titreCommentaire" [style]="{ width: '100%' }" />
+                  <BR />
+                  <label>Description :</label>
+                  <textarea [style]="{ width: '100%' }" pInputTextarea autoResize="true" [(ngModel)]="descCommentaire"></textarea>
+                  <label *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'"> Note :</label>
+                  <p-rating
+                    *ngIf="noteSteps > 0 && currentQuestion && currentQuestion?.gradeType !== 'DIRECT'"
+                    [stars]="noteSteps"
+                    [(ngModel)]="noteCommentaire"
+                    [style]="{ width: '100%' }"
+                  ></p-rating>
+                  <span *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'"
+                    >Note associée à ce commentaire : <span *ngIf="currentQuestion && currentQuestion?.gradeType !== 'NEGATIVE'"> - </span
+                    >{{ noteCommentaire / questionStep }}</span
+                  >
+                </p>
+                <a class="btn btn-primary" (click)="addComment()">Ajouter et appliquer</a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="grid align-items-center">

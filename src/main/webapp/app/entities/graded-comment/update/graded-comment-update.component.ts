@@ -25,6 +25,7 @@ export class GradedCommentUpdateComponent implements OnInit {
     id: [],
     zonegeneratedid: [],
     text: [],
+    description: [],
     grade: [],
     questionId: [],
   });
@@ -85,6 +86,7 @@ export class GradedCommentUpdateComponent implements OnInit {
       id: gradedComment.id,
       zonegeneratedid: gradedComment.zonegeneratedid,
       text: gradedComment.text,
+      description: gradedComment.description,
       grade: gradedComment.grade,
       questionId: gradedComment.questionId,
     });
@@ -96,6 +98,7 @@ export class GradedCommentUpdateComponent implements OnInit {
       id: this.editForm.get(['id'])!.value,
       zonegeneratedid: this.editForm.get(['zonegeneratedid'])!.value,
       text: this.editForm.get(['text'])!.value,
+      description: this.editForm.get(['description'])!.value,
       grade: this.editForm.get(['grade'])!.value,
       questionId: this.editForm.get(['questionId'])!.value,
     };

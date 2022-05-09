@@ -23,6 +23,7 @@ export class TextCommentUpdateComponent implements OnInit {
   editForm = this.fb.group({
     id: [],
     text: [],
+    description: [],
     zonegeneratedid: [],
     questionId: [],
   });
@@ -82,6 +83,7 @@ export class TextCommentUpdateComponent implements OnInit {
     this.editForm.patchValue({
       id: textComment.id,
       text: textComment.text,
+      description: textComment.description,
       zonegeneratedid: textComment.zonegeneratedid,
       questionId: textComment.questionId,
     });
@@ -92,6 +94,7 @@ export class TextCommentUpdateComponent implements OnInit {
       ...new TextComment(),
       id: this.editForm.get(['id'])!.value,
       text: this.editForm.get(['text'])!.value,
+      description: this.editForm.get(['description'])!.value,
       zonegeneratedid: this.editForm.get(['zonegeneratedid'])!.value,
       questionId: this.editForm.get(['questionId'])!.value,
     };

@@ -39,6 +39,9 @@
           <th scope="col" jhiSortBy="text">
             <span jhiTranslate="gradeScopeIsticApp.gradedComment.text">Text</span> <fa-icon icon="sort"></fa-icon>
           </th>
+          <th scope="col" jhiSortBy="description">
+            <span jhiTranslate="gradeScopeIsticApp.gradedComment.description">Description</span> <fa-icon icon="sort"></fa-icon>
+          </th>
           <th scope="col" jhiSortBy="grade">
             <span jhiTranslate="gradeScopeIsticApp.gradedComment.grade">Grade</span> <fa-icon icon="sort"></fa-icon>
           </th>
@@ -55,6 +58,7 @@
           </td>
           <td>{{ gradedComment.zonegeneratedid }}</td>
           <td>{{ gradedComment.text }}</td>
+          <td>{{ gradedComment.description }}</td>
           <td>{{ gradedComment.grade }}</td>
           <td>
             <div *ngIf="gradedComment.questionId">

@@ -4,6 +4,7 @@ export interface IGradedComment {
   id?: number;
   zonegeneratedid?: string | null;
   text?: string | null;
+  description?: string | null;
   grade?: number | null;
   questionId?: number;
   studentResponses?: IStudentResponse[];
@@ -14,6 +15,7 @@ export class GradedComment implements IGradedComment {
     public id?: number,
     public zonegeneratedid?: string | null,
     public text?: string | null,
+    public description?: string | null,
     public grade?: number | null,
     public questionId?: number,
     public studentResponses?: IStudentResponse[]
