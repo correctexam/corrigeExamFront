@@ -253,7 +253,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
   ajouterGComment(comment: IGradedComment): void {
-    console.log(comment);
     this.resp?.gradedcomments?.push(comment);
     this.studentResponseService.update(this.resp!).subscribe(() => {
       (comment as any).checked = true;
@@ -266,7 +265,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
   retirerGComment(comment: IGradedComment): void {
-    console.log(comment);
     this.resp!.gradedcomments = this.resp?.gradedcomments!.filter(e => e.id !== comment.id);
     this.studentResponseService.update(this.resp!).subscribe(() => {
       (comment as any).checked = false;
