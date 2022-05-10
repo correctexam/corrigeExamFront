@@ -65,6 +65,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   descCommentaire = '';
   noteCommentaire = 0;
   currentQuestion: IQuestion | undefined;
+  noalign = false;
+  factor = 1;
 
   currentTextComment4Question: ITextComment[] | undefined;
   currentGradedComment4Question: IGradedComment[] | undefined;
@@ -164,6 +166,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                                 if (sr.body !== null && sr.body.length > 0) {
                                   this.resp = sr.body![0];
                                   this.currentNote = this.resp.note!;
+                                  this.computeNote(false);
                                   if (this.questions![0].gradeType === GradeType.DIRECT) {
                                     this.textCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
                                       this.resp?.textcomments!.forEach(com1 => {
@@ -218,19 +221,23 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.canvass.changes.subscribe(() => {
-      this.questions!.forEach((q, i) => {
-        this.showImage[i] = false;
-        this.loadZone(
-          q.zoneId,
-          b => {
-            this.showImage[i] = b;
-          },
-          this.canvass.get(i),
-          this.currentStudent,
-          i
-        );
-      });
+      this.reloadImage();
       this.changeDetector.detectChanges();
+    });
+  }
+
+  reloadImage() {
+    this.questions!.forEach((q, i) => {
+      this.showImage[i] = false;
+      this.loadZone(
+        q.zoneId,
+        b => {
+          this.showImage[i] = b;
+        },
+        this.canvass.get(i),
+        this.currentStudent,
+        i
+      );
     });
   }
 
@@ -241,9 +248,24 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
+  updateResponse(): void {
+    if (this.resp !== undefined) {
+      this.studentResponseService.update(this.resp!).subscribe(sr1 => (this.resp = sr1.body!));
+    }
+  }
+
   checked(comment: ITextComment | IGradedComment): boolean {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return (comment as any).checked;
+  }
+
+  getStyle(comment: ITextComment | IGradedComment): any {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    if ((comment as any).checked) {
+      return { 'background-color': '#DCDCDC' };
+    } else {
+      return {};
+    }
   }
 
   ajouterTComment(comment: ITextComment): void {
@@ -257,6 +279,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.studentResponseService.update(this.resp!).subscribe(() => {
       (comment as any).checked = true;
     });
+    this.computeNote(true);
   }
   retirerTComment(comment: ITextComment): void {
     this.resp!.textcomments = this.resp?.textcomments!.filter(e => e.id !== comment.id);
@@ -269,6 +292,37 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.studentResponseService.update(this.resp!).subscribe(() => {
       (comment as any).checked = false;
     });
+    this.computeNote(true);
+  }
+
+  computeNote(update: boolean): any {
+    if (this.currentQuestion?.gradeType === GradeType.POSITIVE) {
+      let currentNote = 0;
+      this.resp!.gradedcomments?.forEach(g => {
+        if (g.grade !== undefined && g.grade !== null) {
+          currentNote = currentNote + g.grade;
+        }
+      });
+      if (currentNote > this.noteSteps) {
+        currentNote = this.noteSteps;
+      }
+      this.currentNote = currentNote;
+    } else if (this.currentQuestion?.gradeType === GradeType.NEGATIVE) {
+      let currentNote = this.noteSteps;
+      this.resp!.gradedcomments?.forEach(g => {
+        if (g.grade !== undefined && g.grade !== null) {
+          currentNote = currentNote - g.grade;
+        }
+      });
+      if (currentNote < 0) {
+        currentNote = 0;
+      }
+      this.currentNote = currentNote;
+      this.resp!.note = currentNote;
+      if (update) {
+        this.studentResponseService.partialUpdate(this.resp!).subscribe(() => {});
+      }
+    }
   }
 
   addComment() {
@@ -285,6 +339,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.studentResponseService.update(this.resp!).subscribe(() => {
           (currentComment as any).checked = true;
           this.currentTextComment4Question?.push(currentComment);
+          this.titreCommentaire = '';
+          this.descCommentaire = '';
         });
       });
     } else if (this.currentQuestion !== undefined && this.currentQuestion.gradeType !== GradeType.DIRECT) {
@@ -296,7 +352,15 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         studentResponses: [{ id: this.resp?.id }],
       };
       this.gradedCommentService.create(t).subscribe(e => {
-        console.log(e);
+        this.resp?.gradedcomments?.push(e.body!);
+        const currentComment = e.body!;
+        this.studentResponseService.update(this.resp!).subscribe(() => {
+          (currentComment as any).checked = true;
+          this.currentGradedComment4Question?.push(currentComment);
+          this.titreCommentaire = '';
+          this.descCommentaire = '';
+          this.noteCommentaire = 0;
+        });
       });
     }
   }
@@ -414,27 +478,79 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
-    return new Promise(resolve => {
-      db.alignImages
-        .where({ examId: +this.examId!, pageNumber: pageInscan })
-        .first()
-        .then(e2 => {
-          const image = JSON.parse(e2!.value, this.reviver);
-          this.loadImage(image.pages, pageInscan).then(v => {
-            const finalW = (zone.width! * v.width!) / 100000;
-            const finalH = (zone.height! * v.height!) / 100000;
-            this.alignImagesService
-              .imageCrop({
-                image: v.image,
-                x: (zone.xInit! * v.width!) / 100000,
-                y: (zone.yInit! * v.height!) / 100000,
-                width: finalW,
-                height: finalH,
-              })
-              .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
+    if (this.noalign) {
+      return new Promise(resolve => {
+        db.nonAlignImages
+          .where({ examId: +this.examId!, pageNumber: pageInscan })
+          .first()
+          .then(e2 => {
+            const image = JSON.parse(e2!.value, this.reviver);
+            this.loadImage(image.pages, pageInscan).then(v => {
+              let finalW = (zone.width! * v.width! * this.factor) / 100000;
+              let finalH = (zone.height! * v.height! * this.factor) / 100000;
+              let initX =
+                (zone.xInit! * v.width!) / 100000 -
+                ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
+              if (initX < 0) {
+                finalW = finalW + initX;
+                initX = 0;
+              }
+              let initY =
+                (zone.yInit! * v.height!) / 100000 -
+                ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
+              if (initY < 0) {
+                finalH = finalH + initY;
+                initY = 0;
+              }
+              this.alignImagesService
+                .imageCrop({
+                  image: v.image,
+                  x: initX,
+                  y: initY,
+                  width: finalW,
+                  height: finalH,
+                })
+                .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
+            });
           });
-        });
-    });
+      });
+    } else {
+      return new Promise(resolve => {
+        db.alignImages
+          .where({ examId: +this.examId!, pageNumber: pageInscan })
+          .first()
+          .then(e2 => {
+            const image = JSON.parse(e2!.value, this.reviver);
+            this.loadImage(image.pages, pageInscan).then(v => {
+              let finalW = (zone.width! * v.width! * this.factor) / 100000;
+              let finalH = (zone.height! * v.height! * this.factor) / 100000;
+              let initX =
+                (zone.xInit! * v.width!) / 100000 -
+                ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
+              if (initX < 0) {
+                finalW = finalW + initX;
+                initX = 0;
+              }
+              let initY =
+                (zone.yInit! * v.height!) / 100000 -
+                ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
+              if (initY < 0) {
+                finalH = finalH + initY;
+                initY = 0;
+              }
+              this.alignImagesService
+                .imageCrop({
+                  image: v.image,
+                  x: initX,
+                  y: initY,
+                  width: finalW,
+                  height: finalH,
+                })
+                .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
+            });
+          });
+      });
+    }
   }
 
   async loadImage(file: any, page1: number): Promise<IPage> {
@@ -459,6 +575,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     } else {
       this.textCommentService.update(l).subscribe(() => {});
     }
+  }
+
+  changeAlign(): void {
+    this.reloadImage();
   }
   /*
   private addEventListeners(canvas: any) {

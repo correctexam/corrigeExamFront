@@ -6,7 +6,7 @@
 /* eslint-disable no-console */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ZoneService } from '../../entities/zone/service/zone.service';
 import { CourseService } from 'app/entities/course/service/course.service';
@@ -144,6 +144,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   imageAligned: ElementRef | undefined;
   debug = false;
   phase1 = false;
+  noalign = false;
+  factor = 1;
 
   alignement = 'marker';
   alignementOptions = [
@@ -190,7 +192,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
               /* let endTime = performance.now();
               let totalTime = endTime - startTime; // ti
               console.log(' step 1 ' + totalTime);*/
-
+              this.factor = 1;
+              this.noalign = false;
               db.alignImages
                 .where('examId')
                 .equals(+this.examId)
@@ -294,9 +297,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                           const solutionName = predicts[0];
                           const solutionFirstname = predicts[1];
                           const solutionINE = predicts[2];
-                          console.log(solutionName);
+                          /* console.log(solutionName);
                           console.log(solutionFirstname);
-                          console.log(solutionINE);
+                          console.log(solutionINE); */
                           if (solutionName.length > 0 && solutionFirstname.length > 0 && solutionINE.length > 0) {
                             let sts = this.students.filter(
                               student =>
@@ -425,6 +428,29 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     });
   }
 
+  reloadImage(): void {
+    this.blocked = true;
+
+    const promiseload: Promise<ImageZone | null>[] = [];
+    const p0 = this.loadZone(this.exam.namezoneId, this.setZoneNom, true, this.setShowNomImage, this.nomImage, this.currentStudent);
+
+    promiseload.push(p0);
+
+    const p1 = this.loadZone(
+      this.exam.firstnamezoneId,
+      this.setZonePrenom,
+      true,
+      this.setShowPrenomImage,
+      this.prenomImage,
+      this.currentStudent
+    );
+    promiseload.push(p1);
+    const p2 = this.loadZone(this.exam.idzoneId, this.setZoneINE, true, this.setShowINEImage, this.ineImage, this.currentStudent);
+    promiseload.push(p2);
+
+    Promise.all(promiseload).then(() => (this.blocked = false));
+  }
+
   async predictText(p: ImageZone, zoneletter: boolean, candidatematch: string[], debugimageRef: ElementRef): Promise<(string | number)[]> {
     return new Promise<(string | number)[]>(resolve => {
       if (this.assisted) {
@@ -439,8 +465,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
       }
     });
   }
-
+  @HostListener('window:keydown.control.Enter', ['$event'])
   async selectRecogniezStudent(): Promise<void> {
+    console.log('ok');
     this.selectionStudents = [this.recognizedStudent];
     await this.bindStudent();
     if ((this.currentStudent + 1) * this.nbreFeuilleParCopie < this.numberPagesInScan) {
@@ -478,45 +505,96 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   bindAllCopies(): void {}
 
   async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
-    return new Promise(resolve => {
-      // const startTime = performance.now();
-      db.alignImages
-        .where({ examId: +this.examId, pageNumber: pageInscan })
-        .first()
-        .then(e2 => {
-          /* let endTime = performance.now();
-          let totalTime = endTime - startTime; // ti*/
-          // console.log(' Time to get image ' + totalTime);
+    if (this.noalign) {
+      return new Promise(resolve => {
+        // const startTime = performance.now();
+        db.nonAlignImages
+          .where({ examId: +this.examId, pageNumber: pageInscan })
+          .first()
+          .then(e2 => {
+            const image = JSON.parse(e2!.value, this.reviver);
+            this.loadImage(image.pages, pageInscan).then(v => {
+              let finalW = (zone.width! * v.width! * this.factor) / 100000;
+              let finalH = (zone.height! * v.height! * this.factor) / 100000;
+              let initX =
+                (zone.xInit! * v.width!) / 100000 -
+                ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
+              if (initX < 0) {
+                finalW = finalW + initX;
+                initX = 0;
+              }
+              let initY =
+                (zone.yInit! * v.height!) / 100000 -
+                ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
+              if (initY < 0) {
+                finalH = finalH + initY;
+                initY = 0;
+              }
+              this.alignImagesService
+                .imageCrop({
+                  image: v.image,
+                  x: initX,
+                  y: initY,
+                  width: finalW,
+                  height: finalH,
+                })
+                .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
 
-          const image = JSON.parse(e2!.value, this.reviver);
-          /* endTime = performance.now();
-          totalTime = endTime - startTime; // ti*/
-          // console.log(' Time to parse image ' + totalTime);
-
-          this.loadImage(image.pages, pageInscan).then(v => {
-            const finalW = (zone.width! * v.width!) / 100000;
-            const finalH = (zone.height! * v.height!) / 100000;
-            /* endTime = performance.now();
-            totalTime = endTime - startTime; // ti
-            // console.log(' Time to load image ' + totalTime);*/
-
-            this.alignImagesService
-              .imageCrop({
-                image: v.image,
-                x: (zone.xInit! * v.width!) / 100000,
-                y: (zone.yInit! * v.height!) / 100000,
-                width: finalW,
-                height: finalH,
-              })
-              .subscribe(res => {
-                // endTime = performance.now();
-                // totalTime = endTime - startTime; // ti
-                // console.log(' Time to crop image ' + totalTime);
-                resolve({ i: res, w: finalW, h: finalH });
-              });
+              /*
+              const finalW = (zone.width! * v.width!) / 100000;
+              const finalH = (zone.height! * v.height!) / 100000;
+              this.alignImagesService
+                .imageCrop({
+                  image: v.image,
+                  x: (zone.xInit! * v.width!) / 100000,
+                  y: (zone.yInit! * v.height!) / 100000,
+                  width: finalW,
+                  height: finalH,
+                })
+                .subscribe(res => {
+                  resolve({ i: res, w: finalW, h: finalH });
+                });*/
+            });
           });
-        });
-    });
+      });
+    } else {
+      return new Promise(resolve => {
+        // const startTime = performance.now();
+        db.alignImages
+          .where({ examId: +this.examId, pageNumber: pageInscan })
+          .first()
+          .then(e2 => {
+            const image = JSON.parse(e2!.value, this.reviver);
+            this.loadImage(image.pages, pageInscan).then(v => {
+              let finalW = (zone.width! * v.width! * this.factor) / 100000;
+              let finalH = (zone.height! * v.height! * this.factor) / 100000;
+              let initX =
+                (zone.xInit! * v.width!) / 100000 -
+                ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
+              if (initX < 0) {
+                finalW = finalW + initX;
+                initX = 0;
+              }
+              let initY =
+                (zone.yInit! * v.height!) / 100000 -
+                ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
+              if (initY < 0) {
+                finalH = finalH + initY;
+                initY = 0;
+              }
+              this.alignImagesService
+                .imageCrop({
+                  image: v.image,
+                  x: initX,
+                  y: initY,
+                  width: finalW,
+                  height: finalH,
+                })
+                .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
+            });
+          });
+      });
+    }
   }
 
   displayImage(v: ImageZone, imageRef: ElementRef<any> | undefined, show: (s: boolean) => void): void {

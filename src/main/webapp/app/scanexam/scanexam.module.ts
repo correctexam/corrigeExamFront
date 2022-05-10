@@ -49,6 +49,8 @@ import { RatingModule } from 'primeng/rating';
 import { GraphicalToolbarCorrectionComponent } from './corrigequestion/toolbar/toolbar.component';
 import { InplaceModule } from 'primeng/inplace';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
+import { ArraySortPipe } from './sort';
+import { SortByDirective } from '../shared/sort/sort-by.directive';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -203,6 +205,7 @@ export const CorrigerCopiesEtudiants_ROUTE: Route = {
     AlignScanComponent,
     CorrigequestionComponent,
     GraphicalToolbarCorrectionComponent,
+    ArraySortPipe,
   ],
   imports: [
     CommonModule,
@@ -253,6 +256,7 @@ export const CorrigerCopiesEtudiants_ROUTE: Route = {
     ListstudentcourseComponent,
     CorrigequestionComponent,
     AssocierCopiesEtudiantsComponent,
+    SortByDirective,
   ],
   providers: [EventHandlerService, FabricShapeService],
 })
