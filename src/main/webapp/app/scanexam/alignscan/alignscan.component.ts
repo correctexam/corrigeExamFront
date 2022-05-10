@@ -85,8 +85,7 @@ export class AlignScanComponent implements OnInit {
     protected activatedRoute: ActivatedRoute,
     public confirmationService: ConfirmationService,
     public router: Router,
-    private alignImagesService: AlignImagesService,
-    private messageService: MessageService
+    private alignImagesService: AlignImagesService
   ) {}
 
   ngOnInit(): void {

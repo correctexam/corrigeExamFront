@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, AfterViewInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, AfterViewInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CourseService } from 'app/entities/course/service/course.service';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
@@ -94,7 +94,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.noteSteps = 0;
       this.maxNote = 0;
       this.resp = undefined;
-
+      //      'answer/:examid/:questionno/:studentid',
       if (params.get('examid') !== null) {
         this.examId = params.get('examid')!;
         if (params.get('questionno') !== null) {
@@ -102,7 +102,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
         if (params.get('studentid') !== null) {
           this.studentid = +params.get('studentid')!;
-
+          this.currentStudent = this.studentid - 1;
           // Step 1 Query templates
           db.templates
             .where('examId')
@@ -260,7 +260,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
   retirerTComment(comment: ITextComment): void {
     this.resp!.textcomments = this.resp?.textcomments!.filter(e => e.id !== comment.id);
-    this.studentResponseService.update(this.resp!).subscribe(e1 => {
+    this.studentResponseService.update(this.resp!).subscribe(() => {
       (comment as any).checked = false;
     });
   }
@@ -298,6 +298,43 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.gradedCommentService.create(t).subscribe(e => {
         console.log(e);
       });
+    }
+  }
+
+  @HostListener('window:keydown.control.ArrowLeft', ['$event'])
+  previousStudent(event: KeyboardEvent) {
+    event.preventDefault();
+    const c = this.currentStudent;
+    if (c > 0) {
+      this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno + 1) + '/' + c);
+    }
+  }
+  @HostListener('window:keydown.control.ArrowRight', ['$event'])
+  nextStudent(event: KeyboardEvent) {
+    event.preventDefault();
+    const c = this.currentStudent + 2;
+    console.log(this.numberPagesInScan! / this.nbreFeuilleParCopie!);
+    if (c <= this.numberPagesInScan! / this.nbreFeuilleParCopie!) {
+      this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno + 1) + '/' + c);
+    }
+  }
+  @HostListener('window:keydown.shift.ArrowLeft', ['$event'])
+  previousQuestion(event: KeyboardEvent): void {
+    event.preventDefault();
+    const c = this.currentStudent + 1;
+    const q = this.questionno;
+    if (q > 0) {
+      this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
+    }
+  }
+  @HostListener('window:keydown.shift.ArrowRight', ['$event'])
+  nextQuestion(event: KeyboardEvent): void {
+    event.preventDefault();
+    const c = this.currentStudent + 1;
+    const q = this.questionno + 2;
+    console.log(this.nbreQuestions);
+    if (q <= this.nbreQuestions) {
+      this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
     }
   }
 
@@ -414,6 +451,14 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       };
       i.src = file;
     });
+  }
+
+  updateComment($event: any, l: IGradedComment | ITextComment, graded: boolean): any {
+    if (graded) {
+      this.gradedCommentService.update(l).subscribe(() => {});
+    } else {
+      this.textCommentService.update(l).subscribe(() => {});
+    }
   }
   /*
   private addEventListeners(canvas: any) {

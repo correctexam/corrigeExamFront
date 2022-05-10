@@ -15,10 +15,10 @@ import { ExamService } from '../../entities/exam/service/exam.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { db } from '../db/db';
 import { ExamSheetService } from '../../entities/exam-sheet/service/exam-sheet.service';
 import { StudentService } from '../../entities/student/service/student.service';
 import { IStudent } from 'app/entities/student/student.model';
+import { db } from '../db/db';
 
 @Component({
   selector: 'jhi-exam-detail',
@@ -104,6 +104,14 @@ export class ExamDetailComponent implements OnInit {
               this.confirmeDelete();
             },
           },
+          {
+            label: 'Nettoyer le cache du browser pour cet exam',
+            icon: 'content/images/Font_Awesome_5_solid_eraser.svg',
+            title: 'Nettoyer le cache du browser pour cet exam (images dans la base de données locale',
+            command1: () => {
+              this.confirmeCleanCache();
+            },
+          },
         ];
       }
     });
@@ -119,6 +127,20 @@ export class ExamDetailComponent implements OnInit {
       },
     });
   }
+
+  confirmeCleanCache(): any {
+    this.confirmationService.confirm({
+      message: 'Etes vous sur de vouloir supprimer le cache dans le navigateur. Vous devrez réalignez les images',
+      // eslint-disable-next-line object-shorthand
+      accept: () => {
+        db.resetDatabase().then(() => {
+          this.showAssociation = false;
+          this.showCorrection = false;
+        });
+      },
+    });
+  }
+
   hasCache(): boolean {
     return true;
   }

@@ -14,6 +14,17 @@
       "follow": "follow @jhipster on Twitter"
     },
     "like": "If you like JHipster, don't forget to give us a star on",
-    "github": "GitHub"
+    "github": "GitHub",
+    "creercours": "Create Course",
+    "coursmain": "Your course",
+    "registerstudents": "Register students",
+    "liststudents": "List students",
+    "creerexam": "Create Exam",
+    "loadscan": "Load scan",
+    "exam": "Your exam",
+    "annotate": "Annotate your exam template",
+    "imagealign": "Align your scan",
+    "studentbindings": "Bind your scan with students",
+    "answer": "Correct your exam"
   }
 }

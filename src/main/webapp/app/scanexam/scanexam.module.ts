@@ -47,6 +47,8 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { CorrigequestionComponent } from './corrigequestion/corrigequestion.component';
 import { RatingModule } from 'primeng/rating';
 import { GraphicalToolbarCorrectionComponent } from './corrigequestion/toolbar/toolbar.component';
+import { InplaceModule } from 'primeng/inplace';
+import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -54,14 +56,16 @@ registerAllModules();
 export const COURSMAIN_ROUTE: Route = {
   path: 'course/:courseid',
   component: CoursdetailsComponent,
+  canActivate: [UserRouteAccessService],
   data: {
     authorities: ['ROLE_USER'],
-    pageTitle: 'home.creercours',
+    pageTitle: 'home.coursmain',
   },
 };
 
 export const CREERCOURS_ROUTE: Route = {
   path: 'creercours',
+  canActivate: [UserRouteAccessService],
   component: CreercoursComponent,
   data: {
     pageTitle: 'home.creercours',
@@ -70,100 +74,111 @@ export const CREERCOURS_ROUTE: Route = {
 
 export const REGISTERSTUDENT_ROUTE: Route = {
   path: 'registerstudents/:courseid',
+  canActivate: [UserRouteAccessService],
   component: ImportStudentComponent,
   data: {
     authorities: ['ROLE_USER'],
-    pageTitle: 'home.creercours',
+    pageTitle: 'home.registerstudents',
   },
 };
 
 export const LISTESTUDENT_ROUTE: Route = {
   path: 'liststudents/:courseid',
+  canActivate: [UserRouteAccessService],
   component: ListstudentcourseComponent,
   data: {
     authorities: ['ROLE_USER'],
-    pageTitle: 'home.creercours',
+    pageTitle: 'home.liststudents',
   },
 };
 
 export const CREEREXAM_ROUTE: Route = {
   path: 'creerexam/:courseid',
+  canActivate: [UserRouteAccessService],
   component: CreerexamComponent,
   data: {
     authorities: ['ROLE_USER'],
-    pageTitle: 'home.creercours',
+    pageTitle: 'home.creerexam',
   },
 };
 
 export const CHARGERSCAN_ROUTE: Route = {
   path: 'loadscan/:examid',
+  canActivate: [UserRouteAccessService],
   component: ChargerscanComponent,
   data: {
     authorities: ['ROLE_USER'],
-    pageTitle: 'home.creercours',
+    pageTitle: 'home.loadscan',
   },
 };
 
 export const EXAMDETAIL_ROUTE: Route = {
   path: 'exam/:examid',
+  canActivate: [UserRouteAccessService],
   component: ExamDetailComponent,
   data: {
     authorities: ['ROLE_USER'],
-    pageTitle: 'home.creercours',
+    pageTitle: 'home.exam',
   },
 };
 
 export const ANNOTATETEMPLATE_ROUTE: Route = {
   path: 'exam/annotate/:examid',
+  canActivate: [UserRouteAccessService],
   component: AnnotateTemplateComponent,
   data: {
     authorities: ['ROLE_USER'],
-    pageTitle: 'home.creercours',
+    pageTitle: 'home.annotate',
   },
 };
 
 export const AlignerCopiesEtudiants_ROUTE: Route = {
   path: 'imagealign/:examid',
+  canActivate: [UserRouteAccessService],
   component: AlignScanComponent,
   data: {
     authorities: ['ROLE_USER'],
-    pageTitle: 'home.creercours',
+    pageTitle: 'home.imagealign',
   },
 };
 
 export const AssocierCopiesEtudiants_ROUTE: Route = {
   path: 'studentbindings/:examid',
+  canActivate: [UserRouteAccessService],
   component: AssocierCopiesEtudiantsComponent,
   data: {
     authorities: ['ROLE_USER'],
-    pageTitle: 'home.creercours',
+    pageTitle: 'home.studentbindings',
   },
 };
 
 export const AssocierCopiesEtudiantsToStudent_ROUTE: Route = {
   path: 'studentbindings/:examid/:currentStudent',
+  canActivate: [UserRouteAccessService],
   component: AssocierCopiesEtudiantsComponent,
   data: {
     authorities: ['ROLE_USER'],
-    pageTitle: 'home.creercours',
-  },
-};
-
-export const CorrigerCopiesEtudiants_ROUTE: Route = {
-  path: 'answer/:examid',
-  component: CorrigequestionComponent,
-  data: {
-    authorities: ['ROLE_USER'],
-    pageTitle: 'home.creercours',
+    pageTitle: 'home.studentbindings',
   },
 };
 
 export const CorrigerCopiesEtudiantsToQuestion_ROUTE: Route = {
   path: 'answer/:examid/:questionno/:studentid',
+  canActivate: [UserRouteAccessService],
   component: CorrigequestionComponent,
   data: {
     authorities: ['ROLE_USER'],
-    pageTitle: 'home.creercours',
+    pageTitle: 'home.answer',
+  },
+};
+
+export const CorrigerCopiesEtudiants_ROUTE: Route = {
+  path: 'answer/:examid',
+  canActivate: [UserRouteAccessService],
+  component: CorrigequestionComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.answer',
   },
 };
 
@@ -213,7 +228,7 @@ export const CorrigerCopiesEtudiantsToQuestion_ROUTE: Route = {
     ListboxModule,
     InputSwitchModule,
     RatingModule,
-
+    InplaceModule,
     RouterModule.forChild([
       CREERCOURS_ROUTE,
       COURSMAIN_ROUTE,
@@ -224,9 +239,9 @@ export const CorrigerCopiesEtudiantsToQuestion_ROUTE: Route = {
       ANNOTATETEMPLATE_ROUTE,
       CHARGERSCAN_ROUTE,
       AssocierCopiesEtudiants_ROUTE,
-      CorrigerCopiesEtudiants_ROUTE,
       AlignerCopiesEtudiants_ROUTE,
       CorrigerCopiesEtudiantsToQuestion_ROUTE,
+      CorrigerCopiesEtudiants_ROUTE,
       AssocierCopiesEtudiantsToStudent_ROUTE,
     ]),
   ],
