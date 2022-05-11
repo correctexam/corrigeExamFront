@@ -307,6 +307,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         currentNote = this.noteSteps;
       }
       this.currentNote = currentNote;
+      this.resp!.note = currentNote;
+      if (update) {
+        this.studentResponseService.partialUpdate(this.resp!).subscribe(() => {});
+      }
     } else if (this.currentQuestion?.gradeType === GradeType.NEGATIVE) {
       let currentNote = this.noteSteps;
       this.resp!.gradedcomments?.forEach(g => {
@@ -434,6 +438,14 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           s.examSheets?.some(ex => ex.scanId === this.exam!.scanfileId && ex.pagemin === this.currentStudent * this.nbreFeuilleParCopie!)
         );
         this.selectionStudents = filterStudent;
+        if (this.selectionStudents.length === 0) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Copie non associé à un étudiant',
+            detail: 'Il semble que cette copie ne soit pas associé à un étudiant',
+          });
+        }
+
         res();
       })
     );
@@ -469,7 +481,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       //  this.addEventListeners( imageRef!.nativeElement)
       show(true);
       const zh = new ZoneCorrectionHandler(
-        '' + this.examId + '_' + this.studentid + '_' + this.questionno + '_' + index,
+        '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index,
         this.eventHandler,
         this.resp?.id
       );

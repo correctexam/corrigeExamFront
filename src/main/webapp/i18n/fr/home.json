@@ -25,6 +25,7 @@
     "annotate": "Annoter votre modèle d'examen",
     "imagealign": "Alignement des scan de copies",
     "studentbindings": "Association des scans avec les étudiants",
-    "answer": "Corriger votre examen"
+    "answer": "Corriger votre examen",
+    "voircopie": "Voir votre copie"
   }
 }

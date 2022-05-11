@@ -60,6 +60,7 @@ export class ZoneCorrectionHandler {
 
     this.eventHandler.extendToObjectWithId();
     this.canvas = canvas;
+    this.eventHandler.commentsService.query();
     fabric.Object.prototype.objectCaching = false;
     this.addEventListeners(canvas);
     return canvas;

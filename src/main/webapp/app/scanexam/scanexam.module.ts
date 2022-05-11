@@ -51,6 +51,7 @@ import { InplaceModule } from 'primeng/inplace';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { ArraySortPipe } from './sort';
 import { SortByDirective } from '../shared/sort/sort-by.directive';
+import { VoirCopieComponent } from './voircopie/voircopie.component';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -184,6 +185,14 @@ export const CorrigerCopiesEtudiants_ROUTE: Route = {
   },
 };
 
+export const VoirCopieEtudiants_ROUTE: Route = {
+  path: 'copie/:uuid/:questionno',
+  component: VoirCopieComponent,
+  data: {
+    pageTitle: 'home.voircopie',
+  },
+};
+
 @NgModule({
   declarations: [
     MesCoursComponent,
@@ -205,6 +214,7 @@ export const CorrigerCopiesEtudiants_ROUTE: Route = {
     AlignScanComponent,
     CorrigequestionComponent,
     GraphicalToolbarCorrectionComponent,
+    VoirCopieComponent,
     ArraySortPipe,
   ],
   imports: [
@@ -246,6 +256,7 @@ export const CorrigerCopiesEtudiants_ROUTE: Route = {
       CorrigerCopiesEtudiantsToQuestion_ROUTE,
       CorrigerCopiesEtudiants_ROUTE,
       AssocierCopiesEtudiantsToStudent_ROUTE,
+      VoirCopieEtudiants_ROUTE,
     ]),
   ],
   exports: [

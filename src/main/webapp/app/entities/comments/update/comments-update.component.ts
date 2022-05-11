@@ -44,6 +44,7 @@ export class CommentsUpdateComponent implements OnInit {
   updateForm(comments: IComments): void {
     this.editForm.patchValue({
       id: comments.id,
+      zonegeneratedid: comments.zonegeneratedid,
       jsonData: comments.jsonData,
       studentResponseId: comments.studentResponseId,
     });
@@ -67,6 +68,7 @@ export class CommentsUpdateComponent implements OnInit {
     return {
       ...new Comments(),
       id: this.editForm.get(['id'])!.value,
+      zonegeneratedid: this.editForm.get(['zonegeneratedid'])!.value,
       jsonData: this.editForm.get(['jsonData'])!.value,
       studentResponseId: this.editForm.get(['studentResponseId'])!.value,
     };
