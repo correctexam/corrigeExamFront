@@ -52,6 +52,7 @@ import { UserRouteAccessService } from 'app/core/auth/user-route-access.service'
 import { ArraySortPipe } from './sort';
 import { SortByDirective } from '../shared/sort/sort-by.directive';
 import { VoirCopieComponent } from './voircopie/voircopie.component';
+import { ResultatStudentcourseComponent } from './resultatstudentcourse/resultatstudentcourse.component';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -193,6 +194,16 @@ export const VoirCopieEtudiants_ROUTE: Route = {
   },
 };
 
+export const ShowResults_ROUTE: Route = {
+  path: 'showresults/:examid',
+  canActivate: [UserRouteAccessService],
+  component: ResultatStudentcourseComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.voircopie',
+  },
+};
+
 @NgModule({
   declarations: [
     MesCoursComponent,
@@ -215,6 +226,7 @@ export const VoirCopieEtudiants_ROUTE: Route = {
     CorrigequestionComponent,
     GraphicalToolbarCorrectionComponent,
     VoirCopieComponent,
+    ResultatStudentcourseComponent,
     ArraySortPipe,
   ],
   imports: [
@@ -257,6 +269,7 @@ export const VoirCopieEtudiants_ROUTE: Route = {
       CorrigerCopiesEtudiants_ROUTE,
       AssocierCopiesEtudiantsToStudent_ROUTE,
       VoirCopieEtudiants_ROUTE,
+      ShowResults_ROUTE,
     ]),
   ],
   exports: [

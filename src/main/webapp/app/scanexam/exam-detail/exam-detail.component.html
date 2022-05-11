@@ -86,6 +86,21 @@
             ><BR />
             <span>Corriger copies</span>
           </button>
+          <button
+            [routerLink]="'/showresults/' + this.examId"
+            [style]="{ width: '20em', marginBottom: '1em', margin: '1em' }"
+            class="p-element p-ripple"
+            pButton
+            pRipple
+            type="button"
+            [disabled]="!showCorrection"
+          >
+            <fa-stack>
+              <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
+              <fa-icon [icon]="faBookOpenReader" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
+            ><BR />
+            <span>Voir résultats</span>
+          </button>
         </div>
       </div>
     </div>

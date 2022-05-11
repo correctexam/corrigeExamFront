@@ -1,0 +1,82 @@
+<div class="grid">
+  <p-toast></p-toast>
+  <p-blockUI [blocked]="blocked">
+    <i class="pi pi-lock" style="font-size: 3rem"></i>
+  </p-blockUI>
+
+  <p-confirmDialog header="Confirmation envoie mail" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+  <div class="col-8">
+    <div class="grid grid-nogutter">
+      <div class="col-8">
+        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">Résultat étudiants</h2>
+      </div>
+      <div class="col-4 flex flex-row-reverse">
+        <button
+          [disabled]="!this.examid"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="btn btn-primary"
+          (click)="gotoUE()"
+        >
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Retourner à l'exam</span>
+        </button>
+        <button
+          [disabled]="!this.examid"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="btn btn-primary"
+          (click)="envoiEmailEtudiant()"
+        >
+          <fa-icon icon="envelope"></fa-icon>&nbsp;<span>Envoi mail étudiants</span>
+        </button>
+        <button
+          [disabled]="!this.examid"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="btn btn-primary"
+          (click)="exportExcel()"
+        >
+          <fa-icon icon="envelope"></fa-icon>&nbsp;<span>Export Excel</span>
+        </button>
+      </div>
+    </div>
+    <div class="col-12 md:col-12">
+      <p-table [value]="studentsresult">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>INE</th>
+            <th>NOM</th>
+            <th>PRENOM</th>
+            <th>MAIL</th>
+            <th>NOTE</th>
+            <th>LIEN</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-student>
+          <tr>
+            <td>{{ student.ine }}</td>
+            <td>{{ student.nom }}</td>
+            <td>{{ student.prenom }}</td>
+            <td>{{ student.mail }}</td>
+            <td *ngIf="!student.abi">{{ student.note / 100 }}</td>
+            <td *ngIf="student.abi">0</td>
+            <td *ngIf="!student.abi"><a target="_blank" href="{{ 'copie/' + student.uuid + '/1' }}">link</a></td>
+            <td *ngIf="student.abi">ABI</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+  <div class="col-4 md:col-4 overflow-hidden">
+    <img
+      src="content/images/bannerright.jpg"
+      alt="Image"
+      class="md:ml-auto block md:h-full"
+      style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
+    />
+  </div>
+</div>

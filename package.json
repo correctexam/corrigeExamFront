@@ -66,6 +66,7 @@
     "dayjs": "1.10.7",
     "dexie": "^3.2.1",
     "fabric": "^5.2.1",
+    "file-saver": "^2.0.5",
     "handsontable": "^11.1.0",
     "ngx-extended-pdf-viewer": "^12.0.0-alpha.3",
     "ngx-infinite-scroll": "10.0.1",
@@ -80,6 +81,7 @@
     "swagger-ui-dist": "4.5.2",
     "tslib": "2.3.1",
     "uuid": "^8.3.2",
+    "xlsx": "^0.18.5",
     "zone.js": "0.11.4"
   },
   "devDependencies": {
@@ -91,6 +93,7 @@
     "@angular/compiler-cli": "13.2.4",
     "@angular/service-worker": "13.2.4",
     "@types/fabric": "^4.5.7",
+    "@types/file-saver": "^2.0.5",
     "@types/jest": "27.4.1",
     "@types/node": "16.11.26",
     "@types/uuid": "^8.3.4",
