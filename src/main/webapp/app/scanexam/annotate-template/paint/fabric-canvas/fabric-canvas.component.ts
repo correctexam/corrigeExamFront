@@ -108,7 +108,6 @@ export class FabricCanvasComponent implements AfterViewInit {
         });
       });
     });
-    this.numeroEvent.subscribe(num => {});
   }
   public ngAfterViewInit(): void {
     const container = document.querySelector('#viewerContainer');
