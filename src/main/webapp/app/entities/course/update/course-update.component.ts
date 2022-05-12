@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/member-ordering */
+
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
@@ -35,7 +37,6 @@ export class CourseUpdateComponent implements OnInit {
     this.activatedRoute.data.subscribe(({ course }) => {
       this.updateForm(course);
 
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
       this.userService.query().subscribe((res: HttpResponse<IUser[]>) => {
         this.users = res.body || [];
         // eslint-disable-next-line no-console
