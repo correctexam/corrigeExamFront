@@ -32,7 +32,6 @@ export class EventCanevasVoirCopieHandlerService {
 
     if (c !== prev) {
       this.currentComment = null;
-      console.log((c as any).zoneid);
       this.commentsService.query({ zonegeneratedid: (c as any).zoneid }).subscribe(e1 => {
         if (!(e1!.body === undefined || e1!.body?.length === 0)) {
           fabric.loadSVGFromString(e1!.body![0].jsonData!, (objects, options) => {

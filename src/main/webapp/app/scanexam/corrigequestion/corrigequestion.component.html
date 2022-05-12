@@ -39,7 +39,7 @@
           ></p-paginator>
         </div>
         <div class="col-4 grid justify-content-end">
-          <!--<p-button icon="pi pi-search"></p-button>-->
+          <fa-icon [size]="'2x'" [pTooltip]="getStudentName()!" tooltipPosition="left" icon="eye"></fa-icon>
         </div>
       </div>
 
@@ -203,7 +203,7 @@
                   <input type="text" pInputText [(ngModel)]="titreCommentaire" [style]="{ width: '100%' }" />
                   <BR />
                   <label>Description :</label>
-                  <textarea [style]="{ width: '100%' }" pInputTextarea autoResize="true" [(ngModel)]="descCommentaire"></textarea>
+                  <textarea [style]="{ width: '100%' }" pInputTextarea [(ngModel)]="descCommentaire"></textarea>
                   <label *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'"> Note :</label>
                   <p-rating
                     *ngIf="noteSteps > 0 && currentQuestion && currentQuestion?.gradeType !== 'DIRECT'"

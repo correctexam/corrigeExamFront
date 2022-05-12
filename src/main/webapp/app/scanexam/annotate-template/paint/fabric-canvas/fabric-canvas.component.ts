@@ -20,6 +20,7 @@ import { ZoneService } from '../../../../entities/zone/service/zone.service';
 import { IZone } from 'app/entities/zone/zone.model';
 import { FabricShapeService } from '../shape.service';
 import { QuestionService } from '../../../../entities/question/service/question.service';
+import { Subject } from 'rxjs';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
 };
@@ -43,6 +44,10 @@ export class FabricCanvasComponent implements AfterViewInit {
   content: any;
   @Input()
   exam!: IExam;
+
+  @Input()
+  numeroEvent!: Subject<string>;
+
   zones: { [page: number]: CustomZone[] } = {};
 
   title = 'gradeScopeFree';
@@ -103,6 +108,7 @@ export class FabricCanvasComponent implements AfterViewInit {
         });
       });
     });
+    this.numeroEvent.subscribe(num => {});
   }
   public ngAfterViewInit(): void {
     const container = document.querySelector('#viewerContainer');
@@ -197,46 +203,4 @@ export class FabricCanvasComponent implements AfterViewInit {
       });
     }
   }
-
-  /* private addEventListeners(canvas: any) {
-    canvas.on('mouse:down', (e: any) => this.ngZone.run(() => this.onCanvasMouseDown(e)));
-    canvas.on('mouse:move', (e: any) => this.ngZone.run(() => this.onCanvasMouseMove(e)));
-    canvas.on('mouse:up', () => this.ngZone.run(() => this.onCanvasMouseUp()));
-    canvas.on('selection:created', (e: any) => this.ngZone.run(() => this.onSelectionCreated(e as any)));
-    canvas.on('selection:updated', (e: any) => this.ngZone.run(() => this.onSelectionUpdated(e as any)));
-    canvas.on('object:moving', (e: any) => this.ngZone.run(() => this.onObjectMoving(e as any)));
-    canvas.on('object:scaling', (e: any) => this.ngZone.run(() => this.onObjectScaling(e as any)));
-  }
-
-  private onCanvasMouseDown(event: { e: Event }) {
-    this.eventHandler.mouseDown(event.e);
-    this.avoidDragAndClickEventsOfOtherUILibs(event.e);
-  }
-  private onCanvasMouseMove(event: { e: Event }) {
-    this.eventHandler.mouseMove(event.e);
-  }
-  private onCanvasMouseUp() {
-    this.eventHandler.mouseUp();
-  }
-  private onSelectionCreated(e: { target: CustomFabricObject }) {
-    this.eventHandler.objectSelected(e.target);
-  }
-  private onSelectionUpdated(e: { target: CustomFabricObject }) {
-    this.eventHandler.objectSelected(e.target);
-  }
-  private onObjectMoving(e: any) {
-    this.eventHandler.objectMoving(e.target.id, e.target.type, e.target.left, e.target.top);
-  }
-  private onObjectScaling(e: any) {
-    this.eventHandler.objectScaling(
-      e.target.id,
-      e.target.type,
-      { x: e.target.scaleX, y: e.target.scaleY },
-      { left: e.target.left, top: e.target.top }
-    );
-  }
-
-  private avoidDragAndClickEventsOfOtherUILibs(e: Event) {
-    e.stopPropagation();
-  } */
 }

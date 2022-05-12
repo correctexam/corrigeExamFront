@@ -40,11 +40,56 @@
         </ng-template>
         <ng-template pTemplate="body" let-student>
           <tr>
-            <td>{{ student.ine }}</td>
-            <td>{{ student.nom }}</td>
-            <td>{{ student.prenom }}</td>
-            <td>{{ student.mail }}</td>
-            <td>{{ student.groupe }}</td>
+            <td>
+              <p-inplace [closable]="true">
+                <ng-template pTemplate="display">
+                  {{ student.ine }}
+                </ng-template>
+                <ng-template pTemplate="content">
+                  <input type="text" [(ngModel)]="student.ine" (change)="updateStudentINE(student)" pInputText />
+                </ng-template>
+              </p-inplace>
+            </td>
+            <td>
+              <p-inplace [closable]="true">
+                <ng-template pTemplate="display">
+                  {{ student.nom }}
+                </ng-template>
+                <ng-template pTemplate="content">
+                  <input type="text" [(ngModel)]="student.nom" (change)="updateStudent(student)" pInputText />
+                </ng-template>
+              </p-inplace>
+            </td>
+            <td>
+              <p-inplace [closable]="true">
+                <ng-template pTemplate="display">
+                  {{ student.prenom }}
+                </ng-template>
+                <ng-template pTemplate="content">
+                  <input type="text" [(ngModel)]="student.prenom" (change)="updateStudent(student)" pInputText />
+                </ng-template>
+              </p-inplace>
+            </td>
+            <td>
+              <p-inplace [closable]="true">
+                <ng-template pTemplate="display">
+                  {{ student.mail }}
+                </ng-template>
+                <ng-template pTemplate="content">
+                  <input type="text" [(ngModel)]="student.mail" (change)="updateStudent(student)" pInputText />
+                </ng-template>
+              </p-inplace>
+            </td>
+            <td>
+              <p-inplace [closable]="true">
+                <ng-template pTemplate="display">
+                  {{ student.groupe }}
+                </ng-template>
+                <ng-template pTemplate="content">
+                  <input type="text" [(ngModel)]="student.groupe" (change)="updateStudentgroup(student)" pInputText />
+                </ng-template>
+              </p-inplace>
+            </td>
           </tr>
         </ng-template>
       </p-table>

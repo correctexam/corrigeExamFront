@@ -5,6 +5,41 @@
   </p-blockUI>
 
   <p-confirmDialog header="Confirmation envoie mail" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+  <p-dialog [(visible)]="showEmail" [modal]="true">
+    <ng-template pTemplate="header">
+      <h4>Confirmation envoi mail</h4>
+    </ng-template>
+    <div class="grid">
+      <div class="col-12">
+        <label>Sujet du mail:</label>
+        <input type="text" [(ngModel)]="mailSubject" pInputText [style]="{ width: '100%' }" />
+      </div>
+      <div class="col-12">
+        <label>Corps du mail:</label>
+        <fa-icon
+          [size]="'1x'"
+          [pTooltip]="'les variables ${firstname}, ${url}, ${lastname}, ${note} peuvent être utilisé au sein du corps du mail'"
+          tooltipPosition="top"
+          icon="eye"
+        ></fa-icon>
+
+        <textarea [style]="{ width: '100%', height: '12rem' }" type="text" [(ngModel)]="mailBody" pInputTextarea></textarea>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button
+        [disabled]="!this.examid"
+        type="submit"
+        id="save-entity"
+        data-cy="entityCreateSaveButton"
+        class="btn btn-primary"
+        (click)="envoiEmailEtudiant()"
+      >
+        <fa-icon icon="envelope"></fa-icon>&nbsp;<span>Envoi mail étudiants</span>
+      </button>
+    </ng-template>
+  </p-dialog>
 
   <div class="col-8">
     <div class="grid grid-nogutter">
@@ -28,7 +63,7 @@
           id="save-entity"
           data-cy="entityCreateSaveButton"
           class="btn btn-primary"
-          (click)="envoiEmailEtudiant()"
+          (click)="showEmailStudent()"
         >
           <fa-icon icon="envelope"></fa-icon>&nbsp;<span>Envoi mail étudiants</span>
         </button>

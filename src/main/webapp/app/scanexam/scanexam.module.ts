@@ -53,6 +53,9 @@ import { ArraySortPipe } from './sort';
 import { SortByDirective } from '../shared/sort/sort-by.directive';
 import { VoirCopieComponent } from './voircopie/voircopie.component';
 import { ResultatStudentcourseComponent } from './resultatstudentcourse/resultatstudentcourse.component';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { InputTextModule } from 'primeng/inputtext';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -253,7 +256,10 @@ export const ShowResults_ROUTE: Route = {
     ListboxModule,
     InputSwitchModule,
     RatingModule,
+    InputTextareaModule,
+    DialogModule,
     InplaceModule,
+    InputTextModule,
     RouterModule.forChild([
       CREERCOURS_ROUTE,
       COURSMAIN_ROUTE,

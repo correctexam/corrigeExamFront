@@ -84,10 +84,8 @@ export class CoursdetailsComponent implements OnInit {
       message: "Etes vous sur de vouloir supprimer ce module, les exams, les groupes d'étudiants et les templates associés",
       accept: () => {
         // eslint-disable-next-line no-console
-        console.log('will delete ' + this.course.id!);
         this.courseService.delete(this.course.id!).subscribe(e => {
           // eslint-disable-next-line no-console
-          console.log(e);
           this.router.navigateByUrl('/');
         });
       },

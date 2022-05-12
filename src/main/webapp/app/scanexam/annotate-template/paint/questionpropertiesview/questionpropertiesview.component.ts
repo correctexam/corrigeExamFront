@@ -3,7 +3,7 @@
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { HttpResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { IQuestionType } from 'app/entities/question-type/question-type.model';
 import { QuestionTypeService } from 'app/entities/question-type/service/question-type.service';
@@ -27,6 +27,9 @@ export class QuestionpropertiesviewComponent implements OnInit {
 
   isSaving = false;
   questiontypes: IQuestionType[] = [];
+
+  @Output()
+  updatenumero: EventEmitter<string> = new EventEmitter<string>();
 
   editForm = this.fb.group({
     id: [],
@@ -63,6 +66,12 @@ export class QuestionpropertiesviewComponent implements OnInit {
         this.question = undefined;
       }
     });
+  }
+
+  numeroUpdate(): any {
+    //    this.updatenumero.emit(this.editForm.get(['numero'])!.value)
+    // eslint-disable-next-line no-console
+    //    console.log(this.editForm.get(['numero'])!.value)
   }
 
   updateForm(question: IQuestion): void {
@@ -104,6 +113,8 @@ export class QuestionpropertiesviewComponent implements OnInit {
 
   protected onSaveSuccess(): void {
     this.isSaving = false;
+    // eslint-disable-next-line no-console
+    this.eventHandler.setCurrentQuestionNumber(this.editForm.get(['numero'])!.value);
   }
 
   protected onSaveError(): void {

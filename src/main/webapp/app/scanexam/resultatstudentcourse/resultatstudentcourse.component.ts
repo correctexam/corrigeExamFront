@@ -9,6 +9,8 @@ import { ApplicationConfigService } from 'app/core/config/application-config.ser
 import { MessageService } from 'primeng/api';
 import { ConfirmationService } from 'primeng/api';
 import * as FileSaver from 'file-saver';
+import { IExam } from '../../entities/exam/exam.model';
+import { ExamService } from '../../entities/exam/service/exam.service';
 
 @Component({
   selector: 'jhi-resultatstudentcourse',
@@ -20,6 +22,10 @@ export class ResultatStudentcourseComponent implements OnInit {
   blocked = false;
   examid: string | undefined = undefined;
   studentsresult: any[] = [];
+  showEmail = false;
+  mailSubject = '';
+  mailBody = '';
+  exam: IExam | undefined;
 
   constructor(
     protected applicationConfigService: ApplicationConfigService,
@@ -28,26 +34,40 @@ export class ResultatStudentcourseComponent implements OnInit {
     private messageService: MessageService,
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
-    public confirmationService: ConfirmationService
+    public confirmationService: ConfirmationService,
+    public examService: ExamService
   ) {}
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('examid') !== null) {
         this.examid = params.get('examid')!;
-        this.loadEtudiants();
+        this.examService.find(+this.examid).subscribe(e => {
+          this.exam = e.body!;
+          this.mailSubject = "Votre résultat à l'examen " + this.exam.name;
+          this.mailBody = `Bonjour $\{firstname},
+Voici le lien vers votre copie $\{url}.
+
+Sincèrement,
+
+L'équipe pédagogique`;
+          this.loadEtudiants();
+        });
       }
     });
   }
 
+  showEmailStudent(): void {
+    this.showEmail = true;
+  }
+
   envoiEmailEtudiant(): void {
-    // TODO Confirm mail box with
     const mail = {
-      subject: '',
-      body: '',
+      subject: this.mailSubject,
+      body: this.mailBody,
     };
     this.http.post('api/sendResult/' + this.examid, mail).subscribe(() => {
-      // eslint-disable-next-line no-console
+      this.showEmail = false;
       this.messageService.add({
         severity: 'success',
         summary: 'Mails envoyés',

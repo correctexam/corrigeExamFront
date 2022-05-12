@@ -54,6 +54,17 @@ export class ListstudentcourseComponent implements OnInit {
     });
   }
 
+  updateStudent(student: any): void {
+    this.http.put('api/updatestudent/' + this.courseid, student).subscribe(() => {});
+  }
+
+  updateStudentINE(student: any): void {
+    this.http.put('api/updatestudentine/' + this.courseid, student).subscribe(() => {});
+  }
+  updateStudentgroup(student: any): void {
+    this.http.put('api/updatestudentgroup/' + this.courseid, student).subscribe(() => {});
+  }
+
   gotoUE(): void {
     this.router.navigateByUrl('/course/' + this.courseid);
   }

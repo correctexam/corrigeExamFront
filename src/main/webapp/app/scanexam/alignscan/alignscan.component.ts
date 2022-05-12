@@ -77,7 +77,6 @@ export class AlignScanComponent implements OnInit {
   ];
   blocked = false;
   constructor(
-    private pdfService: NgxExtendedPdfViewerService,
     public examService: ExamService,
     public scanService: ScanService,
     public courseService: CourseService,
@@ -85,6 +84,7 @@ export class AlignScanComponent implements OnInit {
     protected activatedRoute: ActivatedRoute,
     public confirmationService: ConfirmationService,
     public router: Router,
+    private pdfService: NgxExtendedPdfViewerService,
     private alignImagesService: AlignImagesService
   ) {}
 
@@ -182,15 +182,6 @@ export class AlignScanComponent implements OnInit {
           this.replacer
         ),
       });
-      /* await db.templates.add({
-      examId: +this.examId,
-      id:0,
-      value: JSON.stringify({
-        template : templatePages64,
-      //  alignPages : alignPages64,
-      //  nonalignPages: nonalignPages64
-    }, this.replacer)
-    })*/
     }
 
     for (let e of alignPages64.keys()) {
@@ -216,17 +207,8 @@ export class AlignScanComponent implements OnInit {
           this.replacer
         ),
       });
-
-      this.router.navigateByUrl('/exam/' + this.examId);
-
-      /* this.dbService.add('keyvalue', {
-              key: 'nonalignPages_' +this.examId+ '_' + e, value : JSON.stringify({
-                pages : nonalignPages64.get(e)!
-              }, this.replacer),
-            })
-            .subscribe(() => {
-            });*/
     }
+    this.router.navigateByUrl('/exam/' + this.examId);
     this.blocked = false;
   }
 
@@ -238,7 +220,6 @@ export class AlignScanComponent implements OnInit {
     const scale = { scale: 2 };
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
     for (let page = 1; page <= this.pdfService.numberOfPages(); page++) {
-      console.log(page);
       this.pdfService.getPageAsImage(page, scale).then(dataURL => {
         this.aligneImages(dataURL, page, (p: IPage) => {
           if (p.page === this.pdfService.numberOfPages()) {

@@ -36,9 +36,9 @@ export class CourseUpdateComponent implements OnInit {
       this.updateForm(course);
 
       // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-      this.userService.query().subscribe((res: HttpResponse<IUser[]>) => {(this.users = res.body || []);
-      // eslint-disable-next-line no-console
-      console.log(this.users)
+      this.userService.query().subscribe((res: HttpResponse<IUser[]>) => {
+        this.users = res.body || [];
+        // eslint-disable-next-line no-console
       });
     });
   }

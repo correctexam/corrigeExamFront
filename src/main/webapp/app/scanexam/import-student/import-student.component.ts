@@ -84,7 +84,6 @@ export class ImportStudentComponent implements OnInit {
       students: this.dataset.filter(e => e.mail !== undefined),
     };
     // eslint-disable-next-line no-console
-    console.log(c);
     // eslint-disable-next-line no-console
     //    console.log( this.dataset);
     // eslint-disable-next-line no-console

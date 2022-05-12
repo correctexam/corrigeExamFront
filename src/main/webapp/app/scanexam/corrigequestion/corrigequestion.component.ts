@@ -381,7 +381,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   nextStudent(event: KeyboardEvent) {
     event.preventDefault();
     const c = this.currentStudent + 2;
-    console.log(this.numberPagesInScan! / this.nbreFeuilleParCopie!);
     if (c <= this.numberPagesInScan! / this.nbreFeuilleParCopie!) {
       this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno + 1) + '/' + c);
     }
@@ -400,7 +399,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     event.preventDefault();
     const c = this.currentStudent + 1;
     const q = this.questionno + 2;
-    console.log(this.nbreQuestions);
     if (q <= this.nbreQuestions) {
       this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
     }
@@ -592,46 +590,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   changeAlign(): void {
     this.reloadImage();
   }
-  /*
-  private addEventListeners(canvas: any) {
-    canvas.on('mouse:down', (e: any) => this.ngZone.run(() => this.onCanvasMouseDown(e)));
-    canvas.on('mouse:move', (e: any) => this.ngZone.run(() => this.onCanvasMouseMove(e)));
-    canvas.on('mouse:up', () => this.ngZone.run(() => this.onCanvasMouseUp()));
-    canvas.on('selection:created', (e: any) => this.ngZone.run(() => this.onSelectionCreated(e as any)));
-    canvas.on('selection:updated', (e: any) => this.ngZone.run(() => this.onSelectionUpdated(e as any)));
-    canvas.on('object:moving', (e: any) => this.ngZone.run(() => this.onObjectMoving(e as any)));
-    canvas.on('object:scaling', (e: any) => this.ngZone.run(() => this.onObjectScaling(e as any)));
+  getStudentName(): string | undefined {
+    return this.selectionStudents?.map(e1 => e1.firstname + ' ' + e1.name).join(', ');
   }
-
-  private onCanvasMouseDown(event: { e: Event }) {
-    this.eventHandler.mouseDown(event.e);
-    this.avoidDragAndClickEventsOfOtherUILibs(event.e);
-  }
-  private onCanvasMouseMove(event: { e: Event }) {
-    this.eventHandler.mouseMove(event.e);
-  }
-  private onCanvasMouseUp() {
-    this.eventHandler.mouseUp();
-  }
-  private onSelectionCreated(e: { target: CustomFabricObject }) {
-    this.eventHandler.objectSelected(e.target);
-  }
-  private onSelectionUpdated(e: { target: CustomFabricObject }) {
-    this.eventHandler.objectSelected(e.target);
-  }
-  private onObjectMoving(e: any) {
-    this.eventHandler.objectMoving(e.target.id, e.target.type, e.target.left, e.target.top);
-  }
-  private onObjectScaling(e: any) {
-    this.eventHandler.objectScaling(
-      e.target.id,
-      e.target.type,
-      { x: e.target.scaleX, y: e.target.scaleY },
-      { left: e.target.left, top: e.target.top }
-    );
-  }
-
-  private avoidDragAndClickEventsOfOtherUILibs(e: Event) {
-    e.stopPropagation();
-  } */
 }

@@ -8,7 +8,8 @@
     <div class="grid grid-nogutter">
       <div class="col-8">
         <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">
-          Votre copie: <span *ngFor="let st of selectionStudents"> {{ st.name }} {{ st.firstname }}</span>
+          Votre copie: <span *ngFor="let st of selectionStudents"> {{ st.name }} {{ st.firstname }}</span> (Note:
+          {{ note | async | number: '1.2-2' }})
         </h2>
       </div>
       <div class="col-4 flex flex-row-reverse"></div>
@@ -83,6 +84,35 @@
             </div>
           </div>
         </div>
+      </div>
+      <div class="canvas-wrapper foo">
+        <ngx-extended-pdf-viewer
+          [hidden]="'true'"
+          [base64Src]="pdfcontent"
+          [useBrowserLocale]="true"
+          style="flex: 1 1 100%"
+          #viewer
+          [height]="'90vh'"
+          [page]="1"
+          [handTool]="false"
+          [showHandToolButton]="false"
+          [textLayer]="false"
+          [handTool]="false"
+          [showToolbar]="false"
+          [pageViewMode]="'infinite-scroll'"
+          [showSecondaryToolbarButton]="false"
+          backgroundColor="#ffffff"
+          [zoom]="'100%'"
+          [minZoom]="1"
+          [maxZoom]="1"
+          (pdfLoaded)="pdfloaded()"
+        ></ngx-extended-pdf-viewer>
+
+        <canvas [hidden]="!debug" #imageAligned></canvas>
+
+        <canvas [hidden]="!debug" #keypoints1></canvas>
+        <canvas [hidden]="!debug" #keypoints2></canvas>
+        <canvas [hidden]="!debug" #imageCompareMatches></canvas>
       </div>
     </div>
   </div>

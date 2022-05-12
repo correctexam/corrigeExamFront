@@ -467,7 +467,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   }
   @HostListener('window:keydown.control.Enter', ['$event'])
   async selectRecogniezStudent(): Promise<void> {
-    console.log('ok');
     this.selectionStudents = [this.recognizedStudent];
     await this.bindStudent();
     if ((this.currentStudent + 1) * this.nbreFeuilleParCopie < this.numberPagesInScan) {

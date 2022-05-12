@@ -8,7 +8,17 @@
 
 // http://localhost:9000/copie/d6680b56-36a5-4488-ac5b-c862096bc311/1
 
-import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, AfterViewInit, HostListener } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnInit,
+  QueryList,
+  ViewChildren,
+  AfterViewInit,
+  HostListener,
+  ViewChild,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CourseService } from 'app/entities/course/service/course.service';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
@@ -17,7 +27,7 @@ import { StudentService } from 'app/entities/student/service/student.service';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AlignImagesService } from '../services/align-images.service';
-import { db } from '../db/db';
+import { db } from '../db/dbstudent';
 import { IExam } from '../../entities/exam/exam.model';
 import { ICourse } from 'app/entities/course/course.model';
 import { IStudent } from '../../entities/student/student.model';
@@ -35,6 +45,13 @@ import { IGradedComment } from '../../entities/graded-comment/graded-comment.mod
 import { GradedCommentService } from '../../entities/graded-comment/service/graded-comment.service';
 import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
 import { ScanService } from 'app/entities/scan/service/scan.service';
+import { FinalResultService } from '../../entities/final-result/service/final-result.service';
+import { IFinalResult } from '../../entities/final-result/final-result.model';
+import { IScan } from '../../entities/scan/scan.model';
+import { IExamSheet } from '../../entities/exam-sheet/exam-sheet.model';
+import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
+import { TemplateService } from '../../entities/template/service/template.service';
+import { ITemplate } from 'app/entities/template/template.model';
 
 @Component({
   selector: 'jhi-voircopie',
@@ -67,8 +84,34 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   noalign = false;
   factor = 1;
   uuid = '';
+  sheet: IExamSheet | undefined;
+  note = new Promise<number>(resolve => {
+    this.resolve = resolve;
+  });
+  scan: IScan | undefined;
+  resolve: any;
   currentTextComment4Question: ITextComment[] | undefined;
   currentGradedComment4Question: IGradedComment[] | undefined;
+  finalResult: IFinalResult | undefined;
+
+  private editedImage: HTMLCanvasElement | undefined;
+  @ViewChild('keypoints1')
+  keypoints1: ElementRef | undefined;
+  @ViewChild('keypoints2')
+  keypoints2: ElementRef | undefined;
+  @ViewChild('imageCompareMatches')
+  imageCompareMatches: ElementRef | undefined;
+  @ViewChild('imageAligned')
+  imageAligned: ElementRef | undefined;
+  templatePages: Map<number, IPage> = new Map();
+  alignPages: Map<number, IPage> = new Map();
+  nonalignPages: Map<number, IPage> = new Map();
+  debug = false;
+  phase1 = false;
+  loaded = false;
+  alignement = 'marker';
+  template!: ITemplate;
+  pdfcontent!: string;
 
   constructor(
     public examService: ExamService,
@@ -87,11 +130,15 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     public textCommentService: TextCommentService,
     public studentResponseService: StudentResponseService,
     private changeDetector: ChangeDetectorRef,
-    private eventHandler: EventCanevasVoirCopieHandlerService
+    private eventHandler: EventCanevasVoirCopieHandlerService,
+    public finalResultService: FinalResultService,
+    private pdfService: NgxExtendedPdfViewerService,
+    private templateService: TemplateService
   ) {}
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
+      this.blocked = true;
       this.currentNote = 0;
       this.noteSteps = 0;
       this.maxNote = 0;
@@ -100,85 +147,93 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
       if (params.get('uuid') !== null) {
         this.uuid = params.get('uuid')!;
         this.sheetService.query({ name: params.get('uuid') }).subscribe(s => {
-          const sheet = s.body![0];
-          this.studentService.query({ sheetId: sheet.id }).subscribe(e => {
-            this.selectionStudents = e.body!;
-          });
+          this.sheet = s.body![0];
+          this.currentStudent = this.sheet.pagemin! / (this.sheet.pagemax! - this.sheet.pagemin! + 1);
 
-          //          this.students = sheet.students
-          console.log(sheet);
-          this.examService
-            .query({
-              scanId: sheet.scanId,
-            })
-            .subscribe(ex2 => {
-              this.exam = ex2.body![0];
-              if (params.get('questionno') !== null) {
-                this.questionno = +params.get('questionno')! - 1;
+          this.studentService.query({ sheetId: this.sheet.id }).subscribe(studentsr => {
+            this.selectionStudents = studentsr.body!;
+            this.examService
+              .query({
+                scanId: this.sheet!.scanId,
+              })
+              .subscribe(ex2 => {
+                this.exam = ex2.body![0];
+                if (
+                  this.selectionStudents !== undefined &&
+                  this.selectionStudents.length > 0 &&
+                  this.selectionStudents[0].id !== undefined
+                ) {
+                  this.finalResultService
+                    .query({ examId: this.exam.id, studentId: this.selectionStudents![0].id })
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+                    .subscribe(bo => this.resolve(bo.body![0].note! / 100));
+                }
 
-                // Step 1 Query templates
-                db.templates
-                  .where('examId')
-                  .equals(this.exam!.id!)
-                  .count()
-                  .then(e2 => {
-                    this.nbreFeuilleParCopie = e2;
-                    // Step 2 Query Scan in local DB
+                if (params.get('questionno') !== null) {
+                  this.questionno = +params.get('questionno')! - 1;
 
-                    db.alignImages
-                      .where('examId')
-                      .equals(this.exam!.id!)
-                      .count()
-                      .then(e1 => {
+                  // Step 1 Query templates
+
+                  this.nbreFeuilleParCopie = this.sheet!.pagemax! - this.sheet!.pagemin! + 1;
+                  // Step 2 Query Scan in local DB
+                  db.alignImages
+                    .where('examId')
+                    .equals(this.exam!.id!)
+                    .count()
+                    .then(e1 => {
+                      if (e1 === 0) {
+                        this.populateCache();
+                      } else {
                         this.numberPagesInScan = e1;
-                        this.examService.find(this.exam!.id!).subscribe(data => {
-                          this.exam = data.body!;
-                          this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
-
-                          // Step 4 Query zone 4 questions
-                          this.blocked = false;
-                          this.questionService.query({ examId: this.exam.id }).subscribe(b =>
-                            b.body!.forEach(q => {
-                              if (q.numero! > this.nbreQuestions) {
-                                this.nbreQuestions = q.numero!;
-                              }
-                            })
-                          );
-                          this.questionService.query({ examId: this.exam.id, numero: this.questionno + 1 }).subscribe(q1 => {
-                            this.questions = q1.body!;
-                            this.showImage = new Array<boolean>(this.questions.length);
-
-                            if (this.questions.length > 0) {
-                              this.noteSteps = this.questions[0].point! * this.questions[0].step!;
-                              this.questionStep = this.questions[0].step!;
-                              this.maxNote = this.questions[0].point!;
-                              this.currentQuestion = this.questions[0];
-
-                              this.studentResponseService
-                                .query({
-                                  sheetId: sheet.id,
-                                  questionId: this.questions[0].id,
-                                })
-                                .subscribe(sr => {
-                                  if (sr.body !== null && sr.body.length > 0) {
-                                    this.resp = sr.body![0];
-                                    console.log(this.resp);
-                                    this.currentNote = this.resp.note!;
-                                    if (this.questions![0].gradeType === GradeType.DIRECT) {
-                                      this.currentTextComment4Question = this.resp.textcomments!;
-                                    } else {
-                                      this.currentGradedComment4Question = this.resp.gradedcomments!;
-                                    }
-                                  }
-                                });
-                            }
-                          });
-                        });
-                      });
-                  });
-              }
-            });
+                        this.finalize();
+                      }
+                    });
+                }
+              });
+          });
         });
+      }
+    });
+  }
+
+  finalize() {
+    this.courseService.find(this.exam!.courseId!).subscribe(e => (this.course = e.body!));
+
+    // Step 4 Query zone 4 questions
+    this.blocked = false;
+    this.questionService.query({ examId: this.exam!.id }).subscribe(b =>
+      b.body!.forEach(q => {
+        if (q.numero! > this.nbreQuestions) {
+          this.nbreQuestions = q.numero!;
+        }
+      })
+    );
+    this.questionService.query({ examId: this.exam!.id, numero: this.questionno + 1 }).subscribe(q1 => {
+      this.questions = q1.body!;
+      this.showImage = new Array<boolean>(this.questions.length);
+
+      if (this.questions.length > 0) {
+        this.noteSteps = this.questions[0].point! * this.questions[0].step!;
+        this.questionStep = this.questions[0].step!;
+        this.maxNote = this.questions[0].point!;
+        this.currentQuestion = this.questions[0];
+
+        this.studentResponseService
+          .query({
+            sheetId: this.sheet!.id,
+            questionId: this.questions[0].id,
+          })
+          .subscribe(sr => {
+            if (sr.body !== null && sr.body.length > 0) {
+              this.resp = sr.body![0];
+              this.currentNote = this.resp.note!;
+              if (this.questions![0].gradeType === GradeType.DIRECT) {
+                this.currentTextComment4Question = this.resp.textcomments!;
+              } else {
+                this.currentGradedComment4Question = this.resp.gradedcomments!;
+              }
+            }
+          });
       }
     });
   }
@@ -193,6 +248,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   reloadImage() {
     this.questions!.forEach((q, i) => {
       this.showImage[i] = false;
+      console.log(q.zoneId);
       this.loadZone(
         q.zoneId,
         b => {
@@ -260,6 +316,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     return new Promise<IZone | undefined>(resolve => {
       if (zoneId) {
         this.zoneService.find(zoneId).subscribe(e => {
+          console.log(currentStudent! * this.nbreFeuilleParCopie! + e.body!.pageNumber!);
           this.getAllImage4Zone(currentStudent! * this.nbreFeuilleParCopie! + e.body!.pageNumber!, e.body!).then(p => {
             this.displayImage(p, imageRef, showImageRef, index);
             resolve(e.body!);
@@ -382,5 +439,243 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
 
   changeAlign(): void {
     this.reloadImage();
+  }
+
+  populateCache() {
+    this.courseService.find(this.exam!.courseId!).subscribe(e => (this.course = e.body!));
+    if (this.exam!.templateId) {
+      this.templateService.find(this.exam!.templateId).subscribe(e1 => {
+        this.template = e1.body!;
+        this.pdfcontent = this.template.content!;
+      });
+    }
+  }
+
+  async removeElement(examId: number): Promise<any> {
+    await db.removeElementForExam(examId);
+    await db.removeExam(examId);
+  }
+
+  public pdfloaded(): void {
+    if (!this.phase1) {
+      this.nbreFeuilleParCopie = this.pdfService.numberOfPages();
+      this.process();
+    }
+    this.loaded = true;
+    if (this.phase1) {
+      if (this.pdfService.numberOfPages() !== 0) {
+        this.numberPagesInScan = this.pdfService.numberOfPages();
+        this.exportAsImage();
+      }
+    }
+  }
+
+  process(): void {
+    this.blocked = true;
+    this.removeElement(this.exam!.id!);
+    if (!this.phase1) {
+      const scale = { scale: 2 };
+      for (let i = 1; i <= this.nbreFeuilleParCopie!; i++) {
+        this.pdfService.getPageAsImage(i, scale).then(dataURL => {
+          this.loadImage(dataURL, i).then(res1 => {
+            this.templatePages.set(res1.page!, {
+              image: res1.image,
+              page: res1.page,
+              width: res1.width,
+              height: res1.height,
+            });
+            if (res1.page! === this.nbreFeuilleParCopie) {
+              this.phase1 = true;
+              if (this.exam!.scanfileId) {
+                this.scanService.find(this.exam!.scanfileId).subscribe(e => {
+                  this.scan = e.body!;
+                  this.pdfcontent = this.scan.content!;
+                });
+              }
+            }
+          });
+        });
+      }
+    }
+  }
+
+  private async saveData(): Promise<any> {
+    const templatePages64: Map<number, string> = new Map();
+    const alignPages64: Map<number, string> = new Map();
+    const nonalignPages64: Map<number, string> = new Map();
+    this.templatePages.forEach((e, k) => {
+      templatePages64.set(k, this.fgetBase64Image(e.image!));
+    });
+    this.alignPages.forEach((e, k) => {
+      alignPages64.set(k, this.fgetBase64Image(e.image!));
+    });
+    this.nonalignPages.forEach((e, k) => {
+      nonalignPages64.set(k, this.fgetBase64Image(e.image!));
+    });
+    await db.exams.add({
+      id: +this.exam!.id!,
+    });
+
+    for (const e of templatePages64.keys()) {
+      await db.templates.add({
+        examId: +this.exam!.id!,
+        pageNumber: e,
+        value: JSON.stringify(
+          {
+            pages: templatePages64.get(e)!,
+          },
+          this.replacer
+        ),
+      });
+    }
+
+    for (const e of alignPages64.keys()) {
+      await db.alignImages.add({
+        examId: +this.exam!.id!,
+        pageNumber: e,
+        value: JSON.stringify(
+          {
+            pages: alignPages64.get(e)!,
+          },
+          this.replacer
+        ),
+      });
+    }
+    for (const e of nonalignPages64.keys()) {
+      await db.nonAlignImages.add({
+        examId: +this.exam!.id!,
+        pageNumber: e,
+        value: JSON.stringify(
+          {
+            pages: nonalignPages64.get(e)!,
+          },
+          this.replacer
+        ),
+      });
+    }
+    this.finalize();
+    this.blocked = false;
+  }
+
+  public exportAsImage(): void {
+    const scale = { scale: 2 };
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+    for (let page = this.sheet!.pagemin! + 1; page <= this.sheet!.pagemax! + 1; page++) {
+      this.pdfService.getPageAsImage(page, scale).then(dataURL => {
+        this.aligneImages(dataURL, page, (p: IPage) => {
+          if (p.page === this.sheet!.pagemax! + 1) {
+            this.saveData();
+          }
+        });
+      });
+    }
+  }
+
+  aligneImages(file: any, pagen: number, cb: (page: IPage) => void): void {
+    if (this.alignPages.has(pagen)) {
+      cb(this.alignPages.get(pagen)!);
+    } else {
+      const i = new Image();
+      i.onload = () => {
+        this.editedImage = <HTMLCanvasElement>document.createElement('canvas');
+        this.editedImage.width = i.width;
+        this.editedImage.height = i.height;
+        const ctx = this.editedImage.getContext('2d');
+        ctx!.drawImage(i, 0, 0);
+        const inputimage1 = ctx!.getImageData(0, 0, i.width, i.height);
+
+        const napage = {
+          image: inputimage1,
+          page: pagen,
+          width: i.width!,
+          height: i.height,
+        };
+        this.nonalignPages.set(pagen, napage);
+        if (this.alignement !== 'off') {
+          let paget = pagen % this.nbreFeuilleParCopie!;
+          if (paget === 0) {
+            paget = this.nbreFeuilleParCopie!;
+          }
+          console.log('ok');
+          console.log(pagen);
+          console.log(paget);
+          this.alignImagesService
+            .imageAlignement({
+              imageA: this.templatePages.get(paget)?.image,
+              imageB: inputimage1,
+              marker: this.alignement === 'marker',
+            })
+            .subscribe(e => {
+              if (this.debug) {
+                const ctx1 = this.imageCompareMatches?.nativeElement.getContext('2d');
+                this.imageCompareMatches!.nativeElement.width = e.imageCompareMatchesWidth;
+                this.imageCompareMatches!.nativeElement.height = e.imageCompareMatchesHeight;
+                ctx1.putImageData(e.imageCompareMatches, 0, 0);
+                const ctx2 = this.keypoints1?.nativeElement.getContext('2d');
+                this.keypoints1!.nativeElement.width = e.keypoints1Width;
+                this.keypoints1!.nativeElement.height = e.keypoints1Height;
+                ctx2.putImageData(e.keypoints1, 0, 0);
+                const ctx3 = this.keypoints2?.nativeElement.getContext('2d');
+                this.keypoints2!.nativeElement.width = e.keypoints2Width;
+                this.keypoints2!.nativeElement.height = e.keypoints2Height;
+                ctx3.putImageData(e.keypoints2, 0, 0);
+                const ctx4 = this.imageAligned?.nativeElement.getContext('2d');
+                this.imageAligned!.nativeElement.width = e.imageAlignedWidth;
+                this.imageAligned!.nativeElement.height = e.imageAlignedHeight;
+                ctx4.putImageData(e.imageAligned, 0, 0);
+              }
+              const apage = {
+                image: e.imageAligned,
+                page: pagen,
+                width: i.width!,
+                height: i.height,
+              };
+              this.alignPages.set(pagen, apage);
+              console.log('ok');
+              console.log(pagen);
+              console.log(apage);
+
+              cb(apage);
+            });
+        } else {
+          const apage = {
+            image: inputimage1,
+            page: pagen,
+            width: i.width,
+            height: i.height,
+          };
+          this.alignPages.set(pagen, apage);
+          cb(apage);
+        }
+      };
+      i.src = file;
+    }
+  }
+
+  public alignementChange(): any {
+    this.alignPages.clear();
+    this.exportAsImage();
+  }
+
+  private fgetBase64Image(img: ImageData): string {
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    const ctx = canvas.getContext('2d');
+    ctx?.putImageData(img, 0, 0);
+    const dataURL = canvas.toDataURL('image/png');
+    return dataURL;
+    // return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+  }
+  replacer(key: any, value: any): any {
+    if (value instanceof Map) {
+      return {
+        dataType: 'Map',
+        value: Array.from(value.entries()), // or with spread: value: [...value]
+      };
+    } else {
+      return value;
+    }
   }
 }

@@ -323,7 +323,6 @@ export class EventCanevascorrectionHandlerService {
         }
         // this.zoneService.delete(this.modelViewpping.get(object.id)!).subscribe();
         this.modelViewpping.delete(object.id);
-        console.log(object.id);
         this.canvas.remove(object);
         this.canvas.renderAll();
         this.updateComments().then(e2 =>

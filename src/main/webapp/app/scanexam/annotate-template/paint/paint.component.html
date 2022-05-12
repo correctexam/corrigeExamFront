@@ -1,12 +1,12 @@
 <div class="d-flex ml-0 mr-0">
   <div class="">
-    <jhi-fabric-canvas [exam]="exam" [content]="content"></jhi-fabric-canvas>
+    <jhi-fabric-canvas [exam]="exam" [content]="content" [numeroEvent]="numero"></jhi-fabric-canvas>
   </div>
   <div class="width-200">
     <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
       <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
     </button>
     <jhi-graphical-toolbar></jhi-graphical-toolbar>
-    <jhi-questionpropertiesview></jhi-questionpropertiesview>
+    <jhi-questionpropertiesview (updatenumero)="updateNumero($event)"></jhi-questionpropertiesview>
   </div>
 </div>

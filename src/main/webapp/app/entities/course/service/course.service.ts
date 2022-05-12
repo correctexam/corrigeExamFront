@@ -24,8 +24,6 @@ export class CourseService {
     return this.http.put<ICourse>(`${this.resourceUrl}`, course, { observe: 'response' });
   }
 
-
-
   find(id: number): Observable<EntityResponseType> {
     return this.http.get<ICourse>(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
@@ -37,7 +35,6 @@ export class CourseService {
 
   delete(id: number): Observable<HttpResponse<{}>> {
     // eslint-disable-next-line no-console
-    console.log(id);
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 

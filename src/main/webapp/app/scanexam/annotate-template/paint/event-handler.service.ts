@@ -27,7 +27,6 @@ import {
   Pointer,
 } from './models';
 import { Injectable } from '@angular/core';
-import { Group, Rect } from 'fabric/fabric-impl';
 import { CustomFabricGroup } from './models';
 import { IZone } from '../../../entities/zone/zone.model';
 import { ZoneService } from '../../../entities/zone/service/zone.service';
@@ -59,6 +58,10 @@ export class EventHandlerService {
   private cb!: (qid: number | undefined) => void;
 
   set selectedTool(t: DrawingTools) {
+    this.allcanvas.forEach(e => {
+      e.discardActiveObject();
+      e.renderAll();
+    });
     this.canvas.discardActiveObject();
     this.canvas.renderAll();
     if (this.drawingToolObserver) {
@@ -115,6 +118,23 @@ export class EventHandlerService {
   private _exam!: IExam;
   set exam(c: IExam) {
     this._exam = c;
+  }
+
+  setCurrentQuestionNumber(number: string) {
+    if (this.currentSelected !== undefined) {
+      (this.currentSelected as any).text = 'Question ' + number;
+      this.currentSelected = undefined;
+      this.allcanvas.forEach(e => {
+        e.discardActiveObject();
+        e.renderAll();
+      });
+      this.cb(undefined);
+
+      // this.canvas.discardActiveObject();
+      // this.canvas.renderAll();
+
+      //   this.selectedTool = DrawingTools.SELECT
+    }
   }
 
   drawingToolObserver!: (d: DrawingTools) => void;
@@ -284,16 +304,6 @@ export class EventHandlerService {
         'Nom',
         DrawingColours.BLUE
       );
-      /*  const r =  this.pages[(this.canvas as any).page].cursorToReal({
-          x:this._elementUnderDrawing.left,
-        y: this._elementUnderDrawing.top
-      });
-      console.log(r)*/
-      /*   const r1 =  this.pages[(this.canvas as any).page].realToCanvas({
-        x:this._elementUnderDrawing.left!,
-        y: this._elementUnderDrawing.top!
-    });
-    console.log(r1)*/
 
       const z: IZone = {
         pageNumber: (this.canvas as any).page,
@@ -413,6 +423,13 @@ export class EventHandlerService {
     }
     if (this._selectedTool !== DrawingTools.SELECT) {
       this.canvas.renderAll();
+    } else {
+      this.allcanvas
+        .filter(c => c !== this.canvas)
+        .forEach(c => {
+          c.discardActiveObject();
+          c.renderAll();
+        });
     }
   }
 
@@ -426,6 +443,8 @@ export class EventHandlerService {
     })(fabric.Object.prototype.toObject);
   }
 
+  currentSelected: fabric.Object | undefined;
+
   objectSelected(object: CustomFabricObject): void {
     this.cb(undefined);
     this.previousLeft = object.left!;
@@ -437,6 +456,7 @@ export class EventHandlerService {
         if (object.type === FabricObjectType.GROUP) {
           if (((object as CustomFabricGroup).getObjects()[1] as any).text.startsWith('Question')) {
             this.cb(this.modelViewpping.get(object.id));
+            this.currentSelected = (object as CustomFabricGroup).getObjects()[1];
           }
         }
 
