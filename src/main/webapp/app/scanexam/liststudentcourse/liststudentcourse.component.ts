@@ -66,7 +66,7 @@ export class ListstudentcourseComponent implements OnInit {
   }
 
   gotoUE(): void {
-    this.router.navigateByUrl(this.applicationConfigService.getEndpointFor('/course/' + this.courseid));
+    this.router.navigateByUrl('course/' + this.courseid);
   }
   loadEtudiants(): void {
     this.http.get(this.applicationConfigService.getEndpointFor('api/getstudentcours/' + this.courseid)).subscribe(s => {
