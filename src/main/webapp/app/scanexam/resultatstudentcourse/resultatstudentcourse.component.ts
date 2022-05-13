@@ -66,7 +66,7 @@ L'équipe pédagogique`;
       subject: this.mailSubject,
       body: this.mailBody,
     };
-    this.http.post('api/sendResult/' + this.examid, mail).subscribe(() => {
+    this.http.post(this.applicationConfigService.getEndpointFor('api/sendResult/' + this.examid), mail).subscribe(() => {
       this.showEmail = false;
       this.messageService.add({
         severity: 'success',
@@ -79,7 +79,7 @@ L'équipe pédagogique`;
     this.router.navigateByUrl('/exam/' + this.examid);
   }
   loadEtudiants(): void {
-    this.http.get('api/showResult/' + this.examid).subscribe(s => {
+    this.http.get(this.applicationConfigService.getEndpointFor('api/showResult/' + this.examid)).subscribe(s => {
       // eslint-disable-next-line no-console
       this.studentsresult = s as any;
     });

@@ -55,21 +55,21 @@ export class ListstudentcourseComponent implements OnInit {
   }
 
   updateStudent(student: any): void {
-    this.http.put('api/updatestudent/' + this.courseid, student).subscribe(() => {});
+    this.http.put(this.applicationConfigService.getEndpointFor('api/updatestudent/' + this.courseid), student).subscribe(() => {});
   }
 
   updateStudentINE(student: any): void {
-    this.http.put('api/updatestudentine/' + this.courseid, student).subscribe(() => {});
+    this.http.put(this.applicationConfigService.getEndpointFor('api/updatestudentine/' + this.courseid), student).subscribe(() => {});
   }
   updateStudentgroup(student: any): void {
-    this.http.put('api/updatestudentgroup/' + this.courseid, student).subscribe(() => {});
+    this.http.put(this.applicationConfigService.getEndpointFor('api/updatestudentgroup/' + this.courseid), student).subscribe(() => {});
   }
 
   gotoUE(): void {
-    this.router.navigateByUrl('/course/' + this.courseid);
+    this.router.navigateByUrl(this.applicationConfigService.getEndpointFor('/course/' + this.courseid));
   }
   loadEtudiants(): void {
-    this.http.get('api/getstudentcours/' + this.courseid).subscribe(s => {
+    this.http.get(this.applicationConfigService.getEndpointFor('api/getstudentcours/' + this.courseid)).subscribe(s => {
       // eslint-disable-next-line no-console
       this.students = s as any;
     });

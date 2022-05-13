@@ -77,6 +77,7 @@ export class ChargerscanComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
+    this.blocked = true;
     const scan = this.createFromForm();
     if (scan.id !== undefined) {
       this.subscribeToSaveResponse(this.scanService.update(scan));
@@ -96,6 +97,8 @@ export class ChargerscanComponent implements OnInit {
     this.exam.scanfileId = s?.id;
     this.examService.update(this.exam).subscribe(
       () => {
+        this.blocked = false;
+
         this.gotoUE();
       },
       () => this.onSaveError()
@@ -103,7 +106,7 @@ export class ChargerscanComponent implements OnInit {
   }
 
   protected onSaveError(): void {
-    // Api for inheritance.
+    this.blocked = false;
   }
 
   protected onSaveFinalize(): void {
