@@ -361,6 +361,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.studentResponseService.update(this.resp!).subscribe(() => {
           (currentComment as any).checked = true;
           this.currentGradedComment4Question?.push(currentComment);
+          this.computeNote(false);
           this.titreCommentaire = '';
           this.descCommentaire = '';
           this.noteCommentaire = 0;
@@ -439,8 +440,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (this.selectionStudents.length === 0) {
           this.messageService.add({
             severity: 'error',
-            summary: 'Copie non associé à un étudiant',
-            detail: 'Il semble que cette copie ne soit pas associé à un étudiant',
+            summary: 'Copie non associée à un étudiant',
+            detail: 'Il semble que cette copie ne soit pas associée à un étudiant',
           });
         }
 

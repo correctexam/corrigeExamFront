@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import Dexie, { Table } from 'dexie';
 
@@ -89,6 +91,16 @@ export class AppDB extends Dexie {
     await db.transaction('rw', 'exams', () => {
       this.exams.delete(examId);
     });
+  }
+
+  async addAligneImage(elt: AlignImage) {
+    await db.alignImages.add(elt);
+    console.log('save ' + elt.pageNumber);
+  }
+
+  async addNonAligneImage(elt: AlignImage) {
+    await db.nonAlignImages.add(elt);
+    console.log('save na ' + elt.pageNumber);
   }
 }
 

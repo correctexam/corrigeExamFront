@@ -40,8 +40,8 @@
         optionValue="value"
       ></p-selectButton>
 
-      <h5>Debug</h5>
-      <p-selectButton [options]="debugOptions" [(ngModel)]="debug" optionLabel="label" optionValue="value"></p-selectButton>
+      <!--<h5>Debug</h5>
+      <p-selectButton [options]="debugOptions" [(ngModel)]="debug" optionLabel="label" optionValue="value"></p-selectButton> -->
 
       <h5>Nombre de page à utiliser dans le template d'exam</h5>
       <p-inputNumber [(ngModel)]="nbreFeuilleParCopie" [showButtons]="true"></p-inputNumber>
@@ -70,11 +70,11 @@
           (pdfLoaded)="pdfloaded()"
         ></ngx-extended-pdf-viewer>
 
-        <canvas [hidden]="!debug" #imageAligned></canvas>
+        <!-- <canvas [hidden]="!debug" #imageAligned></canvas>
 
         <canvas [hidden]="!debug" #keypoints1></canvas>
         <canvas [hidden]="!debug" #keypoints2></canvas>
-        <canvas [hidden]="!debug" #imageCompareMatches></canvas>
+        <canvas [hidden]="!debug" #imageCompareMatches></canvas>-->
       </div>
     </div>
   </div>

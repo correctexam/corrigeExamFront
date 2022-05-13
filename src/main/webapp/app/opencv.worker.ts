@@ -372,7 +372,7 @@ cv.rectangle(dst1, point1, point2,  [0, 0, 255, 255], 2, cv.LINE_AA, 0);
 cv.rectangle(srcMat, point1, point2,  [0, 0, 255, 255], 2, cv.LINE_AA, 0);*/
 
     let result = {} as any;
-    result['keypoints1'] = imageDataFromMat(srcMat);
+    /*result['keypoints1'] = imageDataFromMat(srcMat);
     result['keypoints1Width'] = srcMat.size().width;
     result['keypoints1Height'] = srcMat.size().height;
     result['keypoints2'] = imageDataFromMat(dst);
@@ -380,7 +380,7 @@ cv.rectangle(srcMat, point1, point2,  [0, 0, 255, 255], 2, cv.LINE_AA, 0);*/
     result['keypoints2Height'] = dst.size().height;
     result['imageCompareMatches'] = imageDataFromMat(srcMat2);
     result['imageCompareMatchesWidth'] = srcMat2.size().width;
-    result['imageCompareMatchesHeight'] = srcMat2.size().height;
+    result['imageCompareMatchesHeight'] = srcMat2.size().height;*/
     result['imageAligned'] = imageDataFromMat(dst1);
     result['imageAlignedWidth'] = dst1.size().width;
     result['imageAlignedHeight'] = dst1.size().height;
@@ -430,21 +430,21 @@ cv.rectangle(srcMat, point1, point2,  [0, 0, 255, 255], 2, cv.LINE_AA, 0);*/
 
     cv.drawMatches(srcMat2, keypoints1, srcMat, keypoints2, good_matches, imMatches, color);
     let result = {} as any;
-    result['imageCompareMatches'] = imageDataFromMat(imMatches);
+    /*result['imageCompareMatches'] = imageDataFromMat(imMatches);
     result['imageCompareMatchesWidth'] = imMatches.size().width;
-    result['imageCompareMatchesHeight'] = imMatches.size().height;
+    result['imageCompareMatchesHeight'] = imMatches.size().height;*/
     let keypoints1_img = new cv.Mat();
     let keypoints2_img = new cv.Mat();
     let keypointcolor = new cv.Scalar(0, 255, 0, 255);
     cv.drawKeypoints(srcMat1, keypoints1, keypoints1_img, keypointcolor);
     cv.drawKeypoints(srcMat, keypoints2, keypoints2_img, keypointcolor);
 
-    result['keypoints1'] = imageDataFromMat(keypoints1_img);
+    /*result['keypoints1'] = imageDataFromMat(keypoints1_img);
     result['keypoints1Width'] = keypoints1_img.size().width;
     result['keypoints1Height'] = keypoints1_img.size().height;
     result['keypoints2'] = imageDataFromMat(keypoints2_img);
     result['keypoints2Width'] = keypoints2_img.size().width;
-    result['keypoints2Height'] = keypoints2_img.size().height;
+    result['keypoints2Height'] = keypoints2_img.size().height;*/
 
     let points1 = [];
     let points2 = [];
@@ -498,6 +498,7 @@ cv.rectangle(srcMat, point1, point2,  [0, 0, 255, 255], 2, cv.LINE_AA, 0);*/
     srcMat1.delete();
     srcMat2.delete();
     circlesMat1.delete();
+    return result;
   }
 }
 

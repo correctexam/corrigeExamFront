@@ -60,6 +60,8 @@ import { ITemplate } from 'app/entities/template/template.model';
   providers: [ConfirmationService, MessageService],
 })
 export class VoirCopieComponent implements OnInit, AfterViewInit {
+  public href = '';
+
   @ViewChildren('nomImage')
   canvass!: QueryList<ElementRef>;
   showImage: boolean[] = [];
@@ -137,6 +139,8 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
+    this.href = this.router.url;
+
     this.activatedRoute.paramMap.subscribe(params => {
       this.blocked = true;
       this.currentNote = 0;
@@ -248,7 +252,6 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   reloadImage() {
     this.questions!.forEach((q, i) => {
       this.showImage[i] = false;
-      console.log(q.zoneId);
       this.loadZone(
         q.zoneId,
         b => {
@@ -316,7 +319,6 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     return new Promise<IZone | undefined>(resolve => {
       if (zoneId) {
         this.zoneService.find(zoneId).subscribe(e => {
-          console.log(currentStudent! * this.nbreFeuilleParCopie! + e.body!.pageNumber!);
           this.getAllImage4Zone(currentStudent! * this.nbreFeuilleParCopie! + e.body!.pageNumber!, e.body!).then(p => {
             this.displayImage(p, imageRef, showImageRef, index);
             resolve(e.body!);
@@ -596,9 +598,6 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
           if (paget === 0) {
             paget = this.nbreFeuilleParCopie!;
           }
-          console.log('ok');
-          console.log(pagen);
-          console.log(paget);
           this.alignImagesService
             .imageAlignement({
               imageA: this.templatePages.get(paget)?.image,
@@ -631,10 +630,6 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
                 height: i.height,
               };
               this.alignPages.set(pagen, apage);
-              console.log('ok');
-              console.log(pagen);
-              console.log(apage);
-
               cb(apage);
             });
         } else {
@@ -676,6 +671,29 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
       };
     } else {
       return value;
+    }
+  }
+  getEmail(): string {
+    if (this.selectionStudents !== undefined && this.exam !== undefined && this.questions !== undefined) {
+      const firsName = this.selectionStudents![0].firstname!;
+      const lastName = this.selectionStudents![0].name!;
+      const examName = this.exam!.name!;
+      const questionNumero = this.questions![0].numero!;
+      const url = window.location.href;
+      const t = `Bonjour,%0D%0A
+je m'appelle ${firsName} ${lastName},%0D%0A
+J'ai passé l'examen ${examName}. En regardant le corrigé de la question ${questionNumero} accessible ici (${url}), je ne comprends pas mon erreur.%0D%0A
+%0D%0A%0D%0A
+///EXPLIQUER VOTRE PROBLEME///%0D%0A
+%0D%0A%0D%0A
+Merci par avance pour le temps pris pour répondre à cet email.%0D%0A
+Cordialement,%0D%0A
+${firsName}
+`;
+
+      return "mailto:?subject=Retour sur l'examen " + this.exam!.name + '&body=' + t;
+    } else {
+      return '';
     }
   }
 }
