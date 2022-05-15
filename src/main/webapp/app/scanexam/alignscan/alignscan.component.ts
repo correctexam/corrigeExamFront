@@ -50,6 +50,8 @@ export class AlignScanComponent implements OnInit {
   currentStudent = 0;
   nbreFeuilleParCopie = 2;
   numberPagesInScan = 0;
+  avancement = 0;
+  avancementunit = '';
   private editedImage: HTMLCanvasElement | undefined;
   /* @ViewChild('keypoints1')
   keypoints1: ElementRef | undefined;
@@ -119,6 +121,7 @@ export class AlignScanComponent implements OnInit {
     if (this.phase1) {
       if (this.pdfService.numberOfPages() !== 0) {
         this.numberPagesInScan = this.pdfService.numberOfPages();
+        this.avancementunit = ' / ' + this.numberPagesInScan;
         this.exportAsImage();
       }
     }
@@ -223,6 +226,7 @@ export class AlignScanComponent implements OnInit {
         this.replacer
       ),
     });
+    this.avancement = pageN;
   }
 
   async saveNonAligneImage(pageN: number, imageString: string): Promise<void> {
@@ -347,8 +351,6 @@ export class AlignScanComponent implements OnInit {
             height: i.height,
           };
           this.saveEligneImage(pagen, this.fgetBase64Image(apage.image!)).then(() => {
-            console.log('save saveAligneImage ' + pagen);
-
             resolve(apage);
           });
 
