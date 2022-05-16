@@ -22,66 +22,53 @@
         </button>
       </div>
     </div>
-    <div class="col-12 md:col-12">
-      <div class="grid align-items-center">
-        <div class="col-1">
-          <!--  <p-button icon="pi pi-refresh"></p-button>-->
+    <div class="grid align-items-center">
+      <div class="col-1">
+        <!--  <p-button icon="pi pi-refresh"></p-button>-->
+      </div>
+      <div class="col-7">
+        <p-paginator
+          [currentPageReportTemplate]="'{currentPage} étudiant sur {totalPages} étudiant(s)'"
+          [rows]="1"
+          [first]="currentStudent"
+          [totalRecords]="numberPagesInScan! / nbreFeuilleParCopie!"
+          (onPageChange)="changeStudent($event)"
+          [showJumpToPageDropdown]="true"
+          [showPageLinks]="false"
+        >
+        </p-paginator>
+      </div>
+      <div class="col-4 grid justify-content-end">
+        <fa-icon [size]="'2x'" [pTooltip]="getStudentName()!" tooltipPosition="left" icon="eye"></fa-icon>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-10">
+        <div class="d-flex justify-content-center">
+          <h2>Question {{ questionno + 1 }}</h2>
         </div>
-        <div class="col-7">
+        <div class="d-flex justify-content-center" *ngFor="let k of questions; let i = index">
+          <div>
+            <canvas [hidden]="!showImage[i]" #nomImage></canvas>
+          </div>
+        </div>
+        <div style="padding-bottom: 2rem"></div>
+        <div class="d-flex justify-content-center">
           <p-paginator
-            [currentPageReportTemplate]="'{currentPage} étudiant sur {totalPages} étudiant(s)'"
+            [currentPageReportTemplate]="'{currentPage} question sur {totalPages} questions(s)'"
             [rows]="1"
-            [first]="currentStudent"
-            [totalRecords]="numberPagesInScan! / nbreFeuilleParCopie!"
-            (onPageChange)="changeStudent($event)"
+            [first]="questionno"
+            [totalRecords]="nbreQuestions!"
+            (onPageChange)="changeQuestion($event)"
             [showJumpToPageDropdown]="true"
             [showPageLinks]="false"
           ></p-paginator>
         </div>
-        <div class="col-4 grid justify-content-end">
-          <fa-icon [size]="'2x'" [pTooltip]="getStudentName()!" tooltipPosition="left" icon="eye"></fa-icon>
-        </div>
       </div>
-
-      <div class="grid">
-        <div class="col-9">
-          <div class="d-flex justify-content-center">
-            <h2>Question {{ questionno + 1 }}</h2>
-          </div>
-          <div class="d-flex justify-content-center" *ngFor="let k of questions; let i = index">
-            <div>
-              <canvas [hidden]="!showImage[i]" #nomImage></canvas>
-            </div>
-          </div>
-          <div style="padding-bottom: 2rem"></div>
-          <div class="d-flex justify-content-center">
-            <p-paginator
-              [currentPageReportTemplate]="'{currentPage} question sur {totalPages} questions(s)'"
-              [rows]="1"
-              [first]="questionno"
-              [totalRecords]="nbreQuestions!"
-              (onPageChange)="changeQuestion($event)"
-              [showJumpToPageDropdown]="true"
-              [showPageLinks]="false"
-            ></p-paginator>
-          </div>
-        </div>
-
-        <div class="col-3">
-          <div>
-            <div *ngIf="resp" style="padding-bottom: 1rem">
-              <label>Excellente réponse: </label>
-              <p-inputSwitch [(ngModel)]="resp!.star" (onChange)="updateResponse()"></p-inputSwitch>
-            </div>
-            <div style="padding-bottom: 1rem">
-              <label>Supprimer alignement: </label>
-              <p-inputSwitch [(ngModel)]="noalign" (onChange)="changeAlign()"></p-inputSwitch>
-            </div>
-
-            <div style="padding-bottom: 1rem">
-              <label>Facteur agrandissement: </label>
-              <p-slider *ngIf="noteSteps > 0" [(ngModel)]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImage()"> </p-slider>
-            </div>
+      <div class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-2">
+        <div class="grid">
+          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-3 xl:col-12">
             <p-rating
               [disabled]="currentQuestion !== undefined && currentQuestion?.gradeType !== 'DIRECT'"
               *ngIf="noteSteps > 0"
@@ -100,101 +87,129 @@
             >
             </p-slider>
             Note attribuée: {{ currentNote / questionStep }}
+          </div>
+          <div *ngIf="resp" style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-3 xl:col-12">
+            <label>Excellente réponse: </label>
+            <p-inputSwitch [(ngModel)]="resp!.star" (onChange)="updateResponse()"></p-inputSwitch>
+          </div>
+          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-3 xl:col-12">
+            <div class="grid">
+              <div style="padding-bottom: 1rem" class="col-12">
+                <label>Supprimer alignement: </label>
+                <p-inputSwitch [(ngModel)]="noalign" (onChange)="changeAlign()"></p-inputSwitch>
+              </div>
+              <div style="padding-bottom: 1rem" class="col-12">
+                <label>Facteur agrandissement: </label>
+                <p-slider *ngIf="noteSteps > 0" [(ngModel)]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImage()">
+                </p-slider>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-3 xl:col-12">
             <!--  <p-button icon="pi pi-refresh"></p-button>-->
             <jhi-graphical-toolbarcorrection></jhi-graphical-toolbarcorrection>
           </div>
-          <div>
-            <div *ngIf="currentQuestion && currentQuestion?.gradeType === 'DIRECT'">
-              <div *ngFor="let comment of currentTextComment4Question | sort: 'checked'" class="card" [style]="getStyle(comment)">
-                <div class="card-body">
-                  <p-inplace [closable]="true">
-                    <ng-template pTemplate="display">
-                      <h5 class="card-title">{{ comment.text }}</h5>
-                    </ng-template>
-                    <ng-template pTemplate="content">
-                      <input
-                        pInputText
-                        type="text"
-                        [(ngModel)]="comment.text"
-                        [style]="{ width: '80%' }"
-                        (change)="updateComment($event, comment, false)"
-                      />
-                    </ng-template>
-                  </p-inplace>
-                  <p-inplace [closable]="true">
-                    <ng-template pTemplate="display">
-                      <p class="card-text">{{ comment.description }}</p>
-                    </ng-template>
-                    <ng-template pTemplate="content">
-                      <input
-                        pInputText
-                        type="text"
-                        [(ngModel)]="comment.description"
-                        (change)="updateComment($event, comment, false)"
-                        [style]="{ width: '80%' }"
-                      />
-                    </ng-template>
-                  </p-inplace>
-                  <a *ngIf="!checked(comment)" class="btn btn-primary" (click)="ajouterTComment(comment)">Ajouter</a>
-                  <a *ngIf="checked(comment)" class="btn btn-primary" (click)="retirerTComment(comment)">Retirer</a>
-                </div>
-              </div>
-            </div>
-            <div *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
-              <div *ngFor="let comment of currentGradedComment4Question | sort: 'checked'" class="card" [style]="getStyle(comment)">
-                <div class="card-body">
-                  <p-inplace [closable]="true">
-                    <ng-template pTemplate="display">
-                      <h5 class="card-title">{{ comment.text }}</h5>
-                    </ng-template>
-                    <ng-template pTemplate="content">
-                      <input
-                        pInputText
-                        type="text"
-                        [(ngModel)]="comment.text"
-                        [style]="{ width: '80%' }"
-                        (change)="updateComment($event, comment, true)"
-                      />
-                    </ng-template>
-                  </p-inplace>
-                  <p-inplace [closable]="true">
-                    <ng-template pTemplate="display">
-                      <p class="card-text">{{ comment.description }}</p>
-                    </ng-template>
-                    <ng-template pTemplate="content">
-                      <input
-                        pInputText
-                        type="text"
-                        [(ngModel)]="comment.description"
-                        (change)="updateComment($event, comment, true)"
-                        [style]="{ width: '80%' }"
-                      />
-                    </ng-template>
-                  </p-inplace>
-                  <p-inplace [closable]="true">
-                    <ng-template pTemplate="display">
-                      <p class="card-text" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
-                        Note associée à ce commentaire :
-                        <span *ngIf="currentQuestion && currentQuestion?.gradeType === 'NEGATIVE'"> - </span
-                        ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'POSITIVE'"> + </span
-                        >{{ comment.grade! / questionStep }}
-                      </p>
-                    </ng-template>
-                    <ng-template pTemplate="content">
-                      <p-rating
-                        *ngIf="noteSteps > 0 && currentQuestion && currentQuestion?.gradeType !== 'DIRECT'"
-                        [stars]="noteSteps"
-                        [(ngModel)]="comment.grade"
-                        (ngModelChange)="updateComment($event, comment, true)"
-                      ></p-rating>
-                    </ng-template>
-                  </p-inplace>
+        </div>
 
-                  <a *ngIf="!checked(comment)" class="btn btn-primary" (click)="ajouterGComment(comment)">Ajouter</a>
-                  <a *ngIf="checked(comment)" class="btn btn-primary" (click)="retirerGComment(comment)">Retirer</a>
-                </div>
+        <div class="grid" *ngIf="currentQuestion && currentQuestion?.gradeType === 'DIRECT'">
+          <div *ngFor="let comment of currentTextComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-3 xl:col-12">
+            <div class="card" [style]="getStyle(comment)">
+              <div class="card-body">
+                <p-inplace [closable]="true">
+                  <ng-template pTemplate="display">
+                    <h5 class="card-title">{{ comment.text }}</h5>
+                  </ng-template>
+                  <ng-template pTemplate="content">
+                    <input
+                      pInputText
+                      type="text"
+                      [(ngModel)]="comment.text"
+                      [style]="{ width: '80%' }"
+                      (change)="updateComment($event, comment, false)"
+                    />
+                  </ng-template>
+                </p-inplace>
+                <p-inplace [closable]="true">
+                  <ng-template pTemplate="display">
+                    <p class="card-text">{{ comment.description }}</p>
+                  </ng-template>
+                  <ng-template pTemplate="content">
+                    <input
+                      pInputText
+                      type="text"
+                      [(ngModel)]="comment.description"
+                      (change)="updateComment($event, comment, false)"
+                      [style]="{ width: '80%' }"
+                    />
+                  </ng-template>
+                </p-inplace>
+                <a *ngIf="!checked(comment)" class="btn btn-primary" (click)="ajouterTComment(comment)">Ajouter</a>
+                <a *ngIf="checked(comment)" class="btn btn-primary" (click)="retirerTComment(comment)">Retirer</a>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="grid" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
+          <div *ngFor="let comment of currentGradedComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-3 xl:col-12">
+            <div class="card" [style]="getStyle(comment)">
+              <div class="card-body">
+                <p-inplace [closable]="true">
+                  <ng-template pTemplate="display">
+                    <h5 class="card-title">{{ comment.text }}</h5>
+                  </ng-template>
+                  <ng-template pTemplate="content">
+                    <input
+                      pInputText
+                      type="text"
+                      [(ngModel)]="comment.text"
+                      [style]="{ width: '80%' }"
+                      (change)="updateComment($event, comment, true)"
+                    />
+                  </ng-template>
+                </p-inplace>
+                <p-inplace [closable]="true">
+                  <ng-template pTemplate="display">
+                    <p class="card-text">{{ comment.description }}</p>
+                  </ng-template>
+                  <ng-template pTemplate="content">
+                    <input
+                      pInputText
+                      type="text"
+                      [(ngModel)]="comment.description"
+                      (change)="updateComment($event, comment, true)"
+                      [style]="{ width: '80%' }"
+                    />
+                  </ng-template>
+                </p-inplace>
+                <p-inplace [closable]="true">
+                  <ng-template pTemplate="display">
+                    <p class="card-text" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
+                      Note associée à ce commentaire :
+                      <span *ngIf="currentQuestion && currentQuestion?.gradeType === 'NEGATIVE'"> - </span
+                      ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'POSITIVE'"> + </span
+                      >{{ comment.grade! / questionStep }}
+                    </p>
+                  </ng-template>
+                  <ng-template pTemplate="content">
+                    <p-rating
+                      *ngIf="noteSteps > 0 && currentQuestion && currentQuestion?.gradeType !== 'DIRECT'"
+                      [stars]="noteSteps"
+                      [(ngModel)]="comment.grade"
+                      (ngModelChange)="updateComment($event, comment, true)"
+                    ></p-rating>
+                  </ng-template>
+                </p-inplace>
+
+                <a *ngIf="!checked(comment)" class="btn btn-primary" (click)="ajouterGComment(comment)">Ajouter</a>
+                <a *ngIf="checked(comment)" class="btn btn-primary" (click)="retirerGComment(comment)">Retirer</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="grid">
+          <div class="sm:col-6 md:col-6 lg:col-6 xl:col-12">
             <div class="card">
               <div class="card-body">
                 <h5 class="card-title">Nouveau commentaire</h5>
@@ -222,18 +237,8 @@
           </div>
         </div>
       </div>
-      <div class="grid align-items-center">
-        <div class="col-1">
-          <!--<p-button icon="pi pi-refresh"></p-button>-->
-        </div>
-        <div class="col-7"></div>
-        <div class="col-4 grid justify-content-end">
-          <!--<p-button icon="pi pi-search"></p-button>-->
-        </div>
-      </div>
-    </div>
-  </div>
-  <!--<div class="col-4 md:col-4 overflow-hidden">
+
+      <!--<div class="col-4 md:col-4 overflow-hidden">
     <img
       src="content/images/bannerright.jpg"
       alt="Image"
@@ -241,4 +246,6 @@
       style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
     />
   </div>-->
+    </div>
+  </div>
 </div>
