@@ -28,15 +28,14 @@
       </div>
       <div class="col-7">
         <p-paginator
-          [currentPageReportTemplate]="'{currentPage} étudiant sur {totalPages} étudiant(s)'"
+          [currentPageReportTemplate]="'{currentPage} question sur {totalPages} questions(s)'"
           [rows]="1"
-          [first]="currentStudent"
-          [totalRecords]="numberPagesInScan! / nbreFeuilleParCopie!"
-          (onPageChange)="changeStudent($event)"
+          [first]="questionno"
+          [totalRecords]="nbreQuestions!"
+          (onPageChange)="changeQuestion($event)"
           [showJumpToPageDropdown]="true"
           [showPageLinks]="false"
-        >
-        </p-paginator>
+        ></p-paginator>
       </div>
       <div class="col-4 grid justify-content-end">
         <fa-icon [size]="'2x'" [pTooltip]="getStudentName()!" tooltipPosition="left" icon="eye"></fa-icon>
@@ -56,14 +55,15 @@
         <div style="padding-bottom: 2rem"></div>
         <div class="d-flex justify-content-center">
           <p-paginator
-            [currentPageReportTemplate]="'{currentPage} question sur {totalPages} questions(s)'"
+            [currentPageReportTemplate]="'{currentPage} étudiant sur {totalPages} étudiant(s)'"
             [rows]="1"
-            [first]="questionno"
-            [totalRecords]="nbreQuestions!"
-            (onPageChange)="changeQuestion($event)"
+            [first]="currentStudent"
+            [totalRecords]="numberPagesInScan! / nbreFeuilleParCopie!"
+            (onPageChange)="changeStudent($event)"
             [showJumpToPageDropdown]="true"
             [showPageLinks]="false"
-          ></p-paginator>
+          >
+          </p-paginator>
         </div>
       </div>
       <div class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-2">
