@@ -10,6 +10,7 @@ import { Account } from 'app/core/auth/account.model';
 
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { AlignImagesService } from 'app/scanexam/services/align-images.service';
+import { ApplicationConfigService } from '../core/config/application-config.service';
 
 @Component({
   selector: 'jhi-home',
@@ -24,7 +25,12 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private readonly destroy$ = new Subject<void>();
 
-  constructor(private accountService: AccountService, private router: Router, private alignImagesService: AlignImagesService) {}
+  constructor(
+    private accountService: AccountService,
+    private router: Router,
+    private alignImagesService: AlignImagesService,
+    private appConfig: ApplicationConfigService
+  ) {}
 
   ngOnInit(): void {
     this.accountService
@@ -35,7 +41,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.dockItems = [
       {
         label: 'Créer cours',
-        icon: 'content/images/plus.svg',
+        icon: this.appConfig.getFrontUrl() + 'content/images/plus.svg',
         title: 'Créer cours',
         route: 'creercours',
       },
