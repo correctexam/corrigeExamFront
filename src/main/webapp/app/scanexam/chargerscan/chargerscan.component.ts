@@ -26,7 +26,7 @@ export class ChargerscanComponent implements OnInit {
   blocked = false;
   examid: string | undefined = undefined;
   isSaving = false;
-  exam!: IExam;
+  exam: IExam = {};
   editForm = this.fb.group({
     content: [],
     contentContentType: [null, [Validators.required]],
@@ -51,7 +51,10 @@ export class ChargerscanComponent implements OnInit {
         this.examid = params.get('examid')!;
         this.examService.find(+this.examid).subscribe(c => {
           this.exam = c.body!;
+          // eslint-disable-next-line no-console
+          console.log(this.exam.scanfileId);
         });
+        //        this.scanService.query
       }
     });
   }
@@ -124,6 +127,7 @@ export class ChargerscanComponent implements OnInit {
   protected createFromForm(): IScan {
     return {
       ...new Scan(),
+      id: this.exam.scanfileId,
       name: this.exam.name + 'StudentSheets.pdf',
       contentContentType: this.editForm.get(['contentContentType'])!.value,
       content: this.editForm.get(['content'])!.value,
