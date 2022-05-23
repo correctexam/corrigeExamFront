@@ -40,7 +40,7 @@
   <div *ngIf="!this.account?.authorities?.includes('ROLE_ADMIN')">
     <p-dock [model]="dockItems" position="top">
       <ng-template pTemplate="item" let-item>
-        <a [routerLink]="item.route"><img [src]="item.icon" [alt]="item.label" width="100%" [pTooltip]="item.title" /></a>
+        <a [routerLink]="item.route"><img [src]="item.icon" [alt]="item.label" width="64px" [pTooltip]="item.title" /></a>
       </ng-template>
     </p-dock>
     <jhi-mes-cours></jhi-mes-cours>

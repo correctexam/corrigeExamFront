@@ -1,9 +1,9 @@
 <div>
   <p-dock [model]="dockItems" position="top">
     <ng-template pTemplate="item" let-item>
-      <a *ngIf="item.route" [routerLink]="item.route"><img [src]="item.icon" [alt]="item.label" width="100%" [pTooltip]="item.title" /></a>
+      <a *ngIf="item.route" [routerLink]="item.route"><img [src]="item.icon" [alt]="item.label" width="64px" [pTooltip]="item.title" /></a>
       <a *ngIf="item.command1" (click)="item.command1()"
-        ><img [src]="item.icon" [alt]="item.label" width="100%" [pTooltip]="item.title"
+        ><img [src]="item.icon" [alt]="item.label" width="64px" [pTooltip]="item.title"
       /></a>
     </ng-template>
   </p-dock>
