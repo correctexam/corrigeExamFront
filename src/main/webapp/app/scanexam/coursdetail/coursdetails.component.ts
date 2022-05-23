@@ -16,6 +16,7 @@ import { ExamService } from '../../entities/exam/service/exam.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { ApplicationConfigService } from '../../core/config/application-config.service';
 
 @Component({
   selector: 'jhi-coursdetails',
@@ -37,7 +38,8 @@ export class CoursdetailsComponent implements OnInit {
     public examService: ExamService,
     protected activatedRoute: ActivatedRoute,
     public confirmationService: ConfirmationService,
-    public router: Router
+    public router: Router,
+    public appConfig: ApplicationConfigService
   ) {}
 
   ngOnInit(): void {
@@ -50,25 +52,25 @@ export class CoursdetailsComponent implements OnInit {
         this.dockItems = [
           {
             label: 'Créer exam',
-            icon: 'content/images/exam.svg',
+            icon: this.appConfig.getFrontUrl() + 'content/images/exam.svg',
             title: 'Créer exam',
             route: '/creerexam/' + params.get('courseid'),
           },
           {
             label: 'Enregistrer liste étudiants',
-            icon: 'content/images/students.svg',
+            icon: this.appConfig.getFrontUrl() + 'content/images/students.svg',
             title: 'Enregistrer liste étudiants',
             route: '/registerstudents/' + params.get('courseid'),
           },
           {
             label: 'Voir liste étudiants',
-            icon: 'content/images/studentslist.svg',
+            icon: this.appConfig.getFrontUrl() + 'content/images/studentslist.svg',
             title: 'Voir liste étudiants',
             route: '/liststudents/' + params.get('courseid'),
           },
           {
             label: 'Supprimer UE',
-            icon: 'content/images/remove-rubbish.svg',
+            icon: this.appConfig.getFrontUrl() + 'content/images/remove-rubbish.svg',
             title: 'Supprimer cet UE (groupes, examsn templates, ...)',
             command1: () => {
               this.confirmeDelete();

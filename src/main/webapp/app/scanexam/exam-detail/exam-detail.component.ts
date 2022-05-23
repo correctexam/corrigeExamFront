@@ -19,6 +19,7 @@ import { ExamSheetService } from '../../entities/exam-sheet/service/exam-sheet.s
 import { StudentService } from '../../entities/student/service/student.service';
 import { IStudent } from 'app/entities/student/student.model';
 import { db } from '../db/db';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
 
 @Component({
   selector: 'jhi-exam-detail',
@@ -47,7 +48,8 @@ export class ExamDetailComponent implements OnInit {
     public confirmationService: ConfirmationService,
     public examSheetService: ExamSheetService,
     public studentService: StudentService,
-    public router: Router
+    public router: Router,
+    public appConfig: ApplicationConfigService
   ) {}
 
   ngOnInit(): void {
@@ -98,7 +100,7 @@ export class ExamDetailComponent implements OnInit {
         this.dockItems = [
           {
             label: 'Supprimer cet Examen',
-            icon: 'content/images/remove-rubbish.svg',
+            icon: this.appConfig.getFrontUrl() + 'content/images/remove-rubbish.svg',
             title: 'Supprimer cet Examen (templates, questions, corrections ...)',
             command1: () => {
               this.confirmeDelete();
@@ -106,7 +108,7 @@ export class ExamDetailComponent implements OnInit {
           },
           {
             label: 'Nettoyer le cache du browser pour cet exam',
-            icon: 'content/images/Font_Awesome_5_solid_eraser.svg',
+            icon: this.appConfig.getFrontUrl() + 'content/images/Font_Awesome_5_solid_eraser.svg',
             title: 'Nettoyer le cache du browser pour cet exam (images dans la base de données locale',
             command1: () => {
               this.confirmeCleanCache();

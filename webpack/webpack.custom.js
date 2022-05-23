@@ -39,6 +39,7 @@ module.exports = async (config, options, targetOptions) => {
         // If you use an API server, in `prod` mode, you will need to enable CORS
         // (see the `jhipster.cors` common JHipster property in the `application-*.yml` configurations)
         SERVER_API_URL: JSON.stringify(environment.SERVER_API_URLDEV),
+        FRONT_URL: JSON.stringify(environment.FRONT_URLDEV),
       })
     );
   }
@@ -102,6 +103,7 @@ module.exports = async (config, options, targetOptions) => {
         // If you use an API server, in `prod` mode, you will need to enable CORS
         // (see the `jhipster.cors` common JHipster property in the `application-*.yml` configurations)
         SERVER_API_URL: JSON.stringify(environment.SERVER_API_URLPROD),
+        FRONT_URL: JSON.stringify(environment.FRONT_URLPROD),
       })
     );
   }

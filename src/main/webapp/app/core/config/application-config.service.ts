@@ -5,7 +5,16 @@ import { Injectable } from '@angular/core';
 })
 export class ApplicationConfigService {
   private endpointPrefix = '';
+  private frontUrl = '';
   private microfrontend = false;
+
+  setFrontUrl(frontURL: string): void {
+    this.frontUrl = frontURL;
+  }
+
+  getFrontUrl(): string {
+    return this.frontUrl;
+  }
 
   setEndpointPrefix(endpointPrefix: string): void {
     this.endpointPrefix = endpointPrefix;

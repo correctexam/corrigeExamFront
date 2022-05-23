@@ -103,6 +103,11 @@
                 <p-slider *ngIf="noteSteps > 0" [(ngModel)]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImage()">
                 </p-slider>
               </div>
+              <div style="padding-bottom: 1rem" class="col-12">
+                <label>Décallage de page(s): </label>
+                <p-slider *ngIf="noteSteps > 0" [(ngModel)]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImage()">
+                </p-slider>
+              </div>
             </div>
           </div>
 

@@ -51,6 +51,7 @@ import { ErrorComponent } from './layouts/error/error.component';
 export class AppModule {
   constructor(applicationConfigService: ApplicationConfigService, iconLibrary: FaIconLibrary, dpConfig: NgbDatepickerConfig) {
     applicationConfigService.setEndpointPrefix(SERVER_API_URL);
+    applicationConfigService.setEndpointPrefix(FRONT_URL);
     registerLocaleData(locale);
     iconLibrary.addIcons(...(fontAwesomeIcons as any[]));
     dpConfig.minDate = { year: dayjs().subtract(100, 'year').year(), month: 1, day: 1 };
