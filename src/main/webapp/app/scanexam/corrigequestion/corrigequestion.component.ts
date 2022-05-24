@@ -243,8 +243,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   changeNote(): void {
     if (this.resp !== undefined) {
+      this.blocked = true;
       this.resp!.note = this.currentNote;
-      this.studentResponseService.update(this.resp!).subscribe(sr1 => (this.resp = sr1.body!));
+      this.studentResponseService.update(this.resp!).subscribe(sr1 => {
+        this.resp = sr1.body!;
+        this.blocked = false;
+      });
     }
   }
 
