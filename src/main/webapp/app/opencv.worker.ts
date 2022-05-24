@@ -251,12 +251,13 @@ function alignImageBasedOnCircle(payload: any): any {
   cv.cvtColor(srcMat2, srcMat1, cv.COLOR_RGBA2GRAY);
   const srcMWidth1 = srcMat1.size().width;
   const srcMHeight1 = srcMat1.size().height;
-
+  console.log(r3);
   //  cv.HoughCircles(srcMat, circlesMat, cv.HOUGH_GRADIENT, 1, 45, 75, 40, 0, 0);
   cv.HoughCircles(srcMat1, circlesMat1, cv.HOUGH_GRADIENT, 1, 45, 75, 15, r3 - 3, r3 + 3);
   let goodpointsx = [];
   let goodpointsy = [];
-  const seuil = ((4 * r3 * r3 - 3.14159 * r3 * r3) * 150) / 100;
+  const seuil = ((4 * r3 * r3 - 3.14159 * r3 * r3) * 180) / 100;
+  console.log('seuil ' + seuil);
   for (let i = 0; i < circlesMat1.cols; i++) {
     let x = circlesMat1.data32F[i * 3];
     let y = circlesMat1.data32F[i * 3 + 1];
@@ -276,6 +277,7 @@ function alignImageBasedOnCircle(payload: any): any {
     let dstrect1 = new cv.Mat();
     dstrect1 = roi(srcMat1, rect1, dstrect1);
     cv.threshold(dstrect1, dstrect1, 0, 255, cv.THRESH_OTSU + cv.THRESH_BINARY);
+    console.log('nonZero' + cv.countNonZero(dstrect1));
     if (cv.countNonZero(dstrect1) < seuil) {
       goodpointsx.push(x);
       goodpointsy.push(y);
@@ -287,6 +289,7 @@ function alignImageBasedOnCircle(payload: any): any {
   let x6, y6;
   let x7, y7;
   let x8, y8;
+  console.log('goodpointsx.length ' + goodpointsx.length);
   if (goodpointsx.length > 0) {
     x5 = goodpointsx[0];
     y5 = goodpointsy[1];
