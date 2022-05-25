@@ -25,6 +25,7 @@ import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.ser
 import { IExamSheet } from '../../entities/exam-sheet/exam-sheet.model';
 import { v4 as uuid } from 'uuid';
 import { faHouseSignal } from '@fortawesome/free-solid-svg-icons';
+import { Listbox } from 'primeng/listbox';
 
 export interface IPage {
   image?: ImageData;
@@ -46,6 +47,8 @@ export interface ImageZone {
   providers: [ConfirmationService, MessageService],
 })
 export class AssocierCopiesEtudiantsComponent implements OnInit {
+  @ViewChild('list')
+  list!: Listbox;
   faHouseSignal = faHouseSignal;
   blocked = false;
   examId = '';
@@ -501,8 +504,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     });
   }
 
-  bindAllCopies(): void {}
-
   async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
     if (this.noalign) {
       return new Promise(resolve => {
@@ -609,6 +610,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   }
 
   goToStudent(i: number): void {
+    this.list._filterValue = '';
+    this.list._filteredOptions = this.list._options;
+
     if (i * this.nbreFeuilleParCopie < this.numberPagesInScan) {
       this.router.navigateByUrl('studentbindings/' + this.examId + '/' + (i + 1));
     }
@@ -806,12 +810,26 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
           s.examSheets?.some(ex => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie)
         );
         this.selectionStudents = filterStudent;
+        //  this.list.onOptionDoubleClick = (event) => {console.log(event)}
+        console.log(this.list.el.nativeElement);
+
         res();
       })
     );
   }
 
+  async selectStudents(event: IStudent): Promise<void> {
+    this.selectionStudents = [event];
+
+    await this.bindStudent();
+    if ((this.currentStudent + 1) * this.nbreFeuilleParCopie < this.numberPagesInScan) {
+      this.currentStudent = this.currentStudent + 1;
+      this.goToStudent(this.currentStudent);
+    }
+  }
+
   async bindStudent(): Promise<void> {
+    console.log('foo1');
     return new Promise<void>(resolve1 => {
       const examSheet4CurrentStudent: IExamSheet[] = (
         this.students.filter(s => this.selectionStudents.map((s1: IStudent) => s1.id)!.includes(s.id)).map(s => s.examSheets) as any

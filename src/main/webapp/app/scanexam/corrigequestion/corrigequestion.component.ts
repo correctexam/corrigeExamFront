@@ -92,6 +92,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
+      console.log('foo');
+      this.blocked = true;
+
       this.currentNote = 0;
       this.noteSteps = 0;
       this.maxNote = 0;
@@ -176,6 +179,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                                         }
                                       });
                                       this.currentTextComment4Question = com.body!;
+                                      this.blocked = false;
                                     });
                                   } else {
                                     this.gradedCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
@@ -186,6 +190,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                                         }
                                       });
                                       this.currentGradedComment4Question = com.body!;
+                                      this.blocked = false;
                                     });
                                   }
                                 } else {
@@ -194,10 +199,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                                     if (this.questions![0].gradeType === GradeType.DIRECT) {
                                       this.textCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
                                         this.currentTextComment4Question = com.body!;
+                                        this.blocked = false;
                                       });
                                     } else {
                                       this.gradedCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
                                         this.currentGradedComment4Question = com.body!;
+                                        this.blocked = false;
                                       });
                                     }
                                   });

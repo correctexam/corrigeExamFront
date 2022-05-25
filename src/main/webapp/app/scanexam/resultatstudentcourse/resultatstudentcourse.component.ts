@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 /* eslint-disable @typescript-eslint/no-empty-function */
@@ -87,6 +88,37 @@ L'équipe pédagogique`;
 
   exportExcel(): void {
     import('xlsx').then(xlsx => {
+      let maxQuestion = 0;
+      this.studentsresult.forEach(res => {
+        // eslint-disable-next-line no-console
+        for (const key in res.notequestions) {
+          // eslint-disable-next-line no-prototype-builtins
+          if (res.notequestions.hasOwnProperty(key)) {
+            if (+key > maxQuestion) {
+              maxQuestion = +key;
+            }
+          }
+        }
+      });
+      this.studentsresult.forEach(res => {
+        for (let i = 1; i <= maxQuestion; i++) {
+          res['Q' + i] = undefined;
+        }
+      });
+
+      this.studentsresult.forEach(res => {
+        for (const key in res.notequestions) {
+          // eslint-disable-next-line no-prototype-builtins
+          if (res.notequestions.hasOwnProperty(key)) {
+            res['Q' + key] = parseFloat(res.notequestions[key].replaceAll(',', '.'));
+          }
+        }
+        /* res.notequestions?.forEach((n:any) => {
+          // eslint-disable-next-line no-console
+          console.log(n);
+
+        });    */
+      });
       const worksheet = xlsx.utils.json_to_sheet(this.studentsresult);
       const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
       const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });

@@ -68,6 +68,8 @@ export class ExamDetailComponent implements OnInit {
 
         this.examService.find(+this.examId).subscribe(data => {
           this.exam = data.body!;
+          console.log(this.exam);
+
           this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
 
           db.templates
@@ -75,6 +77,7 @@ export class ExamDetailComponent implements OnInit {
             .equals(+this.examId)
             .count()
             .then(e2 => {
+              console.log('pass par la');
               this.nbreFeuilleParCopie = e2;
               // Step 2 Query Scan in local DB
 
@@ -83,9 +86,11 @@ export class ExamDetailComponent implements OnInit {
                 .equals(+this.examId)
                 .count()
                 .then(e1 => {
+                  console.log('pass par la1');
                   this.numberPagesInScan = e1;
 
                   this.studentService.query({ courseId: this.exam.courseId }).subscribe(studentsbody => {
+                    console.log(studentsbody);
                     this.students = studentsbody.body!;
                     const ex2 = (this.students.map(s => s.examSheets) as any)
                       .flat()

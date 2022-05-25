@@ -121,6 +121,7 @@
         <canvas [hidden]="!debug" #ineImageReco></canvas>
       </div>
       <p-listbox
+        #list
         [options]="studentsOptions()"
         [(ngModel)]="selectionStudents"
         [filter]="true"
@@ -130,6 +131,18 @@
         (onClick)="bindStudent()"
         [optionValue]="'value'"
       >
+        <ng-template let-table pTemplate="item">
+          <div class="ui-helper-clearfix" style="width: '100%'">
+            <div class="row">
+              <div class="col-md-6">
+                <span style="float: left">{{ table.label }}</span>
+              </div>
+              <div class="col-md-6 text-right">
+                <button style="padding: '0.1rem'" pButton (click)="selectStudents(table.value)">Next</button>
+              </div>
+            </div>
+          </div>
+        </ng-template>
       </p-listbox>
 
       <!--<p-orderList

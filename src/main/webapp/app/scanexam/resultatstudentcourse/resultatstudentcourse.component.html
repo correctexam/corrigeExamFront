@@ -97,7 +97,7 @@
             <td>{{ student.nom }}</td>
             <td>{{ student.prenom }}</td>
             <td>{{ student.mail }}</td>
-            <td *ngIf="!student.abi">{{ student.note / 100 }}</td>
+            <td *ngIf="!student.abi">{{ student.note }}</td>
             <td *ngIf="student.abi">0</td>
             <td *ngIf="!student.abi"><a target="_blank" href="{{ 'copie/' + student.uuid + '/1' }}">link</a></td>
             <td *ngIf="student.abi">ABI</td>
