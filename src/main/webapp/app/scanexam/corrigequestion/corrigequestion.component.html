@@ -3,6 +3,28 @@
   <p-blockUI [blocked]="blocked">
     <i class="pi pi-lock" style="font-size: 3rem"></i>
   </p-blockUI>
+  <p-galleria
+    [value]="images"
+    [(visible)]="displayBasic"
+    [responsiveOptions]="responsiveOptions2"
+    [circular]="true"
+    [fullScreen]="true"
+    [showItemNavigators]="true"
+    [baseZIndex]="100000"
+    [showThumbnails]="false"
+    [containerStyle]="{ 'max-height': '90vh' }"
+    [numVisible]="7"
+    [(activeIndex)]="activeIndex"
+  >
+    <ng-template pTemplate="item" let-item>
+      <div
+        class="grid grid-nogutter justify-content-center"
+        style="overflow-x: hidden; overflow-y: scroll; border: #000000 1px solid; height: 96vh; width: 90vw"
+      >
+        <img [src]="item.src" style="display: block" />
+      </div>
+    </ng-template>
+  </p-galleria>
 
   <div class="col-12">
     <div class="grid grid-nogutter">
@@ -45,7 +67,7 @@
     <div class="grid">
       <div class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-10">
         <div class="d-flex justify-content-center">
-          <h2>Question {{ questionno + 1 }}</h2>
+          <h2>Question {{ questionno + 1 }} <button pButton (click)="showGalleria()">Show full page</button></h2>
         </div>
         <div class="d-flex justify-content-center" *ngFor="let k of questions; let i = index">
           <div>

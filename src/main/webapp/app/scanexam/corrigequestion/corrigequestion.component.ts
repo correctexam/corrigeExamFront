@@ -71,6 +71,27 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   currentTextComment4Question: ITextComment[] | undefined;
   currentGradedComment4Question: IGradedComment[] | undefined;
 
+  activeIndex = 1;
+  responsiveOptions2: any[] = [
+    {
+      breakpoint: '1500px',
+      numVisible: 5,
+    },
+    {
+      breakpoint: '1024px',
+      numVisible: 3,
+    },
+    {
+      breakpoint: '768px',
+      numVisible: 2,
+    },
+    {
+      breakpoint: '560px',
+      numVisible: 1,
+    },
+  ];
+  displayBasic = false;
+  images: any[] = [];
   constructor(
     public examService: ExamService,
     public zoneService: ZoneService,
@@ -101,7 +122,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.resp = undefined;
       //      'answer/:examid/:questionno/:studentid',
       if (params.get('examid') !== null) {
+        if (this.examId !== params.get('examid')! || this.images.length === 0) {
+          this.examId = params.get('examid')!;
+          this.loadAllPages();
+        }
         this.examId = params.get('examid')!;
+
         if (params.get('questionno') !== null) {
           this.questionno = +params.get('questionno')! - 1;
         }
@@ -471,6 +497,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     return new Promise<IZone | undefined>(resolve => {
       if (zoneId) {
         this.zoneService.find(zoneId).subscribe(e => {
+          if (index === 0) {
+            this.activeIndex = currentStudent! * this.nbreFeuilleParCopie! + e.body!.pageNumber! - 1;
+          }
           this.getAllImage4Zone(currentStudent! * this.nbreFeuilleParCopie! + e.body!.pageNumber!, e.body!).then(p => {
             this.displayImage(p, imageRef, showImageRef, index);
             resolve(e.body!);
@@ -499,6 +528,28 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
+  loadAllPages(): void {
+    if (this.noalign) {
+      db.nonAlignImages.where({ examId: +this.examId! }).each(e => {
+        const image = JSON.parse(e!.value, this.reviver);
+        this.images.push({
+          src: image.pages,
+          alt: 'Description for Image 2',
+          title: 'Exam',
+        });
+      });
+    } else {
+      db.alignImages.where({ examId: +this.examId! }).each(e => {
+        const image = JSON.parse(e!.value, this.reviver);
+        this.images.push({
+          src: image.pages,
+          alt: 'Description for Image 2',
+          title: 'Exam',
+        });
+      });
+    }
+  }
+
   async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
     if (this.noalign) {
       return new Promise(resolve => {
@@ -507,6 +558,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           .first()
           .then(e2 => {
             const image = JSON.parse(e2!.value, this.reviver);
+            /* this.images.push({
+              source: image,
+              title: 'Exam'});
+            console.log(image); */
             this.loadImage(image.pages, pageInscan).then(v => {
               let finalW = (zone.width! * v.width! * this.factor) / 100000;
               let finalH = (zone.height! * v.height! * this.factor) / 100000;
@@ -543,6 +598,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           .first()
           .then(e2 => {
             const image = JSON.parse(e2!.value, this.reviver);
+            /* this.images = [{
+              src:  image.pages,
+              alt: 'Description for Image 2',
+              title: 'Exam'}];
+            console.log(image.pages);*/
+
             this.loadImage(image.pages, pageInscan).then(v => {
               let finalW = (zone.width! * v.width! * this.factor) / 100000;
               let finalH = (zone.height! * v.height! * this.factor) / 100000;
@@ -575,6 +636,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
+  showGalleria(): void {
+    console.log(this.images);
+    this.displayBasic = true;
+  }
+
   async loadImage(file: any, page1: number): Promise<IPage> {
     return new Promise(resolve => {
       const i = new Image();
@@ -600,6 +666,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   changeAlign(): void {
+    this.images = [];
+    this.loadAllPages();
     this.reloadImage();
   }
   getStudentName(): string | undefined {

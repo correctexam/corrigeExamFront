@@ -56,6 +56,10 @@ import { ResultatStudentcourseComponent } from './resultatstudentcourse/resultat
 import { DialogModule } from 'primeng/dialog';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputTextModule } from 'primeng/inputtext';
+import { GalleriaModule } from 'primeng/galleria';
+import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
+import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -206,6 +210,9 @@ export const ShowResults_ROUTE: Route = {
     pageTitle: 'home.voircopie',
   },
 };
+const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
+  suppressScrollX: true,
+};
 
 @NgModule({
   declarations: [
@@ -260,6 +267,9 @@ export const ShowResults_ROUTE: Route = {
     DialogModule,
     InplaceModule,
     InputTextModule,
+    GalleriaModule,
+    PerfectScrollbarModule,
+
     RouterModule.forChild([
       CREERCOURS_ROUTE,
       COURSMAIN_ROUTE,
@@ -288,6 +298,13 @@ export const ShowResults_ROUTE: Route = {
     AssocierCopiesEtudiantsComponent,
     SortByDirective,
   ],
-  providers: [EventHandlerService, FabricShapeService],
+  providers: [
+    EventHandlerService,
+    FabricShapeService,
+    {
+      provide: PERFECT_SCROLLBAR_CONFIG,
+      useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG,
+    },
+  ],
 })
 export class ScanexamModule {}
