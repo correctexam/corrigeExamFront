@@ -1,7 +1,7 @@
 module.exports = {
   I18N_HASH: 'generated_hash',
   FRONT_URLDEV: 'http://localhost:9000/',
-  FRONT_URLPROD: 'https://olivier.barais.fr/corrigeExamFront/',
+  FRONT_URLPROD: 'https://correctexam.github.io/corrigeExamFront/',
   SERVER_API_URLPROD: 'https://api.gradescope.barais.fr/',
   SERVER_API_URLDEV: 'http://localhost:9000/',
   __VERSION__: process.env.hasOwnProperty('APP_VERSION') ? process.env.APP_VERSION : 'DEV',
