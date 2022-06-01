@@ -98,7 +98,8 @@
       "id": "ID"
     },
     "ribbon": {
-      "dev": "Développement"
+      "dev": "Développement",
+      "prod": "Production"
     },
     "item-count": "Affichage {{first}} - {{second}} de {{total}} items."
   },

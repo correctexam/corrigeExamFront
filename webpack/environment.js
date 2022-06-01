@@ -4,6 +4,6 @@ module.exports = {
   FRONT_URLPROD: 'https://correctexam.github.io/corrigeExamFront/',
   SERVER_API_URLPROD: 'https://api.gradescope.barais.fr/',
   SERVER_API_URLDEV: 'http://localhost:9000/',
-  __VERSION__: process.env.hasOwnProperty('APP_VERSION') ? process.env.APP_VERSION : 'DEV',
+  __VERSION__: process.env.hasOwnProperty('APP_VERSION') ? process.env.APP_VERSION : '0.9.0',
   __DEBUG_INFO_ENABLED__: false,
 };
