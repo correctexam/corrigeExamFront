@@ -26,9 +26,29 @@
           id="save-entity"
           data-cy="entityCreateSaveButton"
           class="btn btn-primary"
-          (click)="downloadTemplate()"
+          (click)="downloadTemplateWord()"
         >
-          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span>Modèle de sujet</span>
+          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span>Modèle de sujet Word</span>
+        </button>
+        <button
+          [disabled]="!this.courseid"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="btn btn-primary"
+          (click)="downloadTemplateOdt()"
+        >
+          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span>Modèle de sujet Libroffice</span>
+        </button>
+        <button
+          [disabled]="!this.courseid"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="btn btn-primary"
+          (click)="downloadTemplateLatex()"
+        >
+          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span>Modèle de sujet Latex</span>
         </button>
       </div>
     </div>
