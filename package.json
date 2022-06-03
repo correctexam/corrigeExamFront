@@ -2,7 +2,7 @@
   "name": "grade-scope-istic",
   "version": "0.0.1-SNAPSHOT",
   "private": true,
-  "description": "Description for gradeScopeIstic",
+  "description": "Description for correctExam",
   "license": "UNLICENSED",
   "scripts": {
     "build": "npm run webapp:prod --",
