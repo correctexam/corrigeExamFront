@@ -94,6 +94,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   ];
   displayBasic = false;
   images: any[] = [];
+
+  pageOffset = 0;
   constructor(
     public examService: ExamService,
     public zoneService: ZoneService,
@@ -128,6 +130,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.loadAllPages();
         }
         this.examId = params.get('examid')!;
+        this.pageOffset = 0;
 
         if (params.get('questionno') !== null) {
           this.questionno = +params.get('questionno')! - 1;
@@ -498,10 +501,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     return new Promise<IZone | undefined>(resolve => {
       if (zoneId) {
         this.zoneService.find(zoneId).subscribe(e => {
-          if (index === 0) {
-            this.activeIndex = currentStudent! * this.nbreFeuilleParCopie! + e.body!.pageNumber! - 1;
+          const pagewithoffset = currentStudent! * this.nbreFeuilleParCopie! + e.body!.pageNumber! + this.pageOffset;
+          const pagewithoutoffset = currentStudent! * this.nbreFeuilleParCopie! + e.body!.pageNumber!;
+          let page = pagewithoutoffset;
+          if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
+            page = pagewithoffset;
           }
-          this.getAllImage4Zone(currentStudent! * this.nbreFeuilleParCopie! + e.body!.pageNumber!, e.body!).then(p => {
+          if (index === 0) {
+            this.activeIndex = page - 1;
+          }
+          this.getAllImage4Zone(page, e.body!).then(p => {
             this.displayImage(p, imageRef, showImageRef, index);
             resolve(e.body!);
           });
