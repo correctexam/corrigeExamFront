@@ -637,7 +637,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   showGalleria(): void {
-    console.log(this.images);
     this.displayBasic = true;
   }
 

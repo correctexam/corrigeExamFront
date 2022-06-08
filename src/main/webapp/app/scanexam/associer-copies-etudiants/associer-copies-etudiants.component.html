@@ -3,8 +3,30 @@
   <p-blockUI [blocked]="blocked">
     <i class="pi pi-lock" style="font-size: 3rem"></i>
   </p-blockUI>
+  <p-galleria
+    [value]="images"
+    [(visible)]="displayBasic"
+    [responsiveOptions]="responsiveOptions2"
+    [circular]="true"
+    [fullScreen]="true"
+    [showItemNavigators]="true"
+    [baseZIndex]="100000"
+    [showThumbnails]="false"
+    [containerStyle]="{ 'max-height': '90vh' }"
+    [numVisible]="7"
+    [(activeIndex)]="activeIndex"
+  >
+    <ng-template pTemplate="item" let-item>
+      <div
+        class="grid grid-nogutter justify-content-center"
+        style="overflow-x: hidden; overflow-y: scroll; border: #000000 1px solid; height: 96vh; width: 90vw"
+      >
+        <img [src]="item.src" style="display: block" />
+      </div>
+    </ng-template>
+  </p-galleria>
 
-  <div class="col-8">
+  <div class="col-12">
     <div class="grid grid-nogutter">
       <div class="col-8">
         <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">Associer étudiants/copies</h2>
@@ -90,14 +112,17 @@
           <p-inputSwitch [(ngModel)]="noalign" (onChange)="reloadImage()"></p-inputSwitch>
         </div>
         <div class="col-8">
-          <p-paginator
-            [rows]="1"
-            [first]="currentStudent"
-            [totalRecords]="numberPagesInScan / nbreFeuilleParCopie"
-            (onPageChange)="onPageChange($event)"
-            [showJumpToPageDropdown]="true"
-            [showPageLinks]="false"
-          ></p-paginator>
+          <div class="d-flex justify-content-center">
+            <p-paginator
+              [rows]="1"
+              [first]="currentStudent"
+              [totalRecords]="numberPagesInScan / nbreFeuilleParCopie"
+              (onPageChange)="onPageChange($event)"
+              [showJumpToPageDropdown]="true"
+              [showPageLinks]="false"
+            ></p-paginator>
+            <button pButton (click)="showGalleria()">Show full page</button>
+          </div>
         </div>
         <div class="col-2 justify-content-end">
           <label>Agrandissement: </label>
@@ -165,12 +190,12 @@
       </p-orderList>-->
     </div>
   </div>
-  <div [hidden]="debug" class="col-4 md:col-4 overflow-hidden">
+  <!--  <div [hidden]="debug" class="col-4 md:col-4 overflow-hidden">
     <img
       src="content/images/bannerright.jpg"
       alt="Image"
       class="md:ml-auto block md:h-full"
       style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
     />
-  </div>
+  </div>-->
 </div>

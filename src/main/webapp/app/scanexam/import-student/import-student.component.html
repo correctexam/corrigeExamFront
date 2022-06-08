@@ -22,14 +22,14 @@
         </button>
 
         <button
-          [disabled]="!this.courseid"
+          [disabled]="!this.courseid || !canImport()"
           type="submit"
           id="save-entity"
           data-cy="entityCreateSaveButton"
           class="btn btn-primary"
           (click)="envoiEtudiants()"
         >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span>Importer</span>
+          <fa-icon icon="save"></fa-icon>&nbsp;<span>Importer étudiants ci-dessous</span>
         </button>
         <button (click)="download()" type="submit" id="save-entity" data-cy="entityCreateSaveButton" class="btn btn-primary">
           <fa-icon icon="save"></fa-icon>&nbsp;<span>Download template</span>
@@ -50,9 +50,9 @@
         [stretchH]="'all'"
         [colHeaders]="true"
         [rowHeaders]="true"
-        [data]="dataset"
         licenseKey="non-commercial-and-evaluation"
         [stretchH]="'all'"
+        [afterChange]="detectChanges"
       >
         <!--<hot-column data="id" [readOnly]="true" title="ID"></hot-column>-->
         <hot-column data="ine" [title]="'INE'"></hot-column>> <hot-column data="nom" [title]="'NOM'"></hot-column>>
