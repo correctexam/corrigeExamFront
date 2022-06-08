@@ -11,12 +11,17 @@ import { EventCanevasVoirCopieHandlerService } from './event-canevasvoircopie-ha
 export class ZoneVoirCopieHandler {
   private annotationCanvas!: HTMLCanvasElement;
   private canvasInitialCanvas!: HTMLCanvasElement;
+  canvas: fabric.Canvas | undefined;
 
   constructor(public zoneid: string, public eventHandler: EventCanevasVoirCopieHandlerService, public respid: number | undefined) {}
 
   updateCanvas(canvas1: any): fabric.Canvas {
     if (this.annotationCanvas && this.annotationCanvas.parentNode) {
       this.annotationCanvas.parentNode.removeChild(this.annotationCanvas);
+      if (this.canvas !== undefined) {
+        this.canvas.removeListeners();
+        (this.canvas as any)['wrapperEl'].parentNode.removeChild((this.canvas as any)['wrapperEl']);
+      }
     }
     this.canvasInitialCanvas = canvas1;
     this.annotationCanvas = document.createElement('CANVAS') as HTMLCanvasElement;
@@ -43,6 +48,7 @@ export class ZoneVoirCopieHandler {
 
     this.eventHandler.allcanvas.push(canvas);
     this.eventHandler.canvas = canvas;
+    this.canvas = canvas;
 
     this.eventHandler.extendToObjectWithId();
     fabric.Object.prototype.objectCaching = false;

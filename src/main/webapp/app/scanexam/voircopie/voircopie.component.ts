@@ -114,7 +114,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   alignement = 'marker';
   template!: ITemplate;
   pdfcontent!: string;
-
+  currentZoneVoirCopieHandler: ZoneVoirCopieHandler | undefined;
   constructor(
     public examService: ExamService,
     public zoneService: ZoneService,
@@ -338,12 +338,31 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
       ctx1.putImageData(v.i, 0, 0);
       //  this.addEventListeners( imageRef!.nativeElement)
       show(true);
-      const zh = new ZoneVoirCopieHandler(
-        '' + this.exam!.id + '_' + this.selectionStudents![0]!.id! + '_' + this.questionno + '_' + index,
-        this.eventHandler,
-        this.resp?.id
-      );
-      zh.updateCanvas(imageRef!.nativeElement);
+
+      if (this.currentZoneVoirCopieHandler === undefined) {
+        const zh = new ZoneVoirCopieHandler(
+          '' + this.exam!.id + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index,
+          this.eventHandler,
+          this.resp?.id
+        );
+        zh.updateCanvas(imageRef!.nativeElement);
+        this.currentZoneVoirCopieHandler = zh;
+      } else {
+        if (
+          this.currentZoneVoirCopieHandler.zoneid ===
+          '' + this.exam!.id + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index
+        ) {
+          this.currentZoneVoirCopieHandler.updateCanvas(imageRef!.nativeElement);
+        } else {
+          const zh = new ZoneVoirCopieHandler(
+            '' + this.exam!.id + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index,
+            this.eventHandler,
+            this.resp?.id
+          );
+          zh.updateCanvas(imageRef!.nativeElement);
+          this.currentZoneVoirCopieHandler = zh;
+        }
+      }
     }
   }
 
