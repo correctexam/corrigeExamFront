@@ -71,6 +71,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   currentTextComment4Question: ITextComment[] | undefined;
   currentGradedComment4Question: IGradedComment[] | undefined;
 
+  currentZoneCorrectionHandler: ZoneCorrectionHandler | undefined;
+
   activeIndex = 1;
   responsiveOptions2: any[] = [
     {
@@ -113,7 +115,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
-      console.log('foo');
       this.blocked = true;
 
       this.currentNote = 0;
@@ -519,12 +520,30 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       ctx1.putImageData(v.i, 0, 0);
       //  this.addEventListeners( imageRef!.nativeElement)
       show(true);
-      const zh = new ZoneCorrectionHandler(
-        '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index,
-        this.eventHandler,
-        this.resp?.id
-      );
-      zh.updateCanvas(imageRef!.nativeElement);
+      if (this.currentZoneCorrectionHandler === undefined) {
+        const zh = new ZoneCorrectionHandler(
+          '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index,
+          this.eventHandler,
+          this.resp?.id
+        );
+        zh.updateCanvas(imageRef!.nativeElement);
+        this.currentZoneCorrectionHandler = zh;
+      } else {
+        if (
+          this.currentZoneCorrectionHandler.zoneid ===
+          '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index
+        ) {
+          this.currentZoneCorrectionHandler.updateCanvas(imageRef!.nativeElement);
+        } else {
+          const zh = new ZoneCorrectionHandler(
+            '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index,
+            this.eventHandler,
+            this.resp?.id
+          );
+          zh.updateCanvas(imageRef!.nativeElement);
+          this.currentZoneCorrectionHandler = zh;
+        }
+      }
     }
   }
 

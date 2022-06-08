@@ -22,7 +22,7 @@ export class ZoneCorrectionHandler {
   currentAnnotationId!: string;
 
   private annotationCanvas!: HTMLCanvasElement;
-  private canvas!: any;
+  private canvas: fabric.Canvas | undefined;
   private canvasInitialCanvas!: HTMLCanvasElement;
   noteImg!: HTMLImageElement;
 
@@ -31,6 +31,10 @@ export class ZoneCorrectionHandler {
   updateCanvas(canvas1: any): fabric.Canvas {
     if (this.annotationCanvas && this.annotationCanvas.parentNode) {
       this.annotationCanvas.parentNode.removeChild(this.annotationCanvas);
+      if (this.canvas !== undefined) {
+        this.canvas.removeListeners();
+        (this.canvas as any)['wrapperEl'].parentNode.removeChild((this.canvas as any)['wrapperEl']);
+      }
     }
     this.canvasInitialCanvas = canvas1;
     this.annotationCanvas = document.createElement('CANVAS') as HTMLCanvasElement;
@@ -60,7 +64,7 @@ export class ZoneCorrectionHandler {
 
     this.eventHandler.extendToObjectWithId();
     this.canvas = canvas;
-    this.eventHandler.commentsService.query();
+    // this.eventHandler.commentsService.query();
     fabric.Object.prototype.objectCaching = false;
     this.addEventListeners(canvas);
     return canvas;
@@ -78,34 +82,34 @@ export class ZoneCorrectionHandler {
   }
 
   private onCanvasMouseDown(event: { e: Event }) {
-    this.eventHandler.canvas = this.canvas;
+    this.eventHandler.canvas = this.canvas!;
     this.eventHandler.mouseDown(event.e);
     this.avoidDragAndClickEventsOfOtherUILibs(event.e);
   }
   private onCanvasMouseMove(event: { e: Event }) {
-    this.eventHandler.canvas = this.canvas;
+    this.eventHandler.canvas = this.canvas!;
     this.eventHandler.mouseMove(event.e);
   }
   private onCanvasMouseUp() {
-    this.eventHandler.canvas = this.canvas;
+    this.eventHandler.canvas = this.canvas!;
     this.eventHandler.mouseUp();
   }
   private onSelectionCreated(e: any) {
-    this.eventHandler.canvas = this.canvas;
+    this.eventHandler.canvas = this.canvas!;
 
     this.eventHandler.objectSelected(e.selected[0]);
   }
   private onSelectionUpdated(e: any) {
-    this.eventHandler.canvas = this.canvas;
+    this.eventHandler.canvas = this.canvas!;
 
     this.eventHandler.objectSelected(e.selected[0]);
   }
   private onObjectMoving(e: any) {
-    this.eventHandler.canvas = this.canvas;
+    this.eventHandler.canvas = this.canvas!;
     this.eventHandler.objectMoving(e.target.id, e.target.type, e.target.left, e.target.top);
   }
   private onObjectScaling(e: any) {
-    this.eventHandler.canvas = this.canvas;
+    this.eventHandler.canvas = this.canvas!;
     this.eventHandler.objectScaling(
       e.target.id,
       e.target.type,
