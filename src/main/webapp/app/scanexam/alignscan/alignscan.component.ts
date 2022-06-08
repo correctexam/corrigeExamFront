@@ -153,23 +153,14 @@ export class AlignScanComponent implements OnInit {
           });
         });
       }
-      // Phase 2;
     }
   }
 
   private async saveData(): Promise<any> {
     const templatePages64: Map<number, string> = new Map();
-    // const alignPages64: Map<number, string> = new Map();
-    //    const nonalignPages64: Map<number, string> = new Map();
     this.templatePages.forEach((e, k) => {
       templatePages64.set(k, this.fgetBase64Image(e.image!));
     });
-    /* this.alignPages.forEach((e, k) => {
-      alignPages64.set(k, this.fgetBase64Image(e.image!));
-    });*/
-    /* this.nonalignPages.forEach((e, k) => {
-      nonalignPages64.set(k, this.fgetBase64Image(e.image!));
-    }); */
     await db.exams.add({
       id: +this.examId,
     });
@@ -186,31 +177,6 @@ export class AlignScanComponent implements OnInit {
         ),
       });
     }
-
-    /* for (let e of alignPages64.keys()) {
-      await db.alignImages.add({
-        examId: +this.examId,
-        pageNumber: e,
-        value: JSON.stringify(
-          {
-            pages: alignPages64.get(e)!,
-          },
-          this.replacer
-        ),
-      });
-    } */
-    /* for (let e of nonalignPages64.keys()) {
-      await db.nonAlignImages.add({
-        examId: +this.examId,
-        pageNumber: e,
-        value: JSON.stringify(
-          {
-            pages: nonalignPages64.get(e)!,
-          },
-          this.replacer
-        ),
-      });
-    } */
     this.router.navigateByUrl('/exam/' + this.examId);
     this.blocked = false;
   }
@@ -351,10 +317,10 @@ export class AlignScanComponent implements OnInit {
             height: i.height,
           };
           this.saveEligneImage(pagen, this.fgetBase64Image(apage.image!)).then(() => {
-            resolve(apage);
+            this.saveNonAligneImage(pagen, this.fgetBase64Image(apage.image!)).then(() => {
+              resolve(apage);
+            });
           });
-
-          //          this.alignPages.set(pagen, apage);
         }
       };
       i.src = file;
@@ -362,9 +328,9 @@ export class AlignScanComponent implements OnInit {
   }
 
   public alignementChange(): any {
-    db.alignImages.clear().then(() => {
+    /* db.alignImages.clear().then(() => {
       this.exportAsImage();
-    });
+    }); */
     // this.alignPages.clear();
   }
 

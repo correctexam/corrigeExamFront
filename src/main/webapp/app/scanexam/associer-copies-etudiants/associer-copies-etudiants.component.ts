@@ -162,6 +162,30 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   ];
   recognizedStudent: IStudent | undefined;
   predictionprecision = 0;
+
+  activeIndex = 1;
+
+  responsiveOptions2: any[] = [
+    {
+      breakpoint: '1500px',
+      numVisible: 5,
+    },
+    {
+      breakpoint: '1024px',
+      numVisible: 3,
+    },
+    {
+      breakpoint: '768px',
+      numVisible: 2,
+    },
+    {
+      breakpoint: '560px',
+      numVisible: 1,
+    },
+  ];
+  displayBasic = false;
+  images: any[] = [];
+
   constructor(
     public examService: ExamService,
     public zoneService: ZoneService,
@@ -181,8 +205,11 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
       this.blocked = true;
       if (params.get('examid') !== null) {
         this.examId = params.get('examid')!;
+        this.loadAllPages();
+
         if (params.get('currentStudent') !== null) {
           this.currentStudent = +params.get('currentStudent')! - 1;
+
           // const startTime = performance.now();
           // Step 1 Query templates
           db.templates
@@ -191,6 +218,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
             .count()
             .then(e2 => {
               this.nbreFeuilleParCopie = e2;
+              this.activeIndex = this.currentStudent! * this.nbreFeuilleParCopie!;
               // Step 2 Query Scan in local DB
               /* let endTime = performance.now();
               let totalTime = endTime - startTime; // ti
@@ -300,9 +328,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                           const solutionName = predicts[0];
                           const solutionFirstname = predicts[1];
                           const solutionINE = predicts[2];
-                          /* console.log(solutionName);
+                          console.log(solutionName);
                           console.log(solutionFirstname);
-                          console.log(solutionINE); */
+                          console.log(solutionINE);
                           if (solutionName.length > 0 && solutionFirstname.length > 0 && solutionINE.length > 0) {
                             let sts = this.students.filter(
                               student =>
@@ -785,6 +813,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   }
 
   public alignementChange(): any {
+    this.loadAllPages();
     this.exportAsImage();
   }
 
@@ -903,5 +932,31 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         this.refreshStudentList().then(() => resolve1());
       });
     });
+  }
+
+  showGalleria(): void {
+    this.displayBasic = true;
+  }
+
+  loadAllPages(): void {
+    if (this.noalign) {
+      db.nonAlignImages.where({ examId: +this.examId! }).each(e => {
+        const image = JSON.parse(e!.value, this.reviver);
+        this.images.push({
+          src: image.pages,
+          alt: 'Description for Image 2',
+          title: 'Exam',
+        });
+      });
+    } else {
+      db.alignImages.where({ examId: +this.examId! }).each(e => {
+        const image = JSON.parse(e!.value, this.reviver);
+        this.images.push({
+          src: image.pages,
+          alt: 'Description for Image 2',
+          title: 'Exam',
+        });
+      });
+    }
   }
 }
