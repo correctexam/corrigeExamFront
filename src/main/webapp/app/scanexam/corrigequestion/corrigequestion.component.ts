@@ -252,8 +252,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 });
             });
         } else {
-          // const c = this.currentStudent + 1;
-          //  this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno + 1) + '/' + c);
+          const c = this.currentStudent + 1;
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno + 1) + '/' + c);
         }
       }
     });
