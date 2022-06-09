@@ -135,6 +135,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (params.get('questionno') !== null) {
           this.questionno = +params.get('questionno')! - 1;
         }
+        console.log('studentid');
+        console.log(params.get('studentid'));
+        console.log(params.get('questionno'));
         if (params.get('studentid') !== null) {
           this.studentid = +params.get('studentid')!;
           this.currentStudent = this.studentid - 1;
@@ -249,8 +252,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 });
             });
         } else {
-          const c = this.currentStudent + 1;
-          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno + 1) + '/' + c);
+          // const c = this.currentStudent + 1;
+          //  this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno + 1) + '/' + c);
         }
       }
     });
