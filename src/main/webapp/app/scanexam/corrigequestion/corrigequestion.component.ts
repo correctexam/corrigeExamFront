@@ -135,6 +135,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (params.get('questionno') !== null) {
           this.questionno = +params.get('questionno')! - 1;
         }
+        console.log('studentid');
+        console.log(params.get('studentid'));
+        console.log(params.get('questionno'));
         if (params.get('studentid') !== null) {
           this.studentid = +params.get('studentid')!;
           this.currentStudent = this.studentid - 1;

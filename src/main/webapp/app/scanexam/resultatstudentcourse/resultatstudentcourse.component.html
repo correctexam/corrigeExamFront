@@ -36,7 +36,7 @@
         class="btn btn-primary"
         (click)="envoiEmailEtudiant()"
       >
-        <fa-icon icon="envelope"></fa-icon>&nbsp;<span>Envoi mail étudiants</span>
+        <fa-icon [icon]="faEnvelope"></fa-icon>&nbsp;<span>Envoi mail étudiants</span>
       </button>
     </ng-template>
   </p-dialog>
@@ -65,7 +65,7 @@
           class="btn btn-primary"
           (click)="showEmailStudent()"
         >
-          <fa-icon icon="envelope"></fa-icon>&nbsp;<span>Envoi mail étudiants</span>
+          <fa-icon [icon]="faEnvelope"></fa-icon>&nbsp;<span>Envoi mail étudiants</span>
         </button>
         <button
           [disabled]="!this.examid"
@@ -75,7 +75,7 @@
           class="btn btn-primary"
           (click)="exportExcel()"
         >
-          <fa-icon icon="envelope"></fa-icon>&nbsp;<span>Export Excel</span>
+          <fa-icon [icon]="faEnvelope"></fa-icon>&nbsp;<span>Export Excel</span>
         </button>
       </div>
     </div>
@@ -88,6 +88,7 @@
             <th>PRENOM</th>
             <th>MAIL</th>
             <th>NOTE</th>
+            <th>LIEN PROF</th>
             <th>LIEN</th>
           </tr>
         </ng-template>
@@ -99,6 +100,8 @@
             <td>{{ student.mail }}</td>
             <td *ngIf="!student.abi">{{ student.note }}</td>
             <td *ngIf="student.abi">0</td>
+            <td *ngIf="student.studentNumber"><a href="{{ 'answer/' + exam?.id + '/1' + '/' + student.studentNumber }}">correction</a></td>
+            <td *ngIf="!student.studentNumber">ABI</td>
             <td *ngIf="!student.abi"><a target="_blank" href="{{ 'copie/' + student.uuid + '/1' }}">link</a></td>
             <td *ngIf="student.abi">ABI</td>
           </tr>
