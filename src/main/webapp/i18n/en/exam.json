@@ -18,7 +18,7 @@
         "title": "Exam"
       },
       "id": "ID",
-      "name": "Name",
+      "name": "Name of the test:",
       "template": "Template",
       "idzone": "Idzone",
       "namezone": "Namezone",
