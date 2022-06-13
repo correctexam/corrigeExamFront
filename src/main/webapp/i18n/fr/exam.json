@@ -18,7 +18,7 @@
         "title": "Examen"
       },
       "id": "Id",
-      "name": "Nom de l'examen",
+      "name": "Nom de l'examen :",
       "template": "Modèle d'examen",
       "idzone": "Idzone",
       "namezone": "Zone du nom",
