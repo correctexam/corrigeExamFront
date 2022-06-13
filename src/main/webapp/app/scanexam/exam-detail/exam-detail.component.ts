@@ -28,6 +28,7 @@ import { ApplicationConfigService } from 'app/core/config/application-config.ser
   providers: [ConfirmationService],
 })
 export class ExamDetailComponent implements OnInit {
+  blocked = false;
   farCircle = farCircle as IconProp;
   fasMotorcycle = fasMotorcycle as IconProp;
   faGraduationCap = faGraduationCap as IconProp;
@@ -55,6 +56,7 @@ export class ExamDetailComponent implements OnInit {
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('examid') !== null) {
+        this.blocked = true;
         this.examId = params.get('examid')!;
         db.exams
           .where('id')
@@ -87,7 +89,8 @@ export class ExamDetailComponent implements OnInit {
                   this.numberPagesInScan = e1;
 
                   this.studentService.query({ courseId: this.exam.courseId }).subscribe(studentsbody => {
-                    console.log(studentsbody);
+                    this.blocked = false;
+
                     this.students = studentsbody.body!;
                     const ex2 = (this.students.map(s => s.examSheets) as any)
                       .flat()
