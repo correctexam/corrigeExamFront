@@ -105,7 +105,7 @@
               [min]="0"
               [max]="maxNote * questionStep"
               [step]="1"
-              (onChange)="changeNote()"
+              (onSlideEnd)="changeNote()"
             >
             </p-slider>
             Note attribuée: {{ currentNote / questionStep }}
@@ -122,12 +122,12 @@
               </div>
               <div style="padding-bottom: 1rem" class="col-12">
                 <label>Facteur agrandissement: ({{ factor }})</label>
-                <p-slider *ngIf="noteSteps > 0" [(ngModel)]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImage()">
+                <p-slider *ngIf="noteSteps > 0" [(ngModel)]="factor" [min]="1" [max]="2" [step]="0.1" (onSlideEnd)="reloadImage()">
                 </p-slider>
               </div>
               <div style="padding-bottom: 1rem" class="col-12">
                 <label>Décallage de page(s): ({{ pageOffset }})</label>
-                <p-slider [(ngModel)]="pageOffset" [min]="-5" [max]="5" [step]="1" (onChange)="reloadImage()"> </p-slider>
+                <p-slider [(ngModel)]="pageOffset" [min]="-5" [max]="5" [step]="1" (onSlideEnd)="reloadImage()"> </p-slider>
               </div>
             </div>
           </div>
