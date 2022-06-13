@@ -451,6 +451,12 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
       });
     });
   }
+  reloadImageGrowFactor(event: any): void {
+    if (event.value !== this.factor) {
+      this.factor = event.value;
+      this.reloadImage();
+    }
+  }
 
   reloadImage(): void {
     this.blocked = true;
