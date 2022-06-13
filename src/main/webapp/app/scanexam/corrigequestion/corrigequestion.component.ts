@@ -260,6 +260,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   reloadImage() {
+    console.log('couocuocucou');
     this.questions!.forEach((q, i) => {
       this.showImage[i] = false;
       this.loadZone(

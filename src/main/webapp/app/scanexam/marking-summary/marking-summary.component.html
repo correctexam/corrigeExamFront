@@ -1,0 +1,26 @@
+<div>
+  <h1>État courant de la correction de l'examen : {{ nameExam }}</h1>
+
+  <div class="grid col-12">
+    <div class="row col-12" *ngFor="let q of questions">
+      <div class="col-1 align-self-center">Question {{ q.number }}</div>
+      <div class="col-1 align-self-center">{{ q.answered }} / {{ nbStd }} ({{ q.answered / nbStd | percent }})</div>
+      <div class="col-1">
+        <button
+          [routerLink]="'/answer/' + this.examId + '/' + q.number + '/' + q.firstNotAnswered"
+          class="p-element p-ripple"
+          pButton
+          type="button"
+        >
+          <span>Continuer</span>
+        </button>
+      </div>
+    </div>
+    <div class="row col-12">
+      <div class="col-2 align-self-center">Total</div>
+      <div class="col-2 align-self-center">
+        {{ getTotalAnswered() }} / {{ nbStd * questions.length }} ({{ getTotalAnswered() / (nbStd * questions.length) | percent }})
+      </div>
+    </div>
+  </div>
+</div>
