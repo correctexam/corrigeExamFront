@@ -118,7 +118,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
       this.blocked = true;
-
+      let forceRefreshStudent = false;
       this.currentNote = 0;
       this.noteSteps = 0;
       this.maxNote = 0;
@@ -128,6 +128,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (this.examId !== params.get('examid')! || this.images.length === 0) {
           this.examId = params.get('examid')!;
           this.loadAllPages();
+          console.log('pass par la');
+          forceRefreshStudent = true;
         }
         this.examId = params.get('examid')!;
         this.pageOffset = 0;
@@ -147,6 +149,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             .equals(+this.examId)
             .count()
             .then(e2 => {
+              console.log('pass par la 1');
+
               this.nbreFeuilleParCopie = e2;
               // Step 2 Query Scan in local DB
 
@@ -155,14 +159,21 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 .equals(+this.examId!)
                 .count()
                 .then(e1 => {
+                  console.log('pass par la 2');
+
                   this.numberPagesInScan = e1;
                   this.examService.find(+this.examId!).subscribe(data => {
+                    console.log('pass par la 3');
+
                     this.exam = data.body!;
                     this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
                     // Step 3 Query Students for Exam
 
-                    this.refreshStudentList().then(() => {
+                    this.refreshStudentList(forceRefreshStudent).then(() => {
+                      this.getSelectedStudent();
                       // Step 4 Query zone 4 questions
+                      console.log('pass par la 4');
+
                       this.blocked = false;
                       this.questionService.query({ examId: this.exam?.id }).subscribe(b =>
                         b.body!.forEach(q => {
@@ -473,25 +484,32 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.router.navigateByUrl('/exam/' + this.examId!);
   }
 
-  async refreshStudentList(): Promise<void> {
-    await new Promise<void>(res =>
-      this.studentService.query({ courseId: this.exam!.courseId }).subscribe(studentsbody => {
-        this.students = studentsbody.body!;
-        const filterStudent = this.students.filter(s =>
-          s.examSheets?.some(ex => ex.scanId === this.exam!.scanfileId && ex.pagemin === this.currentStudent * this.nbreFeuilleParCopie!)
-        );
-        this.selectionStudents = filterStudent;
-        if (this.selectionStudents.length === 0) {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Copie non associée à un étudiant',
-            detail: 'Il semble que cette copie ne soit pas associée à un étudiant',
-          });
-        }
-
+  async refreshStudentList(force: boolean): Promise<void> {
+    await new Promise<void>(res => {
+      if (force || this.students === undefined || this.students.length === 0) {
+        this.studentService.query({ courseId: this.exam!.courseId }).subscribe(studentsbody => {
+          console.log('pass par la 5');
+          this.students = studentsbody.body!;
+          res();
+        });
+      } else {
         res();
-      })
+      }
+    });
+  }
+
+  getSelectedStudent() {
+    const filterStudent = this.students!.filter(s =>
+      s.examSheets?.some(ex => ex.scanId === this.exam!.scanfileId && ex.pagemin === this.currentStudent * this.nbreFeuilleParCopie!)
     );
+    this.selectionStudents = filterStudent;
+    if (this.selectionStudents.length === 0) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Copie non associée à un étudiant',
+        detail: 'Il semble que cette copie ne soit pas associée à un étudiant',
+      });
+    }
   }
 
   async loadZone(
