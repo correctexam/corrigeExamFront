@@ -277,6 +277,20 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
 
+  reloadImageGrowFactor(event: any): void {
+    if (event.value !== this.factor) {
+      this.factor = event.value;
+      this.reloadImage();
+    }
+  }
+
+  reloadImageOffset(event: any): void {
+    if (event.value !== this.pageOffset) {
+      this.pageOffset = event.value;
+      this.reloadImage();
+    }
+  }
+
   reloadImage() {
     this.questions!.forEach((q, i) => {
       this.showImage[i] = false;
@@ -300,6 +314,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.resp = sr1.body!;
         this.blocked = false;
       });
+    }
+  }
+
+  changeNoteSlider(event: any): void {
+    if (event.value !== this.currentNote) {
+      this.currentNote = event.value;
+      this.changeNote();
     }
   }
 
