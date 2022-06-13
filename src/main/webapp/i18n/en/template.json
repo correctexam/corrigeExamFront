@@ -19,8 +19,8 @@
       },
       "id": "ID",
       "name": "Name",
-      "content": "Content",
-      "mark": "Mark",
+      "content": "Test subject:",
+      "mark": "Does the test subject contain alignment marks?",
       "autoMapStudentCopyToList": "Auto Map Student Copy To List",
       "exam": "Exam"
     }

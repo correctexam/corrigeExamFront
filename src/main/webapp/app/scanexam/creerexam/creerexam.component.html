@@ -38,7 +38,7 @@
           class="btn btn-primary"
           (click)="downloadTemplateOdt()"
         >
-          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span>Modèle de sujet Libroffice</span>
+          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span>Modèle de sujet LibreOffice</span>
         </button>
         <button
           [disabled]="!this.courseid"
@@ -48,25 +48,25 @@
           class="btn btn-primary"
           (click)="downloadTemplateLatex()"
         >
-          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span>Modèle de sujet Latex</span>
+          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span>Modèle de sujet LaTeX</span>
         </button>
       </div>
     </div>
     <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
       <div class="col-12 md:col-12">
-        <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.exam.name" for="field_name">Name</label>
-          <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" />
-          <div *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
+        <div class="row">
+          <label class="form-label col-2" jhiTranslate="gradeScopeIsticApp.exam.name" for="field_name">Name</label>
+          <input type="text" class="form-control col-6" name="name" id="field_name" data-cy="name" formControlName="name" />
+          <div class="col-2" *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
             <small class="form-text text-danger" *ngIf="editForm.get('name')?.errors?.required" jhiTranslate="entity.validation.required">
               This field is required.
             </small>
           </div>
         </div>
 
-        <div class="row mb-3">
-          <label class="form-label" for="field_content">Enoncé de l'examen</label>
-          <div>
+        <div class="row">
+          <label class="form-label col-2" for="field_content">Enoncé de l'examen :</label>
+          <div class="col-6">
             <div *ngIf="editForm.get('content')!.value" class="form-text text-danger clearfix">
               <a
                 class="pull-start"
@@ -102,9 +102,9 @@
             formControlName="contentContentType"
           />
         </div>
-        <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.template.mark" for="field_mark">Mark</label>
-          <input type="checkbox" class="form-check" name="mark" id="field_mark" data-cy="mark" formControlName="mark" />
+        <div class="row">
+          <label class="form-label col-4" jhiTranslate="gradeScopeIsticApp.template.mark" for="field_mark">Mark</label>
+          <input type="checkbox" class="form-check col-1" name="mark" id="field_mark" data-cy="mark" formControlName="mark" />
         </div>
 
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="gotoUE()">
