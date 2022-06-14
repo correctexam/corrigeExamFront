@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @angular-eslint/use-lifecycle-interface */
@@ -10,6 +12,7 @@ import { HotTableRegisterer } from '@handsontable/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import Handsontable from 'handsontable';
+import { CellChange, ChangeSource } from 'handsontable/common';
 import { MessageService } from 'primeng/api';
 
 @Component({
@@ -48,8 +51,14 @@ export class ImportStudentComponent implements OnInit {
         this.courseid = params.get('courseid')!;
       }
     });
+    // eslint-disable-next-line no-console
+    //    this.hotRegisterer.getInstance(this.id).addHook('afterChange' ,()=> {console.log('ok')})
   }
 
+  detectChanges = (changes: CellChange[] | null, source: ChangeSource) => {
+    // eslint-disable-next-line no-console
+    // console.log("foo");
+  };
   updateTableSize(): void {
     this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val);
   }
@@ -77,6 +86,16 @@ export class ImportStudentComponent implements OnInit {
 
   gotoUE(): void {
     this.router.navigateByUrl('/course/' + this.courseid);
+  }
+
+  canImport(): boolean {
+    return (
+      this.dataset.filter(e => e.mail !== undefined && e.mail !== '').length > 0 &&
+      this.dataset.filter(e => e.ine !== undefined && e.ine !== '').length ===
+        this.dataset.filter(e => e.mail !== undefined && e.mail !== '').length &&
+      this.dataset.filter(e => e.ine !== undefined && e.ine !== '').length ===
+        this.dataset.filter(e => e.groupe !== undefined && e.groupe !== '').length
+    );
   }
   envoiEtudiants(): void {
     const c = {

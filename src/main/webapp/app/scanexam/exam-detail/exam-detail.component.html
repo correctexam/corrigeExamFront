@@ -9,6 +9,10 @@
   </p-dock>
   <p-confirmDialog header="Confirmation suppression" icon="pi pi-exclamation-triangle"></p-confirmDialog>
   <div class="wizard-v2-content">
+    <p-blockUI [blocked]="blocked">
+      <i class="pi pi-lock" style="font-size: 3rem"></i>
+    </p-blockUI>
+
     <div class="wizard-image"></div>
     <div class="wizard-form">
       <div class="wizard-header">
@@ -50,7 +54,7 @@
             pButton
             pRipple
             type="button"
-            [disabled]="!exam?.scanfileId"
+            [disabled]="blocked || !exam?.scanfileId"
           >
             <fa-stack>
               <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
@@ -64,7 +68,7 @@
             pButton
             pRipple
             type="button"
-            [disabled]="!showAssociation"
+            [disabled]="blocked || !showAssociation"
           >
             <fa-stack>
               <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
@@ -78,7 +82,7 @@
             pButton
             pRipple
             type="button"
-            [disabled]="!showCorrection"
+            [disabled]="blocked || !showCorrection"
           >
             <fa-stack>
               <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
@@ -93,7 +97,7 @@
             pButton
             pRipple
             type="button"
-            [disabled]="!showCorrection"
+            [disabled]="blocked || !showCorrection"
           >
             <fa-stack>
               <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>

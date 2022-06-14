@@ -12,6 +12,7 @@ import { ConfirmationService } from 'primeng/api';
 import * as FileSaver from 'file-saver';
 import { IExam } from '../../entities/exam/exam.model';
 import { ExamService } from '../../entities/exam/service/exam.service';
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'jhi-resultatstudentcourse',
@@ -27,6 +28,8 @@ export class ResultatStudentcourseComponent implements OnInit {
   mailSubject = '';
   mailBody = '';
   exam: IExam | undefined;
+
+  faEnvelope = faEnvelope;
 
   constructor(
     protected applicationConfigService: ApplicationConfigService,
