@@ -13,9 +13,10 @@ import { IExam } from '../../entities/exam/exam.model';
 })
 export class MarkingSummaryComponent implements OnInit {
   public nameExam = '';
-  public examId = 0;
+  public examId = -1;
   public questions: QuestionSummary[] = [];
   public nbStd = 0;
+  public exam: IExam | null = null;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -29,10 +30,10 @@ export class MarkingSummaryComponent implements OnInit {
     this.activatedRoute.paramMap.subscribe(params => {
       this.examId = parseInt(params.get('examid') ?? '-1', 10);
       this.examService.find(this.examId).subscribe(dataExam => {
-        const exam = dataExam.body;
+        this.exam = dataExam.body;
 
-        if (exam) {
-          this.fillQuestionsTableSummary(exam);
+        if (this.exam) {
+          this.fillQuestionsTableSummary(this.exam);
         }
       });
     });

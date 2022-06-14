@@ -1,4 +1,5 @@
-<div>
+<div *ngIf="exam === null">Numéro de l'examen invalide.</div>
+<div *ngIf="exam">
   <h1>État courant de la correction de l'examen : {{ nameExam }}</h1>
 
   <br />
