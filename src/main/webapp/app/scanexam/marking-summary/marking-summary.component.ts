@@ -75,13 +75,12 @@ export class MarkingSummaryComponent implements OnInit {
 
         questions.forEach(q => {
           const marksQ = marks.filter(m => m.questionId === q.id);
-          const countMarked = marksQ.length;
           const markedSheets = marksQ.filter(m => m.sheetId).map(m => m.sheetId!);
           // removing the marked sheets from 'questionsSerie' to get the unmarked questions
           const remainingSheets = questionsSerie.filter(sheet => !markedSheets.includes(sheet));
 
           this.questions.push({
-            answeredSheets: countMarked,
+            answeredSheets: marksQ.length,
             number: q.numero ?? -1,
             firstSheetNotAnswered: remainingSheets.length === 0 ? 1 : remainingSheets[0],
           });
