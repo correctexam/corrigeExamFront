@@ -1,13 +1,14 @@
 <div>
   <h1>État courant de la correction de l'examen : {{ nameExam }}</h1>
 
-  <div class="grid col-12">
-    <div class="row col-12" *ngFor="let q of questions">
-      <div class="col-1 align-self-center">Question {{ q.number }}</div>
-      <div class="col-1 align-self-center">{{ q.answered }} / {{ nbStd }} ({{ q.answered / nbStd | percent }})</div>
-      <div class="col-1">
+  <br />
+  <div class="container">
+    <div class="row row-striped" *ngFor="let q of getSortedQuestions()">
+      <div class="col align-self-center">Question {{ q.number }}</div>
+      <div class="col align-self-center">{{ q.answeredSheets }} / {{ nbStd }} ({{ q.answeredSheets / nbStd | percent }})</div>
+      <div class="col">
         <button
-          [routerLink]="'/answer/' + this.examId + '/' + q.number + '/' + q.firstNotAnswered"
+          [routerLink]="'/answer/' + this.examId + '/' + q.number + '/' + q.firstSheetNotAnswered"
           class="p-element p-ripple"
           pButton
           type="button"
@@ -16,11 +17,15 @@
         </button>
       </div>
     </div>
-    <div class="row col-12">
-      <div class="col-2 align-self-center">Total</div>
-      <div class="col-2 align-self-center">
-        {{ getTotalAnswered() }} / {{ nbStd * questions.length }} ({{ getTotalAnswered() / (nbStd * questions.length) | percent }})
+
+    <div class="row row-striped">
+      <div class="col align-self-center fw-bold"><p class="font-weight-bold">Total</p></div>
+      <div class="col align-self-center fw-bold">
+        <p class="font-weight-bold">
+          {{ getTotalAnswered() }} / {{ nbStd * questions.length }} ({{ getTotalAnswered() / (nbStd * questions.length) | percent }})
+        </p>
       </div>
+      <div class="col"></div>
     </div>
   </div>
 </div>

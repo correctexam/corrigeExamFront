@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ActivatedRoute } from '@angular/router';
 import { QuestionService } from '../../entities/question/service/question.service';
-import { GradedCommentService } from '../../entities/graded-comment/service/graded-comment.service';
 import { StudentService } from '../../entities/student/service/student.service';
+import { StudentResponseService } from '../../entities/student-response/service/student-response.service';
 
 @Component({
   selector: 'jhi-marking-summary',
@@ -20,7 +20,7 @@ export class MarkingSummaryComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private examService: ExamService,
     private questionService: QuestionService,
-    private gradedCommentService: GradedCommentService,
+    private studentResponseService: StudentResponseService,
     private studentService: StudentService
   ) {}
 
@@ -35,22 +35,25 @@ export class MarkingSummaryComponent implements OnInit {
 
           this.studentService.query({ courseId: exam.courseId }).subscribe(dataStd => {
             this.nbStd = dataStd.body?.length ?? 0;
+          });
+
+          this.studentResponseService.query().subscribe(dataMarking => {
+            const marks = dataMarking.body ?? [];
 
             this.questionService.query({ examId: exam.id }).subscribe(dataQuestion => {
               const questions = dataQuestion.body ?? [];
-              questions.forEach(q => {
-                this.gradedCommentService.query({ questionId: q.id }).subscribe(dataMarking => {
-                  const marking = dataMarking.body ?? [];
-                  let first = marking.findIndex(m => m.grade === null);
-                  first = first === -1 ? 1 : first;
+              const questionsSerie = Array.from(Array(questions.length - 1).keys()).map(x => x + 1);
 
-                  this.questions.push({
-                    answered: marking.filter(m => m.grade).length,
-                    number: q.numero ?? -1,
-                    firstNotAnswered: first,
-                  });
-                  // eslint-disable-next-line no-console
-                  console.log(this.questions);
+              questions.forEach(q => {
+                const marksQ = marks.filter(m => m.questionId === q.id);
+                const countMarked = marksQ.length;
+                const markedSheets = marksQ.filter(m => m.sheetId).map(m => m.sheetId!);
+                const remainingSheets = questionsSerie.filter(sheet => !markedSheets.includes(sheet));
+
+                this.questions.push({
+                  answeredSheets: countMarked,
+                  number: q.numero ?? -1,
+                  firstSheetNotAnswered: remainingSheets.length === 0 ? 1 : remainingSheets[0],
                 });
               });
             });
@@ -60,17 +63,21 @@ export class MarkingSummaryComponent implements OnInit {
     });
   }
 
+  public getSortedQuestions(): Array<QuestionSummary> {
+    return this.questions.sort((q1, q2) => (q1.number < q2.number ? 0 : 1));
+  }
+
   public getTotalAnswered(): number {
     if (this.questions.length === 0) {
       return 0;
     }
 
-    return this.questions.map(q => q.answered).reduce((q1, q2) => q1 + q2);
+    return this.questions.map(q => q.answeredSheets).reduce((q1, q2) => q1 + q2);
   }
 }
 
 interface QuestionSummary {
   number: number;
-  answered: number;
-  firstNotAnswered: number;
+  answeredSheets: number;
+  firstSheetNotAnswered: number;
 }
