@@ -33,6 +33,7 @@ export class MarkingSummaryComponent implements OnInit {
         this.exam = dataExam.body;
 
         if (this.exam) {
+          this.nameExam = this.exam.name ?? '';
           this.fillQuestionsTableSummary(this.exam);
         }
       });
@@ -56,8 +57,6 @@ export class MarkingSummaryComponent implements OnInit {
    * @param exam The exam to use for filling the table.
    */
   private fillQuestionsTableSummary(exam: IExam): void {
-    this.nameExam = exam.name ?? '';
-
     // Getting the students involved in the current course
     this.studentService.query({ courseId: exam.courseId }).subscribe(dataStd => {
       this.nbStd = dataStd.body?.length ?? 0;
@@ -72,19 +71,19 @@ export class MarkingSummaryComponent implements OnInit {
       this.questionService.query({ examId: exam.id }).subscribe(dataQuestion => {
         const questions = dataQuestion.body ?? [];
         // Used to identify the first sheet not marked
-        const questionsSerie = Array.from(Array(questions.length - 1).keys()).map(x => x + 1);
+        const studentsSerie = Array.from(Array(questions.length - 1).keys()).map(x => x + 1);
 
-        questions.forEach(q => {
+        this.questions = questions.map(q => {
           const marksQ = marks.filter(m => m.questionId === q.id);
           const markedSheets = marksQ.filter(m => m.sheetId).map(m => m.sheetId!);
           // removing the marked sheets from 'questionsSerie' to get the unmarked questions
-          const remainingSheets = questionsSerie.filter(sheet => !markedSheets.includes(sheet));
+          const remainingSheets = studentsSerie.filter(sheet => !markedSheets.includes(sheet));
 
-          this.questions.push({
+          return {
             answeredSheets: marksQ.length,
             number: q.numero ?? -1,
             firstSheetNotAnswered: remainingSheets.length === 0 ? 1 : remainingSheets[0],
-          });
+          };
         });
       });
     });
