@@ -5,6 +5,7 @@ import { QuestionService } from '../../entities/question/service/question.servic
 import { StudentService } from '../../entities/student/service/student.service';
 import { StudentResponseService } from '../../entities/student-response/service/student-response.service';
 import { IExam } from '../../entities/exam/exam.model';
+import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'jhi-marking-summary',
@@ -14,11 +15,12 @@ import { IExam } from '../../entities/exam/exam.model';
 export class MarkingSummaryComponent implements OnInit {
   public nameExam = '';
   public examId = -1;
-  public questions: QuestionSummary[] = [];
+  public questions: ItemSummary[] = [];
+  public students: ItemSummary[] = [];
   public nbStd = 0;
   public exam: IExam | null = null;
 
-  constructor(
+  public constructor(
     private activatedRoute: ActivatedRoute,
     private examService: ExamService,
     private questionService: QuestionService,
@@ -26,7 +28,7 @@ export class MarkingSummaryComponent implements OnInit {
     private studentService: StudentService
   ) {}
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
       this.examId = parseInt(params.get('examid') ?? '-1', 10);
       this.examService.find(this.examId).subscribe(dataExam => {
@@ -40,7 +42,7 @@ export class MarkingSummaryComponent implements OnInit {
     });
   }
 
-  public getSortedQuestions(): Array<QuestionSummary> {
+  public getSortedQuestions(): Array<ItemSummary> {
     return this.questions.sort((q1, q2) => (q1.number < q2.number ? 0 : 1));
   }
 
@@ -63,29 +65,49 @@ export class MarkingSummaryComponent implements OnInit {
     });
 
     // Getting all the marks of the current exam
-    // TODO: does the query only return the remarks of the ongoing exam? Not able to use parameters
+    // FIXME: it returns all the responses of all the exams
     this.studentResponseService.query().subscribe(dataMarking => {
       const marks = dataMarking.body ?? [];
+      const allMarkedSheets: Array<Array<number>> = [];
 
       // Getting all the questions of the current exam
-      this.questionService.query({ examId: exam.id }).subscribe(dataQuestion => {
-        const questions = dataQuestion.body ?? [];
-        // Used to identify the first sheet not marked
-        const studentsSerie = Array.from(Array(questions.length - 1).keys()).map(x => x + 1);
+      lastValueFrom(this.questionService.query({ examId: exam.id }))
+        .then(dataQuestion => {
+          const questions = dataQuestion.body ?? [];
+          // Used to identify the first sheet not marked
+          const studentsSerie = Array.from(Array(questions.length - 1).keys()).map(x => x + 1);
 
-        this.questions = questions.map(q => {
-          const marksQ = marks.filter(m => m.questionId === q.id);
-          const markedSheets = marksQ.filter(m => m.sheetId).map(m => m.sheetId!);
-          // removing the marked sheets from 'questionsSerie' to get the unmarked questions
-          const remainingSheets = studentsSerie.filter(sheet => !markedSheets.includes(sheet));
+          this.questions = questions.map(q => {
+            const marksQ = marks.filter(m => m.questionId === q.id);
+            const markedSheets = marksQ.filter(m => m.sheetId).map(m => m.sheetId!);
+            allMarkedSheets.push(markedSheets);
 
-          return {
-            answeredSheets: marksQ.length,
-            number: q.numero ?? -1,
-            firstSheetNotAnswered: remainingSheets.length === 0 ? 1 : remainingSheets[0],
-          };
+            // removing the marked sheets from 'questionsSerie' to get the unmarked questions
+            const remainingSheets = studentsSerie.filter(sheet => !markedSheets.includes(sheet));
+
+            return {
+              answeredSheets: marksQ.length,
+              number: q.numero ?? -1,
+              firstSheetNotAnswered: remainingSheets.length === 0 ? 1 : remainingSheets[0],
+            };
+          });
+        })
+        .then(() => {
+          // FIXME: firstSheetNotAnswered to compute
+          this.studentService.query({ courseId: exam.courseId }).subscribe(studentsData => {
+            const nbStds = (studentsData.body ?? []).length;
+
+            Array.from(Array(nbStds).keys()).forEach(sheetID => {
+              const stdQuestionsMarked = allMarkedSheets.filter(q => q.includes(sheetID + 1)).length;
+
+              this.students.push({
+                answeredSheets: stdQuestionsMarked,
+                number: sheetID + 1,
+                firstSheetNotAnswered: 1,
+              });
+            });
+          });
         });
-      });
     });
   }
 }
@@ -93,7 +115,7 @@ export class MarkingSummaryComponent implements OnInit {
 /**
  * Local type used in the summary table
  */
-interface QuestionSummary {
+interface ItemSummary {
   number: number;
   answeredSheets: number;
   firstSheetNotAnswered: number;

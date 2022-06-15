@@ -58,6 +58,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputTextModule } from 'primeng/inputtext';
 import { GalleriaModule } from 'primeng/galleria';
 import { MarkingSummaryComponent } from './marking-summary/marking-summary.component';
+import { TabViewModule } from 'primeng/tabview';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -293,6 +294,7 @@ export const ShowResults_ROUTE: Route = {
       VoirCopieEtudiants_ROUTE,
       ShowResults_ROUTE,
     ]),
+    TabViewModule,
   ],
   exports: [
     MesCoursComponent,

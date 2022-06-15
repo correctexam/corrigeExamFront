@@ -3,30 +3,66 @@
   <h1>État courant de la correction de l'examen : {{ nameExam }}</h1>
 
   <br />
-  <div class="container">
-    <div class="row row-striped" *ngFor="let q of getSortedQuestions()">
-      <div class="col align-self-center">Question {{ q.number }}</div>
-      <div class="col align-self-center">{{ q.answeredSheets }} / {{ nbStd }} ({{ q.answeredSheets / nbStd | percent }})</div>
-      <div class="col">
-        <button
-          [routerLink]="'/answer/' + this.examId + '/' + q.number + '/' + q.firstSheetNotAnswered"
-          class="p-element p-ripple"
-          pButton
-          type="button"
-        >
-          <span>Continuer</span>
-        </button>
-      </div>
-    </div>
 
-    <div class="row row-striped">
-      <div class="col align-self-center fw-bold"><p class="font-weight-bold">Total</p></div>
-      <div class="col align-self-center fw-bold">
-        <p class="font-weight-bold">
-          {{ getTotalAnswered() }} / {{ nbStd * questions.length }} ({{ getTotalAnswered() / (nbStd * questions.length) | percent }})
-        </p>
+  <p-tabView>
+    <p-tabPanel header="Questions">
+      <div class="container">
+        <div class="row row-striped" *ngFor="let q of getSortedQuestions()">
+          <div class="col align-self-center">Question {{ q.number }}</div>
+          <div class="col align-self-center">{{ q.answeredSheets }} / {{ nbStd }} ({{ q.answeredSheets / nbStd | percent }})</div>
+          <div class="col">
+            <button
+              [routerLink]="'/answer/' + this.examId + '/' + q.number + '/' + q.firstSheetNotAnswered"
+              class="p-element p-ripple"
+              pButton
+              type="button"
+            >
+              <span>Continuer</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="row row-striped">
+          <div class="col align-self-center fw-bold"><p class="font-weight-bold">Total</p></div>
+          <div class="col align-self-center fw-bold">
+            <p class="font-weight-bold">
+              {{ getTotalAnswered() }} / {{ nbStd * questions.length }} ({{ getTotalAnswered() / (nbStd * questions.length) | percent }})
+            </p>
+          </div>
+          <div class="col"></div>
+        </div>
       </div>
-      <div class="col"></div>
-    </div>
-  </div>
+    </p-tabPanel>
+
+    <p-tabPanel header="Étudiants">
+      <div class="container">
+        <div class="row row-striped" *ngFor="let s of students">
+          <div class="col align-self-center">Étudiant {{ s.number }}</div>
+          <div class="col align-self-center">
+            {{ s.answeredSheets }} / {{ questions.length }} ({{ s.answeredSheets / questions.length | percent }})
+          </div>
+          <div class="col">
+            <button
+              [routerLink]="'/answer/' + this.examId + '/' + s.firstSheetNotAnswered + '/' + s.number"
+              class="p-element p-ripple"
+              pButton
+              type="button"
+            >
+              <span>Continuer</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="row row-striped">
+          <div class="col align-self-center fw-bold"><p class="font-weight-bold">Total</p></div>
+          <div class="col align-self-center fw-bold">
+            <p class="font-weight-bold">
+              {{ getTotalAnswered() }} / {{ nbStd * questions.length }} ({{ getTotalAnswered() / (nbStd * questions.length) | percent }})
+            </p>
+          </div>
+          <div class="col"></div>
+        </div>
+      </div>
+    </p-tabPanel>
+  </p-tabView>
 </div>
