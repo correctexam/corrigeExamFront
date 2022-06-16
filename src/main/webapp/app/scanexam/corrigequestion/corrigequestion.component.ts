@@ -448,36 +448,44 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   @HostListener('window:keydown.control.ArrowLeft', ['$event'])
   previousStudent(event: KeyboardEvent) {
-    event.preventDefault();
-    const c = this.currentStudent;
-    if (c > 0) {
-      this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno + 1) + '/' + c);
+    if (!this.blocked) {
+      event.preventDefault();
+      const c = this.currentStudent;
+      if (c > 0) {
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno + 1) + '/' + c);
+      }
     }
   }
   @HostListener('window:keydown.control.ArrowRight', ['$event'])
   nextStudent(event: KeyboardEvent) {
-    event.preventDefault();
-    const c = this.currentStudent + 2;
-    if (c <= this.numberPagesInScan! / this.nbreFeuilleParCopie!) {
-      this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno + 1) + '/' + c);
+    if (!this.blocked) {
+      event.preventDefault();
+      const c = this.currentStudent + 2;
+      if (c <= this.numberPagesInScan! / this.nbreFeuilleParCopie!) {
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno + 1) + '/' + c);
+      }
     }
   }
   @HostListener('window:keydown.shift.ArrowLeft', ['$event'])
   previousQuestion(event: KeyboardEvent): void {
-    event.preventDefault();
-    const c = this.currentStudent + 1;
-    const q = this.questionno;
-    if (q > 0) {
-      this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
+    if (!this.blocked) {
+      event.preventDefault();
+      const c = this.currentStudent + 1;
+      const q = this.questionno;
+      if (q > 0) {
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
+      }
     }
   }
   @HostListener('window:keydown.shift.ArrowRight', ['$event'])
   nextQuestion(event: KeyboardEvent): void {
-    event.preventDefault();
-    const c = this.currentStudent + 1;
-    const q = this.questionno + 2;
-    if (q <= this.nbreQuestions) {
-      this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
+    if (!this.blocked) {
+      event.preventDefault();
+      const c = this.currentStudent + 1;
+      const q = this.questionno + 2;
+      if (q <= this.nbreQuestions) {
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
+      }
     }
   }
 
