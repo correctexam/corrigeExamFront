@@ -295,6 +295,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   changeNote(): void {
     if (this.resp !== undefined) {
       this.blocked = true;
+      // When cancelling the marking, in fact it means marking to 0
+      this.currentNote ??= 0;
       this.resp!.note = this.currentNote;
       this.studentResponseService.update(this.resp!).subscribe(sr1 => {
         this.resp = sr1.body!;

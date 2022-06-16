@@ -97,6 +97,7 @@
               [stars]="noteSteps"
               [(ngModel)]="currentNote"
               (onRate)="changeNote()"
+              (onCancel)="changeNote()"
             ></p-rating>
             <p-slider
               [disabled]="currentQuestion !== undefined && currentQuestion?.gradeType !== 'DIRECT'"
