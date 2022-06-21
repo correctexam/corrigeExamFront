@@ -97,6 +97,7 @@
               [stars]="noteSteps"
               [(ngModel)]="currentNote"
               (onRate)="changeNote()"
+              (onCancel)="changeNote()"
             ></p-rating>
             Note attribuée : {{ currentNote / questionStep }}
           </div>
