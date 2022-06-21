@@ -317,13 +317,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  changeNoteSlider(event: any): void {
-    if (event.value !== this.currentNote) {
-      this.currentNote = event.value;
-      this.changeNote();
-    }
-  }
-
   updateResponse(): void {
     if (this.resp !== undefined) {
       this.studentResponseService.update(this.resp!).subscribe(sr1 => (this.resp = sr1.body!));
