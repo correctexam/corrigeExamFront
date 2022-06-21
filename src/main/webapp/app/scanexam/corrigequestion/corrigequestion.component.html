@@ -97,18 +97,9 @@
               [stars]="noteSteps"
               [(ngModel)]="currentNote"
               (onRate)="changeNote()"
+              (onCancel)="changeNote()"
             ></p-rating>
-            <p-slider
-              [disabled]="currentQuestion !== undefined && currentQuestion?.gradeType !== 'DIRECT'"
-              *ngIf="noteSteps > 0"
-              [ngModel]="currentNote"
-              [min]="0"
-              [max]="maxNote * questionStep"
-              [step]="1"
-              (onChange)="changeNoteSlider($event)"
-            >
-            </p-slider>
-            Note attribuée: {{ currentNote / questionStep }}
+            Note attribuée : {{ currentNote / questionStep }}
           </div>
           <div *ngIf="resp" style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-3 xl:col-12">
             <label>Excellente réponse: </label>

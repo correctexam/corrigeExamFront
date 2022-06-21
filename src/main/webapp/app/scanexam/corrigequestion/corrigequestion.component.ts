@@ -309,18 +309,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   changeNote(): void {
     if (this.resp !== undefined) {
       this.blocked = true;
+      // When cancelling the marking, in fact it means marking to 0
+      this.currentNote ??= 0;
       this.resp!.note = this.currentNote;
       this.studentResponseService.update(this.resp!).subscribe(sr1 => {
         this.resp = sr1.body!;
         this.blocked = false;
       });
-    }
-  }
-
-  changeNoteSlider(event: any): void {
-    if (event.value !== this.currentNote) {
-      this.currentNote = event.value;
-      this.changeNote();
     }
   }
 
@@ -448,36 +443,44 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   @HostListener('window:keydown.control.ArrowLeft', ['$event'])
   previousStudent(event: KeyboardEvent) {
-    event.preventDefault();
-    const c = this.currentStudent;
-    if (c > 0) {
-      this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno + 1) + '/' + c);
+    if (!this.blocked) {
+      event.preventDefault();
+      const c = this.currentStudent;
+      if (c > 0) {
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno + 1) + '/' + c);
+      }
     }
   }
   @HostListener('window:keydown.control.ArrowRight', ['$event'])
   nextStudent(event: KeyboardEvent) {
-    event.preventDefault();
-    const c = this.currentStudent + 2;
-    if (c <= this.numberPagesInScan! / this.nbreFeuilleParCopie!) {
-      this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno + 1) + '/' + c);
+    if (!this.blocked) {
+      event.preventDefault();
+      const c = this.currentStudent + 2;
+      if (c <= this.numberPagesInScan! / this.nbreFeuilleParCopie!) {
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno + 1) + '/' + c);
+      }
     }
   }
   @HostListener('window:keydown.shift.ArrowLeft', ['$event'])
   previousQuestion(event: KeyboardEvent): void {
-    event.preventDefault();
-    const c = this.currentStudent + 1;
-    const q = this.questionno;
-    if (q > 0) {
-      this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
+    if (!this.blocked) {
+      event.preventDefault();
+      const c = this.currentStudent + 1;
+      const q = this.questionno;
+      if (q > 0) {
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
+      }
     }
   }
   @HostListener('window:keydown.shift.ArrowRight', ['$event'])
   nextQuestion(event: KeyboardEvent): void {
-    event.preventDefault();
-    const c = this.currentStudent + 1;
-    const q = this.questionno + 2;
-    if (q <= this.nbreQuestions) {
-      this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
+    if (!this.blocked) {
+      event.preventDefault();
+      const c = this.currentStudent + 1;
+      const q = this.questionno + 2;
+      if (q <= this.nbreQuestions) {
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
+      }
     }
   }
 
