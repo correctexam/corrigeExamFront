@@ -50,7 +50,12 @@ export class CoursdetailsComponent implements OnInit {
         this.examService.query({ courseId: params.get('courseid') }).subscribe(data => {
           this.exams = data.body!;
         });
-        this.courseService.find(+params.get('courseid')!).subscribe(e => (this.course = e.body!));
+        this.courseService.find(+params.get('courseid')!).subscribe(
+          e => (this.course = e.body!),
+          () => {
+            this.router.navigateByUrl('/');
+          }
+        );
         this.dockItems = [
           {
             label: 'Créer exam',
