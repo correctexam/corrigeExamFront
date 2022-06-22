@@ -71,7 +71,12 @@ export class ExamDetailComponent implements OnInit {
         this.examService.find(+this.examId).subscribe(data => {
           this.exam = data.body!;
 
-          this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
+          this.courseService.find(this.exam.courseId!).subscribe(
+            e => (this.course = e.body!),
+            () => {
+              this.router.navigateByUrl('/');
+            }
+          );
 
           db.templates
             .where('examId')
