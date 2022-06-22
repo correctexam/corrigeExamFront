@@ -20,7 +20,6 @@ import {
   ViewChild,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CourseService } from 'app/entities/course/service/course.service';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { StudentService } from 'app/entities/student/service/student.service';
@@ -29,7 +28,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { AlignImagesService } from '../services/align-images.service';
 import { db } from '../db/dbstudent';
 import { IExam } from '../../entities/exam/exam.model';
-import { ICourse } from 'app/entities/course/course.model';
+// import { ICourse } from 'app/entities/course/course.model';
 import { IStudent } from '../../entities/student/student.model';
 import { ImageZone, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.component';
 import { IZone } from 'app/entities/zone/zone.model';
@@ -68,7 +67,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   nbreFeuilleParCopie: number | undefined;
   numberPagesInScan: number | undefined;
   exam: IExam | undefined;
-  course: ICourse | undefined;
+  // course: ICourse | undefined;
   // students: IStudent[] | undefined;
   currentStudent = 0;
   selectionStudents: IStudent[] | undefined;
@@ -118,7 +117,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   constructor(
     public examService: ExamService,
     public zoneService: ZoneService,
-    public courseService: CourseService,
+    //    public courseService: CourseService,
     public studentService: StudentService,
     public scanService: ScanService,
     protected activatedRoute: ActivatedRoute,
@@ -201,7 +200,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   }
 
   finalize() {
-    this.courseService.find(this.exam!.courseId!).subscribe(e => (this.course = e.body!));
+    // this.courseService.find(this.exam!.courseId!).subscribe(e => (this.course = e.body!));
 
     // Step 4 Query zone 4 questions
     this.blocked = false;
@@ -463,7 +462,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   }
 
   populateCache() {
-    this.courseService.find(this.exam!.courseId!).subscribe(e => (this.course = e.body!));
+    // this.courseService.find(this.exam!.courseId!).subscribe(e => (this.course = e.body!));
     if (this.exam!.templateId) {
       this.templateService.find(this.exam!.templateId).subscribe(e1 => {
         this.template = e1.body!;
