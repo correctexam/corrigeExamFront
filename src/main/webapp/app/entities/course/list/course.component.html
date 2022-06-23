@@ -36,9 +36,6 @@
           <th scope="col" jhiSortBy="name">
             <span jhiTranslate="gradeScopeIsticApp.course.name">Name</span> <fa-icon icon="sort"></fa-icon>
           </th>
-          <th scope="col" jhiSortBy="prof.login">
-            <span jhiTranslate="gradeScopeIsticApp.course.prof">Prof</span> <fa-icon icon="sort"></fa-icon>
-          </th>
           <th scope="col"></th>
         </tr>
       </thead>
@@ -48,9 +45,6 @@
             <a [routerLink]="['/course', course.id, 'view']">{{ course.id }}</a>
           </td>
           <td>{{ course.name }}</td>
-          <td>
-            {{ course.profLogin }}
-          </td>
           <td class="text-end">
             <div class="btn-group">
               <button type="submit" [routerLink]="['/course', course.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
