@@ -24,18 +24,21 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.course.prof" for="field_prof">Prof</label>
-          <select class="form-control" id="field_prof" name="prof" formControlName="profId">
-            <option *ngIf="!editForm.get('profId')!.value" [ngValue]="null" selected></option>
-            <option [ngValue]="userOption.id" *ngFor="let userOption of users; trackBy: trackById">{{ userOption.login }}</option>
-        </select>
+          <label jhiTranslate="gradeScopeIsticApp.course.prof" for="field_profs">Prof</label>
+          <select class="form-control" id="field_profs" data-cy="prof" multiple name="profs" formControlName="profs">
+            <option
+              [ngValue]="getSelectedUser(userOption, editForm.get('profs')!.value)"
+              *ngFor="let userOption of users; trackBy: trackById"
+            >
+              {{ userOption.login }}
+            </option>
+          </select>
         </div>
-        <div *ngIf="editForm.get('profId')!.invalid && (editForm.get('profId')!.dirty || editForm.get('profId')!.touched)">
-          <small class="form-text text-danger"
-                 *ngIf="editForm.get('profId')?.errors?.required" jhiTranslate="entity.validation.required">
-              This field is required.
+        <div *ngIf="editForm.get(['profs'])!.invalid && (editForm.get(['profs'])!.dirty || editForm.get(['profs'])!.touched)">
+          <small class="form-text text-danger" *ngIf="editForm.get(['profs'])?.errors?.required" jhiTranslate="entity.validation.required">
+            This field is required.
           </small>
-      </div>
+        </div>
       </div>
 
       <div>

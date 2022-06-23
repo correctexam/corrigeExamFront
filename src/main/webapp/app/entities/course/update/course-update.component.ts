@@ -23,7 +23,7 @@ export class CourseUpdateComponent implements OnInit {
   editForm = this.fb.group({
     id: [],
     name: [null, [Validators.required]],
-    profId: [null, Validators.required],
+    profs: [null, Validators.required],
   });
 
   constructor(
@@ -48,7 +48,7 @@ export class CourseUpdateComponent implements OnInit {
     this.editForm.patchValue({
       id: course.id,
       name: course.name,
-      profId: course.profId,
+      profs: course.profs,
     });
   }
 
@@ -71,7 +71,7 @@ export class CourseUpdateComponent implements OnInit {
       ...new Course(),
       id: this.editForm.get(['id'])!.value,
       name: this.editForm.get(['name'])!.value,
-      profId: this.editForm.get(['profId'])!.value,
+      profs: this.editForm.get(['profs'])!.value,
     };
   }
 
@@ -95,5 +95,15 @@ export class CourseUpdateComponent implements OnInit {
 
   trackById(index: number, item: IUser): any {
     return item.id;
+  }
+  getSelectedUser(option: IUser, selectedVals?: IUser[]): IUser {
+    if (selectedVals) {
+      for (const selectedVal of selectedVals) {
+        if (option.id === selectedVal.id) {
+          return selectedVal;
+        }
+      }
+    }
+    return option;
   }
 }

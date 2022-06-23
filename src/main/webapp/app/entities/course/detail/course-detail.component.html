@@ -20,7 +20,7 @@
         </dd>
         <dt><span jhiTranslate="gradeScopeIsticApp.course.prof">Prof</span></dt>
         <dd>
-          <span>{{ course.profLogin}}</span>
+          <span *ngFor="let prof of course.profs; let last = last"> {{ prof.login }}{{ last ? '' : ', ' }} </span>
         </dd>
       </dl>
 
