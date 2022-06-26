@@ -57,6 +57,8 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputTextModule } from 'primeng/inputtext';
 import { GalleriaModule } from 'primeng/galleria';
+import { MarkingSummaryComponent } from './marking-summary/marking-summary.component';
+import { TabViewModule } from 'primeng/tabview';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -190,6 +192,16 @@ export const CorrigerCopiesEtudiants_ROUTE: Route = {
   },
 };
 
+export const MarkingSummary_ROUTE: Route = {
+  path: 'marking-summary/:examid',
+  canActivate: [UserRouteAccessService],
+  component: MarkingSummaryComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.answer',
+  },
+};
+
 export const VoirCopieEtudiants_ROUTE: Route = {
   path: 'copie/:uuid/:questionno',
   component: VoirCopieComponent,
@@ -232,6 +244,7 @@ export const ShowResults_ROUTE: Route = {
     VoirCopieComponent,
     ResultatStudentcourseComponent,
     ArraySortPipe,
+    MarkingSummaryComponent,
   ],
   imports: [
     CommonModule,
@@ -276,10 +289,12 @@ export const ShowResults_ROUTE: Route = {
       AlignerCopiesEtudiants_ROUTE,
       CorrigerCopiesEtudiantsToQuestion_ROUTE,
       CorrigerCopiesEtudiants_ROUTE,
+      MarkingSummary_ROUTE,
       AssocierCopiesEtudiantsToStudent_ROUTE,
       VoirCopieEtudiants_ROUTE,
       ShowResults_ROUTE,
     ]),
+    TabViewModule,
   ],
   exports: [
     MesCoursComponent,
