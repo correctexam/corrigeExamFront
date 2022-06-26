@@ -6,6 +6,8 @@ import { StudentService } from '../../entities/student/service/student.service';
 import { StudentResponseService } from '../../entities/student-response/service/student-response.service';
 import { IExam } from '../../entities/exam/exam.model';
 import { lastValueFrom } from 'rxjs';
+import { ApplicationConfigService } from '../../core/config/application-config.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'jhi-marking-summary',
@@ -25,7 +27,9 @@ export class MarkingSummaryComponent implements OnInit {
     private examService: ExamService,
     private questionService: QuestionService,
     private studentResponseService: StudentResponseService,
-    private studentService: StudentService
+    private studentService: StudentService,
+    private appConfigService: ApplicationConfigService,
+    private http: HttpClient
   ) {}
 
   public ngOnInit(): void {
@@ -63,52 +67,58 @@ export class MarkingSummaryComponent implements OnInit {
     this.studentService.query({ courseId: exam.courseId }).subscribe(dataStd => {
       this.nbStd = dataStd.body?.length ?? 0;
     });
-
-    // Getting all the marks of the current exam
-    // FIXME: it returns all the responses of all the exams
-    this.studentResponseService.query().subscribe(dataMarking => {
-      const marks = dataMarking.body ?? [];
-      const allMarkedSheets: Array<Array<number>> = [];
-
-      // Getting all the questions of the current exam
-      lastValueFrom(this.questionService.query({ examId: exam.id }))
-        .then(dataQuestion => {
-          const questions = dataQuestion.body ?? [];
-          // Used to identify the first sheet not marked
-          const studentsSerie = Array.from(Array(questions.length - 1).keys()).map(x => x + 1);
-
-          this.questions = questions.map(q => {
-            const marksQ = marks.filter(m => m.questionId === q.id);
-            const markedSheets = marksQ.filter(m => m.sheetId).map(m => m.sheetId!);
-            allMarkedSheets.push(markedSheets);
-
-            // removing the marked sheets from 'questionsSerie' to get the unmarked questions
-            const remainingSheets = studentsSerie.filter(sheet => !markedSheets.includes(sheet));
-
-            return {
-              answeredSheets: marksQ.length,
-              number: q.numero ?? -1,
-              firstSheetNotAnswered: remainingSheets.length === 0 ? 1 : remainingSheets[0],
-            };
-          });
-        })
-        .then(() => {
-          // FIXME: firstSheetNotAnswered to compute
-          this.studentService.query({ courseId: exam.courseId }).subscribe(studentsData => {
-            const nbStds = (studentsData.body ?? []).length;
-
-            Array.from(Array(nbStds).keys()).forEach(sheetID => {
-              const stdQuestionsMarked = allMarkedSheets.filter(q => q.includes(sheetID + 1)).length;
-
-              this.students.push({
-                answeredSheets: stdQuestionsMarked,
-                number: sheetID + 1,
-                firstSheetNotAnswered: 1,
-              });
-            });
-          });
-        });
+    // eslint-disable-next-line no-console
+    console.log(exam);
+    this.http.get(this.appConfigService.getEndpointFor(`api/summary/exam/${exam.id!}`)).subscribe(s => {
+      // eslint-disable-next-line no-console
+      console.log(s);
     });
+
+    // // Getting all the marks of the current exam
+    // // FIXME: it returns all the responses of all the exams
+    // this.studentResponseService.query().subscribe(dataMarking => {
+    //   const marks = dataMarking.body ?? [];
+    //   const allMarkedSheets: Array<Array<number>> = [];
+    //
+    //   // Getting all the questions of the current exam
+    //   lastValueFrom(this.questionService.query({ examId: exam.id }))
+    //     .then(dataQuestion => {
+    //       const questions = dataQuestion.body ?? [];
+    //       // Used to identify the first sheet not marked
+    //       const studentsSerie = Array.from(Array(questions.length - 1).keys()).map(x => x + 1);
+    //
+    //       this.questions = questions.map(q => {
+    //         const marksQ = marks.filter(m => m.questionId === q.id);
+    //         const markedSheets = marksQ.filter(m => m.sheetId).map(m => m.sheetId!);
+    //         allMarkedSheets.push(markedSheets);
+    //
+    //         // removing the marked sheets from 'questionsSerie' to get the unmarked questions
+    //         const remainingSheets = studentsSerie.filter(sheet => !markedSheets.includes(sheet));
+    //
+    //         return {
+    //           answeredSheets: marksQ.length,
+    //           number: q.numero ?? -1,
+    //           firstSheetNotAnswered: remainingSheets.length === 0 ? 1 : remainingSheets[0],
+    //         };
+    //       });
+    //     })
+    //     .then(() => {
+    //       // FIXME: firstSheetNotAnswered to compute
+    //       this.studentService.query({ courseId: exam.courseId }).subscribe(studentsData => {
+    //         const nbStds = (studentsData.body ?? []).length;
+    //
+    //         Array.from(Array(nbStds).keys()).forEach(sheetID => {
+    //           const stdQuestionsMarked = allMarkedSheets.filter(q => q.includes(sheetID + 1)).length;
+    //
+    //           this.students.push({
+    //             answeredSheets: stdQuestionsMarked,
+    //             number: sheetID + 1,
+    //             firstSheetNotAnswered: 1,
+    //           });
+    //         });
+    //       });
+    //     });
+    // });
   }
 }
 
