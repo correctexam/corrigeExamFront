@@ -1,0 +1,13 @@
+<h1>
+  Statistiques de l'examen <span *ngIf="questions.length !== 0">{{ questions[0].examName }}</span>
+</h1>
+<div *ngFor="let stat of this.global_stats">
+  <div>
+    {{ stat.label }} : /{{ stat.bareme }}
+    <ul>
+      <li *ngFor="let note of stat.notesAssociees">{{ note }}</li>
+    </ul>
+  </div>
+</div>
+
+<!--<div *ngFor="let st of studentsresult | async"> </div>-->

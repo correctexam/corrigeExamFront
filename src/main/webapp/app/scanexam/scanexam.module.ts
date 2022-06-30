@@ -57,6 +57,7 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputTextModule } from 'primeng/inputtext';
 import { GalleriaModule } from 'primeng/galleria';
+import { StatsExamComponent } from './statsexam/statsexam.component';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -97,6 +98,16 @@ export const LISTESTUDENT_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.liststudents',
+  },
+};
+
+export const STATS_ROUTE: Route = {
+  path: 'statistiques/:examid',
+  canActivate: [UserRouteAccessService],
+  component: StatsExamComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.stats',
   },
 };
 
@@ -232,6 +243,7 @@ export const ShowResults_ROUTE: Route = {
     VoirCopieComponent,
     ResultatStudentcourseComponent,
     ArraySortPipe,
+    StatsExamComponent,
   ],
   imports: [
     CommonModule,
@@ -279,6 +291,7 @@ export const ShowResults_ROUTE: Route = {
       AssocierCopiesEtudiantsToStudent_ROUTE,
       VoirCopieEtudiants_ROUTE,
       ShowResults_ROUTE,
+      STATS_ROUTE,
     ]),
   ],
   exports: [
