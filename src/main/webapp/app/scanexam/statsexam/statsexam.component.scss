@@ -1,0 +1,15 @@
+.cards {
+  // width: max-content;
+  min-width: 400px;
+  max-width: 37%;
+}
+
+button {
+  margin-left: auto;
+  margin-right: 0px;
+}
+.card-body {
+  padding: 0px;
+  display: flex;
+  flex-direction: column;
+}

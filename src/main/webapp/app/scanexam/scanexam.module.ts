@@ -58,6 +58,9 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputTextModule } from 'primeng/inputtext';
 import { GalleriaModule } from 'primeng/galleria';
 import { StatsExamComponent } from './statsexam/statsexam.component';
+import { StatsExampleComponent } from './stats-example/stats-example.component';
+import { CardModule } from 'primeng/card';
+import { ChartModule } from 'primeng/chart';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -105,6 +108,16 @@ export const STATS_ROUTE: Route = {
   path: 'statistiques/:examid',
   canActivate: [UserRouteAccessService],
   component: StatsExamComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.stats',
+  },
+};
+
+export const STATS_EXAMPLE_ROUTE: Route = {
+  path: 'statexample',
+  canActivate: [UserRouteAccessService],
+  component: StatsExampleComponent,
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.stats',
@@ -248,7 +261,9 @@ export const ShowResults_ROUTE: Route = {
   imports: [
     CommonModule,
     BrowserAnimationsModule,
+    CardModule,
     ButtonModule,
+    ChartModule,
     SharedModule,
     FontAwesomeModule,
     BlockUIModule,
@@ -292,6 +307,7 @@ export const ShowResults_ROUTE: Route = {
       VoirCopieEtudiants_ROUTE,
       ShowResults_ROUTE,
       STATS_ROUTE,
+      STATS_EXAMPLE_ROUTE,
     ]),
   ],
   exports: [

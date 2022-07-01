@@ -1,0 +1,31 @@
+<!--Ne pas oublier de faire npm install chart.js --save  en ligne de commande avant ! -->
+<h1>Tableau récapitulatif des notes</h1>
+<div id="card-wrapper">
+  <p-card header="Diagramme" subheader="Diagramme à barres vertical">
+    <ng-template pTemplate="header"> </ng-template>
+    <p>Voici un exemple de diagramme à barres</p>
+    <p-chart type="bar" [data]="dataDiagBarres"></p-chart>
+  </p-card>
+
+  <p-card header="Diagramme" subheader="Courbes">
+    <ng-template pTemplate="header">
+      <p-chart type="line" [data]="dataCourbes"></p-chart>
+    </ng-template>
+    <p>Voici un exemple de courbes statistiques.</p>
+  </p-card>
+  <p-card header="Diagramme" subheader="Radar">
+    <ng-template pTemplate="header">
+      <p-chart type="radar" [data]="dataRadar" [style]="{ width: '40%' }"></p-chart>
+    </ng-template>
+    <p>Voici un exemple de graphique radar, aussi appelé diagramme de Kiviat.</p>
+  </p-card>
+  <p-card class="numberCard" header="Moyenne" subheader="Ensemble de l'examen">
+    <h1 class="number">13.27</h1>
+  </p-card>
+  <p-card header="Diagramme" subheader="Radar">
+    <ng-template pTemplate="header">
+      <p-chart type="bar" [data]="dataCombo"></p-chart>
+    </ng-template>
+    <p>Voici un exemple de graphique radar, aussi appelé diagramme de Kiviat.</p>
+  </p-card>
+</div>

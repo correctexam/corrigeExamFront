@@ -1,6 +1,28 @@
 <h1>
   Statistiques de l'examen <span *ngIf="questions.length !== 0">{{ questions[0].examName }}</span>
 </h1>
+
+<div class="cards">
+  <p-card id="infosRadar" header="Statistiques générales" subheader="Radar">
+    <ng-template pTemplate="header">
+      <p-chart *ngIf="dataRadar !== undefined" type="radar" [data]="dataRadar"></p-chart>
+    </ng-template>
+    <div class="card-body">
+      <p>Aperçu global des notes de l'examen.</p>
+      <button
+        pButton
+        (click)="toggleRadar()"
+        type="button"
+        class="p-button-outlined"
+        id="radarChoice"
+        choix="pourcents"
+        label="Changer la vue"
+        icon="pi pi-chart-pie"
+      ></button>
+    </div>
+  </p-card>
+</div>
+
 <div *ngFor="let stat of this.global_stats">
   <div>
     {{ stat.label }} : /{{ stat.bareme }}
@@ -9,5 +31,3 @@
     </ul>
   </div>
 </div>
-
-<!--<div *ngFor="let st of studentsresult | async"> </div>-->
