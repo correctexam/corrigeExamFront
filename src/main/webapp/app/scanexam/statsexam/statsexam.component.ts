@@ -15,7 +15,18 @@ import { CourseService } from 'app/entities/course/service/course.service';
 import { IQuestion } from 'app/entities/question/question.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
 import { Observable } from 'rxjs';
-import { StatsExampleComponent } from '../stats-example/stats-example.component';
+
+// Couleurs à utiliser
+const GRIS_LEGER = 'rgba(179,181,198,0.2)';
+const GRIS = 'rgba(179,181,198,1)';
+const VERT_LEGER = 'rgba(120,255,132,0.2)';
+const VERT = 'rgba(120,255,132,1)';
+const ROUGE_LEGER = 'rgb(255, 120, 120,0.2)';
+const ROUGE = 'rgb(255, 120, 120)';
+const BLEU_FONCE_LEGER = 'rgb(72, 61, 139,0.2)';
+const BLEU_FONCE = 'rgb(72, 61, 139)';
+const BLANC = 'rgba(255,255,255,1)';
+const TRANSPARENT = 'rgba(255,255,255,0.0)';
 
 @Component({
   selector: 'jhi-statsexam',
@@ -25,12 +36,13 @@ import { StatsExampleComponent } from '../stats-example/stats-example.component'
 export class StatsExamComponent implements OnInit {
   // Page related variables
   examid: string | undefined = undefined;
+  infosQuestions: IQuestion[] = [];
   infosStudents: StudentRes[] = [];
-  questions: IQuestion[] = [];
+  q_notees: QuestionNotee[] = [];
+  notes_eleves: number[] = [];
 
-  // Statistical variables
-  global_stats: QuestionNotee[] = [];
-  dataRadar: IRadar | undefined = undefined;
+  // Variables d'affichage
+  data_radar_global!: IRadar;
 
   constructor(
     protected applicationConfigService: ApplicationConfigService,
@@ -46,9 +58,9 @@ export class StatsExamComponent implements OnInit {
         this.examid = params.get('examid')!;
         this.initStudents().then(() =>
           this.requeteInfoQuestions().subscribe(b => {
-            this.questions = b.body;
-            this.notesGlobales();
-            this.toggleRadar();
+            this.infosQuestions = b.body;
+            this.initStatVariables();
+            this.initDisplayVariables();
           })
         );
       }
@@ -72,38 +84,35 @@ export class StatsExamComponent implements OnInit {
     });
   }
 
-  private notesGlobales(): void {
+  private initStatVariables(): void {
     const qn: QuestionNotee[] = [];
     let indice = 0;
-    for (const q of this.questions) {
+    for (const q of this.infosQuestions) {
       const bareme: number = q.point !== undefined ? q.point : 0;
-      const label: string = 'Question ' + (q.numero !== undefined ? q.numero : '0').toString();
+      const step: string = q.step === undefined ? '' : q.step == null ? '' : q.step.toString();
+      const label: string = /* 'Partie '+step + */ ' Question ' + (q.numero !== undefined ? q.numero : '0').toString();
       const notesAssociees: number[] = [];
       qn[indice] = { bareme, label, notesAssociees };
       indice++;
     }
     for (const s of this.infosStudents) {
-      for (const key in s.notequestions) {
-        const indiceNote = parseInt(key, 10);
-        const note = parseFloat(s.notequestions[key].replace(',', '.')); // La note associée est décrite avec une virgule et non un point comme séparateur décimal
-        qn[indiceNote - 1].notesAssociees.push(note); // On suppose qu'il n'y a pas de question n°0
+      if (s.ine !== '') {
+        let indiceNote = 0; // On suppose que l'ordre entre infosQuestions et notequestions est le même
+        for (const key in s.notequestions) {
+          // const indiceNote = parseInt(key, 10);
+          const note = parseFloat(s.notequestions[key].replace(',', '.')); // La note associée est décrite avec une virgule et non un point comme séparateur décimal
+          qn[indiceNote].notesAssociees.push(note);
+          indiceNote++;
+        }
+        // Stockage de la note de l'élève
+        const note = s.note === undefined ? 0 : parseFloat(s.note.replace(',', '.'));
+        this.notes_eleves.push(note);
       }
     }
-    this.global_stats = qn;
-    // Ne pas faire attention à la partie qui suit (juste pour test)
-    /*  const indiceTmp = 2;
-    const moy = this.calculMoy(indiceTmp,this.global_stats);
-    const pire = this.pireNote(indiceTmp,this.global_stats);
-    const meilleur = this.getDataFromIndex(this.meilleureNote,indiceTmp,this.global_stats)
-    console.log(moy)
-    console.log(pire)
-    console.log(meilleur)
-    const allAVG = this.getAllProcessedGrades(this.calculMoy);
-    console.log(allAVG);*/
-    // this.dataRadar = this.initRadar(this.global_stats);
-    // console.log(radar);
+    this.q_notees = qn;
   }
 
+  /** @return le barème associé à chaque question */
   private getBaremes(stats: QuestionNotee[]): number[] {
     const baremes: number[] = [];
     for (const stat of stats) {
@@ -111,133 +120,219 @@ export class StatsExamComponent implements OnInit {
     }
     return baremes;
   }
-
-  private getAllProcessedGrades(traitement: (indice: number, stats: QuestionNotee[]) => number): number[] {
-    const res: number[] = [];
-    this.global_stats.forEach((stat, indice) => {
-      const data: number = this.getDataFromIndex(traitement, indice, this.global_stats);
-      res.push(data);
-    });
-    return res;
-  }
-
-  // Conceptualise les différentes actions de traitement qui ont lieu
-  private getDataFromIndex(
-    traitement: (indice: number, stats: QuestionNotee[]) => number,
-    idQuestion: number,
-    stats: QuestionNotee[]
-  ): number {
-    return traitement(idQuestion, stats);
-  }
-
-  /** @returns la moyenne des élèves pour une question */
-  private calculMoy(idQuestion: number, stats: QuestionNotee[]): number {
-    let sum = 0;
-    let nbNotes = 0;
-    stats[idQuestion].notesAssociees.forEach(note => {
-      sum += note;
-      nbNotes++;
-    });
-    if (nbNotes === 0) {
-      return 0;
-    } // Permet d'éviter le NaN
-    else {
-      return sum / nbNotes;
+  /** @return la moyenne associée à chaque question */
+  private getMoyennesQuestions(): number[] {
+    const moyennes: number[] = [];
+    for (const qn of this.q_notees) {
+      moyennes.push(this.avg(qn.notesAssociees));
     }
+    return moyennes;
   }
 
-  private pireNote(idQuestion: number, stats: QuestionNotee[]): number {
-    return Math.min(...stats[idQuestion].notesAssociees);
+  public getMoyenneExam(): number {
+    return this.sum(this.notes_eleves) / this.notes_eleves.length;
   }
 
-  private meilleureNote(idQuestion: number, stats: QuestionNotee[]): number {
-    return Math.max(...stats[idQuestion].notesAssociees);
+  /** @return la médiane associée à chaque question */
+  private getMedianeQuestions(): number[] {
+    const medianes: number[] = [];
+    for (const qn of this.q_notees) {
+      medianes.push(this.med(qn.notesAssociees));
+    }
+    return medianes;
   }
 
-  public initRadar(stats: QuestionNotee[], pourcents: boolean = false): IRadar {
-    const labels: string[] = [];
-    for (const stat of stats) {
-      labels.push(stat.label);
-    }
-    // Couleurs à utiliser
-    const grisLeger = 'rgba(179,181,198,0.2)';
-    const gris = 'rgba(179,181,198,1)';
-    const vertLeger = 'rgba(120,255,132,0.2)';
-    const vert = 'rgba(120,255,132,1)';
-    const rougeLeger = 'rgb(255, 120, 120,0.2)';
-    const rouge = 'rgb(255, 120, 120)';
-    const blanc = 'rgba(255,255,255,1)';
-    const transparent = 'rgba(255,255,255,0.0)';
-    // Data et objets radar des différents traitements
-    // Moyenne
-    const dataMoy: number[] = this.getAllProcessedGrades(this.calculMoy);
-    const radarMoy = this.radarDataset('Moyenne', transparent, gris, gris, blanc, blanc, gris, dataMoy);
-    // Meilleure note
-    const dataMeil: number[] = this.getAllProcessedGrades(this.meilleureNote);
-    const radarMeil = this.radarDataset('Meilleure note', transparent, vert, vert, blanc, blanc, vert, dataMeil);
-    // Pire note
-    const dataPire: number[] = this.getAllProcessedGrades(this.pireNote);
-    const radarPire = this.radarDataset('Moins bonne note', transparent, rouge, rouge, blanc, blanc, rouge, dataPire);
-    const datasets = [radarMoy, radarMeil, radarPire];
-    // Traitements pourcentages
-    if (pourcents) {
-      datasets.forEach((ds, indice) => {
-        datasets[indice].data = this.prctGrades(ds.data, this.getBaremes(stats));
-      });
-    }
-    const vue = pourcents ? 'pourcents' : 'brut';
-    return {
-      labels,
-      datasets,
-      vue,
-    };
+  public getMedianeExam(): number {
+    return this.med(this.notes_eleves);
   }
 
-  /**
-   *
-   * @action l'appeler initialise this.dataRadar ou change sa valeur s'il existe déjà
-   */
-  public toggleRadar(): void {
-    // Bouton
-    // const b = document.getElementById("radarChoice"); if(b==null){return;}
-    const choixPrct = this.dataRadar?.vue === 'pourcents'; // b.getAttribute("choix")?.includes("pourcents"); // Choix des pourcentages
-    this.dataRadar = this.initRadar(this.global_stats, choixPrct);
-    this.dataRadar.vue = choixPrct ? 'brut' : 'pourcents';
-    // b.setAttribute("choix",choix?"brut":"pourcents")
-    // Carte
-    const c = document.getElementById('infosRadar');
-    if (c == null) {
-      return;
-    }
-    const elemSoustitre = c.querySelector('.p-card-subtitle');
-    if (elemSoustitre == null) {
-      return;
-    }
-    elemSoustitre.innerHTML = !choixPrct ? 'Valeurs brutes par question' : 'Pourcentages par question';
-    // Résumé de l'examen
-    const totalPoints: number = this.sum(this.getBaremes(this.global_stats));
-    if (!choixPrct) {
-      let infosExam = '';
-      this.dataRadar.datasets.forEach(ds => {
-        infosExam += ds.label + ' : ' + this.sum(ds.data).toString() + '/' + totalPoints.toString() + '<br>';
-      });
-
-      c.getElementsByTagName('p')[0].innerHTML = infosExam + ' <br> Notes à recalculer, on cherche à le faire par élève !! ';
-    }
-    console.log(this.dataRadar);
+  public getVarianceExam(): number {
+    return this.var(this.notes_eleves);
   }
 
+  public getEcartTypeExam(): number {
+    return this.ecart_type(this.notes_eleves);
+  }
+
+  /** @return la note la plus élevée associée à chaque question */
+  private getMaxNoteQuestions(): number[] {
+    const maxnotes: number[] = [];
+    for (const qn of this.q_notees) {
+      maxnotes.push(this.max(qn.notesAssociees));
+    }
+    return maxnotes;
+  }
+  /** @return la note la moins élevée associée à chaque question */
+  private getMinNoteQuestions(): number[] {
+    const minnotes: number[] = [];
+    for (const qn of this.q_notees) {
+      minnotes.push(this.min(qn.notesAssociees));
+    }
+    return minnotes;
+  }
+
+  public getMaxNoteExam(): number {
+    return this.max(this.notes_eleves);
+  }
+
+  public getMinNoteExam(): number {
+    return this.min(this.notes_eleves);
+  }
+
+  /** @param tab un tableau non vide @returns la valeur la plus élevée  */
+  private max(tab: number[]): number {
+    return Math.max(...tab);
+  }
+
+  /** @param tab un tableau non vide @returns la valeur la moins élevée  */
+  private min(tab: number[]): number {
+    return Math.min(...tab);
+  }
+
+  /** @param tab un tableau non vide @returns la moyenne  */
   private sum(tab: number[]): number {
     return tab.reduce((x, y) => x + y, 0);
   }
 
-  private prctGrades(notes: number[], baremes: number[]): number[] {
+  /** @param tab un tableau non vide @returns la moyenne correspondant à ce tableau*/
+  private avg(tab: number[]): number {
+    return tab.length > 0 ? this.sum(tab) / tab.length : 0;
+  }
+
+  /** @param tab un tableau non vide @returns la mediane correspondant à ce tableau*/
+  private med(tab: number[]): number {
+    tab.sort();
+    const moitie: number = tab.length / 2;
+    const indiceMilieu: number = Number.isInteger(moitie) ? moitie : Math.floor(moitie);
+    return tab[indiceMilieu];
+  }
+
+  /** @param tab un tableau non vide @returns la variance correspondant à ce tableau*/
+  private var(tab: number[]): number {
+    const moy: number = this.avg(tab);
+    let variance = 0;
+    for (const xi of tab) {
+      variance += Math.pow(xi - moy, 2);
+    }
+    variance /= tab.length;
+    return variance;
+  }
+
+  /** @param tab un tableau non vide @returns l'écart-type correspondant à ce tableau*/
+  private ecart_type(tab: number[]): number {
+    return Math.sqrt(this.var(tab));
+  }
+
+  private normaliseNotes(notes: number[], baremes: number[], norme: number = 100): number[] {
     //  expect(notes.length).toBe(baremes.length);
     notes.forEach((note, indice) => {
       note /= baremes[indice];
-      notes[indice] = note * 100;
+      notes[indice] = note * norme;
     });
     return notes;
+  }
+
+  private initDisplayVariables(): void {
+    this.initGlobalRadarData(this.q_notees, true);
+    this.toggleRadar();
+  }
+
+  /** @initialise les données à afficher dans le radar de visualisation globale*/
+  private initGlobalRadarData(stats: QuestionNotee[], pourcents: boolean = false): void {
+    const labels: string[] = [];
+    for (const stat of stats) {
+      labels.push(stat.label);
+    }
+
+    // Data et objets radar des différentes catégories statistiques
+    // Moyenne par question
+    const dataMoy: number[] = this.getMoyennesQuestions();
+    const radarMoy = this.basicDataset('Moyenne', GRIS, TRANSPARENT, dataMoy);
+    // Mediane par question
+    const dataMed: number[] = this.getMedianeQuestions();
+    const radarMed = this.basicDataset('Mediane', BLEU_FONCE, TRANSPARENT, dataMed);
+    // Notes min et max déliverées par question
+    const dataMaxNote: number[] = this.getMaxNoteQuestions();
+    const radarMaxNote = this.basicDataset('Note maximale déliverée', VERT, TRANSPARENT, dataMaxNote);
+    const dataMinNote: number[] = this.getMinNoteQuestions();
+    const radarMinNote = this.basicDataset('Note minimale déliverée', ROUGE, TRANSPARENT, dataMinNote);
+
+    const datasets = [radarMoy, radarMed, radarMaxNote, radarMinNote];
+    // Traitements pourcentages
+    if (pourcents) {
+      datasets.forEach((ds, indice) => {
+        datasets[indice].data = this.normaliseNotes(ds.data, this.getBaremes(stats));
+      });
+    }
+    const vue = pourcents ? 'pourcents' : 'brut';
+    this.data_radar_global = { labels, datasets, vue };
+  }
+
+  private basicDataset(label: string, couleurForte: string, couleurLegere: string, data: number[]): IRadarDataset {
+    return this.radarDataset(label, couleurLegere, couleurForte, couleurForte, BLANC, BLANC, GRIS, data);
+  }
+
+  private resumeExam(): string {
+    console.log(this.q_notees);
+    const totalPoints: string = this.sum(this.getBaremes(this.q_notees)).toString();
+    const moyenne: string = this.getMoyenneExam().toFixed(2).toString();
+    const mediane: string = this.getMedianeExam().toFixed(2).toString();
+    const ecarttype: string = this.getEcartTypeExam().toFixed(2).toString();
+    const maxNote: string = this.getMaxNoteExam().toString();
+    const minNote: string = this.getMinNoteExam().toString();
+    const resume: string =
+      "Moyenne de l'examen: <b>" +
+      moyenne +
+      '</b>/' +
+      totalPoints +
+      '<br>' +
+      "Écart type de l'examen : σ=<b>" +
+      ecarttype +
+      '</b><br>' +
+      "Médiane de l'examen : <b>" +
+      mediane +
+      '</b>/' +
+      totalPoints +
+      '<br>' +
+      'Note la plus élevée : <b>' +
+      maxNote +
+      '</b>/' +
+      totalPoints +
+      '<br>' +
+      'Note la plus basse : <b>' +
+      minNote +
+      '</b>/' +
+      totalPoints +
+      '<br>';
+    return resume;
+  }
+
+  public toggleRadar(): void {
+    // Toggle action
+    const choixPrct = this.data_radar_global.vue === 'pourcents';
+    this.initGlobalRadarData(this.q_notees, choixPrct);
+    this.data_radar_global.vue = choixPrct ? 'brut' : 'pourcents';
+    // Carte
+    const selection: string = !choixPrct ? 'Valeurs brutes par question' : 'Valeurs normalisées par question';
+    const infosExam: string = this.resumeExam();
+    this.updateCarte('global_stats', undefined, selection, infosExam);
+  }
+
+  /** @modifies les valeurs textuelles d'un élément < p-card > */
+  private updateCarte(id: string, titre: string | undefined, soustitre: string | undefined, texte: string | undefined): void {
+    const c = document.getElementById(id);
+    if (c == null) {
+      return;
+    }
+    if (titre !== undefined) {
+      c.getElementsByClassName('p-card-title')[0].innerHTML = titre;
+    }
+    if (soustitre !== undefined) {
+      c.getElementsByClassName('p-card-subtitle')[0].innerHTML = soustitre;
+    }
+    if (texte) {
+      c.getElementsByTagName('p')[0].innerHTML = texte;
+    }
   }
 
   private radarDataset(
@@ -263,26 +358,6 @@ export class StatsExamComponent implements OnInit {
   }
 }
 
-// Interfaces permettant décrivant les données nécessaires
-// à la construction d'un diagramme en radar
-export interface IRadar {
-  labels: string[];
-  datasets: IRadarDataset[];
-  vue: string;
-  infos?: string;
-}
-
-export interface IRadarDataset {
-  label: string;
-  backgroundColor: string;
-  borderColor: string;
-  pointBackgroundColor: string;
-  pointBorderColor: string;
-  pointHoverBackgroundColor: string;
-  pointHoverBorderColor: string;
-  data: number[];
-}
-
 export interface QuestionNotee {
   label: string;
   bareme: number;
@@ -298,4 +373,20 @@ export interface StudentRes {
   notequestions: { [key: string]: string };
   studentNumber?: string;
   uuid?: string;
+}
+export interface IRadar {
+  labels: string[];
+  datasets: IRadarDataset[];
+  vue: string;
+  infos?: string;
+}
+export interface IRadarDataset {
+  label: string;
+  backgroundColor: string;
+  borderColor: string;
+  pointBackgroundColor: string;
+  pointBorderColor: string;
+  pointHoverBackgroundColor: string;
+  pointHoverBorderColor: string;
+  data: number[];
 }
