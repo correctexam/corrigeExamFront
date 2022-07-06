@@ -1,15 +1,43 @@
-.cards {
-  // width: max-content;
-  min-width: 400px;
-  max-width: 37%;
-}
-
-button {
-  margin-left: auto;
-  margin-right: 0px;
+.boutons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
 }
 .card-body {
   padding: 0px;
   display: flex;
   flex-direction: column;
+}
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-around;
+}
+#statsquestions {
+  min-width: 440px;
+  max-width: 660px;
+  flex-grow: 1;
+}
+.card {
+  // Taille par défaut de la carte
+  width: 300px;
+  height: 100%;
+  padding: 5px;
+  border: 0px;
+  overflow: auto;
+}
+.statgenerale {
+  padding: 0.5em;
+  font-size: larger;
+  font-weight: bold;
+  color: gray;
+}
+.statgenerale > span {
+  display: block;
+  font-size: larger;
+  color: black;
+}
+#selectstudent {
+  width: max-content;
 }

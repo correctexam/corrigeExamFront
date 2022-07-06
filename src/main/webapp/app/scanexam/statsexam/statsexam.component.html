@@ -1,28 +1,116 @@
 <h1>
   Statistiques de l'examen <span *ngIf="infosQuestions.length !== 0">{{ infosQuestions[0].examName }}</span>
 </h1>
-
 <div class="cards">
-  <p-card id="global_stats" header="Statistiques générales" subheader="Radar">
-    <ng-template pTemplate="header">
-      <p-chart *ngIf="data_radar_global !== undefined" type="radar" [data]="data_radar_global"></p-chart>
-    </ng-template>
-    <div class="card-body">
-      <p>Aperçu global des notes de l'examen.</p>
-      <button
-        pButton
-        (click)="toggleRadar()"
-        type="button"
-        class="p-button-outlined"
-        id="radarChoice"
-        label="Changer la vue"
-        icon="pi pi-chart-pie"
-      ></button>
-    </div>
-  </p-card>
+  <div class="card">
+    <p-card header="Statistiques de l'examen" subheader="Statistiques générales">
+      <div class="statgenerale">
+        Nombre d'étudiants<span>{{ this.notes_eleves.length }}</span>
+      </div>
+      <div class="statgenerale">
+        Moyenne<span>{{ this.getMoyenneExam().toFixed(2) }}/{{ this.getBaremeExam() }}</span>
+      </div>
+      <div class="statgenerale">
+        Écart type (σ)<span>{{ this.getEcartTypeExam().toFixed(2) }}</span>
+      </div>
+      <div class="statgenerale">
+        Mediane <span>{{ this.getMedianeExam() }}/{{ this.getBaremeExam() }}</span>
+      </div>
+      <div class="statgenerale">
+        Note maximale<span>{{ this.getMaxNoteExam() }}/{{ this.getBaremeExam() }}</span>
+      </div>
+      <div class="statgenerale">
+        Note minimale<span>{{ this.getMinNoteExam() }}/{{ this.getBaremeExam() }}</span>
+      </div>
+    </p-card>
+  </div>
+  <div class="card" id="statsquestions">
+    <p-card id="questions_stats" header="Statistiques par question" subheader="Vue">
+      <ng-template pTemplate="header">
+        <p-chart type="radar" [data]="data_radar_courant"></p-chart>
+      </ng-template>
+      <div class="card-body">
+        <p>Aperçu global des notes de l'examen.</p>
+      </div>
+      <ng-template pTemplate="footer">
+        <div class="boutons">
+          <button
+            pButton
+            (click)="toggleRadar()"
+            type="button"
+            class="p-button-outlined"
+            id="radarChoice"
+            label="Changer la vue"
+            icon="pi pi-chart-pie"
+          ></button>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+  <div class="card" id="selectstudent">
+    <p-card id="selection_etudiant" header="Sélection d'un étudiant" subheader="Aucun étudiant sélectionné">
+      <ng-template pTemplate="header">
+        <p-table
+          [value]="this.infosStudents"
+          selectionMode="single"
+          [(selection)]="this.etudiantSelec"
+          dataKey="ine"
+          responsiveLayout="scroll"
+          [scrollable]="true"
+          scrollHeight="500px"
+          (sortFunction)="triSelection($event)"
+          [customSort]="true"
+          (onRowSelect)="onStudentSelect($event)"
+          (onRowUnselect)="onStudentUnselect($event)"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="ine">INE<p-sortIcon field="ine"></p-sortIcon></th>
+              <th pSortableColumn="alpha">NOM<p-sortIcon field="alpha"></p-sortIcon></th>
+              <th pSortableColumn="alpha">PRENOM<p-sortIcon field="alpha"></p-sortIcon></th>
+              <th pSortableColumn="note">NOTE<p-sortIcon field="note"></p-sortIcon></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-student>
+            <tr [pSelectableRow]="student">
+              <td>{{ student.ine }}</td>
+              <td>{{ student.nom }}</td>
+              <td>{{ student.prenom }}</td>
+              <td>{{ student.note }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </ng-template>
+      <div class="card-body">
+        <p>Cliquez une fois pour sélectionner un étudiant.</p>
+      </div>
+      <ng-template pTemplate="footer">
+        <div class="boutons">
+          <button
+            disabled
+            pButton
+            (click)="toggleRadar()"
+            type="button"
+            class="p-button-primary"
+            label="Voir la copie"
+            icon="pi pi-file"
+          ></button>
+          <button
+            disabled
+            pButton
+            (click)="toggleRadar()"
+            type="button"
+            class="p-button-raised p-button-text"
+            id="radarChoice"
+            label="Correction"
+            icon="pi pi-external-link"
+          ></button>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
 </div>
-
-<div *ngFor="let stat of this.q_notees">
+<!--<div *ngFor="let stat of this.q_notees">
   <div>
     {{ stat.label }} : /{{ stat.bareme }}
     <ul>
@@ -30,3 +118,4 @@
     </ul>
   </div>
 </div>
+-->

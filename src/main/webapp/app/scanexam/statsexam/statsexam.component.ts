@@ -6,6 +6,7 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
+import { style } from '@angular/animations';
 import { HttpClient } from '@angular/common/http';
 import { STRING_TYPE } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
@@ -26,6 +27,8 @@ const ROUGE = 'rgb(255, 120, 120)';
 const BLEU_FONCE_LEGER = 'rgb(72, 61, 139,0.2)';
 const BLEU_FONCE = 'rgb(72, 61, 139)';
 const BLANC = 'rgba(255,255,255,1)';
+const VIOLET = 'rgb(233, 120, 255)';
+const VIOLET_LEGER = 'rgb(233, 120, 255,0.2)';
 const TRANSPARENT = 'rgba(255,255,255,0.0)';
 
 @Component({
@@ -42,7 +45,8 @@ export class StatsExamComponent implements OnInit {
   notes_eleves: number[] = [];
 
   // Variables d'affichage
-  data_radar_global!: IRadar;
+  data_radar_courant!: IRadar;
+  etudiantSelec: StudentRes | null | undefined;
 
   constructor(
     protected applicationConfigService: ApplicationConfigService,
@@ -61,6 +65,7 @@ export class StatsExamComponent implements OnInit {
             this.infosQuestions = b.body;
             this.initStatVariables();
             this.initDisplayVariables();
+            this.style();
           })
         );
       }
@@ -85,6 +90,7 @@ export class StatsExamComponent implements OnInit {
   }
 
   private initStatVariables(): void {
+    this.triNotes(this.infosStudents).reverse();
     const qn: QuestionNotee[] = [];
     let indice = 0;
     for (const q of this.infosQuestions) {
@@ -100,16 +106,78 @@ export class StatsExamComponent implements OnInit {
         let indiceNote = 0; // On suppose que l'ordre entre infosQuestions et notequestions est le même
         for (const key in s.notequestions) {
           // const indiceNote = parseInt(key, 10);
-          const note = parseFloat(s.notequestions[key].replace(',', '.')); // La note associée est décrite avec une virgule et non un point comme séparateur décimal
+          const note = this.s2f(s.notequestions[key]); // La note associée est décrite avec une virgule et non un point comme séparateur décimal
           qn[indiceNote].notesAssociees.push(note);
           indiceNote++;
         }
         // Stockage de la note de l'élève
-        const note = s.note === undefined ? 0 : parseFloat(s.note.replace(',', '.'));
+        const note = s.note === undefined ? 0 : this.s2f(s.note);
         this.notes_eleves.push(note);
       }
     }
     this.q_notees = qn;
+  }
+
+  public s2f(str: string): number {
+    return parseFloat(str.replace(',', '.'));
+  }
+  public triSelection(event: ISort): void {
+    switch (event.field) {
+      case 'ine':
+        this.triINE(event.data);
+        break;
+      case 'alpha':
+        this.triAlpha(event.data);
+        break;
+      default:
+        this.triNotes(event.data);
+        break;
+    }
+    if (event.order === -1) {
+      event.data.reverse();
+    }
+  }
+
+  private triNotes(etudiants: StudentRes[]): StudentRes[] {
+    etudiants.sort((s1: StudentRes, s2: StudentRes) => {
+      const note1 = s1.note;
+      const note2 = s2.note;
+      if (note1 === undefined && note2 === undefined) {
+        return 0;
+      } else if (note1 === undefined) {
+        return -1;
+      } else if (note2 === undefined) {
+        return 1;
+      } else if (this.s2f(note1) < this.s2f(note2)) {
+        return -1;
+      } else if (this.s2f(note1) === this.s2f(note2)) {
+        return 0;
+      }
+      return 1;
+    });
+    return etudiants;
+  }
+
+  private triINE(etudiants: StudentRes[]): StudentRes[] {
+    etudiants.sort((s1: StudentRes, s2: StudentRes) => {
+      const ine1 = s1.ine;
+      const ine2 = s2.ine;
+      return ine1.localeCompare(ine2);
+    });
+    return etudiants;
+  }
+
+  private triAlpha(etudiants: StudentRes[]): StudentRes[] {
+    etudiants.sort((s1: StudentRes, s2: StudentRes) => {
+      const nom1 = s1.nom;
+      const nom2 = s2.nom;
+      let diff = nom1.localeCompare(nom2);
+      if (diff === 0) {
+        diff = s1.prenom.localeCompare(s2.prenom);
+      }
+      return diff;
+    });
+    return etudiants;
   }
 
   /** @return le barème associé à chaque question */
@@ -120,6 +188,18 @@ export class StatsExamComponent implements OnInit {
     }
     return baremes;
   }
+  public getBaremeExam(): number {
+    return this.sum(this.getBaremes(this.q_notees));
+  }
+
+  private getNotes(etudiant: StudentRes): number[] {
+    const notes: number[] = [];
+    for (const key in etudiant.notequestions) {
+      notes.push(this.s2f(etudiant.notequestions[key]));
+    }
+    return notes;
+  }
+
   /** @return la moyenne associée à chaque question */
   private getMoyennesQuestions(): number[] {
     const moyennes: number[] = [];
@@ -233,31 +313,17 @@ export class StatsExamComponent implements OnInit {
   }
 
   private initDisplayVariables(): void {
-    this.initGlobalRadarData(this.q_notees, true);
-    this.toggleRadar();
+    this.data_radar_courant = this.initGlobalRadarData(this.q_notees, true);
+    this.updateCarteRadar();
   }
 
   /** @initialise les données à afficher dans le radar de visualisation globale*/
-  private initGlobalRadarData(stats: QuestionNotee[], pourcents: boolean = false): void {
+  private initGlobalRadarData(stats: QuestionNotee[], pourcents: boolean = false): IRadar {
     const labels: string[] = [];
     for (const stat of stats) {
       labels.push(stat.label);
     }
-
-    // Data et objets radar des différentes catégories statistiques
-    // Moyenne par question
-    const dataMoy: number[] = this.getMoyennesQuestions();
-    const radarMoy = this.basicDataset('Moyenne', GRIS, TRANSPARENT, dataMoy);
-    // Mediane par question
-    const dataMed: number[] = this.getMedianeQuestions();
-    const radarMed = this.basicDataset('Mediane', BLEU_FONCE, TRANSPARENT, dataMed);
-    // Notes min et max déliverées par question
-    const dataMaxNote: number[] = this.getMaxNoteQuestions();
-    const radarMaxNote = this.basicDataset('Note maximale déliverée', VERT, TRANSPARENT, dataMaxNote);
-    const dataMinNote: number[] = this.getMinNoteQuestions();
-    const radarMinNote = this.basicDataset('Note minimale déliverée', ROUGE, TRANSPARENT, dataMinNote);
-
-    const datasets = [radarMoy, radarMed, radarMaxNote, radarMinNote];
+    const datasets = [this.radarMoy(), this.radarMed(), this.radarMaxNote(), this.radarMinNote()];
     // Traitements pourcentages
     if (pourcents) {
       datasets.forEach((ds, indice) => {
@@ -265,7 +331,43 @@ export class StatsExamComponent implements OnInit {
       });
     }
     const vue = pourcents ? 'pourcents' : 'brut';
-    this.data_radar_global = { labels, datasets, vue };
+    return { labels, datasets, vue };
+  }
+
+  private initStudentRadarData(etudiant: StudentRes, pourcents: boolean = false): IRadar {
+    const labels = this.data_radar_courant.labels;
+    const datasets = [this.radarMoy(), this.radarMed(), this.radarStudent(etudiant)];
+    if (pourcents) {
+      datasets.forEach((ds, indice) => {
+        datasets[indice].data = this.normaliseNotes(ds.data, this.getBaremes(this.q_notees));
+      });
+    }
+    const vue = pourcents ? 'pourcents' : 'brut';
+    return { labels, datasets, vue };
+  }
+
+  private radarMoy(): IRadarDataset {
+    const dataMoy: number[] = this.getMoyennesQuestions();
+    return this.basicDataset('Moyenne', GRIS, TRANSPARENT, dataMoy);
+  }
+
+  private radarMed(): IRadarDataset {
+    const dataMed: number[] = this.getMedianeQuestions();
+    return this.basicDataset('Mediane', BLEU_FONCE, TRANSPARENT, dataMed);
+  }
+
+  private radarMaxNote(): IRadarDataset {
+    const dataMaxNote: number[] = this.getMaxNoteQuestions();
+    return this.basicDataset('Note maximale déliverée', VERT, TRANSPARENT, dataMaxNote);
+  }
+  private radarMinNote(): IRadarDataset {
+    const dataMinNote: number[] = this.getMinNoteQuestions();
+    return this.basicDataset('Note minimale déliverée', ROUGE, TRANSPARENT, dataMinNote);
+  }
+
+  private radarStudent(etudiant: StudentRes): IRadarDataset {
+    const notesEtudiant: number[] = this.getNotes(etudiant);
+    return this.basicDataset('Notes', VIOLET, VIOLET_LEGER, notesEtudiant);
   }
 
   private basicDataset(label: string, couleurForte: string, couleurLegere: string, data: number[]): IRadarDataset {
@@ -273,8 +375,7 @@ export class StatsExamComponent implements OnInit {
   }
 
   private resumeExam(): string {
-    console.log(this.q_notees);
-    const totalPoints: string = this.sum(this.getBaremes(this.q_notees)).toString();
+    const totalPoints: string = this.getBaremeExam().toString();
     const moyenne: string = this.getMoyenneExam().toFixed(2).toString();
     const mediane: string = this.getMedianeExam().toFixed(2).toString();
     const ecarttype: string = this.getEcartTypeExam().toFixed(2).toString();
@@ -308,14 +409,35 @@ export class StatsExamComponent implements OnInit {
   }
 
   public toggleRadar(): void {
-    // Toggle action
-    const choixPrct = this.data_radar_global.vue === 'pourcents';
-    this.initGlobalRadarData(this.q_notees, choixPrct);
-    this.data_radar_global.vue = choixPrct ? 'brut' : 'pourcents';
+    const choixPrct = this.data_radar_courant.vue === 'pourcents';
+
+    this.data_radar_courant.vue = choixPrct ? 'brut' : 'pourcents';
     // Carte
-    const selection: string = !choixPrct ? 'Valeurs brutes par question' : 'Valeurs normalisées par question';
-    const infosExam: string = this.resumeExam();
-    this.updateCarte('global_stats', undefined, selection, infosExam);
+    this.updateCarteRadar();
+  }
+
+  public updateCarteRadar(): void {
+    const choixPrct = this.data_radar_courant.vue === 'pourcents';
+    if (this.etudiantSelec !== null && this.etudiantSelec !== undefined) {
+      this.data_radar_courant = this.initStudentRadarData(this.etudiantSelec, choixPrct);
+    } else {
+      this.data_radar_courant = this.initGlobalRadarData(this.q_notees, choixPrct);
+    }
+    const selection: string = choixPrct ? 'Valeurs normalisées par question' : 'Valeurs brutes par question';
+    const infosExam = undefined; // : string = this.resumeExam();
+    this.updateCarte('questions_stats', undefined, selection, infosExam);
+  }
+
+  onStudentSelect(event: any): void {
+    if (this.etudiantSelec !== null && this.etudiantSelec !== undefined) {
+      this.updateCarte('selection_etudiant', undefined, this.etudiantSelec.prenom + ' ' + this.etudiantSelec.nom, undefined);
+      this.data_radar_courant = this.initStudentRadarData(this.etudiantSelec, this.data_radar_courant.vue === 'pourcents');
+      this.updateCarteRadar();
+    }
+  }
+  onStudentUnselect(event: any): void {
+    this.updateCarte('selection_etudiant', undefined, 'Aucun étudiant sélectionné', undefined);
+    this.updateCarteRadar();
   }
 
   /** @modifies les valeurs textuelles d'un élément < p-card > */
@@ -356,8 +478,22 @@ export class StatsExamComponent implements OnInit {
       data,
     };
   }
-}
 
+  /** @info méthode dédiée à modifier le style de certaines balises de PrimeNG inaccessibles via le CSS de manière classique*/
+  private style(): void {
+    // Modification de l'espace entre le header et le body d'une carte
+    const e = document.getElementsByClassName('p-card-content');
+    for (let i = 0; i < e.length; i++) {
+      e[i].setAttribute('style', 'padding:0px;');
+    }
+  }
+}
+export interface ISort {
+  data: StudentRes[];
+  mode: string;
+  field: string;
+  order: number;
+}
 export interface QuestionNotee {
   label: string;
   bareme: number;
@@ -378,7 +514,6 @@ export interface IRadar {
   labels: string[];
   datasets: IRadarDataset[];
   vue: string;
-  infos?: string;
 }
 export interface IRadarDataset {
   label: string;
