@@ -381,30 +381,7 @@ export class StatsExamComponent implements OnInit {
     const ecarttype: string = this.getEcartTypeExam().toFixed(2).toString();
     const maxNote: string = this.getMaxNoteExam().toString();
     const minNote: string = this.getMinNoteExam().toString();
-    const resume: string =
-      "Moyenne de l'examen: <b>" +
-      moyenne +
-      '</b>/' +
-      totalPoints +
-      '<br>' +
-      "Écart type de l'examen : σ=<b>" +
-      ecarttype +
-      '</b><br>' +
-      "Médiane de l'examen : <b>" +
-      mediane +
-      '</b>/' +
-      totalPoints +
-      '<br>' +
-      'Note la plus élevée : <b>' +
-      maxNote +
-      '</b>/' +
-      totalPoints +
-      '<br>' +
-      'Note la plus basse : <b>' +
-      minNote +
-      '</b>/' +
-      totalPoints +
-      '<br>';
+    const resume: string = `Moyenne de l'examen: <b>${moyenne}</b>/${totalPoints}<br>Écart type de l'examen : σ=<b>${ecarttype}</b><br>Médiane de l'examen : <b>${mediane}</b>/${totalPoints}<br>Note la plus élevée : <b>${maxNote}</b>/${totalPoints}<br>Note la plus basse : <b>${minNote}</b>/${totalPoints}<br>`;
     return resume;
   }
 
@@ -486,6 +463,14 @@ export class StatsExamComponent implements OnInit {
     for (let i = 0; i < e.length; i++) {
       e[i].setAttribute('style', 'padding:0px;');
     }
+    // Permet dès le chargement de voir que l'ordre sélectionné est celui des notes
+    const f = document.querySelector('th[ng-reflect-field=note]');
+    if (f === null) {
+      return;
+    }
+    f.setAttribute('aria-sort', 'descending');
+    f.className = 'p-element p-sortable-column p-highlight';
+    f.getElementsByTagName('i')[0].className = 'p-sortable-column-icon pi pi-fw pi-sort-amount-down';
   }
 }
 export interface ISort {
