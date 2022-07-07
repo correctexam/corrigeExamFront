@@ -1,7 +1,11 @@
 .boutons {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 15px;
+}
+.boutons > a {
+  text-decoration: none;
 }
 .card-body {
   padding: 0px;
@@ -16,7 +20,7 @@
 }
 #statsquestions {
   min-width: 440px;
-  max-width: 660px;
+  max-width: 500px;
   flex-grow: 1;
 }
 .card {
@@ -40,4 +44,27 @@
 }
 #selectstudent {
   width: max-content;
+}
+.knobs {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 3em;
+  row-gap: 0.5em;
+}
+.knobQuestion {
+  background-color: aliceblue;
+  padding: 10px;
+  border-radius: 5px;
+}
+.knobQuestion:hover,
+.knobQuestion:focus {
+  background-color: rgb(193, 202, 209);
+}
+.progbar {
+  margin-top: 10px;
+  height: 5px;
+  overflow: hidden;
+}
+.progbar-grade {
+  color: gray;
 }

@@ -30,7 +30,23 @@
         <p-chart type="radar" [data]="data_radar_courant"></p-chart>
       </ng-template>
       <div class="card-body">
-        <p>Aperçu global des notes de l'examen.</p>
+        <div *ngIf="etudiantSelec === null || etudiantSelec == undefined; else selecBlock"><p>Aperçu global des notes de l'examen.</p></div>
+        <ng-template #selecBlock>
+          <div class="knobs">
+            <div *ngFor="let note of this.getNotesSelect(); let iQuest = index">
+              <div class="knobQuestion" tabindex="0" (click)="this.selectQuestion(iQuest)">
+                <h6>Question {{ iQuest + 1 }}</h6>
+                <p-knob
+                  [(ngModel)]="this.getNotesSelect()[iQuest]"
+                  [max]="this.getBaremes(this.q_notees)[iQuest]"
+                  [size]="75"
+                  [readonly]="true"
+                  valueColor="{{ COLOR_GRADES }}"
+                ></p-knob>
+              </div>
+            </div>
+          </div>
+        </ng-template>
       </div>
       <ng-template pTemplate="footer">
         <div class="boutons">
@@ -82,7 +98,19 @@
         </p-table>
       </ng-template>
       <div class="card-body">
-        <p>Cliquez une fois pour sélectionner un étudiant.</p>
+        <div *ngIf="etudiantSelec !== null && etudiantSelec !== undefined">
+          <div class="progbar">
+            <p-progressBar
+              [value]="((this.getNoteSelect() * 100) / this.getBaremeExam()).toFixed(2)"
+              [showValue]="false"
+              mode="determinate"
+            ></p-progressBar>
+          </div>
+          <div class="progbar-grade">
+            <b>{{ this.getNoteSelect() }}</b
+            >/{{ this.getBaremeExam() }}
+          </div>
+        </div>
       </div>
       <ng-template pTemplate="footer">
         <div class="boutons">
@@ -96,9 +124,9 @@
             icon="pi pi-file"
           ></button>
           <button
-            disabled
+            [disabled]="etudiantSelec === null || etudiantSelec == undefined"
             pButton
-            (click)="toggleRadar()"
+            (click)="goToCorrection()"
             type="button"
             class="p-button-raised p-button-text"
             id="radarChoice"

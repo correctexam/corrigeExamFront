@@ -6,9 +6,7 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-import { style } from '@angular/animations';
 import { HttpClient } from '@angular/common/http';
-import { STRING_TYPE } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
@@ -28,6 +26,7 @@ const BLEU_FONCE_LEGER = 'rgb(72, 61, 139,0.2)';
 const BLEU_FONCE = 'rgb(72, 61, 139)';
 const BLANC = 'rgba(255,255,255,1)';
 const VIOLET = 'rgb(233, 120, 255)';
+const VIOLET_TIEDE = 'rgb(233, 120, 255,0.6)';
 const VIOLET_LEGER = 'rgb(233, 120, 255,0.2)';
 const TRANSPARENT = 'rgba(255,255,255,0.0)';
 
@@ -43,6 +42,8 @@ export class StatsExamComponent implements OnInit {
   infosStudents: StudentRes[] = [];
   q_notees: QuestionNotee[] = [];
   notes_eleves: number[] = [];
+
+  valueKnob: number = 80;
 
   // Variables d'affichage
   data_radar_courant!: IRadar;
@@ -90,7 +91,7 @@ export class StatsExamComponent implements OnInit {
   }
 
   private initStatVariables(): void {
-    this.triNotes(this.infosStudents).reverse();
+    this.triNotes(this.infosStudents);
     const qn: QuestionNotee[] = [];
     let indice = 0;
     for (const q of this.infosQuestions) {
@@ -151,11 +152,11 @@ export class StatsExamComponent implements OnInit {
       } else if (this.s2f(note1) < this.s2f(note2)) {
         return -1;
       } else if (this.s2f(note1) === this.s2f(note2)) {
-        return 0;
+        return this.compareAlpha(s1, s2);
       }
       return 1;
     });
-    return etudiants;
+    return etudiants.reverse();
   }
 
   private triINE(etudiants: StudentRes[]): StudentRes[] {
@@ -169,19 +170,24 @@ export class StatsExamComponent implements OnInit {
 
   private triAlpha(etudiants: StudentRes[]): StudentRes[] {
     etudiants.sort((s1: StudentRes, s2: StudentRes) => {
-      const nom1 = s1.nom;
-      const nom2 = s2.nom;
-      let diff = nom1.localeCompare(nom2);
-      if (diff === 0) {
-        diff = s1.prenom.localeCompare(s2.prenom);
-      }
+      const diff = this.compareAlpha(s1, s2);
       return diff;
     });
     return etudiants;
   }
 
+  private compareAlpha(s1: StudentRes, s2: StudentRes): number {
+    const nom1 = s1.nom;
+    const nom2 = s2.nom;
+    let diff = nom1.localeCompare(nom2);
+    if (diff === 0) {
+      diff = s1.prenom.localeCompare(s2.prenom);
+    }
+    return diff;
+  }
+
   /** @return le barème associé à chaque question */
-  private getBaremes(stats: QuestionNotee[]): number[] {
+  public getBaremes(stats: QuestionNotee[]): number[] {
     const baremes: number[] = [];
     for (const stat of stats) {
       baremes.push(stat.bareme);
@@ -198,6 +204,18 @@ export class StatsExamComponent implements OnInit {
       notes.push(this.s2f(etudiant.notequestions[key]));
     }
     return notes;
+  }
+  // Permet de pouvoir accéder facilement aux notes de l'étudiant sélectionné et de ne pas devoir gérer les erreurs en cas d'étudiant non sélectionné
+  public getNotesSelect(): number[] {
+    if (this.etudiantSelec !== null && this.etudiantSelec !== undefined) {
+      return this.getNotes(this.etudiantSelec);
+    } else {
+      return [];
+    }
+  }
+
+  getNoteSelect(): number {
+    return this.sum(this.getNotesSelect());
   }
 
   /** @return la moyenne associée à chaque question */
@@ -270,7 +288,7 @@ export class StatsExamComponent implements OnInit {
   }
 
   /** @param tab un tableau non vide @returns la moyenne  */
-  private sum(tab: number[]): number {
+  sum(tab: number[]): number {
     return tab.reduce((x, y) => x + y, 0);
   }
 
@@ -468,9 +486,29 @@ export class StatsExamComponent implements OnInit {
     if (f === null) {
       return;
     }
-    f.setAttribute('aria-sort', 'descending');
+    f.id = 'order-notes';
+    document.getElementById('order-notes')?.click();
+    /* f.setAttribute('aria-sort', 'descending');
     f.className = 'p-element p-sortable-column p-highlight';
-    f.getElementsByTagName('i')[0].className = 'p-sortable-column-icon pi pi-fw pi-sort-amount-down';
+    f.getElementsByTagName('i')[0].className = 'p-sortable-column-icon pi pi-fw pi-sort-amount-down';*/
+  }
+  readonly COLOR_GRADES = VIOLET_TIEDE;
+
+  idQuestionSelected: number = 0;
+
+  public selectQuestion(idQuestion: number): void {
+    this.idQuestionSelected = idQuestion;
+    const e = document.getElementById('selectstudent')?.getElementsByClassName('p-button-label')[1];
+    if (e === undefined) {
+      return;
+    }
+    e.innerHTML = 'Correction (' + (idQuestion + 1).toString() + ')';
+  }
+
+  public goToCorrection(): void {
+    // "{{ 'answer/' + examid + '/1' + '/' + etudiantSelec?.studentNumber }}"
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+    location.href = 'answer/' + this.examid + '/' + (this.idQuestionSelected + 1) + '/' + this.etudiantSelec?.studentNumber?.toString();
   }
 }
 export interface ISort {

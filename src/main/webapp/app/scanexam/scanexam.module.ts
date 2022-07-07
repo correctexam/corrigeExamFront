@@ -60,6 +60,8 @@ import { GalleriaModule } from 'primeng/galleria';
 import { StatsExamComponent } from './statsexam/statsexam.component';
 import { CardModule } from 'primeng/card';
 import { ChartModule } from 'primeng/chart';
+import { KnobModule } from 'primeng/knob';
+import { ProgressBarModule } from 'primeng/progressbar';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -253,6 +255,8 @@ export const ShowResults_ROUTE: Route = {
     CardModule,
     ButtonModule,
     ChartModule,
+    KnobModule,
+    ProgressBarModule,
     SharedModule,
     FontAwesomeModule,
     BlockUIModule,
