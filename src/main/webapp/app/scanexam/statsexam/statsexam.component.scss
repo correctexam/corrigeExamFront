@@ -56,6 +56,9 @@
   padding: 10px;
   border-radius: 5px;
 }
+.knobQuestion:hover {
+  cursor: pointer;
+}
 .knobQuestion:hover,
 .knobQuestion:focus {
   background-color: rgb(193, 202, 209);
