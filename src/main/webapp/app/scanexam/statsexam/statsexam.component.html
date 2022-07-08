@@ -2,7 +2,7 @@
   Statistiques de l'examen <span *ngIf="infosQuestions.length !== 0">{{ infosQuestions[0].examName }}</span>
 </h1>
 <div class="cards">
-  <div class="card">
+  <div class="card" id="statgen">
     <p-card header="Statistiques de l'examen" subheader="Statistiques générales">
       <div class="statgenerale">
         Nombre d'étudiants<span>{{ this.notes_eleves.length }}</span>
@@ -27,10 +27,24 @@
   <div class="card" id="statsquestions">
     <p-card id="questions_stats" header="Statistiques par question" subheader="Vue">
       <ng-template pTemplate="header">
-        <p-chart type="radar" [data]="data_radar_courant"></p-chart>
+        <div class="header-radar">
+          <div class="radar-container">
+            <p-chart type="radar" [data]="data_radar_courant"></p-chart>
+          </div>
+        </div>
       </ng-template>
       <div class="card-body">
-        <div *ngIf="etudiantSelec === null || etudiantSelec == undefined; else selecBlock"><p>Aperçu global des notes de l'examen.</p></div>
+        <div *ngIf="etudiantSelec === null || etudiantSelec == undefined; else selecBlock">
+          <!--Permet d'avoir la même largeur de carte-->
+          <div class="knobs" style="visibility: hidden; height: 0px">
+            <div *ngFor="let question of this.q_notees">
+              <div class="knobQuestion">
+                <h6>Question N</h6>
+                <p-knob [size]="70"></p-knob>
+              </div>
+            </div>
+          </div>
+        </div>
         <ng-template #selecBlock>
           <div class="knobs">
             <div *ngFor="let note of this.getNotesSelect(); let iQuest = index">
@@ -39,7 +53,7 @@
                 <p-knob
                   [(ngModel)]="this.getNotesSelect()[iQuest]"
                   [max]="this.getBaremes(this.q_notees)[iQuest]"
-                  [size]="75"
+                  [size]="70"
                   [readonly]="true"
                   valueColor="{{ COLOR_GRADES }}"
                 ></p-knob>
@@ -100,15 +114,12 @@
       <div class="card-body">
         <div *ngIf="etudiantSelec !== null && etudiantSelec !== undefined">
           <div class="progbar">
-            <p-progressBar
-              [value]="((this.getNoteSelect() * 100) / this.getBaremeExam()).toFixed(2)"
-              [showValue]="false"
-              mode="determinate"
-            ></p-progressBar>
-          </div>
-          <div class="progbar-grade">
-            <b>{{ this.getNoteSelect() }}</b
-            >/{{ this.getBaremeExam() }}
+            <div class="avancement-progbar" [ngStyle]="{ width: ((this.getNoteSelect() * 100) / this.getBaremeExam()).toString() + '%' }">
+              <div class="progbar-grade">
+                <b>{{ this.getNoteSelect() }}</b
+                >/{{ this.getBaremeExam() }}
+              </div>
+            </div>
           </div>
         </div>
       </div>

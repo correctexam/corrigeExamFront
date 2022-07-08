@@ -15,14 +15,20 @@
 .cards {
   display: flex;
   flex-wrap: wrap;
+  //  flex-direction: column-reverse;
   align-items: center;
   justify-content: space-around;
 }
-#statsquestions {
-  min-width: 440px;
-  max-width: 500px;
-  flex-grow: 1;
+#statgen {
+  order: 1;
 }
+#statsquestions {
+  order: 2;
+}
+#selectstudent {
+  order: 3;
+}
+
 .card {
   // Taille par défaut de la carte
   width: 300px;
@@ -45,16 +51,30 @@
 #selectstudent {
   width: max-content;
 }
-.knobs {
+#statsquestions {
+  width: max-content;
+}
+.radar-container {
+  width: 500px;
+}
+.header-radar {
   display: flex;
-  flex-wrap: wrap;
-  column-gap: 3em;
-  row-gap: 0.5em;
+  justify-content: center;
+}
+.knobs {
+  width: 100%; // 480px;
+  display: flex;
+  // flex-wrap: wrap;
+  flex-direction: row;
+  padding-bottom: 15px;
+  overflow: auto;
+  gap: 10px;
 }
 .knobQuestion {
   background-color: aliceblue;
   padding: 10px;
   border-radius: 5px;
+  width: max-content;
 }
 .knobQuestion:hover {
   cursor: pointer;
@@ -63,11 +83,20 @@
 .knobQuestion:focus {
   background-color: rgb(193, 202, 209);
 }
-.progbar {
-  margin-top: 10px;
-  height: 5px;
-  overflow: hidden;
-}
 .progbar-grade {
-  color: gray;
+  color: lightgray;
+}
+.progbar {
+  background-color: #dee2e6;
+}
+.progbar,
+.avancement-progbar {
+  border-radius: 5px;
+}
+.avancement-progbar {
+  height: 1.5rem;
+  text-indent: 1rem;
+  font-size: 1.1em;
+  background-color: #2196f3;
+  transition: width 1s ease-in-out;
 }

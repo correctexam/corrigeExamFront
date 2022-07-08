@@ -43,8 +43,6 @@ export class StatsExamComponent implements OnInit {
   q_notees: QuestionNotee[] = [];
   notes_eleves: number[] = [];
 
-  valueKnob: number = 80;
-
   // Variables d'affichage
   data_radar_courant!: IRadar;
   etudiantSelec: StudentRes | null | undefined;
@@ -488,9 +486,6 @@ export class StatsExamComponent implements OnInit {
     }
     f.id = 'order-notes';
     document.getElementById('order-notes')?.click();
-    /* f.setAttribute('aria-sort', 'descending');
-    f.className = 'p-element p-sortable-column p-highlight';
-    f.getElementsByTagName('i')[0].className = 'p-sortable-column-icon pi pi-fw pi-sort-amount-down';*/
   }
   readonly COLOR_GRADES = VIOLET_TIEDE;
 
