@@ -79,7 +79,6 @@
 .knobQuestion:hover {
   cursor: pointer;
 }
-.knobQuestion:focus,
 #knobSelected {
   background-color: rgb(193, 202, 209);
 }
@@ -88,6 +87,7 @@
 }
 .progbar-grade {
   color: lightgray;
+  white-space: nowrap;
 }
 .progbar {
   background-color: #dee2e6;
