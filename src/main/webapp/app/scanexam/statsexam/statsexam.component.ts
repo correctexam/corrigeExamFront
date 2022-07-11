@@ -28,6 +28,9 @@ const BLANC = 'rgba(255,255,255,1)';
 const VIOLET = 'rgb(233, 120, 255)';
 const VIOLET_TIEDE = 'rgb(233, 120, 255,0.6)';
 const VIOLET_LEGER = 'rgb(233, 120, 255,0.2)';
+const BLEU_AERO = 'rgb(142, 184, 229)';
+const BLEU_AERO_TIEDE = 'rgb(142, 184, 229,0.6)';
+const BLEU_AERO_LEGER = 'rgb(142, 184, 229,0.2)';
 const TRANSPARENT = 'rgba(255,255,255,0.0)';
 
 @Component({
@@ -46,6 +49,9 @@ export class StatsExamComponent implements OnInit {
   // Variables d'affichage
   data_radar_courant!: IRadar;
   etudiantSelec: StudentRes | null | undefined;
+  knobsCourants: string[] = [];
+  COLOR_KNOBS = BLEU_AERO_TIEDE;
+  idQuestionSelected: number = 0;
 
   constructor(
     protected applicationConfigService: ApplicationConfigService,
@@ -225,6 +231,14 @@ export class StatsExamComponent implements OnInit {
     return moyennes;
   }
 
+  private updateKnobs(): void {
+    const knobsNb = this.etudiantSelec !== null && this.etudiantSelec !== undefined ? this.getNotesSelect() : this.getMoyennesQuestions();
+    this.knobsCourants = [];
+    knobsNb.forEach(knobValue => {
+      this.knobsCourants.push(knobValue.toFixed(2));
+    });
+  }
+
   public getMoyenneExam(): number {
     return this.sum(this.notes_eleves) / this.notes_eleves.length;
   }
@@ -330,6 +344,7 @@ export class StatsExamComponent implements OnInit {
 
   private initDisplayVariables(): void {
     this.data_radar_courant = this.initGlobalRadarData(this.q_notees, true);
+    this.updateKnobs();
     this.updateCarteRadar();
   }
 
@@ -352,7 +367,7 @@ export class StatsExamComponent implements OnInit {
 
   private initStudentRadarData(etudiant: StudentRes, pourcents: boolean = false): IRadar {
     const labels = this.data_radar_courant.labels;
-    const datasets = [this.radarMoy(), this.radarMed(), this.radarStudent(etudiant)];
+    const datasets = [this.radarStudent(etudiant), this.radarMoy(), this.radarMed()];
     if (pourcents) {
       datasets.forEach((ds, indice) => {
         datasets[indice].data = this.normaliseNotes(ds.data, this.getBaremes(this.q_notees));
@@ -364,7 +379,7 @@ export class StatsExamComponent implements OnInit {
 
   private radarMoy(): IRadarDataset {
     const dataMoy: number[] = this.getMoyennesQuestions();
-    return this.basicDataset('Moyenne', GRIS, TRANSPARENT, dataMoy);
+    return this.basicDataset('Moyenne', BLEU_AERO, TRANSPARENT, dataMoy);
   }
 
   private radarMed(): IRadarDataset {
@@ -426,11 +441,15 @@ export class StatsExamComponent implements OnInit {
       this.updateCarte('selection_etudiant', undefined, this.etudiantSelec.prenom + ' ' + this.etudiantSelec.nom, undefined);
       this.data_radar_courant = this.initStudentRadarData(this.etudiantSelec, this.data_radar_courant.vue === 'pourcents');
       this.updateCarteRadar();
+      this.updateKnobs();
+      this.COLOR_KNOBS = VIOLET_TIEDE;
     }
   }
   onStudentUnselect(event: any): void {
     this.updateCarte('selection_etudiant', undefined, 'Aucun étudiant sélectionné', undefined);
     this.updateCarteRadar();
+    this.updateKnobs();
+    this.COLOR_KNOBS = BLEU_AERO_TIEDE;
   }
 
   /** @modifies les valeurs textuelles d'un élément < p-card > */
@@ -487,23 +506,23 @@ export class StatsExamComponent implements OnInit {
     f.id = 'order-notes';
     document.getElementById('order-notes')?.click();
   }
-  readonly COLOR_GRADES = VIOLET_TIEDE;
-
-  idQuestionSelected: number = 0;
 
   public selectQuestion(idQuestion: number): void {
-    this.idQuestionSelected = idQuestion;
     const e = document.getElementById('selectstudent')?.getElementsByClassName('p-button-label')[1];
-    if (e === undefined) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (e === undefined || this.etudiantSelec == null || this.etudiantSelec === undefined) {
       return;
     }
+    this.idQuestionSelected = idQuestion;
     e.innerHTML = 'Correction (' + (idQuestion + 1).toString() + ')';
   }
 
   public goToCorrection(): void {
-    // "{{ 'answer/' + examid + '/1' + '/' + etudiantSelec?.studentNumber }}"
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
     location.href = 'answer/' + this.examid + '/' + (this.idQuestionSelected + 1) + '/' + this.etudiantSelec?.studentNumber?.toString();
+  }
+  public voirLaCopie(): void {
+    alert('Fonction à développer');
   }
 }
 export interface ISort {
