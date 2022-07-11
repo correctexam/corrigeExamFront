@@ -36,7 +36,7 @@
       <div class="card-body">
         <div class="knobs">
           <div *ngFor="let note of this.knobsCourants; let iQuest = index">
-            <div class="knobQuestion" tabindex="0" (click)="this.selectQuestion(iQuest)">
+            <div class="knobQuestion" tabindex="0" (click)="this.selectQuestion($event, iQuest)">
               <h6>Question {{ iQuest + 1 }}</h6>
               <p-knob
                 [(ngModel)]="this.knobsCourants[iQuest]"
@@ -136,12 +136,3 @@
     </p-card>
   </div>
 </div>
-<!--<div *ngFor="let stat of this.q_notees">
-  <div>
-    {{ stat.label }} : /{{ stat.bareme }}
-    <ul>
-      <li *ngFor="let note of stat.notesAssociees">{{ note }}</li>
-    </ul>
-  </div>
-</div>
--->

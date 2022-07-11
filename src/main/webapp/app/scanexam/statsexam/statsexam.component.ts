@@ -507,14 +507,24 @@ export class StatsExamComponent implements OnInit {
     document.getElementById('order-notes')?.click();
   }
 
-  public selectQuestion(idQuestion: number): void {
+  public selectQuestion(event: any, idQuestion: number): void {
     const e = document.getElementById('selectstudent')?.getElementsByClassName('p-button-label')[1];
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (e === undefined || this.etudiantSelec == null || this.etudiantSelec === undefined) {
       return;
     }
+    if (this.idQuestionSelected === idQuestion) {
+      idQuestion = 0;
+    }
+    document.getElementById('knobSelected')?.removeAttribute('id');
     this.idQuestionSelected = idQuestion;
-    e.innerHTML = 'Correction (' + (idQuestion + 1).toString() + ')';
+    if (this.idQuestionSelected === 0) {
+      e.innerHTML = 'Correction';
+    } else {
+      e.innerHTML = 'Correction (' + (idQuestion + 1).toString() + ')';
+      const knobCard = event.path.find((elem: any) => elem.className === 'knobQuestion');
+      knobCard.setAttribute('id', 'knobSelected');
+    }
   }
 
   public goToCorrection(): void {
