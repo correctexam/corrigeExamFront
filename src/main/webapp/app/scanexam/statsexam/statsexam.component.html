@@ -40,7 +40,9 @@
           <div
             *ngFor="let note of this.knobsCourants; let iQuest = index"
             [class]="
-              questionSelectionnee && iQuest == idQuestionSelected && etudiantSelec !== null && etudiantSelec !== undefined
+              etudiantSelec === null || etudiantSelec === undefined
+                ? 'knobQuestion knobNonSelectionnable'
+                : questionSelectionnee && iQuest == idQuestionSelected
                 ? 'knobQuestion knobSelected'
                 : 'knobQuestion'
             "
