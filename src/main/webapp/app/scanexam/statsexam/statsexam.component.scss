@@ -14,24 +14,66 @@
 }
 .cards {
   display: flex;
-  flex-wrap: wrap;
-  //  flex-direction: column-reverse;
+  // flex-wrap: wrap;
+  flex-direction: row;
   align-items: center;
   justify-content: space-around;
 }
-#statgen {
-  order: 1;
+
+@media (min-width: 1100px) {
+  #statgen {
+    order: 1;
+  }
+  #statsquestions {
+    order: 2;
+  }
+  #selectstudent {
+    order: 3;
+  }
+  .radar-container {
+    width: 500px;
+  }
+  .card {
+    // Taille par défaut de la carte
+    width: 300px;
+  }
 }
-#statsquestions {
-  order: 2;
-}
-#selectstudent {
-  order: 3;
+@media (max-width: 1100px) {
+  .cards {
+    flex-direction: column;
+  }
+  .card {
+    width: 100%;
+  }
+  #statgen {
+    order: 3;
+  }
+  .statgenerale {
+    word-wrap: break-word;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  #statsquestions {
+    order: 2;
+    max-width: 90%;
+  }
+  #selectstudent {
+    order: 1;
+  }
+  .statsgenerales-container {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  .radar-container {
+    width: min-content;
+  }
 }
 
 .card {
-  // Taille par défaut de la carte
-  width: 300px;
   height: 100%;
   padding: 5px;
   border: 0px;
@@ -54,27 +96,24 @@
 #statsquestions {
   width: max-content;
 }
-.radar-container {
-  width: 500px;
-}
+
 .header-radar {
   display: flex;
   justify-content: center;
 }
 .knobs {
-  width: 100%; // 480px;
   display: flex;
-  // flex-wrap: wrap;
-  flex-direction: row;
-  padding-bottom: 15px;
-  overflow: auto;
   gap: 10px;
+  height: 100%;
+  flex-wrap: wrap;
+  justify-content: space-around;
 }
 .knobQuestion {
   background-color: rgba(250, 247, 241, 1);
   padding: 10px;
   border-radius: 5px;
   width: max-content;
+  white-space: nowrap;
 }
 .knobQuestion:hover {
   cursor: pointer;
