@@ -52,6 +52,7 @@ export class StatsExamComponent implements OnInit {
   knobsCourants: string[] = [];
   COLOR_KNOBS = BLEU_AERO_TIEDE;
   idQuestionSelected: number = 0;
+  questionSelectionnee: boolean = false;
 
   constructor(
     protected applicationConfigService: ApplicationConfigService,
@@ -507,23 +508,31 @@ export class StatsExamComponent implements OnInit {
     document.getElementById('order-notes')?.click();
   }
 
-  public selectQuestion(event: any, idQuestion: number): void {
+  public selectQuestion(idQuestion: number): void {
     const e = document.getElementById('selectstudent')?.getElementsByClassName('p-button-label')[1];
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (e === undefined || this.etudiantSelec == null || this.etudiantSelec === undefined) {
       return;
     }
+    let q_selectionne = true;
     if (this.idQuestionSelected === idQuestion) {
-      idQuestion = 0;
+      // Effet toggle
+      // idQuestion = 0;
+      q_selectionne = !this.questionSelectionnee;
     }
-    document.getElementById('knobSelected')?.removeAttribute('id');
+    if (this.questionSelectionnee && document.getElementsByClassName('knobSelected').length > 0) {
+      document.getElementsByClassName('knobSelected')[0].setAttribute('class', 'knobQuestion');
+    }
     this.idQuestionSelected = idQuestion;
-    if (this.idQuestionSelected === 0) {
+    if (!q_selectionne) {
       e.innerHTML = 'Correction';
+      this.questionSelectionnee = false;
+      this.idQuestionSelected = 0;
     } else {
       e.innerHTML = 'Correction (' + (idQuestion + 1).toString() + ')';
-      const knobCard = event.path.find((elem: any) => elem.className === 'knobQuestion');
-      knobCard.setAttribute('id', 'knobSelected');
+      const knobCard = document.getElementById('knobquest' + idQuestion.toString());
+      knobCard?.setAttribute('class', 'knobQuestion knobSelected');
+      this.questionSelectionnee = true;
     }
   }
 
