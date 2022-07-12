@@ -12,7 +12,7 @@ import { ConfirmationService } from 'primeng/api';
 import * as FileSaver from 'file-saver';
 import { IExam } from '../../entities/exam/exam.model';
 import { ExamService } from '../../entities/exam/service/exam.service';
-import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faTemperatureThreeQuarters } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'jhi-resultatstudentcourse',
@@ -30,6 +30,7 @@ export class ResultatStudentcourseComponent implements OnInit {
   exam: IExam | undefined;
 
   faEnvelope = faEnvelope;
+  fatemperaturethreequarters = faTemperatureThreeQuarters;
 
   constructor(
     protected applicationConfigService: ApplicationConfigService,

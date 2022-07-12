@@ -77,6 +77,16 @@
         >
           <fa-icon [icon]="faEnvelope"></fa-icon>&nbsp;<span>Export Excel</span>
         </button>
+        <button
+          [disabled]="!this.examid"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="btn btn-primary"
+          [routerLink]="'/statistics/' + this.examid"
+        >
+          <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span>Show statistics</span>
+        </button>
       </div>
     </div>
     <div class="col-12 md:col-12">
