@@ -105,7 +105,7 @@ export const LISTESTUDENT_ROUTE: Route = {
 };
 
 export const STATS_ROUTE: Route = {
-  path: 'statistiques/:examid',
+  path: 'statistics/:examid',
   canActivate: [UserRouteAccessService],
   component: StatsExamComponent,
   data: {

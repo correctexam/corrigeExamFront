@@ -149,8 +149,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             .equals(+this.examId)
             .count()
             .then(e2 => {
-              console.log('pass par la 1');
-
               this.nbreFeuilleParCopie = e2;
               // Step 2 Query Scan in local DB
 
@@ -273,6 +271,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.canvass.changes.subscribe(() => {
       this.reloadImage();
+
       this.changeDetector.detectChanges();
     });
   }
