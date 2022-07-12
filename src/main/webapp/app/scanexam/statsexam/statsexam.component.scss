@@ -118,6 +118,10 @@
 .knobQuestion:hover {
   cursor: pointer;
 }
+.knobNonSelectionnable:hover {
+  cursor: default;
+  background-color: rgba(250, 247, 241, 1);
+}
 .knobSelected {
   background-color: rgb(193, 202, 209);
 }

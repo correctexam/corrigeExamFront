@@ -98,14 +98,16 @@ export class StatsExamComponent implements OnInit {
   private initStatVariables(): void {
     this.triNotes(this.infosStudents);
     const qn: QuestionNotee[] = [];
-    let indice = 0;
     for (const q of this.infosQuestions) {
       const bareme: number = q.point !== undefined ? q.point : 0;
-      const step: string = q.step === undefined ? '' : q.step == null ? '' : q.step.toString();
-      const label: string = /* 'Partie '+step + */ ' Question ' + (q.numero !== undefined ? q.numero : '0').toString();
+      const label: string = ' Question ' + (q.numero !== undefined ? q.numero : '0').toString();
       const notesAssociees: number[] = [];
-      qn[indice] = { bareme, label, notesAssociees };
-      indice++;
+      const quest_divisee = qn.find(quest => quest.label === label);
+      if (quest_divisee === undefined) {
+        // On ne prend pas en compte la notation de la deuxième partie s'il y en a une
+        // (même comportement que lorsque l'on note la question dans la partie  correction)
+        qn.push({ bareme, label, notesAssociees });
+      }
     }
     for (const s of this.infosStudents) {
       if (s.ine !== '') {
@@ -122,6 +124,7 @@ export class StatsExamComponent implements OnInit {
       }
     }
     this.q_notees = qn;
+    console.log(this.q_notees);
   }
 
   public s2f(str: string): number {
