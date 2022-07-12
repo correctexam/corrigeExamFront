@@ -26,6 +26,7 @@
     "imagealign": "Alignement des scan de copies",
     "studentbindings": "Association des scans avec les étudiants",
     "answer": "Corriger votre examen",
-    "voircopie": "Voir votre copie"
+    "voircopie": "Voir votre copie",
+    "stats": "Statistiques de l'examen"
   }
 }

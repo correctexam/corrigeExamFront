@@ -1,0 +1,148 @@
+<h1>
+  Statistiques de l'examen <span *ngIf="infosQuestions.length !== 0">{{ infosQuestions[0].examName }}</span>
+</h1>
+<div class="cards">
+  <div class="card" id="statgen">
+    <p-card header="Statistiques de l'examen" subheader="Statistiques générales">
+      <div class="statsgenerales-container">
+        <div class="statgenerale">
+          Nombre d'étudiants<span>{{ this.notes_eleves.length }}</span>
+        </div>
+        <div class="statgenerale">
+          Moyenne<span>{{ this.getMoyenneExam().toFixed(2) }}/{{ this.getBaremeExam() }}</span>
+        </div>
+        <div class="statgenerale">
+          Écart type (σ)<span>{{ this.getEcartTypeExam().toFixed(2) }}</span>
+        </div>
+        <div class="statgenerale">
+          Mediane <span>{{ this.getMedianeExam() }}/{{ this.getBaremeExam() }}</span>
+        </div>
+        <div class="statgenerale">
+          Note maximale<span>{{ this.getMaxNoteExam() }}/{{ this.getBaremeExam() }}</span>
+        </div>
+        <div class="statgenerale">
+          Note minimale<span>{{ this.getMinNoteExam() }}/{{ this.getBaremeExam() }}</span>
+        </div>
+      </div>
+    </p-card>
+  </div>
+  <div class="card" id="statsquestions">
+    <p-card id="questions_stats" header="Statistiques par question" subheader="Vue">
+      <ng-template pTemplate="header">
+        <div class="header-radar">
+          <div class="radar-container">
+            <p-chart type="radar" [data]="data_radar_courant"></p-chart>
+          </div>
+        </div>
+      </ng-template>
+      <div class="card-body">
+        <div class="knobs">
+          <div
+            *ngFor="let note of this.knobsCourants; let iQuest = index"
+            [class]="
+              questionSelectionnee && iQuest == idQuestionSelected && etudiantSelec !== null && etudiantSelec !== undefined
+                ? 'knobQuestion knobSelected'
+                : 'knobQuestion'
+            "
+            tabindex="0"
+            (click)="this.selectQuestion(iQuest)"
+            id="knobquest{{ iQuest }}"
+          >
+            <h6>Question {{ iQuest + 1 }}</h6>
+            <p-knob
+              [(ngModel)]="this.knobsCourants[iQuest]"
+              [max]="this.getBaremes(this.q_notees)[iQuest]"
+              [size]="70"
+              [readonly]="true"
+              valueColor="{{ COLOR_KNOBS }}"
+            ></p-knob>
+          </div>
+        </div>
+      </div>
+      <ng-template pTemplate="footer">
+        <div class="boutons">
+          <button
+            pButton
+            (click)="toggleRadar()"
+            type="button"
+            class="p-button-outlined"
+            id="radarChoice"
+            label="Changer la vue"
+            icon="pi pi-chart-pie"
+          ></button>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+  <div class="card" id="selectstudent">
+    <p-card id="selection_etudiant" header="Sélection d'un étudiant" subheader="Aucun étudiant sélectionné">
+      <ng-template pTemplate="header">
+        <p-table
+          [value]="this.infosStudents"
+          selectionMode="single"
+          [(selection)]="this.etudiantSelec"
+          dataKey="ine"
+          responsiveLayout="scroll"
+          [scrollable]="true"
+          scrollHeight="500px"
+          (sortFunction)="triSelection($event)"
+          [customSort]="true"
+          (onRowSelect)="onStudentSelect($event)"
+          (onRowUnselect)="onStudentUnselect($event)"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="ine">INE<p-sortIcon field="ine"></p-sortIcon></th>
+              <th pSortableColumn="alpha">NOM<p-sortIcon field="alpha"></p-sortIcon></th>
+              <th pSortableColumn="alpha">PRENOM<p-sortIcon field="alpha"></p-sortIcon></th>
+              <th pSortableColumn="note">NOTE<p-sortIcon field="note"></p-sortIcon></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-student>
+            <tr [pSelectableRow]="student">
+              <td>{{ student.ine }}</td>
+              <td>{{ student.nom }}</td>
+              <td>{{ student.prenom }}</td>
+              <td>{{ student.note }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </ng-template>
+      <div class="card-body">
+        <div *ngIf="etudiantSelec !== null && etudiantSelec !== undefined">
+          <div class="progbar">
+            <div class="avancement-progbar" [ngStyle]="{ width: ((this.getNoteSelect() * 100) / this.getBaremeExam()).toString() + '%' }">
+              <div class="progbar-grade">
+                <b>{{ this.getNoteSelect() }}</b
+                >/{{ this.getBaremeExam() }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template pTemplate="footer">
+        <div class="boutons">
+          <button
+            [disabled]="etudiantSelec === null || etudiantSelec == undefined"
+            pButton
+            (click)="voirLaCopie()"
+            type="button"
+            class="p-button-primary"
+            label="Voir la copie"
+            icon="pi pi-file"
+          ></button>
+          <button
+            [disabled]="etudiantSelec === null || etudiantSelec == undefined"
+            pButton
+            (click)="goToCorrection()"
+            type="button"
+            class="p-button-raised p-button-text"
+            id="radarChoice"
+            label="Correction"
+            icon="pi pi-external-link"
+          ></button>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+</div>
