@@ -124,7 +124,6 @@ export class StatsExamComponent implements OnInit {
       }
     }
     this.q_notees = qn;
-    console.log(this.q_notees);
   }
 
   public s2f(str: string): number {
