@@ -45,14 +45,23 @@ export class StatsExamComponent implements OnInit {
   infosStudents: StudentRes[] = [];
   q_notees: QuestionNotee[] = [];
   notes_eleves: number[] = [];
+  choixTri: boolean = true;
 
   // Variables d'affichage
   data_radar_courant!: IRadar;
   etudiantSelec: StudentRes | null | undefined;
+  listeMobileEtudiant: StudSelecMobile[] = [];
+  mobileSortChoices = [
+    { icon: 'pi pi-id-card', sort: 'ine' },
+    { icon: 'pi pi-sort-alpha-up', sort: 'alpha' },
+    { icon: 'pi pi-sort-numeric-up', sort: 'note' },
+  ];
+  mobileSortChoice: any;
   knobsCourants: string[] = [];
   COLOR_KNOBS = BLEU_AERO_TIEDE;
   idQuestionSelected: number = 0;
   questionSelectionnee: boolean = false;
+  readonly ICONSORTUP = 'pi pi-sort-amount-up-alt'; // Permet d'éviter une étrange erreur de vscode (Unexpected keyword or identifier.javascript)
 
   constructor(
     protected applicationConfigService: ApplicationConfigService,
@@ -76,6 +85,11 @@ export class StatsExamComponent implements OnInit {
         );
       }
     });
+  }
+
+  public changementTriMobile(): void {
+    this.clickColonneTableau(this.mobileSortChoice.sort);
+    this.initMobileSelection();
   }
 
   private async initStudents(): Promise<any> {
@@ -132,18 +146,23 @@ export class StatsExamComponent implements OnInit {
   public triSelection(event: ISort): void {
     switch (event.field) {
       case 'ine':
-        this.triINE(event.data);
+        this.triINE(this.infosStudents);
+        this.mobileSortChoice = this.mobileSortChoices[0];
         break;
       case 'alpha':
-        this.triAlpha(event.data);
+        this.triAlpha(this.infosStudents);
+        this.mobileSortChoice = this.mobileSortChoices[1];
         break;
       default:
-        this.triNotes(event.data);
+        this.triNotes(this.infosStudents);
+        this.mobileSortChoice = this.mobileSortChoices[2];
         break;
     }
     if (event.order === -1) {
       event.data.reverse();
     }
+    this.choixTri = event.order === 1;
+    this.initMobileSelection();
   }
 
   private triNotes(etudiants: StudentRes[]): StudentRes[] {
@@ -351,6 +370,30 @@ export class StatsExamComponent implements OnInit {
     this.updateCarteRadar();
   }
 
+  private initMobileSelection(): void {
+    if (this.listeMobileEtudiant.length > 0) {
+      while (this.listeMobileEtudiant.length !== 0) {
+        this.listeMobileEtudiant.pop();
+      }
+    }
+    for (const etudiant of this.infosStudents) {
+      const note = this.s2f(etudiant.note === undefined ? '0' : etudiant.note)
+        .toFixed(2)
+        .toString();
+      const name = etudiant.ine + ' | ' + this.s_red(etudiant.prenom, 1) + ' ' + this.s_red(etudiant.nom, 8) + ' | ' + note;
+      const value = etudiant;
+      const etmob: StudSelecMobile = { name, value };
+      this.listeMobileEtudiant.push(etmob);
+    }
+  }
+
+  private s_red(s: string, length: number = 3, abrevSymbol: string = '.'): string {
+    if (length >= s.length) {
+      return s;
+    }
+    return s.slice(0, length) + abrevSymbol;
+  }
+
   /** @initialise les données à afficher dans le radar de visualisation globale*/
   private initGlobalRadarData(stats: QuestionNotee[], pourcents: boolean = false): IRadar {
     const labels: string[] = [];
@@ -502,12 +545,16 @@ export class StatsExamComponent implements OnInit {
       e[i].setAttribute('style', 'padding:0px;');
     }
     // Permet dès le chargement de voir que l'ordre sélectionné est celui des notes
-    const f = document.querySelector('th[ng-reflect-field=note]');
+    this.clickColonneTableau('note');
+  }
+
+  private clickColonneTableau(id: string): void {
+    const f = document.querySelector('th[ng-reflect-field=' + id + ']');
     if (f === null) {
       return;
     }
-    f.id = 'order-notes';
-    document.getElementById('order-notes')?.click();
+    f.id = 'order-' + id;
+    document.getElementById('order-' + id)?.click();
   }
 
   public selectQuestion(idQuestion: number): void {
@@ -545,6 +592,10 @@ export class StatsExamComponent implements OnInit {
   public voirLaCopie(): void {
     alert('Fonction à développer');
   }
+}
+export interface StudSelecMobile {
+  name: string;
+  value: StudentRes;
 }
 export interface ISort {
   data: StudentRes[];
