@@ -111,6 +111,12 @@ L'équipe pédagogique`;
       });
 
       this.studentsresult.forEach(res => {
+        if (res['note'] !== undefined) {
+          res['note'] = parseFloat(res['note'].replaceAll(',', '.'));
+        }
+        if (res['abi'] !== undefined) {
+          res['abi'] = !!res['abi'];
+        }
         for (const key in res.notequestions) {
           // eslint-disable-next-line no-prototype-builtins
           if (res.notequestions.hasOwnProperty(key)) {
