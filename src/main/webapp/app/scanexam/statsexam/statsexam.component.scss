@@ -37,39 +37,73 @@
     // Taille par défaut de la carte
     width: 300px;
   }
+  .mobile-view {
+    display: none;
+  }
 }
 @media (max-width: 1100px) {
   .cards {
     flex-direction: column;
   }
   .card {
-    width: 100%;
+    width: 100% !important;
   }
   #statgen {
-    order: 3;
+    order: 1;
   }
   .statgenerale {
     word-wrap: break-word;
     text-align: center;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    width: 20rem;
   }
   #statsquestions {
-    order: 2;
-    max-width: 90%;
+    order: 3;
   }
   #selectstudent {
-    order: 1;
+    order: 2;
   }
   .statsgenerales-container {
     display: flex;
     width: 100%;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: center;
+    // flex-direction: column;
   }
   .radar-container {
     width: min-content;
+  }
+  .computer-view {
+    display: none;
+  }
+  .selectstudentmobile {
+    display: flex;
+    padding: 15px;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 15px;
+  }
+  .changementTriMobile {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 50px;
+  }
+  :host ::ng-deep .p-dropdown {
+    width: 20rem;
+  }
+  :host ::ng-deep .p-dropdown-items {
+    width: 19rem;
+  }
+  :host ::ng-deep .p-dropdown-item {
+    overflow: auto;
+    word-break: break-all;
+    word-wrap: break-word;
+  }
+  :host ::ng-deep .p-togglebutton {
+    border-radius: 20px;
   }
 }
 
