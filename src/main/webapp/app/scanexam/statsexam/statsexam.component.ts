@@ -14,6 +14,7 @@ import { CourseService } from 'app/entities/course/service/course.service';
 import { IQuestion } from 'app/entities/question/question.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
 import { Observable } from 'rxjs';
+import { db } from '../db/db';
 
 // Couleurs à utiliser
 const GRIS_LEGER = 'rgba(179,181,198,0.2)';
@@ -63,6 +64,30 @@ export class StatsExamComponent implements OnInit {
   questionSelectionnee: boolean = false;
   readonly ICONSORTUP = 'pi pi-sort-amount-up-alt'; // Permet d'éviter une étrange erreur de vscode (Unexpected keyword or identifier.javascript)
 
+  activeIndex = 1;
+  responsiveOptions2: any[] = [
+    {
+      breakpoint: '1500px',
+      numVisible: 5,
+    },
+    {
+      breakpoint: '1024px',
+      numVisible: 3,
+    },
+    {
+      breakpoint: '768px',
+      numVisible: 2,
+    },
+    {
+      breakpoint: '560px',
+      numVisible: 1,
+    },
+  ];
+  displayBasic = false;
+  images: any[] = [];
+  noalign = false;
+  nbreFeuilleParCopie: number | undefined;
+
   constructor(
     protected applicationConfigService: ApplicationConfigService,
     private http: HttpClient,
@@ -75,6 +100,12 @@ export class StatsExamComponent implements OnInit {
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('examid') !== null) {
         this.examid = params.get('examid')!;
+
+        if (this.examid !== params.get('examid')! || this.images.length === 0) {
+          this.examid = params.get('examid')!;
+          this.loadAllPages();
+        }
+
         this.initStudents().then(() =>
           this.requeteInfoQuestions().subscribe(b => {
             this.infosQuestions = b.body;
@@ -85,6 +116,44 @@ export class StatsExamComponent implements OnInit {
         );
       }
     });
+  }
+
+  loadAllPages(): void {
+    db.templates
+      .where('examId')
+      .equals(+this.examid!)
+      .count()
+      .then(e2 => {
+        this.nbreFeuilleParCopie = e2;
+      });
+    if (this.noalign) {
+      db.nonAlignImages.where({ examId: +this.examid! }).each(e => {
+        const image = JSON.parse(e.value, this.reviver);
+        this.images.push({
+          src: image.pages,
+          alt: 'Description for Image 2',
+          title: 'Exam',
+        });
+      });
+    } else {
+      db.alignImages.where({ examId: +this.examid! }).each(e => {
+        const image = JSON.parse(e.value, this.reviver);
+        this.images.push({
+          src: image.pages,
+          alt: 'Description for Image 2',
+          title: 'Exam',
+        });
+      });
+    }
+  }
+
+  private reviver(key: any, value: any): any {
+    if (typeof value === 'object' && value !== null) {
+      if (value.dataType === 'Map') {
+        return new Map(value.value);
+      }
+    }
+    return value;
   }
 
   public changementTriMobile(): void {
@@ -590,7 +659,13 @@ export class StatsExamComponent implements OnInit {
     location.href = 'answer/' + this.examid + '/' + (this.idQuestionSelected + 1) + '/' + this.etudiantSelec?.studentNumber?.toString();
   }
   public voirLaCopie(): void {
-    alert('Fonction à développer');
+    if (this.etudiantSelec?.studentNumber?.toString() !== undefined) {
+      this.activeIndex = (+this.etudiantSelec.studentNumber.toString() - 1) * this.nbreFeuilleParCopie!;
+    } else {
+      this.activeIndex = 1;
+    }
+    console.log(this.activeIndex);
+    this.displayBasic = true;
   }
 }
 export interface StudSelecMobile {
