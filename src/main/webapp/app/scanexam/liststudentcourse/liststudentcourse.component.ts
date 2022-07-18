@@ -46,9 +46,8 @@ export class ListstudentcourseComponent implements OnInit {
         this.blocked = true;
 
         this.http.delete(this.applicationConfigService.getEndpointFor('api/deletegroupstudents/' + this.courseid)).subscribe(() => {
-          this.blocked = false;
-          // eslint-disable-next-line no-console
           this.loadEtudiants();
+          this.blocked = false;
         });
       },
     });
@@ -64,13 +63,25 @@ export class ListstudentcourseComponent implements OnInit {
   updateStudentgroup(student: any): void {
     this.http.put(this.applicationConfigService.getEndpointFor('api/updatestudentgroup/' + this.courseid), student).subscribe(() => {});
   }
+  removeSt(student: any): void {
+    this.confirmationService.confirm({
+      message: 'Etes vous sur de vouloir supprimer cet étudiant',
+      accept: () => {
+        this.blocked = true;
+
+        this.http.put(this.applicationConfigService.getEndpointFor('api/deletestudentgroup/' + this.courseid), student).subscribe(() => {
+          this.loadEtudiants();
+          this.blocked = false;
+        });
+      },
+    });
+  }
 
   gotoUE(): void {
     this.router.navigateByUrl('course/' + this.courseid);
   }
   loadEtudiants(): void {
     this.http.get(this.applicationConfigService.getEndpointFor('api/getstudentcours/' + this.courseid)).subscribe(s => {
-      // eslint-disable-next-line no-console
       this.students = s as any;
     });
   }
