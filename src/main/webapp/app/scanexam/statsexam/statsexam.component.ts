@@ -664,7 +664,6 @@ export class StatsExamComponent implements OnInit {
     } else {
       this.activeIndex = 1;
     }
-    console.log(this.activeIndex);
     this.displayBasic = true;
   }
 }
