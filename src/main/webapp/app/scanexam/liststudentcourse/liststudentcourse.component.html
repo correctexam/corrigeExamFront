@@ -36,6 +36,7 @@
             <th>PRENOM</th>
             <th>MAIL</th>
             <th>GROUPE</th>
+            <th>SUPPRIMER</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-student>
@@ -89,6 +90,11 @@
                   <input type="text" [(ngModel)]="student.groupe" (change)="updateStudentgroup(student)" pInputText />
                 </ng-template>
               </p-inplace>
+            </td>
+            <td>
+              <button class="btn btn-danger" (click)="removeSt(student)">
+                <fa-icon icon="times"></fa-icon>
+              </button>
             </td>
           </tr>
         </ng-template>
