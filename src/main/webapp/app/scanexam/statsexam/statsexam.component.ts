@@ -52,12 +52,12 @@ export class StatsExamComponent implements OnInit {
   data_radar_courant!: IRadar;
   etudiantSelec: StudentRes | null | undefined;
   listeMobileEtudiant: StudSelecMobile[] = [];
-  mobileSortChoices = [
+  mobileSortChoices: ISortMobile[] = [
     { icon: 'pi pi-id-card', sort: 'ine' },
     { icon: 'pi pi-sort-alpha-up', sort: 'alpha' },
     { icon: 'pi pi-sort-numeric-up', sort: 'note' },
   ];
-  mobileSortChoice: any;
+  mobileSortChoice: ISortMobile = this.mobileSortChoices[2];
   knobsCourants: string[] = [];
   COLOR_KNOBS = BLEU_AERO_TIEDE;
   idQuestionSelected: number = 0;
@@ -157,7 +157,13 @@ export class StatsExamComponent implements OnInit {
   }
 
   public changementTriMobile(): void {
-    this.clickColonneTableau(this.mobileSortChoice.sort);
+    const evenement: ISort = {
+      data: this.infosStudents,
+      mode: 'single',
+      field: this.mobileSortChoice.sort,
+      order: this.choixTri ? 1 : -1,
+    };
+    this.triSelection(evenement);
     this.initMobileSelection();
   }
 
@@ -437,6 +443,7 @@ export class StatsExamComponent implements OnInit {
     this.data_radar_courant = this.initGlobalRadarData(this.q_notees, true);
     this.updateKnobs();
     this.updateCarteRadar();
+    this.changementTriMobile();
   }
 
   private initMobileSelection(): void {
@@ -518,17 +525,6 @@ export class StatsExamComponent implements OnInit {
 
   private basicDataset(label: string, couleurForte: string, couleurLegere: string, data: number[]): IRadarDataset {
     return this.radarDataset(label, couleurLegere, couleurForte, couleurForte, BLANC, BLANC, GRIS, data);
-  }
-
-  private resumeExam(): string {
-    const totalPoints: string = this.getBaremeExam().toString();
-    const moyenne: string = this.getMoyenneExam().toFixed(2).toString();
-    const mediane: string = this.getMedianeExam().toFixed(2).toString();
-    const ecarttype: string = this.getEcartTypeExam().toFixed(2).toString();
-    const maxNote: string = this.getMaxNoteExam().toString();
-    const minNote: string = this.getMinNoteExam().toString();
-    const resume: string = `Moyenne de l'examen: <b>${moyenne}</b>/${totalPoints}<br>Écart type de l'examen : σ=<b>${ecarttype}</b><br>Médiane de l'examen : <b>${mediane}</b>/${totalPoints}<br>Note la plus élevée : <b>${maxNote}</b>/${totalPoints}<br>Note la plus basse : <b>${minNote}</b>/${totalPoints}<br>`;
-    return resume;
   }
 
   public toggleRadar(): void {
@@ -617,13 +613,23 @@ export class StatsExamComponent implements OnInit {
     this.clickColonneTableau('note');
   }
 
+  /**
+   *
+   * @warning méthode non fiable à n'utiliser que pour le style.  La version localhost fontionne, mais pas sa version en production
+   */
   private clickColonneTableau(id: string): void {
-    const f = document.querySelector('th[ng-reflect-field=' + id + ']');
-    if (f === null) {
+    const es = document.getElementById('selectstudent')?.getElementsByClassName('p-element p-sortable-column');
+    if (es === undefined) {
       return;
     }
-    f.id = 'order-' + id;
-    document.getElementById('order-' + id)?.click();
+    for (let i = 0; i < es.length; i++) {
+      const e = es[i];
+      if (e.getAttribute('psortablecolumn') === id) {
+        e.id = 'order-' + id;
+        document.getElementById('order-' + id)?.click();
+        break;
+      }
+    }
   }
 
   public selectQuestion(idQuestion: number): void {
@@ -666,6 +672,10 @@ export class StatsExamComponent implements OnInit {
     }
     this.displayBasic = true;
   }
+}
+export interface ISortMobile {
+  icon: string;
+  sort: string;
 }
 export interface StudSelecMobile {
   name: string;
