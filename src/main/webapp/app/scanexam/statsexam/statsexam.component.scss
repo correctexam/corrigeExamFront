@@ -180,3 +180,9 @@
   background-color: #2196f3;
   transition: width 1s ease-in-out;
 }
+
+a.disabled {
+  //  color: gray;
+  cursor: not-allowed;
+  //  text-decoration: underline;
+}

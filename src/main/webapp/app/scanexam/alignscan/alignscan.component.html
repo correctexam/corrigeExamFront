@@ -15,13 +15,13 @@
           type="submit"
           id="save-entity"
           data-cy="entityCreateSaveButton"
-          class="btn btn-primary"
+          class="p-button p-button-primary"
           (click)="gotoUE()"
         >
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Retourner à l'exam</span>
         </button>
 
-        <button (click)="process()" class="btn btn-primary" [disabled]="!loaded">
+        <button (click)="process()" class="p-button p-button-primary" [disabled]="!loaded">
           <fa-icon [icon]="faObjectGroup"></fa-icon>&nbsp;<span>Alignement des scans</span>
         </button>
       </div>
