@@ -7,27 +7,14 @@
   <div class="col-8">
     <div class="grid grid-nogutter">
       <div class="col-8">
-        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">
-          Votre copie: <span *ngFor="let st of selectionStudents"> {{ st.name }} {{ st.firstname }}</span> (Note:
-          {{ note | async | number: '1.2-2' }})
-        </h2>
+        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading"></h2>
       </div>
       <div class="col-4 flex flex-row-reverse"></div>
     </div>
     <div class="col-12 md:col-12">
       <div class="grid align-items-center">
         <div class="col-1"></div>
-        <div class="col-7">
-          <p-paginator
-            [currentPageReportTemplate]="'{currentPage} question sur {totalPages} questions(s)'"
-            [rows]="1"
-            [first]="questionno"
-            [totalRecords]="nbreQuestions!"
-            (onPageChange)="changeQuestion($event)"
-            [showJumpToPageDropdown]="true"
-            [showPageLinks]="false"
-          ></p-paginator>
-        </div>
+        <div class="col-7"></div>
         <div class="col-4 grid justify-content-end"></div>
       </div>
 
@@ -40,17 +27,6 @@
             <div>
               <canvas [hidden]="!showImage[i]" #nomImage></canvas>
             </div>
-          </div>
-          <div style="padding-bottom: 2rem"></div>
-          <div class="d-flex justify-content-center">
-            Voir des exemples de solutions correctes pour cette question :&nbsp;<span *ngFor="let item of bestSolutions; let index = index"
-              ><a target="_blank" [routerLink]="item">{{ index + 1 }}</a> <span *ngIf="index !== bestSolutions.length - 1">, </span></span
-            >
-            <span *ngIf="bestSolutions.length === 0"> Aucune bonne solution identifiée</span>
-          </div>
-          <div style="padding-bottom: 1rem"></div>
-          <div class="d-flex justify-content-center">
-            <a target="_blank" [href]="getEmail()">Echange avec l'équipe pédagogique suite à une incompréhension de la correction</a>
           </div>
         </div>
 
@@ -67,30 +43,6 @@
             <p-rating [disabled]="true" *ngIf="noteSteps > 0" [stars]="noteSteps" [(ngModel)]="currentNote"></p-rating>
             Note attribuée: {{ currentNote / questionStep }}
             <!--  <p-button icon="pi pi-refresh"></p-button>-->
-          </div>
-          <div>
-            <div *ngIf="currentQuestion && currentQuestion?.gradeType === 'DIRECT'">
-              <div *ngFor="let comment of currentTextComment4Question | sort: 'checked'" class="card" [style]="getStyle(comment)">
-                <div class="card-body">
-                  <h5 class="card-title">{{ comment.text }}</h5>
-                  <p class="card-text">{{ comment.description }}</p>
-                </div>
-              </div>
-            </div>
-            <div *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
-              <div *ngFor="let comment of currentGradedComment4Question | sort: 'checked'" class="card" [style]="getStyle(comment)">
-                <div class="card-body">
-                  <h5 class="card-title">{{ comment.text }}</h5>
-                  <p class="card-text">{{ comment.description }}</p>
-                  <p class="card-text" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
-                    Note associée à ce commentaire :
-                    <span *ngIf="currentQuestion && currentQuestion?.gradeType === 'NEGATIVE'"> - </span
-                    ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'POSITIVE'"> + </span
-                    >{{ comment.grade! / questionStep }}
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

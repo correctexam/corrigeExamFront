@@ -8,17 +8,7 @@
 
 // http://localhost:9000/copie/d6680b56-36a5-4488-ac5b-c862096bc311/1
 
-import {
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  OnInit,
-  QueryList,
-  ViewChildren,
-  AfterViewInit,
-  HostListener,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, AfterViewInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 import { ExamService } from 'app/entities/exam/service/exam.service';
@@ -26,7 +16,7 @@ import { StudentService } from 'app/entities/student/service/student.service';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AlignImagesService } from '../services/align-images.service';
-import { db } from '../db/dbstudent';
+import { db } from '../db/dbreponse';
 import { IExam } from '../../entities/exam/exam.model';
 // import { ICourse } from 'app/entities/course/course.model';
 import { IStudent } from '../../entities/student/student.model';
@@ -36,8 +26,6 @@ import { QuestionService } from '../../entities/question/service/question.servic
 import { IQuestion } from '../../entities/question/question.model';
 import { IStudentResponse } from '../../entities/student-response/student-response.model';
 import { StudentResponseService } from 'app/entities/student-response/service/student-response.service';
-import { EventCanevasVoirCopieHandlerService } from './event-canevasvoircopie-handler.service';
-import { ZoneVoirCopieHandler } from './ZoneVoirCopieHandler';
 import { GradeType } from '../../entities/enumerations/grade-type.model';
 import { ITextComment } from '../../entities/text-comment/text-comment.model';
 import { IGradedComment } from '../../entities/graded-comment/graded-comment.model';
@@ -51,23 +39,20 @@ import { IExamSheet } from '../../entities/exam-sheet/exam-sheet.model';
 import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 import { TemplateService } from '../../entities/template/service/template.service';
 import { ITemplate } from 'app/entities/template/template.model';
-import { ApplicationConfigService } from 'app/core/config/application-config.service';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
-  selector: 'jhi-voircopie',
-  templateUrl: './voircopie.component.html',
-  styleUrls: ['./voircopie.component.scss'],
+  selector: 'jhi-voirreponse',
+  templateUrl: './voirreponse.component.html',
+  styleUrls: ['./voirreponse.component.scss'],
   providers: [ConfirmationService, MessageService],
 })
-export class VoirCopieComponent implements OnInit, AfterViewInit {
+export class VoirReponseComponent implements OnInit, AfterViewInit {
   public href = '';
 
   @ViewChildren('nomImage')
   canvass!: QueryList<ElementRef>;
   showImage: boolean[] = [];
   nbreFeuilleParCopie: number | undefined;
-  numberPagesInScan: number | undefined;
   exam: IExam | undefined;
   // course: ICourse | undefined;
   // students: IStudent[] | undefined;
@@ -115,11 +100,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   alignement = 'marker';
   template!: ITemplate;
   pdfcontent!: string;
-  currentZoneVoirCopieHandler: ZoneVoirCopieHandler | undefined;
   constructor(
-    protected applicationConfigService: ApplicationConfigService,
-    private http: HttpClient,
-
     public examService: ExamService,
     public zoneService: ZoneService,
     //    public courseService: CourseService,
@@ -136,7 +117,6 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     public textCommentService: TextCommentService,
     public studentResponseService: StudentResponseService,
     private changeDetector: ChangeDetectorRef,
-    private eventHandler: EventCanevasVoirCopieHandlerService,
     public finalResultService: FinalResultService,
     private pdfService: NgxExtendedPdfViewerService,
     private templateService: TemplateService
@@ -151,63 +131,46 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
       this.noteSteps = 0;
       this.maxNote = 0;
       this.resp = undefined;
-      //      'answer/:examid/:questionno/:studentid',
-      if (params.get('uuid') !== null) {
-        this.uuid = params.get('uuid')!;
-        this.sheetService.query({ name: params.get('uuid') }).subscribe(s => {
-          this.sheet = s.body![0];
-          this.currentStudent = this.sheet.pagemin! / (this.sheet.pagemax! - this.sheet.pagemin! + 1);
+      if (params.get('base64uuid') !== null) {
+        const base64uuid = params.get('base64uuid')!;
+        const uuiddecode = atob(base64uuid);
+        const param = uuiddecode.split('/');
+        if (param.length > 2) {
+          this.uuid = param[1];
+          this.sheetService.query({ name: this.uuid }).subscribe(s => {
+            this.sheet = s.body![0];
+            this.currentStudent = this.sheet.pagemin! / (this.sheet.pagemax! - this.sheet.pagemin! + 1);
 
-          this.studentService.query({ sheetId: this.sheet.id }).subscribe(studentsr => {
-            this.selectionStudents = studentsr.body!;
-            this.examService
-              .query({
-                scanId: this.sheet!.scanId,
-              })
-              .subscribe(ex2 => {
-                this.exam = ex2.body![0];
-                if (
-                  this.selectionStudents !== undefined &&
-                  this.selectionStudents.length > 0 &&
-                  this.selectionStudents[0].id !== undefined
-                ) {
-                  this.finalResultService
-                    .query({ examId: this.exam.id, studentId: this.selectionStudents![0].id })
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-                    .subscribe(bo => this.resolve(bo.body![0].note! / 100));
-                }
+            this.studentService.query({ sheetId: this.sheet.id }).subscribe(studentsr => {
+              this.selectionStudents = studentsr.body!;
+              this.examService
+                .query({
+                  scanId: this.sheet!.scanId,
+                })
+                .subscribe(ex2 => {
+                  this.exam = ex2.body![0];
+                  if (
+                    this.selectionStudents !== undefined &&
+                    this.selectionStudents.length > 0 &&
+                    this.selectionStudents[0].id !== undefined
+                  ) {
+                    this.questionno = +param[2] - 1;
 
-                if (params.get('questionno') !== null) {
-                  this.questionno = +params.get('questionno')! - 1;
-                  this.populateBestSolutions();
+                    // Step 1 Query templates
 
-                  // Step 1 Query templates
-
-                  this.nbreFeuilleParCopie = this.sheet!.pagemax! - this.sheet!.pagemin! + 1;
-                  // Step 2 Query Scan in local DB
-                  db.alignImages
-                    .where('examId')
-                    .equals(this.exam!.id!)
-                    .count()
-                    .then(e1 => {
-                      if (e1 === 0) {
-                        this.populateCache();
-                      } else {
-                        this.numberPagesInScan = e1;
-                        this.finalize();
-                      }
-                    });
-                }
-              });
+                    this.nbreFeuilleParCopie = this.sheet!.pagemax! - this.sheet!.pagemin! + 1;
+                    // Step 2 Query Scan in local DB
+                    this.populateCache();
+                  }
+                });
+            });
           });
-        });
+        }
       }
     });
   }
 
   finalize() {
-    // this.courseService.find(this.exam!.courseId!).subscribe(e => (this.course = e.body!));
-
     // Step 4 Query zone 4 questions
     this.blocked = false;
     this.questionService.query({ examId: this.exam!.id }).subscribe(b =>
@@ -263,46 +226,9 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
           this.showImage[i] = b;
         },
         this.canvass.get(i),
-        this.currentStudent,
-        i
+        this.currentStudent
       );
     });
-  }
-
-  checked(comment: ITextComment | IGradedComment): boolean {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return (comment as any).checked;
-  }
-
-  getStyle(comment: ITextComment | IGradedComment): any {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    if ((comment as any).checked) {
-      return { 'background-color': '#DCDCDC' };
-    } else {
-      return {};
-    }
-  }
-
-  @HostListener('window:keydown.shift.ArrowLeft', ['$event'])
-  previousQuestion(event: KeyboardEvent): void {
-    event.preventDefault();
-    const q = this.questionno;
-    if (q > 0) {
-      this.router.navigateByUrl('/copie/' + this.uuid + '/' + q);
-    }
-  }
-  @HostListener('window:keydown.shift.ArrowRight', ['$event'])
-  nextQuestion(event: KeyboardEvent): void {
-    event.preventDefault();
-    const q = this.questionno + 2;
-    if (q <= this.nbreQuestions) {
-      this.router.navigateByUrl('/copie/' + this.uuid + '/' + q);
-    }
-  }
-
-  changeQuestion($event: any): void {
-    this.questionno = $event.page;
-    this.router.navigateByUrl('/copie/' + this.uuid + '/' + (this.questionno + 1));
   }
 
   private reviver(key: any, value: any): any {
@@ -318,14 +244,13 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     zoneId: number | undefined,
     showImageRef: (s: boolean) => void,
     imageRef: ElementRef<any> | undefined,
-    currentStudent: number,
-    index: number
+    currentStudent: number
   ): Promise<IZone | undefined> {
     return new Promise<IZone | undefined>(resolve => {
       if (zoneId) {
         this.zoneService.find(zoneId).subscribe(e => {
           this.getAllImage4Zone(currentStudent! * this.nbreFeuilleParCopie! + e.body!.pageNumber!, e.body!).then(p => {
-            this.displayImage(p, imageRef, showImageRef, index);
+            this.displayImage(p, imageRef, showImageRef);
             resolve(e.body!);
           });
         });
@@ -335,7 +260,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     });
   }
 
-  displayImage(v: ImageZone, imageRef: ElementRef<any> | undefined, show: (s: boolean) => void, index: number): void {
+  displayImage(v: ImageZone, imageRef: ElementRef<any> | undefined, show: (s: boolean) => void): void {
     if (imageRef !== undefined) {
       imageRef!.nativeElement.width = v.w;
       imageRef!.nativeElement.height = v.h;
@@ -343,31 +268,6 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
       ctx1.putImageData(v.i, 0, 0);
       //  this.addEventListeners( imageRef!.nativeElement)
       show(true);
-
-      if (this.currentZoneVoirCopieHandler === undefined) {
-        const zh = new ZoneVoirCopieHandler(
-          '' + this.exam!.id + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index,
-          this.eventHandler,
-          this.resp?.id
-        );
-        zh.updateCanvas(imageRef!.nativeElement);
-        this.currentZoneVoirCopieHandler = zh;
-      } else {
-        if (
-          this.currentZoneVoirCopieHandler.zoneid ===
-          '' + this.exam!.id + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index
-        ) {
-          this.currentZoneVoirCopieHandler.updateCanvas(imageRef!.nativeElement);
-        } else {
-          const zh = new ZoneVoirCopieHandler(
-            '' + this.exam!.id + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index,
-            this.eventHandler,
-            this.resp?.id
-          );
-          zh.updateCanvas(imageRef!.nativeElement);
-          this.currentZoneVoirCopieHandler = zh;
-        }
-      }
     }
   }
 
@@ -490,7 +390,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     this.loaded = true;
     if (this.phase1) {
       if (this.pdfService.numberOfPages() !== 0) {
-        this.numberPagesInScan = this.pdfService.numberOfPages();
+        //   this.numberPagesInScan = this.pdfService.numberOfPages();
         this.exportAsImage();
       }
     }
@@ -696,43 +596,5 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     } else {
       return value;
     }
-  }
-  getEmail(): string {
-    if (this.selectionStudents !== undefined && this.exam !== undefined && this.questions !== undefined) {
-      const firsName = this.selectionStudents![0].firstname!;
-      const lastName = this.selectionStudents![0].name!;
-      const examName = this.exam!.name!;
-      const questionNumero = this.questions![0].numero!;
-      const url = window.location.href;
-      const t = `Bonjour,%0D%0A
-je m'appelle ${firsName} ${lastName},%0D%0A
-J'ai passé l'examen ${examName}. En regardant le corrigé de la question ${questionNumero} accessible ici (${url}), je ne comprends pas mon erreur.%0D%0A
-%0D%0A%0D%0A
-///EXPLIQUER VOTRE PROBLEME///%0D%0A
-%0D%0A%0D%0A
-Merci par avance pour le temps pris pour répondre à cet email.%0D%0A
-Cordialement,%0D%0A
-${firsName}
-`;
-
-      return "mailto:?subject=Retour sur l'examen " + this.exam!.name + '&body=' + t;
-    } else {
-      return '';
-    }
-  }
-
-  bestSolutions: string[] = [];
-
-  populateBestSolutions(): void {
-    this.http
-      .get<string[]>(this.applicationConfigService.getEndpointFor('api/getBestAnswer/' + this.exam?.id + '/' + (this.questionno + 1)))
-      .subscribe(s => {
-        console.log(s);
-        const result: string[] = [];
-        s.forEach(s1 => {
-          result.push('/reponse/' + btoa('/' + s1 + '/' + (this.questionno + 1) + '/'));
-        });
-        this.bestSolutions = result;
-      });
   }
 }

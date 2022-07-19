@@ -63,6 +63,7 @@ import { ChartModule } from 'primeng/chart';
 import { KnobModule } from 'primeng/knob';
 import { DropdownModule } from 'primeng/dropdown';
 import { ToggleButtonModule } from 'primeng/togglebutton';
+import { VoirReponseComponent } from './voirreponse/voirreponse.component';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -214,6 +215,14 @@ export const VoirCopieEtudiants_ROUTE: Route = {
   },
 };
 
+export const VoirReponseEtudiants_ROUTE: Route = {
+  path: 'reponse/:base64uuid',
+  component: VoirReponseComponent,
+  data: {
+    pageTitle: 'home.voirreponse',
+  },
+};
+
 export const ShowResults_ROUTE: Route = {
   path: 'showresults/:examid',
   canActivate: [UserRouteAccessService],
@@ -249,6 +258,7 @@ export const ShowResults_ROUTE: Route = {
     ResultatStudentcourseComponent,
     ArraySortPipe,
     StatsExamComponent,
+    VoirReponseComponent,
   ],
   imports: [
     CommonModule,
@@ -302,6 +312,7 @@ export const ShowResults_ROUTE: Route = {
       VoirCopieEtudiants_ROUTE,
       ShowResults_ROUTE,
       STATS_ROUTE,
+      VoirReponseEtudiants_ROUTE,
     ]),
   ],
   exports: [
