@@ -27,6 +27,8 @@
     "studentbindings": "Association des scans avec les étudiants",
     "answer": "Corriger votre examen",
     "voircopie": "Voir votre copie",
-    "stats": "Statistiques de l'examen"
+    "voirreponse": "Voir une réponse particulière",
+    "stats": "Statistiques de l'examen",
+    "voirreponsesstarunstar": "Voir les réponses représentatives"
   }
 }

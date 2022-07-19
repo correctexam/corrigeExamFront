@@ -20,6 +20,7 @@
       "id": "ID",
       "note": "Note",
       "star": "Star",
+      "worststar": "Bad answer",
       "comments": "Comments",
       "question": "Question",
       "sheet": "Sheet",

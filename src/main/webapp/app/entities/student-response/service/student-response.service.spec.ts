@@ -22,6 +22,8 @@ describe('StudentResponse Service', () => {
     elemDefault = {
       id: 0,
       note: 0,
+      star: false,
+      worststar: false,
     };
   });
 
@@ -58,6 +60,8 @@ describe('StudentResponse Service', () => {
         {
           id: 1,
           note: 1,
+          star: true,
+          worststar: true,
         },
         elemDefault
       );
@@ -72,7 +76,12 @@ describe('StudentResponse Service', () => {
     });
 
     it('should partial update a StudentResponse', () => {
-      const patchObject = Object.assign({}, new StudentResponse());
+      const patchObject = Object.assign(
+        {
+          star: true,
+        },
+        new StudentResponse()
+      );
 
       const returnedFromService = Object.assign(patchObject, elemDefault);
 
@@ -90,6 +99,8 @@ describe('StudentResponse Service', () => {
         {
           id: 1,
           note: 1,
+          star: true,
+          worststar: true,
         },
         elemDefault
       );
@@ -141,7 +152,7 @@ describe('StudentResponse Service', () => {
       });
 
       it('should add only unique StudentResponse to an array', () => {
-        const studentResponseArray: IStudentResponse[] = [{ id: 123 }, { id: 456 }, { id: 53544 }];
+        const studentResponseArray: IStudentResponse[] = [{ id: 123 }, { id: 456 }, { id: 28658 }];
         const studentResponseCollection: IStudentResponse[] = [{ id: 123 }];
         expectedResult = service.addStudentResponseToCollectionIfMissing(studentResponseCollection, ...studentResponseArray);
         expect(expectedResult).toHaveLength(3);

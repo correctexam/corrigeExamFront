@@ -27,6 +27,8 @@
     "studentbindings": "Bind your scan with students",
     "answer": "Correct your exam",
     "voircopie": "Show your sheet",
-    "stats": "Exam statistics"
+    "stats": "Exam statistics",
+    "voirreponse": "Show a specific answer",
+    "voirreponsesstarunstar": "Show representative answers"
   }
 }
