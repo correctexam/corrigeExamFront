@@ -20,7 +20,7 @@
   justify-content: space-around;
 }
 
-@media (min-width: 1100px) {
+@media (min-width: 1350px) {
   #statgen {
     order: 1;
   }
@@ -41,7 +41,7 @@
     display: none;
   }
 }
-@media (max-width: 1100px) {
+@media (max-width: 1350px) {
   .cards {
     flex-direction: column;
   }
