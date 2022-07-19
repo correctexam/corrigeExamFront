@@ -128,7 +128,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (this.examId !== params.get('examid')! || this.images.length === 0) {
           this.examId = params.get('examid')!;
           this.loadAllPages();
-          console.log('pass par la');
           forceRefreshStudent = true;
         }
         this.examId = params.get('examid')!;

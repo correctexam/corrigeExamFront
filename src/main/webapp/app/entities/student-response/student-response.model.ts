@@ -6,6 +6,7 @@ export interface IStudentResponse {
   id?: number;
   note?: number;
   star?: boolean;
+  worststar?: boolean;
   comments?: IComments[];
   questionNumero?: string;
   questionId?: number;
@@ -20,6 +21,7 @@ export class StudentResponse implements IStudentResponse {
     public id?: number,
     public note?: number,
     public star?: boolean,
+    public worststar?: boolean,
     public comments?: IComments[],
     public questionNumero?: string,
     public questionId?: number,
@@ -29,6 +31,7 @@ export class StudentResponse implements IStudentResponse {
     public gradedcomments?: IGradedComment[] | null
   ) {
     this.star = this.star ?? false;
+    this.worststar = this.worststar ?? false;
   }
 }
 
