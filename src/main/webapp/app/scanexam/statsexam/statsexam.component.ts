@@ -157,6 +157,8 @@ export class StatsExamComponent implements OnInit {
   }
 
   public changementTriMobile(): void {
+    // Clic automatique qui permet de modifier l'affichage de la sélection dans le tableau (si l'utilisateur rebascule de vue)
+    this.clickColonneTableau(this.mobileSortChoice.sort);
     const evenement: ISort = {
       data: this.infosStudents,
       mode: 'single',
@@ -609,8 +611,6 @@ export class StatsExamComponent implements OnInit {
     for (let i = 0; i < e.length; i++) {
       e[i].setAttribute('style', 'padding:0px;');
     }
-    // Permet dès le chargement de voir que l'ordre sélectionné est celui des notes
-    this.clickColonneTableau('note');
   }
 
   /**
