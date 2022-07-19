@@ -17,7 +17,7 @@
           type="submit"
           id="save-entity"
           data-cy="entityCreateSaveButton"
-          class="btn btn-primary"
+          class="p-button p-button-primary"
           (click)="gotoUE()"
         >
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Retourner au module</span>
@@ -74,7 +74,7 @@
           id="save-entity"
           data-cy="entityCreateSaveButton"
           [disabled]="editForm.invalid || isSaving"
-          class="btn btn-primary"
+          class="p-button p-button-primary"
         >
           <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
         </button>

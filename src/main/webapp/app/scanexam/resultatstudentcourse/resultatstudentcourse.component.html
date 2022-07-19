@@ -33,7 +33,7 @@
         type="submit"
         id="save-entity"
         data-cy="entityCreateSaveButton"
-        class="btn btn-primary"
+        class="p-button p-button-primary"
         (click)="envoiEmailEtudiant()"
       >
         <fa-icon [icon]="faEnvelope"></fa-icon>&nbsp;<span>Envoi mail étudiants</span>
@@ -52,7 +52,7 @@
           type="submit"
           id="save-entity"
           data-cy="entityCreateSaveButton"
-          class="btn btn-primary"
+          class="p-button p-button-primary"
           (click)="gotoUE()"
         >
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Retourner à l'exam</span>
@@ -62,7 +62,7 @@
           type="submit"
           id="save-entity"
           data-cy="entityCreateSaveButton"
-          class="btn btn-primary"
+          class="p-button p-button-primary"
           (click)="showEmailStudent()"
         >
           <fa-icon [icon]="faEnvelope"></fa-icon>&nbsp;<span>Envoi mail étudiants</span>
@@ -72,21 +72,34 @@
           type="submit"
           id="save-entity"
           data-cy="entityCreateSaveButton"
-          class="btn btn-primary"
+          class="p-button p-button-primary"
           (click)="exportExcel()"
         >
           <fa-icon [icon]="faEnvelope"></fa-icon>&nbsp;<span>Export Excel</span>
         </button>
-        <button
+
+        <a class="p-button p-button-primary" pButton [routerLink]="'/statistics/' + this.examid" type="button" *ngIf="this.examid">
+          <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span>Show statistics</span>
+        </a>
+        <a
+          *ngIf="!this.examid"
+          class="disabled p-button p-button-primary"
+          pButton
+          type="button"
+          label="Correction"
+          icon="fatemperaturethreequarters"
+        ></a>
+
+        <!--        <button
           [disabled]="!this.examid"
           type="submit"
           id="save-entity"
           data-cy="entityCreateSaveButton"
-          class="btn btn-primary"
+          class="p-button p-button-primary"
           [routerLink]="'/statistics/' + this.examid"
         >
           <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span>Show statistics</span>
-        </button>
+        </button>-->
       </div>
     </div>
     <div class="col-12 md:col-12">

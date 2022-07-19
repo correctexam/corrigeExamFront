@@ -37,7 +37,7 @@
           type="submit"
           id="save-entity"
           data-cy="entityCreateSaveButton"
-          class="btn btn-primary"
+          class="p-button p-button-primary"
           (click)="gotoUE()"
         >
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Retourner à l'exam</span>
@@ -168,8 +168,8 @@
                     />
                   </ng-template>
                 </p-inplace>
-                <a *ngIf="!checked(comment)" class="btn btn-primary" (click)="ajouterTComment(comment)">Ajouter</a>
-                <a *ngIf="checked(comment)" class="btn btn-primary" (click)="retirerTComment(comment)">Retirer</a>
+                <a *ngIf="!checked(comment)" class="p-button p-button-primary" (click)="ajouterTComment(comment)">Ajouter</a>
+                <a *ngIf="checked(comment)" class="p-button p-button-primary" (click)="retirerTComment(comment)">Retirer</a>
               </div>
             </div>
           </div>
@@ -226,8 +226,8 @@
                   </ng-template>
                 </p-inplace>
 
-                <a *ngIf="!checked(comment)" class="btn btn-primary" (click)="ajouterGComment(comment)">Ajouter</a>
-                <a *ngIf="checked(comment)" class="btn btn-primary" (click)="retirerGComment(comment)">Retirer</a>
+                <a *ngIf="!checked(comment)" class="p-button p-button-primary" (click)="ajouterGComment(comment)">Ajouter</a>
+                <a *ngIf="checked(comment)" class="p-button p-button-primary" (click)="retirerGComment(comment)">Retirer</a>
               </div>
             </div>
           </div>
@@ -255,7 +255,7 @@
                     >{{ noteCommentaire / questionStep }}</span
                   >
                 </p>
-                <a class="btn btn-primary" (click)="addComment()">Ajouter et appliquer</a>
+                <a class="p-button p-button-primary" (click)="addComment()">Ajouter et appliquer</a>
               </div>
             </div>
           </div>

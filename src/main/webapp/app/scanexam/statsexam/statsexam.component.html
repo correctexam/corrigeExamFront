@@ -194,7 +194,28 @@
             label="Voir la copie"
             icon="pi pi-file"
           ></button>
-          <button
+          <a
+            [routerLink]="['Other']"
+            class="p-element p-button p-component p-button-raised p-button-text"
+            pButton
+            [routerLink]="
+              '/answer/' + this.examid + '/' + (this.idQuestionSelected + 1) + '/' + this.etudiantSelec?.studentNumber?.toString()
+            "
+            type="button"
+            label="Correction"
+            icon="pi pi-external-link"
+            *ngIf="!(etudiantSelec === null || etudiantSelec == undefined)"
+          ></a>
+          <a
+            *ngIf="etudiantSelec === null || etudiantSelec == undefined"
+            class="disabled p-element p-button-raised p-button-text p-button p-component"
+            pButton
+            type="button"
+            label="Correction"
+            icon="pi pi-external-link"
+          ></a>
+
+          <!--<button
             [disabled]="etudiantSelec === null || etudiantSelec == undefined"
             pButton
             (click)="goToCorrection()"
@@ -203,7 +224,7 @@
             id="radarChoice"
             label="Correction"
             icon="pi pi-external-link"
-          ></button>
+          ></button>-->
         </div>
       </ng-template>
     </p-card>
