@@ -43,7 +43,10 @@
           </div>
           <div style="padding-bottom: 2rem"></div>
           <div class="d-flex justify-content-center">
-            <a target="_blank" [href]="getEmail()">Voir exemple solution correcte pour cette question</a>
+            Voir des exemples de solutions correctes pour cette question :&nbsp;<span *ngFor="let item of bestSolutions; let index = index"
+              ><a target="_blank" [routerLink]="item">{{ index + 1 }}</a> <span *ngIf="index !== bestSolutions.length - 1">, </span></span
+            >
+            <span *ngIf="bestSolutions.length === 0"> Aucune bonne solution identifiée</span>
           </div>
           <div style="padding-bottom: 1rem"></div>
           <div class="d-flex justify-content-center">

@@ -51,6 +51,8 @@ import { IExamSheet } from '../../entities/exam-sheet/exam-sheet.model';
 import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 import { TemplateService } from '../../entities/template/service/template.service';
 import { ITemplate } from 'app/entities/template/template.model';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'jhi-voircopie',
@@ -115,6 +117,9 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   pdfcontent!: string;
   currentZoneVoirCopieHandler: ZoneVoirCopieHandler | undefined;
   constructor(
+    protected applicationConfigService: ApplicationConfigService,
+    private http: HttpClient,
+
     public examService: ExamService,
     public zoneService: ZoneService,
     //    public courseService: CourseService,
@@ -174,6 +179,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
 
                 if (params.get('questionno') !== null) {
                   this.questionno = +params.get('questionno')! - 1;
+                  this.populateBestSolutions();
 
                   // Step 1 Query templates
 
@@ -713,5 +719,20 @@ ${firsName}
     } else {
       return '';
     }
+  }
+
+  bestSolutions: string[] = [];
+
+  populateBestSolutions(): void {
+    this.http
+      .get<string[]>(this.applicationConfigService.getEndpointFor('api/getBestAnswer/' + this.exam?.id + '/' + (this.questionno + 1)))
+      .subscribe(s => {
+        console.log(s);
+        const result: string[] = [];
+        s.forEach(s1 => {
+          result.push('/reponse/' + btoa('/' + s1 + '/' + (this.questionno + 1) + '/'));
+        });
+        this.bestSolutions = result;
+      });
   }
 }
