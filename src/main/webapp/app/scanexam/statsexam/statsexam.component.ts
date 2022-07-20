@@ -62,6 +62,7 @@ export class StatsExamComponent implements OnInit {
   COLOR_KNOBS = BLEU_AERO_TIEDE;
   idQuestionSelected: number = 0;
   questionSelectionnee: boolean = false;
+  texte_correction: string = 'Correction';
   readonly ICONSORTUP = 'pi pi-sort-amount-up-alt'; // Permet d'éviter une étrange erreur de vscode (Unexpected keyword or identifier.javascript)
 
   activeIndex = 1;
@@ -633,15 +634,13 @@ export class StatsExamComponent implements OnInit {
   }
 
   public selectQuestion(idQuestion: number): void {
-    const e = document.getElementById('selectstudent')?.getElementsByClassName('p-button-label')[1];
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (e === undefined || this.etudiantSelec == null || this.etudiantSelec === undefined) {
+    if (this.etudiantSelec == null || this.etudiantSelec === undefined) {
       return;
     }
     let q_selectionne = true;
     if (this.idQuestionSelected === idQuestion) {
       // Effet toggle
-      // idQuestion = 0;
       q_selectionne = !this.questionSelectionnee;
     }
     if (this.questionSelectionnee && document.getElementsByClassName('knobSelected').length > 0) {
@@ -649,11 +648,11 @@ export class StatsExamComponent implements OnInit {
     }
     this.idQuestionSelected = idQuestion;
     if (!q_selectionne) {
-      e.innerHTML = 'Correction';
+      this.texte_correction = 'Correction';
       this.questionSelectionnee = false;
       this.idQuestionSelected = 0;
     } else {
-      e.innerHTML = 'Correction (' + (idQuestion + 1).toString() + ')';
+      this.texte_correction = 'Correction (' + (idQuestion + 1).toString() + ')';
       const knobCard = document.getElementById('knobquest' + idQuestion.toString());
       knobCard?.setAttribute('class', 'knobQuestion knobSelected');
       this.questionSelectionnee = true;
