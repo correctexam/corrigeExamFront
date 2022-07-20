@@ -7,16 +7,12 @@
   [showItemNavigators]="true"
   [baseZIndex]="100000"
   [showThumbnails]="false"
-  [containerStyle]="{ 'max-height': '90vh' }"
   [numVisible]="7"
   [(activeIndex)]="activeIndex"
 >
   <ng-template pTemplate="item" let-item>
-    <div
-      class="grid grid-nogutter justify-content-center"
-      style="overflow-x: hidden; overflow-y: scroll; border: #000000 1px solid; height: 96vh; width: 90vw"
-    >
-      <img [src]="item.src" style="display: block" />
+    <div class="image-container">
+      <img [src]="item.src" />
     </div>
   </ng-template>
 </p-galleria>
@@ -195,6 +191,7 @@
             icon="pi pi-file"
           ></button>
           <a
+            *ngIf="etudiantSelec !== null && etudiantSelec !== undefined; else correctionDesactivee"
             [routerLink]="['Other']"
             class="p-element p-button p-component p-button-raised p-button-text"
             pButton
@@ -202,29 +199,19 @@
               '/answer/' + this.examid + '/' + (this.idQuestionSelected + 1) + '/' + this.etudiantSelec?.studentNumber?.toString()
             "
             type="button"
-            label="Correction"
-            icon="pi pi-external-link"
-            *ngIf="!(etudiantSelec === null || etudiantSelec == undefined)"
-          ></a>
-          <a
-            *ngIf="etudiantSelec === null || etudiantSelec == undefined"
-            class="disabled p-element p-button-raised p-button-text p-button p-component"
-            pButton
-            type="button"
-            label="Correction"
+            label="{{ this.texte_correction }}"
             icon="pi pi-external-link"
           ></a>
-
-          <!--<button
-            [disabled]="etudiantSelec === null || etudiantSelec == undefined"
-            pButton
-            (click)="goToCorrection()"
-            type="button"
-            class="p-button-raised p-button-text"
-            id="radarChoice"
-            label="Correction"
-            icon="pi pi-external-link"
-          ></button>-->
+          <ng-template #correctionDesactivee>
+            <button
+              [disabled]="true"
+              pButton
+              type="button"
+              class="p-button-raised p-button-text"
+              label="Correction"
+              icon="pi pi-external-link"
+            ></button>
+          </ng-template>
         </div>
       </ng-template>
     </p-card>
