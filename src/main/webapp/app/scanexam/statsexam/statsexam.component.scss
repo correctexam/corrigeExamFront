@@ -191,3 +191,30 @@ a {
   //  color: gray;
   text-decoration: none;
 }
+
+:host ::ng-deep p-galleria .p-ripple {
+  color: #2196f3;
+}
+:host ::ng-deep .p-galleria-close {
+  z-index: 1;
+}
+
+.image-container {
+  height: 90vh;
+  overflow: auto;
+  display: flex;
+}
+.image-container img {
+  width: 100%;
+}
+
+@media (max-height: 500px) {
+  .image-container {
+    flex-direction: column;
+  }
+}
+@media (min-height: 500px) {
+  .image-container {
+    flex-direction: row;
+  }
+}
