@@ -81,14 +81,22 @@
         <a class="p-button p-button-primary" pButton [routerLink]="'/statistics/' + this.examid" type="button" *ngIf="this.examid">
           <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span>Show statistics</span>
         </a>
+        <a *ngIf="!this.examid" class="disabled p-button p-button-primary" type="button" pButton>
+          <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span>Show statistics</span>
+        </a>
+
         <a
-          *ngIf="!this.examid"
-          class="disabled p-button p-button-primary"
+          class="p-button p-button-primary"
           pButton
+          [routerLink]="'/voirreponsesstarunstar/' + this.examid"
           type="button"
-          label="Correction"
-          icon="fatemperaturethreequarters"
-        ></a>
+          *ngIf="this.examid"
+        >
+          <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span>Show representative answers</span>
+        </a>
+        <a *ngIf="!this.examid" class="disabled p-button p-button-primary" pButton type="button">
+          <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span>Show representative answers</span></a
+        >
 
         <!--        <button
           [disabled]="!this.examid"

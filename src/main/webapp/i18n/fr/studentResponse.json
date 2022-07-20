@@ -20,6 +20,7 @@
       "id": "ID",
       "note": "Note",
       "star": "Star",
+      "worststar": "Mauvaise réponse remarquable",
       "comments": "Comments",
       "question": "Question",
       "sheet": "Sheet",

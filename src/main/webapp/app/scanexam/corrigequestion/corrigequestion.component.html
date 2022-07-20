@@ -105,6 +105,10 @@
             <label>Excellente réponse: </label>
             <p-inputSwitch [(ngModel)]="resp!.star" (onChange)="updateResponse()"></p-inputSwitch>
           </div>
+          <div *ngIf="resp" style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-3 xl:col-12">
+            <label>Mauvaise réponse remarquable: </label>
+            <p-inputSwitch [(ngModel)]="resp!.worststar" (onChange)="updateResponse()"></p-inputSwitch>
+          </div>
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-3 xl:col-12">
             <div class="grid">
               <div style="padding-bottom: 1rem" class="col-12">
