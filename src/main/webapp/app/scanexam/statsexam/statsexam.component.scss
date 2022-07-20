@@ -187,6 +187,11 @@ a.disabled {
   //  text-decoration: underline;
 }
 
+a {
+  //  color: gray;
+  text-decoration: none;
+}
+
 :host ::ng-deep p-galleria .p-ripple {
   color: #2196f3;
 }
