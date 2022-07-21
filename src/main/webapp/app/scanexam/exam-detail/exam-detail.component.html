@@ -1,4 +1,6 @@
 <div>
+  <p-toast></p-toast>
+
   <p-dock [model]="dockItems" position="top">
     <ng-template pTemplate="item" let-item>
       <a *ngIf="item.route" [routerLink]="item.route"><img [src]="item.icon" [alt]="item.label" width="64px" [pTooltip]="item.title" /></a>

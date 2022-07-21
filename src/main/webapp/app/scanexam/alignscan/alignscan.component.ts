@@ -23,6 +23,7 @@ import { faObjectGroup } from '@fortawesome/free-solid-svg-icons';
 
 import { db } from '../db/db';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { ExportOptions } from 'dexie-export-import';
 
 export interface IPage {
   image?: ImageData;
@@ -110,7 +111,6 @@ export class AlignScanComponent implements OnInit {
 
   async removeElement(examId: number): Promise<any> {
     await db.removeElementForExam(examId);
-    await db.removeExam(examId);
   }
 
   public pdfloaded(): void {
@@ -177,8 +177,34 @@ export class AlignScanComponent implements OnInit {
         ),
       });
     }
-    this.router.navigateByUrl('/exam/' + this.examId);
-    this.blocked = false;
+
+    const o: ExportOptions = {};
+    o.filter = (table: string, value: any) =>
+      (table === 'exams' && value.id === +this.examId) ||
+      (table === 'templates' && value.examId === +this.examId) ||
+      (table === 'nonAlignImages' && value.examId === +this.examId) ||
+      (table === 'alignImages' && value.examId === +this.examId);
+    db.export(o).then((value: Blob) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(value);
+      reader.onloadend = () => {
+        const base64data = '' + reader.result;
+        const s: IScan = {};
+        s.name = this.examId + 'indexdb.json';
+        s.contentContentType = 'application/json';
+        s.content = base64data.substr(base64data.indexOf(',') + 1)!;
+        this.scanService.create(s).subscribe(
+          () => {
+            this.blocked = false;
+            this.router.navigateByUrl('/exam/' + this.examId);
+          },
+          () => {
+            this.blocked = false;
+            this.router.navigateByUrl('/exam/' + this.examId);
+          }
+        );
+      };
+    });
   }
 
   async saveEligneImage(pageN: number, imageString: string): Promise<void> {

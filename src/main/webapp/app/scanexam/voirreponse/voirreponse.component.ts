@@ -16,7 +16,7 @@ import { StudentService } from 'app/entities/student/service/student.service';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AlignImagesService } from '../services/align-images.service';
-import { db } from '../db/dbreponse';
+import { db } from '../db/dbstudent';
 import { IExam } from '../../entities/exam/exam.model';
 // import { ICourse } from 'app/entities/course/course.model';
 import { IStudent } from '../../entities/student/student.model';
@@ -160,7 +160,17 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
 
                     this.nbreFeuilleParCopie = this.sheet!.pagemax! - this.sheet!.pagemin! + 1;
                     // Step 2 Query Scan in local DB
-                    this.populateCache();
+                    db.alignImages
+                      .where('examId')
+                      .equals(this.exam!.id!)
+                      .count()
+                      .then(e1 => {
+                        if (e1 === 0) {
+                          this.populateCache();
+                        } else {
+                          this.finalize();
+                        }
+                      });
                   }
                 });
             });
@@ -367,7 +377,41 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
     this.reloadImage();
   }
 
-  populateCache() {
+  populateCache(): Promise<void> {
+    return new Promise<void>(resolve => {
+      db.removeElementForExam(this.exam!.id!).then(() => {
+        this.scanService.query({ name: this.exam?.id + 'indexdb.json' }).subscribe(scan => {
+          if (scan.body !== null && scan.body.length > 0) {
+            const s = scan.body[0];
+            const byteCharacters1 = atob(s.content!);
+            const data = JSON.parse(byteCharacters1);
+            data.data.databaseName = 'correctExamStudent';
+            const datas = JSON.stringify(data);
+            const byteNumbers = new Array(datas.length);
+            for (let i = 0; i < datas.length; i++) {
+              byteNumbers[i] = datas.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: s.contentContentType! });
+            db.import(blob).then(() => {
+              this.finalize();
+              resolve();
+            });
+          } else {
+            if (this.exam!.templateId) {
+              this.templateService.find(this.exam!.templateId).subscribe(e1 => {
+                this.template = e1.body!;
+                this.pdfcontent = this.template.content!;
+                resolve();
+              });
+            }
+          }
+        });
+      });
+    });
+  }
+
+  /* populateCache() {
     // this.courseService.find(this.exam!.courseId!).subscribe(e => (this.course = e.body!));
     if (this.exam!.templateId) {
       this.templateService.find(this.exam!.templateId).subscribe(e1 => {
@@ -375,11 +419,10 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
         this.pdfcontent = this.template.content!;
       });
     }
-  }
+  }*/
 
   async removeElement(examId: number): Promise<any> {
     await db.removeElementForExam(examId);
-    await db.removeExam(examId);
   }
 
   public pdfloaded(): void {

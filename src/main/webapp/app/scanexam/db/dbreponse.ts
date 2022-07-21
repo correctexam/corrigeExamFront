@@ -59,7 +59,8 @@ export class AppDB extends Dexie {
   }
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   async removeElementForExam(examId: number) {
-    await db.transaction('rw', 'templates', 'alignImages', 'nonAlignImages', () => {
+    await db.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
+      db.exams.delete(examId);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       db.templates
         .where('examId')
