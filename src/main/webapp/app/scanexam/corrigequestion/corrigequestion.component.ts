@@ -136,9 +136,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (params.get('questionno') !== null) {
           this.questionno = +params.get('questionno')! - 1;
         }
-        console.log('studentid');
-        console.log(params.get('studentid'));
-        console.log(params.get('questionno'));
         if (params.get('studentid') !== null) {
           this.studentid = +params.get('studentid')!;
           this.currentStudent = this.studentid - 1;
@@ -156,12 +153,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 .equals(+this.examId!)
                 .count()
                 .then(e1 => {
-                  console.log('pass par la 2');
-
                   this.numberPagesInScan = e1;
                   this.examService.find(+this.examId!).subscribe(data => {
-                    console.log('pass par la 3');
-
                     this.exam = data.body!;
                     this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
                     // Step 3 Query Students for Exam
@@ -169,7 +162,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                     this.refreshStudentList(forceRefreshStudent).then(() => {
                       this.getSelectedStudent();
                       // Step 4 Query zone 4 questions
-                      console.log('pass par la 4');
 
                       this.blocked = false;
                       this.questionService.query({ examId: this.exam?.id }).subscribe(b =>
@@ -510,7 +502,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     await new Promise<void>(res => {
       if (force || this.students === undefined || this.students.length === 0) {
         this.studentService.query({ courseId: this.exam!.courseId }).subscribe(studentsbody => {
-          console.log('pass par la 5');
           this.students = studentsbody.body!;
           res();
         });
@@ -629,10 +620,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           .first()
           .then(e2 => {
             const image = JSON.parse(e2!.value, this.reviver);
-            /* this.images.push({
-              source: image,
-              title: 'Exam'});
-            console.log(image); */
             this.loadImage(image.pages, pageInscan).then(v => {
               let finalW = (zone.width! * v.width! * this.factor) / 100000;
               let finalH = (zone.height! * v.height! * this.factor) / 100000;
@@ -669,11 +656,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           .first()
           .then(e2 => {
             const image = JSON.parse(e2!.value, this.reviver);
-            /* this.images = [{
-              src:  image.pages,
-              alt: 'Description for Image 2',
-              title: 'Exam'}];
-            console.log(image.pages);*/
 
             this.loadImage(image.pages, pageInscan).then(v => {
               let finalW = (zone.width! * v.width! * this.factor) / 100000;

@@ -44,7 +44,6 @@ export class CoursdetailsComponent implements OnInit {
 
   ngOnInit(): void {
     // eslint-disable-next-line no-console
-    console.log(this.appConfig.getFrontUrl());
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('courseid') !== null) {
         this.examService.query({ courseId: params.get('courseid') }).subscribe(data => {

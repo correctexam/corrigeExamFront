@@ -224,7 +224,6 @@ export class AlignScanComponent implements OnInit {
   public async alignPage(page: number): Promise<number> {
     const scale = { scale: 2 };
     const dataURL = await this.pdfService.getPageAsImage(page, scale);
-    console.log('page ' + page);
     const p = await this.aligneImages(dataURL, page);
     return p.page! + 1;
   }

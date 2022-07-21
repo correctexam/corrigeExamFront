@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import Dexie, { Table } from 'dexie';
+import 'dexie-export-import';
+import { ExportOptions, ImportOptions } from 'dexie-export-import';
 
 export interface Exam {
   id?: number;
@@ -95,12 +97,17 @@ export class AppDB extends Dexie {
 
   async addAligneImage(elt: AlignImage) {
     await db.alignImages.add(elt);
-    console.log('save ' + elt.pageNumber);
   }
 
   async addNonAligneImage(elt: AlignImage) {
     await db.nonAlignImages.add(elt);
-    console.log('save na ' + elt.pageNumber);
+  }
+
+  export(options?: ExportOptions): Promise<Blob> {
+    return super.export(options);
+  }
+  import(blob: Blob, options?: ImportOptions): Promise<void> {
+    return super.import(blob, options);
   }
 }
 
