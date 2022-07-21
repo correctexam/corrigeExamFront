@@ -33,7 +33,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log(this.appConfig.getFrontUrl());
     this.accountService
       .getAuthenticationState()
       .pipe(takeUntil(this.destroy$))

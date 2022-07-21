@@ -52,7 +52,6 @@ export class ChargerscanComponent implements OnInit {
         this.examService.find(+this.examid).subscribe(c => {
           this.exam = c.body!;
           // eslint-disable-next-line no-console
-          console.log(this.exam.scanfileId);
         });
         //        this.scanService.query
       }
@@ -82,6 +81,7 @@ export class ChargerscanComponent implements OnInit {
     this.isSaving = true;
     this.blocked = true;
     const scan = this.createFromForm();
+
     if (scan.id !== undefined) {
       this.subscribeToSaveResponse(this.scanService.update(scan));
     } else {
