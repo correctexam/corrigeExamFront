@@ -906,6 +906,9 @@ Apache License
 
 
 
+dexie-export-import
+Apache-2.0
+
 dompurify
 (MPL-2.0 OR Apache-2.0)
 DOMPurify
