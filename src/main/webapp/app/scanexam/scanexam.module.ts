@@ -65,6 +65,9 @@ import { DropdownModule } from 'primeng/dropdown';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { VoirReponseComponent } from './voirreponse/voirreponse.component';
 import { VoirReponsesStarUnstarComponent } from './voirreponsesstarunstarexam/voirreponsesstarunstarexam.component';
+import { DynamicDialogModule } from 'primeng/dynamicdialog';
+import { SharecourseComponent } from './sharecourse/sharecourse.component';
+import { PickListModule } from 'primeng/picklist';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -269,6 +272,7 @@ export const ShowResults_ROUTE: Route = {
     StatsExamComponent,
     VoirReponseComponent,
     VoirReponsesStarUnstarComponent,
+    SharecourseComponent,
   ],
   imports: [
     CommonModule,
@@ -304,6 +308,8 @@ export const ShowResults_ROUTE: Route = {
     InplaceModule,
     InputTextModule,
     GalleriaModule,
+    DynamicDialogModule,
+    PickListModule,
 
     RouterModule.forChild([
       CREERCOURS_ROUTE,

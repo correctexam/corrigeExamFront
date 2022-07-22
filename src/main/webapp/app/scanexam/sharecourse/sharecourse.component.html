@@ -1,0 +1,23 @@
+<p-pickList
+  [source]="list1"
+  [target]="list2"
+  [responsive]="true"
+  sourceHeader="Professeurs disponibles"
+  targetHeader="Partage en cours"
+  [dragdrop]="true"
+  [showSourceControls]="false"
+  [showTargetControls]="false"
+  filterBy="name,firstname,login"
+  [stripedRows]="true"
+  (onMoveToTarget)="moveToTarget($event)"
+  (onMoveToSource)="moveToSource($event)"
+  (onMoveAllToTarget)="moveToTarget($event)"
+  (onMoveAllToSource)="moveToSource($event)"
+>
+  <ng-template let-user pTemplate="item">
+    <div>
+      {{ user.login }} (<span *ngIf="user.name">{{ user.name }}</span> <span *ngIf="user.firstname">{{ user.firstname }}</span
+      >)
+    </div>
+  </ng-template>
+</p-pickList>
