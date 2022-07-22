@@ -39,6 +39,7 @@ import { IExamSheet } from '../../entities/exam-sheet/exam-sheet.model';
 import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 import { TemplateService } from '../../entities/template/service/template.service';
 import { ITemplate } from 'app/entities/template/template.model';
+import { CacheUploadService } from '../exam-detail/cacheUpload.service';
 
 @Component({
   selector: 'jhi-voirreponse',
@@ -119,7 +120,8 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
     private changeDetector: ChangeDetectorRef,
     public finalResultService: FinalResultService,
     private pdfService: NgxExtendedPdfViewerService,
-    private templateService: TemplateService
+    private templateService: TemplateService,
+    public cacheUploadService: CacheUploadService
   ) {}
 
   ngOnInit(): void {
@@ -380,7 +382,51 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
   populateCache(): Promise<void> {
     return new Promise<void>(resolve => {
       db.removeElementForExam(this.exam!.id!).then(() => {
-        this.scanService.query({ name: this.exam?.id + 'indexdb.json' }).subscribe(scan => {
+        this.cacheUploadService.getCache(this.exam!.id! + 'indexdb.json').subscribe(
+          data1 => {
+            (data1 as Blob).text().then(ee => {
+              const data = JSON.parse(ee);
+              data.data.databaseName = 'correctExamStudent';
+              const datas = JSON.stringify(data);
+              const blob = new Blob([datas], { type: 'text/json' });
+              /*            for (let i = 0; i < datas.length; i++) {
+              byteNumbers[i] = datas.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: s.contentContentType! });*/
+              db.import(blob)
+                .then(() => {
+                  this.messageService.add({
+                    severity: 'success',
+                    summary: 'Download file from server',
+                    detail: 'Import de la bse de données locales réussi',
+                  });
+                  this.finalize();
+                  resolve();
+                })
+                .catch(() => {
+                  if (this.exam!.templateId) {
+                    this.templateService.find(this.exam!.templateId).subscribe(e1 => {
+                      this.template = e1.body!;
+                      this.pdfcontent = this.template.content!;
+                      resolve();
+                    });
+                  }
+                });
+            });
+          },
+          () => {
+            if (this.exam!.templateId) {
+              this.templateService.find(this.exam!.templateId).subscribe(e1 => {
+                this.template = e1.body!;
+                this.pdfcontent = this.template.content!;
+                resolve();
+              });
+            }
+          }
+        );
+
+        /* this.scanService.query({ name: this.exam?.id + 'indexdb.json' }).subscribe(scan => {
           if (scan.body !== null && scan.body.length > 0) {
             const s = scan.body[0];
             const byteCharacters1 = atob(s.content!);
@@ -396,7 +442,15 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
             db.import(blob).then(() => {
               this.finalize();
               resolve();
-            });
+            }).catch(()=> {
+              if (this.exam!.templateId) {
+                this.templateService.find(this.exam!.templateId).subscribe(e1 => {
+                  this.template = e1.body!;
+                  this.pdfcontent = this.template.content!;
+                  resolve();
+                });
+              }
+              });
           } else {
             if (this.exam!.templateId) {
               this.templateService.find(this.exam!.templateId).subscribe(e1 => {
@@ -406,7 +460,7 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
               });
             }
           }
-        });
+        });*/
       });
     });
   }

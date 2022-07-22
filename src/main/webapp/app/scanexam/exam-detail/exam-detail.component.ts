@@ -20,11 +20,10 @@ import { StudentService } from '../../entities/student/service/student.service';
 import { IStudent } from 'app/entities/student/student.model';
 import { db } from '../db/db';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
-import { ScanService } from '../../entities/scan/service/scan.service';
-import { IScan } from '../../entities/scan/scan.model';
 import { AccountService } from '../../core/auth/account.service';
 import { ExportOptions } from 'dexie-export-import';
 import { MessageService } from 'primeng/api';
+import { CacheUploadService } from './cacheUpload.service';
 
 @Component({
   selector: 'jhi-exam-detail',
@@ -56,9 +55,9 @@ export class ExamDetailComponent implements OnInit {
     public studentService: StudentService,
     public router: Router,
     public appConfig: ApplicationConfigService,
-    public scanService: ScanService,
     public accountService: AccountService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    public cacheUploadService: CacheUploadService
   ) {}
 
   ngOnInit(): void {
@@ -77,24 +76,26 @@ export class ExamDetailComponent implements OnInit {
               this.initTemplate();
             } else {
               db.removeElementForExam(+this.examId).then(() => {
-                this.scanService.query({ name: this.examId + 'indexdb.json' }).subscribe(scan => {
-                  if (scan.body !== null && scan.body.length > 0) {
-                    const s = scan.body[0];
-                    const byteCharacters = atob(s.content!);
-                    const byteNumbers = new Array(byteCharacters.length);
-                    for (let i = 0; i < byteCharacters.length; i++) {
-                      byteNumbers[i] = byteCharacters.charCodeAt(i);
-                    }
-                    const byteArray = new Uint8Array(byteNumbers);
-                    const blob = new Blob([byteArray], { type: s.contentContentType! });
-                    db.import(blob).then(() => {
-                      this.showAssociation = true;
-                      this.initTemplate();
-                    });
-                  } else {
+                this.cacheUploadService.getCache(this.examId + 'indexdb.json').subscribe(
+                  data => {
+                    db.import(data)
+                      .then(() => {
+                        this.messageService.add({
+                          severity: 'success',
+                          summary: 'Download file from server',
+                          detail: 'Import de la bse de données locales réussi',
+                        });
+                        this.showAssociation = true;
+                        this.initTemplate();
+                      })
+                      .catch(() => {
+                        this.blocked = false;
+                      });
+                  },
+                  () => {
                     this.blocked = false;
                   }
-                });
+                );
               });
             }
           });
@@ -216,49 +217,31 @@ export class ExamDetailComponent implements OnInit {
           (table === 'templates' && value.examId === +this.examId) ||
           (table === 'nonAlignImages' && value.examId === +this.examId) ||
           (table === 'alignImages' && value.examId === +this.examId);
+        this.blocked = true;
         db.export(o).then((value: Blob) => {
-          this.blocked = true;
-
-          value.text().then(ee => console.log(JSON.parse(ee)));
-
-          const reader = new FileReader();
-          reader.readAsDataURL(value);
-          reader.onloadend = () => {
-            const base64data = '' + reader.result;
-            const s: IScan = {};
-            s.name = this.examId + 'indexdb.json';
-            s.contentContentType = 'application/json';
-            s.content = base64data.substr(base64data.indexOf(',') + 1)!;
-            this.scanService.create(s).subscribe(
-              () => {
+          console.log(value);
+          const file = new File([value], this.examId + 'indexdb.json');
+          this.cacheUploadService.uploadCache(file).subscribe(
+            e => {
+              if ((e as any).loaded === (e as any).total) {
                 this.blocked = false;
                 this.messageService.add({
                   severity: 'success',
                   summary: 'Upload file on server',
-                  detail: 'Export de la bse de données locales réussi',
+                  detail: 'Export de la base de données locales réussi',
                 });
-              },
-              () => {
-                this.messageService.add({
-                  severity: 'error',
-                  summary: 'Cannot not upload file on server',
-                  detail: "Export de la bse de données locales impossible (sans doute due à la taille, ce n'est pas très grave)",
-                });
-
-                this.blocked = false;
               }
-            );
-          };
+            },
+            () => {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Cannot not upload file on server',
+                detail: "Export de la base de données locales impossible (sans doute due à la taille, ce n'est pas très grave)",
+              });
 
-          /* const url = window.URL.createObjectURL(value);
-          const a = document.createElement('a');
-          document.body.appendChild(a);
-          a.setAttribute('style', 'display: none');
-          a.href = url;
-          a.download = 'indexdb.json';
-          a.click();
-          window.URL.revokeObjectURL(url);
-          a.remove();*/
+              this.blocked = false;
+            }
+          );
         });
       },
     });
@@ -272,28 +255,29 @@ export class ExamDetailComponent implements OnInit {
       accept: () => {
         this.blocked = true;
         db.removeElementForExam(+this.examId).then(() => {
-          this.scanService.query({ name: this.examId + 'indexdb.json' }).subscribe(scan => {
-            if (scan.body !== null && scan.body.length > 0) {
-              const s = scan.body[0];
-              const byteCharacters = atob(s.content!);
-              const byteNumbers = new Array(byteCharacters.length);
-              for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-              }
-              const byteArray = new Uint8Array(byteNumbers);
-              const blob = new Blob([byteArray], { type: s.contentContentType! });
-              db.import(blob).then(() => {
-                this.messageService.add({
-                  severity: 'success',
-                  summary: 'Download file from server',
-                  detail: 'Import de la bse de données locales réussi',
+          this.cacheUploadService.getCache(this.examId + 'indexdb.json').subscribe(
+            data => {
+              db.import(data)
+                .then(() => {
+                  this.messageService.add({
+                    severity: 'success',
+                    summary: 'Download file from server',
+                    detail: 'Import de la bse de données locales réussi',
+                  });
+                  this.blocked = false;
+                  this.showAssociation = true;
+                  this.showCorrection = true;
+                })
+                .catch(() => {
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Download file from server',
+                    detail: "Aucune données de cache sur le serveur. Merci de lancer l'alignement des images depuis ce navigateur",
+                  });
+                  this.blocked = false;
                 });
-
-                this.blocked = false;
-                this.showAssociation = true;
-                this.showCorrection = true;
-              });
-            } else {
+            },
+            () => {
               this.messageService.add({
                 severity: 'error',
                 summary: 'Download file from server',
@@ -302,7 +286,7 @@ export class ExamDetailComponent implements OnInit {
 
               this.blocked = false;
             }
-          });
+          );
         });
       },
     });
