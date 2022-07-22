@@ -23,6 +23,8 @@ import { faObjectGroup } from '@fortawesome/free-solid-svg-icons';
 
 import { db } from '../db/db';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { ExportOptions } from 'dexie-export-import';
+import { CacheUploadService } from '../exam-detail/cacheUpload.service';
 
 export interface IPage {
   image?: ImageData;
@@ -87,7 +89,8 @@ export class AlignScanComponent implements OnInit {
     public confirmationService: ConfirmationService,
     public router: Router,
     private pdfService: NgxExtendedPdfViewerService,
-    private alignImagesService: AlignImagesService
+    private alignImagesService: AlignImagesService,
+    private cacheUploadService: CacheUploadService
   ) {}
 
   ngOnInit(): void {
@@ -110,7 +113,6 @@ export class AlignScanComponent implements OnInit {
 
   async removeElement(examId: number): Promise<any> {
     await db.removeElementForExam(examId);
-    await db.removeExam(examId);
   }
 
   public pdfloaded(): void {
@@ -177,8 +179,34 @@ export class AlignScanComponent implements OnInit {
         ),
       });
     }
-    this.router.navigateByUrl('/exam/' + this.examId);
-    this.blocked = false;
+
+    const o: ExportOptions = {};
+    o.filter = (table: string, value: any) =>
+      (table === 'exams' && value.id === +this.examId) ||
+      (table === 'templates' && value.examId === +this.examId) ||
+      (table === 'nonAlignImages' && value.examId === +this.examId) ||
+      (table === 'alignImages' && value.examId === +this.examId);
+
+    db.export(o)
+      .then((value: Blob) => {
+        const file = new File([value], this.examId + 'indexdb.json');
+        this.cacheUploadService.uploadCache(file).subscribe(
+          e => {
+            if ((e as any).loaded === (e as any).total) {
+              this.blocked = false;
+              this.router.navigateByUrl('/exam/' + this.examId);
+            }
+          },
+          () => {
+            this.blocked = false;
+            this.router.navigateByUrl('/exam/' + this.examId);
+          }
+        );
+      })
+      .catch(() => {
+        this.blocked = false;
+        this.router.navigateByUrl('/exam/' + this.examId);
+      });
   }
 
   async saveEligneImage(pageN: number, imageString: string): Promise<void> {

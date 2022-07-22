@@ -20,15 +20,16 @@ import { StudentService } from '../../entities/student/service/student.service';
 import { IStudent } from 'app/entities/student/student.model';
 import { db } from '../db/db';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
-import { ScanService } from '../../entities/scan/service/scan.service';
-import { IScan } from '../../entities/scan/scan.model';
 import { AccountService } from '../../core/auth/account.service';
+import { ExportOptions } from 'dexie-export-import';
+import { MessageService } from 'primeng/api';
+import { CacheUploadService } from './cacheUpload.service';
 
 @Component({
   selector: 'jhi-exam-detail',
   templateUrl: './exam-detail.component.html',
   styleUrls: ['./exam-detail.component.scss'],
-  providers: [ConfirmationService],
+  providers: [ConfirmationService, MessageService],
 })
 export class ExamDetailComponent implements OnInit {
   blocked = false;
@@ -54,8 +55,9 @@ export class ExamDetailComponent implements OnInit {
     public studentService: StudentService,
     public router: Router,
     public appConfig: ApplicationConfigService,
-    public scanService: ScanService,
-    public accountService: AccountService
+    public accountService: AccountService,
+    private messageService: MessageService,
+    public cacheUploadService: CacheUploadService
   ) {}
 
   ngOnInit(): void {
@@ -69,7 +71,32 @@ export class ExamDetailComponent implements OnInit {
           .count()
           .then(c => {
             if (c !== 0) {
+              this.blocked = true;
               this.showAssociation = true;
+              this.initTemplate();
+            } else {
+              db.removeElementForExam(+this.examId).then(() => {
+                this.cacheUploadService.getCache(this.examId + 'indexdb.json').subscribe(
+                  data => {
+                    db.import(data)
+                      .then(() => {
+                        this.messageService.add({
+                          severity: 'success',
+                          summary: 'Download file from server',
+                          detail: 'Import de la bse de données locales réussi',
+                        });
+                        this.showAssociation = true;
+                        this.initTemplate();
+                      })
+                      .catch(() => {
+                        this.blocked = false;
+                      });
+                  },
+                  () => {
+                    this.blocked = false;
+                  }
+                );
+              });
             }
           });
 
@@ -82,33 +109,6 @@ export class ExamDetailComponent implements OnInit {
               this.router.navigateByUrl('/');
             }
           );
-
-          db.templates
-            .where('examId')
-            .equals(+this.examId)
-            .count()
-            .then(e2 => {
-              this.nbreFeuilleParCopie = e2;
-              // Step 2 Query Scan in local DB
-
-              db.alignImages
-                .where('examId')
-                .equals(+this.examId)
-                .count()
-                .then(e1 => {
-                  this.numberPagesInScan = e1;
-
-                  this.studentService.query({ courseId: this.exam.courseId }).subscribe(studentsbody => {
-                    this.blocked = false;
-
-                    this.students = studentsbody.body!;
-                    const ex2 = (this.students.map(s => s.examSheets) as any)
-                      .flat()
-                      .filter((ex1: any) => ex1.scanId === this.exam.scanfileId && ex1.pagemin !== -1).length;
-                    this.showCorrection = ex2 === this.numberPagesInScan / this.nbreFeuilleParCopie;
-                  });
-                });
-            });
 
           //          this.examSheetService.
         });
@@ -153,6 +153,35 @@ export class ExamDetailComponent implements OnInit {
     });
   }
 
+  initTemplate(): void {
+    db.templates
+      .where('examId')
+      .equals(+this.examId)
+      .count()
+      .then(e2 => {
+        this.nbreFeuilleParCopie = e2;
+        // Step 2 Query Scan in local DB
+
+        db.alignImages
+          .where('examId')
+          .equals(+this.examId)
+          .count()
+          .then(e1 => {
+            this.numberPagesInScan = e1;
+
+            this.studentService.query({ courseId: this.exam.courseId }).subscribe(studentsbody => {
+              this.blocked = false;
+
+              this.students = studentsbody.body!;
+              const ex2 = (this.students.map(s => s.examSheets) as any)
+                .flat()
+                .filter((ex1: any) => ex1.scanId === this.exam.scanfileId && ex1.pagemin !== -1).length;
+              this.showCorrection = ex2 === this.numberPagesInScan / this.nbreFeuilleParCopie;
+            });
+          });
+      });
+  }
+
   confirmeDelete(): any {
     this.confirmationService.confirm({
       message: "Etes vous sur de vouloir supprimer ce module, les exams, les groupes d'étudiants et les templates associés",
@@ -169,7 +198,7 @@ export class ExamDetailComponent implements OnInit {
       message: 'Etes vous sur de vouloir supprimer le cache dans le navigateur. Vous devrez réalignez les images',
       // eslint-disable-next-line object-shorthand
       accept: () => {
-        db.resetDatabase().then(() => {
+        db.removeElementForExam(+this.examId).then(() => {
           this.showAssociation = false;
           this.showCorrection = false;
         });
@@ -182,35 +211,37 @@ export class ExamDetailComponent implements OnInit {
       message: 'Etes vous sur de vouloir télécharger le cache du navigateur vers le serveur.',
       // eslint-disable-next-line object-shorthand
       accept: () => {
-        db.export().then((value: Blob) => {
-          if (this.accountService.isAuthenticated()) {
-            this.blocked = true;
-
-            this.accountService.identity().subscribe(account => {
-              const reader = new FileReader();
-              reader.readAsDataURL(value);
-              reader.onloadend = () => {
-                const base64data = '' + reader.result;
-                const s: IScan = {};
-                s.name = account?.login + 'indexdb.json';
-                s.contentContentType = 'application/json';
-                s.content = base64data.substr(base64data.indexOf(',') + 1)!;
-                this.scanService.create(s).subscribe(() => {
-                  this.blocked = false;
+        const o: ExportOptions = {};
+        o.filter = (table: string, value: any) =>
+          (table === 'exams' && value.id === +this.examId) ||
+          (table === 'templates' && value.examId === +this.examId) ||
+          (table === 'nonAlignImages' && value.examId === +this.examId) ||
+          (table === 'alignImages' && value.examId === +this.examId);
+        this.blocked = true;
+        db.export(o).then((value: Blob) => {
+          console.log(value);
+          const file = new File([value], this.examId + 'indexdb.json');
+          this.cacheUploadService.uploadCache(file).subscribe(
+            e => {
+              if ((e as any).loaded === (e as any).total) {
+                this.blocked = false;
+                this.messageService.add({
+                  severity: 'success',
+                  summary: 'Upload file on server',
+                  detail: 'Export de la base de données locales réussi',
                 });
-              };
-            });
-          }
+              }
+            },
+            () => {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Cannot not upload file on server',
+                detail: "Export de la base de données locales impossible (sans doute due à la taille, ce n'est pas très grave)",
+              });
 
-          /* const url = window.URL.createObjectURL(value);
-          const a = document.createElement('a');
-          document.body.appendChild(a);
-          a.setAttribute('style', 'display: none');
-          a.href = url;
-          a.download = 'indexdb.json';
-          a.click();
-          window.URL.revokeObjectURL(url);
-          a.remove();*/
+              this.blocked = false;
+            }
+          );
         });
       },
     });
@@ -223,26 +254,39 @@ export class ExamDetailComponent implements OnInit {
       // eslint-disable-next-line object-shorthand
       accept: () => {
         this.blocked = true;
-        db.resetDatabase().then(() => {
-          this.accountService.identity().subscribe(account => {
-            this.scanService.query({ name: account?.login + 'indexdb.json' }).subscribe(scan => {
-              if (scan.body !== null && scan.body.length > 0) {
-                const s = scan.body[0];
-                const byteCharacters = atob(s.content!);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {
-                  byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: s.contentContentType! });
-                db.import(blob).then(() => {
+        db.removeElementForExam(+this.examId).then(() => {
+          this.cacheUploadService.getCache(this.examId + 'indexdb.json').subscribe(
+            data => {
+              db.import(data)
+                .then(() => {
+                  this.messageService.add({
+                    severity: 'success',
+                    summary: 'Download file from server',
+                    detail: 'Import de la bse de données locales réussi',
+                  });
                   this.blocked = false;
                   this.showAssociation = true;
                   this.showCorrection = true;
+                })
+                .catch(() => {
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Download file from server',
+                    detail: "Aucune données de cache sur le serveur. Merci de lancer l'alignement des images depuis ce navigateur",
+                  });
+                  this.blocked = false;
                 });
-              }
-            });
-          });
+            },
+            () => {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Download file from server',
+                detail: "Aucune données de cache sur le serveur. Merci de lancer l'alignement des images depuis ce navigateur",
+              });
+
+              this.blocked = false;
+            }
+          );
         });
       },
     });
