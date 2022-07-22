@@ -7,9 +7,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { of, Subject, from } from 'rxjs';
 
 import { CommentsService } from '../service/comments.service';
-import { IComments, Comments } from '../comments.model';
-import { IStudentResponse } from 'app/entities/student-response/student-response.model';
-import { StudentResponseService } from 'app/entities/student-response/service/student-response.service';
+import { Comments } from '../comments.model';
 
 import { CommentsUpdateComponent } from './comments-update.component';
 
@@ -18,7 +16,6 @@ describe('Comments Management Update Component', () => {
   let fixture: ComponentFixture<CommentsUpdateComponent>;
   let activatedRoute: ActivatedRoute;
   let commentsService: CommentsService;
-  let studentResponseService: StudentResponseService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -40,7 +37,6 @@ describe('Comments Management Update Component', () => {
     fixture = TestBed.createComponent(CommentsUpdateComponent);
     activatedRoute = TestBed.inject(ActivatedRoute);
     commentsService = TestBed.inject(CommentsService);
-    studentResponseService = TestBed.inject(StudentResponseService);
 
     comp = fixture.componentInstance;
   });
