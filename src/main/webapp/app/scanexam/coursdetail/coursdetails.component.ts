@@ -17,12 +17,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { ApplicationConfigService } from '../../core/config/application-config.service';
+import { DialogService } from 'primeng/dynamicdialog';
+import { SharecourseComponent } from '../sharecourse/sharecourse.component';
 
 @Component({
   selector: 'jhi-coursdetails',
   templateUrl: './coursdetails.component.html',
   styleUrls: ['./coursdetails.component.scss'],
-  providers: [ConfirmationService],
+  providers: [ConfirmationService, DialogService],
 })
 export class CoursdetailsComponent implements OnInit {
   farCircle = farCircle as IconProp;
@@ -30,7 +32,7 @@ export class CoursdetailsComponent implements OnInit {
   faGraduationCap = faGraduationCap as IconProp;
   faBookOpenReader = faBookOpenReader as IconProp;
   exams!: IExam[];
-  course!: ICourse;
+  course: ICourse | undefined;
   dockItems!: any[];
 
   constructor(
@@ -39,7 +41,8 @@ export class CoursdetailsComponent implements OnInit {
     protected activatedRoute: ActivatedRoute,
     public confirmationService: ConfirmationService,
     public router: Router,
-    public appConfig: ApplicationConfigService
+    public appConfig: ApplicationConfigService,
+    public dialogService: DialogService
   ) {}
 
   ngOnInit(): void {
@@ -75,9 +78,17 @@ export class CoursdetailsComponent implements OnInit {
             route: '/liststudents/' + params.get('courseid'),
           },
           {
+            label: 'Partager UE',
+            icon: this.appConfig.getFrontUrl() + 'content/images/share-button-svgrepo-com.svg',
+            title: "Partager cette UE avec un ou plusieurs collègue(s) car partager la correction, c'est plus fun",
+            command1: () => {
+              this.showShare();
+            },
+          },
+          {
             label: 'Supprimer UE',
             icon: this.appConfig.getFrontUrl() + 'content/images/remove-rubbish.svg',
-            title: 'Supprimer cet UE (groupes, examsn templates, ...)',
+            title: 'Supprimer cette UE (groupes, examsn templates, ...)',
             command1: () => {
               this.confirmeDelete();
             },
@@ -92,11 +103,26 @@ export class CoursdetailsComponent implements OnInit {
       message: "Etes vous sur de vouloir supprimer ce module, les exams, les groupes d'étudiants et les templates associés",
       accept: () => {
         // eslint-disable-next-line no-console
-        this.courseService.delete(this.course.id!).subscribe(e => {
-          // eslint-disable-next-line no-console
-          this.router.navigateByUrl('/');
-        });
+        if (this.course !== undefined) {
+          this.courseService.delete(this.course.id!).subscribe(e => {
+            // eslint-disable-next-line no-console
+            this.router.navigateByUrl('/');
+          });
+        }
       },
     });
+  }
+
+  showShare(): void {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (this.course !== undefined) {
+      const ref = this.dialogService.open(SharecourseComponent, {
+        data: {
+          courseid: this.course.id,
+        },
+        header: 'Share your course',
+        width: '70%',
+      });
+    }
   }
 }
