@@ -192,7 +192,7 @@ export class AlignScanComponent implements OnInit {
         const file = new File([value], this.examId + 'indexdb.json');
         this.cacheUploadService.uploadCache(file).subscribe(
           e => {
-            if ((e as any).loaded === (e as any).total) {
+            if (e.type === 4) {
               this.blocked = false;
               this.router.navigateByUrl('/exam/' + this.examId);
             }
