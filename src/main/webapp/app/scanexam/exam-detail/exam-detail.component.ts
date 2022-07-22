@@ -219,11 +219,10 @@ export class ExamDetailComponent implements OnInit {
           (table === 'alignImages' && value.examId === +this.examId);
         this.blocked = true;
         db.export(o).then((value: Blob) => {
-          console.log(value);
           const file = new File([value], this.examId + 'indexdb.json');
           this.cacheUploadService.uploadCache(file).subscribe(
             e => {
-              if ((e as any).loaded === (e as any).total) {
+              if (e.type === 4) {
                 this.blocked = false;
                 this.messageService.add({
                   severity: 'success',
