@@ -130,14 +130,14 @@ export class CoursdetailsComponent implements OnInit {
   }
 
   showShare(): void {
-    this.translateService.get('scanexam.sharecourse').subscribe(data => {
+    this.translateService.get('scanexam.sharecourse').subscribe(data1 => {
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (this.course !== undefined) {
         const ref = this.dialogService.open(SharecourseComponent, {
           data: {
             courseid: this.course.id,
           },
-          header: data,
+          header: data1,
           width: '70%',
         });
       }
