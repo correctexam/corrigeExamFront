@@ -40,6 +40,7 @@ import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 import { TemplateService } from '../../entities/template/service/template.service';
 import { ITemplate } from 'app/entities/template/template.model';
 import { CacheUploadService } from '../exam-detail/cacheUpload.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'jhi-voirreponse',
@@ -121,7 +122,8 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
     public finalResultService: FinalResultService,
     private pdfService: NgxExtendedPdfViewerService,
     private templateService: TemplateService,
-    public cacheUploadService: CacheUploadService
+    public cacheUploadService: CacheUploadService,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -159,7 +161,6 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
                     this.questionno = +param[2] - 1;
 
                     // Step 1 Query templates
-
                     this.nbreFeuilleParCopie = this.sheet!.pagemax! - this.sheet!.pagemin! + 1;
                     // Step 2 Query Scan in local DB
                     db.alignImages
@@ -285,75 +286,97 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
 
   async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
     if (this.noalign) {
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         db.nonAlignImages
           .where({ examId: +this.exam!.id!, pageNumber: pageInscan })
-          .first()
-          .then(e2 => {
-            const image = JSON.parse(e2!.value, this.reviver);
-            this.loadImage(image.pages, pageInscan).then(v => {
-              let finalW = (zone.width! * v.width! * this.factor) / 100000;
-              let finalH = (zone.height! * v.height! * this.factor) / 100000;
-              let initX =
-                (zone.xInit! * v.width!) / 100000 -
-                ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
-              if (initX < 0) {
-                finalW = finalW + initX;
-                initX = 0;
-              }
-              let initY =
-                (zone.yInit! * v.height!) / 100000 -
-                ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
-              if (initY < 0) {
-                finalH = finalH + initY;
-                initY = 0;
-              }
-              this.alignImagesService
-                .imageCrop({
-                  image: v.image,
-                  x: initX,
-                  y: initY,
-                  width: finalW,
-                  height: finalH,
-                })
-                .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
-            });
+          .count()
+          .then(count => {
+            if (count > 0) {
+              db.nonAlignImages
+                .where({ examId: +this.exam!.id!, pageNumber: pageInscan })
+                .first()
+                .then(e2 => {
+                  const image = JSON.parse(e2!.value, this.reviver);
+                  this.loadImage(image.pages, pageInscan).then(v => {
+                    let finalW = (zone.width! * v.width! * this.factor) / 100000;
+                    let finalH = (zone.height! * v.height! * this.factor) / 100000;
+                    let initX =
+                      (zone.xInit! * v.width!) / 100000 -
+                      ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
+                    if (initX < 0) {
+                      finalW = finalW + initX;
+                      initX = 0;
+                    }
+                    let initY =
+                      (zone.yInit! * v.height!) / 100000 -
+                      ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
+                    if (initY < 0) {
+                      finalH = finalH + initY;
+                      initY = 0;
+                    }
+                    this.alignImagesService
+                      .imageCrop({
+                        image: v.image,
+                        x: initX,
+                        y: initY,
+                        width: finalW,
+                        height: finalH,
+                      })
+                      .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
+                  });
+                });
+            } else {
+              db.resetDatabase().then(() => {
+                reject('no image in cache');
+              });
+            }
           });
       });
     } else {
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         db.alignImages
           .where({ examId: +this.exam!.id!, pageNumber: pageInscan })
-          .first()
-          .then(e2 => {
-            const image = JSON.parse(e2!.value, this.reviver);
-            this.loadImage(image.pages, pageInscan).then(v => {
-              let finalW = (zone.width! * v.width! * this.factor) / 100000;
-              let finalH = (zone.height! * v.height! * this.factor) / 100000;
-              let initX =
-                (zone.xInit! * v.width!) / 100000 -
-                ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
-              if (initX < 0) {
-                finalW = finalW + initX;
-                initX = 0;
-              }
-              let initY =
-                (zone.yInit! * v.height!) / 100000 -
-                ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
-              if (initY < 0) {
-                finalH = finalH + initY;
-                initY = 0;
-              }
-              this.alignImagesService
-                .imageCrop({
-                  image: v.image,
-                  x: initX,
-                  y: initY,
-                  width: finalW,
-                  height: finalH,
-                })
-                .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
-            });
+          .count()
+          .then(count => {
+            if (count > 0) {
+              db.alignImages
+                .where({ examId: +this.exam!.id!, pageNumber: pageInscan })
+                .first()
+                .then(e2 => {
+                  const image = JSON.parse(e2!.value, this.reviver);
+                  this.loadImage(image.pages, pageInscan).then(v => {
+                    let finalW = (zone.width! * v.width! * this.factor) / 100000;
+                    let finalH = (zone.height! * v.height! * this.factor) / 100000;
+                    let initX =
+                      (zone.xInit! * v.width!) / 100000 -
+                      ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
+                    if (initX < 0) {
+                      finalW = finalW + initX;
+                      initX = 0;
+                    }
+                    let initY =
+                      (zone.yInit! * v.height!) / 100000 -
+                      ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
+                    if (initY < 0) {
+                      finalH = finalH + initY;
+                      initY = 0;
+                    }
+                    this.alignImagesService
+                      .imageCrop({
+                        image: v.image,
+                        x: initX,
+                        y: initY,
+                        width: finalW,
+                        height: finalH,
+                      })
+                      .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
+                  });
+                });
+            } else {
+              db.resetDatabase().then(() => {
+                reject('no image in cache');
+              });
+            }
           });
       });
     }
@@ -384,36 +407,27 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
       db.removeElementForExam(this.exam!.id!).then(() => {
         this.cacheUploadService.getCache(this.exam!.id! + 'indexdb.json').subscribe(
           data1 => {
-            (data1 as Blob).text().then(ee => {
-              const data = JSON.parse(ee);
-              data.data.databaseName = 'correctExamStudent';
-              const datas = JSON.stringify(data);
-              const blob = new Blob([datas], { type: 'text/json' });
-              /*            for (let i = 0; i < datas.length; i++) {
-              byteNumbers[i] = datas.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], { type: s.contentContentType! });*/
-              db.import(blob)
-                .then(() => {
+            db.import(data1, { acceptNameDiff: true })
+              .then(() => {
+                this.translateService.get('scanexam.downloadcacheok').subscribe(data2 => {
                   this.messageService.add({
                     severity: 'success',
-                    summary: 'Download file from server',
-                    detail: 'Import de la bse de données locales réussi',
+                    summary: data2,
+                    detail: this.translateService.instant('scanexam.downloadcacheokdetail'),
                   });
                   this.finalize();
                   resolve();
-                })
-                .catch(() => {
-                  if (this.exam!.templateId) {
-                    this.templateService.find(this.exam!.templateId).subscribe(e1 => {
-                      this.template = e1.body!;
-                      this.pdfcontent = this.template.content!;
-                      resolve();
-                    });
-                  }
                 });
-            });
+              })
+              .catch(() => {
+                if (this.exam!.templateId) {
+                  this.templateService.find(this.exam!.templateId).subscribe(e1 => {
+                    this.template = e1.body!;
+                    this.pdfcontent = this.template.content!;
+                    resolve();
+                  });
+                }
+              });
           },
           () => {
             if (this.exam!.templateId) {

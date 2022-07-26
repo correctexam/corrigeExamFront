@@ -29,6 +29,14 @@
     "voircopie": "Voir votre copie",
     "voirreponse": "Voir une réponse particulière",
     "stats": "Statistiques de l'examen",
-    "voirreponsesstarunstar": "Voir les réponses représentatives"
+    "voirreponsesstarunstar": "Voir les réponses représentatives",
+    "titleu": "Corriger vos copies plus efficacement ✔️",
+    "subtitleu": "un retour à vos étudiants en moins d'une journée",
+    "slogan": "Scanner, corriger par lots, soyez assisté par de l'IA, faites un retour précis à vos étudiants, depuis un PC ou une tablette",
+    "login": "Authentifiez vous",
+    "register": "Créer un compte",
+    "welcomeadmin": "Bienvenue sur la page d'administration de cette application",
+    "welcomeadminsub": "Vous pouvez accéder aux données depuis le menu entité",
+    "textadmin": "Vous pouvez gérer les utilsiateurs et les services depuis le menu administration."
   }
 }

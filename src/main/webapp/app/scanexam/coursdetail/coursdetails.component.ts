@@ -19,6 +19,7 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { ApplicationConfigService } from '../../core/config/application-config.service';
 import { DialogService } from 'primeng/dynamicdialog';
 import { SharecourseComponent } from '../sharecourse/sharecourse.component';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'jhi-coursdetails',
@@ -34,6 +35,7 @@ export class CoursdetailsComponent implements OnInit {
   exams!: IExam[];
   course: ICourse | undefined;
   dockItems!: any[];
+  courseId = '';
 
   constructor(
     public courseService: CourseService,
@@ -42,13 +44,22 @@ export class CoursdetailsComponent implements OnInit {
     public confirmationService: ConfirmationService,
     public router: Router,
     public appConfig: ApplicationConfigService,
-    public dialogService: DialogService
+    public dialogService: DialogService,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
     // eslint-disable-next-line no-console
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('courseid') !== null) {
+        this.courseId = params.get('courseid')!;
+        this.translateService.get('scanexam.creerexam').subscribe(() => {
+          this.initCmpt();
+        });
+        this.translateService.onLangChange.subscribe(() => {
+          this.initCmpt();
+        });
+
         this.examService.query({ courseId: params.get('courseid') }).subscribe(data => {
           this.exams = data.body!;
         });
@@ -58,71 +69,78 @@ export class CoursdetailsComponent implements OnInit {
             this.router.navigateByUrl('/');
           }
         );
-        this.dockItems = [
-          {
-            label: 'Créer exam',
-            icon: this.appConfig.getFrontUrl() + 'content/images/exam.svg',
-            title: 'Créer exam',
-            route: '/creerexam/' + params.get('courseid'),
-          },
-          {
-            label: 'Enregistrer liste étudiants',
-            icon: this.appConfig.getFrontUrl() + 'content/images/students.svg',
-            title: 'Enregistrer liste étudiants',
-            route: '/registerstudents/' + params.get('courseid'),
-          },
-          {
-            label: 'Voir liste étudiants',
-            icon: this.appConfig.getFrontUrl() + 'content/images/studentslist.svg',
-            title: 'Voir liste étudiants',
-            route: '/liststudents/' + params.get('courseid'),
-          },
-          {
-            label: 'Partager UE',
-            icon: this.appConfig.getFrontUrl() + 'content/images/share-button-svgrepo-com.svg',
-            title: "Partager cette UE avec un ou plusieurs collègue(s) car partager la correction, c'est plus fun",
-            command1: () => {
-              this.showShare();
-            },
-          },
-          {
-            label: 'Supprimer UE',
-            icon: this.appConfig.getFrontUrl() + 'content/images/remove-rubbish.svg',
-            title: 'Supprimer cette UE (groupes, examsn templates, ...)',
-            command1: () => {
-              this.confirmeDelete();
-            },
-          },
-        ];
       }
     });
   }
 
-  confirmeDelete(): any {
-    this.confirmationService.confirm({
-      message: "Etes vous sur de vouloir supprimer ce module, les exams, les groupes d'étudiants et les templates associés",
-      accept: () => {
-        // eslint-disable-next-line no-console
-        if (this.course !== undefined) {
-          this.courseService.delete(this.course.id!).subscribe(e => {
-            // eslint-disable-next-line no-console
-            this.router.navigateByUrl('/');
-          });
-        }
+  initCmpt(): void {
+    this.dockItems = [
+      {
+        label: this.translateService.instant('scanexam.creerexam'),
+        icon: this.appConfig.getFrontUrl() + 'content/images/exam.svg',
+        title: this.translateService.instant('scanexam.creerexam'),
+        route: '/creerexam/' + this.courseId,
       },
+      {
+        label: this.translateService.instant('scanexam.enregistreretudiant'),
+        icon: this.appConfig.getFrontUrl() + 'content/images/students.svg',
+        title: this.translateService.instant('scanexam.enregistreretudiant'),
+        route: '/registerstudents/' + this.courseId,
+      },
+      {
+        label: this.translateService.instant('scanexam.listeetudiant'),
+        icon: this.appConfig.getFrontUrl() + 'content/images/studentslist.svg',
+        title: this.translateService.instant('scanexam.listeetudiant'),
+        route: '/liststudents/' + this.courseId,
+      },
+      {
+        label: this.translateService.instant('scanexam.shareue'),
+        icon: this.appConfig.getFrontUrl() + 'content/images/share-button-svgrepo-com.svg',
+        title: this.translateService.instant('scanexam.shareuedetail'),
+        command1: () => {
+          this.showShare();
+        },
+      },
+      {
+        label: this.translateService.instant('scanexam.removeue'),
+        icon: this.appConfig.getFrontUrl() + 'content/images/remove-rubbish.svg',
+        title: this.translateService.instant('scanexam.removeuedetail'),
+        command1: () => {
+          this.confirmeDelete();
+        },
+      },
+    ];
+  }
+
+  confirmeDelete(): any {
+    this.translateService.get('scanexam.removeverufy').subscribe(data => {
+      this.confirmationService.confirm({
+        message: data,
+        accept: () => {
+          // eslint-disable-next-line no-console
+          if (this.course !== undefined) {
+            this.courseService.delete(this.course.id!).subscribe(e => {
+              // eslint-disable-next-line no-console
+              this.router.navigateByUrl('/');
+            });
+          }
+        },
+      });
     });
   }
 
   showShare(): void {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (this.course !== undefined) {
-      const ref = this.dialogService.open(SharecourseComponent, {
-        data: {
-          courseid: this.course.id,
-        },
-        header: 'Share your course',
-        width: '70%',
-      });
-    }
+    this.translateService.get('scanexam.sharecourse').subscribe(data => {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (this.course !== undefined) {
+        const ref = this.dialogService.open(SharecourseComponent, {
+          data: {
+            courseid: this.course.id,
+          },
+          header: data,
+          width: '70%',
+        });
+      }
+    });
   }
 }

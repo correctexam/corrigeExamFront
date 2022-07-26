@@ -1,23 +1,28 @@
 <div class="wizard-v2-content">
-  <div class="wizard-image">
-  </div>
+  <div class="wizard-image"></div>
   <div class="wizard-form">
     <div class="wizard-header">
-      <h3>Mes cours</h3>
-      <p>votre correction de copies assistée à l'aide du numérique</p>
+      <h3 jhiTranslate="scanexam.mescours">Mes cours</h3>
+      <p jhiTranslate="scanexam.slogan2">votre correction de copies assistée à l'aide du numérique</p>
     </div>
     <div id="form-total" #formTotal>
-      <div class="inner" [style]="{'text-align':'center'}">
-        <button *ngFor="let course of courses"
-        [style]="{width: '20em', marginBottom: '1em', margin: '1em'}" class="p-element p-ripple " pButton pRipple type="button" [routerLink]="'course/'+course.id">
+      <div class="inner" [style]="{ 'text-align': 'center' }">
+        <button
+          *ngFor="let course of courses"
+          [style]="{ width: '20em', marginBottom: '1em', margin: '1em' }"
+          class="p-element p-ripple"
+          pButton
+          pRipple
+          type="button"
+          [routerLink]="'course/' + course.id"
+        >
           <fa-stack>
             <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
-            <fa-icon [icon]="faGraduationCap" stackItemSize="1x" [inverse]="false"></fa-icon>
-          </fa-stack><BR>
-          <span>{{course.name}}</span>
+            <fa-icon [icon]="faGraduationCap" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
+          ><BR />
+          <span>{{ course.name }}</span>
         </button>
       </div>
-
     </div>
   </div>
 </div>

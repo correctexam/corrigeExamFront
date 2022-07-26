@@ -7,7 +7,7 @@
   <div class="col-8">
     <div class="grid grid-nogutter">
       <div class="col-8">
-        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">Liste étudiants</h2>
+        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" jhiTranslate="scanexam.liststudents">Liste étudiants</h2>
       </div>
       <div class="col-4 flex flex-row-reverse">
         <button
@@ -18,7 +18,7 @@
           class="p-button p-button-primary"
           [routerLink]="'/exam/' + examid"
         >
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Retourner à l'examen</span>
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam">Retourner à l'examen</span>
         </button>
       </div>
     </div>
@@ -26,9 +26,9 @@
       <p-table [value]="questions">
         <ng-template pTemplate="header">
           <tr>
-            <th>Numéro de question</th>
-            <th>Réponses marquées comme excellente</th>
-            <th>Réponses contenant une erreur représentatives</th>
+            <th jhiTranslate="scanexam.numeroquestion">Numéro de question</th>
+            <th jhiTranslate="scanexam.goodanswers">Réponses marquées comme excellentes</th>
+            <th jhiTranslate="scanexam.badanswers">Réponses contenant une erreur représentatives</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-question>
@@ -41,14 +41,18 @@
                 ><a target="_blank" [routerLink]="item">{{ index + 1 }}</a>
                 <span *ngIf="index !== question.bestSolutions.length - 1">, </span></span
               >
-              <span *ngIf="question.bestSolutions.length === 0"> Aucune bonne réponse identifiée</span>
+              <span *ngIf="question.bestSolutions.length === 0" jhiTranslate="scanexam.nogoodsolution">
+                Aucune bonne réponse identifiée</span
+              >
             </td>
             <td>
               <span *ngFor="let item of question.worstSolutions; let index = index"
                 ><a target="_blank" [routerLink]="item">{{ index + 1 }}</a>
                 <span *ngIf="index !== question.worstSolutions.length - 1">, </span></span
               >
-              <span *ngIf="question.worstSolutions.length === 0"> Aucune mauvaise réponse identifiée</span>
+              <span *ngIf="question.worstSolutions.length === 0" jhiTranslate="scanexam.nobadsolution">
+                Aucune mauvaise réponse identifiée</span
+              >
             </td>
           </tr>
         </ng-template>

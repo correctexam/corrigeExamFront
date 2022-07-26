@@ -11,6 +11,7 @@ import { Account } from 'app/core/auth/account.model';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { AlignImagesService } from 'app/scanexam/services/align-images.service';
 import { ApplicationConfigService } from '../core/config/application-config.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'jhi-home',
@@ -29,7 +30,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     private accountService: AccountService,
     private router: Router,
     private alignImagesService: AlignImagesService,
-    private appConfig: ApplicationConfigService
+    private appConfig: ApplicationConfigService,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -37,12 +39,21 @@ export class HomeComponent implements OnInit, OnDestroy {
       .getAuthenticationState()
       .pipe(takeUntil(this.destroy$))
       .subscribe(account => (this.account = account));
+    this.translateService.get('home.creercours').subscribe(() => {
+      this.initCmpt();
+    });
+    this.translateService.onLangChange.subscribe(() => {
+      console.log('language change');
+      this.initCmpt();
+    });
+  }
 
+  initCmpt(): void {
     this.dockItems = [
       {
-        label: 'Créer cours',
+        label: this.translateService.instant('home.creercours'),
         icon: this.appConfig.getFrontUrl() + 'content/images/plus.svg',
-        title: 'Créer cours',
+        title: this.translateService.instant('home.creercours'),
         route: 'creercours',
       },
     ];

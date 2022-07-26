@@ -40,16 +40,18 @@ export class ListstudentcourseComponent implements OnInit {
   }
 
   reset(): void {
-    this.confirmationService.confirm({
-      message: "Etes vous sur de vouloir supprimer ces listes d'étudiants",
-      accept: () => {
-        this.blocked = true;
+    this.translate.get('scanexam.confirmremovestudents').subscribe(data => {
+      this.confirmationService.confirm({
+        message: data,
+        accept: () => {
+          this.blocked = true;
 
-        this.http.delete(this.applicationConfigService.getEndpointFor('api/deletegroupstudents/' + this.courseid)).subscribe(() => {
-          this.loadEtudiants();
-          this.blocked = false;
-        });
-      },
+          this.http.delete(this.applicationConfigService.getEndpointFor('api/deletegroupstudents/' + this.courseid)).subscribe(() => {
+            this.loadEtudiants();
+            this.blocked = false;
+          });
+        },
+      });
     });
   }
 
@@ -64,16 +66,18 @@ export class ListstudentcourseComponent implements OnInit {
     this.http.put(this.applicationConfigService.getEndpointFor('api/updatestudentgroup/' + this.courseid), student).subscribe(() => {});
   }
   removeSt(student: any): void {
-    this.confirmationService.confirm({
-      message: 'Etes vous sur de vouloir supprimer cet étudiant',
-      accept: () => {
-        this.blocked = true;
+    this.translate.get('scanexam.confirmremovestudent').subscribe(data => {
+      this.confirmationService.confirm({
+        message: data,
+        accept: () => {
+          this.blocked = true;
 
-        this.http.put(this.applicationConfigService.getEndpointFor('api/deletestudentgroup/' + this.courseid), student).subscribe(() => {
-          this.loadEtudiants();
-          this.blocked = false;
-        });
-      },
+          this.http.put(this.applicationConfigService.getEndpointFor('api/deletestudentgroup/' + this.courseid), student).subscribe(() => {
+            this.loadEtudiants();
+            this.blocked = false;
+          });
+        },
+      });
     });
   }
 

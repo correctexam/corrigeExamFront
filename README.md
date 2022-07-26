@@ -41,7 +41,7 @@ In the project root, JHipster generates configuration files for tools like git, 
 
 ## Build and deploy
 
-Documenttion to deploy your own instance is available [here](https://github.com/correctexam/documentation/blob/main/Install.md)
+Documenttion to deploy your own instance is available [here](https://correctexam.readthedocs.io/en/latest/Install.html)
 
 ## Development
 

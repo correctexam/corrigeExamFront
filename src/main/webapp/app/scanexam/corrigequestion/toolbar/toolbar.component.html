@@ -1,7 +1,7 @@
 <div>
   <div class="d-flex flex-wrap mb-5">
     <div
-      title="Select and move shapes/texts"
+      [title]="'scanexam.selectmove' | translate"
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'SELECT' }"
       (click)="select(DrawingTools.SELECT)"
@@ -9,7 +9,7 @@
       <fa-icon [icon]="faHandPointer"></fa-icon>
     </div>
     <div
-      title="Erase shape/text on click"
+      [title]="'scanexam.erase' | translate"
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'ERASER' }"
       (click)="select(DrawingTools.ERASER)"
@@ -58,7 +58,7 @@
       <img src="/content/images/toolbar-images/polygon.png" />
     </div>-->
     <div
-      title="Free hand drawing"
+      [title]="'scanexam.freedrawing' | translate"
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'PENCIL' }"
       (click)="select(DrawingTools.PENCIL)"
@@ -66,7 +66,7 @@
       <fa-icon [icon]="faPencil"></fa-icon>
     </div>
     <div
-      title="Editable textfield"
+      [title]="'scanexam.edittext' | translate"
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'TEXT' }"
       (click)="select(DrawingTools.TEXT)"
@@ -82,7 +82,7 @@
       <img src="/content/images/toolbar-images/fill.png" />
     </div>-->
     <div
-      title="Clear canvas, remove all shapes/texts"
+      [title]="'scanexam.clearcanvas' | translate"
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'GARBAGE' }"
       (click)="select(DrawingTools.GARBAGE)"

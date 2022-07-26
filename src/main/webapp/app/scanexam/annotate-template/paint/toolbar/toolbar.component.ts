@@ -15,6 +15,7 @@ import {
   faTrash,
   faPencil,
 } from '@fortawesome/free-solid-svg-icons';
+import { TranslateService } from '@ngx-translate/core';
 import { EventHandlerService } from '../event-handler.service';
 import { DrawingTools } from '../models';
 
@@ -37,7 +38,11 @@ export class GraphicalToolbarComponent {
   DrawingTools = DrawingTools;
   selected = this.eventService.selectedTool;
 
-  constructor(private eventService: EventHandlerService) {}
+  constructor(
+    private eventService: EventHandlerService,
+
+    public translateService: TranslateService
+  ) {}
 
   ngOnInit(): void {
     this.eventService.registerSelectedToolObserver(s => {

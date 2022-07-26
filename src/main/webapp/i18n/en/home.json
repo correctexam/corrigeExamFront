@@ -29,6 +29,14 @@
     "voircopie": "Show your sheet",
     "stats": "Exam statistics",
     "voirreponse": "Show a specific answer",
-    "voirreponsesstarunstar": "Show representative answers"
+    "voirreponsesstarunstar": "Show representative answers",
+    "titleu": "Correct your exam sheets more efficiently ✔️",
+    "subtitleu": "a feedback to your students in less than a day",
+    "slogan": "Scan, batch correct, be assisted by AI, give accurate feedback to your students, from a PC or a tablet",
+    "login": "Sign in",
+    "register": "Register",
+    "welcomeadmin": "Welcome to the administration page of this application",
+    "welcomeadminsub": "You can access the data from the entity menu",
+    "textadmin": "You can manage users and services from the administration menu."
   }
 }

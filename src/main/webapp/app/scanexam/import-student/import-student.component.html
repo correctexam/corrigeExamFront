@@ -7,7 +7,7 @@
   <div class="col-8">
     <div class="grid grid-nogutter">
       <div class="col-8">
-        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">Importer étudiants</h2>
+        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" jhiTranslate="scanexam.importstudent">Importer étudiants</h2>
       </div>
       <div class="col-4 flex flex-row-reverse">
         <button
@@ -18,7 +18,7 @@
           class="p-button p-button-primary"
           (click)="gotoUE()"
         >
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Retourner au module</span>
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackue">Retourner au module</span>
         </button>
 
         <button
@@ -29,14 +29,14 @@
           class="p-button p-button-primary"
           (click)="envoiEtudiants()"
         >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span>Importer étudiants ci-dessous</span>
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="scanexam.importfollowingstudent">Importer étudiants ci-dessous</span>
         </button>
         <button (click)="download()" type="submit" id="save-entity" data-cy="entityCreateSaveButton" class="p-button p-button-primary">
-          <fa-icon icon="save"></fa-icon>&nbsp;<span>Download template</span>
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="scanexam.downloadtemplate">Download template</span>
         </button>
       </div>
       <div class="col-offset-8 col-4">
-        <label for="slider">Nombre de lignes dans le tableau (entre 100 et 300)</label>
+        <label for="slider" jhiTranslate="scanexam.nbrligne">Nombre de lignes dans le tableau (entre 100 et 300)</label>
         <p-slider id="slider" [(ngModel)]="val" (onChange)="updateTableSize()" [step]="20" [min]="100" [max]="300"></p-slider>
       </div>
     </div>
@@ -55,9 +55,11 @@
         [afterChange]="detectChanges"
       >
         <!--<hot-column data="id" [readOnly]="true" title="ID"></hot-column>-->
-        <hot-column data="ine" [title]="'INE'"></hot-column>> <hot-column data="nom" [title]="'NOM'"></hot-column>>
-        <hot-column data="prenom" [title]="'PRENOM'"></hot-column>> <hot-column data="mail" [title]="'MAIL'"></hot-column>>
-        <hot-column data="groupe" [title]="'GROUPE'"></hot-column>>
+        <hot-column data="ine" [title]="'scanexam.ine' | translate"></hot-column>>
+        <hot-column data="nom" [title]="'scanexam.nom' | translate"></hot-column>>
+        <hot-column data="prenom" [title]="'scanexam.prenom' | translate"></hot-column>>
+        <hot-column data="mail" [title]="'scanexam.mail' | translate"></hot-column>>
+        <hot-column data="groupe" [title]="'scanexam.groupe' | translate"></hot-column>>
       </hot-table>
     </div>
   </div>

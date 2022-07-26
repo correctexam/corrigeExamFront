@@ -31,6 +31,7 @@ import { ITextComment } from '../../entities/text-comment/text-comment.model';
 import { IGradedComment } from '../../entities/graded-comment/graded-comment.model';
 import { GradedCommentService } from '../../entities/graded-comment/service/graded-comment.service';
 import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'jhi-corrigequestion',
@@ -112,7 +113,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     public textCommentService: TextCommentService,
     public studentResponseService: StudentResponseService,
     private changeDetector: ChangeDetectorRef,
-    private eventHandler: EventCanevascorrectionHandlerService
+    private eventHandler: EventCanevascorrectionHandlerService,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -517,10 +519,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     );
     this.selectionStudents = filterStudent;
     if (this.selectionStudents.length === 0) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Copie non associée à un étudiant',
-        detail: 'Il semble que cette copie ne soit pas associée à un étudiant',
+      this.translateService.get('scanexam.copienotassociated').subscribe(() => {
+        this.messageService.add({
+          severity: 'error',
+          summary: this.translateService.instant('scanexam.copienotassociated'),
+          detail: this.translateService.instant('scanexam.copienotassociateddetails'),
+        });
       });
     }
   }

@@ -7,7 +7,14 @@
   <div class="col-8">
     <div class="grid grid-nogutter">
       <div class="col-5">
-        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">Créer un examen pour le cours {{ coursName }}</h2>
+        <h2
+          id="jhi-course-heading"
+          data-cy="CourseCreateUpdateHeading"
+          jhiTranslate="scanexam.creeexamcours"
+          [translateValues]="{ coursName: coursName }"
+        >
+          Créer un examen pour le cours {{ coursName }}
+        </h2>
       </div>
       <div class="col-7 flex flex-row-reverse">
         <button
@@ -18,7 +25,7 @@
           class="p-button p-button-primary"
           (click)="gotoUE()"
         >
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Retourner au module</span>
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackue">Retourner au module</span>
         </button>
         <button
           [disabled]="!this.courseid"
@@ -28,7 +35,7 @@
           class="p-button p-button-primary"
           (click)="downloadTemplateWord()"
         >
-          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span>Modèle de sujet Word</span>
+          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span jhiTranslate="scanexam.wordtemplate">Modèle de sujet Word</span>
         </button>
         <button
           [disabled]="!this.courseid"
@@ -38,7 +45,7 @@
           class="p-button p-button-primary"
           (click)="downloadTemplateOdt()"
         >
-          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span>Modèle de sujet LibreOffice</span>
+          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span jhiTranslate="scanexam.odttemplate">Modèle de sujet LibreOffice</span>
         </button>
         <button
           [disabled]="!this.courseid"
@@ -48,7 +55,7 @@
           class="p-button p-button-primary"
           (click)="downloadTemplateLatex()"
         >
-          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span>Modèle de sujet LaTeX</span>
+          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span jhiTranslate="scanexam.latextemplate">Modèle de sujet LaTeX</span>
         </button>
       </div>
     </div>
@@ -65,7 +72,7 @@
         </div>
 
         <div class="row">
-          <label class="form-label col-2" for="field_content">Enoncé de l'examen :</label>
+          <label class="form-label col-2" for="field_content" jhiTranslate="scanexam.enonceexam">Enoncé de l'examen :</label>
           <div class="col-6">
             <div *ngIf="editForm.get('content')!.value" class="form-text text-danger clearfix">
               <a
