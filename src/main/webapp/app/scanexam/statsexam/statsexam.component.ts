@@ -9,6 +9,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { CourseService } from 'app/entities/course/service/course.service';
 import { IQuestion } from 'app/entities/question/question.model';
@@ -94,7 +95,8 @@ export class StatsExamComponent implements OnInit {
     private http: HttpClient,
     protected courseService: CourseService,
     public questionService: QuestionService,
-    protected activatedRoute: ActivatedRoute
+    protected activatedRoute: ActivatedRoute,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -106,15 +108,25 @@ export class StatsExamComponent implements OnInit {
           this.examid = params.get('examid')!;
           this.loadAllPages();
         }
+        this.translateService.get('scanexam.noteattribuee').subscribe(data => {
+          this.initStudents().then(() =>
+            this.requeteInfoQuestions().subscribe(b => {
+              this.infosQuestions = b.body;
+              this.initStatVariables();
+              this.initDisplayVariables();
+              this.style();
+            })
+          );
 
-        this.initStudents().then(() =>
-          this.requeteInfoQuestions().subscribe(b => {
-            this.infosQuestions = b.body;
-            this.initStatVariables();
-            this.initDisplayVariables();
-            this.style();
-          })
-        );
+          this.translateService.onLangChange.subscribe(() => {
+            this.requeteInfoQuestions().subscribe(b => {
+              this.infosQuestions = b.body;
+              this.initStatVariables();
+              this.initDisplayVariables();
+              this.style();
+            });
+          });
+        });
       }
     });
   }
@@ -498,32 +510,32 @@ export class StatsExamComponent implements OnInit {
         datasets[indice].data = this.normaliseNotes(ds.data, this.getBaremes(this.q_notees));
       });
     }
-    const vue = pourcents ? 'pourcents' : 'brut';
+    const vue = pourcents ? this.translateService.instant('scanexam.pourcents') : this.translateService.instant('scanexam.brut');
     return { labels, datasets, vue };
   }
 
   private radarMoy(): IRadarDataset {
     const dataMoy: number[] = this.getMoyennesQuestions();
-    return this.basicDataset('Moyenne', BLEU_AERO, TRANSPARENT, dataMoy);
+    return this.basicDataset(this.translateService.instant('scanexam.average'), BLEU_AERO, TRANSPARENT, dataMoy);
   }
 
   private radarMed(): IRadarDataset {
     const dataMed: number[] = this.getMedianeQuestions();
-    return this.basicDataset('Mediane', BLEU_FONCE, TRANSPARENT, dataMed);
+    return this.basicDataset(this.translateService.instant('scanexam.mediane'), BLEU_FONCE, TRANSPARENT, dataMed);
   }
 
   private radarMaxNote(): IRadarDataset {
     const dataMaxNote: number[] = this.getMaxNoteQuestions();
-    return this.basicDataset('Note maximale déliverée', VERT, TRANSPARENT, dataMaxNote);
+    return this.basicDataset(this.translateService.instant('scanexam.notemax1'), VERT, TRANSPARENT, dataMaxNote);
   }
   private radarMinNote(): IRadarDataset {
     const dataMinNote: number[] = this.getMinNoteQuestions();
-    return this.basicDataset('Note minimale déliverée', ROUGE, TRANSPARENT, dataMinNote);
+    return this.basicDataset(this.translateService.instant('scanexam.notemin1'), ROUGE, TRANSPARENT, dataMinNote);
   }
 
   private radarStudent(etudiant: StudentRes): IRadarDataset {
     const notesEtudiant: number[] = this.getNotes(etudiant);
-    return this.basicDataset('Notes', VIOLET, VIOLET_LEGER, notesEtudiant);
+    return this.basicDataset(this.translateService.instant('scanexam.notes'), VIOLET, VIOLET_LEGER, notesEtudiant);
   }
 
   private basicDataset(label: string, couleurForte: string, couleurLegere: string, data: number[]): IRadarDataset {
@@ -531,21 +543,25 @@ export class StatsExamComponent implements OnInit {
   }
 
   public toggleRadar(): void {
-    const choixPrct = this.data_radar_courant.vue === 'pourcents';
+    const choixPrct = this.data_radar_courant.vue === this.translateService.instant('scanexam.pourcents');
 
-    this.data_radar_courant.vue = choixPrct ? 'brut' : 'pourcents';
+    this.data_radar_courant.vue = choixPrct
+      ? this.translateService.instant('scanexam.brut')
+      : this.translateService.instant('scanexam.pourcents');
     // Carte
     this.updateCarteRadar();
   }
 
   public updateCarteRadar(): void {
-    const choixPrct = this.data_radar_courant.vue === 'pourcents';
+    const choixPrct = this.data_radar_courant.vue === this.translateService.instant('scanexam.pourcents');
     if (this.etudiantSelec !== null && this.etudiantSelec !== undefined) {
       this.data_radar_courant = this.initStudentRadarData(this.etudiantSelec, choixPrct);
     } else {
       this.data_radar_courant = this.initGlobalRadarData(this.q_notees, choixPrct);
     }
-    const selection: string = choixPrct ? 'Valeurs normalisées par question' : 'Valeurs brutes par question';
+    const selection: string = choixPrct
+      ? this.translateService.instant('scanexam.valeursnormalisees')
+      : this.translateService.instant('scanexam.valeursbrutes');
     const infosExam = undefined; // : string = this.resumeExam();
     this.updateCarte('questions_stats', undefined, selection, infosExam);
   }
@@ -553,14 +569,17 @@ export class StatsExamComponent implements OnInit {
   onStudentSelect(event: any): void {
     if (this.etudiantSelec !== null && this.etudiantSelec !== undefined) {
       this.updateCarte('selection_etudiant', undefined, this.etudiantSelec.prenom + ' ' + this.etudiantSelec.nom, undefined);
-      this.data_radar_courant = this.initStudentRadarData(this.etudiantSelec, this.data_radar_courant.vue === 'pourcents');
+      this.data_radar_courant = this.initStudentRadarData(
+        this.etudiantSelec,
+        this.data_radar_courant.vue === this.translateService.instant('scanexam.pourcents')
+      );
       this.updateCarteRadar();
       this.updateKnobs();
       this.COLOR_KNOBS = VIOLET_TIEDE;
     }
   }
   onStudentUnselect(event: any): void {
-    this.updateCarte('selection_etudiant', undefined, 'Aucun étudiant sélectionné', undefined);
+    this.updateCarte('selection_etudiant', undefined, this.translateService.instant('scanexam.nostudentselected'), undefined);
     this.updateCarteRadar();
     this.updateKnobs();
     this.COLOR_KNOBS = BLEU_AERO_TIEDE;
@@ -648,11 +667,12 @@ export class StatsExamComponent implements OnInit {
     }
     this.idQuestionSelected = idQuestion;
     if (!q_selectionne) {
-      this.texte_correction = 'Correction';
+      this.texte_correction = this.translateService.instant('scanexam.correction');
       this.questionSelectionnee = false;
       this.idQuestionSelected = 0;
     } else {
-      this.texte_correction = 'Correction (' + (idQuestion + 1).toString() + ')';
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+      this.texte_correction = this.translateService.instant('scanexam.correction') +  '(' + (idQuestion + 1).toString() + ')';
       const knobCard = document.getElementById('knobquest' + idQuestion.toString());
       knobCard?.setAttribute('class', 'knobQuestion knobSelected');
       this.questionSelectionnee = true;

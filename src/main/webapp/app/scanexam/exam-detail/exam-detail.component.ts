@@ -24,6 +24,7 @@ import { AccountService } from '../../core/auth/account.service';
 import { ExportOptions } from 'dexie-export-import';
 import { MessageService } from 'primeng/api';
 import { CacheUploadService } from './cacheUpload.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'jhi-exam-detail',
@@ -57,7 +58,8 @@ export class ExamDetailComponent implements OnInit {
     public appConfig: ApplicationConfigService,
     public accountService: AccountService,
     private messageService: MessageService,
-    public cacheUploadService: CacheUploadService
+    public cacheUploadService: CacheUploadService,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -83,7 +85,7 @@ export class ExamDetailComponent implements OnInit {
                         this.messageService.add({
                           severity: 'success',
                           summary: 'Download file from server',
-                          detail: 'Import de la bse de données locales réussi',
+                          detail: 'Import de la base de données locales réussi',
                         });
                         this.showAssociation = true;
                         this.initTemplate();
@@ -112,45 +114,52 @@ export class ExamDetailComponent implements OnInit {
 
           //          this.examSheetService.
         });
-        this.dockItems = [
-          {
-            label: 'Supprimer cet Examen',
-            icon: this.appConfig.getFrontUrl() + 'content/images/remove-rubbish.svg',
-            title: 'Supprimer cet Examen (templates, questions, corrections ...)',
-            command1: () => {
-              this.confirmeDelete();
-            },
-          },
-          {
-            label: 'Nettoyer le cache du browser pour cet exam',
-            icon: this.appConfig.getFrontUrl() + 'content/images/Font_Awesome_5_solid_eraser.svg',
-            title: 'Nettoyer le cache du browser pour cet exam (images dans la base de données locale)',
-            command1: () => {
-              this.confirmeCleanCache();
-            },
-          },
-
-          {
-            label: 'Synchroniser le cache du browser vers le serveur pour une correction sur un autre device',
-            icon: this.appConfig.getFrontUrl() + 'content/images/upload-solid.svg',
-            title:
-              'Synchroniser le cache du browser vers le serveur pour une correction sur un autre device (images dans la base de données locale)',
-            command1: () => {
-              this.confirmUpload();
-            },
-          },
-          {
-            label: 'Synchroniser le cache du browser avec celui du serveur',
-            icon: this.appConfig.getFrontUrl() + 'content/images/download-solid.svg',
-            title:
-              "Synchroniser le cache du browser avec celui du serveur (permet d'importer un ensemble d'images préalablement alignées sur un autre équipement)",
-            command1: () => {
-              this.confirmDownload();
-            },
-          },
-        ];
+        this.translateService.get('scanexam.removeexam').subscribe(() => {
+          this.initCmpt();
+        });
+        this.translateService.onLangChange.subscribe(() => {
+          this.initCmpt();
+        });
       }
     });
+  }
+
+  initCmpt(): void {
+    this.dockItems = [
+      {
+        label: this.translateService.instant('scanexam.removeexam'),
+        icon: this.appConfig.getFrontUrl() + 'content/images/remove-rubbish.svg',
+        title: this.translateService.instant('scanexam.removeexamdetail'),
+        command1: () => {
+          this.confirmeDelete();
+        },
+      },
+      {
+        label: this.translateService.instant('scanexam.cleancache'),
+        icon: this.appConfig.getFrontUrl() + 'content/images/Font_Awesome_5_solid_eraser.svg',
+        title: this.translateService.instant('scanexam.cleancachedetail'),
+        command1: () => {
+          this.confirmeCleanCache();
+        },
+      },
+
+      {
+        label: this.translateService.instant('scanexam.synchrobrowserserver'),
+        icon: this.appConfig.getFrontUrl() + 'content/images/upload-solid.svg',
+        title: this.translateService.instant('scanexam.synchrobrowserserverdetail'),
+        command1: () => {
+          this.confirmUpload();
+        },
+      },
+      {
+        label: this.translateService.instant('scanexam.synchroserverbrowser'),
+        icon: this.appConfig.getFrontUrl() + 'content/images/download-solid.svg',
+        title: this.translateService.instant('scanexam.synchroserverbrowserdetail'),
+        command1: () => {
+          this.confirmDownload();
+        },
+      },
+    ];
   }
 
   initTemplate(): void {
@@ -194,100 +203,105 @@ export class ExamDetailComponent implements OnInit {
   }
 
   confirmeCleanCache(): any {
-    this.confirmationService.confirm({
-      message: 'Etes vous sur de vouloir supprimer le cache dans le navigateur. Vous devrez réalignez les images',
-      // eslint-disable-next-line object-shorthand
-      accept: () => {
-        db.removeElementForExam(+this.examId).then(() => {
-          this.showAssociation = false;
-          this.showCorrection = false;
-        });
-      },
+    this.translateService.get('scanexam.confirmcleancache').subscribe(data => {
+      this.confirmationService.confirm({
+        message: data,
+        // eslint-disable-next-line object-shorthand
+        accept: () => {
+          db.removeElementForExam(+this.examId).then(() => {
+            this.showAssociation = false;
+            this.showCorrection = false;
+          });
+        },
+      });
     });
   }
 
   confirmUpload(): any {
-    this.confirmationService.confirm({
-      message: 'Etes vous sur de vouloir télécharger le cache du navigateur vers le serveur.',
-      // eslint-disable-next-line object-shorthand
-      accept: () => {
-        const o: ExportOptions = {};
-        o.filter = (table: string, value: any) =>
-          (table === 'exams' && value.id === +this.examId) ||
-          (table === 'templates' && value.examId === +this.examId) ||
-          (table === 'nonAlignImages' && value.examId === +this.examId) ||
-          (table === 'alignImages' && value.examId === +this.examId);
-        this.blocked = true;
-        db.export(o).then((value: Blob) => {
-          const file = new File([value], this.examId + 'indexdb.json');
-          this.cacheUploadService.uploadCache(file).subscribe(
-            e => {
-              if (e.type === 4) {
-                this.blocked = false;
+    this.translateService.get('scanexam.confirmuploadcache').subscribe(data => {
+      this.confirmationService.confirm({
+        message: data,
+        // eslint-disable-next-line object-shorthand
+        accept: () => {
+          const o: ExportOptions = {};
+          o.filter = (table: string, value: any) =>
+            (table === 'exams' && value.id === +this.examId) ||
+            (table === 'templates' && value.examId === +this.examId) ||
+            (table === 'nonAlignImages' && value.examId === +this.examId) ||
+            (table === 'alignImages' && value.examId === +this.examId);
+          this.blocked = true;
+          db.export(o).then((value: Blob) => {
+            const file = new File([value], this.examId + 'indexdb.json');
+            this.cacheUploadService.uploadCache(file).subscribe(
+              e => {
+                if (e.type === 4) {
+                  this.blocked = false;
+                  this.messageService.add({
+                    severity: 'success',
+                    summary: this.translateService.instant('scanexam.uploadcacheok'),
+                    detail: this.translateService.instant('scanexam.uploadcacheokdetail'),
+                  });
+                }
+              },
+              () => {
                 this.messageService.add({
-                  severity: 'success',
-                  summary: 'Upload file on server',
-                  detail: 'Export de la base de données locales réussi',
+                  severity: 'error',
+                  summary: this.translateService.instant('scanexam.uploadcacheko'),
+                  detail: this.translateService.instant('scanexam.uploadcachekodetail'),
                 });
-              }
-            },
-            () => {
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Cannot not upload file on server',
-                detail: "Export de la base de données locales impossible (sans doute due à la taille, ce n'est pas très grave)",
-              });
 
-              this.blocked = false;
-            }
-          );
-        });
-      },
+                this.blocked = false;
+              }
+            );
+          });
+        },
+      });
     });
   }
 
   confirmDownload(): any {
-    this.confirmationService.confirm({
-      message:
-        "Etes vous sur de vouloir télécharger le cache du serveur vers le navigateur. Cela supprimera votre base d'images locale à cet équipement préalablement alignées.",
-      // eslint-disable-next-line object-shorthand
-      accept: () => {
-        this.blocked = true;
-        db.removeElementForExam(+this.examId).then(() => {
-          this.cacheUploadService.getCache(this.examId + 'indexdb.json').subscribe(
-            data => {
-              db.import(data)
-                .then(() => {
-                  this.messageService.add({
-                    severity: 'success',
-                    summary: 'Download file from server',
-                    detail: 'Import de la bse de données locales réussi',
+    this.translateService.get('scanexam.confirmuploadcache').subscribe(data1 => {
+      this.confirmationService.confirm({
+        message: data1,
+        // eslint-disable-next-line object-shorthand
+        accept: () => {
+          this.blocked = true;
+          db.removeElementForExam(+this.examId).then(() => {
+            this.cacheUploadService.getCache(this.examId + 'indexdb.json').subscribe(
+              data => {
+                db.import(data)
+                  .then(() => {
+                    this.messageService.add({
+                      severity: 'success',
+                      summary: this.translateService.instant('scanexam.downloadcacheok'),
+                      detail: this.translateService.instant('scanexam.downloadcacheokdetail'),
+                    });
+                    this.blocked = false;
+                    this.showAssociation = true;
+                    this.showCorrection = true;
+                  })
+                  .catch(() => {
+                    this.messageService.add({
+                      severity: 'error',
+                      summary: this.translateService.instant('scanexam.downloadcacheko'),
+                      detail: this.translateService.instant('scanexam.downloadcachekodetail'),
+                    });
+                    this.blocked = false;
                   });
-                  this.blocked = false;
-                  this.showAssociation = true;
-                  this.showCorrection = true;
-                })
-                .catch(() => {
-                  this.messageService.add({
-                    severity: 'error',
-                    summary: 'Download file from server',
-                    detail: "Aucune données de cache sur le serveur. Merci de lancer l'alignement des images depuis ce navigateur",
-                  });
-                  this.blocked = false;
+              },
+              () => {
+                this.messageService.add({
+                  severity: 'error',
+                  summary: this.translateService.instant('scanexam.downloadcacheko'),
+                  detail: this.translateService.instant('scanexam.downloadcachekodetail'),
                 });
-            },
-            () => {
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Download file from server',
-                detail: "Aucune données de cache sur le serveur. Merci de lancer l'alignement des images depuis ce navigateur",
-              });
 
-              this.blocked = false;
-            }
-          );
-        });
-      },
+                this.blocked = false;
+              }
+            );
+          });
+        },
+      });
     });
   }
 

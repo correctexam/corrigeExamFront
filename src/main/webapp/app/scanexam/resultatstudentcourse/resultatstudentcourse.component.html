@@ -7,21 +7,16 @@
   <p-confirmDialog header="Confirmation envoie mail" icon="pi pi-exclamation-triangle"></p-confirmDialog>
   <p-dialog [(visible)]="showEmail" [modal]="true">
     <ng-template pTemplate="header">
-      <h4>Confirmation envoi mail</h4>
+      <h4 jhiTranslate="scanexam.confirmemail">Confirmation envoi mail</h4>
     </ng-template>
     <div class="grid">
       <div class="col-12">
-        <label>Sujet du mail:</label>
+        <label jhiTranslate="scanexam.mailsubject">Sujet du mail:</label>
         <input type="text" [(ngModel)]="mailSubject" pInputText [style]="{ width: '100%' }" />
       </div>
       <div class="col-12">
-        <label>Corps du mail:</label>
-        <fa-icon
-          [size]="'1x'"
-          [pTooltip]="'les variables ${firstname}, ${url}, ${lastname}, ${note} peuvent être utilisé au sein du corps du mail'"
-          tooltipPosition="top"
-          icon="eye"
-        ></fa-icon>
+        <label jhiTranslate="scanexam.mailbody">Corps du mail:</label>
+        <fa-icon [size]="'1x'" [pTooltip]="'scanexam.mailtooltip' | translate" tooltipPosition="top" icon="eye"></fa-icon>
 
         <textarea [style]="{ width: '100%', height: '12rem' }" type="text" [(ngModel)]="mailBody" pInputTextarea></textarea>
       </div>
@@ -36,7 +31,7 @@
         class="p-button p-button-primary"
         (click)="envoiEmailEtudiant()"
       >
-        <fa-icon [icon]="faEnvelope"></fa-icon>&nbsp;<span>Envoi mail étudiants</span>
+        <fa-icon [icon]="faEnvelope"></fa-icon>&nbsp;<span jhiTranslate="scanexam.envoiemail">Envoi mail étudiants</span>
       </button>
     </ng-template>
   </p-dialog>
@@ -44,7 +39,7 @@
   <div class="col-8">
     <div class="grid grid-nogutter">
       <div class="col-4">
-        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">Résultat étudiants</h2>
+        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" jhiTranslate="scanexam.resultatstudents">Résultat étudiants</h2>
       </div>
       <div class="col-8 flex flex-row-reverse">
         <button
@@ -55,7 +50,7 @@
           class="p-button p-button-primary"
           (click)="gotoUE()"
         >
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Retourner à l'exam</span>
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam">Retourner à l'exam</span>
         </button>
         <button
           [disabled]="!this.examid"
@@ -65,7 +60,7 @@
           class="p-button p-button-primary"
           (click)="showEmailStudent()"
         >
-          <fa-icon [icon]="faEnvelope"></fa-icon>&nbsp;<span>Envoi mail étudiants</span>
+          <fa-icon [icon]="faEnvelope"></fa-icon>&nbsp;<span jhiTranslate="scanexam.envoimailstudent">Envoi mail étudiants</span>
         </button>
         <button
           [disabled]="!this.examid"
@@ -75,14 +70,14 @@
           class="p-button p-button-primary"
           (click)="exportExcel()"
         >
-          <fa-icon [icon]="faEnvelope"></fa-icon>&nbsp;<span>Export Excel</span>
+          <fa-icon [icon]="faEnvelope"></fa-icon>&nbsp;<span jhiTranslate="scanexam.exportexcel">Export Excel</span>
         </button>
 
         <a class="p-button p-button-primary" pButton [routerLink]="'/statistics/' + this.examid" type="button" *ngIf="this.examid">
-          <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span>Show statistics</span>
+          <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span jhiTranslate="scanexam.showstat">Show statistics</span>
         </a>
         <a *ngIf="!this.examid" class="disabled p-button p-button-primary" type="button" pButton>
-          <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span>Show statistics</span>
+          <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span jhiTranslate="scanexam.showstat">Show statistics</span>
         </a>
 
         <a
@@ -92,10 +87,14 @@
           type="button"
           *ngIf="this.examid"
         >
-          <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span>Show representative answers</span>
+          <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span jhiTranslate="scanexam.showanswer"
+            >Show representative answers</span
+          >
         </a>
         <a *ngIf="!this.examid" class="disabled p-button p-button-primary" pButton type="button">
-          <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span>Show representative answers</span></a
+          <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span jhiTranslate="scanexam.showanswer"
+            >Show representative answers</span
+          ></a
         >
 
         <!--        <button
@@ -114,13 +113,13 @@
       <p-table [value]="studentsresult">
         <ng-template pTemplate="header">
           <tr>
-            <th>INE</th>
-            <th>NOM</th>
-            <th>PRENOM</th>
-            <th>MAIL</th>
-            <th>NOTE</th>
-            <th>LIEN PROF</th>
-            <th>LIEN</th>
+            <th jhiTranslate="scanexam.ine">INE</th>
+            <th jhiTranslate="scanexam.nom">NOM</th>
+            <th jhiTranslate="scanexam.prenom">PRENOM</th>
+            <th jhiTranslate="scanexam.mail">MAIL</th>
+            <th jhiTranslate="scanexam.note">NOTE</th>
+            <th jhiTranslate="scanexam.lienprof">LIEN PROF</th>
+            <th jhiTranslate="scanexam.lieneleve">LIEN</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-student>
@@ -131,9 +130,13 @@
             <td>{{ student.mail }}</td>
             <td *ngIf="!student.abi">{{ student.note }}</td>
             <td *ngIf="student.abi">0</td>
-            <td *ngIf="student.studentNumber"><a href="{{ 'answer/' + exam?.id + '/1' + '/' + student.studentNumber }}">correction</a></td>
+            <td *ngIf="student.studentNumber">
+              <a href="{{ 'answer/' + exam?.id + '/1' + '/' + student.studentNumber }}" jhiTranslate="scanexam.correction1">correction</a>
+            </td>
             <td *ngIf="!student.studentNumber">ABI</td>
-            <td *ngIf="!student.abi"><a target="_blank" href="{{ 'copie/' + student.uuid + '/1' }}">link</a></td>
+            <td *ngIf="!student.abi">
+              <a target="_blank" href="{{ 'copie/' + student.uuid + '/1' }}" jhiTranslate="scanexam.lien">link</a>
+            </td>
             <td *ngIf="student.abi">ABI</td>
           </tr>
         </ng-template>

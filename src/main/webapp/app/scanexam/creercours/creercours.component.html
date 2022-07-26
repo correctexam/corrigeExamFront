@@ -4,7 +4,7 @@
       <div class="d-flex justify-content-center">
         <div class="col-8">
           <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-            <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">Créer un cours</h2>
+            <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" jhiTranslate="scanexam.creercours">Créer un cours</h2>
 
             <div>
               <jhi-alert-error></jhi-alert-error>
@@ -15,7 +15,7 @@
               </div>
 
               <div class="row mb-3">
-                <label class="form-label" for="field_name">Nom du cours</label>
+                <label class="form-label" for="field_name" jhiTranslate="scanexam.coursename">Nom du cours</label>
                 <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" />
                 <div *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
                   <small

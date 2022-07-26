@@ -47,16 +47,22 @@ export class ResultatStudentcourseComponent implements OnInit {
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('examid') !== null) {
         this.examid = params.get('examid')!;
+
         this.examService.find(+this.examid).subscribe(e => {
-          this.exam = e.body!;
-          this.mailSubject = "Votre résultat à l'examen " + this.exam.name;
-          this.mailBody = `Bonjour $\{firstname},
-Voici le lien vers votre copie $\{url}.
-
-Sincèrement,
-
-L'équipe pédagogique`;
+          this.translate.get('scanexam.mailtemplate').subscribe(data => {
+            this.exam = e.body!;
+            this.mailSubject = this.translate.instant('scanexam.mailsubjecttemplate') + this.exam.name;
+            this.mailBody = data;
+          });
           this.loadEtudiants();
+        });
+        this.translate.onLangChange.subscribe(() => {
+          this.translate.get('scanexam.mailtemplate').subscribe(data => {
+            if (this.exam !== undefined) {
+              this.mailSubject = this.translate.instant('scanexam.mailsubjecttemplate') + this.exam.name;
+              this.mailBody = data;
+            }
+          });
         });
       }
     });
@@ -73,10 +79,13 @@ L'équipe pédagogique`;
     };
     this.http.post(this.applicationConfigService.getEndpointFor('api/sendResult/' + this.examid), mail).subscribe(() => {
       this.showEmail = false;
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Mails envoyés',
-        detail: 'Tous les étudiants sont maintenant prévenus de leur résultat',
+
+      this.translate.get('scanexam.mailsent').subscribe(data => {
+        this.messageService.add({
+          severity: 'success',
+          summary: data,
+          detail: this.translate.instant('scanexam.mailsentdetails'),
+        });
       });
     });
   }

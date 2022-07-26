@@ -18,35 +18,36 @@
 </p-galleria>
 
 <h1>
-  Statistiques de l'examen <span *ngIf="infosQuestions.length !== 0">{{ infosQuestions[0].examName }}</span>
+  <span jhiTranslate="scanexam.statexam">Statistiques de l'examen </span>
+  <span *ngIf="infosQuestions.length !== 0">{{ infosQuestions[0].examName }}</span>
 </h1>
 <div class="cards">
   <div class="card" id="statgen">
-    <p-card header="Statistiques de l'examen" subheader="Statistiques générales">
+    <p-card [header]="'scanexam.statexam' | translate" [subheader]="'scanexam.statgeneral' | translate">
       <div class="statsgenerales-container">
         <div class="statgenerale">
-          Nombre d'étudiants<span>{{ this.notes_eleves.length }}</span>
+          <span jhiTranslate="scanexam.nbrstudents">Nombre d'étudiants</span><span>{{ this.notes_eleves.length }}</span>
         </div>
         <div class="statgenerale">
-          Moyenne<span>{{ this.getMoyenneExam().toFixed(2) }}/{{ this.getBaremeExam() }}</span>
+          <span jhiTranslate="scanexam.average">Moyenne</span><span>{{ this.getMoyenneExam().toFixed(2) }}/{{ this.getBaremeExam() }}</span>
         </div>
         <div class="statgenerale">
-          Écart type (σ)<span>{{ this.getEcartTypeExam().toFixed(2) }}</span>
+          <span jhiTranslate="scanexam.ecarttype">Écart type (σ)</span><span>{{ this.getEcartTypeExam().toFixed(2) }}</span>
         </div>
         <div class="statgenerale">
-          Mediane <span>{{ this.getMedianeExam() }}/{{ this.getBaremeExam() }}</span>
+          <span jhiTranslate="scanexam.mediane">Mediane</span> <span>{{ this.getMedianeExam() }}/{{ this.getBaremeExam() }}</span>
         </div>
         <div class="statgenerale">
-          Note maximale<span>{{ this.getMaxNoteExam() }}/{{ this.getBaremeExam() }}</span>
+          <span jhiTranslate="scanexam.notemax">Note maximale</span><span>{{ this.getMaxNoteExam() }}/{{ this.getBaremeExam() }}</span>
         </div>
         <div class="statgenerale">
-          Note minimale<span>{{ this.getMinNoteExam() }}/{{ this.getBaremeExam() }}</span>
+          <span jhiTranslate="scanexam.notemin">Note minimale</span><span>{{ this.getMinNoteExam() }}/{{ this.getBaremeExam() }}</span>
         </div>
       </div>
     </p-card>
   </div>
   <div class="card" id="statsquestions">
-    <p-card id="questions_stats" header="Statistiques par question" subheader="Vue">
+    <p-card id="questions_stats" [header]="'scanexam.statperquestion' | translate" [subheader]="'scanexam.vue' | translate">
       <ng-template pTemplate="header">
         <div class="header-radar">
           <div class="radar-container">
@@ -88,7 +89,7 @@
             type="button"
             class="p-button-outlined"
             id="radarChoice"
-            label="Changer la vue"
+            [label]="'scanexam.changeview' | translate"
             icon="pi pi-chart-pie"
           ></button>
         </div>
@@ -96,7 +97,11 @@
     </p-card>
   </div>
   <div class="card" id="selectstudent">
-    <p-card id="selection_etudiant" header="Sélection d'un étudiant" subheader="Aucun étudiant sélectionné">
+    <p-card
+      id="selection_etudiant"
+      [header]="'scanexam.studentselection' | translate"
+      [subheader]="'scanexam.noselectedstudent' | translate"
+    >
       <ng-template pTemplate="header">
         <p-table
           class="computer-view"
@@ -114,10 +119,10 @@
         >
           <ng-template pTemplate="header">
             <tr>
-              <th pSortableColumn="ine">INE<p-sortIcon field="ine"></p-sortIcon></th>
-              <th pSortableColumn="alpha">NOM<p-sortIcon field="alpha"></p-sortIcon></th>
-              <th pSortableColumn="alpha">PRENOM<p-sortIcon field="alpha"></p-sortIcon></th>
-              <th pSortableColumn="note">NOTE<p-sortIcon field="note"></p-sortIcon></th>
+              <th pSortableColumn="ine" jhiTranslate="scanexam.ine">INE<p-sortIcon field="ine"></p-sortIcon></th>
+              <th pSortableColumn="alpha" jhiTranslate="scanexam.nom">NOM<p-sortIcon field="alpha"></p-sortIcon></th>
+              <th pSortableColumn="alpha" jhiTranslate="scanexam.prenom">PRENOM<p-sortIcon field="alpha"></p-sortIcon></th>
+              <th pSortableColumn="note" jhiTranslate="scanexam.note">NOTE<p-sortIcon field="note"></p-sortIcon></th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-student>
@@ -137,7 +142,7 @@
               optionValue="value"
               optionLabel="name"
               [showClear]="true"
-              placeholder="Aucun étudiant sélectionné"
+              [placeholder]="'scanexam.nostudentselected' | translate"
               dropdownIcon="pi pi-user"
               tooltipPosition="bottom"
               (onChange)="onStudentSelect($event)"
@@ -187,7 +192,7 @@
             (click)="voirLaCopie()"
             type="button"
             class="p-button-primary"
-            label="Voir la copie"
+            [label]="'scanexam.voircopie' | translate"
             icon="pi pi-file"
           ></button>
           <a
@@ -208,7 +213,7 @@
               pButton
               type="button"
               class="p-button-raised p-button-text"
-              label="Correction"
+              [label]="'scanexam.correction' | translate"
               icon="pi pi-external-link"
             ></button>
           </ng-template>

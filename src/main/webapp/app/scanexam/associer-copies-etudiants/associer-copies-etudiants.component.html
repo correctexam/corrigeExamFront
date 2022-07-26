@@ -29,7 +29,7 @@
   <div class="col-12">
     <div class="grid grid-nogutter">
       <div class="col-8">
-        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">Associer étudiants/copies</h2>
+        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" jhiTranslate="scanexam.bindcopies">Associer étudiants/copies</h2>
       </div>
       <div class="col-4 flex flex-row-reverse">
         <button
@@ -40,7 +40,7 @@
           class="p-button p-button-primary"
           (click)="gotoUE()"
         >
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Retourner à l'exam</span>
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam">Retourner à l'exam</span>
         </button>
         <!-- <button
           [disabled]="!this.examId"
@@ -53,7 +53,7 @@
           <fa-icon [icon]="faHouseSignal"></fa-icon>&nbsp;<span>Reconnaissance noms</span>
         </button>-->
         <p-inputSwitch [(ngModel)]="assisted"></p-inputSwitch>
-        <label>Assistance</label>
+        <label jhiTranslate="scanexam.assistance">Assistance</label>
 
         <!-- <button
           pButton
@@ -79,7 +79,7 @@
     </div>
     <div class="col-12 md:col-12">
       <div *ngIf="debug">
-        <h5>Alignement</h5>
+        <h5 jhiTranslate="scanexam.alignement">Alignement</h5>
         <p-selectButton
           [options]="alignementOptions"
           [(ngModel)]="alignement"
@@ -92,10 +92,10 @@
       <p-selectButton [options]="debugOptions" [(ngModel)]="debug" optionLabel="label" optionValue="value"></p-selectButton>-->
       <div class="d-flex justify-content-center">
         <div>
-          <span>Etudiant(es) Séléctionné(es):</span> {{ selectionStudentsString() }}
+          <span jhiTranslate="scanexam.selectedstudent">Etudiant(es) Séléctionné(es):</span> {{ selectionStudentsString() }}
           <BR />
           <span *ngIf="assisted && recognizedStudent !== undefined && predictionprecision > 0.07"
-            >Etudiant(es) Reconnu(es): {{ showRecognizedStudent() }}</span
+            ><span jhiTranslate="scanexam.aistudent">Etudiant(es) Reconnu(es):</span> {{ showRecognizedStudent() }}</span
           >
           <p-button
             (onClick)="selectRecogniezStudent()"
@@ -108,7 +108,7 @@
 
       <div class="grid align-items-center">
         <div class="col-3">
-          <label>Supprimer alignement: </label>
+          <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
           <p-inputSwitch [(ngModel)]="noalign" (onChange)="reloadImage()"></p-inputSwitch>
         </div>
         <div class="col-6">
@@ -121,11 +121,11 @@
               [showJumpToPageDropdown]="true"
               [showPageLinks]="false"
             ></p-paginator>
-            <button pButton (click)="showGalleria()">Show full page</button>
+            <button pButton (click)="showGalleria()" jhiTranslate="scanexam.showgalleria">Show full page</button>
           </div>
         </div>
         <div class="col-3 justify-content-end">
-          <label>Facteur d'agrandissement: {{ factor }} </label>
+          <label><span jhiTranslate="scanexam.zoomfactor"> Facteur d'agrandissement: </span>{{ factor }} </label>
           <p-slider [ngModel]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImageGrowFactor($event)"> </p-slider>
         </div>
       </div>
@@ -162,7 +162,7 @@
                 <span style="float: left">{{ table.label }}</span>
               </div>
               <div class="col-md-6 text-right">
-                <button style="padding: '0.1rem'" pButton (click)="selectStudents(table.value)">Next</button>
+                <button style="padding: '0.1rem'" pButton (click)="selectStudents(table.value)" jhiTranslate="scanexam.next">Next</button>
               </div>
             </div>
           </div>

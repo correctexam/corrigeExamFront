@@ -113,24 +113,26 @@ export class ImportStudentComponent implements OnInit {
       () => {
         this.blocked = false;
         this.hotRegisterer.getInstance(this.id).render();
-
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Import valide',
-          detail: 'Tous les étudiants sont maintenant associés à ce module',
+        this.translate.get('scanexam.importsuccess').subscribe(data => {
+          this.messageService.add({
+            severity: 'success',
+            summary: data,
+            detail: this.translate.instant('scanexam.importsuccessdetail'),
+          });
+          this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val);
+          this.router.navigateByUrl('/course/' + this.courseid);
+          //        window.history.back();
         });
-        this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val);
-        this.router.navigateByUrl('/course/' + this.courseid);
-        //        window.history.back();
       },
       err => {
         this.blocked = false;
         this.hotRegisterer.getInstance(this.id).render();
-
-        this.messageService.add({
-          severity: 'error',
-          summary: "impossible d'importer ces étudiants",
-          detail: JSON.stringify(err),
+        this.translate.get('scanexam.importerror').subscribe(data => {
+          this.messageService.add({
+            severity: 'error',
+            summary: data,
+            detail: JSON.stringify(err),
+          });
         });
       }
     );

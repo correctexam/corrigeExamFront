@@ -39,15 +39,11 @@ export class SharecourseComponent implements OnInit {
   moveToTarget(event: any): void {
     this.http
       .put<any>(this.applicationConfigService.getEndpointFor('api/updateProfs/' + this.courseid), { availables: event.items })
-      .subscribe(s => {
-        console.log(s);
-      });
+      .subscribe(() => {});
   }
   moveToSource(event: any): void {
     this.http
       .put<any>(this.applicationConfigService.getEndpointFor('api/updateProfs/' + this.courseid), { shared: event.items })
-      .subscribe(s => {
-        console.log(s);
-      });
+      .subscribe(() => {});
   }
 }

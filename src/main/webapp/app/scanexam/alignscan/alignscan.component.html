@@ -7,7 +7,7 @@
   <div class="col-8">
     <div class="grid grid-nogutter">
       <div class="col-8">
-        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">Aligner scans</h2>
+        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" jhiTranslate="scanexam.align">Aligner scans</h2>
       </div>
       <div class="col-4 flex flex-row-reverse">
         <button
@@ -18,11 +18,11 @@
           class="p-button p-button-primary"
           (click)="gotoUE()"
         >
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Retourner à l'exam</span>
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam">Retourner à l'exam</span>
         </button>
 
         <button (click)="process()" class="p-button p-button-primary" [disabled]="!loaded">
-          <fa-icon [icon]="faObjectGroup"></fa-icon>&nbsp;<span>Alignement des scans</span>
+          <fa-icon [icon]="faObjectGroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.alignscan"> Alignement des scans</span>
         </button>
       </div>
       <!--      <div class="col-offset-8 col-4">
@@ -31,7 +31,7 @@
       </div>-->
     </div>
     <div class="col-12 md:col-12">
-      <h5>Algorithme d'alignement</h5>
+      <h5 jhiTranslate="scanexam.alignscanalgo">Algorithme d'alignement</h5>
       <p-selectButton
         [options]="alignementOptions"
         [(ngModel)]="alignement"
@@ -43,7 +43,7 @@
       <!--<h5>Debug</h5>
       <p-selectButton [options]="debugOptions" [(ngModel)]="debug" optionLabel="label" optionValue="value"></p-selectButton> -->
 
-      <h5>Nombre de page à utiliser dans le template d'exam</h5>
+      <h5 jhiTranslate="scanexam.alignscanbrpage">Nombre de page à utiliser dans le template d'exam</h5>
       <p-inputNumber [(ngModel)]="nbreFeuilleParCopie" [showButtons]="true"></p-inputNumber>
 
       <div class="canvas-wrapper foo">

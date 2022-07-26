@@ -25,6 +25,7 @@ import { db } from '../db/db';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { ExportOptions } from 'dexie-export-import';
 import { CacheUploadService } from '../exam-detail/cacheUpload.service';
+import { TranslateService } from '@ngx-translate/core';
 
 export interface IPage {
   image?: ImageData;
@@ -90,7 +91,8 @@ export class AlignScanComponent implements OnInit {
     public router: Router,
     private pdfService: NgxExtendedPdfViewerService,
     private alignImagesService: AlignImagesService,
-    private cacheUploadService: CacheUploadService
+    private cacheUploadService: CacheUploadService,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {

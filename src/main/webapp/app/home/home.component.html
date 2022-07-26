@@ -1,29 +1,21 @@
 <div *ngIf="account == null" class="grid grid-nogutter surface-section text-800">
   <div class="col-12 md:col-6 p-6 text-center md:text-left flex align-items-center">
     <section>
-      <span class="block text-6xl font-bold mb-1">Corriger vos copies plus efficacement ✔️</span>
-      <div class="text-6xl text-primary font-bold mb-3">un retour à vos étudiants en moins d'une journée</div>
-      <p class="mt-0 mb-4 text-700 line-height-3">
+      <span class="block text-6xl font-bold mb-1" jhiTranslate="home.titleu">Corriger vos copies plus efficacement ✔️</span>
+      <div class="text-6xl text-primary font-bold mb-3" jhiTranslate="home.titleu">un retour à vos étudiants en moins d'une journée</div>
+      <p class="mt-0 mb-4 text-700 line-height-3" jhiTranslate="home.slogan">
         Scanner, corriger par lots, soyez assisté par de l'IA, faites un retour précis à vos étudiants, depuis un PC ou une tablette
       </p>
-      <button
-        (click)="login()"
-        pbutton=""
-        pripple=""
-        label="Learn More"
-        type="button"
-        class="p-element p-ripple mr-3 p-button-raised p-button p-component"
-      >
-        <span class="p-button-label">Authentifiez vous</span><span class="p-ink"></span></button
+      <button (click)="login()" pbutton="" pripple="" type="button" class="p-element p-ripple mr-3 p-button-raised p-button p-component">
+        <span class="p-button-label" jhiTranslate="home.login">Authentifiez vous</span><span class="p-ink"></span></button
       ><button
         routerLink="account/register"
         pbutton=""
         pripple=""
-        label="Live Demo"
         type="button"
         class="p-element p-ripple p-button-outlined p-button p-component"
       >
-        <span class="p-button-label">Créer un compte</span><span class="p-ink"></span>
+        <span class="p-button-label" jhiTranslate="home.register">Créer un compte</span><span class="p-ink"></span>
       </button>
     </section>
   </div>
@@ -50,12 +42,12 @@
       <span class="hipster img-fluid rounded"></span>
     </div>
     <div class="col-md-9">
-      <h1 class="display-4"><span>Bienvenue sur la page d'administration de cette application</span></h1>
+      <h1 class="display-4"><span jhiTranslate="home.welcomeadmin">Bienvenue sur la page d'administration de cette application</span></h1>
 
-      <p class="lead">Vous pouvez accéder aux données depuis le menu entité</p>
+      <p class="lead" jhiTranslate="home.welcomeadminsub">Vous pouvez accéder aux données depuis le menu entité</p>
       <BR />
       <BR />
-      <p>Vous pouvez gérer les utilsiateurs et les services depuis le menu administration.</p>
+      <p jhiTranslate="home.textadmin">Vous pouvez gérer les utilsiateurs et les services depuis le menu administration.</p>
       <BR />
     </div>
   </div>
