@@ -9,13 +9,14 @@ import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 
 import { HomeComponent } from './home.component';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 describe('Home Component', () => {
   let comp: HomeComponent;
   let fixture: ComponentFixture<HomeComponent>;
   let mockAccountService: AccountService;
+  let mockTranslateService: TranslateService;
   let mockRouter: Router;
-
 
   const account: Account = {
     activated: true,
@@ -31,9 +32,9 @@ describe('Home Component', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [RouterTestingModule.withRoutes([])],
+        imports: [RouterTestingModule.withRoutes([]), TranslateModule.forRoot()],
         declarations: [HomeComponent],
-        providers: [AccountService],
+        providers: [AccountService, TranslateService],
       })
         .overrideTemplate(HomeComponent, '')
         .compileComponents();
@@ -44,11 +45,16 @@ describe('Home Component', () => {
     fixture = TestBed.createComponent(HomeComponent);
     comp = fixture.componentInstance;
     mockAccountService = TestBed.inject(AccountService);
+
     mockAccountService.identity = jest.fn(() => of(null));
     mockAccountService.getAuthenticationState = jest.fn(() => of(null));
 
     mockRouter = TestBed.inject(Router);
     jest.spyOn(mockRouter, 'navigate').mockImplementation(() => Promise.resolve(true));
+    jest.spyOn(mockRouter, 'navigate').mockImplementation(() => Promise.resolve(true));
+
+    mockTranslateService = TestBed.inject(TranslateService);
+    jest.spyOn(mockTranslateService, 'use').mockImplementation(() => of(''));
   });
 
   describe('ngOnInit', () => {
