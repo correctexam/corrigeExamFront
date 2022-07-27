@@ -39,7 +39,7 @@ export class ExamDetailComponent implements OnInit {
   faGraduationCap = faGraduationCap as IconProp;
   faBookOpenReader = faBookOpenReader as IconProp;
   examId = '';
-  exam!: IExam;
+  exam: IExam | undefined;
   course!: ICourse;
   dockItems!: any[];
   showAssociation = false;
@@ -67,43 +67,8 @@ export class ExamDetailComponent implements OnInit {
       if (params.get('examid') !== null) {
         this.blocked = true;
         this.examId = params.get('examid')!;
-        db.exams
-          .where('id')
-          .equals(+this.examId)
-          .count()
-          .then(c => {
-            if (c !== 0) {
-              this.blocked = true;
-              this.showAssociation = true;
-              this.initTemplate();
-            } else {
-              db.removeElementForExam(+this.examId).then(() => {
-                this.cacheUploadService.getCache(this.examId + 'indexdb.json').subscribe(
-                  data => {
-                    db.import(data)
-                      .then(() => {
-                        this.messageService.add({
-                          severity: 'success',
-                          summary: 'Download file from server',
-                          detail: 'Import de la base de données locales réussi',
-                        });
-                        this.showAssociation = true;
-                        this.initTemplate();
-                      })
-                      .catch(() => {
-                        this.blocked = false;
-                      });
-                  },
-                  () => {
-                    this.blocked = false;
-                  }
-                );
-              });
-            }
-          });
-
-        this.examService.find(+this.examId).subscribe(data => {
-          this.exam = data.body!;
+        this.examService.find(+this.examId).subscribe(ex => {
+          this.exam = ex.body!;
 
           this.courseService.find(this.exam.courseId!).subscribe(
             e => (this.course = e.body!),
@@ -113,7 +78,45 @@ export class ExamDetailComponent implements OnInit {
           );
 
           //          this.examSheetService.
+
+          db.exams
+            .where('id')
+            .equals(+this.examId)
+            .count()
+            .then(c => {
+              if (c !== 0) {
+                console.log('pass par la');
+                this.blocked = true;
+                this.showAssociation = true;
+                this.initTemplate();
+              } else {
+                console.log('pass par la1');
+                db.removeElementForExam(+this.examId).then(() => {
+                  this.cacheUploadService.getCache(this.examId + 'indexdb.json').subscribe(
+                    data => {
+                      db.import(data)
+                        .then(() => {
+                          this.messageService.add({
+                            severity: 'success',
+                            summary: 'Download file from server',
+                            detail: 'Import de la base de données locales réussi',
+                          });
+                          this.showAssociation = true;
+                          this.initTemplate();
+                        })
+                        .catch(() => {
+                          this.blocked = false;
+                        });
+                    },
+                    () => {
+                      this.blocked = false;
+                    }
+                  );
+                });
+              }
+            });
         });
+
         this.translateService.get('scanexam.removeexam').subscribe(() => {
           this.initCmpt();
         });
@@ -168,6 +171,8 @@ export class ExamDetailComponent implements OnInit {
       .equals(+this.examId)
       .count()
       .then(e2 => {
+        console.log('pass par la2');
+
         this.nbreFeuilleParCopie = e2;
         // Step 2 Query Scan in local DB
 
@@ -176,17 +181,24 @@ export class ExamDetailComponent implements OnInit {
           .equals(+this.examId)
           .count()
           .then(e1 => {
+            console.log('pass par la3');
             this.numberPagesInScan = e1;
 
-            this.studentService.query({ courseId: this.exam.courseId }).subscribe(studentsbody => {
-              this.blocked = false;
+            this.studentService.query({ courseId: this.exam!.courseId }).subscribe(
+              studentsbody => {
+                this.blocked = false;
 
-              this.students = studentsbody.body!;
-              const ex2 = (this.students.map(s => s.examSheets) as any)
-                .flat()
-                .filter((ex1: any) => ex1.scanId === this.exam.scanfileId && ex1.pagemin !== -1).length;
-              this.showCorrection = ex2 === this.numberPagesInScan / this.nbreFeuilleParCopie;
-            });
+                this.students = studentsbody.body!;
+                const ex2 = (this.students.map(s => s.examSheets) as any)
+                  .flat()
+                  .filter((ex1: any) => ex1.scanId === this.exam!.scanfileId && ex1.pagemin !== -1).length;
+                this.showCorrection = ex2 === this.numberPagesInScan / this.nbreFeuilleParCopie;
+              },
+              () => {
+                console.log('pass par la4');
+                this.blocked = false;
+              }
+            );
           });
       });
   }
@@ -196,7 +208,7 @@ export class ExamDetailComponent implements OnInit {
       this.confirmationService.confirm({
         message: data,
         accept: () => {
-          this.examService.delete(this.exam.id!).subscribe(() => {
+          this.examService.delete(this.exam!.id!).subscribe(() => {
             db.removeElementForExam(+this.examId)
               .then(() => {
                 this.router.navigateByUrl('/course/' + this.course.id);
