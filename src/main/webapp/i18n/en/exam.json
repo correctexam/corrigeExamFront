@@ -18,13 +18,13 @@
         "title": "Exam"
       },
       "id": "ID",
-      "name": "Name of the test:",
+      "name": "Name of the Exam:",
       "template": "Template",
-      "idzone": "Idzone",
-      "namezone": "Namezone",
-      "firstnamezone": "Firstnamezone",
-      "notezone": "Notezone",
-      "scanfile": "Scanfile",
+      "idzone": "Id zone",
+      "namezone": "Name zone",
+      "firstnamezone": "First name zone",
+      "notezone": "Note zone",
+      "scanfile": "Scan file",
       "question": "Question",
       "course": "Course"
     }
