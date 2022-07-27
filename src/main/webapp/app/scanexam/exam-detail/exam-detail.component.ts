@@ -192,13 +192,26 @@ export class ExamDetailComponent implements OnInit {
   }
 
   confirmeDelete(): any {
-    this.confirmationService.confirm({
-      message: "Etes vous sur de vouloir supprimer ce module, les exams, les groupes d'étudiants et les templates associés",
-      accept: () => {
-        this.examService.delete(this.exam.id!).subscribe(() => {
-          this.router.navigateByUrl('/course/' + this.course.id);
-        });
-      },
+    this.translateService.get('scanexam.removexamveverify').subscribe(data => {
+      this.confirmationService.confirm({
+        message: data,
+        accept: () => {
+          this.examService.delete(this.exam.id!).subscribe(() => {
+            db.removeElementForExam(+this.examId)
+              .then(() => {
+                this.router.navigateByUrl('/course/' + this.course.id);
+              })
+              .catch(() => {
+                this.messageService.add({
+                  severity: 'error',
+                  summary: this.translateService.instant('scanexam.deletecacheko'),
+                  detail: this.translateService.instant('scanexam.deletecachekodetail'),
+                });
+                this.router.navigateByUrl('/course/' + this.course.id);
+              });
+          });
+        },
+      });
     });
   }
 

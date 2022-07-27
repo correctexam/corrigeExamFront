@@ -113,7 +113,7 @@ export class CoursdetailsComponent implements OnInit {
   }
 
   confirmeDelete(): any {
-    this.translateService.get('scanexam.removeverufy').subscribe(data => {
+    this.translateService.get('scanexam.removeverify').subscribe(data => {
       this.confirmationService.confirm({
         message: data,
         accept: () => {

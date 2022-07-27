@@ -50,7 +50,8 @@
     "shareuedetail": "Share this module with one or more colleagues because sharing the correction is more fun",
     "removeue": "Remove this module",
     "removeuedetail": "Remove this module (groups, exam template, ...)",
-    "removeverufy": "Are you sure you want to delete this module, exams, student groups and associated templates",
+    "removeverify": "Are you sure you want to delete this module, exams, student groups and associated templates? (This will also remove this module for the colleague(s) with whom this module is shared.) ⚠️ This action is irreversible.",
+    "removexamveverify": "Are you sure you want to delete this exam, the scans and the associated corrections? (This will also remove this exam for the colleague(s) with whom this exam is shared.) ⚠️ This action is irreversible.",
     "sharecourse": "Share your module",
     "slogan": "Your assesments accessible in one click",
     "confirmremove": "Confirmation of removal",
@@ -75,8 +76,8 @@
     "synchrobrowserserverdetail": "Synchronize the browser cache to the server for a correction on another device (images in the local indexdb database)",
     "synchroserverbrowser": "Synchronize the browser cache with the server cache",
     "synchroserverbrowserdetail": "Synchronize the browser's cache with the server's (allows you to import a set of images previously aligned on another device)",
-    "confirmcleancache": "Are you sure you want to delete the cache in the browser. You will need to realign the images",
-    "confirmuploadcache": "Are you sure you want to download the cache from the browser to the server.",
+    "confirmcleancache": "Are you sure you want to delete the cache in the browser? You will need to realign the images",
+    "confirmuploadcache": "Are you sure you want to download the cache from the browser to the server?",
     "uploadcacheok": "Upload file on server",
     "uploadcacheokdetail": "Successful export of the local database",
     "uploadcacheko": "Cannot not upload file on server",
@@ -98,8 +99,8 @@
     "liststudents": "Student list",
     "vider": "Clear",
     "supprimer": "REMOVE",
-    "confirmremovestudents": "Are you sure you want to delete these student lists",
-    "confirmremovestudent": "Are you sure you want to delete this student",
+    "confirmremovestudents": "Are you sure you want to delete these student lists?",
+    "confirmremovestudent": "Are you sure you want to delete this student?",
     "mescours": "My courses/modules",
     "slogan2": "your digital-assisted copy correction",
     "confirmemail": "Confirmation email sent",
@@ -155,6 +156,8 @@
     "notemin1": "Minimum score released",
     "notes": "Grades",
     "valeursnormalisees": "Normalized values per question",
-    "valeursbrutes": "Raw values per question"
+    "valeursbrutes": "Raw values per question",
+    "deletecacheko": "Unable to delete local cache",
+    "deletecachekodetail": "Unable to delete local cache"
   }
 }
