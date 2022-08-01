@@ -97,9 +97,9 @@ export class QuestionpropertiesviewComponent implements OnInit {
       this.subscribeToSaveResponse(this.questionService.create(question));
     }
     // call of the associated service if there is one
-    if (question.id !== undefined) {
+    if (question.typeId !== undefined) {
       //   // call of the database to know the id of the question's type
-      this.questionTypeService.find(question.id).subscribe(rep => {
+      this.questionTypeService.find(question.typeId).subscribe(rep => {
         //     // recuperation of the endpoint associated to this type of question
         this.questionTypeService.query(rep.url).subscribe(questionsTypeList => {
           questionsTypeList.body?.forEach(questtype => {
