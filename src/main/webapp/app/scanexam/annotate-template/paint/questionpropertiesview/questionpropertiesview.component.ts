@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
@@ -13,6 +14,7 @@ import { IQuestion } from '../../../../entities/question/question.model';
 import { EventHandlerService } from '../event-handler.service';
 import { ZoneService } from '../../../../entities/zone/service/zone.service';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
+import { QuestionTypeInteractionService } from 'app/entities/question-type/service/question-type-interaction.service';
 
 type SelectableEntity = IQuestionType;
 
@@ -43,6 +45,7 @@ export class QuestionpropertiesviewComponent implements OnInit {
   });
 
   constructor(
+    protected questionTypeInteractionService: QuestionTypeInteractionService,
     protected questionService: QuestionService,
     protected zoneService: ZoneService,
     protected questionTypeService: QuestionTypeService,
@@ -87,10 +90,31 @@ export class QuestionpropertiesviewComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     const question = this.createFromForm();
+    // Save of the question type associated to the current question in the database
     if (question.id !== undefined) {
       this.subscribeToSaveResponse(this.questionService.update(question));
     } else {
       this.subscribeToSaveResponse(this.questionService.create(question));
+    }
+    // call of the associated service if there is one
+    if (question.id !== undefined) {
+      //   // call of the database to know the id of the question's type
+      this.questionTypeService.find(question.id).subscribe(rep => {
+        //     // recuperation of the endpoint associated to this type of question
+        this.questionTypeService.query(rep.url).subscribe(questionsTypeList => {
+          questionsTypeList.body?.forEach(questtype => {
+            if (questtype.id === question.typeId) {
+              const urlEndPoint = questtype.endpoint;
+              if (urlEndPoint !== null && urlEndPoint !== undefined) {
+                this.questionTypeInteractionService.greetings(urlEndPoint).subscribe(res => {
+                  console.log(res);
+                });
+              }
+              return;
+            }
+          });
+        });
+      });
     }
   }
 
