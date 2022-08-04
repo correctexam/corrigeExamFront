@@ -1,8 +1,7 @@
-/* eslint-disable no-console */
+/* eslint-disable no-empty */
 /* eslint-disable @typescript-eslint/member-ordering */
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { HttpResponse } from '@angular/common/http';
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
@@ -15,6 +14,7 @@ import { EventHandlerService } from '../event-handler.service';
 import { ZoneService } from '../../../../entities/zone/service/zone.service';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { QuestionTypeInteractionService } from 'app/entities/question-type/service/question-type-interaction.service';
+// import { env } from 'process';
 
 type SelectableEntity = IQuestionType;
 
@@ -97,25 +97,17 @@ export class QuestionpropertiesviewComponent implements OnInit {
       this.subscribeToSaveResponse(this.questionService.create(question));
     }
     // call of the associated service if there is one
-    if (question.typeId !== undefined) {
-      //   // call of the database to know the id of the question's type
-      this.questionTypeService.find(question.typeId).subscribe(rep => {
-        //     // recuperation of the endpoint associated to this type of question
-        this.questionTypeService.query(rep.url).subscribe(questionsTypeList => {
-          questionsTypeList.body?.forEach(questtype => {
-            if (questtype.id === question.typeId) {
-              const urlEndPoint = questtype.endpoint;
-              if (urlEndPoint !== null && urlEndPoint !== undefined) {
-                this.questionTypeInteractionService.greetings(urlEndPoint).subscribe(res => {
-                  console.log(res);
-                });
-              }
-              return;
-            }
-          });
+    this.questionTypeInteractionService.loadQuestionTemplate(question, this.questionTypeService).then(sendPossible => {
+      if (sendPossible) {
+        this.questionTypeInteractionService.sendQuestionTemplate(question).subscribe(infotemplate => {
+          // On envoie le template s'il n'a pas déjà été envoyé à l'API de la question
+          const template = this.questionTypeInteractionService.getCurrentTemplate();
+          if (!infotemplate['template_loadded'] && template !== undefined) {
+            this.questionTypeInteractionService.sendTemplate(this.questionTypeInteractionService.getCurrentURL(), template);
+          }
         });
-      });
-    }
+      }
+    });
   }
 
   private createFromForm(): IQuestion {

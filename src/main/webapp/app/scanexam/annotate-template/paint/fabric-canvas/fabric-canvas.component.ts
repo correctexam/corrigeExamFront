@@ -65,6 +65,8 @@ export class FabricCanvasComponent implements AfterViewInit {
 
   public scrollMode: ScrollModeType = ScrollModeType.vertical;
   ngOnInit(): void {
+    //  console.log(this.exam)
+    //  console.log(this.content)
     this.eventHandler.exam = this.exam;
     if (this.exam.namezoneId !== undefined) {
       this.zoneService.find(this.exam.namezoneId!).subscribe(z => {

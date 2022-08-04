@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Component, OnInit } from '@angular/core';
@@ -9,6 +10,7 @@ import { ExamService } from 'app/entities/exam/service/exam.service';
 import { ConfirmationService } from 'primeng/api';
 import { TemplateService } from '../../entities/template/service/template.service';
 import { ITemplate } from '../../entities/template/template.model';
+import { QuestionTypeInteractionService } from 'app/entities/question-type/service/question-type-interaction.service';
 
 @Component({
   selector: 'jhi-annotate-template',
@@ -23,7 +25,10 @@ export class AnnotateTemplateComponent implements OnInit {
   template!: ITemplate;
   dockItems!: any[];
 
+  pdfData!: string;
+
   constructor(
+    protected questionTypeInteractionService: QuestionTypeInteractionService,
     public courseService: CourseService,
     public examService: ExamService,
     public templateService: TemplateService,
@@ -40,9 +45,18 @@ export class AnnotateTemplateComponent implements OnInit {
           this.exam = data.body!;
           this.templateService.find(this.exam.templateId!).subscribe(t => {
             this.template = t.body!;
+            if (t.body?.content !== undefined && t.body.content !== null) {
+              this.pdfData = t.body.content;
+              this.remoteTemplateSave();
+            }
           });
         });
       }
     });
+  }
+
+  remoteTemplateSave(): void {
+    const base64String = this.pdfData;
+    this.questionTypeInteractionService.loadTemplate(base64String);
   }
 }
