@@ -1,3 +1,4 @@
+/* eslint-disable object-shorthand */
 /* eslint-disable no-empty */
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable no-console */
@@ -14,6 +15,7 @@ import { EventHandlerService } from '../event-handler.service';
 import { ZoneService } from '../../../../entities/zone/service/zone.service';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { QuestionTypeInteractionService } from 'app/entities/question-type/service/question-type-interaction.service';
+import { MessageService } from 'primeng/api';
 // import { env } from 'process';
 
 type SelectableEntity = IQuestionType;
@@ -22,6 +24,7 @@ type SelectableEntity = IQuestionType;
   selector: 'jhi-questionpropertiesview',
   templateUrl: './questionpropertiesview.component.html',
   styleUrls: ['./questionpropertiesview.component.scss'],
+  providers: [MessageService],
 })
 export class QuestionpropertiesviewComponent implements OnInit {
   question: IQuestion | undefined;
@@ -47,6 +50,7 @@ export class QuestionpropertiesviewComponent implements OnInit {
   constructor(
     protected questionTypeInteractionService: QuestionTypeInteractionService,
     protected questionService: QuestionService,
+    protected messageService: MessageService,
     protected zoneService: ZoneService,
     protected questionTypeService: QuestionTypeService,
     private fb: FormBuilder,
@@ -99,16 +103,62 @@ export class QuestionpropertiesviewComponent implements OnInit {
     // call of the associated service if there is one
     this.questionTypeInteractionService.loadQuestionTemplate(question, this.questionTypeService).then(sendPossible => {
       if (sendPossible) {
-        this.questionTypeInteractionService.sendQuestionTemplate(question).subscribe(infotemplate => {
-          // On envoie le template s'il n'a pas déjà été envoyé à l'API de la question
-          const template = this.questionTypeInteractionService.getCurrentTemplate();
-          if (!infotemplate['template_loadded'] && template !== undefined) {
-            this.questionTypeInteractionService.sendTemplate(this.questionTypeInteractionService.getCurrentURL(), template);
-          }
+        this.questionTypeInteractionService.sendQuestionTemplate(question).subscribe({
+          error: () => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'API innaccessible',
+              detail: "L'API située à l'adresse " + this.questionTypeInteractionService.getCurrentURL() + " n'a pas pu être atteinte",
+            });
+          }, // errorHandler
+          next: infotemplate => {
+            // On envoie le template s'il n'a pas déjà été envoyé à l'API de la question
+            const template = this.questionTypeInteractionService.getCurrentTemplate();
+            if (!infotemplate['template_loadded'] && template !== undefined) {
+              this.questionTypeInteractionService
+                .sendTemplate(this.questionTypeInteractionService.getCurrentURL(), template)
+                .subscribe(data => {
+                  if (data['save'] === 'success') {
+                    this.messageService.add({
+                      severity: 'success',
+                      summary: "Envoi du template vers l'API",
+                      detail: 'Export réussi',
+                    });
+                  } else {
+                    this.messageService.add({
+                      severity: 'error',
+                      summary: "Envoi du template vers l'API",
+                      detail: 'Export échoué',
+                    });
+                  }
+                });
+            }
+            if (infotemplate['question_loadded']) {
+              this.messageService.add({
+                severity: 'success',
+                summary: "Envoi de la question vers l'API",
+                detail: 'Export réussi',
+              });
+            } else {
+              console.log(infotemplate);
+              this.messageService.add({
+                severity: 'error',
+                summary: "Envoi de la question vers l'API",
+                detail: 'Export échoué',
+              });
+            }
+          }, // nextHandler
         });
       }
     });
   }
+
+  /**
+   *
+   infotemplate => {
+
+        }
+   */
 
   private createFromForm(): IQuestion {
     this.question!.numero = this.editForm.get(['numero'])!.value;

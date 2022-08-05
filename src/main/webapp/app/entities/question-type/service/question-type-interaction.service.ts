@@ -18,7 +18,7 @@ export class QuestionTypeInteractionService {
   constructor(private http: HttpClient, private questionService: QuestionService, private questionTypeService: QuestionTypeService) {}
 
   private currentTemplate: string | undefined;
-  private currentUrlEndPoint = 'localhost';
+  private currentUrlEndPoint = '';
 
   getCurrentURL(): string {
     return this.currentUrlEndPoint;
@@ -56,7 +56,7 @@ export class QuestionTypeInteractionService {
             questionsTypeList.body?.forEach(questtype => {
               if (questtype.id === question.typeId) {
                 const urlEndPoint = questtype.endpoint;
-                if (urlEndPoint !== null && urlEndPoint !== undefined) {
+                if (urlEndPoint !== null && urlEndPoint !== undefined && urlEndPoint.length > 0) {
                   this.currentUrlEndPoint = urlEndPoint;
                   res(true);
                 }
@@ -71,7 +71,6 @@ export class QuestionTypeInteractionService {
 
   loadTemplate(base64String: string): void {
     this.currentTemplate = base64String;
-    console.log('Template chargé');
   }
 
   sendTemplate(urlQuestionType: string, template64: string): Observable<any> {
