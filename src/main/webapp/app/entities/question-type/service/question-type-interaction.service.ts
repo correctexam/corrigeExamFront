@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable object-shorthand */
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable no-console */
@@ -19,6 +20,8 @@ export class QuestionTypeInteractionService {
 
   private currentTemplate: string | undefined;
   private currentUrlEndPoint = '';
+  private currentExamId = -1;
+  private currentExamName = '';
 
   getCurrentURL(): string {
     return this.currentUrlEndPoint;
@@ -58,6 +61,8 @@ export class QuestionTypeInteractionService {
                 const urlEndPoint = questtype.endpoint;
                 if (urlEndPoint !== null && urlEndPoint !== undefined && urlEndPoint.length > 0) {
                   this.currentUrlEndPoint = urlEndPoint;
+                  if (question.examId !== undefined) this.currentExamId = question.examId;
+                  if (question.examName !== undefined) this.currentExamName = question.examName;
                   res(true);
                 }
               }
@@ -75,7 +80,7 @@ export class QuestionTypeInteractionService {
 
   sendTemplate(urlQuestionType: string, template64: string): Observable<any> {
     const templateBlob = this.b64toBlob(template64, 'application/pdf');
-    const templateFile = new File([templateBlob], 'template.pdf', { type: templateBlob.type });
+    const templateFile = new File([templateBlob], 'template-' + this.currentExamId.toString() + '.pdf', { type: templateBlob.type });
     const formData = new FormData();
     formData.append('clientfile', templateFile);
     return this.http.post(urlQuestionType + 'uploadpdf/', formData);
