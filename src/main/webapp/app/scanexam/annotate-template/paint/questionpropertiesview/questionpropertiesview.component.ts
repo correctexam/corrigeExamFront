@@ -16,7 +16,6 @@ import { ZoneService } from '../../../../entities/zone/service/zone.service';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { QuestionTypeInteractionService } from 'app/entities/question-type/service/question-type-interaction.service';
 import { MessageService } from 'primeng/api';
-// import { env } from 'process';
 
 type SelectableEntity = IQuestionType;
 
@@ -100,6 +99,9 @@ export class QuestionpropertiesviewComponent implements OnInit {
     } else {
       this.subscribeToSaveResponse(this.questionService.create(question));
     }
+    this.questionTypeInteractionService.getQuestEndPoint(question).then(url => {
+      console.log(url);
+    });
     // call of the associated service if there is one
     /* this.questionTypeInteractionService.loadQuestionTemplate(question, this.questionTypeService).then(sendPossible => {
       if (sendPossible) {

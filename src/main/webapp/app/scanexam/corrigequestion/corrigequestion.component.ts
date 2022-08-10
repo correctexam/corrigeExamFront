@@ -32,7 +32,7 @@ import { IGradedComment } from '../../entities/graded-comment/graded-comment.mod
 import { GradedCommentService } from '../../entities/graded-comment/service/graded-comment.service';
 import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
 import { TranslateService } from '@ngx-translate/core';
-import { QuestionTypeInteractionService } from 'app/entities/question-type/service/question-type-interaction.service';
+import { ExamQuestPictureServiceService } from 'app/entities/exam-sheet/service/exam-quest-picture-service.service';
 
 @Component({
   selector: 'jhi-corrigequestion',
@@ -99,7 +99,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   pageOffset = 0;
   constructor(
-    public questionTypeInteractionService: QuestionTypeInteractionService,
+    private examQuestPictureService: ExamQuestPictureServiceService,
     public examService: ExamService,
     public zoneService: ZoneService,
     public courseService: CourseService,
@@ -137,8 +137,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.examId = params.get('examid')!;
         this.pageOffset = 0;
 
-        // this.questionTypeInteractionService.loadSheets(+this.examId,!this.noalign)
-        this.questionTypeInteractionService.suite(+this.examId, !this.noalign);
+        // this.examQuestPictureService.loadAllExamPNGs(+this.examId, !this.noalign);
 
         if (params.get('questionno') !== null) {
           this.questionno = +params.get('questionno')! - 1;
