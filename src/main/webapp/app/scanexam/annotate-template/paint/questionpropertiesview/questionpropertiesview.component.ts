@@ -101,7 +101,7 @@ export class QuestionpropertiesviewComponent implements OnInit {
       this.subscribeToSaveResponse(this.questionService.create(question));
     }
     // call of the associated service if there is one
-    this.questionTypeInteractionService.loadQuestionTemplate(question, this.questionTypeService).then(sendPossible => {
+    /* this.questionTypeInteractionService.loadQuestionTemplate(question, this.questionTypeService).then(sendPossible => {
       if (sendPossible) {
         this.questionTypeInteractionService.sendQuestionTemplate(question).subscribe({
           error: () => {
@@ -150,7 +150,7 @@ export class QuestionpropertiesviewComponent implements OnInit {
           }, // nextHandler
         });
       }
-    });
+    });*/
   }
 
   /**

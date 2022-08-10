@@ -57,6 +57,6 @@ export class AnnotateTemplateComponent implements OnInit {
 
   remoteTemplateSave(): void {
     const base64String = this.pdfData;
-    this.questionTypeInteractionService.loadTemplate(base64String);
+    // this.questionTypeInteractionService.loadTemplate(base64String);
   }
 }

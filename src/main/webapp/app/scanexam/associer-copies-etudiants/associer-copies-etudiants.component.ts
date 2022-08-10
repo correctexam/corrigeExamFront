@@ -483,7 +483,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
 
   async predictText(p: ImageZone, zoneletter: boolean, candidatematch: string[], debugimageRef: ElementRef): Promise<(string | number)[]> {
     return new Promise<(string | number)[]>(resolve => {
-      if (this.assisted) {
+      if (this.assisted && p != null) {
         const c = { image: p.i, match: candidatematch };
         this.alignImagesService.prediction(c, zoneletter).subscribe(result => {
           const ctx2 = debugimageRef?.nativeElement.getContext('2d');

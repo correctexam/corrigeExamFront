@@ -32,6 +32,7 @@ import { IGradedComment } from '../../entities/graded-comment/graded-comment.mod
 import { GradedCommentService } from '../../entities/graded-comment/service/graded-comment.service';
 import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
 import { TranslateService } from '@ngx-translate/core';
+import { QuestionTypeInteractionService } from 'app/entities/question-type/service/question-type-interaction.service';
 
 @Component({
   selector: 'jhi-corrigequestion',
@@ -98,6 +99,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   pageOffset = 0;
   constructor(
+    public questionTypeInteractionService: QuestionTypeInteractionService,
     public examService: ExamService,
     public zoneService: ZoneService,
     public courseService: CourseService,
@@ -135,6 +137,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.examId = params.get('examid')!;
         this.pageOffset = 0;
 
+        // this.questionTypeInteractionService.loadSheets(+this.examId,!this.noalign)
+        this.questionTypeInteractionService.suite(+this.examId, !this.noalign);
+
         if (params.get('questionno') !== null) {
           this.questionno = +params.get('questionno')! - 1;
         }
@@ -149,7 +154,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             .then(e2 => {
               this.nbreFeuilleParCopie = e2;
               // Step 2 Query Scan in local DB
-
               db.alignImages
                 .where('examId')
                 .equals(+this.examId!)
@@ -175,7 +179,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                       );
                       this.questionService.query({ examId: this.exam?.id, numero: this.questionno + 1 }).subscribe(q1 => {
                         this.questions = q1.body!;
-
                         if (this.questions.length > 0) {
                           this.noteSteps = this.questions[0].point! * this.questions[0].step!;
                           this.questionStep = this.questions[0].step!;
@@ -192,6 +195,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                                 (ex: any) =>
                                   ex?.scanId === this.exam!.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie!
                               );
+                            // console.log(this.selectionStudents)
                             if (sheets !== undefined && sheets!.length > 0) {
                               this.resp.sheetId = sheets[0]?.id;
                             }
@@ -617,80 +621,50 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
-    if (this.noalign) {
-      return new Promise(resolve => {
-        db.nonAlignImages
-          .where({ examId: +this.examId!, pageNumber: pageInscan })
-          .first()
-          .then(e2 => {
-            const image = JSON.parse(e2!.value, this.reviver);
-            this.loadImage(image.pages, pageInscan).then(v => {
-              let finalW = (zone.width! * v.width! * this.factor) / 100000;
-              let finalH = (zone.height! * v.height! * this.factor) / 100000;
-              let initX =
-                (zone.xInit! * v.width!) / 100000 -
-                ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
-              if (initX < 0) {
-                finalW = finalW + initX;
-                initX = 0;
-              }
-              let initY =
-                (zone.yInit! * v.height!) / 100000 -
-                ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
-              if (initY < 0) {
-                finalH = finalH + initY;
-                initY = 0;
-              }
-              this.alignImagesService
-                .imageCrop({
-                  image: v.image,
-                  x: initX,
-                  y: initY,
-                  width: finalW,
-                  height: finalH,
-                })
-                .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
-            });
+    const images_alignment = this.noalign ? db.nonAlignImages : db.alignImages;
+    return new Promise(resolve => {
+      images_alignment
+        .where({ examId: +this.examId!, pageNumber: pageInscan })
+        .first()
+        .then(e2 => {
+          const image = JSON.parse(e2!.value, this.reviver);
+          this.loadImage(image.pages, pageInscan).then(v => {
+            let finalW = (zone.width! * v.width! * this.factor) / 100000;
+            let finalH = (zone.height! * v.height! * this.factor) / 100000;
+            let initX =
+              (zone.xInit! * v.width!) / 100000 - ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
+            if (initX < 0) {
+              finalW = finalW + initX;
+              initX = 0;
+            }
+            let initY =
+              (zone.yInit! * v.height!) / 100000 -
+              ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
+            if (initY < 0) {
+              finalH = finalH + initY;
+              initY = 0;
+            }
+            // console.log(v)
+            this.alignImagesService
+              .imageCrop({
+                image: v.image,
+                x: initX,
+                y: initY,
+                width: finalW,
+                height: finalH,
+              })
+              .subscribe(res => {
+                resolve({ i: res, w: finalW, h: finalH });
+                const imagedata = res;
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = imagedata.width;
+                canvas.height = imagedata.height;
+                ctx?.putImageData(imagedata, 0, 0);
+              });
           });
-      });
-    } else {
-      return new Promise(resolve => {
-        db.alignImages
-          .where({ examId: +this.examId!, pageNumber: pageInscan })
-          .first()
-          .then(e2 => {
-            const image = JSON.parse(e2!.value, this.reviver);
-
-            this.loadImage(image.pages, pageInscan).then(v => {
-              let finalW = (zone.width! * v.width! * this.factor) / 100000;
-              let finalH = (zone.height! * v.height! * this.factor) / 100000;
-              let initX =
-                (zone.xInit! * v.width!) / 100000 -
-                ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
-              if (initX < 0) {
-                finalW = finalW + initX;
-                initX = 0;
-              }
-              let initY =
-                (zone.yInit! * v.height!) / 100000 -
-                ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
-              if (initY < 0) {
-                finalH = finalH + initY;
-                initY = 0;
-              }
-              this.alignImagesService
-                .imageCrop({
-                  image: v.image,
-                  x: initX,
-                  y: initY,
-                  width: finalW,
-                  height: finalH,
-                })
-                .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
-            });
-          });
-      });
-    }
+        });
+    });
   }
 
   showGalleria(): void {
