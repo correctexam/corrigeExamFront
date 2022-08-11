@@ -4,6 +4,7 @@
 /* eslint-disable curly */
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ExamQuestPictureServiceService } from 'app/entities/exam-sheet/service/exam-quest-picture-service.service';
 import { IQuestion } from 'app/entities/question/question.model';
 import { Observable } from 'rxjs';
 import { QuestionTypeService } from './question-type.service';
@@ -20,8 +21,17 @@ export interface StatusContentAPI {
   providedIn: 'root',
 })
 export class QuestionTypeInteractionService {
-  constructor(private http: HttpClient, private questionTypeService: QuestionTypeService) {}
+  constructor(
+    private http: HttpClient,
+    private questionTypeService: QuestionTypeService,
+    private examQuestPictureService: ExamQuestPictureServiceService
+  ) {}
 
+  /**
+   *
+   * @param q  a question
+   * @returns the associated EndPoint if it exists, An undefined promise otherwise
+   */
   public getQuestEndPoint(q: IQuestion): Promise<string | undefined> {
     return new Promise<string | undefined>(res => {
       if (q.typeId === undefined) {
@@ -48,6 +58,8 @@ export class QuestionTypeInteractionService {
     });
   }
 
+  // EndPoint Example : http://127.0.0.1:8000/   (don't forget the last slash)
+
   public connectEndPointToQuestion(endpoint: string, question: IQuestion): Observable<StatusContentAPI> {
     if (question.examId === undefined || question.numero === undefined) {
       return new Observable();
@@ -55,5 +67,25 @@ export class QuestionTypeInteractionService {
       const finalEndpoint: string = endpoint + 'status/exam/' + question.examId.toString() + '/question/' + question.numero.toString();
       return this.http.get<StatusContentAPI>(finalEndpoint);
     }
+  }
+
+  public sendQuestionToEndPoint(examId: number, align: boolean, question: IQuestion): Promise<any> {
+    return new Promise<any>(res => {
+      this.examQuestPictureService.questionAnswPNGs(examId, align, question).then(dataQuestionStudents => {
+        if (dataQuestionStudents === undefined) res(undefined);
+        else {
+          const picturesStudents = dataQuestionStudents.studAns;
+          // On vient de récupérer les données des réponses aux questions des étudiants
+          // On peut donc recherher le template de cette question
+          this.examQuestPictureService.questionPNGsTemplate(examId, question).then(dataTemplate => {
+            if (dataTemplate === undefined) res(undefined);
+            else {
+              const picturesTemplate = dataTemplate.templateCaptures;
+              console.log(picturesTemplate, picturesStudents);
+            }
+          });
+        }
+      });
+    });
   }
 }

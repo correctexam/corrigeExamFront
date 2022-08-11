@@ -117,6 +117,50 @@ export class ExamQuestPictureServiceService {
     });
   }
 
+  // The data of only 1 question
+  // TODO: TEMPORAIRE ?
+  /**
+   * @warning Fait en mode 'brute', évidemment à retravailler pour mieux optimiser.
+   * Je voulais exécuter le code qui est en commentaires à la place, mais il semble y avoir un problème d'asynchronisme
+   *
+   * @param examId
+   * @param align
+   * @param question
+   * @returns all the answsers to a specific question
+   */
+  public questionAnswPNGs(examId: number, align: boolean, question: IQuestion): Promise<IQuestAnsw | undefined> {
+    return new Promise<IQuestAnsw | undefined>(res => {
+      /* TODO: Code that I wanted to execute, but 'dss' seems to load too late, I don't know why
+      this.getDataStudents(examId).then(dss => {
+        console.log(dss)
+        this.pngQuestResp(examId, align, question, dss).then(quest=>{
+          if (quest.length > 0) {
+            const questId = quest[0].ansId;
+            const studAns: { studId: number; answser: File[] }[] = [];
+            quest.forEach(istudpic => {
+              studAns.push({ studId: istudpic.studId, answser: istudpic.answer });
+            });
+            const qa: IQuestAnsw = { questId, studAns };
+            console.log(qa)
+            res(qa)
+            return;
+          }
+          else {
+            res(undefined);
+            return;
+          }
+        })
+      });*/
+      this.questionsAnswPNGs(examId, align).then(quests => {
+        let currentQa: IQuestAnsw | undefined = undefined;
+        quests.forEach(qa => {
+          if (qa.questId === question.numero) currentQa = qa;
+        });
+        res(currentQa);
+      });
+    });
+  }
+
   private pngQuestResp(examId: number, align: boolean, q: IQuestion, dss: DataStudent[]): Promise<IAnswPic[]> {
     return new Promise<IAnswPic[]>(res => {
       // const values : {studid :number,pageNum:number,imquest : File}[]= []
@@ -373,13 +417,13 @@ export class ExamQuestPictureServiceService {
 
   // ------------------------------TEMPLATE MANAGENENT----------------
 
-  private questionsPNGsTemplate(examId: number): Promise<ITemplateQuestCaptures[]> {
+  public questionsPNGsTemplate(examId: number): Promise<ITemplateQuestCaptures[]> {
     return new Promise<ITemplateQuestCaptures[]>(res => {
       this.loadTemplatePNGPages(examId).then(p64s => {
         this.getQuestions(examId).then(questions => {
           const promapics: Promise<IAnswPic[]>[] = [];
           questions.forEach(q => {
-            const promqs = this.questionPNGsTemplate(q, p64s);
+            const promqs = this.question64Template(q, p64s);
             promapics.push(promqs);
           });
           Promise.all(promapics).then(apics => {
@@ -398,8 +442,26 @@ export class ExamQuestPictureServiceService {
       });
     });
   }
+  public questionPNGsTemplate(examId: number, question: IQuestion): Promise<ITemplateQuestCaptures | undefined> {
+    return new Promise<ITemplateQuestCaptures | undefined>(res => {
+      this.loadTemplatePNGPages(examId).then(p64s => {
+        this.question64Template(question, p64s).then(apics => {
+          if (apics.length === 0) {
+            res(undefined);
+          } else {
+            const fs: File[] = [];
+            apics.forEach(apic => {
+              apic.answer.forEach(f => fs.push(f));
+            });
+            const tqc: ITemplateQuestCaptures = { questId: apics[0].ansId, templateCaptures: fs };
+            res(tqc);
+          }
+        });
+      });
+    });
+  }
 
-  private questionPNGsTemplate(q: IQuestion, p64s: Page64[]): Promise<IAnswPic[]> {
+  private question64Template(q: IQuestion, p64s: Page64[]): Promise<IAnswPic[]> {
     return new Promise<IAnswPic[]>(resq => {
       const promqpics: Promise<IAnswPic>[] = [];
       this.zoneService.find(q.zoneId!).subscribe(zoneRep => {

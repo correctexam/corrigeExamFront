@@ -30,7 +30,10 @@
     <div class="grid grid-nogutter">
       <div class="col-8">
         <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" jhiTranslate="scanexam.correction">Correction</h2>
-        <p-button (onClick)="connectAPI()">Connecter l'API de cette question</p-button>
+        <!-- <p-button *ngIf="this.currentEndPoint!==undefined" (onClick)="connectAPI()">Recuperate infos about this question in the related EndPoint</p-button>-->
+        <p-button *ngIf="this.currentEndPoint !== undefined" (onClick)="loadQuestionToApi()"
+          >Loads this question to the related EndPoint</p-button
+        >
       </div>
       <div class="col-4 flex flex-row-reverse">
         <button

@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
@@ -71,6 +72,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   currentQuestion: IQuestion | undefined;
   noalign = false;
   factor = 1;
+  currentEndPoint: string | undefined;
 
   currentTextComment4Question: ITextComment[] | undefined;
   currentGradedComment4Question: IGradedComment[] | undefined;
@@ -122,34 +124,52 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     private translateService: TranslateService
   ) {}
 
+  /**
+   *
+   * @info asks for the API of the current question if there are already some datas about it
+   */
   public connectAPI(): void {
-    this.questionTypeInteractionService.getQuestEndPoint(this.currentQuestion!).then(endpointForThisQuestion => {
-      if (endpointForThisQuestion === undefined) {
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Connection to API',
-          detail: 'The type of this question is not related to an EndPoint',
-        });
-      } else {
-        this.questionTypeInteractionService.connectEndPointToQuestion(endpointForThisQuestion, this.currentQuestion!).subscribe({
-          next: infoConnect => {
-            console.log(infoConnect);
+    if (this.currentEndPoint === undefined) return;
+    else {
+      this.questionTypeInteractionService.connectEndPointToQuestion(this.currentEndPoint, this.currentQuestion!).subscribe({
+        next: infoConnect => {
+          // There is a reason that explains a problem enconterd
+          if (infoConnect.reason !== undefined) {
             this.messageService.add({
               severity: infoConnect.status,
               summary: 'Connection to API for this question',
-              detail: infoConnect.status,
+              detail: infoConnect.reason,
             });
-          },
-          error: () => {
+          }
+          // There is no problem in reaching the informations about this question. We know now if the question number is known by the API
+          else if (infoConnect.exists !== undefined) {
             this.messageService.add({
-              severity: 'error',
-              summary: 'Connection to API',
-              detail: 'The connection to ' + endpointForThisQuestion + ' could not be reached',
+              severity: infoConnect.exists ? 'success' : 'warn',
+              summary: 'Connection to API for this question',
+              detail: infoConnect.exists ? 'the question is loadded on the API' : 'the question is not known by the service',
             });
-          },
-        });
-      }
-    });
+          }
+        },
+        error: () => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Connection to API',
+            detail: 'The connection to ' + this.currentEndPoint + ' could not be reached',
+          });
+        },
+      });
+    }
+  }
+  /**
+   * @info sends all the data about this question to the API (if it is necessary)
+   * and recuperates the analysed data
+   */
+  public loadQuestionToApi(): void {
+    if (this.examId === undefined || this.currentQuestion === undefined) {
+      return;
+    }
+    console.log('LoadQuestion');
+    this.questionTypeInteractionService.sendQuestionToEndPoint(Number(this.examId), true, this.currentQuestion);
   }
 
   ngOnInit(): void {
@@ -216,7 +236,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                           this.questionStep = this.questions[0].step!;
                           this.maxNote = this.questions[0].point!;
                           this.currentQuestion = this.questions[0];
-
+                          this.questionTypeInteractionService.getQuestEndPoint(this.currentQuestion!).then(endpontForThisQuestion => {
+                            this.currentEndPoint = endpontForThisQuestion;
+                          });
                           if (this.resp === undefined) {
                             this.resp = new StudentResponse(undefined, this.currentNote);
                             this.resp.note = this.currentNote;
