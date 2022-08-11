@@ -5,7 +5,16 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { IQuestion } from 'app/entities/question/question.model';
+import { Observable } from 'rxjs';
 import { QuestionTypeService } from './question-type.service';
+
+export interface StatusContentAPI {
+  status: string;
+  reason?: string;
+  examId?: number;
+  questnum?: number;
+  exists?: boolean;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -37,5 +46,14 @@ export class QuestionTypeInteractionService {
         });
       }
     });
+  }
+
+  public connectEndPointToQuestion(endpoint: string, question: IQuestion): Observable<StatusContentAPI> {
+    if (question.examId === undefined || question.numero === undefined) {
+      return new Observable();
+    } else {
+      const finalEndpoint: string = endpoint + 'status/exam/' + question.examId.toString() + '/question/' + question.numero.toString();
+      return this.http.get<StatusContentAPI>(finalEndpoint);
+    }
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable no-console */
@@ -33,6 +34,7 @@ import { GradedCommentService } from '../../entities/graded-comment/service/grad
 import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ExamQuestPictureServiceService } from 'app/entities/exam-sheet/service/exam-quest-picture-service.service';
+import { QuestionTypeInteractionService } from 'app/entities/question-type/service/question-type-interaction.service';
 
 @Component({
   selector: 'jhi-corrigequestion',
@@ -100,6 +102,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   pageOffset = 0;
   constructor(
     private examQuestPictureService: ExamQuestPictureServiceService,
+    private questionTypeInteractionService: QuestionTypeInteractionService,
     public examService: ExamService,
     public zoneService: ZoneService,
     public courseService: CourseService,
@@ -118,6 +121,36 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     private eventHandler: EventCanevascorrectionHandlerService,
     private translateService: TranslateService
   ) {}
+
+  public connectAPI(): void {
+    this.questionTypeInteractionService.getQuestEndPoint(this.currentQuestion!).then(endpointForThisQuestion => {
+      if (endpointForThisQuestion === undefined) {
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Connection to API',
+          detail: 'The type of this question is not related to an EndPoint',
+        });
+      } else {
+        this.questionTypeInteractionService.connectEndPointToQuestion(endpointForThisQuestion, this.currentQuestion!).subscribe({
+          next: infoConnect => {
+            console.log(infoConnect);
+            this.messageService.add({
+              severity: infoConnect.status,
+              summary: 'Connection to API for this question',
+              detail: infoConnect.status,
+            });
+          },
+          error: () => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Connection to API',
+              detail: 'The connection to ' + endpointForThisQuestion + ' could not be reached',
+            });
+          },
+        });
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
