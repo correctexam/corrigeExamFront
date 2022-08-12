@@ -62,6 +62,12 @@ export class ExamQuestPictureServiceService {
     return datatypebase64.replace('data:image/png;base64,', '');
   }
 
+  public getAllFileNames(fs: File[]): string[] {
+    const fnames: string[] = [];
+    fs.forEach(f => fnames.push(f.name));
+    return fnames;
+  }
+
   /**
    *
    * @param examId

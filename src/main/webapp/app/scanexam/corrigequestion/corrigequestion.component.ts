@@ -165,11 +165,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
    * and recuperates the analysed data
    */
   public loadQuestionToApi(): void {
-    if (this.examId === undefined || this.currentQuestion === undefined) {
+    if (this.examId === undefined || this.currentQuestion === undefined || this.currentEndPoint === undefined) {
       return;
     }
     console.log('LoadQuestion');
-    this.questionTypeInteractionService.sendQuestionToEndPoint(Number(this.examId), true, this.currentQuestion);
+    this.questionTypeInteractionService
+      .sendQuestionToEndPoint(Number(this.examId), true, this.currentQuestion, this.currentEndPoint)
+      .then(data => console.log(data));
   }
 
   ngOnInit(): void {
