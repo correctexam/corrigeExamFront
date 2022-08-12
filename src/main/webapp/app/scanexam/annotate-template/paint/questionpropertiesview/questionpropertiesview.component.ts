@@ -102,57 +102,6 @@ export class QuestionpropertiesviewComponent implements OnInit {
     this.questionTypeInteractionService.getQuestEndPoint(question).then(url => {
       console.log(url);
     });
-    // call of the associated service if there is one
-    /* this.questionTypeInteractionService.loadQuestionTemplate(question, this.questionTypeService).then(sendPossible => {
-      if (sendPossible) {
-        this.questionTypeInteractionService.sendQuestionTemplate(question).subscribe({
-          error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'API innaccessible',
-              detail: "L'API située à l'adresse " + this.questionTypeInteractionService.getCurrentURL() + " n'a pas pu être atteinte",
-            });
-          }, // errorHandler
-          next: infotemplate => {
-            // On envoie le template s'il n'a pas déjà été envoyé à l'API de la question
-            const template = this.questionTypeInteractionService.getCurrentTemplate();
-            if (!infotemplate['template_loadded'] && template !== undefined) {
-              this.questionTypeInteractionService
-                .sendTemplate(this.questionTypeInteractionService.getCurrentURL(), template)
-                .subscribe(data => {
-                  if (data['save'] === 'success') {
-                    this.messageService.add({
-                      severity: 'success',
-                      summary: "Envoi du template vers l'API",
-                      detail: 'Export réussi',
-                    });
-                  } else {
-                    this.messageService.add({
-                      severity: 'error',
-                      summary: "Envoi du template vers l'API",
-                      detail: 'Export échoué',
-                    });
-                  }
-                });
-            }
-            if (infotemplate['question_loadded']) {
-              this.messageService.add({
-                severity: 'success',
-                summary: "Envoi de la question vers l'API",
-                detail: 'Export réussi',
-              });
-            } else {
-              console.log(infotemplate);
-              this.messageService.add({
-                severity: 'error',
-                summary: "Envoi de la question vers l'API",
-                detail: 'Export échoué',
-              });
-            }
-          }, // nextHandler
-        });
-      }
-    });*/
   }
 
   /**

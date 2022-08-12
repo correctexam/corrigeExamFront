@@ -30,10 +30,26 @@
     <div class="grid grid-nogutter">
       <div class="col-8">
         <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" jhiTranslate="scanexam.correction">Correction</h2>
-        <!-- <p-button *ngIf="this.currentEndPoint!==undefined" (onClick)="connectAPI()">Recuperate infos about this question in the related EndPoint</p-button>-->
-        <p-button *ngIf="this.currentEndPoint !== undefined" (onClick)="loadQuestionToApi()"
-          >Loads this question to the related EndPoint</p-button
-        >
+        <div>
+          <p-button *ngIf="this.currentEndPoint !== undefined" (onClick)="connectAPI()">Sync question to API</p-button>
+          <div style="width: 400px; display: flex; flex-wrap: wrap">
+            <span [hidden]="!processData">Processing the data that will be sent to the API...</span>
+            <span
+              style="width: 100%; display: flex; justify-content: space-evenly; align-items: center"
+              [hidden]="this.examQuestPictureService.croppingProgress == 0"
+              >Images Cropped : {{ this.examQuestPictureService.croppingProgress }}<br /><p-progressSpinner
+                [style]="{ width: '50px', height: '50px' }"
+              ></p-progressSpinner
+            ></span>
+            <span
+              style="width: 100%; display: flex; justify-content: space-evenly; align-items: center"
+              [hidden]="this.questionTypeInteractionService.fileSent == 0"
+              >Files sent : {{ this.questionTypeInteractionService.fileSent }}<br /><p-progressSpinner
+                [style]="{ width: '50px', height: '50px' }"
+              ></p-progressSpinner
+            ></span>
+          </div>
+        </div>
       </div>
       <div class="col-4 flex flex-row-reverse">
         <button

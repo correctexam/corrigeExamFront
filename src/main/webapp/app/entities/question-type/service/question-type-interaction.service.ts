@@ -22,6 +22,8 @@ export interface StatusContentAPI {
   providedIn: 'root',
 })
 export class QuestionTypeInteractionService {
+  public fileSent = 0;
+
   constructor(
     private http: HttpClient,
     private questionTypeService: QuestionTypeService,
@@ -65,45 +67,57 @@ export class QuestionTypeInteractionService {
     if (question.examId === undefined || question.numero === undefined) {
       return new Observable();
     } else {
-      const finalEndpoint: string = endpoint + 'status/exam/' + question.examId.toString() + '/question/' + question.numero.toString();
+      const finalEndpoint: string =
+        endpoint + 'status/in-depth/exam/' + question.examId.toString() + '/question/' + question.numero.toString();
       return this.http.get<StatusContentAPI>(finalEndpoint);
     }
   }
 
+  /**
+   * @warning it requires to have a sure access to the endpoint
+   * @param examId
+   * @param align
+   * @param question
+   * @param endpoint
+   * @returns si l'analyse des questions de la part du EndPoint a pu être faite
+   */
   public sendQuestionToEndPoint(examId: number, align: boolean, question: IQuestion, endpoint: string): Promise<boolean> {
     return new Promise<boolean>(res => {
-      this.connectEndPointToQuestion(endpoint, question).subscribe({
-        next: () => {
-          this.examQuestPictureService.questionAnswPNGs(examId, align, question).then(dataQuestionStudents => {
-            if (dataQuestionStudents === undefined) res(false);
+      this.examQuestPictureService.getPNGstudentsQuestion(examId, align, question).then(dataQuestionStudents => {
+        if (dataQuestionStudents === undefined) res(false);
+        else {
+          // On vient de récupérer les données des réponses aux questions des étudiants
+          // On peut donc recherher le template de cette question
+          this.examQuestPictureService.getPNGtemplateQuestion(examId, question).then(dataTemplate => {
+            if (dataTemplate === undefined) res(false);
             else {
-              // On vient de récupérer les données des réponses aux questions des étudiants
-              // On peut donc recherher le template de cette question
-              this.examQuestPictureService.questionPNGsTemplate(examId, question).then(dataTemplate => {
-                if (dataTemplate === undefined) res(false);
+              const picturesTemplate = dataTemplate.templateCaptures;
+              this.declareQuestionContentToEndpoint(
+                examId,
+                question.numero!,
+                endpoint,
+                picturesTemplate,
+                dataQuestionStudents.studAns
+              ).then(verdict => {
+                if (!verdict) res(false);
                 else {
-                  const picturesTemplate = dataTemplate.templateCaptures;
-                  this.declareQuestionContentToEndpoint(
-                    examId,
-                    question.numero!,
-                    endpoint,
-                    picturesTemplate,
-                    dataQuestionStudents.studAns
-                  ).then(verdict => {
-                    if (!verdict) res(false);
+                  // On a déclaré tous les fichiers qui seront envoyés à l'API
+                  // On peut maintenant tous les envoyer
+                  const picturesStudents: File[] = [];
+                  dataQuestionStudents.studAns.forEach(s => {
+                    s.answser.forEach(f => picturesStudents.push(f));
+                  });
+                  this.sendFilesToEndPoint(endpoint, picturesTemplate).then(verdictTemplate => {
+                    if (!verdictTemplate) res(false);
                     else {
-                      // On a déclaré tous les fichiers qui seront envoyés à l'API
-                      // On peut maintenant tous les envoyer
+                      this.sendFilesToEndPoint(endpoint, picturesStudents).then(verdictStud => res(verdictStud));
                     }
                   });
                 }
               });
             }
           });
-        },
-        error: () => {
-          res(false);
-        },
+        }
       });
     });
   }
@@ -146,6 +160,31 @@ export class QuestionTypeInteractionService {
               });
           } else res(false);
         });
+    });
+  }
+
+  // TODO: à l'avenir, appeler upload/pngs pour envoyer plusieurs fichiers d'un seul coup.. Je n'ai pas trouvé comment faire jusqu'alors
+  private sendFilesToEndPoint(endpoint: string, files: File[]): Promise<boolean> {
+    return new Promise<boolean>(res => {
+      this.fileSent = 0;
+      const proms: Promise<any>[] = [];
+      files.forEach(file => {
+        const formData = new FormData();
+        formData.append('clientfile', file);
+        const prom: Promise<any> = new Promise<any>(r => {
+          this.http.post<{ save: string; filename: string }>(endpoint + 'upload/png', formData).subscribe(resp => {
+            if (resp.save === 'success') {
+              this.fileSent++;
+              r(resp);
+            }
+          });
+        });
+        proms.push(prom);
+      });
+      Promise.all(proms).then(() => {
+        this.fileSent = 0;
+        res(true);
+      });
     });
   }
 }

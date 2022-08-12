@@ -63,6 +63,7 @@ import { ChartModule } from 'primeng/chart';
 import { KnobModule } from 'primeng/knob';
 import { DropdownModule } from 'primeng/dropdown';
 import { ToggleButtonModule } from 'primeng/togglebutton';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { VoirReponseComponent } from './voirreponse/voirreponse.component';
 import { VoirReponsesStarUnstarComponent } from './voirreponsesstarunstarexam/voirreponsesstarunstarexam.component';
 import { DynamicDialogModule } from 'primeng/dynamicdialog';
@@ -281,6 +282,7 @@ export const ShowResults_ROUTE: Route = {
     ButtonModule,
     ChartModule,
     KnobModule,
+    ProgressSpinnerModule,
     DropdownModule,
     ToggleButtonModule,
     SharedModule,

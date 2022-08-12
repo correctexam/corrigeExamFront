@@ -73,6 +73,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   noalign = false;
   factor = 1;
   currentEndPoint: string | undefined;
+  processData = false;
 
   currentTextComment4Question: ITextComment[] | undefined;
   currentGradedComment4Question: IGradedComment[] | undefined;
@@ -103,8 +104,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   pageOffset = 0;
   constructor(
-    private examQuestPictureService: ExamQuestPictureServiceService,
-    private questionTypeInteractionService: QuestionTypeInteractionService,
+    public examQuestPictureService: ExamQuestPictureServiceService,
+    public questionTypeInteractionService: QuestionTypeInteractionService,
     public examService: ExamService,
     public zoneService: ZoneService,
     public courseService: CourseService,
@@ -129,24 +130,35 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
    * @info asks for the API of the current question if there are already some datas about it
    */
   public connectAPI(): void {
-    if (this.currentEndPoint === undefined) return;
+    if (this.processData || this.currentEndPoint === undefined || this.currentQuestion === undefined) return;
     else {
+      const question = this.currentQuestion;
+      const endpoint = this.currentEndPoint;
       this.questionTypeInteractionService.connectEndPointToQuestion(this.currentEndPoint, this.currentQuestion!).subscribe({
         next: infoConnect => {
           // There is a reason that explains a problem enconterd
-          if (infoConnect.reason !== undefined) {
+          if (infoConnect.reason !== undefined && infoConnect.reason !== 'exam_unknown' && infoConnect.reason !== 'question_unknown') {
             this.messageService.add({
               severity: infoConnect.status,
               summary: 'Connection to API for this question',
               detail: infoConnect.reason,
             });
-          }
-          // There is no problem in reaching the informations about this question. We know now if the question number is known by the API
-          else if (infoConnect.exists !== undefined) {
-            this.messageService.add({
-              severity: infoConnect.exists ? 'success' : 'warn',
-              summary: 'Connection to API for this question',
-              detail: infoConnect.exists ? 'the question is loadded on the API' : 'the question is not known by the service',
+          } else {
+            // We suppose that everything happened well
+            if (infoConnect.exists) {
+              // TODO: for optimisation, I advise to ask all the filenames stored in examQuestPictures
+            }
+            // else
+            this.processData = true;
+            this.questionTypeInteractionService.sendQuestionToEndPoint(Number(this.examId), true, question, endpoint).then(success => {
+              this.messageService.add({
+                severity: success ? 'success' : 'warn',
+                summary: 'Connection to API for this question',
+                detail: success
+                  ? 'The question is loaded on the API'
+                  : 'The service encoundered a problem. The question is partially loaded or not loaded at all.',
+              });
+              this.processData = false;
             });
           }
         },
@@ -159,19 +171,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         },
       });
     }
-  }
-  /**
-   * @info sends all the data about this question to the API (if it is necessary)
-   * and recuperates the analysed data
-   */
-  public loadQuestionToApi(): void {
-    if (this.examId === undefined || this.currentQuestion === undefined || this.currentEndPoint === undefined) {
-      return;
-    }
-    console.log('LoadQuestion');
-    this.questionTypeInteractionService
-      .sendQuestionToEndPoint(Number(this.examId), true, this.currentQuestion, this.currentEndPoint)
-      .then(data => console.log(data));
   }
 
   ngOnInit(): void {
@@ -251,7 +250,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                                 (ex: any) =>
                                   ex?.scanId === this.exam!.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie!
                               );
-                            // console.log(this.selectionStudents)
                             if (sheets !== undefined && sheets!.length > 0) {
                               this.resp.sheetId = sheets[0]?.id;
                             }

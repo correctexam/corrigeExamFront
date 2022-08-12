@@ -68,25 +68,77 @@ export class ExamQuestPictureServiceService {
     return fnames;
   }
 
-  /**
-   *
-   * @param examId
-   * @returns a promise about all the questions of the exam
-   */
-  private getQuestions(examId: number): Promise<IQuestion[]> {
-    return new Promise<IQuestion[]>(res => {
-      this.questionService.query({ examId: +examId }).subscribe(data => {
-        if (data.body !== null) {
-          res(data.body);
-        } else res([]);
+  public croppingProgress = 0;
+
+  // TODO: L'idée est d'à terme ne proposer que des interactions à l'échelle de l'exam tout entier.. les getters Question sont voués à disparaitre
+
+  // Getters Exam
+  // Variable locales de cache (pour éviter de devoir refaire tous les calculs)
+  lastPromiseStudent: { examid: number; align: boolean; content: Promise<IQuestAnsw[]> } | undefined;
+  lastPromiseTemplate: { examid: number; content: Promise<ITemplateQuestCaptures[]> } | undefined;
+  /** @warning forceCalcul doit normalement être à false, sauf qu'il semble y avoir un problème parfois : 'content' récupère un tableau vide de promesses */
+  public getPNGstudentsExam(examid: number, align: boolean, forceCalcul = true): Promise<IQuestAnsw[]> {
+    if (
+      !forceCalcul &&
+      this.lastPromiseStudent !== undefined &&
+      this.lastPromiseStudent.examid === examid &&
+      this.lastPromiseStudent.align === align
+    ) {
+      return this.lastPromiseStudent.content;
+    } else {
+      this.croppingProgress = 0;
+      const content = this.questionsAnswPNGs(examid, align);
+      content.then(() => (this.croppingProgress = 0));
+      this.lastPromiseStudent = { examid, align, content };
+      return content;
+    }
+  }
+
+  public getPNGtemplateExam(examid: number, forceCalcul = false): Promise<ITemplateQuestCaptures[]> {
+    if (!forceCalcul && this.lastPromiseTemplate !== undefined && this.lastPromiseTemplate.examid === examid)
+      return this.lastPromiseTemplate.content;
+    else {
+      this.croppingProgress = 0;
+      const content = this.questionsPNGsTemplate(examid);
+      this.lastPromiseTemplate = { examid, content };
+      return content;
+    }
+  }
+
+  // Getters Question
+
+  public getPNGstudentsQuestion(examid: number, align: boolean, question: IQuestion): Promise<IQuestAnsw | undefined> {
+    return new Promise<IQuestAnsw | undefined>(res => {
+      this.getPNGstudentsExam(examid, align).then(quests => {
+        let currentQa: IQuestAnsw | undefined = undefined;
+        quests.forEach(qa => {
+          if (qa.questId === question.numero) currentQa = qa;
+        });
+        res(currentQa);
       });
     });
   }
 
+  public getPNGtemplateQuestion(examid: number, question: IQuestion): Promise<ITemplateQuestCaptures | undefined> {
+    return new Promise<ITemplateQuestCaptures | undefined>(res => {
+      this.getPNGtemplateExam(examid).then(quests => {
+        let current_tqc: ITemplateQuestCaptures | undefined = undefined;
+        quests.forEach(tqc => {
+          if (tqc.questId === question.numero) current_tqc = tqc;
+        });
+        res(current_tqc);
+      });
+    });
+  }
+
+  /**
+   * @note this is a debugging function. It can be deleted once it is useless
+   * @param examId
+   * @param align
+   */
   public loadAllExamPNGs(examId: number, align: boolean): void {
-    console.log('Loading pngs...');
-    this.questionsAnswPNGs(examId, align).then(qas => console.log(qas));
-    this.questionsPNGsTemplate(examId).then(templs => {
+    this.getPNGstudentsExam(examId, align).then(qas => console.log(qas));
+    this.getPNGtemplateExam(examId).then(templs => {
       console.log(templs);
     });
   }
@@ -94,7 +146,7 @@ export class ExamQuestPictureServiceService {
   /**
    *@warning  It seems that sometimes, 1 student is missing.. I don't know why
    * */
-  public questionsAnswPNGs(examId: number, align: boolean): Promise<IQuestAnsw[]> {
+  private questionsAnswPNGs(examId: number, align: boolean): Promise<IQuestAnsw[]> {
     return new Promise<IQuestAnsw[]>(res => {
       this.getDataStudents(examId).then(dss => {
         this.getQuestions(examId).then(questions => {
@@ -123,50 +175,20 @@ export class ExamQuestPictureServiceService {
     });
   }
 
-  // The data of only 1 question
-  // TODO: TEMPORAIRE ?
   /**
-   * @warning Fait en mode 'brute', évidemment à retravailler pour mieux optimiser.
-   * Je voulais exécuter le code qui est en commentaires à la place, mais il semble y avoir un problème d'asynchronisme
    *
    * @param examId
-   * @param align
-   * @param question
-   * @returns all the answsers to a specific question
+   * @returns a promise about all the questions of the exam
    */
-  public questionAnswPNGs(examId: number, align: boolean, question: IQuestion): Promise<IQuestAnsw | undefined> {
-    return new Promise<IQuestAnsw | undefined>(res => {
-      /* TODO: Code that I wanted to execute, but 'dss' seems to load too late, I don't know why
-      this.getDataStudents(examId).then(dss => {
-        console.log(dss)
-        this.pngQuestResp(examId, align, question, dss).then(quest=>{
-          if (quest.length > 0) {
-            const questId = quest[0].ansId;
-            const studAns: { studId: number; answser: File[] }[] = [];
-            quest.forEach(istudpic => {
-              studAns.push({ studId: istudpic.studId, answser: istudpic.answer });
-            });
-            const qa: IQuestAnsw = { questId, studAns };
-            console.log(qa)
-            res(qa)
-            return;
-          }
-          else {
-            res(undefined);
-            return;
-          }
-        })
-      });*/
-      this.questionsAnswPNGs(examId, align).then(quests => {
-        let currentQa: IQuestAnsw | undefined = undefined;
-        quests.forEach(qa => {
-          if (qa.questId === question.numero) currentQa = qa;
-        });
-        res(currentQa);
+  private getQuestions(examId: number): Promise<IQuestion[]> {
+    return new Promise<IQuestion[]>(res => {
+      this.questionService.query({ examId: +examId }).subscribe(data => {
+        if (data.body !== null) {
+          res(data.body);
+        } else res([]);
       });
     });
   }
-
   private pngQuestResp(examId: number, align: boolean, q: IQuestion, dss: DataStudent[]): Promise<IAnswPic[]> {
     return new Promise<IAnswPic[]>(res => {
       // const values : {studid :number,pageNum:number,imquest : File}[]= []
@@ -279,7 +301,7 @@ export class ExamQuestPictureServiceService {
         i,
         align,
         zone,
-        'rep_stud_' + ds.student.id!.toString() + '_q_' + q.numero!.toString()
+        'rep_stud_' + ds.student.id!.toString() + '_q_' + q.numero!.toString() + '_idimg_' + new Date().getTime().toString()
       );
       promsCaptPNG.push(psq);
     }
@@ -324,7 +346,10 @@ export class ExamQuestPictureServiceService {
           if (algimg === undefined) res('');
           else {
             const image = JSON.parse(algimg!.value);
-            this.cropImage(image.pages, pageNumber, zone).then(crop => res(crop));
+            this.cropImage(image.pages, pageNumber, zone).then(crop => {
+              this.croppingProgress++;
+              res(crop);
+            });
           }
         });
     });
@@ -423,7 +448,7 @@ export class ExamQuestPictureServiceService {
 
   // ------------------------------TEMPLATE MANAGENENT----------------
 
-  public questionsPNGsTemplate(examId: number): Promise<ITemplateQuestCaptures[]> {
+  private questionsPNGsTemplate(examId: number): Promise<ITemplateQuestCaptures[]> {
     return new Promise<ITemplateQuestCaptures[]>(res => {
       this.loadTemplatePNGPages(examId).then(p64s => {
         this.getQuestions(examId).then(questions => {
@@ -448,24 +473,6 @@ export class ExamQuestPictureServiceService {
       });
     });
   }
-  public questionPNGsTemplate(examId: number, question: IQuestion): Promise<ITemplateQuestCaptures | undefined> {
-    return new Promise<ITemplateQuestCaptures | undefined>(res => {
-      this.loadTemplatePNGPages(examId).then(p64s => {
-        this.question64Template(question, p64s).then(apics => {
-          if (apics.length === 0) {
-            res(undefined);
-          } else {
-            const fs: File[] = [];
-            apics.forEach(apic => {
-              apic.answer.forEach(f => fs.push(f));
-            });
-            const tqc: ITemplateQuestCaptures = { questId: apics[0].ansId, templateCaptures: fs };
-            res(tqc);
-          }
-        });
-      });
-    });
-  }
 
   private question64Template(q: IQuestion, p64s: Page64[]): Promise<IAnswPic[]> {
     return new Promise<IAnswPic[]>(resq => {
@@ -478,7 +485,10 @@ export class ExamQuestPictureServiceService {
             const promFtemplate: Promise<File> = new Promise<File>(res => {
               const promCrop = this.cropImage('data:image/png;base64,' + p64.base64String, 0, zone);
               promCrop.then(crop => {
-                const fcrop = this.base64toPNG(this.base64root(crop), 'template_' + 'q_' + q.numero!.toString());
+                const fcrop = this.base64toPNG(
+                  this.base64root(crop),
+                  'template_' + 'q_' + q.numero!.toString() + '_idimg_' + new Date().getTime().toString()
+                );
                 res(fcrop);
               });
             });
