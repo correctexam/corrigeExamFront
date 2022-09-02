@@ -368,7 +368,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                   res.solutions?.forEach(e => {
                     if (e.solution !== undefined && e.solution !== '') {
                       this.getStudentResponse(this.questions![0].id!, e.numero!).then(resp => {
-                        console.log(resp);
                         resp.gradedcomments?.forEach(gc => {
                           (gc as any).checked = false;
                         });
@@ -381,9 +380,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                           text: e.solution,
                           description: this.questions![0].validExpression!.split('|').includes(e.solution!)
                             ? 'correct ' + this.questions![0].point! + 'pt'
-                            : 'incorrect pénalité ' + (this.questions![0].step! > 0)
-                            ? ' - ' + ((1 / this.questions![0].step!) * this.questions![0].point!).toFixed(2) + 'pt'
-                            : '0 pt',
+                            : this.questions![0].step! > 0
+                            ? 'incorrect pénalité ' + ' - ' + ((1 / this.questions![0].step!) * this.questions![0].point!).toFixed(2) + 'pt'
+                            : 'incorrect pénalité ' + '0 pt',
                           grade: this.questions![0].validExpression!.split('|').includes(e.solution!)
                             ? this.questions![0].point
                             : this.questions![0].step,
