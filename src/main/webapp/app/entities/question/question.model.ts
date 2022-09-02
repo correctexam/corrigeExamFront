@@ -7,6 +7,7 @@ export interface IQuestion {
   numero?: number;
   point?: number;
   step?: number | null;
+  validExpression?: string | null;
   gradeType?: GradeType | null;
   textcomments?: ITextComment[] | null;
   gradedcomments?: IGradedComment[] | null;
@@ -23,6 +24,7 @@ export class Question implements IQuestion {
     public numero?: number,
     public point?: number,
     public step?: number | null,
+    public validExpression?: string | null,
     public gradeType?: GradeType | null,
     public textcomments?: ITextComment[] | null,
     public gradedcomments?: IGradedComment[] | null,

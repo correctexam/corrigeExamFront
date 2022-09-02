@@ -6,6 +6,7 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 import { MLModel } from './scanexam/ml/model';
+import { doQCMResolution } from './qcm';
 
 /// <reference lib="webworker" />
 declare let cv: any;
@@ -52,6 +53,8 @@ addEventListener('message', e => {
       return doPrediction(e.data, true);
     case 'ineprediction':
       return doPrediction(e.data, false);
+    case 'qcmresolution':
+      return doQCMResolution(e.data);
     default:
       break;
   }

@@ -21,17 +21,15 @@ export class StudentResponseService {
   }
 
   update(studentResponse: IStudentResponse): Observable<EntityResponseType> {
-    return this.http.put<IStudentResponse>(
-      `${this.resourceUrl}`,
-      studentResponse,
-      { observe: 'response' }
-    );
+    return this.http.put<IStudentResponse>(`${this.resourceUrl}`, studentResponse, { observe: 'response' });
   }
 
   partialUpdate(studentResponse: IStudentResponse): Observable<EntityResponseType> {
     return this.http.patch<IStudentResponse>(
       `${this.resourceUrl}/${getStudentResponseIdentifier(studentResponse) as number}`,
-      studentResponse,
+      {
+        currentNote: studentResponse.note,
+      },
       { observe: 'response' }
     );
   }

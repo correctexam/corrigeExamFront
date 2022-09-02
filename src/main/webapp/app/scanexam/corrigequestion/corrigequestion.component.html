@@ -3,6 +3,14 @@
   <p-blockUI [blocked]="blocked">
     <i class="pi pi-lock" style="font-size: 3rem"></i>
   </p-blockUI>
+  <p-overlayPanel #qcmcorrect (onShow)="computeQCMdebug()">
+    <ng-template pTemplate>
+      <div>
+        <canvas [hidden]="!showImageQCM" #imageQcmDebugs></canvas>
+      </div>
+    </ng-template>
+  </p-overlayPanel>
+
   <p-galleria
     [value]="images"
     [(visible)]="displayBasic"
@@ -44,9 +52,8 @@
         </button>
       </div>
     </div>
-    <div class="grid align-items-center">
+    <!-- <div class="grid align-items-center">
       <div class="col-1">
-        <!--  <p-button icon="pi pi-refresh"></p-button>-->
       </div>
       <div class="col-7">
         <p-paginator
@@ -62,15 +69,46 @@
       <div class="col-4 grid justify-content-end">
         <fa-icon [size]="'2x'" [pTooltip]="getStudentName()!" tooltipPosition="left" icon="eye"></fa-icon>
       </div>
-    </div>
-
+    </div>-->
     <div class="grid">
       <div class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-10">
         <div class="d-flex justify-content-center">
-          <h2>
-            Question {{ questionno + 1 }}
+          <p-paginator
+            [currentPageReportTemplate]="'scanexam.currentpage' | translate"
+            [rows]="1"
+            [first]="questionno"
+            [totalRecords]="nbreQuestions!"
+            (onPageChange)="changeQuestion($event)"
+            [showJumpToPageDropdown]="true"
+            [showPageLinks]="false"
+          ></p-paginator>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="col-12 sm:col-12 md:col-12 lg:col-10 xl:col-10">
+        <div class="d-flex justify-content-center">
+          <div class="col-5">
+            <button *ngIf="this.currentQuestion?.typeAlgoName === 'QCM'" pButton (click)="workOnQCM()">
+              Correction automatique du QCM
+            </button>
+            <button
+              type="text"
+              *ngIf="this.currentQuestion?.typeAlgoName === 'QCM'"
+              pButton
+              label="showQCMCorrect"
+              (click)="showQCMCorrect($event)"
+            ></button>
+          </div>
+
+          <div class="col-3">
+            <h2>Question {{ questionno + 1 }}</h2>
+          </div>
+          <div class="col-4">
             <button pButton (click)="showGalleria()" jhiTranslate="scanexam.showgalleria">Show full page</button>
-          </h2>
+            <fa-icon [size]="'2x'" [pTooltip]="getStudentName()!" tooltipPosition="left" icon="eye"></fa-icon>
+          </div>
         </div>
         <div class="d-flex justify-content-center" *ngFor="let k of questions; let i = index">
           <div>
@@ -91,12 +129,14 @@
           </p-paginator>
         </div>
       </div>
-      <div class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-2">
+      <div class="col-12 sm:col-12 md:col-12 lg:col-2 xl:col-2">
         <div class="grid">
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-3 xl:col-12">
             <p-rating
-              [disabled]="currentQuestion !== undefined && currentQuestion?.gradeType !== 'DIRECT'"
-              *ngIf="noteSteps > 0"
+              [disabled]="
+                currentQuestion !== undefined && (currentQuestion.gradeType !== 'DIRECT' || currentQuestion.typeAlgoName === 'QCM')
+              "
+              *ngIf="noteSteps > 0 && currentQuestion?.typeAlgoName !== 'QCM'"
               [stars]="noteSteps"
               [(ngModel)]="currentNote"
               (onRate)="changeNote()"
@@ -143,7 +183,7 @@
           </div>
         </div>
 
-        <div class="grid" *ngIf="currentQuestion && currentQuestion?.gradeType === 'DIRECT'">
+        <div class="grid" *ngIf="currentQuestion && currentQuestion?.gradeType === 'DIRECT' && currentQuestion?.typeAlgoName !== 'QCM'">
           <div *ngFor="let comment of currentTextComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-3 xl:col-12">
             <div class="card" [style]="getStyle(comment)">
               <div class="card-body">
@@ -194,7 +234,7 @@
           </div>
         </div>
 
-        <div class="grid" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
+        <div class="grid" *ngIf="(currentQuestion && currentQuestion?.gradeType !== 'DIRECT') || currentQuestion?.typeAlgoName === 'QCM'">
           <div *ngFor="let comment of currentGradedComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-3 xl:col-12">
             <div class="card" [style]="getStyle(comment)">
               <div class="card-body">
@@ -248,7 +288,7 @@
                 <a
                   *ngIf="!checked(comment)"
                   class="p-button p-button-primary"
-                  (click)="ajouterGComment(comment)"
+                  (click)="ajouterGComment(comment, resp!)"
                   jhiTranslate="scanexam.add"
                   >Ajouter</a
                 >
@@ -263,7 +303,7 @@
             </div>
           </div>
         </div>
-        <div class="grid">
+        <div class="grid" *ngIf="currentQuestion && currentQuestion?.typeAlgoName !== 'QCM'">
           <div class="sm:col-6 md:col-6 lg:col-6 xl:col-12">
             <div class="card">
               <div class="card-body">
