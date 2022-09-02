@@ -381,7 +381,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                           text: e.solution,
                           description: this.questions![0].validExpression!.split('|').includes(e.solution!)
                             ? 'correct ' + this.questions![0].point! + 'pt'
-                            : 'incorrect pénalité - ' + ((1 / this.questions![0].step!) * this.questions![0].point!).toFixed(2) + 'pt',
+                            : 'incorrect pénalité ' + (this.questions![0].step! > 0)
+                            ? ' - ' + ((1 / this.questions![0].step!) * this.questions![0].point!).toFixed(2) + 'pt'
+                            : '0 pt',
                           grade: this.questions![0].validExpression!.split('|').includes(e.solution!)
                             ? this.questions![0].point
                             : this.questions![0].step,
