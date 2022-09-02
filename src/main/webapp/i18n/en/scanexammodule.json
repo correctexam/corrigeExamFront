@@ -158,6 +158,15 @@
     "valeursnormalisees": "Normalized values per question",
     "valeursbrutes": "Raw values per question",
     "deletecacheko": "Unable to delete local cache",
-    "deletecachekodetail": "Unable to delete local cache"
+    "deletecachekodetail": "Unable to delete local cache",
+    "invalidanswerpenalty": "Cost for wrong answer",
+    "validanswerexpression": "Valide expression",
+    "penaltytooltip": "Cost according to the total points of the current question (e.g. if the total points of the question equals 2 and selection is 1/5, a wrong answer will cost 0,4 pt",
+    "expressiontooltip": "A valid expression will have the format 'a&b|a&c' meaning either box 'a' and box 'b' checked or box 'a' and box 'c' checked ('a' being the first box, 'c' being the third, ...)",
+    "steptooltip": "Step means the number of steps per point. If step equels 4, the question can be scored from 0.25pt to 0.25pt whatever the total number of points of the question.",
+    "couldnotcorrectQCM": "Could not correct this QCM automatically",
+    "couldnotcorrectQCMdetails": "Could not correct this QCM automatically",
+    "nosupportQMCmultiplepage": "No support for automatic correction on multiple page MCQs",
+    "nosupportQMCmultiplepagedetails": "No support for automatic correction on multiple page MCQs."
   }
 }

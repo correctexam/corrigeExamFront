@@ -25,6 +25,7 @@ describe('Question Service', () => {
       numero: 0,
       point: 0,
       step: 0,
+      validExpression: 'AAAAAAA',
       gradeType: GradeType.DIRECT,
     };
   });
@@ -64,6 +65,7 @@ describe('Question Service', () => {
           numero: 1,
           point: 1,
           step: 1,
+          validExpression: 'BBBBBB',
           gradeType: 'BBBBBB',
         },
         elemDefault
@@ -105,6 +107,7 @@ describe('Question Service', () => {
           numero: 1,
           point: 1,
           step: 1,
+          validExpression: 'BBBBBB',
           gradeType: 'BBBBBB',
         },
         elemDefault

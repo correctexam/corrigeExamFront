@@ -44,6 +44,33 @@ export interface IImageCropInput {
   height?: number;
 }
 
+export interface IQCMInput {
+  imageTemplate?: ImageData;
+  pages?: IQCMImageInput[];
+  //  xPage?: number;
+  //  yPage?: number;
+  //  widthPage?: number;
+  //  heightPage?: number;
+  //  xZone?: number;
+  //  yZone?: number;
+  widthZone?: number;
+  heightZone?: number;
+}
+
+export interface IQCMOutput {
+  solutions?: IQCMSolution[];
+}
+export interface IQCMImageInput {
+  imageInput?: ImageData;
+  numero?: number;
+}
+
+export interface IQCMSolution {
+  imageSolution?: ImageData;
+  numero?: number;
+  solution?: string;
+}
+
 export interface IImagePredictionInput {
   image?: ImageData;
   match?: string[];
@@ -53,13 +80,13 @@ export interface IImagePredictionOutput {
   debug: ImageData;
 }
 
-export interface IImageCropOutput {
+/* export interface IImageCropOutput {
   image?: ImageData;
   x?: number;
   y?: number;
   width?: number;
   height?: number;
-}
+} */
 
 @Injectable({
   providedIn: 'root',
@@ -152,5 +179,9 @@ export class AlignImagesService {
     } else {
       return this._dispatch('ineprediction', payload);
     }
+  }
+
+  public correctQCM(payload: IQCMInput): Observable<IQCMOutput> {
+    return this._dispatch('qcmresolution', payload);
   }
 }

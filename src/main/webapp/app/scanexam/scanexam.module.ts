@@ -15,6 +15,8 @@ import { DockModule } from 'primeng/dock';
 import { HotTableModule } from '@handsontable/angular';
 import { registerAllModules } from 'handsontable/registry';
 import { SliderModule } from 'primeng/slider';
+import { KeyFilterModule } from 'primeng/keyfilter';
+
 import { ToastModule } from 'primeng/toast';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -68,6 +70,9 @@ import { VoirReponsesStarUnstarComponent } from './voirreponsesstarunstarexam/vo
 import { DynamicDialogModule } from 'primeng/dynamicdialog';
 import { SharecourseComponent } from './sharecourse/sharecourse.component';
 import { PickListModule } from 'primeng/picklist';
+import { MessagesModule } from 'primeng/messages';
+import { MessageModule } from 'primeng/message';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -310,7 +315,10 @@ export const ShowResults_ROUTE: Route = {
     GalleriaModule,
     DynamicDialogModule,
     PickListModule,
-
+    KeyFilterModule,
+    MessagesModule,
+    MessageModule,
+    OverlayPanelModule,
     RouterModule.forChild([
       CREERCOURS_ROUTE,
       COURSMAIN_ROUTE,

@@ -85,12 +85,10 @@ export class ExamDetailComponent implements OnInit {
             .count()
             .then(c => {
               if (c !== 0) {
-                console.log('pass par la');
                 this.blocked = true;
                 this.showAssociation = true;
                 this.initTemplate();
               } else {
-                console.log('pass par la1');
                 db.removeElementForExam(+this.examId).then(() => {
                   this.cacheUploadService.getCache(this.examId + 'indexdb.json').subscribe(
                     data => {
@@ -171,8 +169,6 @@ export class ExamDetailComponent implements OnInit {
       .equals(+this.examId)
       .count()
       .then(e2 => {
-        console.log('pass par la2');
-
         this.nbreFeuilleParCopie = e2;
         // Step 2 Query Scan in local DB
 
@@ -181,7 +177,6 @@ export class ExamDetailComponent implements OnInit {
           .equals(+this.examId)
           .count()
           .then(e1 => {
-            console.log('pass par la3');
             this.numberPagesInScan = e1;
 
             this.studentService.query({ courseId: this.exam!.courseId }).subscribe(
