@@ -187,6 +187,7 @@ export class ExamDetailComponent implements OnInit {
                 const ex2 = (this.students.map(s => s.examSheets) as any)
                   .flat()
                   .filter((ex1: any) => ex1.scanId === this.exam!.scanfileId && ex1.pagemin !== -1).length;
+                console.log(ex2);
                 this.showCorrection = ex2 === this.numberPagesInScan / this.nbreFeuilleParCopie;
               },
               () => {
