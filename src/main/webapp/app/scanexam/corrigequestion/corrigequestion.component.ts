@@ -43,6 +43,7 @@ import { IGradedComment } from '../../entities/graded-comment/graded-comment.mod
 import { GradedCommentService } from '../../entities/graded-comment/service/graded-comment.service';
 import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
 import { TranslateService } from '@ngx-translate/core';
+import { IQCMSolution } from '../../qcm';
 
 @Component({
   selector: 'jhi-corrigequestion',
@@ -198,7 +199,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                           this.questionStep = this.questions[0].step!;
                           this.maxNote = this.questions[0].point!;
                           this.currentQuestion = this.questions[0];
-
                           if (this.resp === undefined) {
                             this.resp = new StudentResponse(undefined, this.currentNote);
                             this.resp.note = this.currentNote;
@@ -364,57 +364,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               });
               this.alignImagesService.correctQCM(t).subscribe(
                 res => {
-                  this.blocked = false;
-                  res.solutions?.forEach(e => {
-                    if (e.solution !== undefined && e.solution !== '') {
-                      this.getStudentResponse(this.questions![0].id!, e.numero!).then(resp => {
-                        resp.gradedcomments?.forEach(gc => {
-                          (gc as any).checked = false;
-                        });
-                        resp!.gradedcomments = [];
-                        // Check if gradedcomment with good parameters exists
-
-                        const gcs = this.currentGradedComment4Question?.filter(c => c.text === e.solution);
-                        let comment: IGradedComment = {
-                          questionId: this.questions![0].id,
-                          text: e.solution,
-                          description: this.questions![0].validExpression!.split('|').includes(e.solution!)
-                            ? 'correct ' + this.questions![0].point! + 'pt'
-                            : this.questions![0].step! > 0
-                            ? 'incorrect pénalité ' + ' - ' + ((1 / this.questions![0].step!) * this.questions![0].point!).toFixed(2) + 'pt'
-                            : 'incorrect pénalité ' + '0 pt',
-                          grade: this.questions![0].validExpression!.split('|').includes(e.solution!)
-                            ? this.questions![0].point
-                            : this.questions![0].step,
-                          studentResponses: [{ id: resp.id }],
-                        };
-                        // Comment already exists
-                        if (gcs !== undefined && gcs.length > 0) {
-                          comment = gcs[0];
-                          comment.studentResponses?.push(resp!);
-                          resp.gradedcomments.push(comment);
-                          this.studentResponseService.update(resp!).subscribe(() => {
-                            this.computeNote(true, resp!);
-                          });
-                        } else {
-                          if (this.currentGradedComment4Question !== undefined) {
-                            this.currentGradedComment4Question.push(comment);
-                          } else {
-                            this.currentGradedComment4Question = [comment];
-                          }
-                          this.gradedCommentService.create(comment).subscribe(e1 => {
-                            resp.gradedcomments?.push(e1.body!);
-                            // const currentComment = e1.body!;
-                            this.studentResponseService.update(resp!).subscribe(() => {
-                              if (this.currentStudent === e.numero) {
-                                (comment as any).checked = true;
-                                this.computeNote(true, resp!);
-                              }
-                            });
-                          });
-                        }
-                      });
-                    }
+                  this.processSolutions(res.solutions).then(() => {
+                    this.blocked = false;
                   });
                 },
                 err => {
@@ -440,6 +391,95 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       });
     }
   }
+
+  async processSolutions(solutions: IQCMSolution[] | undefined) {
+    // Create list of gradedComments
+    const validExp = this.currentQuestion?.validExpression!.split('|');
+    let validToCreate: string[] = [];
+    const invalidExp = solutions!.map(s => s.solution!);
+    let invalidToCreate: string[] = [];
+    if (this.currentGradedComment4Question === undefined) {
+      this.currentGradedComment4Question = [];
+    }
+    validToCreate = validExp!.filter(c => !this.currentGradedComment4Question?.map(v => v.text).includes(c));
+
+    invalidToCreate = invalidExp!.filter(
+      c => !this.currentGradedComment4Question?.map(v => v.text).includes(c) && !validExp!.includes(c!) && c !== ''
+    );
+
+    for (const gcv of validToCreate) {
+      const comment: IGradedComment = {
+        questionId: this.questions![0].id,
+        text: gcv,
+        description: 'correct ' + this.questions![0].point! + 'pt',
+        grade: this.questions![0].point,
+        studentResponses: [],
+      };
+      const c1 = await this.createGradedComment(comment);
+      this.currentGradedComment4Question!.push(c1);
+    }
+    for (const gcv of invalidToCreate) {
+      const comment: IGradedComment = {
+        questionId: this.questions![0].id,
+        text: gcv,
+        description:
+          this.questions![0].step! > 0
+            ? 'incorrect pénalité ' + ' - ' + ((1 / this.questions![0].step!) * this.questions![0].point!).toFixed(2) + 'pt'
+            : 'incorrect pénalité ' + '0 pt',
+        grade: this.questions![0].step,
+        studentResponses: [],
+      };
+      const c1 = await this.createGradedComment(comment);
+      this.currentGradedComment4Question!.push(c1);
+    }
+    // UpdateStudentResponse
+    for (const solution of solutions!) {
+      await this.processAnswer(solution);
+    }
+  }
+
+  async processAnswer(e: IQCMSolution) {
+    if (e.solution !== undefined && e.solution !== '') {
+      const resp = await this.getStudentResponse(this.questions![0].id!, e.numero!);
+      resp.gradedcomments?.forEach(gc => {
+        (gc as any).checked = false;
+      });
+      resp!.gradedcomments = [];
+      // Check if gradedcomment with good parameters exists
+
+      const gcs = this.currentGradedComment4Question?.filter(c => c.text === e.solution);
+      // Comment already exists
+      if (gcs !== undefined && gcs.length > 0) {
+        resp.gradedcomments.push(gcs[0]);
+        await this.updateStudentResponsAndComputeNote(resp, e.numero!, gcs[0]);
+        // gcs[0].studentResponses?.push(resp!);
+      }
+    }
+  }
+
+  createGradedComment(comment: IGradedComment): Promise<IGradedComment> {
+    return new Promise<IStudentResponse>((resolve, reject) => {
+      this.gradedCommentService.create(comment).subscribe(e1 => {
+        if (e1.body !== null) {
+          resolve(e1.body!);
+        } else {
+          reject(null);
+        }
+      });
+    });
+  }
+
+  updateStudentResponsAndComputeNote(resp: IStudentResponse, numero: number, comment: IGradedComment): Promise<IStudentResponse> {
+    return new Promise<IStudentResponse>(resolve => {
+      this.studentResponseService.update(resp!).subscribe(resp1 => {
+        if (this.currentStudent === numero) {
+          (comment as any).checked = true;
+        }
+        this.computeNote(true, resp1.body!).then(value => resolve(value));
+      });
+    });
+  }
+
   changeNote(): void {
     if (this.resp !== undefined) {
       this.blocked = true;
@@ -500,55 +540,82 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  computeNote(update: boolean, resp: IStudentResponse): any {
-    if (this.currentQuestion?.gradeType === GradeType.POSITIVE && this.currentQuestion.typeAlgoName !== 'QCM') {
-      let currentNote = 0;
-      resp.gradedcomments?.forEach(g => {
-        if (g.grade !== undefined && g.grade !== null) {
-          currentNote = currentNote + g.grade;
+  computeNote(update: boolean, resp: IStudentResponse): Promise<IStudentResponse> {
+    return new Promise<IStudentResponse>((resolve, reject) => {
+      if (this.currentQuestion?.gradeType === GradeType.POSITIVE && this.currentQuestion.typeAlgoName !== 'QCM') {
+        let currentNote = 0;
+        resp.gradedcomments?.forEach(g => {
+          if (g.grade !== undefined && g.grade !== null) {
+            currentNote = currentNote + g.grade;
+          }
+        });
+        if (currentNote > this.noteSteps) {
+          currentNote = this.noteSteps;
         }
-      });
-      if (currentNote > this.noteSteps) {
-        currentNote = this.noteSteps;
-      }
-      this.currentNote = currentNote;
-      resp.note = currentNote;
-      if (update) {
-        this.studentResponseService.partialUpdate(resp).subscribe(() => {});
-      }
-    } else if (this.currentQuestion?.gradeType === GradeType.NEGATIVE && this.currentQuestion.typeAlgoName !== 'QCM') {
-      let currentNote = this.noteSteps;
-      resp.gradedcomments?.forEach(g => {
-        if (g.grade !== undefined && g.grade !== null) {
-          currentNote = currentNote - g.grade;
-        }
-      });
-      if (currentNote < 0) {
-        currentNote = 0;
-      }
-      this.currentNote = currentNote;
-      resp.note = currentNote;
-      if (update) {
-        this.studentResponseService.partialUpdate(resp!).subscribe(() => {});
-      }
-    } else if (this.currentQuestion?.typeAlgoName === 'QCM') {
-      let currentNote = 0;
-      resp.gradedcomments?.forEach(g => {
-        if (g.description?.startsWith('correct')) {
-          currentNote = currentNote + this.questions![0].point! * this.questions![0].step!;
-        } else if (g.description?.startsWith('incorrect')) {
-          //          currentNote = currentNote -  (Math.round(((1/ this.questions![0].step!) * this.questions![0].point!)*100)/100)
-          currentNote = currentNote - this.questions![0].point!;
-        }
-      });
-      if (resp === this.resp) {
         this.currentNote = currentNote;
+        resp.note = currentNote;
+        if (update) {
+          this.studentResponseService.partialUpdate(resp).subscribe(b => {
+            if (b.body !== null) {
+              resolve(b.body);
+            } else {
+              reject(null);
+            }
+          });
+        } else {
+          resolve(resp);
+        }
+      } else if (this.currentQuestion?.gradeType === GradeType.NEGATIVE && this.currentQuestion.typeAlgoName !== 'QCM') {
+        let currentNote = this.noteSteps;
+        resp.gradedcomments?.forEach(g => {
+          if (g.grade !== undefined && g.grade !== null) {
+            currentNote = currentNote - g.grade;
+          }
+        });
+        if (currentNote < 0) {
+          currentNote = 0;
+        }
+        this.currentNote = currentNote;
+        resp.note = currentNote;
+        if (update) {
+          this.studentResponseService.partialUpdate(resp!).subscribe(b => {
+            if (b.body !== null) {
+              resolve(b.body);
+            } else {
+              reject(null);
+            }
+          });
+        } else {
+          resolve(resp);
+        }
+      } else if (this.currentQuestion?.typeAlgoName === 'QCM') {
+        let currentNote = 0;
+        resp.gradedcomments?.forEach(g => {
+          if (g.description?.startsWith('correct')) {
+            currentNote = currentNote + this.questions![0].point! * this.questions![0].step!;
+          } else if (g.description?.startsWith('incorrect')) {
+            if (this.questions![0].step! > 0) {
+              currentNote = currentNote - this.questions![0].point!;
+            }
+          }
+        });
+        if (resp === this.resp) {
+          this.currentNote = currentNote;
+        }
+        resp.note = currentNote;
+        if (update) {
+          this.studentResponseService.partialUpdate(resp).subscribe(b => {
+            if (b.body !== null) {
+              resolve(b.body);
+            } else {
+              reject(null);
+            }
+          });
+        } else {
+          resolve(resp);
+        }
       }
-      resp.note = currentNote;
-      if (update) {
-        this.studentResponseService.partialUpdate(resp).subscribe(() => {});
-      }
-    }
+    });
   }
 
   addComment() {
@@ -945,7 +1012,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   updateComment($event: any, l: IGradedComment | ITextComment, graded: boolean): any {
     if (graded) {
-      this.gradedCommentService.update(l).subscribe(() => {});
+      this.gradedCommentService.update(l).subscribe(() => {
+        const coms = this.resp?.gradedcomments?.filter(c => c.id === l.id!);
+        if (coms !== undefined && coms.length > 0) {
+          coms[0].grade = (l as any).grade;
+          this.computeNote(true, this.resp!);
+        }
+      });
     } else {
       this.textCommentService.update(l).subscribe(() => {});
     }

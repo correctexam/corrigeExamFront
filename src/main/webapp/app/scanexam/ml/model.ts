@@ -22,9 +22,20 @@ export class MLModel {
       //			this.alphabet = "abcdefghijklmnopqrstuvwxyz";
       this.characters = '0123456789';
     }
-    this.isWarmedUp = this.loadModel(letteranddigit)
-      .then()
-      .then(() => console.info('Backend running on:', tf.getBackend()));
+    this.isWarmedUp = this.initModel(letteranddigit);
+  }
+
+  initModel(letteranddigit: boolean): Promise<void> {
+    return new Promise<void>(resolve => {
+      tf.setBackend('wasm').then(() => {
+        this.loadModel(letteranddigit)
+          .then()
+          .then(() => {
+            console.info('Backend running on:', tf.getBackend());
+            resolve();
+          });
+      });
+    });
   }
 
   /**

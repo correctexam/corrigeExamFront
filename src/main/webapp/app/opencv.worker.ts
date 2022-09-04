@@ -10,6 +10,7 @@ import { doQCMResolution } from './qcm';
 
 /// <reference lib="webworker" />
 declare let cv: any;
+declare let tf: any;
 
 /**
  * This exists to capture all the events that are thrown out of the worker
@@ -41,6 +42,9 @@ addEventListener('message', e => {
       //Load and await the .js OpenCV
       self1.importScripts(self1['Module'].scriptUrl);
       self1.importScripts('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs');
+      self1.importScripts('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@3.20.0/dist/tf-backend-wasm.min.js');
+      tf.wasm.setWasmPaths('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@3.20.0/dist/');
+
       break;
     }
     case 'imageProcessing':
