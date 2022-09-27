@@ -342,9 +342,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         const solutionName = predicts[0];
         const solutionFirstname = predicts[1];
         const solutionINE = predicts[2];
-        //        console.log(solutionName);
-        //        console.log(solutionFirstname);
-        //        console.log(solutionINE);
+        console.log(solutionName);
+        console.log(solutionFirstname);
+        console.log(solutionINE);
         if (solutionName.length > 0 && solutionFirstname.length > 0 && solutionINE.length > 0) {
           let sts = this.students.filter(
             student =>
