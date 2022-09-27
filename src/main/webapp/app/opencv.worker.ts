@@ -719,6 +719,7 @@ function fprediction(src: any, cand: string[], m: MLModel, lookingForMissingLett
     }
     predict.push(res1);
   }
+  // console.log(predict)
   for (let k = 0; k < candidate.length; k++) {
     for (let j = 0; j < 13; j++) {
       if (j < predict.length) {
@@ -728,6 +729,7 @@ function fprediction(src: any, cand: string[], m: MLModel, lookingForMissingLett
         } else {
           if (onlyletter) {
             candidate[k][1] = candidate[k][1] + (1 - predict[j][1]) / 35;
+            // console.log(predict[j][1])
           } else {
             candidate[k][1] = candidate[k][1] + (1 - predict[j][1]) / 9;
           }
