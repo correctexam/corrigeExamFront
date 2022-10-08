@@ -43,6 +43,10 @@ export class QuestionService {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
+  cleanAllCorrectionAndComment(question: IQuestion): Observable<EntityResponseType> {
+    return this.http.post<IQuestion>(this.applicationConfigService.getEndpointFor('api/cleanResponse'), question, { observe: 'response' });
+  }
+
   addQuestionToCollectionIfMissing(questionCollection: IQuestion[], ...questionsToCheck: (IQuestion | null | undefined)[]): IQuestion[] {
     const questions: IQuestion[] = questionsToCheck.filter(isPresent);
     if (questions.length > 0) {

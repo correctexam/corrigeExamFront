@@ -112,7 +112,7 @@ const MIN_HEIGHT_SHAPE = 10;
 const EPSILON = 0.0145; // 0.03
 
 // Interprétation
-const DIFFERENCES_AVEC_CASE_BLANCHE = 0.2;
+const DIFFERENCES_AVEC_CASE_BLANCHE = 0.25;
 
 function getDimensions(forme: any): any {
   const rect = cv.boundingRect(forme);

@@ -144,7 +144,7 @@
             ></p-rating>
             <span jhiTranslate="scanexam.noteattribuee">Note attribuée : </span
             ><span *ngIf="questionStep > 0">{{ currentNote / questionStep }}</span>
-            <span *ngIf="questionStep <= 0">0</span>
+            <span *ngIf="questionStep <= 0">{{ currentNote }}</span>
           </div>
           <div *ngIf="resp" style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-3 xl:col-12">
             <label jhiTranslate="scanexam.excellente">Excellente réponse: </label>
