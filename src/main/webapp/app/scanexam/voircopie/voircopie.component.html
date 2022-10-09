@@ -77,7 +77,7 @@
             <!--  <p-button icon="pi pi-refresh"></p-button>-->
           </div>
           <div>
-            <div *ngIf="currentQuestion && currentQuestion?.gradeType === 'DIRECT'">
+            <div *ngIf="currentQuestion && currentQuestion?.gradeType === 'DIRECT' && currentQuestion?.typeAlgoName !== 'QCM'">
               <div *ngFor="let comment of currentTextComment4Question | sort: 'checked'" class="card" [style]="getStyle(comment)">
                 <div class="card-body">
                   <h5 class="card-title">{{ comment.text }}</h5>
@@ -85,7 +85,7 @@
                 </div>
               </div>
             </div>
-            <div *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
+            <div *ngIf="(currentQuestion && currentQuestion?.gradeType !== 'DIRECT') || currentQuestion?.typeAlgoName === 'QCM'">
               <div *ngFor="let comment of currentGradedComment4Question | sort: 'checked'" class="card" [style]="getStyle(comment)">
                 <div class="card-body">
                   <h5 class="card-title">{{ comment.text }}</h5>
