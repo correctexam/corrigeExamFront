@@ -280,7 +280,13 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   getStyle(comment: ITextComment | IGradedComment): any {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     if ((comment as any).checked) {
-      return { 'background-color': '#DCDCDC' };
+      if (comment.description?.startsWith('correct')) {
+        return { 'background-color': '#7EED92' };
+      } else if (comment.description?.startsWith('incorrect')) {
+        return { 'background-color': '#FF6961' };
+      } else {
+        return { 'background-color': '#DCDCDC' };
+      }
     } else {
       return {};
     }
