@@ -77,16 +77,27 @@ export class ResultatStudentcourseComponent implements OnInit {
       subject: this.mailSubject,
       body: this.mailBody,
     };
+    this.blocked = true;
     this.http.post(this.applicationConfigService.getEndpointFor('api/sendResult/' + this.examid), mail).subscribe(() => {
       this.showEmail = false;
 
-      this.translate.get('scanexam.mailsent').subscribe(data => {
-        this.messageService.add({
-          severity: 'success',
-          summary: data,
-          detail: this.translate.instant('scanexam.mailsentdetails'),
-        });
-      });
+      this.translate.get('scanexam.mailsent').subscribe(
+        data => {
+          this.blocked = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: data,
+            detail: this.translate.instant('scanexam.mailsentdetails'),
+          });
+        },
+        () => {
+          this.messageService.add({
+            severity: 'error',
+            summary: this.translate.instant('scanexam.mailnotsent'),
+            detail: this.translate.instant('scanexam.mailnotsentdetails'),
+          });
+        }
+      );
     });
   }
   gotoUE(): void {
