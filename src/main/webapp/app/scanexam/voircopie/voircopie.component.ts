@@ -786,9 +786,9 @@ ${firsName}
 `;
 
       if (this.translateService.currentLang === 'fr') {
-        return "m{ailto:?subject=Retour sur l'examen " + this.exam!.name + '&body=' + tfr;
+        return "mailto:?subject=Retour sur l'examen " + this.exam!.name + '&body=' + tfr;
       } else {
-        return 'm{ailto:?subject=Feedback on your ewam ' + this.exam!.name + '&body=' + ten;
+        return 'mailto:?subject=Feedback on your ewam ' + this.exam!.name + '&body=' + ten;
       }
     } else {
       return '';

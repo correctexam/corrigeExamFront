@@ -93,9 +93,11 @@ export class ResultatStudentcourseComponent implements OnInit {
     this.router.navigateByUrl('/exam/' + this.examid);
   }
   loadEtudiants(): void {
+    this.blocked = true;
     this.http.get(this.applicationConfigService.getEndpointFor('api/showResult/' + this.examid)).subscribe(s => {
       // eslint-disable-next-line no-console
       this.studentsresult = s as any;
+      this.blocked = false;
     });
   }
 
