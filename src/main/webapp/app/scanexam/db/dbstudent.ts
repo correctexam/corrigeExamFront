@@ -91,6 +91,14 @@ export class AppDB extends Dexie {
       this.exams.delete(examId);
     });
   }
+
+  async addAligneImage(elt: AlignImage) {
+    await db.alignImages.add(elt);
+  }
+
+  async addNonAligneImage(elt: AlignImage) {
+    await db.nonAlignImages.add(elt);
+  }
 }
 
 export const db = new AppDB();
