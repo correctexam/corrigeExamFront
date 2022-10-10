@@ -120,6 +120,8 @@
     "lien": "lien",
     "mailsent": "Mails envoyés",
     "mailsentdetails": "Tous les étudiants sont maintenant prévenus de leur résultat",
+    "mailnotsent": "Mails non envoyés",
+    "mailnotsentdetails": "Une erreur s'est produite pendant l'envoi des emails aux étudiants",
     "mailtemplate": "Bonjour ${firstname},\n\nVoici le lien vers votre copie ${url}.\n\nSincèrement,\n\nL'équipe pédagogique",
     "mailsubjecttemplate": "Votre résultat à l'examen ",
     "profdispo": "Professeurs disponibles",
