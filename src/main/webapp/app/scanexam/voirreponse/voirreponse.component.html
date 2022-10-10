@@ -41,7 +41,10 @@
               <p-slider *ngIf="noteSteps > 0" [(ngModel)]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImage()"> </p-slider>
             </div>
             <p-rating [disabled]="true" *ngIf="noteSteps > 0" [stars]="noteSteps" [(ngModel)]="currentNote"></p-rating>
-            <span jhiTranslate="scanexam.noteattribuee">Note attribuée :</span> {{ currentNote / questionStep }}
+
+            <span jhiTranslate="scanexam.noteattribuee">Note attribuée :</span>
+            <span *ngIf="questionStep > 0">{{ currentNote / questionStep }}</span>
+            <span *ngIf="questionStep <= 0">{{ currentNote }}</span>
             <!--  <p-button icon="pi pi-refresh"></p-button>-->
           </div>
         </div>
