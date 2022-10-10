@@ -189,7 +189,9 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
 
                   this.nbreFeuilleParCopie = this.sheet!.pagemax! - this.sheet!.pagemin! + 1;
                   // Step 2 Query Scan in local DB
-                  db.alignImages
+                  this.finalize();
+
+                  /* db.alignImages
                     .where('examId')
                     .equals(this.exam!.id!)
                     .count()
@@ -199,7 +201,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
                       } else {
                         this.finalize();
                       }
-                    });
+                    });*/
                 }
               });
           });
@@ -387,39 +389,24 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
           .where({ examId: +this.exam!.id!, pageNumber: pageInscan })
           .count()
           .then(count => {
-            if (count > 0) {
+            if (count === 0) {
+              this.cacheUploadService.getNoAlignImage(this.exam!.id!, pageInscan).subscribe(body => {
+                const image = JSON.parse(body, this.reviver);
+                db.addNonAligneImage({
+                  examId: this.exam!.id!,
+                  pageNumber: pageInscan,
+                  value: body,
+                }).then(() => {
+                  this.loadImage1(image, pageInscan, zone, resolve);
+                });
+              });
+            } else if (count > 0) {
               db.nonAlignImages
                 .where({ examId: +this.exam!.id!, pageNumber: pageInscan })
                 .first()
                 .then(e2 => {
                   const image = JSON.parse(e2!.value, this.reviver);
-                  this.loadImage(image.pages, pageInscan).then(v => {
-                    let finalW = (zone.width! * v.width! * this.factor) / 100000;
-                    let finalH = (zone.height! * v.height! * this.factor) / 100000;
-                    let initX =
-                      (zone.xInit! * v.width!) / 100000 -
-                      ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
-                    if (initX < 0) {
-                      finalW = finalW + initX;
-                      initX = 0;
-                    }
-                    let initY =
-                      (zone.yInit! * v.height!) / 100000 -
-                      ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
-                    if (initY < 0) {
-                      finalH = finalH + initY;
-                      initY = 0;
-                    }
-                    this.alignImagesService
-                      .imageCrop({
-                        image: v.image,
-                        x: initX,
-                        y: initY,
-                        width: finalW,
-                        height: finalH,
-                      })
-                      .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
-                  });
+                  this.loadImage1(image, pageInscan, zone, resolve);
                 });
             } else {
               db.resetDatabase().then(() => {
@@ -434,39 +421,24 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
           .where({ examId: +this.exam!.id!, pageNumber: pageInscan })
           .count()
           .then(count => {
-            if (count > 0) {
+            if (count === 0) {
+              this.cacheUploadService.getAlignImage(this.exam!.id!, pageInscan).subscribe(body => {
+                const image = JSON.parse(body, this.reviver);
+                db.addAligneImage({
+                  examId: this.exam!.id!,
+                  pageNumber: pageInscan,
+                  value: body,
+                }).then(() => {
+                  this.loadImage1(image, pageInscan, zone, resolve);
+                });
+              });
+            } else if (count > 0) {
               db.alignImages
                 .where({ examId: +this.exam!.id!, pageNumber: pageInscan })
                 .first()
                 .then(e2 => {
                   const image = JSON.parse(e2!.value, this.reviver);
-                  this.loadImage(image.pages, pageInscan).then(v => {
-                    let finalW = (zone.width! * v.width! * this.factor) / 100000;
-                    let finalH = (zone.height! * v.height! * this.factor) / 100000;
-                    let initX =
-                      (zone.xInit! * v.width!) / 100000 -
-                      ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
-                    if (initX < 0) {
-                      finalW = finalW + initX;
-                      initX = 0;
-                    }
-                    let initY =
-                      (zone.yInit! * v.height!) / 100000 -
-                      ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
-                    if (initY < 0) {
-                      finalH = finalH + initY;
-                      initY = 0;
-                    }
-                    this.alignImagesService
-                      .imageCrop({
-                        image: v.image,
-                        x: initX,
-                        y: initY,
-                        width: finalW,
-                        height: finalH,
-                      })
-                      .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
-                  });
+                  this.loadImage1(image, pageInscan, zone, resolve);
                 });
             } else {
               db.resetDatabase().then(() => {
@@ -476,6 +448,34 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
           });
       });
     }
+  }
+
+  loadImage1(image: any, pageInscan: number, zone: IZone, resolve: (value: ImageZone | PromiseLike<ImageZone>) => void) {
+    this.loadImage(image.pages, pageInscan).then(v => {
+      let finalW = (zone.width! * v.width! * this.factor) / 100000;
+      let finalH = (zone.height! * v.height! * this.factor) / 100000;
+      let initX =
+        (zone.xInit! * v.width!) / 100000 - ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
+      if (initX < 0) {
+        finalW = finalW + initX;
+        initX = 0;
+      }
+      let initY =
+        (zone.yInit! * v.height!) / 100000 - ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
+      if (initY < 0) {
+        finalH = finalH + initY;
+        initY = 0;
+      }
+      this.alignImagesService
+        .imageCrop({
+          image: v.image,
+          x: initX,
+          y: initY,
+          width: finalW,
+          height: finalH,
+        })
+        .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
+    });
   }
 
   async loadImage(file: any, page1: number): Promise<IPage> {
@@ -498,7 +498,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     this.reloadImage();
   }
 
-  populateCache(): Promise<void> {
+  /* populateCache(): Promise<void> {
     return new Promise<void>(resolve => {
       db.removeElementForExam(this.exam!.id!).then(() => {
         this.cacheUploadService.getCache(this.exam!.id! + 'indexdb.json').subscribe(
@@ -537,7 +537,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
         );
       });
     });
-  }
+  } */
 
   async removeElement(examId: number): Promise<any> {
     await db.removeElementForExam(examId);
