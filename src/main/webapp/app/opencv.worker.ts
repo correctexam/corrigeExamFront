@@ -579,7 +579,7 @@ function matchSmallImage(
     let dMatch1 = match.get(0);
     let dMatch2 = match.get(1);
     let knnDistance_option = '0.7';
-    if (dMatch1.distance <= dMatch2.distance * parseFloat(knnDistance_option)) {
+    if (dMatch1 !== undefined && dMatch2 !== undefined && dMatch1.distance <= dMatch2.distance * parseFloat(knnDistance_option)) {
       good_matches.push_back(dMatch1);
     }
   }
