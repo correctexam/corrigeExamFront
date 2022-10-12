@@ -91,6 +91,7 @@ export class ResultatStudentcourseComponent implements OnInit {
           });
         },
         () => {
+          this.blocked = false;
           this.messageService.add({
             severity: 'error',
             summary: this.translate.instant('scanexam.mailnotsent'),
