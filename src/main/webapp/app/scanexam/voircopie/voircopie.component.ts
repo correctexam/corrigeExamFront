@@ -33,12 +33,8 @@ import { ITextComment } from '../../entities/text-comment/text-comment.model';
 import { IGradedComment } from '../../entities/graded-comment/graded-comment.model';
 import { GradedCommentService } from '../../entities/graded-comment/service/graded-comment.service';
 import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
-import { ScanService } from 'app/entities/scan/service/scan.service';
 import { FinalResultService } from '../../entities/final-result/service/final-result.service';
-import { IFinalResult } from '../../entities/final-result/final-result.model';
-import { IScan } from '../../entities/scan/scan.model';
 import { IExamSheet } from '../../entities/exam-sheet/exam-sheet.model';
-import { ITemplate } from 'app/entities/template/template.model';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { HttpClient } from '@angular/common/http';
 import { CacheUploadService } from '../exam-detail/cacheUpload.service';
@@ -57,10 +53,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   canvass!: QueryList<ElementRef>;
   showImage: boolean[] = [];
   nbreFeuilleParCopie: number | undefined;
-  // numberPagesInScan: number | undefined;
   exam: IExam | undefined;
-  // course: ICourse | undefined;
-  // students: IStudent[] | undefined;
   currentStudent = 0;
   selectionStudents: IStudent[] | undefined;
   numberofzone: number | undefined = 0;
@@ -81,14 +74,10 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   note = new Promise<number>(resolve => {
     this.resolve = resolve;
   });
-  scan: IScan | undefined;
   resolve: any;
   currentTextComment4Question: ITextComment[] | undefined;
   currentGradedComment4Question: IGradedComment[] | undefined;
-  finalResult: IFinalResult | undefined;
 
-  alignPages: Map<number, IPage> = new Map();
-  nonalignPages: Map<number, IPage> = new Map();
   currentZoneVoirCopieHandler: ZoneVoirCopieHandler | undefined;
   constructor(
     protected applicationConfigService: ApplicationConfigService,
@@ -98,7 +87,6 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     public zoneService: ZoneService,
     //    public courseService: CourseService,
     public studentService: StudentService,
-    public scanService: ScanService,
     protected activatedRoute: ActivatedRoute,
     public confirmationService: ConfirmationService,
     public router: Router,

@@ -32,11 +32,7 @@ import { IGradedComment } from '../../entities/graded-comment/graded-comment.mod
 import { GradedCommentService } from '../../entities/graded-comment/service/graded-comment.service';
 import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
 import { ScanService } from 'app/entities/scan/service/scan.service';
-import { FinalResultService } from '../../entities/final-result/service/final-result.service';
-import { IFinalResult } from '../../entities/final-result/final-result.model';
-import { IScan } from '../../entities/scan/scan.model';
 import { IExamSheet } from '../../entities/exam-sheet/exam-sheet.model';
-import { ITemplate } from 'app/entities/template/template.model';
 import { CacheUploadService } from '../exam-detail/cacheUpload.service';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -54,8 +50,6 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
   showImage: boolean[] = [];
   nbreFeuilleParCopie: number | undefined;
   exam: IExam | undefined;
-  // course: ICourse | undefined;
-  // students: IStudent[] | undefined;
   currentStudent = 0;
   selectionStudents: IStudent[] | undefined;
   numberofzone: number | undefined = 0;
@@ -73,23 +67,9 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
   factor = 1;
   uuid = '';
   sheet: IExamSheet | undefined;
-  note = new Promise<number>(resolve => {
-    this.resolve = resolve;
-  });
-  scan: IScan | undefined;
-  resolve: any;
   currentTextComment4Question: ITextComment[] | undefined;
   currentGradedComment4Question: IGradedComment[] | undefined;
-  finalResult: IFinalResult | undefined;
 
-  alignPages: Map<number, IPage> = new Map();
-  nonalignPages: Map<number, IPage> = new Map();
-  debug = false;
-  phase1 = false;
-  loaded = false;
-  alignement = 'marker';
-  template!: ITemplate;
-  pdfcontent!: string;
   constructor(
     public examService: ExamService,
     public zoneService: ZoneService,
@@ -107,7 +87,6 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
     public textCommentService: TextCommentService,
     public studentResponseService: StudentResponseService,
     private changeDetector: ChangeDetectorRef,
-    public finalResultService: FinalResultService,
     public cacheUploadService: CacheUploadService,
     private translateService: TranslateService
   ) {}
@@ -150,18 +129,6 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
                     this.nbreFeuilleParCopie = this.sheet!.pagemax! - this.sheet!.pagemin! + 1;
                     // Step 2 Query Scan in local DB
                     this.finalize();
-
-                    /* db.alignImages
-                      .where('examId')
-                      .equals(this.exam!.id!)
-                      .count()
-                      .then(e1 => {
-                        if (e1 === 0) {
-                          this.populateCache();
-                        } else {
-                          this.finalize();
-                        }
-                      }); */
                   }
                 });
             });
@@ -230,15 +197,6 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
         this.currentStudent
       );
     });
-  }
-
-  private reviver(key: any, value: any): any {
-    if (typeof value === 'object' && value !== null) {
-      if (value.dataType === 'Map') {
-        return new Map(value.value);
-      }
-    }
-    return value;
   }
 
   async loadZone(
@@ -401,5 +359,14 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
     } else {
       return value;
     }
+  }
+
+  private reviver(key: any, value: any): any {
+    if (typeof value === 'object' && value !== null) {
+      if (value.dataType === 'Map') {
+        return new Map(value.value);
+      }
+    }
+    return value;
   }
 }
