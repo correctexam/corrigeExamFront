@@ -16,8 +16,9 @@ export class MLModel {
    */
   constructor(letteranddigit: boolean) {
     if (letteranddigit) {
-      this.alphabet = 'abcdefghijklmnopqrstuvwxyz';
-      this.characters = '0123456789' + this.alphabet.toUpperCase() + this.alphabet;
+      this.alphabet = ' abcdefghijklmnopqrstuvwxyz';
+      //      this.characters = '0123456789' + this.alphabet.toUpperCase() + this.alphabet;
+      this.characters = this.alphabet.toUpperCase();
     } else {
       //			this.alphabet = "abcdefghijklmnopqrstuvwxyz";
       this.characters = '0123456789';
@@ -44,11 +45,13 @@ export class MLModel {
   public loadModel(letteranddigit: boolean): Promise<any> {
     console.time('Load model');
     if (letteranddigit) {
-      return tf.loadLayersModel('content/classifier/letteranddigitclassifier/model.json').then((model: any) => {
+      console.log('load letter');
+      return tf.loadLayersModel('content/classifier/letterclassifier/model.json').then((model: any) => {
         this._model = model;
         console.timeEnd('Load model');
       });
     } else {
+      console.log('load digit');
       return tf.loadLayersModel('content/classifier/digitclassifier/model.json').then((model: any) => {
         this._model = model;
         console.timeEnd('Load model');
