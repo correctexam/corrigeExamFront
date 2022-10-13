@@ -102,43 +102,6 @@
           </div>
         </div>
       </div>
-      <div class="canvas-wrapper foo">
-        <ngx-extended-pdf-viewer
-          [hidden]="'true'"
-          [base64Src]="pdfcontent"
-          [useBrowserLocale]="true"
-          style="flex: 1 1 100%"
-          #viewer
-          [height]="'90vh'"
-          [page]="1"
-          [handTool]="false"
-          [showHandToolButton]="false"
-          [textLayer]="false"
-          [handTool]="false"
-          [showToolbar]="false"
-          [pageViewMode]="'infinite-scroll'"
-          [showSecondaryToolbarButton]="false"
-          backgroundColor="#ffffff"
-          [zoom]="'100%'"
-          [minZoom]="1"
-          [maxZoom]="1"
-          (pdfLoaded)="pdfloaded()"
-        ></ngx-extended-pdf-viewer>
-
-        <canvas [hidden]="!debug" #imageAligned></canvas>
-
-        <canvas [hidden]="!debug" #keypoints1></canvas>
-        <canvas [hidden]="!debug" #keypoints2></canvas>
-        <canvas [hidden]="!debug" #imageCompareMatches></canvas>
-      </div>
     </div>
   </div>
-  <!-- <div class="col-4 md:col-4 overflow-hidden">
-    <img
-      src="content/images/bannerright.jpg"
-      alt="Image"
-      class="md:ml-auto block md:h-full"
-      style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
-    />
-  </div>-->
 </div>
