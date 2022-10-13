@@ -25,11 +25,8 @@ export class SharecourseComponent implements OnInit {
     private http: HttpClient
   ) {}
 
-  // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
-
   ngOnInit(): void {
     this.courseid = this.config.data.courseid;
-
     this.http.get<any>(this.applicationConfigService.getEndpointFor('api/getUsers/' + this.courseid)).subscribe(s => {
       this.list1 = s.availables;
       this.list2 = s.shared;

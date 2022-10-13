@@ -47,12 +47,6 @@ export interface IImageCropInput {
 export interface IQCMInput {
   imageTemplate?: ImageData;
   pages?: IQCMImageInput[];
-  //  xPage?: number;
-  //  yPage?: number;
-  //  widthPage?: number;
-  //  heightPage?: number;
-  //  xZone?: number;
-  //  yZone?: number;
   widthZone?: number;
   heightZone?: number;
 }
@@ -79,14 +73,6 @@ export interface IImagePredictionOutput {
   solution?: (string | number)[];
   debug: ImageData;
 }
-
-/* export interface IImageCropOutput {
-  image?: ImageData;
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-} */
 
 @Injectable({
   providedIn: 'root',

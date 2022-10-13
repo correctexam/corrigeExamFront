@@ -137,25 +137,10 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   ineImage: ElementRef | undefined;
   @ViewChild('ineImageReco')
   ineImageReco: ElementRef | undefined;
-  @ViewChild('keypoints1')
-  keypoints1: ElementRef | undefined;
-  @ViewChild('keypoints2')
-  keypoints2: ElementRef | undefined;
-  @ViewChild('imageCompareMatches')
-  imageCompareMatches: ElementRef | undefined;
-  @ViewChild('imageAligned')
-  imageAligned: ElementRef | undefined;
   debug = false;
-  phase1 = false;
   noalign = false;
   factor = 1;
 
-  alignement = 'marker';
-  alignementOptions = [
-    { label: 'Off', value: 'off' },
-    { label: 'with Marker', value: 'marker' },
-    { label: 'without Marker', value: 'nomarker' },
-  ];
   debugOptions = [
     { label: 'Off', value: false },
     { label: 'On', value: true },
@@ -566,21 +551,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                   height: finalH,
                 })
                 .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
-
-              /*
-              const finalW = (zone.width! * v.width!) / 100000;
-              const finalH = (zone.height! * v.height!) / 100000;
-              this.alignImagesService
-                .imageCrop({
-                  image: v.image,
-                  x: (zone.xInit! * v.width!) / 100000,
-                  y: (zone.yInit! * v.height!) / 100000,
-                  width: finalW,
-                  height: finalH,
-                })
-                .subscribe(res => {
-                  resolve({ i: res, w: finalW, h: finalH });
-                });*/
             });
           });
       });
@@ -667,54 +637,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     this.reShow();
   }
 
-  async getImageAndRealign(zone: IZone, currentStudent: number, imageRef: ElementRef<any>): Promise<ImageData> {
-    return new Promise<ImageData>(resolve => {
-      if (zone !== undefined) {
-        db.nonAlignImages
-          .where({ examId: +this.examId, pageNumber: zone.pageNumber! + currentStudent * this.nbreFeuilleParCopie })
-          .first()
-          .then(e2 => {
-            const image = JSON.parse(e2!.value, this.reviver);
-
-            this.aligneImages(image.pages, zone.pageNumber! + currentStudent * this.nbreFeuilleParCopie).then((p: IPage) => {
-              imageRef!.nativeElement.width = (zone.width! * p.width!) / 100000;
-              imageRef!.nativeElement.height = (zone.height! * p.height!) / 100000;
-
-              this.alignImagesService
-                .imageCrop({
-                  image: p.image,
-                  x: (zone.xInit! * p.width!) / 100000,
-                  y: (zone.yInit! * p.height!) / 100000,
-                  width: (zone.width! * p.width!) / 100000,
-                  height: (zone.height! * p.height!) / 100000,
-                })
-                .subscribe(res => {
-                  resolve(res);
-                });
-            });
-          });
-      }
-    });
-  }
-
-  public exportAsImage(): void {
-    this.getImageAndRealign(this.zonenom, this.currentStudent, this.nomImage!).then(res => {
-      const ctx1 = this.nomImage?.nativeElement.getContext('2d');
-      ctx1.putImageData(res, 0, 0);
-      this.showNomImage = true;
-      this.getImageAndRealign(this.zoneprenom, this.currentStudent, this.prenomImage!).then(res1 => {
-        const ctx2 = this.prenomImage?.nativeElement.getContext('2d');
-        ctx2.putImageData(res1, 0, 0);
-        this.showPrenomImage = true;
-      });
-      this.getImageAndRealign(this.zoneine, this.currentStudent, this.ineImage!).then(res1 => {
-        const ctx2 = this.ineImage?.nativeElement.getContext('2d');
-        ctx2.putImageData(res1, 0, 0);
-        this.showINEImage = true;
-      });
-    });
-  }
-
   async loadImage(file: any, page1: number): Promise<IPage> {
     return new Promise(resolve => {
       const i = new Image();
@@ -731,77 +653,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     });
   }
 
-  async aligneImages(file: any, pagen: number): Promise<IPage> {
-    return new Promise<IPage>(resolve => {
-      const i = new Image();
-      i.onload = () => {
-        this.editedImage = <HTMLCanvasElement>document.createElement('canvas');
-        this.editedImage.width = i.width;
-        this.editedImage.height = i.height;
-        const ctx = this.editedImage.getContext('2d');
-        ctx!.drawImage(i, 0, 0);
-        const inputimage1 = ctx!.getImageData(0, 0, i.width, i.height);
-        if (this.alignement !== 'off') {
-          db.templates
-            .where({ examId: +this.examId, pageNumber: pagen % this.nbreFeuilleParCopie })
-            .first()
-            .then(e1 => {
-              const image1 = JSON.parse(e1!.value, this.reviver);
-
-              this.loadImage(image1.pages, pagen % this.nbreFeuilleParCopie).then(v => {
-                this.alignImagesService
-                  .imageAlignement({
-                    imageA: v.image,
-                    imageB: inputimage1,
-                    marker: this.alignement === 'marker',
-                    x: (this.zoneine.xInit! * v.width!) / 100000,
-                    y: (this.zoneine.yInit! * v.height!) / 100000,
-                    width: (this.zoneine.width! * v.width!) / 100000,
-                    height: (this.zoneine.height! * v.height!) / 100000,
-                  })
-                  .subscribe(e => {
-                    if (this.debug) {
-                      const ctx1 = this.imageCompareMatches?.nativeElement.getContext('2d');
-                      this.imageCompareMatches!.nativeElement.width = e.imageCompareMatchesWidth;
-                      this.imageCompareMatches!.nativeElement.height = e.imageCompareMatchesHeight;
-                      ctx1.putImageData(e.imageCompareMatches, 0, 0);
-                      const ctx2 = this.keypoints1?.nativeElement.getContext('2d');
-                      this.keypoints1!.nativeElement.width = e.keypoints1Width;
-                      this.keypoints1!.nativeElement.height = e.keypoints1Height;
-                      ctx2.putImageData(e.keypoints1, 0, 0);
-                      const ctx3 = this.keypoints2?.nativeElement.getContext('2d');
-                      this.keypoints2!.nativeElement.width = e.keypoints2Width;
-                      this.keypoints2!.nativeElement.height = e.keypoints2Height;
-                      ctx3.putImageData(e.keypoints2, 0, 0);
-                      const ctx4 = this.imageAligned?.nativeElement.getContext('2d');
-                      this.imageAligned!.nativeElement.width = e.imageAlignedWidth;
-                      this.imageAligned!.nativeElement.height = e.imageAlignedHeight;
-                      ctx4.putImageData(e.imageAligned, 0, 0);
-                    }
-                    const apage = {
-                      image: e.imageAligned,
-                      page: pagen,
-                      width: i.width!,
-                      height: i.height,
-                    };
-                    resolve(apage);
-                  });
-              });
-            });
-        } else {
-          const apage = {
-            image: inputimage1,
-            page: pagen,
-            width: i.width,
-            height: i.height,
-          };
-          resolve(apage);
-        }
-      };
-      i.src = file;
-    });
-  }
-
   onPageChange($event: any): void {
     this.selectionStudents = [];
     this.goToStudent($event.page);
@@ -813,7 +664,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
 
   public alignementChange(): any {
     this.loadAllPages();
-    this.exportAsImage();
+    // this.exportAsImage();
   }
 
   private reviver(key: any, value: any): any {

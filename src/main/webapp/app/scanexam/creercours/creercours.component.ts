@@ -25,7 +25,6 @@ export class CreercoursComponent implements OnInit {
   editForm = this.fb.group({
     id: [],
     name: [null, [Validators.required]],
-    //  prof: [null, Validators.required],
   });
 
   constructor(
@@ -84,8 +83,6 @@ export class CreercoursComponent implements OnInit {
       ...new Course(),
       id: this.editForm.get(['id'])!.value,
       name: this.editForm.get(['name'])!.value,
-      //  prof: {new User(id:null, }this.login!)
-      // prof: this.editForm.get(['prof'])!.value,
     };
   }
 }

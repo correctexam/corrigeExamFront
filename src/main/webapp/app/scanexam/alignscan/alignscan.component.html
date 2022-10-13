@@ -25,10 +25,6 @@
           <fa-icon [icon]="faObjectGroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.alignscan"> Alignement des scans</span>
         </button>
       </div>
-      <!--      <div class="col-offset-8 col-4">
-        <label for="slider">Nombre de lignes dans le tableau (entre 100 et 300)</label>
-        <p-slider id="slider" [(ngModel)]="val" (onChange)="updateTableSize()" [step]="20" [min]="100" [max]="300"></p-slider>
-      </div>-->
     </div>
     <div class="col-12 md:col-12">
       <h5 jhiTranslate="scanexam.alignscanalgo">Algorithme d'alignement</h5>
@@ -39,9 +35,6 @@
         optionLabel="label"
         optionValue="value"
       ></p-selectButton>
-
-      <!--<h5>Debug</h5>
-      <p-selectButton [options]="debugOptions" [(ngModel)]="debug" optionLabel="label" optionValue="value"></p-selectButton> -->
 
       <h5 jhiTranslate="scanexam.alignscanbrpage">Nombre de page à utiliser dans le template d'exam</h5>
       <p-inputNumber [(ngModel)]="nbreFeuilleParCopie" [showButtons]="true"></p-inputNumber>
@@ -69,12 +62,6 @@
           [maxZoom]="1"
           (pdfLoaded)="pdfloaded()"
         ></ngx-extended-pdf-viewer>
-
-        <!-- <canvas [hidden]="!debug" #imageAligned></canvas>
-
-        <canvas [hidden]="!debug" #keypoints1></canvas>
-        <canvas [hidden]="!debug" #keypoints2></canvas>
-        <canvas [hidden]="!debug" #imageCompareMatches></canvas>-->
       </div>
     </div>
   </div>

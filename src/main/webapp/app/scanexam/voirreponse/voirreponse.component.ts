@@ -52,7 +52,6 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
   exam: IExam | undefined;
   currentStudent = 0;
   selectionStudents: IStudent[] | undefined;
-  numberofzone: number | undefined = 0;
   questions: IQuestion[] | undefined;
   blocked = true;
   nbreQuestions = 1;
