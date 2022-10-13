@@ -201,7 +201,7 @@
             class="p-element p-button p-component p-button-raised p-button-text"
             pButton
             [routerLink]="
-              '/answer/' + this.examid + '/' + (this.idQuestionSelected + 1) + '/' + this.etudiantSelec?.studentNumber?.toString()
+              '/answer/' + this.examid + '/' + (this.idQuestionSelected + 1) + '/' + this.etudiantSelec.studentNumber?.toString()
             "
             type="button"
             label="{{ this.texte_correction }}"

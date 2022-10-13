@@ -56,7 +56,6 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   exam: IExam | undefined;
   currentStudent = 0;
   selectionStudents: IStudent[] | undefined;
-  numberofzone: number | undefined = 0;
   questions: IQuestion[] | undefined;
   blocked = true;
   nbreQuestions = 1;
@@ -77,7 +76,6 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   resolve: any;
   currentTextComment4Question: ITextComment[] | undefined;
   currentGradedComment4Question: IGradedComment[] | undefined;
-
   currentZoneVoirCopieHandler: ZoneVoirCopieHandler | undefined;
   constructor(
     protected applicationConfigService: ApplicationConfigService,
@@ -85,7 +83,6 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
 
     public examService: ExamService,
     public zoneService: ZoneService,
-    //    public courseService: CourseService,
     public studentService: StudentService,
     protected activatedRoute: ActivatedRoute,
     public confirmationService: ConfirmationService,

@@ -42,54 +42,11 @@
         >
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam">Retourner à l'exam</span>
         </button>
-        <!-- <button
-          [disabled]="!this.examId"
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          class="p-button p-button-primary"
-          (click)="bindAllCopies()"
-        >
-          <fa-icon [icon]="faHouseSignal"></fa-icon>&nbsp;<span>Reconnaissance noms</span>
-        </button>-->
         <p-inputSwitch [(ngModel)]="assisted"></p-inputSwitch>
         <label jhiTranslate="scanexam.assistance">Assistance</label>
-
-        <!-- <button
-          pButton
-          type="button"
-          class="p-button p-button-primary"
-          label="Next"
-          [disabled]="(currentStudent + 1) * nbreFeuilleParCopie >= numberPagesInScan"
-          (click)="nextStudent()"
-        ></button>
-        <button
-          pButton
-          class="p-button p-button-primary"
-          type="button"
-          label="Previous"
-          [disabled]="currentStudent === 0"
-          (click)="previousStudent()"
-        ></button>-->
       </div>
-      <!--      <div class="col-offset-8 col-4">
-        <label for="slider">Nombre de lignes dans le tableau (entre 100 et 300)</label>
-        <p-slider id="slider" [(ngModel)]="val" (onChange)="updateTableSize()" [step]="20" [min]="100" [max]="300"></p-slider>
-      </div>-->
     </div>
     <div class="col-12 md:col-12">
-      <div *ngIf="debug">
-        <h5 jhiTranslate="scanexam.alignement">Alignement</h5>
-        <p-selectButton
-          [options]="alignementOptions"
-          [(ngModel)]="alignement"
-          (onChange)="alignementChange()"
-          optionLabel="label"
-          optionValue="value"
-        ></p-selectButton>
-      </div>
-      <!--      <h5 >Debug</h5>
-      <p-selectButton [options]="debugOptions" [(ngModel)]="debug" optionLabel="label" optionValue="value"></p-selectButton>-->
       <div class="d-flex justify-content-center">
         <div>
           <span jhiTranslate="scanexam.selectedstudent">Etudiant(es) Séléctionné(es):</span> {{ selectionStudentsString() }}
@@ -134,12 +91,6 @@
         <canvas [hidden]="!showNomImage" #nomImage></canvas>
         <canvas [hidden]="!showPrenomImage" #prenomImage></canvas>
         <canvas [hidden]="!showINEImage" #ineImage></canvas>
-
-        <canvas [hidden]="!debug" #imageAligned></canvas>
-
-        <canvas [hidden]="!debug" #keypoints1></canvas>
-        <canvas [hidden]="!debug" #keypoints2></canvas>
-        <canvas [hidden]="!debug" #imageCompareMatches></canvas>
         <canvas [hidden]="!debug" #nomImageReco></canvas>
         <canvas [hidden]="!debug" #prenomImageReco></canvas>
         <canvas [hidden]="!debug" #ineImageReco></canvas>
@@ -168,33 +119,6 @@
           </div>
         </ng-template>
       </p-listbox>
-
-      <!--<p-orderList
-        [value]="students!"
-        filterBy="name,firstname"
-        (onSelectionChange)="selectStudent4Copie($event)"
-        [metaKeySelection]="true"
-        [(selection)]="selectionStudents"
-        [stripedRows]="false"
-      >
-        <ng-template let-student pTemplate="item">
-          <div>
-            <p style="margin-top: '0'; margin-bottom: '0'; padding-bottom: '0rem'; padding-top: '0rem'">
-              {{ student.name }} - {{ student.firstname }}
-            </p>
-                  <img src="assets/showcase/images/demo/car/{{car.brand}}.png" style="display:inline-block;margin:2px 0 2px 2px" width="48">-->
-      <!--           <div style="font-size: 14px; float: right; margin: 15px 5px 0 0">{{ student.mail }} - {{ student.ine }}</div>
-          </div>
-        </ng-template>
-      </p-orderList>-->
     </div>
   </div>
-  <!--  <div [hidden]="debug" class="col-4 md:col-4 overflow-hidden">
-    <img
-      src="content/images/bannerright.jpg"
-      alt="Image"
-      class="md:ml-auto block md:h-full"
-      style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
-    />
-  </div>-->
 </div>

@@ -27,25 +27,6 @@
                   </small>
                 </div>
               </div>
-
-              <!-- <div class="row mb-3">
-              <label class="form-label" jhiTranslate="gradeScopeIsticApp.course.prof" for="field_prof">Prof</label>
-              <select class="form-control" id="field_prof" data-cy="prof" name="prof" formControlName="prof">
-                <option *ngIf="!editForm.get('prof')!.value" [ngValue]="null" selected></option>
-                <option
-                  [ngValue]="userOption.id === editForm.get('prof')!.value?.id ? editForm.get('prof')!.value : userOption"
-                  *ngFor="let userOption of usersSharedCollection; trackBy: trackUserById"
-                >
-                  {{ userOption.login }}
-                </option>
-              </select>
-            </div>
-            <div *ngIf="editForm.get(['prof'])!.invalid && (editForm.get(['prof'])!.dirty || editForm.get(['prof'])!.touched)">
-              <small class="form-text text-danger" *ngIf="editForm.get(['prof'])?.errors?.required" jhiTranslate="entity.validation.required">
-                This field is required.
-              </small>
-            </div>
--->
             </div>
 
             <div>

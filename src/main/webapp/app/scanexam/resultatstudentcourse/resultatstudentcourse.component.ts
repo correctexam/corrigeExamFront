@@ -146,11 +146,6 @@ export class ResultatStudentcourseComponent implements OnInit {
             res['Q' + key] = parseFloat(res.notequestions[key].replaceAll(',', '.'));
           }
         }
-        /* res.notequestions?.forEach((n:any) => {
-          // eslint-disable-next-line no-console
-          console.log(n);
-
-        });    */
       });
       const worksheet = xlsx.utils.json_to_sheet(this.studentsresult);
       const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };

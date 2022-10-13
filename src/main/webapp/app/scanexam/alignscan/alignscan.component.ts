@@ -56,18 +56,7 @@ export class AlignScanComponent implements OnInit {
   avancement = 0;
   avancementunit = '';
   private editedImage: HTMLCanvasElement | undefined;
-  /* @ViewChild('keypoints1')
-  keypoints1: ElementRef | undefined;
-  @ViewChild('keypoints2')
-  keypoints2: ElementRef | undefined;
-  @ViewChild('imageCompareMatches')
-  imageCompareMatches: ElementRef | undefined;
-  @ViewChild('imageAligned')
-  imageAligned: ElementRef | undefined; */
   templatePages: Map<number, IPage> = new Map();
-  // alignPages: Map<number, IPage> = new Map();
-  // nonalignPages: Map<number, IPage> = new Map();
-  // debug = false;
   phase1 = false;
   loaded = false;
   alignement = 'marker';
@@ -273,9 +262,6 @@ export class AlignScanComponent implements OnInit {
   }
 
   async aligneImages(file: any, pagen: number): Promise<IPage> {
-    /* if (this.alignPages.has(pagen)) {
-      cb(this.alignPages.get(pagen)!);
-    } else { */
     return new Promise(resolve => {
       const i = new Image();
       i.onload = async () => {
@@ -307,24 +293,6 @@ export class AlignScanComponent implements OnInit {
               marker: this.alignement === 'marker',
             })
             .subscribe(e => {
-              /* if (this.debug) {
-                const ctx1 = this.imageCompareMatches?.nativeElement.getContext('2d');
-                this.imageCompareMatches!.nativeElement.width = e.imageCompareMatchesWidth;
-                this.imageCompareMatches!.nativeElement.height = e.imageCompareMatchesHeight;
-                ctx1.putImageData(e.imageCompareMatches, 0, 0);
-                const ctx2 = this.keypoints1?.nativeElement.getContext('2d');
-                this.keypoints1!.nativeElement.width = e.keypoints1Width;
-                this.keypoints1!.nativeElement.height = e.keypoints1Height;
-                ctx2.putImageData(e.keypoints1, 0, 0);
-                const ctx3 = this.keypoints2?.nativeElement.getContext('2d');
-                this.keypoints2!.nativeElement.width = e.keypoints2Width;
-                this.keypoints2!.nativeElement.height = e.keypoints2Height;
-                ctx3.putImageData(e.keypoints2, 0, 0);
-                const ctx4 = this.imageAligned?.nativeElement.getContext('2d');
-                this.imageAligned!.nativeElement.width = e.imageAlignedWidth;
-                this.imageAligned!.nativeElement.height = e.imageAlignedHeight;
-                ctx4.putImageData(e.imageAligned, 0, 0);
-              } */
               const apage = {
                 image: e.imageAligned,
                 page: pagen,
@@ -334,9 +302,6 @@ export class AlignScanComponent implements OnInit {
               this.saveEligneImage(pagen, this.fgetBase64Image(apage.image!)).then(() => {
                 resolve(apage);
               });
-
-              //              this.alignPages.set(pagen, apage);
-              // cb(apage);
             });
         } else {
           const apage = {

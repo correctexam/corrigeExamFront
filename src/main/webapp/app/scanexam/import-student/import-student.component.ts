@@ -51,14 +51,9 @@ export class ImportStudentComponent implements OnInit {
         this.courseid = params.get('courseid')!;
       }
     });
-    // eslint-disable-next-line no-console
-    //    this.hotRegisterer.getInstance(this.id).addHook('afterChange' ,()=> {console.log('ok')})
   }
 
-  detectChanges = (changes: CellChange[] | null, source: ChangeSource) => {
-    // eslint-disable-next-line no-console
-    // console.log("foo");
-  };
+  detectChanges = (changes: CellChange[] | null, source: ChangeSource) => {};
   updateTableSize(): void {
     this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val);
   }
@@ -102,11 +97,6 @@ export class ImportStudentComponent implements OnInit {
       course: this.courseid,
       students: this.dataset.filter(e => e.mail !== undefined),
     };
-    // eslint-disable-next-line no-console
-    // eslint-disable-next-line no-console
-    //    console.log( this.dataset);
-    // eslint-disable-next-line no-console
-    //    console.log( c.adherents);
     this.blocked = true;
     this.hotRegisterer.getInstance(this.id).suspendExecution();
     this.http.post<number>(this.applicationConfigService.getEndpointFor('api/createstudentmasse'), c).subscribe(
@@ -121,7 +111,6 @@ export class ImportStudentComponent implements OnInit {
           });
           this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val);
           this.router.navigateByUrl('/course/' + this.courseid);
-          //        window.history.back();
         });
       },
       err => {

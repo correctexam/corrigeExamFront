@@ -51,9 +51,7 @@ export class ChargerscanComponent implements OnInit {
         this.examid = params.get('examid')!;
         this.examService.find(+this.examid).subscribe(c => {
           this.exam = c.body!;
-          // eslint-disable-next-line no-console
         });
-        //        this.scanService.query
       }
     });
   }
