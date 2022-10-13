@@ -8,7 +8,7 @@
 
 // http://localhost:9000/copie/d6680b56-36a5-4488-ac5b-c862096bc311/1
 
-import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, AfterViewInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 import { ExamService } from 'app/entities/exam/service/exam.service';
@@ -36,8 +36,6 @@ import { FinalResultService } from '../../entities/final-result/service/final-re
 import { IFinalResult } from '../../entities/final-result/final-result.model';
 import { IScan } from '../../entities/scan/scan.model';
 import { IExamSheet } from '../../entities/exam-sheet/exam-sheet.model';
-import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
-import { TemplateService } from '../../entities/template/service/template.service';
 import { ITemplate } from 'app/entities/template/template.model';
 import { CacheUploadService } from '../exam-detail/cacheUpload.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -84,16 +82,6 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
   currentGradedComment4Question: IGradedComment[] | undefined;
   finalResult: IFinalResult | undefined;
 
-  private editedImage: HTMLCanvasElement | undefined;
-  @ViewChild('keypoints1')
-  keypoints1: ElementRef | undefined;
-  @ViewChild('keypoints2')
-  keypoints2: ElementRef | undefined;
-  @ViewChild('imageCompareMatches')
-  imageCompareMatches: ElementRef | undefined;
-  @ViewChild('imageAligned')
-  imageAligned: ElementRef | undefined;
-  templatePages: Map<number, IPage> = new Map();
   alignPages: Map<number, IPage> = new Map();
   nonalignPages: Map<number, IPage> = new Map();
   debug = false;
@@ -120,8 +108,6 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
     public studentResponseService: StudentResponseService,
     private changeDetector: ChangeDetectorRef,
     public finalResultService: FinalResultService,
-    private pdfService: NgxExtendedPdfViewerService,
-    private templateService: TemplateService,
     public cacheUploadService: CacheUploadService,
     private translateService: TranslateService
   ) {}
@@ -402,302 +388,10 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
     this.reloadImage();
   }
 
-  /* populateCache(): Promise<void> {
-    return new Promise<void>(resolve => {
-      db.removeElementForExam(this.exam!.id!).then(() => {
-        this.cacheUploadService.getCache(this.exam!.id! + 'indexdb.json').subscribe(
-          data1 => {
-            db.import(data1, { acceptNameDiff: true })
-              .then(() => {
-                this.translateService.get('scanexam.downloadcacheok').subscribe(data2 => {
-                  this.messageService.add({
-                    severity: 'success',
-                    summary: data2,
-                    detail: this.translateService.instant('scanexam.downloadcacheokdetail'),
-                  });
-                  this.finalize();
-                  resolve();
-                });
-              })
-              .catch(() => {
-                if (this.exam!.templateId) {
-                  this.templateService.find(this.exam!.templateId).subscribe(e1 => {
-                    this.template = e1.body!;
-                    this.pdfcontent = this.template.content!;
-                    resolve();
-                  });
-                }
-              });
-          },
-          () => {
-            if (this.exam!.templateId) {
-              this.templateService.find(this.exam!.templateId).subscribe(e1 => {
-                this.template = e1.body!;
-                this.pdfcontent = this.template.content!;
-                resolve();
-              });
-            }
-          }
-        );
-
-        /* this.scanService.query({ name: this.exam?.id + 'indexdb.json' }).subscribe(scan => {
-          if (scan.body !== null && scan.body.length > 0) {
-            const s = scan.body[0];
-            const byteCharacters1 = atob(s.content!);
-            const data = JSON.parse(byteCharacters1);
-            data.data.databaseName = 'correctExamStudent';
-            const datas = JSON.stringify(data);
-            const byteNumbers = new Array(datas.length);
-            for (let i = 0; i < datas.length; i++) {
-              byteNumbers[i] = datas.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], { type: s.contentContentType! });
-            db.import(blob).then(() => {
-              this.finalize();
-              resolve();
-            }).catch(()=> {
-              if (this.exam!.templateId) {
-                this.templateService.find(this.exam!.templateId).subscribe(e1 => {
-                  this.template = e1.body!;
-                  this.pdfcontent = this.template.content!;
-                  resolve();
-                });
-              }
-              });
-          } else {
-            if (this.exam!.templateId) {
-              this.templateService.find(this.exam!.templateId).subscribe(e1 => {
-                this.template = e1.body!;
-                this.pdfcontent = this.template.content!;
-                resolve();
-              });
-            }
-          }
-        });
-      });
-    });
-  } */
-
-  /* populateCache() {
-    // this.courseService.find(this.exam!.courseId!).subscribe(e => (this.course = e.body!));
-    if (this.exam!.templateId) {
-      this.templateService.find(this.exam!.templateId).subscribe(e1 => {
-        this.template = e1.body!;
-        this.pdfcontent = this.template.content!;
-      });
-    }
-  }*/
-
   async removeElement(examId: number): Promise<any> {
     await db.removeElementForExam(examId);
   }
 
-  public pdfloaded(): void {
-    if (!this.phase1) {
-      this.nbreFeuilleParCopie = this.pdfService.numberOfPages();
-      this.process();
-    }
-    this.loaded = true;
-    if (this.phase1) {
-      if (this.pdfService.numberOfPages() !== 0) {
-        //   this.numberPagesInScan = this.pdfService.numberOfPages();
-        this.exportAsImage();
-      }
-    }
-  }
-
-  process(): void {
-    this.blocked = true;
-    this.removeElement(this.exam!.id!);
-    if (!this.phase1) {
-      const scale = { scale: 2 };
-      for (let i = 1; i <= this.nbreFeuilleParCopie!; i++) {
-        this.pdfService.getPageAsImage(i, scale).then(dataURL => {
-          this.loadImage(dataURL, i).then(res1 => {
-            this.templatePages.set(res1.page!, {
-              image: res1.image,
-              page: res1.page,
-              width: res1.width,
-              height: res1.height,
-            });
-            if (res1.page! === this.nbreFeuilleParCopie) {
-              this.phase1 = true;
-              if (this.exam!.scanfileId) {
-                this.scanService.find(this.exam!.scanfileId).subscribe(e => {
-                  this.scan = e.body!;
-                  this.pdfcontent = this.scan.content!;
-                });
-              }
-            }
-          });
-        });
-      }
-    }
-  }
-
-  private async saveData(): Promise<any> {
-    const templatePages64: Map<number, string> = new Map();
-    const alignPages64: Map<number, string> = new Map();
-    const nonalignPages64: Map<number, string> = new Map();
-    this.templatePages.forEach((e, k) => {
-      templatePages64.set(k, this.fgetBase64Image(e.image!));
-    });
-    this.alignPages.forEach((e, k) => {
-      alignPages64.set(k, this.fgetBase64Image(e.image!));
-    });
-    this.nonalignPages.forEach((e, k) => {
-      nonalignPages64.set(k, this.fgetBase64Image(e.image!));
-    });
-    await db.exams.add({
-      id: +this.exam!.id!,
-    });
-
-    for (const e of templatePages64.keys()) {
-      await db.templates.add({
-        examId: +this.exam!.id!,
-        pageNumber: e,
-        value: JSON.stringify(
-          {
-            pages: templatePages64.get(e)!,
-          },
-          this.replacer
-        ),
-      });
-    }
-
-    for (const e of alignPages64.keys()) {
-      await db.alignImages.add({
-        examId: +this.exam!.id!,
-        pageNumber: e,
-        value: JSON.stringify(
-          {
-            pages: alignPages64.get(e)!,
-          },
-          this.replacer
-        ),
-      });
-    }
-    for (const e of nonalignPages64.keys()) {
-      await db.nonAlignImages.add({
-        examId: +this.exam!.id!,
-        pageNumber: e,
-        value: JSON.stringify(
-          {
-            pages: nonalignPages64.get(e)!,
-          },
-          this.replacer
-        ),
-      });
-    }
-    this.finalize();
-    this.blocked = false;
-  }
-
-  public exportAsImage(): void {
-    const scale = { scale: 2 };
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-    for (let page = this.sheet!.pagemin! + 1; page <= this.sheet!.pagemax! + 1; page++) {
-      this.pdfService.getPageAsImage(page, scale).then(dataURL => {
-        this.aligneImages(dataURL, page, (p: IPage) => {
-          if (p.page === this.sheet!.pagemax! + 1) {
-            this.saveData();
-          }
-        });
-      });
-    }
-  }
-
-  aligneImages(file: any, pagen: number, cb: (page: IPage) => void): void {
-    if (this.alignPages.has(pagen)) {
-      cb(this.alignPages.get(pagen)!);
-    } else {
-      const i = new Image();
-      i.onload = () => {
-        this.editedImage = <HTMLCanvasElement>document.createElement('canvas');
-        this.editedImage.width = i.width;
-        this.editedImage.height = i.height;
-        const ctx = this.editedImage.getContext('2d');
-        ctx!.drawImage(i, 0, 0);
-        const inputimage1 = ctx!.getImageData(0, 0, i.width, i.height);
-
-        const napage = {
-          image: inputimage1,
-          page: pagen,
-          width: i.width!,
-          height: i.height,
-        };
-        this.nonalignPages.set(pagen, napage);
-        if (this.alignement !== 'off') {
-          let paget = pagen % this.nbreFeuilleParCopie!;
-          if (paget === 0) {
-            paget = this.nbreFeuilleParCopie!;
-          }
-          this.alignImagesService
-            .imageAlignement({
-              imageA: this.templatePages.get(paget)?.image,
-              imageB: inputimage1,
-              marker: this.alignement === 'marker',
-            })
-            .subscribe(e => {
-              if (this.debug) {
-                const ctx1 = this.imageCompareMatches?.nativeElement.getContext('2d');
-                this.imageCompareMatches!.nativeElement.width = e.imageCompareMatchesWidth;
-                this.imageCompareMatches!.nativeElement.height = e.imageCompareMatchesHeight;
-                ctx1.putImageData(e.imageCompareMatches, 0, 0);
-                const ctx2 = this.keypoints1?.nativeElement.getContext('2d');
-                this.keypoints1!.nativeElement.width = e.keypoints1Width;
-                this.keypoints1!.nativeElement.height = e.keypoints1Height;
-                ctx2.putImageData(e.keypoints1, 0, 0);
-                const ctx3 = this.keypoints2?.nativeElement.getContext('2d');
-                this.keypoints2!.nativeElement.width = e.keypoints2Width;
-                this.keypoints2!.nativeElement.height = e.keypoints2Height;
-                ctx3.putImageData(e.keypoints2, 0, 0);
-                const ctx4 = this.imageAligned?.nativeElement.getContext('2d');
-                this.imageAligned!.nativeElement.width = e.imageAlignedWidth;
-                this.imageAligned!.nativeElement.height = e.imageAlignedHeight;
-                ctx4.putImageData(e.imageAligned, 0, 0);
-              }
-              const apage = {
-                image: e.imageAligned,
-                page: pagen,
-                width: i.width!,
-                height: i.height,
-              };
-              this.alignPages.set(pagen, apage);
-              cb(apage);
-            });
-        } else {
-          const apage = {
-            image: inputimage1,
-            page: pagen,
-            width: i.width,
-            height: i.height,
-          };
-          this.alignPages.set(pagen, apage);
-          cb(apage);
-        }
-      };
-      i.src = file;
-    }
-  }
-
-  public alignementChange(): any {
-    this.alignPages.clear();
-    this.exportAsImage();
-  }
-
-  private fgetBase64Image(img: ImageData): string {
-    const canvas = document.createElement('canvas');
-    canvas.width = img.width;
-    canvas.height = img.height;
-
-    const ctx = canvas.getContext('2d');
-    ctx?.putImageData(img, 0, 0);
-    const dataURL = canvas.toDataURL('image/png');
-    return dataURL;
-    // return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
-  }
   replacer(key: any, value: any): any {
     if (value instanceof Map) {
       return {
