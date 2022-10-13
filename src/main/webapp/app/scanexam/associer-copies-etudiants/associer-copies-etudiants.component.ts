@@ -341,7 +341,14 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
             this.recognizedStudent = sts[0];
             this.predictionprecision = ((solutionName[1] as number) + (solutionFirstname[1] as number) + (solutionINE[1] as number)) / 3;
           } else {
-            if (solutionINE[1] < solutionFirstname[1] && solutionINE[1] < solutionName[1]) {
+            if (solutionINE[1] > 0.28) {
+              sts = this.students.filter(student => (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase());
+              if (sts.length > 0) {
+                this.recognizedStudent = sts[0];
+                this.predictionprecision = solutionINE[1] as number;
+              }
+            }
+            if (this.recognizedStudent === undefined && solutionINE[1] < solutionFirstname[1] && solutionINE[1] < solutionName[1]) {
               let sts1 = this.students.filter(
                 student =>
                   (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
@@ -351,7 +358,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                 this.recognizedStudent = sts1[0];
                 this.predictionprecision = ((solutionName[1] as number) + (solutionFirstname[1] as number)) / 2;
               }
-            } else if (this.recognizedStudent === undefined && solutionName[1] < solutionFirstname[1] && solutionName[1] < solutionINE[1]) {
+            }
+            if (this.recognizedStudent === undefined && solutionName[1] < solutionFirstname[1] && solutionName[1] < solutionINE[1]) {
               let sts1 = this.students.filter(
                 student =>
                   (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase() &&
@@ -376,33 +384,18 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                 this.predictionprecision = ((solutionName[1] as number) + (solutionINE[1] as number)) / 2;
               }
             }
-            if (
-              this.recognizedStudent === undefined &&
-              solutionINE[1] > solutionName[1] &&
-              solutionINE[1] > solutionFirstname[1] &&
-              solutionINE[1] > 0.4
-            ) {
-              sts = this.students.filter(student => (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase());
+            if (this.recognizedStudent === undefined && solutionName[1] > 0.5 && solutionFirstname[1] < solutionName[1]) {
+              sts = this.students.filter(student => (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase());
               if (sts.length > 0) {
                 this.recognizedStudent = sts[0];
-                this.predictionprecision = solutionINE[1] as number;
+                this.predictionprecision = (solutionName[1] as number) / 3;
               }
             }
-            if (
-              (this.recognizedStudent === undefined &&
-                solutionName[1] > solutionINE[1] &&
-                solutionName[1] > solutionFirstname[1] &&
-                solutionName[1] > 0.4) ||
-              (solutionFirstname[1] > solutionINE[1] && solutionFirstname[1] > solutionName[1] && solutionFirstname[1] > 0.4)
-            ) {
-              sts = this.students.filter(
-                student =>
-                  (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-                  (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase()
-              );
+            if (this.recognizedStudent === undefined && solutionFirstname[1] > 0.5 && solutionName[1] < solutionFirstname[1]) {
+              sts = this.students.filter(student => (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase());
               if (sts.length > 0) {
                 this.recognizedStudent = sts[0];
-                this.predictionprecision = ((solutionName[1] as number) + (solutionFirstname[1] as number)) / 2;
+                this.predictionprecision = (solutionFirstname[1] as number) / 3;
               }
             }
           }
@@ -426,7 +419,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
             this.recognizedStudent = sts[0];
             this.predictionprecision = ((solutionName[1] as number) + (solutionINE[1] as number)) / 2;
           }
-        } else if (solutionINE.length > 0 && solutionINE[1] > 0.4) {
+        } else if (solutionINE.length > 0 && solutionINE[1] > 0.25) {
           let sts = this.students.filter(student => (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase());
           if (sts.length > 0) {
             this.recognizedStudent = sts[0];
