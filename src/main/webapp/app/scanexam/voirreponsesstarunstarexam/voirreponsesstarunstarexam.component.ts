@@ -15,7 +15,6 @@ import { StudentService } from 'app/entities/student/service/student.service';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AlignImagesService } from '../services/align-images.service';
-// import { ICourse } from 'app/entities/course/course.model';
 import { ScanService } from 'app/entities/scan/service/scan.service';
 import { HttpClient } from '@angular/common/http';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
@@ -34,14 +33,11 @@ export interface WorstAndBestSolution {
 })
 export class VoirReponsesStarUnstarComponent implements OnInit {
   examid: string | undefined;
-  // course: ICourse | undefined;
-  // students: IStudent[] | undefined;
   blocked = true;
   questions: WorstAndBestSolution[] = [];
   constructor(
     public examService: ExamService,
     public zoneService: ZoneService,
-    //    public courseService: CourseService,
     public studentService: StudentService,
     public scanService: ScanService,
     protected activatedRoute: ActivatedRoute,

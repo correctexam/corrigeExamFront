@@ -125,7 +125,6 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
                   ) {
                     this.questionno = +param[2] - 1;
 
-                    // Step 1 Query templates
                     this.nbreFeuilleParCopie = this.sheet!.pagemax! - this.sheet!.pagemin! + 1;
                     // Step 2 Query Scan in local DB
                     this.finalize();
