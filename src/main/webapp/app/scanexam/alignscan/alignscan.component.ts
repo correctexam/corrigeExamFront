@@ -28,6 +28,7 @@ import { CacheUploadService } from '../exam-detail/cacheUpload.service';
 import { TranslateService } from '@ngx-translate/core';
 import { fromWorkerPool } from 'observable-webworker';
 import { Observable, Subscriber } from 'rxjs';
+import { worker1 } from '../services/workerimport';
 
 export interface IPage {
   image?: ArrayBuffer;
@@ -138,13 +139,9 @@ export class AlignScanComponent implements OnInit {
     this.blocked = true;
     this.removeElement(+this.examId);
 
-    fromWorkerPool<IImageAlignementInput, IImageAlignement>(
-      () => new Worker(new URL('../../align.pool.worker', import.meta.url), { type: 'module' }),
-      this.observable,
-      {
-        selectTransferables: input => [input.imageA, input.imageB],
-      }
-    ).subscribe(
+    fromWorkerPool<IImageAlignementInput, IImageAlignement>(() => worker1, this.observable, {
+      selectTransferables: input => [input.imageA, input.imageB],
+    }).subscribe(
       e => {
         const apage = {
           image: e.imageAligned,
