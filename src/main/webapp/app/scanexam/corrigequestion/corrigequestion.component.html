@@ -72,11 +72,11 @@
     </div>-->
     <div class="grid">
       <div class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-10">
-        <div class="d-flex justify-content-center">
+        <div class="d-flex justify-content-center" ng-if="questionnofirst !== -1">
           <p-paginator
             [currentPageReportTemplate]="'scanexam.currentpage' | translate"
             [rows]="1"
-            [first]="questionno"
+            [first]="questionno!"
             [totalRecords]="nbreQuestions!"
             (onPageChange)="changeQuestion($event)"
             [showJumpToPageDropdown]="true"
@@ -103,7 +103,7 @@
           </div>
 
           <div class="col-3">
-            <h2>Question {{ questionno + 1 }}</h2>
+            <h2>Question {{ questionno! + 1 }}</h2>
           </div>
           <div class="col-4">
             <button pButton (click)="showGalleria()" jhiTranslate="scanexam.showgalleria">Show full page</button>
