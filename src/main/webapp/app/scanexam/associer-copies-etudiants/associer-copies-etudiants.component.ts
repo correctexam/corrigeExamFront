@@ -457,6 +457,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     promiseload.push(p2);
 
     Promise.all(promiseload).then(() => (this.blocked = false));
+    this.loadAllPages();
   }
 
   async predictText(p: ImageZone, zoneletter: boolean, candidatematch: string[], debugimageRef: ElementRef): Promise<(string | number)[]> {
@@ -786,24 +787,37 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   }
 
   loadAllPages(): void {
+    this.images = [];
+
     if (this.noalign) {
-      db.nonAlignImages.where({ examId: +this.examId! }).each(e => {
-        const image = JSON.parse(e!.value, this.reviver);
-        this.images.push({
-          src: image.pages,
-          alt: 'Description for Image 2',
-          title: 'Exam',
-        });
-      });
+      db.nonAlignImages
+        .where({ examId: +this.examId! })
+        .sortBy('pageNumber')
+        .then(e1 =>
+          e1.forEach(e => {
+            const image = JSON.parse(e!.value, this.reviver);
+
+            this.images.push({
+              src: image.pages,
+              alt: 'Description for Image 2',
+              title: 'Exam',
+            });
+          })
+        );
     } else {
-      db.alignImages.where({ examId: +this.examId! }).each(e => {
-        const image = JSON.parse(e!.value, this.reviver);
-        this.images.push({
-          src: image.pages,
-          alt: 'Description for Image 2',
-          title: 'Exam',
-        });
-      });
+      db.alignImages
+        .where({ examId: +this.examId! })
+        .sortBy('pageNumber')
+        .then(e1 =>
+          e1.forEach(e => {
+            const image = JSON.parse(e!.value, this.reviver);
+            this.images.push({
+              src: image.pages,
+              alt: 'Description for Image 2',
+              title: 'Exam',
+            });
+          })
+        );
     }
   }
 }

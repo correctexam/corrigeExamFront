@@ -139,24 +139,37 @@ export class StatsExamComponent implements OnInit {
       .then(e2 => {
         this.nbreFeuilleParCopie = e2;
       });
+    this.images = [];
+
     if (this.noalign) {
-      db.nonAlignImages.where({ examId: +this.examid! }).each(e => {
-        const image = JSON.parse(e.value, this.reviver);
-        this.images.push({
-          src: image.pages,
-          alt: 'Description for Image 2',
-          title: 'Exam',
-        });
-      });
+      db.nonAlignImages
+        .where({ examId: +this.examid! })
+        .sortBy('pageNumber')
+        .then(e1 =>
+          e1.forEach(e => {
+            const image = JSON.parse(e.value, this.reviver);
+
+            this.images.push({
+              src: image.pages,
+              alt: 'Description for Image 2',
+              title: 'Exam',
+            });
+          })
+        );
     } else {
-      db.alignImages.where({ examId: +this.examid! }).each(e => {
-        const image = JSON.parse(e.value, this.reviver);
-        this.images.push({
-          src: image.pages,
-          alt: 'Description for Image 2',
-          title: 'Exam',
-        });
-      });
+      db.alignImages
+        .where({ examId: +this.examid! })
+        .sortBy('pageNumber')
+        .then(e1 =>
+          e1.forEach(e => {
+            const image = JSON.parse(e.value, this.reviver);
+            this.images.push({
+              src: image.pages,
+              alt: 'Description for Image 2',
+              title: 'Exam',
+            });
+          })
+        );
     }
   }
 
@@ -672,7 +685,7 @@ export class StatsExamComponent implements OnInit {
       this.idQuestionSelected = 0;
     } else {
       // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-      this.texte_correction = this.translateService.instant('scanexam.correction') +  '(' + (idQuestion + 1).toString() + ')';
+      this.texte_correction = this.translateService.instant('scanexam.correction') + '(' + (idQuestion + 1).toString() + ')';
       const knobCard = document.getElementById('knobquest' + idQuestion.toString());
       knobCard?.setAttribute('class', 'knobQuestion knobSelected');
       this.questionSelectionnee = true;

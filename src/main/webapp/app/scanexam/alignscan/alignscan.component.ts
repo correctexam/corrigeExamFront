@@ -16,7 +16,7 @@ import { IExam } from 'app/entities/exam/exam.model';
 import { ICourse } from 'app/entities/course/course.model';
 import { IScan } from '../../entities/scan/scan.model';
 import { ScrollModeType, NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
-import { AlignImagesService } from '../services/align-images.service';
+import { AlignImagesService, IImageAlignement, IImageAlignementInput } from '../services/align-images.service';
 import { TemplateService } from '../../entities/template/service/template.service';
 import { ITemplate } from 'app/entities/template/template.model';
 import { faObjectGroup } from '@fortawesome/free-solid-svg-icons';
@@ -26,9 +26,11 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { ExportOptions } from 'dexie-export-import';
 import { CacheUploadService } from '../exam-detail/cacheUpload.service';
 import { TranslateService } from '@ngx-translate/core';
+import { fromWorkerPool } from 'observable-webworker';
+import { Observable, Subscriber } from 'rxjs';
 
 export interface IPage {
-  image?: ImageData;
+  image?: ArrayBuffer;
   page?: number;
   width?: number;
   height?: number;
@@ -55,7 +57,7 @@ export class AlignScanComponent implements OnInit {
   numberPagesInScan = 0;
   avancement = 0;
   avancementunit = '';
-  private editedImage: HTMLCanvasElement | undefined;
+  // private editedImage: HTMLCanvasElement | undefined;
   templatePages: Map<number, IPage> = new Map();
   phase1 = false;
   loaded = false;
@@ -70,6 +72,13 @@ export class AlignScanComponent implements OnInit {
     { label: 'On', value: true },
   ];
   blocked = false;
+  observable: Observable<IImageAlignementInput> | undefined;
+  observer: Subscriber<IImageAlignementInput> | undefined;
+  observablePage: Observable<number> | undefined;
+  observerPage: Subscriber<number> | undefined;
+
+  currentPageAlign = 1;
+
   constructor(
     public examService: ExamService,
     public scanService: ScanService,
@@ -85,6 +94,8 @@ export class AlignScanComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // this.runWorker();
+    // this.callWebWorkerPool().subscribe(s => console.log('receive ' + s))
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('examid') !== null) {
         this.examId = params.get('examid')!;
@@ -121,15 +132,61 @@ export class AlignScanComponent implements OnInit {
   }
 
   process(): void {
+    this.observable = new Observable(observer => {
+      this.observer = observer;
+    });
     this.blocked = true;
     this.removeElement(+this.examId);
+
+    fromWorkerPool<IImageAlignementInput, IImageAlignement>(
+      () => new Worker(new URL('../../align.pool.worker', import.meta.url), { type: 'module' }),
+      this.observable,
+      {
+        selectTransferables: input => [input.imageA, input.imageB],
+      }
+    ).subscribe(
+      e => {
+        const apage = {
+          image: e.imageAligned,
+          page: e.pageNumber,
+          width: e.imageAlignedWidth!,
+          height: e.imageAlignedHeight,
+        };
+        const im = new ImageData(new Uint8ClampedArray(apage.image!), apage.width, apage.height);
+
+        this.saveEligneImage(apage.page!, this.fgetBase64Image(im)).then(() => {
+          if (this.currentPageAlign < this.numberPagesInScan + 1) {
+            this.avancement = this.currentPageAlign;
+            this.observerPage?.next(this.currentPageAlign);
+            this.currentPageAlign = this.currentPageAlign + 1;
+          } else {
+            this.observerPage?.complete();
+          }
+
+          // console.log('save image ' + apage.page! )
+
+          // resolve(apage);
+        });
+      },
+      err => {
+        console.log(err);
+      },
+      () => {
+        console.log('done');
+        this.saveData();
+      }
+    );
+
     if (!this.phase1) {
       const scale = { scale: 2 };
       for (let i = 1; i <= this.nbreFeuilleParCopie; i++) {
         this.pdfService.getPageAsImage(i, scale).then(dataURL => {
           this.loadImage(dataURL, i, (_image: ImageData, _page: number, _width: number, _height: number) => {
+            // const dst = new ArrayBuffer(_image.data.buffer.byteLength);
+            // new Uint8Array(dst).set(new Uint8Array(_image.data.buffer));
+
             this.templatePages.set(_page, {
-              image: _image,
+              image: _image.data.buffer,
               page: _page,
               width: _width,
               height: _height,
@@ -152,7 +209,8 @@ export class AlignScanComponent implements OnInit {
   private async saveData(): Promise<any> {
     const templatePages64: Map<number, string> = new Map();
     this.templatePages.forEach((e, k) => {
-      templatePages64.set(k, this.fgetBase64Image(e.image!));
+      const pixels = new ImageData(new Uint8ClampedArray(e.image!), e.width!, e.height!);
+      templatePages64.set(k, this.fgetBase64Image(pixels));
     });
     await db.exams.add({
       id: +this.examId,
@@ -211,7 +269,6 @@ export class AlignScanComponent implements OnInit {
         this.replacer
       ),
     });
-    this.avancement = pageN;
   }
 
   async saveNonAligneImage(pageN: number, imageString: string): Promise<void> {
@@ -231,13 +288,32 @@ export class AlignScanComponent implements OnInit {
     this.router.navigateByUrl('/exam/' + this.examId);
   }
 
-  public async exportAsImage(): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-    let page = 1;
-    while (page < this.pdfService.numberOfPages() + 1) {
-      page = await this.alignPage(page);
+  public exportAsImage(): void {
+    this.observablePage = new Observable(observer => {
+      this.observerPage = observer;
+    });
+
+    this.observablePage.subscribe(e => {
+      this.alignPage(e);
+    });
+
+    this.currentPageAlign = 1;
+    while (
+      this.currentPageAlign < 1 + (navigator.hardwareConcurrency - 1) * 2 &&
+      this.currentPageAlign < this.pdfService.numberOfPages() + 1
+    ) {
+      //      page = await this.alignPage(page);
+      this.avancement = this.currentPageAlign;
+
+      this.observerPage!.next(this.currentPageAlign);
+      this.currentPageAlign = this.currentPageAlign + 1;
     }
-    this.saveData();
+
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+    //    let page = 1;
+    //    while (page < this.pdfService.numberOfPages() + 1) {
+    //      page = await this.alignPage(page);
+    //    }
   }
 
   public async alignPage(page: number): Promise<number> {
@@ -250,10 +326,10 @@ export class AlignScanComponent implements OnInit {
   loadImage(file: any, page: number, cb: (image: ImageData, page: number, w: number, h: number) => void): void {
     const i = new Image();
     i.onload = () => {
-      this.editedImage = <HTMLCanvasElement>document.createElement('canvas');
-      this.editedImage.width = i.width;
-      this.editedImage.height = i.height;
-      const ctx = this.editedImage.getContext('2d');
+      const editedImage = <HTMLCanvasElement>document.createElement('canvas');
+      editedImage.width = i.width;
+      editedImage.height = i.height;
+      const ctx = editedImage.getContext('2d');
       ctx!.drawImage(i, 0, 0);
       const inputimage = ctx!.getImageData(0, 0, i.width, i.height);
       cb(inputimage, page, i.width, i.height);
@@ -265,13 +341,12 @@ export class AlignScanComponent implements OnInit {
     return new Promise(resolve => {
       const i = new Image();
       i.onload = async () => {
-        this.editedImage = <HTMLCanvasElement>document.createElement('canvas');
-        this.editedImage.width = i.width;
-        this.editedImage.height = i.height;
-        const ctx = this.editedImage.getContext('2d');
+        const editedImage = <HTMLCanvasElement>document.createElement('canvas');
+        editedImage.width = i.width;
+        editedImage.height = i.height;
+        const ctx = editedImage.getContext('2d');
         ctx!.drawImage(i, 0, 0);
         const inputimage1 = ctx!.getImageData(0, 0, i.width, i.height);
-
         const napage = {
           image: inputimage1,
           page: pagen,
@@ -285,13 +360,31 @@ export class AlignScanComponent implements OnInit {
           }
           await this.saveNonAligneImage(pagen, this.fgetBase64Image(napage.image!));
           // console.log('save saveNonAligneImage ' + pagen)
-
-          this.alignImagesService
-            .imageAlignement({
-              imageA: this.templatePages.get(paget)?.image,
-              imageB: inputimage1,
-              marker: this.alignement === 'marker',
-            })
+          // this.avancement = pagen;
+          this.observer!.next({
+            //            imageA: this.templatePages.get(paget)?.image,
+            //            imageB: inputimage1,
+            imageA: this.templatePages.get(paget)!.image!.slice(0),
+            imageB: inputimage1.data.buffer!,
+            widthA: this.templatePages.get(paget)!.width,
+            heightA: this.templatePages.get(paget)!.height,
+            widthB: i.width!,
+            heightB: i.height!,
+            marker: this.alignement === 'marker',
+            pageNumber: pagen,
+          });
+          if (pagen === this.numberPagesInScan) {
+            this.observer!.complete();
+          }
+          const apage = {
+            page: pagen,
+            width: i.width!,
+            height: i.height,
+            pageNumber: pagen,
+          };
+          resolve(apage);
+          /*         this.alignImagesService
+            .imageAlignement()
             .subscribe(e => {
               const apage = {
                 image: e.imageAligned,
@@ -301,17 +394,19 @@ export class AlignScanComponent implements OnInit {
               };
               this.saveEligneImage(pagen, this.fgetBase64Image(apage.image!)).then(() => {
                 resolve(apage);
-              });
-            });
+              });*/
+          //            });
         } else {
           const apage = {
-            image: inputimage1,
+            image: inputimage1.data.buffer,
             page: pagen,
             width: i.width,
             height: i.height,
           };
-          this.saveEligneImage(pagen, this.fgetBase64Image(apage.image!)).then(() => {
-            this.saveNonAligneImage(pagen, this.fgetBase64Image(apage.image!)).then(() => {
+          const pixels = new ImageData(new Uint8ClampedArray(apage.image), apage.width, apage.height);
+          this.saveEligneImage(pagen, this.fgetBase64Image(pixels)).then(() => {
+            this.saveNonAligneImage(pagen, this.fgetBase64Image(pixels)).then(() => {
+              this.avancement = pagen;
               resolve(apage);
             });
           });
