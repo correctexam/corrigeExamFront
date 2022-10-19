@@ -305,8 +305,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     zone1: any,
     ii: number,
     numberofpointToMatch: number,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     numberofgoodpointToMatch: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _pageNumber: number
   ): boolean {
     // console.log("pass par la 4 ", "page ", pageNumber + "zone " + ii)

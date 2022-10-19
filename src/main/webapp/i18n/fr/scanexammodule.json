@@ -169,6 +169,9 @@
     "couldnotcorrectQCM": "Impossible de corriger ce QCM",
     "couldnotcorrectQCMdetails": "Impossible de corriger ce QCM",
     "nosupportQMCmultiplepage": "Pas de support de la correction automatique sur des QCM sur plusieurs pages",
-    "nosupportQMCmultiplepagedetails": "Pas de support de la correction automatique sur des QCM sur plusieurs pages."
+    "nosupportQMCmultiplepagedetails": "Pas de support de la correction automatique sur des QCM sur plusieurs pages.",
+    "alignementencours": "Alignement en cours",
+    "uploadcacheencours": "Upload du cache des images vers serveur en cours",
+    "uploadcacheencoursdetail": "(Cela peut prendre un peu de temps)"
   }
 }
