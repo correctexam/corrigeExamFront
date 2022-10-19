@@ -80,7 +80,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   noteSteps = 0;
   maxNote = 0;
   questionStep = 0;
-  questionno: number | undefined;
+  questionno = 0;
   resp: IStudentResponse | undefined;
   titreCommentaire = '';
   descCommentaire = '';
