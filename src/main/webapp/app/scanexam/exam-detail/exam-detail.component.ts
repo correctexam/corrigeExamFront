@@ -92,6 +92,7 @@ export class ExamDetailComponent implements OnInit {
                 db.removeElementForExam(+this.examId).then(() => {
                   this.cacheUploadService.getCache(this.examId + 'indexdb.json').subscribe(
                     data => {
+                      console.log(data);
                       db.import(data)
                         .then(() => {
                           this.messageService.add({
@@ -253,7 +254,7 @@ export class ExamDetailComponent implements OnInit {
             const file = new File([value], this.examId + 'indexdb.json');
             this.cacheUploadService.uploadCache(file).subscribe(
               e => {
-                if (e.type === 4) {
+                if (e.state === 'DONE') {
                   this.blocked = false;
                   this.messageService.add({
                     severity: 'success',
@@ -288,7 +289,7 @@ export class ExamDetailComponent implements OnInit {
           db.removeElementForExam(+this.examId).then(() => {
             this.cacheUploadService.getCache(this.examId + 'indexdb.json').subscribe(
               data => {
-                db.import(data)
+                db.import(data.body)
                   .then(() => {
                     this.messageService.add({
                       severity: 'success',

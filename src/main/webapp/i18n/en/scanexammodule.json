@@ -172,6 +172,8 @@
     "nosupportQMCmultiplepagedetails": "No support for automatic correction on multiple page MCQs.",
     "alignementencours": "Alignment in progress",
     "uploadcacheencours": "Upload of the image cache to the server in progress",
-    "uploadcacheencoursdetail": "(This may take a while)"
+    "uploadcacheencoursdetail": "(This may take a while)",
+    "savetemplateencours": "saving cache of template files",
+    "exportcacheencours": "export cache to send it to server"
   }
 }

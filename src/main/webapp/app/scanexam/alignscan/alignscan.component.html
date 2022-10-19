@@ -3,6 +3,7 @@
   <p-blockUI [blocked]="blocked">
     <i class="pi pi-lock" style="font-size: 3rem"
       >&nbsp;{{ avancement }}{{ avancementunit }} <BR /> {{ message }} <BR /> {{ submessage }}
+      <span *ngIf="submessage !== undefined && submessage.length > 0">{{ progress }} / 100</span>
     </i>
   </p-blockUI>
 

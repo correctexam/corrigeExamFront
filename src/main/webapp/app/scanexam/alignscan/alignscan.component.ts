@@ -82,6 +82,7 @@ export class AlignScanComponent implements OnInit {
   currentPageAlignOver = 1;
   message = '';
   submessage = '';
+  progress = 0;
   constructor(
     public examService: ExamService,
     public scanService: ScanService,
@@ -121,7 +122,6 @@ export class AlignScanComponent implements OnInit {
       selectTransferables: input => [input.imageA, input.imageB],
     }).subscribe(
       e => {
-        console.log('receive response for page ', e.pageNumber);
         const apage = {
           image: e.imageAligned,
           page: e.pageNumber,
@@ -131,9 +131,6 @@ export class AlignScanComponent implements OnInit {
         const im = new ImageData(new Uint8ClampedArray(apage.image!), apage.width, apage.height);
 
         this.saveEligneImage(apage.page!, this.fgetBase64Image(im)).then(() => {
-          console.log(apage.page);
-          console.log(' this.currentPageAlignOver', this.currentPageAlignOver);
-
           if (this.currentPageAlign < this.numberPagesInScan + 1) {
             this.observerPage?.next(this.currentPageAlign);
             this.currentPageAlign = this.currentPageAlign + 1;
@@ -144,7 +141,6 @@ export class AlignScanComponent implements OnInit {
           } else {
             this.avancement = this.currentPageAlignOver;
             this.currentPageAlignOver = this.currentPageAlignOver + 1;
-            console.log('send complete');
             this.observerPage?.complete();
             this.observer?.complete();
           }
@@ -211,6 +207,8 @@ export class AlignScanComponent implements OnInit {
   }
 
   private async saveData(): Promise<any> {
+    this.translateService.get('scanexam.savetemplateencours').subscribe(res => (this.message = '' + res));
+
     const templatePages64: Map<number, string> = new Map();
     this.templatePages.forEach((e, k) => {
       const pixels = new ImageData(new Uint8ClampedArray(e.image!), e.width!, e.height!);
@@ -240,14 +238,19 @@ export class AlignScanComponent implements OnInit {
       (table === 'nonAlignImages' && value.examId === +this.examId) ||
       (table === 'alignImages' && value.examId === +this.examId);
 
-    console.log('save data');
+    this.translateService.get('scanexam.exportcacheencours').subscribe(res => (this.message = '' + res));
 
     db.export(o)
       .then((value: Blob) => {
         const file = new File([value], this.examId + 'indexdb.json');
+        this.progress = 0;
+        this.translateService.get('scanexam.uploadcacheencours').subscribe(res => (this.message = '' + res));
+        this.translateService.get('scanexam.uploadcacheencoursdetail').subscribe(res => (this.submessage = '' + res));
+
         this.cacheUploadService.uploadCache(file).subscribe(
-          e => {
-            if (e.type === 4) {
+          data => {
+            this.progress = data.progress;
+            if (data.state === 'DONE') {
               setTimeout(() => {
                 this.blocked = false;
                 this.router.navigateByUrl('/exam/' + this.examId);
@@ -260,8 +263,6 @@ export class AlignScanComponent implements OnInit {
             }
           },
           err => {
-            console.log('could not export1');
-
             if (err) {
               setTimeout(() => {
                 this.blocked = false;
@@ -331,9 +332,6 @@ export class AlignScanComponent implements OnInit {
       },
       err => console.log(err),
       () => {
-        this.translateService.get('scanexam.uploadcacheencours').subscribe(res => (this.message = '' + res));
-        this.translateService.get('scanexam.uploadcacheencoursdetail').subscribe(res => (this.submessage = '' + res));
-
         this.saveData();
       }
     );
