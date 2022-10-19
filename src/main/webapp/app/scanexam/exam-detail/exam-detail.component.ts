@@ -289,7 +289,7 @@ export class ExamDetailComponent implements OnInit {
           db.removeElementForExam(+this.examId).then(() => {
             this.cacheUploadService.getCache(this.examId + 'indexdb.json').subscribe(
               data => {
-                db.import(data.body)
+                db.import(data)
                   .then(() => {
                     this.messageService.add({
                       severity: 'success',
