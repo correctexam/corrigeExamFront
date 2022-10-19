@@ -169,6 +169,12 @@
     "couldnotcorrectQCM": "Could not correct this QCM automatically",
     "couldnotcorrectQCMdetails": "Could not correct this QCM automatically",
     "nosupportQMCmultiplepage": "No support for automatic correction on multiple page MCQs",
-    "nosupportQMCmultiplepagedetails": "No support for automatic correction on multiple page MCQs."
+    "nosupportQMCmultiplepagedetails": "No support for automatic correction on multiple page MCQs.",
+    "alignementencours": "Alignment in progress",
+    "uploadcacheencours": "Upload of the image cache to the server in progress",
+    "uploadcacheencoursdetail": "(This may take a while)",
+    "savetemplateencours": "saving cache of template files",
+    "exportcacheencours": "export cache to send it to server",
+    "listestudentvalid": "Please provide a valid list of students and then click on the import button ..."
   }
 }

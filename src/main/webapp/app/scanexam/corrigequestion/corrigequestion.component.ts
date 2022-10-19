@@ -862,24 +862,37 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   loadAllPages(): void {
+    this.images = [];
+
     if (this.noalign) {
-      db.nonAlignImages.where({ examId: +this.examId! }).each(e => {
-        const image = JSON.parse(e!.value, this.reviver);
-        this.images.push({
-          src: image.pages,
-          alt: 'Description for Image 2',
-          title: 'Exam',
-        });
-      });
+      db.nonAlignImages
+        .where({ examId: +this.examId! })
+        .sortBy('pageNumber')
+        .then(e1 =>
+          e1.forEach(e => {
+            const image = JSON.parse(e!.value, this.reviver);
+
+            this.images.push({
+              src: image.pages,
+              alt: 'Description for Image 2',
+              title: 'Exam',
+            });
+          })
+        );
     } else {
-      db.alignImages.where({ examId: +this.examId! }).each(e => {
-        const image = JSON.parse(e!.value, this.reviver);
-        this.images.push({
-          src: image.pages,
-          alt: 'Description for Image 2',
-          title: 'Exam',
-        });
-      });
+      db.alignImages
+        .where({ examId: +this.examId! })
+        .sortBy('pageNumber')
+        .then(e1 =>
+          e1.forEach(e => {
+            const image = JSON.parse(e!.value, this.reviver);
+            this.images.push({
+              src: image.pages,
+              alt: 'Description for Image 2',
+              title: 'Exam',
+            });
+          })
+        );
     }
   }
 

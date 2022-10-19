@@ -10,31 +10,27 @@ import { Injectable } from '@angular/core';
 import { v4 as uuid } from 'uuid';
 import { Subject, Observable } from 'rxjs';
 import { worker } from './workerimport';
-import { Student, IStudent } from '../../entities/student/student.model';
 
 export interface IImageAlignement {
-  imageCompareMatches?: ImageData;
-  keypoints1?: ImageData;
-  keypoints2?: ImageData;
-  imageAligned?: ImageData;
-  imageCompareMatchesWidth?: number;
-  imageCompareMatchesHeight?: number;
-  keypoints1Width?: number;
-  keypoints1Height?: number;
-  keypoints2Width?: number;
-  keypoints2Height?: number;
+  imageAligned?: ArrayBuffer;
   imageAlignedWidth?: number;
   imageAlignedHeight?: number;
+  pageNumber?: number;
 }
 
 export interface IImageAlignementInput {
-  imageA?: ImageData;
-  imageB?: ImageData;
+  //  imageA?: ImageData;
+  //  imageB?: ImageData;
+  imageA: ArrayBuffer;
+  imageB: ArrayBuffer;
   marker?: boolean;
   x?: number;
   y?: number;
-  width?: number;
-  height?: number;
+  widthA?: number;
+  heightA?: number;
+  widthB?: number;
+  heightB?: number;
+  pageNumber?: number;
 }
 export interface IImageCropInput {
   image?: ImageData;
@@ -147,13 +143,6 @@ export class AlignImagesService {
         );
     });
     return p.asObservable();
-  }
-  public imageProcessing(image: ImageData): Observable<ImageData> {
-    return this._dispatch('imageProcessing', image);
-  }
-
-  public imageAlignement(payload: IImageAlignementInput): Observable<IImageAlignement> {
-    return this._dispatch('imageAlignement', payload);
   }
 
   public imageCrop(payload: IImageCropInput): Observable<ImageData> {

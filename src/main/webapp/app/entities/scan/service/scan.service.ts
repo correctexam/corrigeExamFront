@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { isPresent } from 'app/core/util/operators';
@@ -20,8 +20,19 @@ export class ScanService {
     return this.http.post<IScan>(this.resourceUrl, scan, { observe: 'response' });
   }
 
+  createWithProgress(scan: IScan): Observable<HttpEvent<IScan>> {
+    return this.http.post<IScan>(this.resourceUrl, scan, { reportProgress: true, observe: 'events' });
+  }
+
   update(scan: IScan): Observable<EntityResponseType> {
     return this.http.put<IScan>(`${this.resourceUrl}`, scan, { observe: 'response' });
+  }
+
+  updateWithProgress(scan: IScan): Observable<HttpEvent<IScan>> {
+    // eslint-disable-next-line no-console
+    console.log('update with progress');
+
+    return this.http.put<IScan>(`${this.resourceUrl}`, scan, { reportProgress: true, observe: 'events' } /* { observe: 'response' }*/);
   }
 
   partialUpdate(scan: IScan): Observable<EntityResponseType> {

@@ -92,6 +92,7 @@ export class ExamDetailComponent implements OnInit {
                 db.removeElementForExam(+this.examId).then(() => {
                   this.cacheUploadService.getCache(this.examId + 'indexdb.json').subscribe(
                     data => {
+                      console.log(data);
                       db.import(data)
                         .then(() => {
                           this.messageService.add({
@@ -187,11 +188,9 @@ export class ExamDetailComponent implements OnInit {
                 const ex2 = (this.students.map(s => s.examSheets) as any)
                   .flat()
                   .filter((ex1: any) => ex1.scanId === this.exam!.scanfileId && ex1.pagemin !== -1).length;
-                console.log(ex2);
                 this.showCorrection = ex2 === this.numberPagesInScan / this.nbreFeuilleParCopie;
               },
               () => {
-                console.log('pass par la4');
                 this.blocked = false;
               }
             );
@@ -255,7 +254,7 @@ export class ExamDetailComponent implements OnInit {
             const file = new File([value], this.examId + 'indexdb.json');
             this.cacheUploadService.uploadCache(file).subscribe(
               e => {
-                if (e.type === 4) {
+                if (e.state === 'DONE') {
                   this.blocked = false;
                   this.messageService.add({
                     severity: 'success',
@@ -290,7 +289,7 @@ export class ExamDetailComponent implements OnInit {
           db.removeElementForExam(+this.examId).then(() => {
             this.cacheUploadService.getCache(this.examId + 'indexdb.json').subscribe(
               data => {
-                db.import(data)
+                db.import(data.body)
                   .then(() => {
                     this.messageService.add({
                       severity: 'success',

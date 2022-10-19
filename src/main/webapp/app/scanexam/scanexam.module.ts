@@ -73,6 +73,7 @@ import { PickListModule } from 'primeng/picklist';
 import { MessagesModule } from 'primeng/messages';
 import { MessageModule } from 'primeng/message';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { ProgressBarModule } from 'primeng/progressbar';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -319,6 +320,7 @@ export const ShowResults_ROUTE: Route = {
     MessagesModule,
     MessageModule,
     OverlayPanelModule,
+    ProgressBarModule,
     RouterModule.forChild([
       CREERCOURS_ROUTE,
       COURSMAIN_ROUTE,

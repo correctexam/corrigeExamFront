@@ -1,7 +1,8 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-import { HttpResponse } from '@angular/common/http';
+import { HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Validators, FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,9 +13,45 @@ import { ExamService } from 'app/entities/exam/service/exam.service';
 import { IScan, Scan } from 'app/entities/scan/scan.model';
 import { AlertError } from 'app/shared/alert/alert-error.model';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { finalize, Observable } from 'rxjs';
+import { finalize, Observable, scan } from 'rxjs';
 import { ScanService } from '../../entities/scan/service/scan.service';
 import { IExam } from '../../entities/exam/exam.model';
+
+interface Upload {
+  progress: number;
+  state: 'PENDING' | 'IN_PROGRESS' | 'DONE';
+  body?: IScan;
+}
+
+function isHttpResponse<T>(event: HttpEvent<T>): event is HttpResponse<T> {
+  return event.type === HttpEventType.Response;
+}
+
+function isHttpProgressEvent(event: HttpEvent<unknown>): event is HttpProgressEvent {
+  return event.type === HttpEventType.DownloadProgress || event.type === HttpEventType.UploadProgress;
+}
+
+const initialState: Upload = { state: 'PENDING', progress: 0 };
+const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
+  if (isHttpProgressEvent(event)) {
+    // eslint-disable-next-line no-console
+    console.log('current');
+
+    return {
+      progress: event.total ? Math.round((100 * event.loaded) / event.total) : upload.progress,
+      state: 'IN_PROGRESS',
+    };
+  }
+  if (isHttpResponse(event)) {
+    // eslint-disable-next-line no-console
+    return {
+      body: event.body as IScan,
+      progress: 100,
+      state: 'DONE',
+    };
+  }
+  return upload;
+};
 
 @Component({
   selector: 'jhi-chargerscan',
@@ -31,6 +68,7 @@ export class ChargerscanComponent implements OnInit {
     content: [],
     contentContentType: [null, [Validators.required]],
   });
+  progress = 0;
 
   constructor(
     private translate: TranslateService,
@@ -78,13 +116,26 @@ export class ChargerscanComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     this.blocked = true;
-    const scan = this.createFromForm();
-
-    if (scan.id !== undefined) {
-      this.subscribeToSaveResponse(this.scanService.update(scan));
+    const scan1 = this.createFromForm();
+    this.progress = 0;
+    if (scan1.id !== undefined) {
+      // this.scanService.updateWithProgress(scan1).subscribe(e=> console.log(e))
+      this.pipeToSaveResponse(this.scanService.updateWithProgress(scan1));
     } else {
-      this.subscribeToSaveResponse(this.scanService.create(scan));
+      this.pipeToSaveResponse(this.scanService.createWithProgress(scan1));
     }
+  }
+
+  protected pipeToSaveResponse(result: Observable<HttpEvent<IScan>>): void {
+    //  console.log(result)
+    result.pipe(scan(calculateState, initialState)).subscribe(data => {
+      this.progress = data.progress;
+
+      if (data.state === 'DONE') {
+        console.log(data.body!);
+        this.onSaveSuccess(data.body!);
+      }
+    });
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IScan>>): void {
@@ -114,11 +165,11 @@ export class ChargerscanComponent implements OnInit {
     this.isSaving = false;
   }
 
-  protected updateForm(scan: IScan): void {
+  protected updateForm(scan1: IScan): void {
     this.editForm.patchValue({
-      name: scan.name,
-      content: scan.content,
-      contentContentType: scan.contentContentType,
+      name: scan1.name,
+      content: scan1.content,
+      contentContentType: scan1.contentContentType,
     });
   }
 

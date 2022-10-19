@@ -1,7 +1,10 @@
 <div class="grid">
   <p-toast></p-toast>
   <p-blockUI [blocked]="blocked">
-    <i class="pi pi-lock" style="font-size: 3rem">&nbsp;{{ avancement }}{{ avancementunit }} </i>
+    <i class="pi pi-lock" style="font-size: 3rem"
+      >&nbsp;{{ avancement }}{{ avancementunit }} <BR /> {{ message }} <BR /> {{ submessage }}
+      <span *ngIf="submessage !== undefined && submessage.length > 0">{{ progress }} / 100</span>
+    </i>
   </p-blockUI>
 
   <div class="col-8">
@@ -28,13 +31,7 @@
     </div>
     <div class="col-12 md:col-12">
       <h5 jhiTranslate="scanexam.alignscanalgo">Algorithme d'alignement</h5>
-      <p-selectButton
-        [options]="alignementOptions"
-        [(ngModel)]="alignement"
-        (onChange)="alignementChange()"
-        optionLabel="label"
-        optionValue="value"
-      ></p-selectButton>
+      <p-selectButton [options]="alignementOptions" [(ngModel)]="alignement" optionLabel="label" optionValue="value"></p-selectButton>
 
       <h5 jhiTranslate="scanexam.alignscanbrpage">Nombre de page à utiliser dans le template d'exam</h5>
       <p-inputNumber [(ngModel)]="nbreFeuilleParCopie" [showButtons]="true"></p-inputNumber>

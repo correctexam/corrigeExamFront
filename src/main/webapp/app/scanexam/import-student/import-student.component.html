@@ -8,6 +8,7 @@
     <div class="grid grid-nogutter">
       <div class="col-8">
         <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" jhiTranslate="scanexam.importstudent">Importer étudiants</h2>
+        <p-message *ngIf="!canImport()" severity="warn" [text]="'scanexam.listestudentvalid' | translate"></p-message>
       </div>
       <div class="col-4 flex flex-row-reverse">
         <button
