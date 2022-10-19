@@ -174,6 +174,7 @@
     "uploadcacheencours": "Upload du cache des images vers le serveur en cours",
     "uploadcacheencoursdetail": "(Cela peut prendre un peu de temps)",
     "savetemplateencours": "Savegarde du cache du template",
-    "exportcacheencours": "export du cache locale"
+    "exportcacheencours": "export du cache locale",
+    "listestudentvalid": "Veuillez fournir une liste d'étudiants valide (puis cliquer sur le bouton Importer ...)"
   }
 }
