@@ -175,6 +175,11 @@
     "uploadcacheencoursdetail": "(This may take a while)",
     "savetemplateencours": "saving cache of template files",
     "exportcacheencours": "export cache to send it to server",
-    "listestudentvalid": "Please provide a valid list of students and then click on the import button ..."
+    "listestudentvalid": "Please provide a valid list of students and then click on the import button ...",
+    "gobacktomodule": "Back to module",
+    "gobacktomoduledetail": "Back to the module view (student list, other exam(s), ...)",
+    "gobacktomodulelist": "Back to the list of modules",
+    "gobacktomodulelistdetail": "Back to the list of modules",
+    "gobackresultat": "Back to results"
   }
 }

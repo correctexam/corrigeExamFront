@@ -148,7 +148,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       //      'answer/:examid/:questionno/:studentid',
       if (params.get('examid') !== null) {
         if (this.examId !== params.get('examid')! || this.images.length === 0) {
-          console.log('pass par la');
           this.examId = params.get('examid')!;
           this.loadAllPages();
           forceRefreshStudent = true;
@@ -158,8 +157,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
         if (params.get('studentid') !== null) {
           this.studentid = +params.get('studentid')!;
-          console.log('this.studentid', this.studentid);
-
           this.currentStudent = this.studentid - 1;
           // Step 1 Query templates
           db.templates
@@ -750,7 +747,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   changeStudent($event: any): void {
-    console.log('change student');
     this.currentStudent = $event.page;
     const c = this.currentStudent + 1;
     this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno! + 1) + '/' + c);

@@ -76,6 +76,14 @@ export class CoursdetailsComponent implements OnInit {
   initCmpt(): void {
     this.dockItems = [
       {
+        label: this.translateService.instant('scanexam.gobacktomodulelist'),
+        icon: this.appConfig.getFrontUrl() + 'content/images/left-arrow.svg',
+        title: this.translateService.instant('scanexam.gobacktomodulelistdetail'),
+        command1: () => {
+          this.gobacktomodulelist();
+        },
+      },
+      {
         label: this.translateService.instant('scanexam.creerexam'),
         icon: this.appConfig.getFrontUrl() + 'content/images/exam.svg',
         title: this.translateService.instant('scanexam.creerexam'),
@@ -142,5 +150,9 @@ export class CoursdetailsComponent implements OnInit {
         });
       }
     });
+  }
+
+  gobacktomodulelist(): void {
+    this.router.navigateByUrl('/');
   }
 }
