@@ -110,7 +110,7 @@ export class ImportStudentComponent implements OnInit {
             detail: this.translate.instant('scanexam.importsuccessdetail'),
           });
           this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val);
-          this.router.navigateByUrl('/course/' + this.courseid);
+          this.router.navigateByUrl('/liststudents/' + this.courseid);
         });
       },
       err => {

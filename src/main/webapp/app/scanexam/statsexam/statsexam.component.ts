@@ -8,7 +8,7 @@
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { CourseService } from 'app/entities/course/service/course.service';
@@ -96,7 +96,8 @@ export class StatsExamComponent implements OnInit {
     protected courseService: CourseService,
     public questionService: QuestionService,
     protected activatedRoute: ActivatedRoute,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    public router: Router
   ) {}
 
   ngOnInit(): void {
@@ -703,6 +704,10 @@ export class StatsExamComponent implements OnInit {
       this.activeIndex = 1;
     }
     this.displayBasic = true;
+  }
+  gotoResultat(): void {
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+    this.router.navigateByUrl('/showresults/' + this.examid);
   }
 }
 export interface ISortMobile {

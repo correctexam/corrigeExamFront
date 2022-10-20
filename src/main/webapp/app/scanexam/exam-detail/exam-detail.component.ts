@@ -40,7 +40,7 @@ export class ExamDetailComponent implements OnInit {
   faBookOpenReader = faBookOpenReader as IconProp;
   examId = '';
   exam: IExam | undefined;
-  course!: ICourse;
+  course: ICourse | undefined;
   dockItems!: any[];
   showAssociation = false;
   showCorrection = false;
@@ -92,7 +92,6 @@ export class ExamDetailComponent implements OnInit {
                 db.removeElementForExam(+this.examId).then(() => {
                   this.cacheUploadService.getCache(this.examId + 'indexdb.json').subscribe(
                     data => {
-                      console.log(data);
                       db.import(data)
                         .then(() => {
                           this.messageService.add({
@@ -128,6 +127,14 @@ export class ExamDetailComponent implements OnInit {
 
   initCmpt(): void {
     this.dockItems = [
+      {
+        label: this.translateService.instant('scanexam.gobacktomodule'),
+        icon: this.appConfig.getFrontUrl() + 'content/images/left-arrow.svg',
+        title: this.translateService.instant('scanexam.gobacktomoduledetail'),
+        command1: () => {
+          this.gobacktomodule();
+        },
+      },
       {
         label: this.translateService.instant('scanexam.removeexam'),
         icon: this.appConfig.getFrontUrl() + 'content/images/remove-rubbish.svg',
@@ -206,7 +213,7 @@ export class ExamDetailComponent implements OnInit {
           this.examService.delete(this.exam!.id!).subscribe(() => {
             db.removeElementForExam(+this.examId)
               .then(() => {
-                this.router.navigateByUrl('/course/' + this.course.id);
+                this.router.navigateByUrl('/course/' + this.course!.id);
               })
               .catch(() => {
                 this.messageService.add({
@@ -214,7 +221,7 @@ export class ExamDetailComponent implements OnInit {
                   summary: this.translateService.instant('scanexam.deletecacheko'),
                   detail: this.translateService.instant('scanexam.deletecachekodetail'),
                 });
-                this.router.navigateByUrl('/course/' + this.course.id);
+                this.router.navigateByUrl('/course/' + this.course!.id);
               });
           });
         },
@@ -331,5 +338,11 @@ export class ExamDetailComponent implements OnInit {
 
   couldAnswer(): boolean {
     return true;
+  }
+
+  gobacktomodule(): void {
+    if (this.course !== undefined) {
+      this.router.navigateByUrl('/course/' + this.course.id);
+    }
   }
 }

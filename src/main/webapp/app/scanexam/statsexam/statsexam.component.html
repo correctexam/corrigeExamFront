@@ -17,10 +17,26 @@
   </ng-template>
 </p-galleria>
 
-<h1>
-  <span jhiTranslate="scanexam.statexam">Statistiques de l'examen </span>
-  <span *ngIf="infosQuestions.length !== 0">{{ infosQuestions[0].examName }}</span>
-</h1>
+<div class="grid grid-nogutter">
+  <div class="col-8">
+    <h2>
+      <span jhiTranslate="scanexam.statexam">Statistiques de l'examen </span>
+      <span *ngIf="infosQuestions.length !== 0">{{ infosQuestions[0].examName }}</span>
+    </h2>
+  </div>
+  <div class="col-4 flex flex-row-reverse">
+    <button
+      [disabled]="!this.examid"
+      type="submit"
+      id="save-entity"
+      data-cy="entityCreateSaveButton"
+      class="p-button p-button-primary"
+      (click)="gotoResultat()"
+    >
+      <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackresultat">Retourner à la vue résultat</span>
+    </button>
+  </div>
+</div>
 <div class="cards">
   <div class="card" id="statgen">
     <p-card [header]="'scanexam.statexam' | translate" [subheader]="'scanexam.statgeneral' | translate">
