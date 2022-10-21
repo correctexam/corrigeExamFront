@@ -144,7 +144,7 @@ function getPosition(forme: any): any {
 function decoupe(img: any, pos: any, dims: any): any {
   let dst = new cv.Mat();
   // You can try more different parameters
-  const rect = new cv.Rect(pos.x, pos.y, dims.w - 1, dims.h - 1);
+  const rect = new cv.Rect(pos.x, pos.y, dims.w - 2, dims.h - 2);
   dst = img.roi(rect);
   return dst;
 }
@@ -277,8 +277,8 @@ function drawRectangle(img: any, formes: any, couleur: any = new cv.Scalar(255, 
   formes.forEach((forme: any) => {
     const pos = getPosition(forme);
     const dim = getDimensions(forme);
-    dim.h = dim.h - 1;
-    dim.w = dim.w - 1;
+    dim.h = dim.h - 2;
+    dim.w = dim.w - 2;
     let pointMin = new cv.Point(pos.x, pos.y);
     let pointMax = new cv.Point(pos.x + dim.w, pos.y + dim.h);
     cv.rectangle(img, pointMin, pointMax, couleur, epaisseur, 0);
