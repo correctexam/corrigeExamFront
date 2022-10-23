@@ -180,6 +180,11 @@
     "gobacktomoduledetail": "Retour à la vue du module (liste étudiants, autre(s) exam(s), ...)",
     "gobacktomodulelist": "Retour à la liste des modules",
     "gobacktomodulelistdetail": "Retour à la liste des modules",
-    "gobackresultat": "Retourner à la vue résultat"
+    "gobackresultat": "Retourner à la vue résultat",
+    "removetextcommentconfirmation": "Vous allez supprimer un commentaire, il sera supprimer pour l'ensemble des copies sur lequel il était appliqué.",
+    "removegradedcommentconfirmation": "Vous allez supprimer un commentaire, il sera supprimer pour l'ensemble des copies sur lequel il était appliqué.",
+    "yes": "oui",
+    "no": "non",
+    "confirmation": "Confirmation suppression"
   }
 }

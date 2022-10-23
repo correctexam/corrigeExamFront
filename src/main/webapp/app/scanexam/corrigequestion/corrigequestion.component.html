@@ -1,5 +1,15 @@
 <div class="grid">
   <p-toast></p-toast>
+  <p-confirmDialog #cd icon="pi pi-exclamation-triangle">
+    <ng-template pTemplate="header">
+      <h3 jhiTranslate="scanexam.confirmation"></h3>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <button type="button" pButton icon="pi pi-times" [label]="'scanexam.no' | translate" (click)="cd.reject()"></button>
+      <button type="button" pButton icon="pi pi-check" [label]="'scanexam.yes' | translate" (click)="cd.accept()"></button>
+    </ng-template>
+  </p-confirmDialog>
+
   <p-blockUI [blocked]="blocked">
     <i class="pi pi-lock" style="font-size: 3rem"></i>
   </p-blockUI>
@@ -189,6 +199,7 @@
           <div *ngFor="let comment of currentTextComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-3 xl:col-12">
             <div class="card" [style]="getStyle(comment)">
               <div class="card-body">
+                <span class="float-end" (click)="removeTextComment(comment)"><fa-icon icon="times"></fa-icon></span>
                 <p-inplace [closable]="true">
                   <ng-template pTemplate="display">
                     <h5 class="card-title">{{ comment.text }}</h5>
@@ -240,6 +251,9 @@
           <div *ngFor="let comment of currentGradedComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-3 xl:col-12">
             <div class="card" [style]="getStyle(comment)">
               <div class="card-body">
+                <span *ngIf="currentQuestion?.typeAlgoName !== 'QCM'" class="float-end clickable" (click)="removeGradedComment(comment)"
+                  ><fa-icon icon="times"></fa-icon
+                ></span>
                 <p-inplace [closable]="true">
                   <ng-template pTemplate="display">
                     <h5 class="card-title">{{ comment.text }}</h5>
