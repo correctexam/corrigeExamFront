@@ -185,6 +185,13 @@
     "removegradedcommentconfirmation": "Vous allez supprimer un commentaire, il sera supprimer pour l'ensemble des copies sur lequel il était appliqué.",
     "yes": "oui",
     "no": "non",
-    "confirmation": "Confirmation suppression"
+    "confirmation": "Confirmation",
+    "contientmarqueur": "Votre scan contient t'il des marqueurs ?",
+    "qcmcorrect": "Correction automatique du QCM",
+    "showqcmcorrect": "Voir QCM corrigé",
+    "showqcmcorrectlabel": "Voir QCM",
+    "realign": "Réaligner la/les pages de la question courante",
+    "realignlabel": "Réalignement",
+    "qcmcorrectlabel": "Autocorrect QCM"
   }
 }

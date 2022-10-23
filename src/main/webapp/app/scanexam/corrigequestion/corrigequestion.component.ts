@@ -24,7 +24,7 @@ import { ExamService } from 'app/entities/exam/service/exam.service';
 import { StudentService } from 'app/entities/student/service/student.service';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { AlignImagesService, IQCMInput } from '../services/align-images.service';
+import { AlignImagesService, IImageAlignement, IImageAlignementInput, IQCMInput } from '../services/align-images.service';
 import { db } from '../db/db';
 import { IExam } from '../../entities/exam/exam.model';
 import { ICourse } from 'app/entities/course/course.model';
@@ -44,8 +44,10 @@ import { GradedCommentService } from '../../entities/graded-comment/service/grad
 import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
 import { TranslateService } from '@ngx-translate/core';
 import { IQCMSolution } from '../../qcm';
-import { Observable } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
+import { fromWorkerPool } from 'observable-webworker';
+import { worker1 } from '../services/workerimport';
 
 @Component({
   selector: 'jhi-corrigequestion',
@@ -1162,5 +1164,127 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.gradedCommentService.delete(comment!.id!).subscribe(() => console.log('delete'));
       },
     });
+  }
+
+  // ----------------- code for realign -----------------------
+
+  realign(): void {
+    this.confirmationService.confirm({
+      message: this.translateService.instant('scanexam.contientmarqueur'),
+      accept: () => {
+        this.realignInternal(true);
+      },
+      reject: () => {
+        this.realignInternal(false);
+      },
+    });
+  }
+
+  realignInternal(mark: boolean) {
+    this.blocked = true;
+    this.initPool();
+    this.questions!.forEach(q => {
+      this.loadZone(q.zoneId).then(z => {
+        const pagewithoffset = this.currentStudent! * this.nbreFeuilleParCopie! + z!.pageNumber! + this.pageOffset;
+        const pagewithoutoffset = this.currentStudent! * this.nbreFeuilleParCopie! + z!.pageNumber!;
+        let page = pagewithoutoffset;
+        if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
+          page = pagewithoffset;
+        }
+        db.templates
+          .where({ examId: +this.examId!, pageNumber: z!.pageNumber! })
+          .first()
+          .then(e2 => {
+            const image = JSON.parse(e2!.value, this.reviver);
+            this.loadImage(image.pages, z!.pageNumber!).then(v => {
+              db.nonAlignImages
+                .where({ examId: +this.examId!, pageNumber: page })
+                .first()
+                .then(e3 => {
+                  const image1 = JSON.parse(e3!.value, this.reviver);
+                  this.loadImage(image1.pages, page).then(v1 => {
+                    const inp: IImageAlignementInput = {
+                      imageA: v.image!.data.buffer,
+                      imageB: v1.image!.data.buffer,
+                      heightA: v.height,
+                      widthA: v.width,
+                      heightB: v1.height,
+                      widthB: v1.width,
+                      pageNumber: page,
+                      marker: mark,
+                    };
+
+                    this.observer!.next(inp);
+                  });
+                });
+            });
+          });
+      });
+    });
+  }
+
+  observable: Observable<IImageAlignementInput> | undefined;
+  observer: Subscriber<IImageAlignementInput> | undefined;
+
+  initPool(): void {
+    this.observable = new Observable(observer => {
+      this.observer = observer;
+    });
+    fromWorkerPool<IImageAlignementInput, IImageAlignement>(worker1, this.observable, {
+      selectTransferables: input => [input.imageA, input.imageB],
+    }).subscribe(
+      e => {
+        const apage = {
+          image: e.imageAligned,
+          page: e.pageNumber,
+          width: e.imageAlignedWidth!,
+          height: e.imageAlignedHeight,
+        };
+        const im = new ImageData(new Uint8ClampedArray(apage.image!), apage.width, apage.height);
+
+        this.saveEligneImage(apage.page!, this.fgetBase64Image(im)).then(() => {
+          this.observer?.complete();
+          this.blocked = false;
+        });
+      },
+      err => {
+        console.log(err);
+      }
+    );
+  }
+  async saveEligneImage(pageN: number, imageString: string): Promise<void> {
+    await db.addAligneImage({
+      examId: +this.examId!,
+      pageNumber: pageN,
+      value: JSON.stringify(
+        {
+          pages: imageString!,
+        },
+        this.replacer
+      ),
+    });
+    this.images = [];
+    this.loadAllPages();
+    this.reloadImage();
+  }
+  replacer(key: any, value: any): any {
+    if (value instanceof Map) {
+      return {
+        dataType: 'Map',
+        value: Array.from(value.entries()), // or with spread: value: [...value]
+      };
+    } else {
+      return value;
+    }
+  }
+  private fgetBase64Image(img: ImageData): string {
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    const ctx = canvas.getContext('2d');
+    ctx?.putImageData(img, 0, 0);
+    const dataURL = canvas.toDataURL('image/png');
+    return dataURL;
   }
 }

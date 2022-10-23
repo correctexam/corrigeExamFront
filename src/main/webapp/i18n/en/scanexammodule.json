@@ -185,6 +185,13 @@
     "removegradedcommentconfirmation": "You are going to delete a comment, it will be deleted for all the copies on which it was applied.",
     "yes": "yes",
     "no": "no",
-    "confirmation": "Confirmation"
+    "confirmation": "Confirmation",
+    "contientmarqueur": "Does your scan contain alignement mark?",
+    "qcmcorrect": "Automatic correction of MCQ",
+    "showqcmcorrect": "Show QCM",
+    "showqcmcorrectlabel": "Show QCM",
+    "realign": "Realign mage(s) for the current question",
+    "realignlabel": "Realign",
+    "qcmcorrectlabel": "Autocorrect MCQ"
   }
 }

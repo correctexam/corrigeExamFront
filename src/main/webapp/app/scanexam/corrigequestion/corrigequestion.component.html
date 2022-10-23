@@ -100,15 +100,27 @@
       <div class="col-12 sm:col-12 md:col-12 lg:col-10 xl:col-10">
         <div class="d-flex justify-content-center">
           <div class="col-5">
-            <button *ngIf="this.currentQuestion?.typeAlgoName === 'QCM'" pButton (click)="workOnQCM()">
-              Correction automatique du QCM
-            </button>
+            <button
+              *ngIf="this.currentQuestion?.typeAlgoName === 'QCM'"
+              pButton
+              (click)="workOnQCM()"
+              [pTooltip]="'scanexam.qcmcorrect' | translate"
+              [label]="'scanexam.qcmcorrectlabel' | translate"
+            ></button>
             <button
               type="text"
               *ngIf="this.currentQuestion?.typeAlgoName === 'QCM'"
               pButton
-              label="showQCMCorrect"
+              [pTooltip]="'scanexam.showqcmcorrect' | translate"
+              [label]="'scanexam.showqcmcorrectlabel' | translate"
               (click)="showQCMCorrect($event)"
+            ></button>
+            <button
+              type="text"
+              pButton
+              [pTooltip]="'scanexam.realign' | translate"
+              [label]="'scanexam.realignlabel' | translate"
+              (click)="realign()"
             ></button>
           </div>
 
