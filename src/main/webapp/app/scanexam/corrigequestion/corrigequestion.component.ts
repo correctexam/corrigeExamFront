@@ -1143,4 +1143,24 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   showQCMCorrect(event: any) {
     (this.qcmcorrect as any).toggle(event);
   }
+
+  removeTextComment(comment: ITextComment): void {
+    this.confirmationService.confirm({
+      message: this.translateService.instant('scanexam.removetextcommentconfirmation'),
+      accept: () => {
+        this.currentTextComment4Question = this.currentTextComment4Question!.filter(e => e.id !== comment.id);
+        this.textCommentService.delete(comment!.id!).subscribe(() => console.log('delete'));
+      },
+    });
+  }
+
+  removeGradedComment(comment: IGradedComment): void {
+    this.confirmationService.confirm({
+      message: this.translateService.instant('scanexam.removegradedcommentconfirmation'),
+      accept: () => {
+        this.currentGradedComment4Question = this.currentGradedComment4Question!.filter(e => e.id !== comment.id);
+        this.gradedCommentService.delete(comment!.id!).subscribe(() => console.log('delete'));
+      },
+    });
+  }
 }
