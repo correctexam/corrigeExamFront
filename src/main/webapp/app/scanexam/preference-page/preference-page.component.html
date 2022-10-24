@@ -1,0 +1,172 @@
+<div class="container">
+  <form #form="ngForm" (ngSubmit)="onSubmit(form.value)" [formGroup]="editForm">
+    <div class="col-12 md:col-12">
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="qcm_min_width_shape">qcm_min_width_shape: </label>
+          <input
+            type="number"
+            name="qcm_min_width_shape"
+            formControlName="qcm_min_width_shape"
+            class="form-control"
+            value="10"
+            [min]="1"
+            [step]="1"
+          />
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="qcm_min_height_shape">qcm_min_height_shape: </label>
+          <input
+            type="number"
+            name="qcm_min_height_shape"
+            formControlName="qcm_min_height_shape"
+            class="form-control"
+            value="10"
+            [min]="1"
+            [step]="1"
+          />
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="qcm_epsilon">qcm_epsilon: </label>
+          <input
+            type="number"
+            name="qcm_epsilon"
+            formControlName="qcm_epsilon"
+            class="form-control"
+            value="0.0145"
+            [min]="0.001"
+            [step]="0.001"
+          />
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="qcm_differences_avec_case_blanche">qcm_differences_avec_case_blanche: </label>
+          <input
+            type="number"
+            name="qcm_differences_avec_case_blanche"
+            formControlName="qcm_differences_avec_case_blanche"
+            class="form-control"
+            value="0.22"
+            [min]="0.01"
+            [step]="0.01"
+          />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="linelength">linelength: </label>
+          <input type="number" name="linelength" formControlName="linelength" class="form-control" value="15" [min]="1" [step]="1" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="repairsize">repairsize: </label>
+          <input type="number" name="repairsize" formControlName="repairsize" class="form-control" value="3" [min]="1" [step]="1" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="dilatesize">dilatesize: </label>
+          <input type="number" name="dilatesize" formControlName="dilatesize" class="form-control" value="3" [min]="1" [step]="1" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="morphsize">morphsize: </label>
+          <input type="number" name="morphsize" formControlName="morphsize" class="form-control" value="3" [min]="1" [step]="1" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="drawcontoursizeh">drawcontoursizeh: </label>
+          <input
+            type="number"
+            name="drawcontoursizeh"
+            formControlName="drawcontoursizeh"
+            class="form-control"
+            value="4"
+            [min]="1"
+            [step]="1"
+          />
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="drawcontoursizev">drawcontoursizev: </label>
+
+          <input
+            type="number"
+            name="drawcontoursizev"
+            formControlName="drawcontoursizev"
+            class="form-control"
+            value="4"
+            [min]="1"
+            [step]="1"
+          />
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="minCircle">minCircle: </label>
+          <input type="number" name="minCircle" formControlName="minCircle" class="form-control" value="6" [min]="1" [step]="1" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="maxCircle">maxCircle: </label>
+
+          <input type="number" name="maxCircle" formControlName="maxCircle" class="form-control" value="20" [min]="1" [step]="1" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="numberofpointToMatch">numberofpointToMatch: </label>
+          <input
+            type="number"
+            name="numberofpointToMatch"
+            formControlName="numberofpointToMatch"
+            class="form-control"
+            value="5"
+            [min]="1"
+            [step]="1"
+          />
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="numberofgoodpointToMatch">numberofgoodpointToMatch: </label>
+          <input
+            type="number"
+            name="numberofgoodpointToMatch"
+            formControlName="numberofgoodpointToMatch"
+            class="form-control"
+            value="0"
+            [min]="0"
+            [step]="1"
+          />
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="defaultAlignAlgowithMarker">defaultAlignAlgowithMarker: </label>
+          <input
+            type="checkbox"
+            class="form-check col-1"
+            name="defaultAlignAlgowithMarker"
+            id="field_defaultAlignAlgowithMarker"
+            data-cy="defaultAlignAlgowithMarker"
+            formControlName="defaultAlignAlgowithMarker"
+          />
+        </div>
+      </div>
+    </div>
+    <button class="p-button p-button-primary" type="submit">Submit</button>
+    <button class="p-button p-button-secondary" (click)="clearToDefault()">Reset to default value</button>
+  </form>
+</div>
