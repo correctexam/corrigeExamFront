@@ -74,6 +74,7 @@ import { MessagesModule } from 'primeng/messages';
 import { MessageModule } from 'primeng/message';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { PreferencePageComponent } from './preference-page/preference-page.component';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -279,6 +280,7 @@ export const ShowResults_ROUTE: Route = {
     VoirReponseComponent,
     VoirReponsesStarUnstarComponent,
     SharecourseComponent,
+    PreferencePageComponent,
   ],
   imports: [
     CommonModule,

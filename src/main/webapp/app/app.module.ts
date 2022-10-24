@@ -30,6 +30,7 @@ import { ErrorComponent } from './layouts/error/error.component';
   imports: [
     BrowserModule,
     SharedModule,
+    //    DynamicDialogModule,
     HomeModule,
     // jhipster-needle-angular-add-module JHipster will add new module here
     AppRoutingModule,

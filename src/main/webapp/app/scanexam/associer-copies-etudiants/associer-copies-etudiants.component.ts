@@ -26,6 +26,7 @@ import { IExamSheet } from '../../entities/exam-sheet/exam-sheet.model';
 import { v4 as uuid } from 'uuid';
 import { faHouseSignal } from '@fortawesome/free-solid-svg-icons';
 import { Listbox } from 'primeng/listbox';
+import { PreferenceService } from '../preference-page/preference.service';
 
 export interface IPage {
   image?: ImageData;
@@ -181,7 +182,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     public router: Router,
     private alignImagesService: AlignImagesService,
     public messageService: MessageService,
-    public sheetService: ExamSheetService
+    public sheetService: ExamSheetService,
+    private preferenceService: PreferenceService
   ) {}
 
   ngOnInit(): void {
@@ -463,7 +465,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   async predictText(p: ImageZone, zoneletter: boolean, candidatematch: string[], debugimageRef: ElementRef): Promise<(string | number)[]> {
     return new Promise<(string | number)[]>(resolve => {
       if (this.assisted) {
-        const c = { image: p.i, match: candidatematch };
+        const c = { image: p.i, match: candidatematch, preference: this.preferenceService.getPreference() };
         this.alignImagesService.prediction(c, zoneletter).subscribe(result => {
           const ctx2 = debugimageRef?.nativeElement.getContext('2d');
           ctx2.putImageData(result.debug, 0, 0);

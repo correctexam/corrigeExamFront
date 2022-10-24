@@ -48,6 +48,7 @@ import { Observable, Subscriber } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 import { fromWorkerPool } from 'observable-webworker';
 import { worker1 } from '../services/workerimport';
+import { PreferenceService } from '../preference-page/preference.service';
 
 @Component({
   selector: 'jhi-corrigequestion',
@@ -136,7 +137,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     public studentResponseService: StudentResponseService,
     private changeDetector: ChangeDetectorRef,
     private eventHandler: EventCanevascorrectionHandlerService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private preferenceService: PreferenceService
   ) {}
 
   ngOnInit(): void {
@@ -355,7 +357,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
           this.loadZone(q.zoneId).then(z => {
             const promises: Promise<ImageZone>[] = [];
-            const t: IQCMInput = {};
+            const t: IQCMInput = {
+              preference: this.preferenceService.getPreference(),
+            };
             t.pages = [];
             this.getTemplateImage4Zone(z!).then(p => {
               t.imageTemplate = p.i;
@@ -1102,7 +1106,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         // this.showImage[i] = false;
         this.loadZone(q.zoneId).then(z => {
           // const promises: Promise<ImageZone>[] = [];
-          const t: IQCMInput = {};
+          const t: IQCMInput = {
+            preference: this.preferenceService.getPreference(),
+          };
           t.pages = [];
           this.getTemplateImage4Zone(z!).then(p => {
             t.imageTemplate = p.i;
@@ -1212,6 +1218,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                       widthB: v1.width,
                       pageNumber: page,
                       marker: mark,
+                      preference: this.preferenceService.getPreference(),
                     };
 
                     this.observer!.next(inp);

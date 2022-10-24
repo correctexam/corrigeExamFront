@@ -29,6 +29,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { fromWorkerPool } from 'observable-webworker';
 import { Observable, Subscriber } from 'rxjs';
 import { worker1 } from '../services/workerimport';
+import { PreferenceService } from '../preference-page/preference.service';
 
 export interface IPage {
   image?: ArrayBuffer;
@@ -93,7 +94,8 @@ export class AlignScanComponent implements OnInit {
     private pdfService: NgxExtendedPdfViewerService,
     private cacheUploadService: CacheUploadService,
     private translateService: TranslateService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private preferenceService: PreferenceService
   ) {}
 
   ngOnInit(): void {
@@ -389,6 +391,8 @@ export class AlignScanComponent implements OnInit {
             paget = this.nbreFeuilleParCopie;
           }
           await this.saveNonAligneImage(pagen, this.fgetBase64Image(napage.image!));
+          const pref = this.preferenceService.getPreference();
+
           this.observer!.next({
             imageA: this.templatePages.get(paget)!.image!.slice(0),
             imageB: inputimage1.data.buffer!,
@@ -398,6 +402,7 @@ export class AlignScanComponent implements OnInit {
             heightB: i.height!,
             marker: this.alignement === 'marker',
             pageNumber: pagen,
+            preference: pref,
           });
           const apage = {
             page: pagen,

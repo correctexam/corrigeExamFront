@@ -52,13 +52,6 @@ export class CacheUploadService {
         observe: 'events',
       })
       .pipe(scan(calculateState, initialState));
-
-    /* const req = new HttpRequest('POST', this.applicationConfigService.getEndpointFor('api/uploadCache'), formData, {
-      reportProgress: true,
-      responseType: 'json',
-      observe: 'events'
-    });
-    return this.http.request(req);*/
   }
   getCache(filename: string): Observable<any> {
     // eslint-disable-next-line no-console
