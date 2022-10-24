@@ -20,9 +20,6 @@ function isHttpProgressEvent(event: HttpEvent<unknown>): event is HttpProgressEv
 const initialState: Upload = { state: 'PENDING', progress: 0 };
 const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
   if (isHttpProgressEvent(event)) {
-    // eslint-disable-next-line no-console
-    console.log('current');
-
     return {
       progress: event.total ? Math.round((100 * event.loaded) / event.total) : upload.progress,
       state: 'IN_PROGRESS',
