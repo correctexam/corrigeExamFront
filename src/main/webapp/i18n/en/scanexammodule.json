@@ -192,6 +192,7 @@
     "showqcmcorrectlabel": "Show QCM",
     "realign": "Realign mage(s) for the current question",
     "realignlabel": "Realign",
-    "qcmcorrectlabel": "Autocorrect MCQ"
+    "qcmcorrectlabel": "Autocorrect MCQ",
+    "sqlinsertfile": "Inserting the file into the database (this may take some time)"
   }
 }

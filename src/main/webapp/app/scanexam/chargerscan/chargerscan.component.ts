@@ -69,7 +69,7 @@ export class ChargerscanComponent implements OnInit {
     contentContentType: [null, [Validators.required]],
   });
   progress = 0;
-
+  message = '';
   constructor(
     private translate: TranslateService,
     private messageService: MessageService,
@@ -130,9 +130,12 @@ export class ChargerscanComponent implements OnInit {
     //  console.log(result)
     result.pipe(scan(calculateState, initialState)).subscribe(data => {
       this.progress = data.progress;
+      console.log(this.progress);
+      if (this.progress >= 100) {
+        this.message = this.translate.instant('scanexam.sqlinsertfile');
+      }
 
       if (data.state === 'DONE') {
-        console.log(data.body!);
         this.onSaveSuccess(data.body!);
       }
     });
