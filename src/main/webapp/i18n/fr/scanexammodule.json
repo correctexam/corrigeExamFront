@@ -165,7 +165,7 @@
     "validanswerexpression": "Expression valide",
     "penaltytooltip": "Pénalité en fonction du total des points de la question (e.g. si total des points de la question = 2 et sélection 1/5, un mauvaise réponse coutera 0,4 pt",
     "expressiontooltip": "Une expression valide aura la forme 'a&b|a&c' signifiant soit case 'a' et case 'b' cochée ou case 'a' et case 'c' cochée ('a' étant la première case, 'c' étant la troisième, ...)",
-    "steptooltip": "Step signifie le nombre de pas par point. Si step = 4, la question pourra être notée de 0,25pt en 0,25pt quelque soit le nombre de point total de la question.",
+    "steptooltip": "La question pourra être notée de 0,25pt en 0,25pt ou de 0,5pt en 0,5pt quelque soit le nombre de point total de la question.",
     "couldnotcorrectQCM": "Impossible de corriger ce QCM",
     "couldnotcorrectQCMdetails": "Impossible de corriger ce QCM",
     "nosupportQMCmultiplepage": "Pas de support de la correction automatique sur des QCM sur plusieurs pages",
@@ -192,6 +192,8 @@
     "showqcmcorrectlabel": "Voir QCM",
     "realign": "Réaligner la/les pages de la question courante",
     "realignlabel": "Réalignement",
-    "qcmcorrectlabel": "Autocorrect QCM"
+    "qcmcorrectlabel": "Autocorrect QCM",
+    "sqlinsertfile": "Insertion du fichier dans la base de données (cela peut prendre un peu de temps)",
+    "preference": "Preferences"
   }
 }

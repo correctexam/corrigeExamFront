@@ -34,9 +34,6 @@ function isHttpProgressEvent(event: HttpEvent<unknown>): event is HttpProgressEv
 const initialState: Upload = { state: 'PENDING', progress: 0 };
 const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
   if (isHttpProgressEvent(event)) {
-    // eslint-disable-next-line no-console
-    console.log('current');
-
     return {
       progress: event.total ? Math.round((100 * event.loaded) / event.total) : upload.progress,
       state: 'IN_PROGRESS',
@@ -69,7 +66,7 @@ export class ChargerscanComponent implements OnInit {
     contentContentType: [null, [Validators.required]],
   });
   progress = 0;
-
+  message = '';
   constructor(
     private translate: TranslateService,
     private messageService: MessageService,
@@ -130,9 +127,11 @@ export class ChargerscanComponent implements OnInit {
     //  console.log(result)
     result.pipe(scan(calculateState, initialState)).subscribe(data => {
       this.progress = data.progress;
+      if (this.progress >= 100) {
+        this.message = this.translate.instant('scanexam.sqlinsertfile');
+      }
 
       if (data.state === 'DONE') {
-        console.log(data.body!);
         this.onSaveSuccess(data.body!);
       }
     });

@@ -165,7 +165,7 @@
     "validanswerexpression": "Valide expression",
     "penaltytooltip": "Cost according to the total points of the current question (e.g. if the total points of the question equals 2 and selection is 1/5, a wrong answer will cost 0,4 pt",
     "expressiontooltip": "A valid expression will have the format 'a&b|a&c' meaning either box 'a' and box 'b' checked or box 'a' and box 'c' checked ('a' being the first box, 'c' being the third, ...)",
-    "steptooltip": "Step means the number of steps per point. If step equels 4, the question can be scored from 0.25pt to 0.25pt whatever the total number of points of the question.",
+    "steptooltip": "The question can be scored from 0.25pt to 0.25pt or 0.5pt to 0.5pt for example, whatever the total number of points of the question.",
     "couldnotcorrectQCM": "Could not correct this QCM automatically",
     "couldnotcorrectQCMdetails": "Could not correct this QCM automatically",
     "nosupportQMCmultiplepage": "No support for automatic correction on multiple page MCQs",
@@ -192,6 +192,8 @@
     "showqcmcorrectlabel": "Show QCM",
     "realign": "Realign mage(s) for the current question",
     "realignlabel": "Realign",
-    "qcmcorrectlabel": "Autocorrect MCQ"
+    "qcmcorrectlabel": "Autocorrect MCQ",
+    "sqlinsertfile": "Inserting the file into the database (this may take some time)",
+    "preference": "Preferences"
   }
 }

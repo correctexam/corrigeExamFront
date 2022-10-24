@@ -28,6 +28,25 @@ interface IImageAlignementInput {
   widthB?: number;
   heightB?: number;
   pageNumber: number;
+  preference: IPreference;
+}
+
+export interface IPreference {
+  qcm_min_width_shape: number;
+  qcm_min_height_shape: number;
+  qcm_epsilon: number;
+  qcm_differences_avec_case_blanche: number;
+  linelength: number;
+  repairsize: number;
+  dilatesize: number;
+  morphsize: number;
+  drawcontoursizeh: number;
+  drawcontoursizev: number;
+  minCircle: number;
+  maxCircle: number;
+  numberofpointToMatch: number;
+  numberofgoodpointToMatch: number;
+  defaultAlignAlgowithMarker: boolean;
 }
 
 export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlignementInput, IImageAlignement> {
@@ -65,8 +84,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
                 input.widthB!,
                 input.heightB!,
                 false,
-                5,
-                0,
+                input.preference.numberofpointToMatch,
+                input.preference.numberofpointToMatch,
                 input.pageNumber
               );
               res.pageNumber = input.pageNumber;
@@ -83,7 +102,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
               input.heightA!,
               input.widthB!,
               input.heightB!,
-              input.pageNumber
+              input.pageNumber,
+              input.preference
             );
             res.pageNumber = input.pageNumber;
             observer.next(res);
@@ -485,7 +505,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     heightA: number,
     widthB: number,
     heightB: number,
-    pageNumber: number
+    pageNumber: number,
+    preference: IPreference
   ): any {
     //im2 is the original reference image we are trying to align to
     const imageA = new ImageData(new Uint8ClampedArray(image_Aba), widthA, heightA);
@@ -498,8 +519,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     let circlesMat = new cv.Mat();
     cv.cvtColor(srcMat, srcMat, cv.COLOR_RGBA2GRAY);
     //  cv.HoughCircles(srcMat, circlesMat, cv.HOUGH_GRADIENT, 1, 45, 75, 40, 0, 0);
-    let minCircle = (srcMat.cols * 6) / 1000;
-    let maxCircle = (srcMat.cols * 20) / 1000;
+    let minCircle = (srcMat.cols * preference.minCircle) / 1000;
+    let maxCircle = (srcMat.cols * preference.maxCircle) / 1000;
 
     cv.HoughCircles(srcMat, circlesMat, cv.HOUGH_GRADIENT, 1, 45, 75, 20, minCircle, maxCircle);
     let x1, y1, r1;
@@ -668,31 +689,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       cv.warpPerspective(srcMat2, dst, M, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
 
       let dst1 = dst.clone();
-
-      /*    for (let i = 0; i < srcTri.rows; ++i) {
-        let x = srcTri.data32F[i * 2];
-        let y = srcTri.data32F[i * 2 + 1];
-        let radius = 15;
-        let center = new cv.Point(x, y);
-  //      cv.circle(srcMat2, center, radius, [0, 0, 255, 255], 1);
-      } */
-
-      /*
-  let point1 = new cv.Point(payload.x, payload.y);
-  let point2 = new cv.Point(payload.x + payload.width, payload.y + payload.height);
-  cv.rectangle(dst1, point1, point2,  [0, 0, 255, 255], 2, cv.LINE_AA, 0);
-  cv.rectangle(srcMat, point1, point2,  [0, 0, 255, 255], 2, cv.LINE_AA, 0);*/
-
       let result = {} as any;
-      /*result['keypoints1'] = imageDataFromMat(srcMat);
-      result['keypoints1Width'] = srcMat.size().width;
-      result['keypoints1Height'] = srcMat.size().height;
-      result['keypoints2'] = imageDataFromMat(dst);
-      result['keypoints2Width'] = dst.size().width;
-      result['keypoints2Height'] = dst.size().height;
-      result['imageCompareMatches'] = imageDataFromMat(srcMat2);
-      result['imageCompareMatchesWidth'] = srcMat2.size().width;
-      result['imageCompareMatchesHeight'] = srcMat2.size().height;*/
       result['imageAligned'] = this.imageDataFromMat(dst1).data.buffer;
       result['imageAlignedWidth'] = dst1.size().width;
       result['imageAlignedHeight'] = dst1.size().height;
@@ -715,7 +712,18 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       srcMat1.delete();
       srcMat2.delete();
       circlesMat1.delete();
-      return this.alignImage(image_Aba, image_Bba, widthA, heightA, widthB, heightB, false, 5, 0, pageNumber);
+      return this.alignImage(
+        image_Aba,
+        image_Bba,
+        widthA,
+        heightA,
+        widthB,
+        heightB,
+        false,
+        preference.numberofpointToMatch,
+        preference.numberofgoodpointToMatch,
+        pageNumber
+      );
     }
   }
 }

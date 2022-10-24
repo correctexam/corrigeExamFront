@@ -18,6 +18,24 @@ export interface IImageAlignement {
   pageNumber?: number;
 }
 
+export interface IPreference {
+  qcm_min_width_shape: number;
+  qcm_min_height_shape: number;
+  qcm_epsilon: number;
+  qcm_differences_avec_case_blanche: number;
+  linelength: number;
+  repairsize: number;
+  dilatesize: number;
+  morphsize: number;
+  drawcontoursizeh: number;
+  drawcontoursizev: number;
+  minCircle: number;
+  maxCircle: number;
+  numberofpointToMatch: number;
+  numberofgoodpointToMatch: number;
+  defaultAlignAlgowithMarker: boolean;
+}
+
 export interface IImageAlignementInput {
   //  imageA?: ImageData;
   //  imageB?: ImageData;
@@ -31,6 +49,7 @@ export interface IImageAlignementInput {
   widthB?: number;
   heightB?: number;
   pageNumber?: number;
+  preference: IPreference;
 }
 export interface IImageCropInput {
   image?: ImageData;
@@ -45,6 +64,7 @@ export interface IQCMInput {
   pages?: IQCMImageInput[];
   widthZone?: number;
   heightZone?: number;
+  preference: IPreference;
 }
 
 export interface IQCMOutput {
@@ -64,6 +84,7 @@ export interface IQCMSolution {
 export interface IImagePredictionInput {
   image?: ImageData;
   match?: string[];
+  preference: IPreference;
 }
 export interface IImagePredictionOutput {
   solution?: (string | number)[];

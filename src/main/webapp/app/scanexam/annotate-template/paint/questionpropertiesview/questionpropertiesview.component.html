@@ -18,7 +18,18 @@
         </div>
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.point" for="field_point">Point</label>
-          <input type="number" class="form-control" name="point" id="field_point" data-cy="point" formControlName="point" />
+          <input
+            type="number"
+            class="form-control"
+            name="point"
+            id="field_point"
+            data-cy="point"
+            formControlName="point"
+            [step]="0.25"
+            [min]="0.25"
+            [max]="50"
+            (change)="pointChange($event)"
+          />
         </div>
 
         <div class="row mb-3">
@@ -30,8 +41,23 @@
             </option>
           </select>
         </div>
+        <div *ngIf="editForm.get(['typeId'])!.value !== qcmid" class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.step" for="field_reponsefausse">Pas </label>
 
-        <div class="row mb-3" *ngIf="editForm.get(['typeId'])!.value == manualid">
+          <p-listbox
+            [options]="pasPointResponseOptions"
+            name="step"
+            id="field_step1"
+            data-cy="step"
+            formControlName="step"
+            [multiple]="false"
+            optionLabel="name"
+            optionValue="value"
+            [pTooltip]="'scanexam.steptooltip' | translate"
+          ></p-listbox>
+        </div>
+
+        <!--    <div class="row mb-3" *ngIf="editForm.get(['typeId'])!.value == manualid">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.step" for="field_step">Step</label>
           <input
             type="number"
@@ -42,7 +68,7 @@
             formControlName="step"
             [pTooltip]="'scanexam.steptooltip' | translate"
           />
-        </div>
+        </div>-->
 
         <div *ngIf="editForm.get(['typeId'])!.value == manualid" class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.gradeType" for="field_gradeType">Grade Type</label>

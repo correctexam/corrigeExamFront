@@ -6,7 +6,7 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 import { MLModel } from './scanexam/ml/model';
-import { doQCMResolution } from './qcm';
+import { doQCMResolution, IPreference } from './qcm';
 
 /// <reference lib="webworker" />
 declare let cv: any;
@@ -94,7 +94,7 @@ function doPrediction(p: { msg: any; payload: any; uid: string }, letter: boolea
   let src = cv.matFromImageData(p.payload.image);
   const m = getModel(letter);
   m.isWarmedUp.then(() => {
-    const res1 = fprediction(src, p.payload.match, m, true, letter);
+    const res1 = fprediction(src, p.payload.match, m, true, letter, p.payload.preference);
     //    const res2 = fprediction(src, p.payload.match, m, false, letter);
     //    if (res1.solution[1] > res2.solution[1]) {
     postMessage({
@@ -153,8 +153,15 @@ function imageDataFromMat(mat: any): any {
   return clampedArray;
 }
 
-function fprediction(src: any, cand: string[], m: MLModel, lookingForMissingLetter: boolean, onlyletter: boolean): any {
-  const res = extractImage(src, false, lookingForMissingLetter);
+function fprediction(
+  src: any,
+  cand: string[],
+  m: MLModel,
+  lookingForMissingLetter: boolean,
+  onlyletter: boolean,
+  preference: IPreference
+): any {
+  const res = extractImage(src, false, lookingForMissingLetter, preference);
   let candidate: any[] = [];
   cand.forEach(e => {
     candidate.push([e.padEnd(13, ' '), 0.0]);
@@ -240,13 +247,13 @@ function roi(src: any, rect: any, dst: any): any {
   return dst;
 }
 
-function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingForMissingLetter: boolean): any {
-  const linelength = 15;
-  const repairsize = 3;
-  const dilatesize = 3;
-  const morphsize = 3;
-  const drawcontoursizeh = 4;
-  const drawcontoursizev = 4;
+function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingForMissingLetter: boolean, preference: IPreference): any {
+  const linelength = preference.linelength;
+  const repairsize = preference.repairsize;
+  const dilatesize = preference.dilatesize;
+  const morphsize = preference.morphsize;
+  const drawcontoursizeh = preference.drawcontoursizeh;
+  const drawcontoursizev = preference.drawcontoursizev;
 
   //  let src = cv.imread(inputid);
   let dst = src.clone();

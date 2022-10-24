@@ -6,14 +6,9 @@ declare let cv: any;
 export interface IQCMInput {
   imageTemplate?: ImageData;
   pages?: IQCMImageInput[];
-  //  xPage?: number;
-  //  yPage?: number;
-  //  widthPage?: number;
-  //  heightPage?: number;
-  // xZone?: number;
-  // yZone?: number;
   widthZone?: number;
   heightZone?: number;
+  preference: IPreference;
 }
 
 export interface IQCMOutput {
@@ -29,6 +24,30 @@ export interface IQCMSolution {
   numero?: number;
   solution?: string;
 }
+
+export interface IPreference {
+  qcm_min_width_shape: number;
+  qcm_min_height_shape: number;
+  qcm_epsilon: number;
+  qcm_differences_avec_case_blanche: number;
+  linelength: number;
+  repairsize: number;
+  dilatesize: number;
+  morphsize: number;
+  drawcontoursizeh: number;
+  drawcontoursizev: number;
+  minCircle: number;
+  maxCircle: number;
+  numberofpointToMatch: number;
+  numberofgoodpointToMatch: number;
+  defaultAlignAlgowithMarker: boolean;
+}
+
+/* const MIN_WIDTH_SHAPE = 10;
+const MIN_HEIGHT_SHAPE = 10;
+const EPSILON = 0.0145; // 0.03
+// Interprétation
+const DIFFERENCES_AVEC_CASE_BLANCHE = 0.22;*/
 
 function imageDataFromMat(mat: any): any {
   // convert the mat type to cv.CV_8U
@@ -64,18 +83,18 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
   let src = cv.matFromImageData(p.payload.imageTemplate);
   let gray = new cv.Mat();
   cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
-  const res = trouveCases(gray);
+  const res = trouveCases(gray, p.payload.preference);
   // drawRectangle(src,res.cases)
 
   p.payload.pages?.forEach((srcEE, i) => {
     let grayE = new cv.Mat();
     let srcE = cv.matFromImageData(srcEE.imageInput);
     cv.cvtColor(srcE, grayE, cv.COLOR_RGBA2GRAY, 0);
-    const casesvideseleves = trouveCases(grayE);
+    const casesvideseleves = trouveCases(grayE, p.payload.preference);
     const decalage = computeDecallage(casesvideseleves, res);
 
     const dstE = applyTranslation(srcE, decalage);
-    let results = analyseStudentSheet(res, src, dstE);
+    let results = analyseStudentSheet(res, src, dstE, p.payload.preference);
     let e = imageDataFromMat(dstE);
     let solution: string[] = [];
 
@@ -107,12 +126,6 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
 }
 
 // Installation/Settup
-const MIN_WIDTH_SHAPE = 10;
-const MIN_HEIGHT_SHAPE = 10;
-const EPSILON = 0.0145; // 0.03
-
-// Interprétation
-const DIFFERENCES_AVEC_CASE_BLANCHE = 0.22;
 
 function getDimensions(forme: any): any {
   const rect = cv.boundingRect(forme);
@@ -149,14 +162,14 @@ function decoupe(img: any, pos: any, dims: any): any {
   return dst;
 }
 
-function interpretationForme(contour: any): any {
-  const eps = EPSILON * cv.arcLength(contour, true);
+function interpretationForme(contour: any, preference: IPreference): any {
+  const eps = preference.qcm_epsilon * cv.arcLength(contour, true);
   const forme = new cv.Mat();
   cv.approxPolyDP(contour, forme, eps, true);
   let nom = undefined;
   const dims = getDimensions(forme);
 
-  if (dims.w >= MIN_WIDTH_SHAPE && dims.h >= MIN_HEIGHT_SHAPE) {
+  if (dims.w >= preference.qcm_min_width_shape && dims.h >= preference.qcm_min_height_shape) {
     //        console.log(forme)
     //        console.log(forme.data.length)
     const nbCotes = forme.rows; // len(forme)
@@ -179,7 +192,7 @@ function interpretationForme(contour: any): any {
   return { nom: nom, forme: forme };
 }
 
-function detectFormes(img: any, nomsFormes: string[] = []): any[] {
+function detectFormes(img: any, nomsFormes: string[] = [], preference: IPreference): any[] {
   const thrash = new cv.Mat();
   cv.threshold(img, thrash, 240, 255, cv.THRESH_BINARY);
   let contours = new cv.MatVector();
@@ -190,7 +203,7 @@ function detectFormes(img: any, nomsFormes: string[] = []): any[] {
   for (let i = 0; i < contours.size(); ++i) {
     let contour = contours.get(i);
     // contours.forEach(contour=> {
-    const res = interpretationForme(contour);
+    const res = interpretationForme(contour, preference);
     if (nomsFormes.includes(res.nom)) {
       // affiche(img,forme=forme)
       formes.push(res.forme);
@@ -257,8 +270,8 @@ function faitDoublon(indice: any, formes: any): boolean {
 }
 
 // Trouve les cases qui composent l'image désignée par le chemin
-function trouveCases(img: any): any {
-  const formes_cases = detectFormes(img, ['CARRE', 'RECTANGLE']);
+function trouveCases(img: any, preference: IPreference): any {
+  const formes_cases = detectFormes(img, ['CARRE', 'RECTANGLE'], preference);
   const cases: any[] = [];
   const img_cases: any[] = [];
   // Enregistrement des cases de l'image (tous les carrés détectés)
@@ -286,7 +299,7 @@ function drawRectangle(img: any, formes: any, couleur: any = new cv.Scalar(255, 
   return img;
 }
 
-function analyseStudentSheet(casesExamTemplate: any, templateimage: any, studentScanImage: any): Map<number, any> {
+function analyseStudentSheet(casesExamTemplate: any, templateimage: any, studentScanImage: any, preference: IPreference): Map<number, any> {
   const cases_remplies: any[] = [];
   const cases_vides: any[] = [];
   let infos_cases: Map<number, any> = new Map<number, any>();
@@ -300,7 +313,7 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
     const img_case_eleve = decoupe(studentScanImage, getPosition(case1), getDimensions(case1));
     const diff = diffCouleurAvecCaseBlanche(img_case_eleve);
 
-    if (diff > DIFFERENCES_AVEC_CASE_BLANCHE) {
+    if (diff > preference.qcm_differences_avec_case_blanche) {
       infos_cases.set(k, { verdict: true, prediction: diff });
       cases_remplies.push(case1);
     } else {

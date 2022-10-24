@@ -61,6 +61,13 @@ export class QuestionpropertiesviewComponent implements OnInit {
     { name: '- 1/8', value: 8 },
     { name: '- 1/10', value: 10 },
   ];
+  pasPointResponseOptions = [
+    { name: '1', value: 1 },
+    { name: '0,5 pt ', value: 2 },
+    { name: '0,25 pt', value: 4 },
+    { name: '0, 125 pt', value: 8 },
+    { name: '0,0625 pt', value: 16 },
+  ];
 
   isSaving = false;
   questiontypes: IQuestionType[] = [];
@@ -172,5 +179,32 @@ export class QuestionpropertiesviewComponent implements OnInit {
 
   trackById(index: number, item: SelectableEntity): any {
     return item.id;
+  }
+
+  pointChange($event: any): void {
+    // eslint-disable-next-line no-console
+    console.log($event.target.value);
+    if ($event.target.value % 1 === 0) {
+      this.pasPointResponseOptions = [
+        { name: '1', value: 1 },
+        { name: '0,5 pt ', value: 2 },
+        { name: '0,25 pt', value: 4 },
+        { name: '0, 125 pt', value: 8 },
+        { name: '0,0625 pt', value: 16 },
+      ];
+    } else if ($event.target.value % 0.5 === 0) {
+      this.pasPointResponseOptions = [
+        { name: '0,5 pt ', value: 2 },
+        { name: '0,25 pt', value: 4 },
+        { name: '0, 125 pt', value: 8 },
+        { name: '0,0625 pt', value: 16 },
+      ];
+    } else {
+      this.pasPointResponseOptions = [
+        { name: '0,25 pt', value: 4 },
+        { name: '0, 125 pt', value: 8 },
+        { name: '0,0625 pt', value: 16 },
+      ];
+    }
   }
 }
