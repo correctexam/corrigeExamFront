@@ -36,6 +36,7 @@ import { IQuestion, Question } from '../../../entities/question/question.model';
 import { QuestionService } from '../../../entities/question/service/question.service';
 import { PageHandler } from './fabric-canvas/PageHandler';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
+import { TranslateService } from '@ngx-translate/core';
 
 const RANGE_AROUND_CENTER = 20;
 
@@ -143,7 +144,8 @@ export class EventHandlerService {
     private fabricShapeService: FabricShapeService,
     private zoneService: ZoneService,
     private examService: ExamService,
-    private questionService: QuestionService
+    private questionService: QuestionService,
+    private translateService: TranslateService
   ) {}
 
   registerSelectedToolObserver(f: (d: DrawingTools) => void): any {
@@ -298,123 +300,146 @@ export class EventHandlerService {
     if (this._selectedTool === DrawingTools.PENCIL) {
       this._elementUnderDrawing = this.fabricShapeService.finishPath(this.canvas, this._elementUnderDrawing as CustomFabricPath);
     } else if (this._selectedTool === DrawingTools.NOMBOX) {
-      this._elementUnderDrawing = this.fabricShapeService.createBox(
-        this.canvas,
-        this._elementUnderDrawing as CustomFabricRect,
-        'Nom',
-        DrawingColours.BLUE
-      );
+      this.translateService.get('scanexam.nomuc1').subscribe(name => {
+        this._elementUnderDrawing = this.fabricShapeService.createBox(
+          this.canvas,
+          this._elementUnderDrawing as CustomFabricRect,
+          name,
+          DrawingColours.BLUE
+        );
 
-      const z: IZone = {
-        pageNumber: (this.canvas as any).page,
-        xInit: Math.trunc((this._elementUnderDrawing.left! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth),
-        yInit: Math.trunc((this._elementUnderDrawing.top! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight),
-        width: Math.trunc(
-          (this._elementUnderDrawing.width! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth
-        ),
-        height: Math.trunc(
-          (this._elementUnderDrawing.height! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight
-        ),
-      };
-      const uid = this._elementUnderDrawing.id;
-      this.zoneService.create(z).subscribe(z1 => {
-        this.modelViewpping.set(uid, z1.body!.id!);
-        this._exam.namezoneId = z1.body!.id!;
-        this.examService.update(this._exam).subscribe(e => {
-          this.exam = e.body!;
-          this.selectedTool = DrawingTools.SELECT;
+        const z: IZone = {
+          pageNumber: (this.canvas as any).page,
+          xInit: Math.trunc(
+            (this._elementUnderDrawing.left! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth
+          ),
+          yInit: Math.trunc(
+            (this._elementUnderDrawing.top! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight
+          ),
+          width: Math.trunc(
+            (this._elementUnderDrawing.width! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth
+          ),
+          height: Math.trunc(
+            (this._elementUnderDrawing.height! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight
+          ),
+        };
+        const uid = this._elementUnderDrawing.id;
+        this.zoneService.create(z).subscribe(z1 => {
+          this.modelViewpping.set(uid, z1.body!.id!);
+          this._exam.namezoneId = z1.body!.id!;
+          this.examService.update(this._exam).subscribe(e => {
+            this.exam = e.body!;
+            this.selectedTool = DrawingTools.SELECT;
+          });
         });
       });
     } else if (this._selectedTool === DrawingTools.PRENOMBOX) {
-      this._elementUnderDrawing = this.fabricShapeService.createBox(
-        this.canvas,
-        this._elementUnderDrawing as CustomFabricRect,
-        'Prénom',
-        DrawingColours.BLUE
-      );
-      const z: IZone = {
-        pageNumber: (this.canvas as any).page,
-        xInit: Math.trunc((this._elementUnderDrawing.left! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth),
-        yInit: Math.trunc((this._elementUnderDrawing.top! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight),
-        width: Math.trunc(
-          (this._elementUnderDrawing.width! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth
-        ),
-        height: Math.trunc(
-          (this._elementUnderDrawing.height! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight
-        ),
-      };
-      const uid = this._elementUnderDrawing.id;
-      this.zoneService.create(z).subscribe(z1 => {
-        this.modelViewpping.set(uid, z1.body!.id!);
-        this._exam.firstnamezoneId = z1.body!.id!;
-        this.examService.update(this._exam).subscribe(e => {
-          this.exam = e.body!;
-          this.selectedTool = DrawingTools.SELECT;
+      this.translateService.get('scanexam.prenomuc1').subscribe(name => {
+        this._elementUnderDrawing = this.fabricShapeService.createBox(
+          this.canvas,
+          this._elementUnderDrawing as CustomFabricRect,
+          name,
+          DrawingColours.BLUE
+        );
+        const z: IZone = {
+          pageNumber: (this.canvas as any).page,
+          xInit: Math.trunc(
+            (this._elementUnderDrawing.left! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth
+          ),
+          yInit: Math.trunc(
+            (this._elementUnderDrawing.top! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight
+          ),
+          width: Math.trunc(
+            (this._elementUnderDrawing.width! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth
+          ),
+          height: Math.trunc(
+            (this._elementUnderDrawing.height! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight
+          ),
+        };
+        const uid = this._elementUnderDrawing.id;
+        this.zoneService.create(z).subscribe(z1 => {
+          this.modelViewpping.set(uid, z1.body!.id!);
+          this._exam.firstnamezoneId = z1.body!.id!;
+          this.examService.update(this._exam).subscribe(e => {
+            this.exam = e.body!;
+            this.selectedTool = DrawingTools.SELECT;
+          });
         });
       });
     } else if (this._selectedTool === DrawingTools.INEBOX) {
-      this._elementUnderDrawing = this.fabricShapeService.createBox(
-        this.canvas,
-        this._elementUnderDrawing as CustomFabricRect,
-        'INE',
-        DrawingColours.BLUE
-      );
-      const z: IZone = {
-        pageNumber: (this.canvas as any).page,
-        xInit: Math.trunc((this._elementUnderDrawing.left! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth),
-        yInit: Math.trunc((this._elementUnderDrawing.top! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight),
-        width: Math.trunc(
-          (this._elementUnderDrawing.width! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth
-        ),
-        height: Math.trunc(
-          (this._elementUnderDrawing.height! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight
-        ),
-      };
-      const uid = this._elementUnderDrawing.id;
-      this.zoneService.create(z).subscribe(z1 => {
-        this.modelViewpping.set(uid, z1.body!.id!);
-        this._exam.idzoneId = z1.body!.id!;
-        this.examService.update(this._exam).subscribe(e => {
-          this.exam = e.body!;
-          this.selectedTool = DrawingTools.SELECT;
+      this.translateService.get('scanexam.ineuc1').subscribe(name => {
+        this._elementUnderDrawing = this.fabricShapeService.createBox(
+          this.canvas,
+          this._elementUnderDrawing as CustomFabricRect,
+          name,
+          DrawingColours.BLUE
+        );
+        const z: IZone = {
+          pageNumber: (this.canvas as any).page,
+          xInit: Math.trunc(
+            (this._elementUnderDrawing.left! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth
+          ),
+          yInit: Math.trunc(
+            (this._elementUnderDrawing.top! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight
+          ),
+          width: Math.trunc(
+            (this._elementUnderDrawing.width! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth
+          ),
+          height: Math.trunc(
+            (this._elementUnderDrawing.height! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight
+          ),
+        };
+        const uid = this._elementUnderDrawing.id;
+        this.zoneService.create(z).subscribe(z1 => {
+          this.modelViewpping.set(uid, z1.body!.id!);
+          this._exam.idzoneId = z1.body!.id!;
+          this.examService.update(this._exam).subscribe(e => {
+            this.exam = e.body!;
+            this.selectedTool = DrawingTools.SELECT;
+          });
         });
       });
     } else if (this._selectedTool === DrawingTools.QUESTIONBOX) {
       const numero = this.nextQuestionNumero;
       this.nextQuestionNumero = this.nextQuestionNumero + 1;
+      this.translateService.get('scanexam.questionuc1').subscribe(name => {
+        this._elementUnderDrawing = this.fabricShapeService.createBox(
+          this.canvas,
+          this._elementUnderDrawing as CustomFabricRect,
+          name + numero,
+          DrawingColours.BLUE
+        );
 
-      this._elementUnderDrawing = this.fabricShapeService.createBox(
-        this.canvas,
-        this._elementUnderDrawing as CustomFabricRect,
-        'Question ' + numero,
-        DrawingColours.BLUE
-      );
-
-      const z: IZone = {
-        pageNumber: (this.canvas as any).page,
-        xInit: Math.trunc((this._elementUnderDrawing.left! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth),
-        yInit: Math.trunc((this._elementUnderDrawing.top! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight),
-        width: Math.trunc(
-          (this._elementUnderDrawing.width! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth
-        ),
-        height: Math.trunc(
-          (this._elementUnderDrawing.height! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight
-        ),
-      };
-      const uid = this._elementUnderDrawing.id;
-      this.zoneService.create(z).subscribe(z1 => {
-        this.modelViewpping.set(uid, z1.body!.id!);
-        const q = new Question();
-        q.zoneId = z1.body!.id!;
-        q.examId = this._exam.id;
-        q.typeId = 2;
-        q.numero = numero;
-        q.point = 2;
-        q.step = 4;
-        q.gradeType = GradeType.DIRECT;
-        this.questionService.create(q).subscribe(e => {
-          this.selectedTool = DrawingTools.SELECT;
-          this.cb(z1.body!.id!);
+        const z: IZone = {
+          pageNumber: (this.canvas as any).page,
+          xInit: Math.trunc(
+            (this._elementUnderDrawing.left! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth
+          ),
+          yInit: Math.trunc(
+            (this._elementUnderDrawing.top! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight
+          ),
+          width: Math.trunc(
+            (this._elementUnderDrawing.width! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientWidth
+          ),
+          height: Math.trunc(
+            (this._elementUnderDrawing.height! * 100000) / this.pages[(this.canvas as any).page].pageViewer.canvas.clientHeight
+          ),
+        };
+        const uid = this._elementUnderDrawing.id;
+        this.zoneService.create(z).subscribe(z1 => {
+          this.modelViewpping.set(uid, z1.body!.id!);
+          const q = new Question();
+          q.zoneId = z1.body!.id!;
+          q.examId = this._exam.id;
+          q.typeId = 2;
+          q.numero = numero;
+          q.point = 2;
+          q.step = 4;
+          q.gradeType = GradeType.DIRECT;
+          this.questionService.create(q).subscribe(e => {
+            this.selectedTool = DrawingTools.SELECT;
+            this.cb(z1.body!.id!);
+          });
         });
       });
     }

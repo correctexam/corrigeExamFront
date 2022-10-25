@@ -21,6 +21,7 @@ import { IZone } from 'app/entities/zone/zone.model';
 import { FabricShapeService } from '../shape.service';
 import { QuestionService } from '../../../../entities/question/service/question.service';
 import { Subject } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
 };
@@ -60,7 +61,8 @@ export class FabricCanvasComponent implements AfterViewInit {
     public config: PerfectScrollbarConfigInterface,
     public zoneService: ZoneService,
     public fabricShapeService: FabricShapeService,
-    public questionService: QuestionService
+    public questionService: QuestionService,
+    public translateService: TranslateService
   ) {}
 
   public scrollMode: ScrollModeType = ScrollModeType.vertical;
@@ -131,69 +133,77 @@ export class FabricCanvasComponent implements AfterViewInit {
       this.zones[page].forEach(z => {
         switch (z.type) {
           case DrawingTools.NOMBOX: {
-            const r = this.fabricShapeService.createBoxFromScratch(
-              canvas,
-              {
-                x: (z.xInit! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
-                y: (z.yInit! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
-              },
-              (z.width! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
-              (z.height! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
-              'Nom',
-              DrawingColours.RED
-            );
-            this.eventHandler.modelViewpping.set(r.id, z.id!);
+            this.translateService.get('scanexam.nomuc1').subscribe(e => {
+              const r = this.fabricShapeService.createBoxFromScratch(
+                canvas,
+                {
+                  x: (z.xInit! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
+                  y: (z.yInit! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
+                },
+                (z.width! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
+                (z.height! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
+                e,
+                DrawingColours.RED
+              );
+              this.eventHandler.modelViewpping.set(r.id, z.id!);
+            });
             break;
           }
           case DrawingTools.PRENOMBOX: {
-            const r = this.fabricShapeService.createBoxFromScratch(
-              canvas,
-              {
-                x: (z.xInit! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
-                y: (z.yInit! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
-              },
-              (z.width! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
-              (z.height! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
-              'Prénom',
-              DrawingColours.RED
-            );
-            this.eventHandler.modelViewpping.set(r.id, z.id!);
+            this.translateService.get('scanexam.prenomuc1').subscribe(e => {
+              const r = this.fabricShapeService.createBoxFromScratch(
+                canvas,
+                {
+                  x: (z.xInit! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
+                  y: (z.yInit! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
+                },
+                (z.width! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
+                (z.height! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
+                e,
+                DrawingColours.RED
+              );
+              this.eventHandler.modelViewpping.set(r.id, z.id!);
+            });
             break;
           }
           case DrawingTools.INEBOX: {
-            const r = this.fabricShapeService.createBoxFromScratch(
-              canvas,
-              {
-                x: (z.xInit! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
-                y: (z.yInit! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
-              },
-              (z.width! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
-              (z.height! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
-              'INE',
-              DrawingColours.RED
-            );
-            this.eventHandler.modelViewpping.set(r.id, z.id!);
+            this.translateService.get('scanexam.ineuc1').subscribe(e => {
+              const r = this.fabricShapeService.createBoxFromScratch(
+                canvas,
+                {
+                  x: (z.xInit! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
+                  y: (z.yInit! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
+                },
+                (z.width! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
+                (z.height! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
+                e,
+                DrawingColours.RED
+              );
+              this.eventHandler.modelViewpping.set(r.id, z.id!);
+            });
             break;
           }
           case DrawingTools.QUESTIONBOX: {
-            this.questionService.query({ zoneId: z.id }).subscribe(e => {
-              if (e.body !== undefined && e.body!.length > 0) {
-                const r = this.fabricShapeService.createBoxFromScratch(
-                  canvas,
-                  {
-                    x: (z.xInit! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
-                    y: (z.yInit! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
-                  },
-                  (z.width! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
-                  (z.height! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
-                  'Question ' + e.body![0].numero,
-                  DrawingColours.GREEN
-                );
-                this.eventHandler.modelViewpping.set(r.id, z.id!);
-                if (this.eventHandler.nextQuestionNumero <= e.body![0].numero!) {
-                  this.eventHandler.nextQuestionNumero = this.eventHandler.nextQuestionNumero + 1;
+            this.translateService.get('scanexam.questionuc1').subscribe(e1 => {
+              this.questionService.query({ zoneId: z.id }).subscribe(e => {
+                if (e.body !== undefined && e.body!.length > 0) {
+                  const r = this.fabricShapeService.createBoxFromScratch(
+                    canvas,
+                    {
+                      x: (z.xInit! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
+                      y: (z.yInit! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
+                    },
+                    (z.width! * this.eventHandler.pages[page].pageViewer.canvas.clientWidth) / 100000,
+                    (z.height! * this.eventHandler.pages[page].pageViewer.canvas.clientHeight) / 100000,
+                    e1 + e.body![0].numero,
+                    DrawingColours.GREEN
+                  );
+                  this.eventHandler.modelViewpping.set(r.id, z.id!);
+                  if (this.eventHandler.nextQuestionNumero <= e.body![0].numero!) {
+                    this.eventHandler.nextQuestionNumero = this.eventHandler.nextQuestionNumero + 1;
+                  }
                 }
-              }
+              });
             });
 
             break;
