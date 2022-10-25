@@ -198,6 +198,9 @@
     "nomuc1": "Nom",
     "prenomuc1": "Prenom",
     "ineuc1": "INE",
-    "questionuc1": "Question "
+    "questionuc1": "Question ",
+    "shortcut": "Raccourci clavier",
+    "shortcutdetail": "Il est possible de passer d'une question à une autre en utilisant les raccourcis clavier suivants: Shift + right ou Shift + left. Il est possible de passer d'un étudiant à un autre en utilisant les raccourcis clavier suivants: Ctrl + right ou Ctrl + left. ",
+    "shortcutopenatstart": "Afficher cette fenètre au chargement du module de correction sur cet ordinateur"
   }
 }

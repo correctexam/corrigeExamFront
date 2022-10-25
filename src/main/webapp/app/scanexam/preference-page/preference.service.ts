@@ -61,4 +61,20 @@ export class PreferenceService {
     this.localStorageService.store('preferences', defaultvalue);
     return defaultvalue;
   }
+
+  showKeyboardShortcuts(): boolean {
+    const pref: boolean | null = this.localStorageService.retrieve('shortcut');
+    if (pref === null) {
+      this.localStorageService.store('shortcut', true);
+      return true;
+    }
+    return pref;
+  }
+  setKeyboardShortcuts(shortcut: boolean): void {
+    this.localStorageService.store('shortcut', shortcut);
+  }
+
+  resetKeyboardShortcuts(): void {
+    this.localStorageService.store('shortcut', true);
+  }
 }
