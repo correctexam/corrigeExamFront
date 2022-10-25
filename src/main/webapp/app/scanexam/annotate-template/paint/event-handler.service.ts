@@ -37,6 +37,7 @@ import { QuestionService } from '../../../entities/question/service/question.ser
 import { PageHandler } from './fabric-canvas/PageHandler';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { TranslateService } from '@ngx-translate/core';
+import { PreferenceService } from '../../preference-page/preference.service';
 
 const RANGE_AROUND_CENTER = 20;
 
@@ -145,7 +146,8 @@ export class EventHandlerService {
     private zoneService: ZoneService,
     private examService: ExamService,
     private questionService: QuestionService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private preferenceService: PreferenceService
   ) {}
 
   registerSelectedToolObserver(f: (d: DrawingTools) => void): any {
@@ -427,15 +429,16 @@ export class EventHandlerService {
         };
         const uid = this._elementUnderDrawing.id;
         this.zoneService.create(z).subscribe(z1 => {
+          const pref = this.preferenceService.getPreferenceForQuestion();
           this.modelViewpping.set(uid, z1.body!.id!);
           const q = new Question();
           q.zoneId = z1.body!.id!;
           q.examId = this._exam.id;
-          q.typeId = 2;
+          q.typeId = pref.typeId;
           q.numero = numero;
-          q.point = 2;
-          q.step = 4;
-          q.gradeType = GradeType.DIRECT;
+          q.point = pref.point;
+          q.step = pref.step;
+          q.gradeType = pref.gradeType;
           this.questionService.create(q).subscribe(e => {
             this.selectedTool = DrawingTools.SELECT;
             this.cb(z1.body!.id!);

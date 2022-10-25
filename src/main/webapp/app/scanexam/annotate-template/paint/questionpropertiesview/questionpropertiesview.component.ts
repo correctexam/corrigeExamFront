@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { HttpResponse } from '@angular/common/http';
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { IQuestionType } from 'app/entities/question-type/question-type.model';
 import { QuestionTypeService } from 'app/entities/question-type/service/question-type.service';
 import { QuestionService } from 'app/entities/question/service/question.service';
@@ -14,6 +14,7 @@ import { EventHandlerService } from '../event-handler.service';
 import { ZoneService } from '../../../../entities/zone/service/zone.service';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { animate, state, style, transition, trigger } from '@angular/animations';
+import { PreferenceService } from '../../../preference-page/preference.service';
 
 type SelectableEntity = IQuestionType;
 
@@ -75,27 +76,31 @@ export class QuestionpropertiesviewComponent implements OnInit {
   @Output()
   updatenumero: EventEmitter<string> = new EventEmitter<string>();
 
-  editForm = this.fb.group({
-    id: [],
-    numero: [null, [Validators.required]],
-    point: [2],
-    step: [4],
-    validExpression: [''],
-    gradeType: [GradeType.DIRECT],
-    zoneId: [],
-    typeId: [],
-    examId: [],
-  });
+  editForm!: FormGroup;
 
   constructor(
     protected questionService: QuestionService,
     protected zoneService: ZoneService,
     protected questionTypeService: QuestionTypeService,
     private fb: FormBuilder,
-    private eventHandler: EventHandlerService
+    private eventHandler: EventHandlerService,
+    private preferenceService: PreferenceService
   ) {}
 
   ngOnInit(): void {
+    const pref = this.preferenceService.getPreferenceForQuestion();
+    this.editForm = this.fb.group({
+      id: [],
+      numero: [null, [Validators.required]],
+      point: [pref.point],
+      step: [pref.step],
+      validExpression: [''],
+      gradeType: [pref.gradeType],
+      zoneId: [],
+      typeId: [pref.typeId],
+      examId: [],
+    });
+
     // this.updateForm(this.question);
 
     this.questionTypeService.query().subscribe((res: HttpResponse<IQuestionType[]>) => {
@@ -142,6 +147,13 @@ export class QuestionpropertiesviewComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     const question = this.createFromForm();
+    this.preferenceService.savePref4Question({
+      point: question.point!,
+      step: question.step!,
+      gradeType: question.gradeType!,
+      typeId: question.typeId!,
+    });
+
     if (question.id !== undefined) {
       this.subscribeToSaveResponse(this.questionService.update(question));
     } else {
