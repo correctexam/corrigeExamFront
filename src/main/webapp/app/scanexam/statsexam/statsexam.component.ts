@@ -577,7 +577,6 @@ export class StatsExamComponent implements OnInit {
       ? this.translateService.instant('scanexam.valeursnormalisees')
       : this.translateService.instant('scanexam.valeursbrutes');
     const infosExam = undefined; // : string = this.resumeExam();
-    console.log(selection, infosExam);
     this.updateCarte('questions_stats', undefined, selection, infosExam);
   }
 

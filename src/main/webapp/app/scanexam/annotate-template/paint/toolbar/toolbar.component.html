@@ -1,5 +1,5 @@
 <div>
-  <div class="d-flex flex-wrap mb-5">
+  <div class="d-flex flex-wrap">
     <div
       [title]="'scanexam.selectmove' | translate"
       class="toolbox-item ml-1 mt-1"
@@ -8,7 +8,9 @@
     >
       <fa-icon [icon]="faHandPointer"></fa-icon>
     </div>
-    <div
+  </div>
+  <div class="d-flex flex-wrap">
+    <!--<div    <div
       [title]="'scanexam.erase' | translate"
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'ERASER' }"
@@ -16,7 +18,7 @@
     >
       <fa-icon [icon]="faEraser"></fa-icon>
     </div>
-    <!--<div
+
       title="Straight Line"
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'LINE' }"
@@ -89,14 +91,14 @@
     >
       <img src="/content/images/toolbar-images/polygon.png" />
     </div>-->
-    <div
+    <!-- <div
       [title]="'scanexam.freedrawing' | translate"
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'PENCIL' }"
       (click)="select(DrawingTools.PENCIL)"
     >
       <fa-icon [icon]="faPencil"></fa-icon>
-    </div>
+    </div>-->
     <!--<div
       title="Editable textfield"
       class="toolbox-item ml-1 mt-1"
@@ -113,6 +115,17 @@
     >
       <img src="/content/images/toolbar-images/fill.png" />
     </div>-->
+  </div>
+  <div class="d-flex flex-wrap mb-5">
+    <div
+      [title]="'scanexam.erase' | translate"
+      class="toolbox-item ml-1 mt-1"
+      [ngClass]="{ selected: selected === 'ERASER' }"
+      (click)="select(DrawingTools.ERASER)"
+    >
+      <fa-icon [icon]="faEraser"></fa-icon>
+    </div>
+
     <div
       [title]="'scanexam.clearcanvas' | translate"
       class="toolbox-item ml-1 mt-1"
