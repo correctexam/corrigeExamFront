@@ -577,12 +577,13 @@ export class StatsExamComponent implements OnInit {
       ? this.translateService.instant('scanexam.valeursnormalisees')
       : this.translateService.instant('scanexam.valeursbrutes');
     const infosExam = undefined; // : string = this.resumeExam();
+    console.log(selection, infosExam);
     this.updateCarte('questions_stats', undefined, selection, infosExam);
   }
 
   onStudentSelect(event: any): void {
     if (this.etudiantSelec !== null && this.etudiantSelec !== undefined) {
-      this.updateCarte('selection_etudiant', undefined, this.etudiantSelec.prenom + ' ' + this.etudiantSelec.nom, undefined);
+      //  this.updateCarte('selection_etudiant', undefined, this.etudiantSelec.prenom + ' ' + this.etudiantSelec.nom, undefined);
       this.data_radar_courant = this.initStudentRadarData(
         this.etudiantSelec,
         this.data_radar_courant.vue === this.translateService.instant('scanexam.pourcents')
@@ -593,7 +594,7 @@ export class StatsExamComponent implements OnInit {
     }
   }
   onStudentUnselect(event: any): void {
-    this.updateCarte('selection_etudiant', undefined, this.translateService.instant('scanexam.nostudentselected'), undefined);
+    // this.updateCarte('selection_etudiant', undefined, this.translateService.instant('scanexam.nostudentselected'), undefined);
     this.updateCarteRadar();
     this.updateKnobs();
     this.COLOR_KNOBS = BLEU_AERO_TIEDE;

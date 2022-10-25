@@ -113,11 +113,7 @@
     </p-card>
   </div>
   <div class="card" id="selectstudent">
-    <p-card
-      id="selection_etudiant"
-      [header]="'scanexam.studentselection' | translate"
-      [subheader]="'scanexam.noselectedstudent' | translate"
-    >
+    <p-card id="selection_etudiant" [header]="'scanexam.studentselection' | translate">
       <ng-template pTemplate="header">
         <p-table
           class="computer-view"
@@ -135,10 +131,10 @@
         >
           <ng-template pTemplate="header">
             <tr>
-              <th pSortableColumn="ine" jhiTranslate="scanexam.ine">INE<p-sortIcon field="ine"></p-sortIcon></th>
-              <th pSortableColumn="alpha" jhiTranslate="scanexam.nom">NOM<p-sortIcon field="alpha"></p-sortIcon></th>
-              <th pSortableColumn="alpha" jhiTranslate="scanexam.prenom">PRENOM<p-sortIcon field="alpha"></p-sortIcon></th>
-              <th pSortableColumn="note" jhiTranslate="scanexam.note">NOTE<p-sortIcon field="note"></p-sortIcon></th>
+              <th pSortableColumn="ine"><span jhiTranslate="scanexam.ine">INE</span><p-sortIcon field="ine"></p-sortIcon></th>
+              <th pSortableColumn="nom"><span jhiTranslate="scanexam.nom">NOM</span> <p-sortIcon field="nom"></p-sortIcon></th>
+              <th pSortableColumn="prenom"><span jhiTranslate="scanexam.prenom">PRENOM</span><p-sortIcon field="prenom"></p-sortIcon></th>
+              <th pSortableColumn="note"><span jhiTranslate="scanexam.note">NOTE</span><p-sortIcon field="note"></p-sortIcon></th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-student>
@@ -188,18 +184,20 @@
           </div>
         </div>
       </ng-template>
-      <div class="card-body">
-        <div *ngIf="etudiantSelec !== null && etudiantSelec !== undefined">
-          <div class="progbar">
-            <div class="avancement-progbar" [ngStyle]="{ width: ((this.getNoteSelect() * 100) / this.getBaremeExam()).toString() + '%' }">
-              <div class="progbar-grade">
-                <b>{{ this.getNoteSelect() }}</b
-                >/{{ this.getBaremeExam() }}
-              </div>
+
+      <ng-template pTemplate="subheader" [ngIf]="etudiantSelec === null || etudiantSelec === undefined">
+        <span jhiTranslate="scanexam.noselectedstudent"></span>
+      </ng-template>
+      <ng-template pTemplate="content">
+        <div *ngIf="etudiantSelec !== null && etudiantSelec !== undefined" class="progbar">
+          <div class="avancement-progbar" [ngStyle]="{ width: ((this.getNoteSelect() * 100) / this.getBaremeExam()).toString() + '%' }">
+            <div class="progbar-grade">
+              <b>{{ this.getNoteSelect() }}</b
+              >/{{ this.getBaremeExam() }}
             </div>
           </div>
         </div>
-      </div>
+      </ng-template>
       <ng-template pTemplate="footer">
         <div class="boutons">
           <button
