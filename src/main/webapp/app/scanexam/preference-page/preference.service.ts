@@ -1,9 +1,16 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Injectable } from '@angular/core';
+import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { LocalStorageService } from 'ngx-webstorage';
 import { IPreference } from '../services/align-images.service';
 
+interface IPreferenceForQuestion {
+  point: number;
+  step: number;
+  gradeType: GradeType;
+  typeId: number;
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -76,5 +83,23 @@ export class PreferenceService {
 
   resetKeyboardShortcuts(): void {
     this.localStorageService.store('shortcut', true);
+  }
+
+  getPreferenceForQuestion(): IPreferenceForQuestion {
+    let pref: IPreferenceForQuestion | null = this.localStorageService.retrieve('preferences4question');
+    if (pref === null) {
+      const defaultvalue: IPreferenceForQuestion = {
+        point: 2,
+        step: 4,
+        gradeType: GradeType.DIRECT,
+        typeId: 2,
+      };
+      this.localStorageService.store('preferences4question', defaultvalue);
+      pref = defaultvalue;
+    }
+    return pref;
+  }
+  savePref4Question(pref: IPreferenceForQuestion): void {
+    this.localStorageService.store('preferences4question', pref);
   }
 }
