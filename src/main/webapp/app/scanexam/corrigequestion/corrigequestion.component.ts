@@ -61,6 +61,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   qcmcorrect!: ElementRef;
   @ViewChild('imageQcmDebugs')
   canvassQCM!: ElementRef;
+  shortcut = true;
+  shortcutvalue = true;
   showImageQCM = false;
 
   @ViewChildren('nomImage')
@@ -142,6 +144,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
+    this.shortcut = this.preferenceService.showKeyboardShortcuts();
+    this.shortcutvalue = this.preferenceService.showKeyboardShortcuts();
+    this.shortcutvalue;
     this.activatedRoute.paramMap.subscribe(params => {
       this.blocked = true;
       let forceRefreshStudent = false;
@@ -1293,5 +1298,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     ctx?.putImageData(img, 0, 0);
     const dataURL = canvas.toDataURL('image/png');
     return dataURL;
+  }
+
+  changeStartPreference(): void {
+    console.log(this.shortcutvalue);
+    this.preferenceService.setKeyboardShortcuts(this.shortcutvalue);
   }
 }

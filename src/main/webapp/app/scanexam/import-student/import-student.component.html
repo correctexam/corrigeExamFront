@@ -27,7 +27,8 @@
           type="submit"
           id="save-entity"
           data-cy="entityCreateSaveButton"
-          class="p-button p-button-primary"
+          class="p-button"
+          [ngClass]="{ 'p-button-primary': this.courseid && canImport(), 'p-button-secondary': !this.courseid || !canImport() }"
           (click)="envoiEtudiants()"
         >
           <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="scanexam.importfollowingstudent">Importer étudiants ci-dessous</span>

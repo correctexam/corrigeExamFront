@@ -10,6 +10,17 @@
     </ng-template>
   </p-confirmDialog>
 
+  <p-dialog [header]="'scanexam.shortcut' | translate" [(visible)]="shortcut" [style]="{ width: '50vw' }">
+    <span jhiTranslate="scanexam.shortcutdetail"></span>
+    <BR />
+    <BR />
+    <span jhiTranslate="scanexam.shortcutopenatstart"></span>
+    <input type="checkbox" [(ngModel)]="shortcutvalue" (change)="changeStartPreference()" />
+    <ng-template pTemplate="footer">
+      <button type="button" pButton label="ok" (click)="shortcut = false"></button>
+    </ng-template>
+  </p-dialog>
+
   <p-blockUI [blocked]="blocked">
     <i class="pi pi-lock" style="font-size: 3rem"></i>
   </p-blockUI>

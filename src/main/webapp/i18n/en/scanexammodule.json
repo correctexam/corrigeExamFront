@@ -198,6 +198,9 @@
     "nomuc1": "Name",
     "prenomuc1": "Firstname",
     "ineuc1": "Student ID",
-    "questionuc1": "Question "
+    "questionuc1": "Question ",
+    "shortcut": "Keyboard shortcut",
+    "shortcutdetail": "It is possible to switch from one question to another by using the following keyboard shortcuts: Shift + right or Shift + left. It is possible to move from one student to another using the following keyboard shortcuts: Ctrl + right or Ctrl + left. ",
+    "shortcutopenatstart": "Display this window when loading the correction module on this computer"
   }
 }

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
@@ -84,13 +86,18 @@ export class ImportStudentComponent implements OnInit {
   }
 
   canImport(): boolean {
-    return (
-      this.dataset.filter(e => e.mail !== undefined && e.mail !== '').length > 0 &&
-      this.dataset.filter(e => e.ine !== undefined && e.ine !== '').length ===
-        this.dataset.filter(e => e.mail !== undefined && e.mail !== '').length &&
-      this.dataset.filter(e => e.ine !== undefined && e.ine !== '').length ===
-        this.dataset.filter(e => e.groupe !== undefined && e.groupe !== '').length
-    );
+    const fullLine =
+      this.dataset.filter(e => e.mail !== undefined && e.mail !== '' && e.mail !== null).length > 0 &&
+      this.dataset.filter(e => e.ine !== undefined && e.ine !== '' && e.ine !== null).length ===
+        this.dataset.filter(e => e.mail !== undefined && e.mail !== '' && e.mail !== null).length &&
+      this.dataset.filter(e => e.ine !== undefined && e.ine !== '' && e.ine !== null).length ===
+        this.dataset.filter(e => e.groupe !== undefined && e.groupe !== '' && e.groupe !== null).length;
+    const duplicatemail: any[] = this.dataset.filter(e => e.mail !== undefined && e.mail !== '' && e.mail !== null).map(e => e.mail);
+    const uniqemail = duplicatemail.length === [...new Set(duplicatemail)].length;
+    const duplicatine: any[] = this.dataset.filter(e => e.ine !== undefined && e.ine !== '' && e.ine !== null).map(e => e.ine);
+    const uniqine = duplicatine.length === [...new Set(duplicatine)].length;
+
+    return fullLine && uniqemail && uniqine;
   }
   envoiEtudiants(): void {
     const c = {
