@@ -200,7 +200,7 @@
     "ineuc1": "Student ID",
     "questionuc1": "Question ",
     "shortcut": "Keyboard shortcut",
-    "shortcutdetail": "It is possible to switch from one question to another by using the following keyboard shortcuts: Shift + right or Shift + left. It is possible to move from one student to another using the following keyboard shortcuts: Ctrl + right or Ctrl + left. ",
+    "shortcutdetail": "It is possible to switch from one question to another by using the following keyboard shortcuts: Ctrl + down  (Cmd + down for mac) or Ctrl + up (Cmd + up for mac). It is possible to move from one student to another using the following keyboard shortcuts: Ctrl + right (Cmd + right for mac) or Ctrl + left. (Cmd + left for mac)",
     "shortcutopenatstart": "Display this window when loading the correction module on this computer",
     "filterboundstudent": "Filter the students already assigned:",
     "removeallbinding": "Remove all bindings",

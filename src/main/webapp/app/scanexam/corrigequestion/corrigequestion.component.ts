@@ -719,22 +719,42 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     if (!this.blocked) {
       event.preventDefault();
       const c = this.currentStudent;
+      const q1 = this.questionno!;
+
       if (c > 0) {
         this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno! + 1) + '/' + c);
+      } else if (q1 > 0) {
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + q1 + '/' + this.numberPagesInScan! / this.nbreFeuilleParCopie!);
       }
     }
+  }
+  @HostListener('window:keydown.meta.ArrowLeft', ['$event'])
+  macpreviousStudent(event: KeyboardEvent) {
+    this.previousStudent(event);
+  }
+
+  @HostListener('window:keydown.meta.ArrowRight', ['$event'])
+  macnextStudent(event: KeyboardEvent) {
+    this.nextStudent(event);
   }
   @HostListener('window:keydown.control.ArrowRight', ['$event'])
   nextStudent(event: KeyboardEvent) {
     if (!this.blocked) {
       event.preventDefault();
       const c = this.currentStudent + 2;
+      const q1 = this.questionno! + 2;
       if (c <= this.numberPagesInScan! / this.nbreFeuilleParCopie!) {
         this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno! + 1) + '/' + c);
+      } else if (q1 <= this.nbreQuestions) {
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + q1 + '/' + 1);
       }
     }
   }
-  @HostListener('window:keydown.shift.ArrowLeft', ['$event'])
+  @HostListener('window:keydown.meta.ArrowUp', ['$event'])
+  macpreviousQuestion(event: KeyboardEvent) {
+    this.previousQuestion(event);
+  }
+  @HostListener('window:keydown.control.ArrowUp', ['$event'])
   previousQuestion(event: KeyboardEvent): void {
     if (!this.blocked) {
       event.preventDefault();
@@ -742,10 +762,17 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       const q = this.questionno;
       if (q! > 0) {
         this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
+      } else if (c > 1) {
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + this.nbreQuestions + '/' + (c - 1));
       }
     }
   }
-  @HostListener('window:keydown.shift.ArrowRight', ['$event'])
+
+  @HostListener('window:keydown.meta.ArrowDown', ['$event'])
+  macnextQuestion(event: KeyboardEvent) {
+    this.nextQuestion(event);
+  }
+  @HostListener('window:keydown.control.ArrowDown', ['$event'])
   nextQuestion(event: KeyboardEvent): void {
     if (!this.blocked) {
       event.preventDefault();
@@ -753,6 +780,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       const q = this.questionno! + 2;
       if (q <= this.nbreQuestions) {
         this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
+      } else if (c < this.numberPagesInScan! / this.nbreFeuilleParCopie!) {
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + 1 + '/' + (c + 1));
       }
     }
   }
