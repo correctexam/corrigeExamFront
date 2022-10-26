@@ -102,4 +102,17 @@ export class PreferenceService {
   savePref4Question(pref: IPreferenceForQuestion): void {
     this.localStorageService.store('preferences4question', pref);
   }
+
+  saveFilterStudentPreference(pref: boolean): void {
+    this.localStorageService.store('filterstudentpreference', pref);
+  }
+  getFilterStudentPreference(): boolean {
+    let pref: boolean | null = this.localStorageService.retrieve('filterstudentpreference');
+    if (pref === null) {
+      const defaultvalue = false;
+      this.localStorageService.store('filterstudentpreference', defaultvalue);
+      pref = defaultvalue;
+    }
+    return pref;
+  }
 }

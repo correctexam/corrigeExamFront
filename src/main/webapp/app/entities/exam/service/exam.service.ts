@@ -42,6 +42,9 @@ export class ExamService {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
+  deleteAllExamSheets(id: number): Observable<HttpResponse<{}>> {
+    return this.http.delete(`${this.resourceUrl}` + '/cleanAllStudentSheet' + `/${id}`, { observe: 'response' });
+  }
   addExamToCollectionIfMissing(examCollection: IExam[], ...examsToCheck: (IExam | null | undefined)[]): IExam[] {
     const exams: IExam[] = examsToCheck.filter(isPresent);
     if (exams.length > 0) {

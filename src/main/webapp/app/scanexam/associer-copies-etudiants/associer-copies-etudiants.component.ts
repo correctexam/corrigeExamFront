@@ -92,11 +92,18 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   students: IStudent[] = [];
   assisted = true;
 
-  studentsOptions: () => SelectItem[] = () =>
-    this.students.map(student => ({
+  studentsOptions: () => SelectItem[] = () => this.getStudentOptions();
+
+  getStudentOptions(): SelectItem[] {
+    if (this.list?._options !== undefined && this.list._options.length > 0) {
+      this.filterLocalStudentList();
+    }
+    return this.students.map(student => ({
       value: student,
       label: student.name + ' - ' + student.firstname + ' - (' + student.ine + ')',
     }));
+  }
+  filterbindstudent = false;
 
   private editedImage: HTMLCanvasElement | undefined;
   _showNomImage = false;
@@ -187,6 +194,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.filterbindstudent = this.preferenceService.getFilterStudentPreference();
     this.activatedRoute.paramMap.subscribe(params => {
       this.recognizedStudent = undefined;
       this.blocked = true;
@@ -332,7 +340,14 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         console.log(solutionName);
         console.log(solutionFirstname);
         console.log(solutionINE);
-        if (solutionName.length > 0 && solutionFirstname.length > 0 && solutionINE.length > 0) {
+        if (
+          solutionName !== undefined &&
+          solutionFirstname !== undefined &&
+          solutionINE !== undefined &&
+          solutionName.length > 0 &&
+          solutionFirstname.length > 0 &&
+          solutionINE.length > 0
+        ) {
           let sts = this.students.filter(
             student =>
               (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
@@ -401,7 +416,12 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
               }
             }
           }
-        } else if (solutionName.length > 0 && solutionFirstname.length > 0) {
+        } else if (
+          solutionName !== undefined &&
+          solutionFirstname !== undefined &&
+          solutionName.length > 0 &&
+          solutionFirstname.length > 0
+        ) {
           let sts = this.students.filter(
             student =>
               (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
@@ -411,7 +431,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
             this.recognizedStudent = sts[0];
             this.predictionprecision = ((solutionName[1] as number) + (solutionFirstname[1] as number)) / 2;
           }
-        } else if (solutionName.length > 0 && solutionINE.length > 0) {
+        } else if (solutionName !== undefined && solutionINE !== undefined && solutionName.length > 0 && solutionINE.length > 0) {
           let sts = this.students.filter(
             student =>
               (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
@@ -421,7 +441,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
             this.recognizedStudent = sts[0];
             this.predictionprecision = ((solutionName[1] as number) + (solutionINE[1] as number)) / 2;
           }
-        } else if (solutionINE.length > 0 && solutionINE[1] > 0.25) {
+        } else if (solutionINE !== undefined && solutionINE.length > 0 && solutionINE[1] > 0.25) {
           let sts = this.students.filter(student => (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase());
           if (sts.length > 0) {
             this.recognizedStudent = sts[0];
@@ -628,11 +648,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     this.selectionStudents = filterStudent;
   }
 
-  async refresh(): Promise<void> {
-    await this.refreshStudentList();
-    this.reShow();
-  }
-
   async loadImage(file: any, page1: number): Promise<IPage> {
     return new Promise(resolve => {
       const i = new Image();
@@ -651,6 +666,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
 
   onPageChange($event: any): void {
     this.selectionStudents = [];
+    //  this.refreshLocalStudentList();
     this.goToStudent($event.page);
   }
 
@@ -680,14 +696,35 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     await new Promise<void>(res =>
       this.studentService.query({ courseId: this.exam.courseId }).subscribe(studentsbody => {
         this.students = studentsbody.body!;
-        // Step 5 Bind All copies
-        this.getFilterStudent();
-        //  this.list.onOptionDoubleClick = (event) => {console.log(event)}
-        // console.log(this.list.el.nativeElement);
-
+        this.refreshLocalStudentList();
         res();
       })
     );
+  }
+
+  filterLocalStudentList(): void {
+    if (this.filterbindstudent) {
+      this.list._filteredOptions = this.list._options.filter(
+        s =>
+          s.value.examSheets === null ||
+          s.value.examSheets!.length === 0 ||
+          !s.value.examSheets?.some((ex: any) => ex?.scanId === this.exam.scanfileId) ||
+          s.value.examSheets?.some(
+            (ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie
+          )
+      );
+    } else {
+      this.list._filterValue = '';
+      this.list._filteredOptions = this.list._options;
+    }
+  }
+
+  refreshLocalStudentList(): void {
+    this.preferenceService.saveFilterStudentPreference(this.filterbindstudent);
+    this.filterLocalStudentList();
+
+    // Step 5 Bind All copies
+    this.getFilterStudent();
   }
 
   getFilterStudent(): void {
@@ -698,17 +735,19 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   }
 
   async selectStudents(event: IStudent): Promise<void> {
+    this.blocked = true;
     this.selectionStudents = [event];
 
     await this.bindStudent();
     if ((this.currentStudent + 1) * this.nbreFeuilleParCopie < this.numberPagesInScan) {
       this.currentStudent = this.currentStudent + 1;
+      this.blocked = false;
+
       this.goToStudent(this.currentStudent);
     }
   }
 
   async bindStudent(): Promise<void> {
-    console.log('foo1');
     return new Promise<void>(resolve1 => {
       const examSheet4CurrentStudent: IExamSheet[] = (
         this.students.filter(s => this.selectionStudents.map((s1: IStudent) => s1.id)!.includes(s.id)).map(s => s.examSheets) as any
@@ -821,5 +860,16 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
           })
         );
     }
+  }
+
+  cleanBinding(): void {
+    this.blocked = true;
+
+    this.examService.deleteAllExamSheets(+this.examId).subscribe(() => {
+      this.filterbindstudent = false;
+      this.preferenceService.saveFilterStudentPreference(false);
+      this.refreshStudentList();
+      this.blocked = false;
+    });
   }
 }
