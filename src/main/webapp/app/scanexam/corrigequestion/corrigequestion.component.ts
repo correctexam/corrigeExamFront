@@ -49,6 +49,7 @@ import { HttpResponse } from '@angular/common/http';
 import { fromWorkerPool } from 'observable-webworker';
 import { worker1 } from '../services/workerimport';
 import { PreferenceService } from '../preference-page/preference.service';
+import { EntityResponseType } from '../../entities/exam-sheet/service/exam-sheet.service';
 
 @Component({
   selector: 'jhi-corrigequestion',
@@ -57,6 +58,7 @@ import { PreferenceService } from '../preference-page/preference.service';
   providers: [ConfirmationService, MessageService],
 })
 export class CorrigequestionComponent implements OnInit, AfterViewInit {
+  debug = false;
   @ViewChild('qcmcorrect')
   qcmcorrect!: ElementRef;
   @ViewChild('imageQcmDebugs')
@@ -262,20 +264,20 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                                       });
                                     }
                                   } else {
-                                    this.studentResponseService.create(this.resp!).subscribe(sr1 => {
-                                      this.resp = sr1.body!;
-                                      if (this.questions![0].gradeType === GradeType.DIRECT) {
-                                        this.textCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
-                                          this.currentTextComment4Question = com.body!;
-                                          this.blocked = false;
-                                        });
-                                      } else {
-                                        this.gradedCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
-                                          this.currentGradedComment4Question = com.body!;
-                                          this.blocked = false;
-                                        });
-                                      }
-                                    });
+                                    //            this.studentResponseService.create(this.resp!).subscribe(sr1 => {
+                                    //                                      this.resp = sr1.body!;
+                                    if (this.questions![0].gradeType === GradeType.DIRECT) {
+                                      this.textCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
+                                        this.currentTextComment4Question = com.body!;
+                                        this.blocked = false;
+                                      });
+                                    } else {
+                                      this.gradedCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
+                                        this.currentGradedComment4Question = com.body!;
+                                        this.blocked = false;
+                                      });
+                                    }
+                                    //                                    });
                                   }
                                 });
                             }
@@ -500,7 +502,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   updateStudentResponsAndComputeNote(resp: IStudentResponse, numero: number, comment: IGradedComment): Promise<IStudentResponse> {
     return new Promise<IStudentResponse>(resolve => {
-      this.studentResponseService.update(resp!).subscribe(resp1 => {
+      this.updateResponseRequest(resp).subscribe(resp1 => {
         if (this.currentStudent === numero) {
           (comment as any).checked = true;
         }
@@ -515,16 +517,24 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       // When cancelling the marking, in fact it means marking to 0
       this.currentNote ??= 0;
       this.resp!.note = this.currentNote;
-      this.studentResponseService.update(this.resp!).subscribe(sr1 => {
+      this.updateResponseRequest(this.resp!).subscribe(sr1 => {
         this.resp = sr1.body!;
         this.blocked = false;
       });
     }
   }
 
+  updateResponseRequest(studentResp: IStudentResponse): Observable<EntityResponseType> {
+    if (studentResp.id !== undefined) {
+      return this.studentResponseService.update(studentResp); // .subscribe(sr1 => (this.resp = sr1.body!));
+    } else {
+      return this.studentResponseService.create(studentResp); // .subscribe(sr1 => (this.resp = sr1.body!));
+    }
+  }
+
   updateResponse(): void {
     if (this.resp !== undefined) {
-      this.studentResponseService.update(this.resp!).subscribe(sr1 => (this.resp = sr1.body!));
+      this.updateResponseRequest(this.resp).subscribe(sr1 => (this.resp = sr1.body!));
     }
   }
 
@@ -550,26 +560,26 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   ajouterTComment(comment: ITextComment): void {
     this.resp?.textcomments?.push(comment);
-    this.studentResponseService.update(this.resp!).subscribe(() => {
+    this.updateResponseRequest(this.resp!).subscribe(() => {
       (comment as any).checked = true;
     });
   }
   ajouterGComment(comment: IGradedComment, resp: IStudentResponse): void {
     this.resp?.gradedcomments?.push(comment);
-    this.studentResponseService.update(resp).subscribe(() => {
+    this.updateResponseRequest(resp).subscribe(() => {
       (comment as any).checked = true;
       this.computeNote(true, this.resp!);
     });
   }
   retirerTComment(comment: ITextComment): void {
     this.resp!.textcomments = this.resp?.textcomments!.filter(e => e.id !== comment.id);
-    this.studentResponseService.update(this.resp!).subscribe(() => {
+    this.updateResponseRequest(this.resp!).subscribe(() => {
       (comment as any).checked = false;
     });
   }
   retirerGComment(comment: IGradedComment): void {
     this.resp!.gradedcomments = this.resp?.gradedcomments!.filter(e => e.id !== comment.id);
-    this.studentResponseService.update(this.resp!).subscribe(() => {
+    this.updateResponseRequest(this.resp!).subscribe(() => {
       (comment as any).checked = false;
       this.computeNote(true, this.resp!);
     });
@@ -684,7 +694,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.textCommentService.create(t).subscribe(e => {
         this.resp?.textcomments?.push(e.body!);
         const currentComment = e.body!;
-        this.studentResponseService.update(this.resp!).subscribe(() => {
+        this.updateResponseRequest(this.resp!).subscribe(() => {
           (currentComment as any).checked = true;
           this.currentTextComment4Question?.push(currentComment);
           this.titreCommentaire = '';
@@ -702,7 +712,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.gradedCommentService.create(t).subscribe(e => {
         this.resp?.gradedcomments?.push(e.body!);
         const currentComment = e.body!;
-        this.studentResponseService.update(this.resp!).subscribe(() => {
+        this.updateResponseRequest(this.resp!).subscribe(() => {
           (currentComment as any).checked = true;
           this.currentGradedComment4Question?.push(currentComment);
           this.computeNote(false, this.resp!);
@@ -1330,7 +1340,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   changeStartPreference(): void {
-    console.log(this.shortcutvalue);
     this.preferenceService.setKeyboardShortcuts(this.shortcutvalue);
+  }
+
+  removeAllAnswer(): void {
+    this.examService.deleteAllAnswerAndComment(+this.examId!).subscribe(() => window.location.reload());
   }
 }
