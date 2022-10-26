@@ -279,7 +279,8 @@ export class AlignScanComponent implements OnInit {
           }
         );
       })
-      .catch(() => {
+      .catch(e => {
+        console.log(e);
         console.log('could not export');
         setTimeout(() => {
           this.blocked = false;
