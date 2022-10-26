@@ -45,6 +45,13 @@ export class ExamService {
   deleteAllExamSheets(id: number): Observable<HttpResponse<{}>> {
     return this.http.delete(`${this.resourceUrl}` + '/cleanAllStudentSheet' + `/${id}`, { observe: 'response' });
   }
+
+  deleteAllAnswerAndComment(id: number): Observable<HttpResponse<{}>> {
+    return this.http.delete(this.applicationConfigService.getEndpointFor('api') + '/deleteAllAnswerAndComment' + `/${id}`, {
+      observe: 'response',
+    });
+  }
+
   addExamToCollectionIfMissing(examCollection: IExam[], ...examsToCheck: (IExam | null | undefined)[]): IExam[] {
     const exams: IExam[] = examsToCheck.filter(isPresent);
     if (exams.length > 0) {

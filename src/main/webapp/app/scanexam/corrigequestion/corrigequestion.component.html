@@ -133,6 +133,7 @@
               [label]="'scanexam.realignlabel' | translate"
               (click)="realign()"
             ></button>
+            <button [hidden]="!debug" type="text" pButton [label]="'reset'" (click)="removeAllAnswer()"></button>
           </div>
 
           <div class="col-3">

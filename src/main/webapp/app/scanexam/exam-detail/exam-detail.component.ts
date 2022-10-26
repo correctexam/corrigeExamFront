@@ -96,8 +96,8 @@ export class ExamDetailComponent implements OnInit {
                         .then(() => {
                           this.messageService.add({
                             severity: 'success',
-                            summary: 'Download file from server',
-                            detail: 'Import de la base de données locales réussi',
+                            summary: this.translateService.instant('scanexam.downloadcacheokc'),
+                            detail: this.translateService.instant('scanexam.downloadcacheokdetail'),
                           });
                           this.showAssociation = true;
                           this.initTemplate();
