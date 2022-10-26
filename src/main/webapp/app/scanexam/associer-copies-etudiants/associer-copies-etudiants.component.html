@@ -95,6 +95,21 @@
         <canvas [hidden]="!debug" #prenomImageReco></canvas>
         <canvas [hidden]="!debug" #ineImageReco></canvas>
       </div>
+      <div class="grid align-items-center">
+        <div class="col-3">
+          <label jhiTranslate="scanexam.filterboundstudent">Filtrer les étudiants déjà affectées: </label>
+          <p-inputSwitch [(ngModel)]="filterbindstudent" (onChange)="refreshLocalStudentList()"></p-inputSwitch>
+        </div>
+        <div class="col-6"></div>
+        <div class="col-3">
+          <button
+            pButton
+            [pTooltip]="'scanexam.removeallbindingtooltip' | translate"
+            (click)="cleanBinding()"
+            jhiTranslate="scanexam.removeallbinding"
+          ></button>
+        </div>
+      </div>
       <p-listbox
         #list
         [options]="studentsOptions()"

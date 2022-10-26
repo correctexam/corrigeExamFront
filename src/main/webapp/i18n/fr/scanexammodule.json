@@ -200,7 +200,10 @@
     "ineuc1": "INE",
     "questionuc1": "Question ",
     "shortcut": "Raccourci clavier",
-    "shortcutdetail": "Il est possible de passer d'une question à une autre en utilisant les raccourcis clavier suivants: Shift + right ou Shift + left. Il est possible de passer d'un étudiant à un autre en utilisant les raccourcis clavier suivants: Ctrl + right ou Ctrl + left. ",
-    "shortcutopenatstart": "Afficher cette fenètre au chargement du module de correction sur cet ordinateur"
+    "shortcutdetail": "Il est possible de passer d'une question à une autre en utilisant les raccourcis clavier suivants: Ctrl + down (Cmd + down pour les mac) ou Ctrl + up (Cmd + up pour les mac). Il est possible de passer d'un étudiant à un autre en utilisant les raccourcis clavier suivants: Ctrl + right (Cmd + right pour les mac) ou Ctrl + left (Cmd + left pour les mac).",
+    "shortcutopenatstart": "Afficher cette fenètre au chargement du module de correction sur cet ordinateur",
+    "filterboundstudent": "Filtrer les étudiants déjà affectées:",
+    "removeallbinding": "Supprimer toutes les associations",
+    "removeallbindingtooltip": "⚠️ à faire uniquement si la correction n'a pas commencé"
   }
 }
