@@ -872,8 +872,4 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
       this.blocked = false;
     });
   }
-
-  bindStudent1(): void {
-    console.error('doubleclic');
-  }
 }
