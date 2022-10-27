@@ -48,7 +48,13 @@ export class QuestionpropertiesviewComponent implements OnInit {
   manualid = 2;
   qcmid = 3;
   //  validexp = '';
-  validexpRegex = /^[a-z]{1}([&|][a-z])*$/;
+  validexpRegex: () => RegExp = () => {
+    if (this.editForm.get(['typeId'])!.value === this.qcmid) {
+      return /^[a-z]{1}([&|][a-z])*$/;
+    } else {
+      return /[\s\S]*/;
+    }
+  };
   //  validexpRegex  = /[a-z]{1}[a-z&|]*[a-z]$/;
 
   pointmauvaiseReponeOptions = [
@@ -217,6 +223,16 @@ export class QuestionpropertiesviewComponent implements OnInit {
         { name: '0, 125 pt', value: 8 },
         { name: '0,0625 pt', value: 16 },
       ];
+    }
+  }
+
+  changeQCM(): any {
+    if (this.editForm.get(['typeId'])!.value === this.qcmid) {
+      this.editForm.controls['validExpression'].setValidators([Validators.required]);
+      this.editForm.controls['validExpression'].updateValueAndValidity();
+    } else {
+      this.editForm.controls['validExpression'].setValidators(null);
+      this.editForm.controls['validExpression'].updateValueAndValidity();
     }
   }
 }

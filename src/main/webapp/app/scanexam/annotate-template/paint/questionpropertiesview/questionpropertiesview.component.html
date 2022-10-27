@@ -34,7 +34,7 @@
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.type" for="field_type">Type</label>
-          <select class="form-control" id="field_type" name="type" formControlName="typeId">
+          <select class="form-control" id="field_type" name="type" formControlName="typeId" (change)="changeQCM()">
             <option [ngValue]="null"></option>
             <option [ngValue]="questionTypeOption.id" *ngFor="let questionTypeOption of questiontypes; trackBy: trackById">
               {{ questionTypeOption.algoName }}
@@ -90,9 +90,9 @@
             name="validexp"
             formControlName="validExpression"
             pInputText
-            [pKeyFilter]="validexpRegex"
-            [required]="true"
-            [pValidateOnly]="true"
+            [pKeyFilter]="validexpRegex()"
+            [required]="editForm.get(['typeId'])!.value == qcmid"
+            [pValidateOnly]="editForm.get(['typeId'])!.value == qcmid"
             placeholder="a&b|a&c"
             style="margin-right: 0.5em"
             [pTooltip]="'scanexam.expressiontooltip' | translate"
