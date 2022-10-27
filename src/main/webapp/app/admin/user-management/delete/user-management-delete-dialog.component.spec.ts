@@ -8,6 +8,7 @@ import { of } from 'rxjs';
 import { UserManagementService } from '../service/user-management.service';
 
 import { UserManagementDeleteDialogComponent } from './user-management-delete-dialog.component';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('User Management Delete Component', () => {
   let comp: UserManagementDeleteDialogComponent;
@@ -18,7 +19,7 @@ describe('User Management Delete Component', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
+        imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
         declarations: [UserManagementDeleteDialogComponent],
         providers: [NgbActiveModal],
       })

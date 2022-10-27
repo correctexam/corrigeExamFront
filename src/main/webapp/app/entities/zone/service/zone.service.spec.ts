@@ -4,6 +4,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { IZone, Zone } from '../zone.model';
 
 import { ZoneService } from './zone.service';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('Zone Service', () => {
   let service: ZoneService;
@@ -13,7 +14,7 @@ describe('Zone Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
     });
     expectedResult = null;
     service = TestBed.inject(ZoneService);

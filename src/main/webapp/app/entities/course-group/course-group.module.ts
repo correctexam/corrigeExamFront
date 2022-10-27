@@ -9,6 +9,5 @@ import { CourseGroupRoutingModule } from './route/course-group-routing.module';
 @NgModule({
   imports: [SharedModule, CourseGroupRoutingModule],
   declarations: [CourseGroupComponent, CourseGroupDetailComponent, CourseGroupUpdateComponent, CourseGroupDeleteDialogComponent],
-  entryComponents: [CourseGroupDeleteDialogComponent],
 })
 export class CourseGroupModule {}

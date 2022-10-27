@@ -4,6 +4,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { IExam, Exam } from '../exam.model';
 
 import { ExamService } from './exam.service';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('Exam Service', () => {
   let service: ExamService;
@@ -13,7 +14,7 @@ describe('Exam Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
     });
     expectedResult = null;
     service = TestBed.inject(ExamService);

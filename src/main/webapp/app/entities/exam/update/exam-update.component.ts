@@ -3,10 +3,10 @@
 /* eslint-disable arrow-body-style */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { FormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import {  map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { IExam, Exam } from '../exam.model';
 import { ExamService } from '../service/exam.service';
@@ -54,7 +54,7 @@ export class ExamUpdateComponent implements OnInit {
     protected scanService: ScanService,
     protected courseService: CourseService,
     protected activatedRoute: ActivatedRoute,
-    private fb: FormBuilder
+    private fb: UntypedFormBuilder
   ) {}
 
   ngOnInit(): void {

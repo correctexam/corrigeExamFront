@@ -157,3 +157,10 @@ Desktop.ini
 ######################
 /coverage/
 /.nyc_output/
+/src/main/webapp/content/*.png
+/src/main/webapp/content/*.pdf
+/src/main/webapp/content/*.ods
+/src/main/webapp/content/*.svg
+/.vscode/**
+
+

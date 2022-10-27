@@ -9,6 +9,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { StudentService } from '../service/student.service';
 
 import { StudentDeleteDialogComponent } from './student-delete-dialog.component';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('Student Management Delete Component', () => {
   let comp: StudentDeleteDialogComponent;
@@ -18,7 +19,7 @@ describe('Student Management Delete Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
       declarations: [StudentDeleteDialogComponent],
       providers: [NgbActiveModal],
     })

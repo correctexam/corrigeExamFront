@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { HttpResponse } from '@angular/common/http';
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
-import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { UntypedFormBuilder, Validators, UntypedFormGroup } from '@angular/forms';
 import { IQuestionType } from 'app/entities/question-type/question-type.model';
 import { QuestionTypeService } from 'app/entities/question-type/service/question-type.service';
 import { QuestionService } from 'app/entities/question/service/question.service';
@@ -82,13 +82,13 @@ export class QuestionpropertiesviewComponent implements OnInit {
   @Output()
   updatenumero: EventEmitter<string> = new EventEmitter<string>();
 
-  editForm!: FormGroup;
+  editForm!: UntypedFormGroup;
 
   constructor(
     protected questionService: QuestionService,
     protected zoneService: ZoneService,
     protected questionTypeService: QuestionTypeService,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private eventHandler: EventHandlerService,
     private preferenceService: PreferenceService
   ) {}

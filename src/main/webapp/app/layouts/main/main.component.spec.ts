@@ -9,6 +9,7 @@ import { TranslateModule, TranslateService, LangChangeEvent } from '@ngx-transla
 import { AccountService } from 'app/core/auth/account.service';
 
 import { MainComponent } from './main.component';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('MainComponent', () => {
   let comp: MainComponent;
@@ -26,7 +27,7 @@ describe('MainComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [TranslateModule.forRoot()],
+        imports: [ReactiveFormsModule, FormsModule, TranslateModule.forRoot()],
         declarations: [MainComponent],
         providers: [
           Title,

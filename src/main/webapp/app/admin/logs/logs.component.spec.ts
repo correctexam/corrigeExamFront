@@ -5,6 +5,7 @@ import { of } from 'rxjs';
 import { LogsComponent } from './logs.component';
 import { LogsService } from './logs.service';
 import { Log, LoggersResponse } from './log.model';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('LogsComponent', () => {
   let comp: LogsComponent;
@@ -14,7 +15,7 @@ describe('LogsComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
+        imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
         declarations: [LogsComponent],
         providers: [LogsService],
       })

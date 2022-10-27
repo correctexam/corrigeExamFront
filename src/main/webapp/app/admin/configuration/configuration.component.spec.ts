@@ -5,6 +5,7 @@ import { of } from 'rxjs';
 import { ConfigurationComponent } from './configuration.component';
 import { ConfigurationService } from './configuration.service';
 import { Bean, PropertySource } from './configuration.model';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('ConfigurationComponent', () => {
   let comp: ConfigurationComponent;
@@ -14,7 +15,7 @@ describe('ConfigurationComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
+        imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
         declarations: [ConfigurationComponent],
         providers: [ConfigurationService],
       })

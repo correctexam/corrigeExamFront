@@ -5,6 +5,7 @@ import { of } from 'rxjs';
 import { MetricsComponent } from './metrics.component';
 import { MetricsService } from './metrics.service';
 import { Metrics } from './metrics.model';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('MetricsComponent', () => {
   let comp: MetricsComponent;
@@ -14,7 +15,7 @@ describe('MetricsComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
+        imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
         declarations: [MetricsComponent],
       })
         .overrideTemplate(MetricsComponent, '')

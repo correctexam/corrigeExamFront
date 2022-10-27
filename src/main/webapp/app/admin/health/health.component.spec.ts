@@ -6,6 +6,7 @@ import { of, throwError } from 'rxjs';
 import { HealthComponent } from './health.component';
 import { HealthService } from './health.service';
 import { Health } from './health.model';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('HealthComponent', () => {
   let comp: HealthComponent;
@@ -15,7 +16,7 @@ describe('HealthComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
+        imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
         declarations: [HealthComponent],
       })
         .overrideTemplate(HealthComponent, '')

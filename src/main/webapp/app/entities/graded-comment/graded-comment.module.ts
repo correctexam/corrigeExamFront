@@ -9,6 +9,5 @@ import { GradedCommentRoutingModule } from './route/graded-comment-routing.modul
 @NgModule({
   imports: [SharedModule, GradedCommentRoutingModule],
   declarations: [GradedCommentComponent, GradedCommentDetailComponent, GradedCommentUpdateComponent, GradedCommentDeleteDialogComponent],
-  entryComponents: [GradedCommentDeleteDialogComponent],
 })
 export class GradedCommentModule {}

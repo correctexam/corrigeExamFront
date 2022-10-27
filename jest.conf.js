@@ -1,4 +1,6 @@
-const { pathsToModuleNameMapper } = require('ts-jest/utils');
+const { pathsToModuleNameMapper } = require('ts-jest');
+
+//  const { compilerOptions } = require('./tsconfig')
 
 const {
   compilerOptions: { paths = {}, baseUrl = './' },
@@ -7,6 +9,27 @@ const environment = require('./webpack/environment');
 
 module.exports = {
   transformIgnorePatterns: ['node_modules/(?!.*\\.mjs$|dayjs/esm)'],
+  resolver: 'jest-preset-angular/build/resolvers/ng-jest-resolver.js',
+  //  preset: 'jest-preset-angular/presets/defaults-esm',
+
+  preset: 'jest-preset-angular',
+  testEnvironment: 'jsdom',
+  globals: {
+    ...environment,
+  },
+  roots: ['<rootDir>', `<rootDir>/${baseUrl}`],
+  modulePaths: [`<rootDir>/${baseUrl}`],
+  setupFiles: ['jest-date-mock'],
+  setupFilesAfterEnv: [`<rootDir>/${baseUrl}__tests__/setup.ts`],
+  cacheDirectory: '<rootDir>/target/jest-cache',
+  coverageDirectory: '<rootDir>/target/test-results/',
+  moduleNameMapper: Object.assign(pathsToModuleNameMapper(paths, { prefix: `<rootDir>/${baseUrl}/` }), { '^uuid$': 'uuid' }),
+  reporters: ['default', ['jest-junit', { outputDirectory: '<rootDir>/target/test-results/', outputName: 'TESTS-results-jest.xml' }]],
+  testResultsProcessor: 'jest-sonar-reporter',
+  testMatch: ['<rootDir>/src/main/webapp/app/**/@(*.)@(spec.ts)'],
+  //  testURL: 'http://localhost/',
+
+  /*  transformIgnorePatterns: ['node_modules/(?!.*\\.mjs$|dayjs/esm)'],
   resolver: 'jest-preset-angular/build/resolvers/ng-jest-resolver.js',
   globals: {
     ...environment,
@@ -19,7 +42,7 @@ module.exports = {
   coverageDirectory: '<rootDir>/target/test-results/',
   moduleNameMapper: pathsToModuleNameMapper(paths, { prefix: `<rootDir>/${baseUrl}/` }),
   reporters: ['default', ['jest-junit', { outputDirectory: '<rootDir>/target/test-results/', outputName: 'TESTS-results-jest.xml' }]],
-  testResultsProcessor: 'jest-sonar-reporter',
-  testMatch: ['<rootDir>/src/main/webapp/app/**/@(*.)@(spec.ts)'],
-  testURL: 'http://localhost/',
+  testResultsProcessor: 'jest-sonar-reporter',*/
+  //  testMatch: ['<rootDir>/src/main/webapp/app/**/@(*.)@(spec.ts)'],
+  //  testURL: 'http://localhost/',
 };

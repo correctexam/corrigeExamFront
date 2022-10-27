@@ -9,6 +9,5 @@ import { ZoneRoutingModule } from './route/zone-routing.module';
 @NgModule({
   imports: [SharedModule, ZoneRoutingModule],
   declarations: [ZoneComponent, ZoneDetailComponent, ZoneUpdateComponent, ZoneDeleteDialogComponent],
-  entryComponents: [ZoneDeleteDialogComponent],
 })
 export class ZoneModule {}

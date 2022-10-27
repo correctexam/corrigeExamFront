@@ -2,7 +2,7 @@ jest.mock('app/core/auth/account.service');
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { throwError, of } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -29,7 +29,7 @@ describe('SettingsComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [TranslateModule.forRoot(), HttpClientTestingModule],
+        imports: [ReactiveFormsModule, FormsModule, TranslateModule.forRoot(), HttpClientTestingModule],
         declarations: [SettingsComponent],
         providers: [FormBuilder, AccountService],
       })

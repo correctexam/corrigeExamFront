@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import { LogsService } from './logs.service';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('Logs Service', () => {
   let service: LogsService;
@@ -9,7 +10,7 @@ describe('Logs Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
     });
 
     service = TestBed.inject(LogsService);

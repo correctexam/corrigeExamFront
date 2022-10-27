@@ -9,6 +9,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FinalResultService } from '../service/final-result.service';
 
 import { FinalResultDeleteDialogComponent } from './final-result-delete-dialog.component';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('FinalResult Management Delete Component', () => {
   let comp: FinalResultDeleteDialogComponent;
@@ -18,7 +19,7 @@ describe('FinalResult Management Delete Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
       declarations: [FinalResultDeleteDialogComponent],
       providers: [NgbActiveModal],
     })

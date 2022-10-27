@@ -3,6 +3,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 import { ConfigurationService } from './configuration.service';
 import { Bean, ConfigProps, Env, PropertySource } from './configuration.model';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('Logs Service', () => {
   let service: ConfigurationService;
@@ -11,7 +12,7 @@ describe('Logs Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
     });
 
     expectedResult = null;

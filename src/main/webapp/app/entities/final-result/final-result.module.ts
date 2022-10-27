@@ -9,6 +9,5 @@ import { FinalResultRoutingModule } from './route/final-result-routing.module';
 @NgModule({
   imports: [SharedModule, FinalResultRoutingModule],
   declarations: [FinalResultComponent, FinalResultDetailComponent, FinalResultUpdateComponent, FinalResultDeleteDialogComponent],
-  entryComponents: [FinalResultDeleteDialogComponent],
 })
 export class FinalResultModule {}

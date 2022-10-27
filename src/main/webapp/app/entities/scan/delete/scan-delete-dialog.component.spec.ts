@@ -9,6 +9,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ScanService } from '../service/scan.service';
 
 import { ScanDeleteDialogComponent } from './scan-delete-dialog.component';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('Scan Management Delete Component', () => {
   let comp: ScanDeleteDialogComponent;
@@ -18,7 +19,7 @@ describe('Scan Management Delete Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
       declarations: [ScanDeleteDialogComponent],
       providers: [NgbActiveModal],
     })

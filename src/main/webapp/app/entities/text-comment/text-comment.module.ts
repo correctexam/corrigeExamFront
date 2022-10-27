@@ -9,6 +9,5 @@ import { TextCommentRoutingModule } from './route/text-comment-routing.module';
 @NgModule({
   imports: [SharedModule, TextCommentRoutingModule],
   declarations: [TextCommentComponent, TextCommentDetailComponent, TextCommentUpdateComponent, TextCommentDeleteDialogComponent],
-  entryComponents: [TextCommentDeleteDialogComponent],
 })
 export class TextCommentModule {}

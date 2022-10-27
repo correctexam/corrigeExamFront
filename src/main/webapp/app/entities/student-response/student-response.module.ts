@@ -14,6 +14,5 @@ import { StudentResponseRoutingModule } from './route/student-response-routing.m
     StudentResponseUpdateComponent,
     StudentResponseDeleteDialogComponent,
   ],
-  entryComponents: [StudentResponseDeleteDialogComponent],
 })
 export class StudentResponseModule {}

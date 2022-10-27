@@ -4,6 +4,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { RegisterService } from './register.service';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { Registration } from './register.model';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('RegisterService Service', () => {
   let service: RegisterService;
@@ -12,7 +13,7 @@ describe('RegisterService Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
     });
 
     service = TestBed.inject(RegisterService);
