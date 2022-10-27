@@ -9,6 +9,5 @@ import { ScanRoutingModule } from './route/scan-routing.module';
 @NgModule({
   imports: [SharedModule, ScanRoutingModule],
   declarations: [ScanComponent, ScanDetailComponent, ScanUpdateComponent, ScanDeleteDialogComponent],
-  entryComponents: [ScanDeleteDialogComponent],
 })
 export class ScanModule {}

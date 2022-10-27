@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import { HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { Validators, FormBuilder } from '@angular/forms';
+import { Validators, UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
@@ -73,7 +73,7 @@ export class ChargerscanComponent implements OnInit {
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
     public confirmationService: ConfirmationService,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     protected dataUtils: DataUtils,
     protected eventManager: EventManager,
     protected examService: ExamService,

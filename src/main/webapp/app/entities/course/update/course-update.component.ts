@@ -3,7 +3,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { FormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 
@@ -30,7 +30,7 @@ export class CourseUpdateComponent implements OnInit {
     protected courseService: CourseService,
     protected userService: UserService,
     protected activatedRoute: ActivatedRoute,
-    private fb: FormBuilder
+    private fb: UntypedFormBuilder
   ) {}
 
   ngOnInit(): void {

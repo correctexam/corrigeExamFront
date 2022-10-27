@@ -9,6 +9,5 @@ import { TemplateRoutingModule } from './route/template-routing.module';
 @NgModule({
   imports: [SharedModule, TemplateRoutingModule],
   declarations: [TemplateComponent, TemplateDetailComponent, TemplateUpdateComponent, TemplateDeleteDialogComponent],
-  entryComponents: [TemplateDeleteDialogComponent],
 })
 export class TemplateModule {}

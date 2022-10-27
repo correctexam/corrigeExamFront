@@ -9,6 +9,5 @@ import { StudentRoutingModule } from './route/student-routing.module';
 @NgModule({
   imports: [SharedModule, StudentRoutingModule],
   declarations: [StudentComponent, StudentDetailComponent, StudentUpdateComponent, StudentDeleteDialogComponent],
-  entryComponents: [StudentDeleteDialogComponent],
 })
 export class StudentModule {}

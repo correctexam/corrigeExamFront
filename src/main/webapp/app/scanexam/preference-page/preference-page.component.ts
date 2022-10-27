@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Component, OnInit } from '@angular/core';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { FormBuilder } from '@angular/forms';
+import { UntypedFormBuilder } from '@angular/forms';
 import { PreferenceService } from './preference.service';
 
 @Component({
@@ -54,7 +54,7 @@ http://angular-form-builder.surge.sh/
     public ref: DynamicDialogRef,
     public config: DynamicDialogConfig,
     public preferenceService: PreferenceService,
-    private fb: FormBuilder
+    private fb: UntypedFormBuilder
   ) {}
 
   // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method

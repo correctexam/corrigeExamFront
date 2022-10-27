@@ -9,6 +9,5 @@ import { CommentsRoutingModule } from './route/comments-routing.module';
 @NgModule({
   imports: [SharedModule, CommentsRoutingModule],
   declarations: [CommentsComponent, CommentsDetailComponent, CommentsUpdateComponent, CommentsDeleteDialogComponent],
-  entryComponents: [CommentsDeleteDialogComponent],
 })
 export class CommentsModule {}
