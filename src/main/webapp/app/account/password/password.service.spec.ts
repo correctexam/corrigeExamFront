@@ -3,6 +3,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 import { PasswordService } from './password.service';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('Password Service', () => {
   let service: PasswordService;
@@ -11,7 +12,7 @@ describe('Password Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
     });
 
     service = TestBed.inject(PasswordService);

@@ -28,7 +28,7 @@ import { ExamDetailComponent } from './exam-detail/exam-detail.component';
 import { AnnotateTemplateComponent } from './annotate-template/annotate-template.component';
 import { PaintComponent } from './annotate-template/paint/paint.component';
 import { GraphicalToolbarComponent } from './annotate-template/paint/toolbar/toolbar.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EventHandlerService } from './annotate-template/paint/event-handler.service';
 import { FabricShapeService } from './annotate-template/paint/shape.service';
 import { ColourPaletteComponent } from './annotate-template/paint/toolbar/colour-palette/colour-palette.component';
@@ -303,6 +303,7 @@ export const ShowResults_ROUTE: Route = {
     TableModule,
     ConfirmDialogModule,
     FormsModule,
+    ReactiveFormsModule,
     NgxExtendedPdfViewerModule,
     SelectButtonModule,
     InputNumberModule,

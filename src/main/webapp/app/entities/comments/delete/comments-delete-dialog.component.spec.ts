@@ -9,6 +9,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { CommentsService } from '../service/comments.service';
 
 import { CommentsDeleteDialogComponent } from './comments-delete-dialog.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 describe('Comments Management Delete Component', () => {
   let comp: CommentsDeleteDialogComponent;
@@ -18,7 +19,7 @@ describe('Comments Management Delete Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
       declarations: [CommentsDeleteDialogComponent],
       providers: [NgbActiveModal],
     })

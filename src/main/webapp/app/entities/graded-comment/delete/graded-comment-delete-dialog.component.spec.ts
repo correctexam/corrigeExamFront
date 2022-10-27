@@ -9,6 +9,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { GradedCommentService } from '../service/graded-comment.service';
 
 import { GradedCommentDeleteDialogComponent } from './graded-comment-delete-dialog.component';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('GradedComment Management Delete Component', () => {
   let comp: GradedCommentDeleteDialogComponent;
@@ -18,7 +19,7 @@ describe('GradedComment Management Delete Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
       declarations: [GradedCommentDeleteDialogComponent],
       providers: [NgbActiveModal],
     })

@@ -9,6 +9,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { CourseGroupService } from '../service/course-group.service';
 
 import { CourseGroupDeleteDialogComponent } from './course-group-delete-dialog.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 describe('CourseGroup Management Delete Component', () => {
   let comp: CourseGroupDeleteDialogComponent;
@@ -18,7 +19,7 @@ describe('CourseGroup Management Delete Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
       declarations: [CourseGroupDeleteDialogComponent],
       providers: [NgbActiveModal],
     })

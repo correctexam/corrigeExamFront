@@ -10,6 +10,7 @@ import { Account } from 'app/core/auth/account.model';
 
 import { HomeComponent } from './home.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('Home Component', () => {
   let comp: HomeComponent;
@@ -32,7 +33,7 @@ describe('Home Component', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [RouterTestingModule.withRoutes([]), TranslateModule.forRoot()],
+        imports: [ReactiveFormsModule, FormsModule, RouterTestingModule.withRoutes([]), TranslateModule.forRoot()],
         declarations: [HomeComponent],
         providers: [AccountService, TranslateService],
       })

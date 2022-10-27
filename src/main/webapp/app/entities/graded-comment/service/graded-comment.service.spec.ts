@@ -4,6 +4,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { IGradedComment, GradedComment } from '../graded-comment.model';
 
 import { GradedCommentService } from './graded-comment.service';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('GradedComment Service', () => {
   let service: GradedCommentService;
@@ -13,7 +14,7 @@ describe('GradedComment Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
     });
     expectedResult = null;
     service = TestBed.inject(GradedCommentService);

@@ -3,7 +3,7 @@ jest.mock('app/core/auth/account.service');
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { of, throwError } from 'rxjs';
 
 import { AccountService } from 'app/core/auth/account.service';
@@ -19,7 +19,7 @@ describe('PasswordComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
+        imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
         declarations: [PasswordComponent],
         providers: [FormBuilder, AccountService],
       })

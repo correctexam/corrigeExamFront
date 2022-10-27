@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync, inject, tick, fakeAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { of, throwError } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -16,7 +16,7 @@ describe('RegisterComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [TranslateModule.forRoot(), HttpClientTestingModule],
+        imports: [ReactiveFormsModule, FormsModule, TranslateModule.forRoot(), HttpClientTestingModule],
         declarations: [RegisterComponent],
         providers: [FormBuilder],
       })

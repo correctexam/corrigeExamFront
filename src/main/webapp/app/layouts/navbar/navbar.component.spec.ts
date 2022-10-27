@@ -14,6 +14,7 @@ import { ProfileService } from 'app/layouts/profiles/profile.service';
 import { LoginService } from 'app/login/login.service';
 
 import { NavbarComponent } from './navbar.component';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('Navbar Component', () => {
   let comp: NavbarComponent;
@@ -34,7 +35,14 @@ describe('Navbar Component', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule, RouterTestingModule.withRoutes([]), TranslateModule.forRoot(), NgxWebstorageModule.forRoot()],
+        imports: [
+          ReactiveFormsModule,
+          FormsModule,
+          HttpClientTestingModule,
+          RouterTestingModule.withRoutes([]),
+          TranslateModule.forRoot(),
+          NgxWebstorageModule.forRoot(),
+        ],
         declarations: [NavbarComponent],
         providers: [LoginService],
       })

@@ -6,6 +6,7 @@ import { Authority } from 'app/config/authority.constants';
 import { User } from '../user-management.model';
 
 import { UserManagementService } from './user-management.service';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('User Service', () => {
   let service: UserManagementService;
@@ -13,7 +14,7 @@ describe('User Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
     });
 
     service = TestBed.inject(UserManagementService);

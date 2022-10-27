@@ -3,6 +3,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { HealthModalComponent } from './health-modal.component';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('HealthModalComponent', () => {
   let comp: HealthModalComponent;
@@ -12,7 +13,7 @@ describe('HealthModalComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
+        imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
         declarations: [HealthModalComponent],
         providers: [NgbActiveModal],
       })

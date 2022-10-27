@@ -6,6 +6,7 @@ import { ProfileInfo } from 'app/layouts/profiles/profile-info.model';
 import { ProfileService } from 'app/layouts/profiles/profile.service';
 
 import { PageRibbonComponent } from './page-ribbon.component';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('Page Ribbon Component', () => {
   let comp: PageRibbonComponent;
@@ -15,7 +16,7 @@ describe('Page Ribbon Component', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
+        imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
         declarations: [PageRibbonComponent],
       })
         .overrideTemplate(PageRibbonComponent, '')
