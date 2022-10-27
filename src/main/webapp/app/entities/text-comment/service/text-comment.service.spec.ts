@@ -4,6 +4,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { ITextComment, TextComment } from '../text-comment.model';
 
 import { TextCommentService } from './text-comment.service';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('TextComment Service', () => {
   let service: TextCommentService;
@@ -13,7 +14,7 @@ describe('TextComment Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
     });
     expectedResult = null;
     service = TestBed.inject(TextCommentService);

@@ -2,7 +2,7 @@
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 import { HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Course, ICourse } from 'app/entities/course/course.model';
 import { CourseService } from 'app/entities/course/service/course.service';
@@ -33,7 +33,7 @@ export class CreercoursComponent implements OnInit {
     protected accountService: AccountService,
 
     protected activatedRoute: ActivatedRoute,
-    protected fb: FormBuilder
+    protected fb: UntypedFormBuilder
   ) {}
 
   ngOnInit(): void {

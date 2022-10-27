@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync, inject, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
@@ -18,7 +18,7 @@ describe('User Management Update Component', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
+        imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
         declarations: [UserManagementUpdateComponent],
         providers: [
           FormBuilder,

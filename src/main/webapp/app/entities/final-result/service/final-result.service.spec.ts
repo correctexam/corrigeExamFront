@@ -4,6 +4,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { IFinalResult, FinalResult } from '../final-result.model';
 
 import { FinalResultService } from './final-result.service';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 describe('FinalResult Service', () => {
   let service: FinalResultService;
@@ -13,7 +14,7 @@ describe('FinalResult Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
     });
     expectedResult = null;
     service = TestBed.inject(FinalResultService);

@@ -9,6 +9,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ExamService } from '../service/exam.service';
 
 import { ExamDeleteDialogComponent } from './exam-delete-dialog.component';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('Exam Management Delete Component', () => {
   let comp: ExamDeleteDialogComponent;
@@ -18,7 +19,7 @@ describe('Exam Management Delete Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
       declarations: [ExamDeleteDialogComponent],
       providers: [NgbActiveModal],
     })

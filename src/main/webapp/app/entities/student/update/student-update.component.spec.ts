@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of, Subject, from } from 'rxjs';
@@ -22,7 +22,7 @@ describe('Student Management Update Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, RouterTestingModule.withRoutes([])],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule, RouterTestingModule.withRoutes([])],
       declarations: [StudentUpdateComponent],
       providers: [
         FormBuilder,

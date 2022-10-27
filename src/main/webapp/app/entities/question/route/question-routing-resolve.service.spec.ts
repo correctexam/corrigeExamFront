@@ -9,7 +9,6 @@ import { IQuestion, Question } from '../question.model';
 import { QuestionService } from '../service/question.service';
 
 import { QuestionRoutingResolveService } from './question-routing-resolve.service';
-
 describe('Question routing resolve service', () => {
   let mockRouter: Router;
   let mockActivatedRouteSnapshot: ActivatedRouteSnapshot;

@@ -9,6 +9,5 @@ import { QuestionRoutingModule } from './route/question-routing.module';
 @NgModule({
   imports: [SharedModule, QuestionRoutingModule],
   declarations: [QuestionComponent, QuestionDetailComponent, QuestionUpdateComponent, QuestionDeleteDialogComponent],
-  entryComponents: [QuestionDeleteDialogComponent],
 })
 export class QuestionModule {}

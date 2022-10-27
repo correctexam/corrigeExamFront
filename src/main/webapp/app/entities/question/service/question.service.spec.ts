@@ -5,6 +5,7 @@ import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { IQuestion, Question } from '../question.model';
 
 import { QuestionService } from './question.service';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('Question Service', () => {
   let service: QuestionService;
@@ -14,7 +15,7 @@ describe('Question Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
     });
     expectedResult = null;
     service = TestBed.inject(QuestionService);

@@ -3,6 +3,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 import { HealthService } from './health.service';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('HealthService Service', () => {
   let service: HealthService;
@@ -11,7 +12,7 @@ describe('HealthService Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
     });
 
     service = TestBed.inject(HealthService);

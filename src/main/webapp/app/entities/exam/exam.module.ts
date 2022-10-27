@@ -9,6 +9,5 @@ import { ExamRoutingModule } from './route/exam-routing.module';
 @NgModule({
   imports: [SharedModule, ExamRoutingModule],
   declarations: [ExamComponent, ExamDetailComponent, ExamUpdateComponent, ExamDeleteDialogComponent],
-  entryComponents: [ExamDeleteDialogComponent],
 })
 export class ExamModule {}

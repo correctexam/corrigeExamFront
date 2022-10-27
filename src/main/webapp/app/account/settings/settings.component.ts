@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 
 import { AccountService } from 'app/core/auth/account.service';
@@ -21,7 +21,7 @@ export class SettingsComponent implements OnInit {
     langKey: [undefined],
   });
 
-  constructor(private accountService: AccountService, private fb: FormBuilder, private translateService: TranslateService) {}
+  constructor(private accountService: AccountService, private fb: UntypedFormBuilder, private translateService: TranslateService) {}
 
   ngOnInit(): void {
     this.accountService.identity().subscribe(account => {

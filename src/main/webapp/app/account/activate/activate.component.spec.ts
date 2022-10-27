@@ -5,6 +5,7 @@ import { of, throwError } from 'rxjs';
 
 import { ActivateService } from './activate.service';
 import { ActivateComponent } from './activate.component';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('ActivateComponent', () => {
   let comp: ActivateComponent;
@@ -12,7 +13,7 @@ describe('ActivateComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
+        imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
         declarations: [ActivateComponent],
         providers: [
           {

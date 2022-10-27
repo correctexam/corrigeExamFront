@@ -9,6 +9,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ZoneService } from '../service/zone.service';
 
 import { ZoneDeleteDialogComponent } from './zone-delete-dialog.component';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('Zone Management Delete Component', () => {
   let comp: ZoneDeleteDialogComponent;
@@ -18,7 +19,7 @@ describe('Zone Management Delete Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
       declarations: [ZoneDeleteDialogComponent],
       providers: [NgbActiveModal],
     })

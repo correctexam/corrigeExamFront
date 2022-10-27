@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { LANGUAGES } from 'app/config/language.constants';
@@ -35,7 +35,7 @@ export class UserManagementUpdateComponent implements OnInit {
     authorities: [],
   });
 
-  constructor(private userService: UserManagementService, private route: ActivatedRoute, private fb: FormBuilder) {}
+  constructor(private userService: UserManagementService, private route: ActivatedRoute, private fb: UntypedFormBuilder) {}
 
   ngOnInit(): void {
     this.route.data.subscribe(({ user }) => {

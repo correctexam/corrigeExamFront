@@ -5,6 +5,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { User, IUser } from './user.model';
 
 import { UserService } from './user.service';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('User Service', () => {
   let service: UserService;
@@ -13,7 +14,7 @@ describe('User Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
     });
     expectedResult = null;
     service = TestBed.inject(UserService);

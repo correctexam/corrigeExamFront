@@ -3,6 +3,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 import { PasswordResetFinishService } from './password-reset-finish.service';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('PasswordResetFinish Service', () => {
   let service: PasswordResetFinishService;
@@ -11,7 +12,7 @@ describe('PasswordResetFinish Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
     });
 
     service = TestBed.inject(PasswordResetFinishService);

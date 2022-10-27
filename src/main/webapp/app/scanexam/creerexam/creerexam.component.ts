@@ -4,7 +4,7 @@
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { TranslateService } from '@ngx-translate/core';
@@ -44,7 +44,7 @@ export class CreerexamComponent implements OnInit {
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
     public confirmationService: ConfirmationService,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     protected dataUtils: DataUtils,
     protected eventManager: EventManager,
     protected courseService: CourseService,

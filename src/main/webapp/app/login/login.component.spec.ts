@@ -3,7 +3,7 @@ jest.mock('app/login/login.service');
 
 import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, Navigation } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of, throwError } from 'rxjs';
@@ -23,7 +23,7 @@ describe('LoginComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [RouterTestingModule.withRoutes([])],
+        imports: [ReactiveFormsModule, FormsModule, RouterTestingModule.withRoutes([])],
         declarations: [LoginComponent],
         providers: [
           FormBuilder,
