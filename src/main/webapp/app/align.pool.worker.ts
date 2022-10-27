@@ -618,13 +618,13 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     let x8, y8;
     if (goodpointsx.length > 0) {
       x5 = goodpointsx[0];
-      y5 = goodpointsy[1];
+      y5 = goodpointsy[0];
       x6 = goodpointsx[0];
-      y6 = goodpointsy[1];
+      y6 = goodpointsy[0];
       x7 = goodpointsx[0];
-      y7 = goodpointsy[1];
+      y7 = goodpointsy[0];
       x8 = goodpointsx[0];
-      y8 = goodpointsy[1];
+      y8 = goodpointsy[0];
     }
 
     if (goodpointsx.length > 1) {
