@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - main
-      - 139-update-all-dependencies
 
 jobs:
   ci:
@@ -53,14 +52,11 @@ jobs:
       - name: Copy 404
         run: |
           npm run copy:404
-#      - name: Deploy
-#        run: |
-#          npm run deploy
-#      - name: Deploy
-#        uses: peaceiris/actions-gh-pages@v3
-#        if: ${{ github.ref == 'refs/heads/main' }}
-#        with:
-#          github_token: ${{ secrets.GITHUB_TOKEN }}
-#          publish_dir: ./target/classes/static
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.ref == 'refs/heads/main' }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/classes/static
 
 
