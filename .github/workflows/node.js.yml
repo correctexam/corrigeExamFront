@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - 139-update-all-dependencies
 
 jobs:
   ci:
@@ -10,9 +11,10 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [18.x]
 
     steps:
+
       - uses: actions/checkout@v2
 
       - name: Use Node.js ${{ matrix.node-version }}
@@ -33,6 +35,8 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+      - name: Install libgif-dev
+        run: sudo apt-get install -y libgif-dev
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: |
@@ -52,11 +56,11 @@ jobs:
 #      - name: Deploy
 #        run: |
 #          npm run deploy
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.ref == 'refs/heads/main' }}
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./target/classes/static
+#      - name: Deploy
+#        uses: peaceiris/actions-gh-pages@v3
+#        if: ${{ github.ref == 'refs/heads/main' }}
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+#          publish_dir: ./target/classes/static
 
 
