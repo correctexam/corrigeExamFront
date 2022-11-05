@@ -38,8 +38,8 @@ module.exports = async (config, options, targetOptions) => {
         // If this URL is left empty (""), then it will be relative to the current context.
         // If you use an API server, in `prod` mode, you will need to enable CORS
         // (see the `jhipster.cors` common JHipster property in the `application-*.yml` configurations)
-        SERVER_API_URL: JSON.stringify(environment.SERVER_API_URLDEV),
-        FRONT_URL: JSON.stringify(environment.FRONT_URLDEV),
+        SERVER_API_URL: JSON.stringify(environment.SERVER_API_URL),
+        FRONT_URL: JSON.stringify(environment.FRONT_URL),
       })
     );
   }
@@ -102,31 +102,8 @@ module.exports = async (config, options, targetOptions) => {
         // If this URL is left empty (""), then it will be relative to the current context.
         // If you use an API server, in `prod` mode, you will need to enable CORS
         // (see the `jhipster.cors` common JHipster property in the `application-*.yml` configurations)
-        SERVER_API_URL: JSON.stringify(environment.SERVER_API_URLPROD),
-        FRONT_URL: JSON.stringify(environment.FRONT_URLPROD),
-      })
-    );
-  }
-
-  if (config.mode === 'productionlocal') {
-    config.plugins.push(
-      new BundleAnalyzerPlugin({
-        analyzerMode: 'static',
-        openAnalyzer: false,
-        // Webpack statistics in target folder
-        reportFilename: '../stats.html',
-      }),
-      new webpack.DefinePlugin({
-        I18N_HASH: JSON.stringify(languagesHash.hash),
-        // APP_VERSION is passed as an environment variable from the Gradle / Maven build tasks.
-        __VERSION__: JSON.stringify(environment.__VERSION__),
-        __DEBUG_INFO_ENABLED__: environment.__DEBUG_INFO_ENABLED__ || config.mode === 'development',
-        // The root URL for API calls, ending with a '/' - for example: `"https://www.jhipster.tech:8081/myservice/"`.
-        // If this URL is left empty (""), then it will be relative to the current context.
-        // If you use an API server, in `prod` mode, you will need to enable CORS
-        // (see the `jhipster.cors` common JHipster property in the `application-*.yml` configurations)
-        SERVER_API_URL: JSON.stringify(environment.SERVER_API_URLPRODLOCAL),
-        FRONT_URL: JSON.stringify(environment.FRONT_URLPRODLOCAL),
+        SERVER_API_URL: JSON.stringify(environment.SERVER_API_URL),
+        FRONT_URL: JSON.stringify(environment.FRONT_URL),
       })
     );
   }
