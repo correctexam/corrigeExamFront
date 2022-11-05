@@ -31,6 +31,7 @@
     "webapp:build:dev": "ng build --configuration development",
     "webapp:build:prod": "ng build --configuration production",
     "webapp:build:prodgithubpage": "ng build --configuration production --base-href=/corrigeExamFront/",
+    "webapp:build:prodlocal": "ng build --configuration productionlocal",
     "webapp:dev": "ng serve",
     "webapp:dev-ssl": "ng serve --ssl",
     "webapp:dev-verbose": "ng serve --verbose",
