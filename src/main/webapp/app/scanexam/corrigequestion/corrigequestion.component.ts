@@ -162,6 +162,17 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.examId = params.get('examid')!;
           this.loadAllPages();
           forceRefreshStudent = true;
+        } else {
+          const changeStudent = params.get('studentid') !== null && this.studentid !== +params.get('studentid')!;
+          db.nonAlignImages
+            .where('examId')
+            .equals(+this.examId!)
+            .count()
+            .then(page => {
+              if (page > 30 && changeStudent) {
+                this.loadAllPages();
+              }
+            });
         }
         this.examId = params.get('examid')!;
         this.pageOffset = 0;
@@ -329,7 +340,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           page = pagewithoffset;
         }
         if (i === 0) {
-          this.activeIndex = page - 1;
+          if (this.numberPagesInScan! > 30) {
+            this.activeIndex = (page - 1) % this.nbreFeuilleParCopie!;
+          } else {
+            this.activeIndex = page - 1;
+          }
         }
 
         this.getAllImage4Zone(page, z!).then(p => {
@@ -378,7 +393,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
                   page = pagewithoffset;
                 }
-                // console.log('page ' + page)
                 promises.push(this.getAllImage4Zone(page, z!));
               }
 
@@ -920,37 +934,82 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   loadAllPages(): void {
     this.images = [];
+    db.nonAlignImages
+      .where('examId')
+      .equals(+this.examId!)
+      .count()
+      .then(page => {
+        if (page > 30) {
+          db.templates
+            .where({ examId: +this.examId! })
+            .count()
+            .then(page1 => {
+              if (this.noalign) {
+                db.nonAlignImages
+                  .where({ examId: +this.examId! })
+                  .filter(e2 => e2.pageNumber <= this.currentStudent * page1 && e2.pageNumber < (this.currentStudent + 1) * page1)
+                  .sortBy('pageNumber')
+                  .then(e1 =>
+                    e1.forEach(e => {
+                      const image = JSON.parse(e!.value, this.reviver);
 
-    if (this.noalign) {
-      db.nonAlignImages
-        .where({ examId: +this.examId! })
-        .sortBy('pageNumber')
-        .then(e1 =>
-          e1.forEach(e => {
-            const image = JSON.parse(e!.value, this.reviver);
+                      this.images.push({
+                        src: image.pages,
+                        alt: 'Description for Image 2',
+                        title: 'Exam',
+                      });
+                    })
+                  );
+              } else {
+                db.alignImages
+                  .where({ examId: +this.examId! })
+                  .filter(e2 => e2.pageNumber >= this.currentStudent * page1 + 1 && e2.pageNumber <= (this.currentStudent + 1) * page1)
+                  .sortBy('pageNumber')
+                  .then(e1 =>
+                    e1.forEach(e => {
+                      const image = JSON.parse(e!.value, this.reviver);
+                      this.images.push({
+                        src: image.pages,
+                        alt: 'Description for Image 2',
+                        title: 'Exam',
+                      });
+                    })
+                  );
+              }
+            });
+        } else {
+          if (this.noalign) {
+            db.nonAlignImages
+              .where({ examId: +this.examId! })
+              .sortBy('pageNumber')
+              .then(e1 =>
+                e1.forEach(e => {
+                  const image = JSON.parse(e!.value, this.reviver);
 
-            this.images.push({
-              src: image.pages,
-              alt: 'Description for Image 2',
-              title: 'Exam',
-            });
-          })
-        );
-    } else {
-      db.alignImages
-        .where({ examId: +this.examId! })
-        .sortBy('pageNumber')
-        .then(e1 =>
-          e1.forEach(e => {
-            const image = JSON.parse(e!.value, this.reviver);
-            this.images.push({
-              src: image.pages,
-              alt: 'Description for Image 2',
-              title: 'Exam',
-            });
-          })
-        );
-    }
+                  this.images.push({
+                    src: image.pages,
+                    alt: 'Description for Image 2',
+                    title: 'Exam',
+                  });
+                })
+              );
+          } else {
+            db.alignImages
+              .where({ examId: +this.examId! })
+              .sortBy('pageNumber')
+              .then(e1 =>
+                e1.forEach(e => {
+                  const image = JSON.parse(e!.value, this.reviver);
+                  this.images.push({
+                    src: image.pages,
+                    alt: 'Description for Image 2',
+                    title: 'Exam',
+                  });
+                })
+              );
+          }
+        }
+      });
   }
 
   async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
@@ -1162,7 +1221,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
               page = pagewithoffset;
             }
-            // console.log('page ' + page)
             this.getAllImage4Zone(page, z!).then(value1 => {
               t.widthZone = value1.w!;
               t.heightZone = value1.h!;
