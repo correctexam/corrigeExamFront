@@ -75,6 +75,8 @@ Generic styles
 .jh-card {
   padding: 1.5%;
   margin-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
   border: none;
 }
 
@@ -236,4 +238,74 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   padding: 0rem 0rem;
   border-radius: 2px;
   transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.pdock {
+  height: 100px;
+}
+.imageDock {
+  width: 64px;
+}
+
+.p-dock .p-dock-action {
+  width: 64px;
+  height: 64px;
+}
+
+.hiddenxsmd {
+  visibility: visible;
+}
+
+/* Responsive */
+@media screen and (max-width: 1199px) {
+  .pdock {
+    height: 50px;
+  }
+  .imageDock {
+    width: 50px;
+  }
+}
+@media screen and (max-width: 991px) {
+  .pdock {
+    height: 50px;
+  }
+  .imageDock {
+    width: 48px;
+  }
+  .p-dock .p-dock-action {
+    width: 50px;
+    height: 50px;
+  }
+  .hiddenxsmd {
+    visibility: hidden;
+  }
+  .jh-card {
+    padding: 1%;
+    margin-top: 2px;
+    margin-left: 2px;
+    margin-right: 2px;
+    border: none;
+  }
+}
+@media screen and (max-width: 575px) {
+  .pdock {
+    height: 50px;
+  }
+  .imageDock {
+    width: 48px;
+  }
+  .p-dock .p-dock-action {
+    width: 48px;
+    height: 48px;
+  }
+  .hiddenxsmd {
+    visibility: hidden;
+  }
+  .jh-card {
+    padding: 1%;
+    margin-top: 2px;
+    margin-left: 2px;
+    margin-right: 2px;
+    border: none;
+  }
 }
