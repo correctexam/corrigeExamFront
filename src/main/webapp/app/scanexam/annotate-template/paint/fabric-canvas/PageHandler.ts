@@ -197,6 +197,7 @@ export class PageHandler {
     this.eventHandler.objectMoving(e.target.id, e.target.type, e.target.left, e.target.top);
   }
   private onObjectScaling(e: any) {
+    console.error('scale');
     this.eventHandler.canvas = this.canvas;
     this.eventHandler.objectScaling(
       e.target.id,

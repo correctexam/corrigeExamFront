@@ -1,4 +1,4 @@
-<div class="grid">
+<div class="grid-nogutter flex">
   <p-toast></p-toast>
   <p-blockUI [blocked]="blocked">
     <div class="grid" style="width: 90vw">
@@ -13,7 +13,7 @@
     </div>
   </p-blockUI>
 
-  <div class="col-8">
+  <div class="sm:col-12 md:col-12 lg:col-8 xl:col-8">
     <div class="grid grid-nogutter">
       <div class="col-8">
         <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" jhiTranslate="scanexam.align">Aligner scans</h2>
@@ -68,7 +68,7 @@
       </div>
     </div>
   </div>
-  <div class="col-4 md:col-4 overflow-hidden">
+  <div class="col-4 md:col-4 overflow-hidden sm:hidden md:hidden lg:flex xl:flex">
     <img
       src="content/images/bannerright.jpg"
       alt="Image"

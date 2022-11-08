@@ -68,6 +68,7 @@ export class FabricCanvasComponent implements AfterViewInit {
   public scrollMode: ScrollModeType = ScrollModeType.vertical;
   ngOnInit(): void {
     this.eventHandler.exam = this.exam;
+    this.eventHandler.zonesRendering = this.zones;
     if (this.exam.namezoneId !== undefined) {
       this.zoneService.find(this.exam.namezoneId!).subscribe(z => {
         const ezone = z.body as CustomZone;

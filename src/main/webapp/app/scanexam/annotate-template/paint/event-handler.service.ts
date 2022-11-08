@@ -35,9 +35,9 @@ import { IExam } from '../../../entities/exam/exam.model';
 import { IQuestion, Question } from '../../../entities/question/question.model';
 import { QuestionService } from '../../../entities/question/service/question.service';
 import { PageHandler } from './fabric-canvas/PageHandler';
-import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { TranslateService } from '@ngx-translate/core';
 import { PreferenceService } from '../../preference-page/preference.service';
+import { CustomZone } from './fabric-canvas/fabric-canvas.component';
 
 const RANGE_AROUND_CENTER = 20;
 
@@ -56,7 +56,7 @@ export class EventHandlerService {
   public modelViewpping = new Map<string, number>();
   public nextQuestionNumero = 1;
   pages: { [page: number]: PageHandler } = {};
-
+  zonesRendering: { [page: number]: CustomZone[] } = {};
   private cb!: (qid: number | undefined) => void;
 
   set selectedTool(t: DrawingTools) {
@@ -120,6 +120,15 @@ export class EventHandlerService {
   private _exam!: IExam;
   set exam(c: IExam) {
     this._exam = c;
+  }
+
+  addZoneRendering(page: number, tzones: CustomZone) {
+    if (!this.zonesRendering[page]) {
+      this.zonesRendering[page] = [];
+      this.zonesRendering[page].push(tzones);
+    } else {
+      this.zonesRendering[page].push(tzones);
+    }
   }
 
   setCurrentQuestionNumber(number: string) {
@@ -327,6 +336,9 @@ export class EventHandlerService {
         };
         const uid = this._elementUnderDrawing.id;
         this.zoneService.create(z).subscribe(z1 => {
+          const ezone = z1.body! as CustomZone;
+          ezone.type = DrawingTools.NOMBOX;
+          this.addZoneRendering(z1.body!.pageNumber!, ezone);
           this.modelViewpping.set(uid, z1.body!.id!);
           this._exam.namezoneId = z1.body!.id!;
           this.examService.update(this._exam).subscribe(e => {
@@ -360,6 +372,10 @@ export class EventHandlerService {
         };
         const uid = this._elementUnderDrawing.id;
         this.zoneService.create(z).subscribe(z1 => {
+          const ezone = z1.body! as CustomZone;
+          ezone.type = DrawingTools.PRENOMBOX;
+          this.addZoneRendering(z1.body!.pageNumber!, ezone);
+
           this.modelViewpping.set(uid, z1.body!.id!);
           this._exam.firstnamezoneId = z1.body!.id!;
           this.examService.update(this._exam).subscribe(e => {
@@ -393,6 +409,10 @@ export class EventHandlerService {
         };
         const uid = this._elementUnderDrawing.id;
         this.zoneService.create(z).subscribe(z1 => {
+          const ezone = z1.body! as CustomZone;
+          ezone.type = DrawingTools.INEBOX;
+          this.addZoneRendering(z1.body!.pageNumber!, ezone);
+
           this.modelViewpping.set(uid, z1.body!.id!);
           this._exam.idzoneId = z1.body!.id!;
           this.examService.update(this._exam).subscribe(e => {
@@ -429,8 +449,12 @@ export class EventHandlerService {
         };
         const uid = this._elementUnderDrawing.id;
         this.zoneService.create(z).subscribe(z1 => {
+          const ezone = z1.body! as CustomZone;
+          ezone.type = DrawingTools.QUESTIONBOX;
+          this.addZoneRendering(z1.body!.pageNumber!, ezone);
           const pref = this.preferenceService.getPreferenceForQuestion();
           this.modelViewpping.set(uid, z1.body!.id!);
+
           const q = new Question();
           q.zoneId = z1.body!.id!;
           q.examId = this._exam.id;

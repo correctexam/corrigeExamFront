@@ -426,6 +426,9 @@ input:checked + .slider1:before {
   padding: 15px 42px;
 }
 
+.button80 {
+  width: 20em;
+}
 /* Responsive */
 @media screen and (max-width: 1199px) {
   .wizard-v2-content {
@@ -433,6 +436,9 @@ input:checked + .slider1:before {
   }
   .wizard-v2-content .wizard-form {
     padding: 40px;
+  }
+  .button80 {
+    width: 15em;
   }
 }
 @media screen and (max-width: 991px) {
@@ -453,6 +459,9 @@ input:checked + .slider1:before {
   }
   .inner .form-row .form-holder .select-btn {
     right: 6%;
+  }
+  .button80 {
+    width: 40%;
   }
 }
 @media screen and (max-width: 575px) {
@@ -478,6 +487,9 @@ input:checked + .slider1:before {
   }
   .inner .table-responsive tr.space-row > td {
     padding-bottom: 30px;
+  }
+  .button80 {
+    width: 80%;
   }
 }
 .treetableDate .ui-widget-content {

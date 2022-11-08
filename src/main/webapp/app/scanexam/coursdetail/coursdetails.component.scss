@@ -237,6 +237,9 @@ input:checked + .slider1:before {
 .form-register .steps li .current-info {
   display: none;
 }
+.button80 {
+  width: 20em;
+}
 .form-register .steps li .title {
   position: absolute;
   top: 50%;
@@ -431,6 +434,10 @@ input:checked + .slider1:before {
   .wizard-v2-content {
     // margin: 180px 20px;
   }
+  .button80 {
+    width: 30%;
+  }
+
   .wizard-v2-content .wizard-form {
     padding: 40px;
   }
@@ -444,6 +451,10 @@ input:checked + .slider1:before {
     -webkit-flex-direction: column;
     margin: 0;
   }
+  .button80 {
+    width: 40%;
+  }
+
   .inner .form-row .form-holder {
     padding: 0;
     width: 100%;
@@ -458,8 +469,12 @@ input:checked + .slider1:before {
 @media screen and (max-width: 575px) {
   .wizard-v2-content .wizard-form {
     padding: 40px 20px;
-    width: auto;
+    //    width: auto;
   }
+  .button80 {
+    width: 80%;
+  }
+
   .wizard-v2-content .wizard-image {
     display: none;
   }
