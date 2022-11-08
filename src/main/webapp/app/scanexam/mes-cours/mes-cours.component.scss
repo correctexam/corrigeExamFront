@@ -79,6 +79,10 @@ input:checked + .slider1:before {
   border-radius: 50%;
 }
 
+.button80 {
+  width: 20em;
+}
+
 .slider {
   -webkit-appearance: none;
   width: 100%;
@@ -434,6 +438,9 @@ input:checked + .slider1:before {
   .wizard-v2-content .wizard-form {
     padding: 40px;
   }
+  .button80 {
+    width: 15em;
+  }
 }
 @media screen and (max-width: 991px) {
   .inner .form-row {
@@ -448,6 +455,9 @@ input:checked + .slider1:before {
     padding: 0;
     width: 100%;
   }
+  .button80 {
+    width: 40%;
+  }
   .inner .form-row .form-holder .ui-datepicker-trigger {
     right: 5%;
   }
@@ -458,7 +468,10 @@ input:checked + .slider1:before {
 @media screen and (max-width: 575px) {
   .wizard-v2-content .wizard-form {
     padding: 40px 20px;
-    width: auto;
+    //    width: auto;
+  }
+  .button80 {
+    width: 80%;
   }
   .wizard-v2-content .wizard-image {
     display: none;

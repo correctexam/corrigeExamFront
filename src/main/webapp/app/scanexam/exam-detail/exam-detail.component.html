@@ -1,11 +1,13 @@
 <div>
   <p-toast></p-toast>
 
-  <p-dock [model]="dockItems" position="top">
+  <p-dock [styleClass]="'pdock'" [model]="dockItems" position="top">
     <ng-template pTemplate="item" let-item>
-      <a *ngIf="item.route" [routerLink]="item.route"><img [src]="item.icon" [alt]="item.label" width="64px" [pTooltip]="item.title" /></a>
+      <a *ngIf="item.route" [routerLink]="item.route"
+        ><img [src]="item.icon" [alt]="item.label" class="imageDock" [pTooltip]="item.title"
+      /></a>
       <a *ngIf="item.command1" (click)="item.command1()"
-        ><img [src]="item.icon" [alt]="item.label" width="64px" [pTooltip]="item.title"
+        ><img [src]="item.icon" [alt]="item.label" class="imageDock" [pTooltip]="item.title"
       /></a>
     </ng-template>
   </p-dock>
@@ -25,8 +27,8 @@
         <div class="inner" [style]="{ 'text-align': 'center' }">
           <button
             [routerLink]="'/exam/annotate/' + this.examId"
-            [style]="{ width: '20em', marginBottom: '1em', margin: '1em' }"
-            class="p-element p-ripple"
+            [style]="{ marginBottom: '1em', margin: '1em' }"
+            class="p-element p-ripple button80"
             pButton
             pRipple
             type="button"
@@ -38,8 +40,8 @@
           </button>
           <button
             [routerLink]="'/loadscan/' + this.examId"
-            [style]="{ width: '20em', marginBottom: '1em', margin: '1em' }"
-            class="p-element p-ripple"
+            [style]="{ marginBottom: '1em', margin: '1em' }"
+            class="p-element p-ripple button80"
             pButton
             pRipple
             type="button"
@@ -51,8 +53,8 @@
           </button>
           <button
             [routerLink]="'/imagealign/' + this.examId"
-            [style]="{ width: '20em', marginBottom: '1em', margin: '1em' }"
-            class="p-element p-ripple"
+            [style]="{ marginBottom: '1em', margin: '1em' }"
+            class="p-element p-ripple button80"
             pButton
             pRipple
             type="button"
@@ -65,8 +67,8 @@
           </button>
           <button
             [routerLink]="'/studentbindings/' + this.examId"
-            [style]="{ width: '20em', marginBottom: '1em', margin: '1em' }"
-            class="p-element p-ripple"
+            [style]="{ marginBottom: '1em', margin: '1em' }"
+            class="p-element p-ripple button80"
             pButton
             pRipple
             type="button"
@@ -79,8 +81,8 @@
           </button>
           <button
             [routerLink]="'/answer/' + this.examId"
-            [style]="{ width: '20em', marginBottom: '1em', margin: '1em' }"
-            class="p-element p-ripple"
+            [style]="{ marginBottom: '1em', margin: '1em' }"
+            class="p-element p-ripple button80"
             pButton
             pRipple
             type="button"
@@ -94,8 +96,8 @@
           </button>
           <button
             [routerLink]="'/showresults/' + this.examId"
-            [style]="{ width: '20em', marginBottom: '1em', margin: '1em' }"
-            class="p-element p-ripple"
+            [style]="{ marginBottom: '1em', margin: '1em' }"
+            class="p-element p-ripple button80"
             pButton
             pRipple
             type="button"

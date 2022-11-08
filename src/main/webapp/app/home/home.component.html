@@ -1,25 +1,25 @@
 <div *ngIf="account == null" class="grid grid-nogutter surface-section text-800">
-  <div class="col-12 md:col-6 p-6 text-center md:text-left flex align-items-center">
+  <div class="sm:col-12 md:col-12 lg:col-6 p-6 text-center md:text-left flex align-items-center">
     <section>
       <span class="block text-6xl font-bold mb-1" jhiTranslate="home.titleu">Corriger vos copies plus efficacement ✔️</span>
       <div class="text-6xl text-primary font-bold mb-3" jhiTranslate="home.subtitleu">un retour à vos étudiants en moins d'une journée</div>
       <p class="mt-0 mb-4 text-700 line-height-3" jhiTranslate="home.slogan">
         Scanner, corriger par lots, soyez assisté par de l'IA, faites un retour précis à vos étudiants, depuis un PC ou une tablette
       </p>
-      <button (click)="login()" pbutton="" pripple="" type="button" class="p-element p-ripple mr-3 p-button-raised p-button p-component">
+      <button (click)="login()" pbutton type="button" class="p-element mr-3 p-button p-component">
         <span class="p-button-label" jhiTranslate="home.login">Authentifiez vous</span><span class="p-ink"></span></button
       ><button
         routerLink="account/register"
         pbutton=""
         pripple=""
         type="button"
-        class="p-element p-ripple p-button-outlined p-button p-component"
+        class="p-element p-ripple p-button-outlined p-button p-component mr-3"
       >
         <span class="p-button-label" jhiTranslate="home.register">Créer un compte</span><span class="p-ink"></span>
       </button>
     </section>
   </div>
-  <div class="col-12 md:col-6 overflow-hidden">
+  <div class="sm:col-12 md:col-12 lg:col-6 overflow-hidden sm:hidden md:hidden lg:flex xl:flex">
     <img
       src="content/images/bannerright.jpg"
       alt="Image"
@@ -30,9 +30,9 @@
 </div>
 <div *jhiHasAnyAuthority="'ROLE_USER'">
   <div *ngIf="!this.account?.authorities?.includes('ROLE_ADMIN')">
-    <p-dock [model]="dockItems" position="top">
+    <p-dock [model]="dockItems" position="top" [styleClass]="'pdock'">
       <ng-template pTemplate="item" let-item>
-        <a [routerLink]="item.route"><img [src]="item.icon" [alt]="item.label" width="64px" [pTooltip]="item.title" /></a>
+        <a [routerLink]="item.route"><img [src]="item.icon" [alt]="item.label" class="imageDock" [pTooltip]="item.title" /></a>
       </ng-template>
     </p-dock>
     <jhi-mes-cours></jhi-mes-cours>

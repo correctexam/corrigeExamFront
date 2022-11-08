@@ -1,47 +1,61 @@
-<div class="grid">
+<div class="grid-nogutter flex">
   <p-toast></p-toast>
   <p-blockUI [blocked]="blocked">
     <i class="pi pi-lock" style="font-size: 3rem"></i>
   </p-blockUI>
 
-  <div class="col-8">
-    <div class="grid grid-nogutter">
-      <div class="col-8">
+  <div class="sm:col-12 md:col-12 lg:col-8 xl:col-8">
+    <div class="grid flex">
+      <div class="sm:col-12 md:col-6 lg:col-6 xl:col-6">
         <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" jhiTranslate="scanexam.importstudent">Importer étudiants</h2>
         <p-message *ngIf="!canImport()" severity="warn" [text]="'scanexam.listestudentvalid' | translate"></p-message>
       </div>
-      <div class="col-4 flex flex-row-reverse">
-        <button
-          [disabled]="!this.courseid"
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          class="p-button p-button-primary"
-          (click)="gotoUE()"
-        >
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackue">Retourner au module</span>
-        </button>
-
-        <button
-          [disabled]="!this.courseid || !canImport()"
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          class="p-button"
-          [ngClass]="{ 'p-button-primary': this.courseid && canImport(), 'p-button-secondary': !this.courseid || !canImport() }"
-          (click)="envoiEtudiants()"
-        >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="scanexam.importfollowingstudent">Importer étudiants ci-dessous</span>
-        </button>
-        <button (click)="download()" type="submit" id="save-entity" data-cy="entityCreateSaveButton" class="p-button p-button-primary">
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="scanexam.downloadtemplate">Download template</span>
-        </button>
-      </div>
-      <div class="col-offset-8 col-4">
-        <label for="slider" jhiTranslate="scanexam.nbrligne">Nombre de lignes dans le tableau (entre 100 et 300)</label>
-        <p-slider id="slider" [(ngModel)]="val" (onChange)="updateTableSize()" [step]="20" [min]="100" [max]="300"></p-slider>
+      <div class="sm:col-12 md:col-6 lg:col-6 xl:col-6">
+        <div class="md:flex lg:flex xl:flex md:flex-row-reverse lg:flex-row-reverse">
+          <div class="">
+            <button
+              [disabled]="!this.courseid"
+              type="submit"
+              id="save-entity"
+              data-cy="entityCreateSaveButton"
+              class="p-button p-button-primary flex-initial flex align-items-center"
+              (click)="gotoUE()"
+            >
+              <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackue">Retourner au module</span>
+            </button>
+          </div>
+          <div class="">
+            <button
+              [disabled]="!this.courseid || !canImport()"
+              type="submit"
+              id="save-entity"
+              data-cy="entityCreateSaveButton"
+              class="p-button flex-initial flex align-items-center"
+              [ngClass]="{ 'p-button-primary': this.courseid && canImport(), 'p-button-secondary': !this.courseid || !canImport() }"
+              (click)="envoiEtudiants()"
+            >
+              <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="scanexam.importfollowingstudent">Importer étudiants ci-dessous</span>
+            </button>
+          </div>
+          <div class="">
+            <button
+              (click)="download()"
+              type="submit"
+              id="save-entity"
+              data-cy="entityCreateSaveButton"
+              class="p-button p-button-primary flex-initial flex align-items-center"
+            >
+              <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="scanexam.downloadtemplate">Download template</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
+    <div class="sm:col-offset-0 sm:col-12 md:col-offset-0 md:col-12 lg:col-offset-8 lg:col-4">
+      <label for="slider" jhiTranslate="scanexam.nbrligne">Nombre de lignes dans le tableau (entre 100 et 300)</label>
+      <p-slider id="slider" [(ngModel)]="val" (onChange)="updateTableSize()" [step]="20" [min]="100" [max]="300"></p-slider>
+    </div>
+
     <div class="col-12 md:col-12">
       <hot-table
         [hotId]="id"
@@ -65,7 +79,7 @@
       </hot-table>
     </div>
   </div>
-  <div class="col-4 md:col-4 overflow-hidden">
+  <div class="lg:col-4 xl:col-4 overflow-hidden sm:hidden md:hidden lg:flex xl:flex">
     <img
       src="content/images/bannerright.jpg"
       alt="Image"
