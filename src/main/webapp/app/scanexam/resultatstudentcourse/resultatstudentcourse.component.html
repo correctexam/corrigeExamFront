@@ -99,7 +99,7 @@
       </div>
     </div>
     <div class="col-12 md:col-12">
-      <p-table [value]="studentsresult">
+      <p-table [value]="studentsresult" responsiveLayout="scroll">
         <ng-template pTemplate="header">
           <tr>
             <th jhiTranslate="scanexam.ine">INE</th>
@@ -132,7 +132,7 @@
       </p-table>
     </div>
   </div>
-  <div class="lg:col-4 xl:col-4 overflow-hidden sm:hidden md:hidden lg:flex xl:flex">
+  <div class="lg:col-4 xl:col-4 overflow-hidden hiddenxsmd sm:hidden md:hidden lg:flex xl:flex">
     <img
       src="content/images/bannerright.jpg"
       alt="Image"
