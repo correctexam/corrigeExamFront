@@ -204,6 +204,7 @@
     "shortcutopenatstart": "Display this window when loading the correction module on this computer",
     "filterboundstudent": "Filter the students already assigned:",
     "removeallbinding": "Remove all bindings",
-    "removeallbindingtooltip": "⚠️ to be done only if the correction has not started"
+    "removeallbindingtooltip": "⚠️ to be done only if the correction has not started",
+    "noneval": "not evaluated"
   }
 }

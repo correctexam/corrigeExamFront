@@ -205,8 +205,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                       this.getSelectedStudent();
                       // Step 4 Query zone 4 questions
 
-                      this.blocked = false;
-
                       this.questionService.query({ examId: this.exam?.id }).subscribe(b => {
                         let maxquestions = 0;
 
@@ -410,7 +408,29 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 this.alignImagesService.correctQCM(t).subscribe(
                   res => {
                     this.processSolutions(res.solutions).then(() => {
-                      this.blocked = false;
+                      const qid = this.questions![0].id;
+                      let sid = '';
+                      const sheets = (this.selectionStudents?.map(st => st.examSheets) as any)
+                        .flat()
+                        .filter(
+                          (ex: any) =>
+                            ex?.scanId === this.exam!.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie!
+                        );
+                      if (sheets !== undefined && sheets!.length > 0) {
+                        sid = sheets[0]?.id;
+                      }
+                      this.studentResponseService
+                        .query({
+                          sheetId: sid,
+                          questionId: qid,
+                        })
+                        .subscribe(sr => {
+                          if (sr.body !== null && sr.body.length > 0) {
+                            this.resp = sr.body![0];
+                            this.computeNote(false, this.resp);
+                            this.blocked = false;
+                          }
+                        });
                     });
                   },
                   err => {
@@ -487,6 +507,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   async processAnswer(e: IQCMSolution) {
     if (e.solution !== undefined && e.solution !== '') {
       const resp = await this.getStudentResponse(this.questions![0].id!, e.numero!);
+
       resp.gradedcomments?.forEach(gc => {
         (gc as any).checked = false;
       });

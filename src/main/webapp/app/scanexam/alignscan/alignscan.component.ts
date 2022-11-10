@@ -272,7 +272,7 @@ export class AlignScanComponent implements OnInit {
               }, 2000);
               this.messageService.add({
                 severity: 'error',
-                summary: this.translateService.instant('scanexam.downloadcacheko'),
+                summary: this.translateService.instant('scanexam.uploadcacheko'),
                 detail: this.translateService.instant('scanexam.downloadcachekodetail'),
               });
             }
