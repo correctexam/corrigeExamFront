@@ -31,6 +31,7 @@ import { CustomFabricGroup } from '../annotate-template/paint/models';
 import { ZoneCorrectionHandler } from './ZoneCorrectionHandler';
 import { IComments } from '../../entities/comments/comments.model';
 import { CommentsService } from '../../entities/comments/service/comments.service';
+import { SVG, extend as SVGextend, Element as SVGElement, G } from '@svgdotjs/svg.js';
 
 const RANGE_AROUND_CENTER = 20;
 
@@ -46,12 +47,17 @@ export class EventCanevascorrectionHandlerService {
   set canvas(c: fabric.Canvas) {
     const prev = this._canvas;
     this._canvas = c;
-
     if (c !== prev) {
       this.currentComment = null;
       this.commentsService.query({ zonegeneratedid: (c as any).zoneid }).subscribe(e1 => {
         if (!(e1!.body === undefined || e1!.body?.length === 0)) {
-          fabric.loadSVGFromString(e1!.body![0].jsonData!, (objects, options) => {
+          const svg = e1!.body![0].jsonData!;
+          let draw = SVG(svg);
+          if (svg.startsWith('<?xml')) {
+            draw = SVG(svg.split('\n').splice(2).join('\n'));
+          }
+          draw.scale(this.scale, this.scale, 0, 0);
+          fabric.loadSVGFromString(draw.svg(), (objects, options) => {
             // const obj = fabric.util.groupSVGElements(objects, options);
             if (objects.length > 0) {
               objects.forEach(obj => c.add(obj));
@@ -71,7 +77,7 @@ export class EventCanevascorrectionHandlerService {
   private previousScaleY!: number;
   public modelViewpping = new Map<string, number>();
   zones: { [zoneNumber: number]: ZoneCorrectionHandler } = {};
-
+  public scale = 1;
   set selectedTool(t: DrawingTools) {
     this.canvas.discardActiveObject();
     this.canvas.renderAll();
@@ -236,14 +242,20 @@ export class EventCanevascorrectionHandlerService {
         .pipe()
         .toPromise();
       if (e1!.body === undefined || e1!.body?.length === 0) {
-        const c = { jsonData: this.canvas.toSVG(), zonegeneratedid: (this.canvas as any).zoneid };
+        const draw = SVG(this.canvas.toSVG().split('\n').splice(2).join('\n'));
+        draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
+        const c = { jsonData: draw.svg(), zonegeneratedid: (this.canvas as any).zoneid };
         return this.commentsService.create(c);
       } else {
-        e1!.body![0].jsonData = this.canvas.toSVG();
+        const draw = SVG(this.canvas.toSVG().split('\n').splice(2).join('\n'));
+        draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
+        e1!.body![0].jsonData = draw.svg(); // this.canvas.toSVG();
         return this.commentsService.update(e1!.body![0]);
       }
     } else {
-      this.currentComment.jsonData = this.canvas.toSVG();
+      const draw = SVG(this.canvas.toSVG().split('\n').splice(2).join('\n'));
+      draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
+      this.currentComment.jsonData = draw.svg();
       return this.commentsService.update(this.currentComment);
     }
   }
