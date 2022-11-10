@@ -65,6 +65,7 @@
     "@ngx-translate/core": "14.0.0",
     "@ngx-translate/http-loader": "7.0.0",
     "@popperjs/core": "2.11.6",
+    "@svgdotjs/svg.js": "^3.1.2",
     "@types/node": "18.11.7",
     "bootstrap": "5.2.2",
     "browser-sync-client": "^2.27.10",

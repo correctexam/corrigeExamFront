@@ -1,4 +1,4 @@
-<div class="grid">
+<div class="grid-nogutter flex">
   <p-toast></p-toast>
   <p-blockUI [blocked]="blocked">
     <i class="pi pi-lock" style="font-size: 3rem"></i>
@@ -27,8 +27,8 @@
         </button>
       </div>
     </div>
-    <div class="col-12 md:col-12">
-      <p-table [value]="students">
+    <div class="sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <p-table [value]="students" responsiveLayout="scroll">
         <ng-template pTemplate="header">
           <tr>
             <th jhiTranslate="scanexam.ine">INE</th>
@@ -101,7 +101,7 @@
       </p-table>
     </div>
   </div>
-  <div class="lg:col-4 xl:col-4 overflow-hidden sm:hidden md:hidden lg:flex xl:flex">
+  <div class="lg:col-4 xl:col-4 overflow-hidden hiddenxsmd sm:hidden md:hidden lg:flex xl:flex">
     <img
       src="content/images/bannerright.jpg"
       alt="Image"
