@@ -47,6 +47,10 @@ export class ExamDetailComponent implements OnInit {
   nbreFeuilleParCopie = 0;
   numberPagesInScan = 0;
   students: IStudent[] | undefined;
+  message = '';
+  submessage = '';
+  progress = 0;
+
   constructor(
     public courseService: CourseService,
     public examService: ExamService,
@@ -257,10 +261,17 @@ export class ExamDetailComponent implements OnInit {
             (table === 'nonAlignImages' && value.examId === +this.examId) ||
             (table === 'alignImages' && value.examId === +this.examId);
           this.blocked = true;
+          this.translateService.get('scanexam.exportcacheencours').subscribe(res => (this.message = '' + res));
           db.export(o).then((value: Blob) => {
             const file = new File([value], this.examId + 'indexdb.json');
+            this.progress = 0;
+            this.translateService.get('scanexam.uploadcacheencours').subscribe(res => (this.message = '' + res));
+            this.translateService.get('scanexam.uploadcacheencoursdetail').subscribe(res => (this.submessage = '' + res));
+
             this.cacheUploadService.uploadCache(file).subscribe(
               e => {
+                this.progress = e.progress;
+
                 if (e.state === 'DONE') {
                   this.blocked = false;
                   this.messageService.add({
@@ -268,6 +279,8 @@ export class ExamDetailComponent implements OnInit {
                     summary: this.translateService.instant('scanexam.uploadcacheok'),
                     detail: this.translateService.instant('scanexam.uploadcacheokdetail'),
                   });
+                  this.message = '';
+                  this.submessage = '';
                 }
               },
               () => {
@@ -278,6 +291,8 @@ export class ExamDetailComponent implements OnInit {
                 });
 
                 this.blocked = false;
+                this.message = '';
+                this.submessage = '';
               }
             );
           });
