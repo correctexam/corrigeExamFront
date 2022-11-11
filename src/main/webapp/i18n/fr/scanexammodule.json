@@ -205,6 +205,7 @@
     "shortcutopenatstart": "Afficher cette fenètre au chargement du module de correction sur cet ordinateur/tablette",
     "filterboundstudent": "Filtrer les étudiant(e)s déjà affectée(s):",
     "removeallbinding": "Supprimer toutes les associations",
-    "removeallbindingtooltip": "⚠️ à faire uniquement si la correction n'a pas commencé"
+    "removeallbindingtooltip": "⚠️ à faire uniquement si la correction n'a pas commencé",
+    "noneval": "non évalué"
   }
 }

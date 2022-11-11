@@ -205,8 +205,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                       this.getSelectedStudent();
                       // Step 4 Query zone 4 questions
 
-                      this.blocked = false;
-
                       this.questionService.query({ examId: this.exam?.id }).subscribe(b => {
                         let maxquestions = 0;
 
@@ -410,7 +408,29 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 this.alignImagesService.correctQCM(t).subscribe(
                   res => {
                     this.processSolutions(res.solutions).then(() => {
-                      this.blocked = false;
+                      const qid = this.questions![0].id;
+                      let sid = '';
+                      const sheets = (this.selectionStudents?.map(st => st.examSheets) as any)
+                        .flat()
+                        .filter(
+                          (ex: any) =>
+                            ex?.scanId === this.exam!.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie!
+                        );
+                      if (sheets !== undefined && sheets!.length > 0) {
+                        sid = sheets[0]?.id;
+                      }
+                      this.studentResponseService
+                        .query({
+                          sheetId: sid,
+                          questionId: qid,
+                        })
+                        .subscribe(sr => {
+                          if (sr.body !== null && sr.body.length > 0) {
+                            this.resp = sr.body![0];
+                            this.computeNote(false, this.resp);
+                            this.blocked = false;
+                          }
+                        });
                     });
                   },
                   err => {
@@ -487,6 +507,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   async processAnswer(e: IQCMSolution) {
     if (e.solution !== undefined && e.solution !== '') {
       const resp = await this.getStudentResponse(this.questions![0].id!, e.numero!);
+
       resp.gradedcomments?.forEach(gc => {
         (gc as any).checked = false;
       });
@@ -517,11 +538,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   updateStudentResponsAndComputeNote(resp: IStudentResponse, numero: number, comment: IGradedComment): Promise<IStudentResponse> {
     return new Promise<IStudentResponse>(resolve => {
+      this.blocked = true;
       this.updateResponseRequest(resp).subscribe(resp1 => {
         if (this.currentStudent === numero) {
           (comment as any).checked = true;
         }
-        this.computeNote(true, resp1.body!).then(value => resolve(value));
+
+        this.computeNote(true, resp1.body!).then(value => {
+          this.blocked = false;
+          resolve(value);
+        });
       });
     });
   }
@@ -548,8 +574,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   updateResponse(): void {
+    this.blocked = true;
     if (this.resp !== undefined) {
-      this.updateResponseRequest(this.resp).subscribe(sr1 => (this.resp = sr1.body!));
+      this.updateResponseRequest(this.resp).subscribe(sr1 => {
+        this.blocked = false;
+        this.resp = sr1.body!;
+      });
     }
   }
 
@@ -575,28 +605,34 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   ajouterTComment(comment: ITextComment): void {
     this.resp?.textcomments?.push(comment);
+    this.blocked = true;
     this.updateResponseRequest(this.resp!).subscribe(() => {
       (comment as any).checked = true;
+      this.blocked = false;
     });
   }
   ajouterGComment(comment: IGradedComment, resp: IStudentResponse): void {
     this.resp?.gradedcomments?.push(comment);
+    this.blocked = true;
     this.updateResponseRequest(resp).subscribe(() => {
       (comment as any).checked = true;
-      this.computeNote(true, this.resp!);
+      this.computeNote(true, this.resp!).then(() => (this.blocked = false));
     });
   }
   retirerTComment(comment: ITextComment): void {
     this.resp!.textcomments = this.resp?.textcomments!.filter(e => e.id !== comment.id);
+    this.blocked = true;
     this.updateResponseRequest(this.resp!).subscribe(() => {
+      this.blocked = false;
       (comment as any).checked = false;
     });
   }
   retirerGComment(comment: IGradedComment): void {
     this.resp!.gradedcomments = this.resp?.gradedcomments!.filter(e => e.id !== comment.id);
+    this.blocked = true;
     this.updateResponseRequest(this.resp!).subscribe(() => {
       (comment as any).checked = false;
-      this.computeNote(true, this.resp!);
+      this.computeNote(true, this.resp!).then(() => (this.blocked = false));
     });
   }
 
@@ -706,6 +742,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         description: this.descCommentaire,
         // studentResponses : [{id: this.resp?.id}]
       };
+      this.blocked = true;
       this.textCommentService.create(t).subscribe(e => {
         this.resp?.textcomments?.push(e.body!);
         const currentComment = e.body!;
@@ -714,6 +751,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.currentTextComment4Question?.push(currentComment);
           this.titreCommentaire = '';
           this.descCommentaire = '';
+          this.blocked = false;
         });
       });
     } else if (this.currentQuestion !== undefined && this.currentQuestion.gradeType !== GradeType.DIRECT) {
@@ -724,6 +762,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         grade: this.noteCommentaire,
         studentResponses: [{ id: this.resp?.id }],
       };
+      this.blocked = true;
       this.gradedCommentService.create(t).subscribe(e => {
         this.resp?.gradedcomments?.push(e.body!);
         const currentComment = e.body!;
@@ -734,6 +773,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.titreCommentaire = '';
           this.descCommentaire = '';
           this.noteCommentaire = 0;
+          this.blocked = false;
         });
       });
     }
