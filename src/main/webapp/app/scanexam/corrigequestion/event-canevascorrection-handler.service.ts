@@ -59,6 +59,7 @@ export class EventCanevascorrectionHandlerService {
           draw.scale(this.scale, this.scale, 0, 0);
           fabric.loadSVGFromString(draw.svg(), (objects, options) => {
             // const obj = fabric.util.groupSVGElements(objects, options);
+            c.clear();
             if (objects.length > 0) {
               objects.forEach(obj => c.add(obj));
               c.renderAll();
@@ -100,6 +101,13 @@ export class EventCanevascorrectionHandlerService {
         c.getObjects().forEach(o => this.canvas.remove(o));
         c.clear();
         c.renderAll();
+        this.updateAllComments(c).then(e2 =>
+          e2.subscribe(e1 => {
+            if (c === this.canvas) {
+              this.currentComment = e1.body!;
+            }
+          })
+        );
       });
       this.modelViewpping.clear();
     }
@@ -257,6 +265,28 @@ export class EventCanevascorrectionHandlerService {
       draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
       this.currentComment.jsonData = draw.svg();
       return this.commentsService.update(this.currentComment);
+    }
+  }
+
+  async updateAllComments(canvas: fabric.Canvas) {
+    if (canvas === this.canvas) {
+      return this.updateComments();
+    } else {
+      const e1 = await this.commentsService
+        .query({ zonegeneratedid: (canvas as any).zoneid })
+        .pipe()
+        .toPromise();
+      if (e1!.body === undefined || e1!.body?.length === 0) {
+        const draw = SVG(canvas.toSVG().split('\n').splice(2).join('\n'));
+        draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
+        const c = { jsonData: draw.svg(), zonegeneratedid: (canvas as any).zoneid };
+        return this.commentsService.create(c);
+      } else {
+        const draw = SVG(canvas.toSVG().split('\n').splice(2).join('\n'));
+        draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
+        e1!.body![0].jsonData = draw.svg(); // this.canvas.toSVG();
+        return this.commentsService.update(e1!.body![0]);
+      }
     }
   }
 

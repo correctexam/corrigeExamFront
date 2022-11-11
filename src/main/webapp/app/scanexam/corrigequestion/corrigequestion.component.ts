@@ -632,12 +632,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       const ret = await this.updateResponseRequest(this.resp!).toPromise();
       this.resp = ret!.body!;
     }
+    console.log(this.resp?.textcomments!.length);
 
     this.resp!.textcomments = this.resp?.textcomments!.filter(e => e.id !== comment.id);
+    console.log(this.resp?.textcomments!.length);
     this.blocked = true;
     this.updateResponseRequest(this.resp!).subscribe(resp1 => {
       this.resp = resp1.body!;
-
       this.blocked = false;
       (comment as any).checked = false;
     });
@@ -783,7 +784,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           questionId: this.currentQuestion.id,
           text: this.titreCommentaire,
           description: this.descCommentaire,
-          grade: this.noteCommentaire,
+          grade: !this.noteCommentaire ? 0 : this.noteCommentaire,
           // studentResponses: [{ id: this.resp?.id }],
         };
         this.blocked = true;
