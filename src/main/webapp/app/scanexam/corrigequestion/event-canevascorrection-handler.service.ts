@@ -47,7 +47,7 @@ export class EventCanevascorrectionHandlerService {
   set canvas(c: fabric.Canvas) {
     const prev = this._canvas;
     this._canvas = c;
-    if (c !== prev) {
+    if (c !== prev && c.getObjects().length === 0) {
       this.currentComment = null;
       this.commentsService.query({ zonegeneratedid: (c as any).zoneid }).subscribe(e1 => {
         if (!(e1!.body === undefined || e1!.body?.length === 0)) {
