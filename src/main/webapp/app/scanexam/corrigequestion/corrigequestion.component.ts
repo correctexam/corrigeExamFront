@@ -518,7 +518,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       // Comment already exists
       if (gcs !== undefined && gcs.length > 0) {
         resp.gradedcomments.push(gcs[0]);
-        await this.updateStudentResponsAndComputeNote(resp, e.numero!, gcs[0]);
+        await this.updateStudentResponsAndComputeNote4QCM(resp, e.numero!, gcs[0]);
         // gcs[0].studentResponses?.push(resp!);
       }
     }
@@ -536,16 +536,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  updateStudentResponsAndComputeNote(resp: IStudentResponse, numero: number, comment: IGradedComment): Promise<IStudentResponse> {
+  updateStudentResponsAndComputeNote4QCM(resp: IStudentResponse, numero: number, comment: IGradedComment): Promise<IStudentResponse> {
     return new Promise<IStudentResponse>(resolve => {
-      this.blocked = true;
       this.updateResponseRequest(resp).subscribe(resp1 => {
         if (this.currentStudent === numero) {
           (comment as any).checked = true;
         }
-
         this.computeNote(true, resp1.body!).then(value => {
-          this.blocked = false;
           resolve(value);
         });
       });
@@ -603,34 +600,58 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  ajouterTComment(comment: ITextComment): void {
+  async ajouterTComment(comment: ITextComment) {
+    if (!this.resp!.id) {
+      const ret = await this.updateResponseRequest(this.resp!).toPromise();
+      this.resp = ret!.body!;
+    }
+
     this.resp?.textcomments?.push(comment);
     this.blocked = true;
-    this.updateResponseRequest(this.resp!).subscribe(() => {
+    this.updateResponseRequest(this.resp!).subscribe(resp1 => {
+      this.resp = resp1.body!;
       (comment as any).checked = true;
       this.blocked = false;
     });
   }
-  ajouterGComment(comment: IGradedComment, resp: IStudentResponse): void {
+  async ajouterGComment(comment: IGradedComment) {
+    if (!this.resp!.id) {
+      const ret = await this.updateResponseRequest(this.resp!).toPromise();
+      this.resp = ret!.body!;
+    }
     this.resp?.gradedcomments?.push(comment);
     this.blocked = true;
-    this.updateResponseRequest(resp).subscribe(() => {
+    this.updateResponseRequest(this.resp!).subscribe(resp1 => {
+      this.resp = resp1.body!;
       (comment as any).checked = true;
       this.computeNote(true, this.resp!).then(() => (this.blocked = false));
     });
   }
-  retirerTComment(comment: ITextComment): void {
+  async retirerTComment(comment: ITextComment) {
+    if (!this.resp!.id) {
+      const ret = await this.updateResponseRequest(this.resp!).toPromise();
+      this.resp = ret!.body!;
+    }
+
     this.resp!.textcomments = this.resp?.textcomments!.filter(e => e.id !== comment.id);
     this.blocked = true;
-    this.updateResponseRequest(this.resp!).subscribe(() => {
+    this.updateResponseRequest(this.resp!).subscribe(resp1 => {
+      this.resp = resp1.body!;
+
       this.blocked = false;
       (comment as any).checked = false;
     });
   }
-  retirerGComment(comment: IGradedComment): void {
+  async retirerGComment(comment: IGradedComment) {
+    if (!this.resp!.id) {
+      const ret = await this.updateResponseRequest(this.resp!).toPromise();
+      this.resp = ret!.body!;
+    }
     this.resp!.gradedcomments = this.resp?.gradedcomments!.filter(e => e.id !== comment.id);
     this.blocked = true;
-    this.updateResponseRequest(this.resp!).subscribe(() => {
+    this.updateResponseRequest(this.resp!).subscribe(resp1 => {
+      this.resp = resp1.body!;
+
       (comment as any).checked = false;
       this.computeNote(true, this.resp!).then(() => (this.blocked = false));
     });
@@ -735,48 +756,54 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   addComment() {
-    if (this.currentQuestion !== undefined && this.currentQuestion.gradeType === GradeType.DIRECT) {
-      const t: ITextComment = {
-        questionId: this.currentQuestion.id,
-        text: this.titreCommentaire,
-        description: this.descCommentaire,
-        // studentResponses : [{id: this.resp?.id}]
-      };
-      this.blocked = true;
-      this.textCommentService.create(t).subscribe(e => {
-        this.resp?.textcomments?.push(e.body!);
-        const currentComment = e.body!;
-        this.updateResponseRequest(this.resp!).subscribe(() => {
-          (currentComment as any).checked = true;
-          this.currentTextComment4Question?.push(currentComment);
-          this.titreCommentaire = '';
-          this.descCommentaire = '';
-          this.blocked = false;
+    this.blocked = true;
+    this.updateResponseRequest(this.resp!).subscribe(resp => {
+      this.resp = resp.body!;
+      if (this.currentQuestion !== undefined && this.currentQuestion.gradeType === GradeType.DIRECT) {
+        const t: ITextComment = {
+          questionId: this.currentQuestion.id,
+          text: this.titreCommentaire,
+          description: this.descCommentaire,
+          // studentResponses : [{id: this.resp?.id}]
+        };
+        this.textCommentService.create(t).subscribe(e => {
+          this.resp?.textcomments?.push(e.body!);
+          const currentComment = e.body!;
+          this.updateResponseRequest(this.resp!).subscribe(resp1 => {
+            this.resp = resp1.body!;
+            (currentComment as any).checked = true;
+            this.currentTextComment4Question?.push(currentComment);
+            this.titreCommentaire = '';
+            this.descCommentaire = '';
+            this.blocked = false;
+          });
         });
-      });
-    } else if (this.currentQuestion !== undefined && this.currentQuestion.gradeType !== GradeType.DIRECT) {
-      const t: IGradedComment = {
-        questionId: this.currentQuestion.id,
-        text: this.titreCommentaire,
-        description: this.descCommentaire,
-        grade: this.noteCommentaire,
-        studentResponses: [{ id: this.resp?.id }],
-      };
-      this.blocked = true;
-      this.gradedCommentService.create(t).subscribe(e => {
-        this.resp?.gradedcomments?.push(e.body!);
-        const currentComment = e.body!;
-        this.updateResponseRequest(this.resp!).subscribe(() => {
-          (currentComment as any).checked = true;
-          this.currentGradedComment4Question?.push(currentComment);
-          this.computeNote(false, this.resp!);
-          this.titreCommentaire = '';
-          this.descCommentaire = '';
-          this.noteCommentaire = 0;
-          this.blocked = false;
+      } else if (this.currentQuestion !== undefined && this.currentQuestion.gradeType !== GradeType.DIRECT) {
+        const t: IGradedComment = {
+          questionId: this.currentQuestion.id,
+          text: this.titreCommentaire,
+          description: this.descCommentaire,
+          grade: this.noteCommentaire,
+          // studentResponses: [{ id: this.resp?.id }],
+        };
+        this.blocked = true;
+        this.gradedCommentService.create(t).subscribe(e => {
+          this.resp?.gradedcomments?.push(e.body!);
+          const currentComment = e.body!;
+          this.updateResponseRequest(this.resp!).subscribe(resp1 => {
+            this.resp = resp1.body!;
+
+            (currentComment as any).checked = true;
+            this.currentGradedComment4Question?.push(currentComment);
+            this.computeNote(false, this.resp!);
+            this.titreCommentaire = '';
+            this.descCommentaire = '';
+            this.noteCommentaire = 0;
+            this.blocked = false;
+          });
         });
-      });
-    }
+      }
+    });
   }
 
   @HostListener('window:keydown.control.ArrowLeft', ['$event'])
