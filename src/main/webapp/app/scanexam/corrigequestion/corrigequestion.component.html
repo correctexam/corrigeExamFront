@@ -179,8 +179,12 @@
               (onCancel)="changeNote()"
             ></p-rating>
             <span jhiTranslate="scanexam.noteattribuee">Note attribuée : </span
-            ><span *ngIf="questionStep > 0 && resp?.id">{{ currentNote / questionStep }}</span>
-            <span *ngIf="questionStep <= 0 && resp?.id">{{ currentNote }}</span>
+            ><span *ngIf="questionStep > 0 && resp?.id"
+              ><b>{{ currentNote / questionStep }}</b></span
+            >
+            <span *ngIf="questionStep <= 0 && resp?.id"
+              ><b>{{ currentNote }}</b></span
+            >
             <span *ngIf="!resp?.id" jhiTranslate="scanexam.noneval">non évalué</span>
           </div>
           <div *ngIf="resp" style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-3 xl:col-12">
@@ -311,16 +315,21 @@
                 </p-inplace>
                 <p-inplace [closable]="true">
                   <ng-template pTemplate="display">
-                    <p class="card-text" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
+                    <p
+                      class="card-text"
+                      *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT' && currentQuestion?.typeAlgoName !== 'QCM'"
+                    >
                       <span jhiTranslate="scanexam.noteassociecomment"> Note associée à ce commentaire : </span>
                       <span *ngIf="currentQuestion && currentQuestion?.gradeType === 'NEGATIVE'"> - </span
-                      ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'POSITIVE'"> + </span
-                      >{{ comment.grade! / questionStep }}
+                      ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'POSITIVE'"> + </span>
+                      <span *ngIf="questionStep > 0">{{ comment.grade! / questionStep }}</span>
+                      <span *ngIf="questionStep <= 0">{{ comment.grade! }}</span>
                     </p>
                   </ng-template>
                   <ng-template pTemplate="content">
                     <p-rating
                       *ngIf="noteSteps > 0 && currentQuestion && currentQuestion?.gradeType !== 'DIRECT'"
+                      [cancel]="true"
                       [stars]="noteSteps"
                       [(ngModel)]="comment.grade"
                       (ngModelChange)="updateComment($event, comment, true)"
@@ -369,7 +378,8 @@
                   <span *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
                     <span jhiTranslate="scanexam.commentnotbind">Note associée à ce commentaire : </span
                     ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'NEGATIVE'"> - </span
-                    >{{ noteCommentaire / questionStep }}</span
+                    ><span *ngIf="questionStep > 0">{{ noteCommentaire / questionStep }}</span>
+                    <span *ngIf="questionStep <= 0">{{ noteCommentaire }}</span></span
                   >
                 </p>
                 <a class="p-button p-button-primary" (click)="addComment()" jhiTranslate="scanexam.commentaddapply">Ajouter et appliquer</a>
