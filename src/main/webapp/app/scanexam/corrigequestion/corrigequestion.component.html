@@ -285,58 +285,61 @@
                 <span *ngIf="currentQuestion?.typeAlgoName !== 'QCM'" class="float-end clickable" (click)="removeGradedComment(comment)"
                   ><fa-icon icon="times"></fa-icon
                 ></span>
-                <p-inplace [closable]="true">
-                  <ng-template pTemplate="display">
-                    <h5 class="card-title">{{ comment.text }}</h5>
-                  </ng-template>
-                  <ng-template pTemplate="content">
-                    <input
-                      pInputText
-                      type="text"
-                      [(ngModel)]="comment.text"
-                      [style]="{ width: '80%' }"
-                      (change)="updateComment($event, comment, true)"
-                    />
-                  </ng-template>
-                </p-inplace>
-                <p-inplace [closable]="true">
-                  <ng-template pTemplate="display">
-                    <p class="card-text">{{ comment.description }}</p>
-                  </ng-template>
-                  <ng-template pTemplate="content">
-                    <input
-                      pInputText
-                      type="text"
-                      [(ngModel)]="comment.description"
-                      (change)="updateComment($event, comment, true)"
-                      [style]="{ width: '80%' }"
-                    />
-                  </ng-template>
-                </p-inplace>
-                <p-inplace [closable]="true">
-                  <ng-template pTemplate="display">
-                    <p
-                      class="card-text"
-                      *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT' && currentQuestion?.typeAlgoName !== 'QCM'"
-                    >
-                      <span jhiTranslate="scanexam.noteassociecomment"> Note associée à ce commentaire : </span>
-                      <span *ngIf="currentQuestion && currentQuestion?.gradeType === 'NEGATIVE'"> - </span
-                      ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'POSITIVE'"> + </span>
-                      <span *ngIf="questionStep > 0">{{ comment.grade! / questionStep }}</span>
-                      <span *ngIf="questionStep <= 0">{{ comment.grade! }}</span>
-                    </p>
-                  </ng-template>
-                  <ng-template pTemplate="content">
-                    <p-rating
-                      *ngIf="noteSteps > 0 && currentQuestion && currentQuestion?.gradeType !== 'DIRECT'"
-                      [cancel]="true"
-                      [stars]="noteSteps"
-                      [(ngModel)]="comment.grade"
-                      (ngModelChange)="updateComment($event, comment, true)"
-                    ></p-rating>
-                  </ng-template>
-                </p-inplace>
+                <div *ngIf="currentQuestion?.typeAlgoName === 'QCM'">
+                  <h5 class="card-title">{{ comment.text }}</h5>
+                  <p class="card-text">{{ comment.description }}</p>
+                </div>
 
+                <div *ngIf="currentQuestion?.typeAlgoName !== 'QCM'">
+                  <p-inplace [closable]="true">
+                    <ng-template pTemplate="display">
+                      <h5 class="card-title">{{ comment.text }}</h5>
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <input
+                        pInputText
+                        type="text"
+                        [(ngModel)]="comment.text"
+                        [style]="{ width: '80%' }"
+                        (change)="updateComment($event, comment, true)"
+                      />
+                    </ng-template>
+                  </p-inplace>
+                  <p-inplace [closable]="true">
+                    <ng-template pTemplate="display">
+                      <p class="card-text">{{ comment.description }}</p>
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <input
+                        pInputText
+                        type="text"
+                        [(ngModel)]="comment.description"
+                        (change)="updateComment($event, comment, true)"
+                        [style]="{ width: '80%' }"
+                      />
+                    </ng-template>
+                  </p-inplace>
+                  <p-inplace [closable]="true">
+                    <ng-template pTemplate="display">
+                      <p class="card-text" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
+                        <span jhiTranslate="scanexam.noteassociecomment"> Note associée à ce commentaire : </span>
+                        <span *ngIf="currentQuestion && currentQuestion?.gradeType === 'NEGATIVE'"> - </span
+                        ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'POSITIVE'"> + </span>
+                        <span *ngIf="questionStep > 0">{{ comment.grade! / questionStep }}</span>
+                        <span *ngIf="questionStep <= 0">{{ comment.grade! }}</span>
+                      </p>
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <p-rating
+                        *ngIf="noteSteps > 0 && currentQuestion && currentQuestion?.gradeType !== 'DIRECT'"
+                        [cancel]="true"
+                        [stars]="noteSteps"
+                        [(ngModel)]="comment.grade"
+                        (ngModelChange)="updateComment($event, comment, true)"
+                      ></p-rating>
+                    </ng-template>
+                  </p-inplace>
+                </div>
                 <a
                   *ngIf="!checked(comment)"
                   class="p-button p-button-primary"
