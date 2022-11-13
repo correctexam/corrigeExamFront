@@ -1259,7 +1259,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   updateComment($event: any, l: IGradedComment | ITextComment, graded: boolean): any {
     if (graded) {
-      if ((l as IGradedComment).grade === undefined) {
+      if ((l as IGradedComment).grade === null) {
         (l as IGradedComment).grade = 0;
       }
       this.gradedCommentService.update(l).subscribe(() => {
