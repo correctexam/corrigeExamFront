@@ -1259,6 +1259,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   updateComment($event: any, l: IGradedComment | ITextComment, graded: boolean): any {
     if (graded) {
+      if ((l as IGradedComment).grade === undefined) {
+        (l as IGradedComment).grade = 0;
+      }
       this.gradedCommentService.update(l).subscribe(() => {
         const coms = this.resp?.gradedcomments?.filter(c => c.id === l.id!);
         if (coms !== undefined && coms.length > 0) {
@@ -1337,8 +1340,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.confirmationService.confirm({
       message: this.translateService.instant('scanexam.removetextcommentconfirmation'),
       accept: () => {
-        this.currentTextComment4Question = this.currentTextComment4Question!.filter(e => e.id !== comment.id);
-        this.textCommentService.delete(comment!.id!).subscribe(() => console.log('delete'));
+        this.retirerTComment(comment).then(() => {
+          this.currentTextComment4Question = this.currentTextComment4Question!.filter(e => e.id !== comment.id);
+          this.textCommentService.delete(comment!.id!).subscribe(() => console.log('delete'));
+        });
       },
     });
   }
@@ -1347,8 +1352,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.confirmationService.confirm({
       message: this.translateService.instant('scanexam.removegradedcommentconfirmation'),
       accept: () => {
-        this.currentGradedComment4Question = this.currentGradedComment4Question!.filter(e => e.id !== comment.id);
-        this.gradedCommentService.delete(comment!.id!).subscribe(() => console.log('delete'));
+        this.retirerGComment(comment).then(() => {
+          this.currentGradedComment4Question = this.currentGradedComment4Question!.filter(e => e.id !== comment.id);
+          this.gradedCommentService.delete(comment!.id!).subscribe(() => {
+            console.log('delete');
+          });
+        });
       },
     });
   }

@@ -93,8 +93,9 @@
                   <p class="card-text" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
                     <span jhiTranslate="scanexam.noteassociecomment"> Note associée à ce commentaire :</span>
                     <span *ngIf="currentQuestion && currentQuestion?.gradeType === 'NEGATIVE'"> - </span
-                    ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'POSITIVE'"> + </span
-                    >{{ comment.grade! / questionStep }}
+                    ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'POSITIVE'"> + </span>
+                    <span *ngIf="questionStep > 0">{{ comment.grade! / questionStep }}</span>
+                    <span *ngIf="questionStep <= 0">{{ comment.grade! }}</span>
                   </p>
                 </div>
               </div>
