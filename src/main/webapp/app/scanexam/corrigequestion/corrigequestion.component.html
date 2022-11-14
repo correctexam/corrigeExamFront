@@ -91,7 +91,7 @@
         <fa-icon [size]="'2x'" [pTooltip]="getStudentName()!" tooltipPosition="left" icon="eye"></fa-icon>
       </div>
     </div>-->
-    <div class="grid">
+    <div class="grid grid-nogutter">
       <div class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-10">
         <div class="d-flex justify-content-center" ng-if="questionnofirst !== -1">
           <p-paginator
@@ -107,8 +107,8 @@
       </div>
     </div>
 
-    <div class="grid">
-      <div class="col-12 sm:col-12 md:col-12 lg:col-10 xl:col-10">
+    <div class="grid grid-nogutter">
+      <div class="col-12 sm:col-12 md:col-12 lg:col-9 xl:col-10">
         <div class="d-flex justify-content-center">
           <div class="col-5">
             <button
@@ -165,9 +165,9 @@
           </p-paginator>
         </div>
       </div>
-      <div class="col-12 sm:col-12 md:col-12 lg:col-2 xl:col-2">
-        <div class="grid">
-          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-3 xl:col-12">
+      <div class="col-12 sm:col-12 md:col-12 lg:col-3 xl:col-2">
+        <div class="grid grid-nogutter">
+          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <p-rating
               [disabled]="
                 currentQuestion !== undefined && (currentQuestion.gradeType !== 'DIRECT' || currentQuestion.typeAlgoName === 'QCM')
@@ -187,15 +187,15 @@
             >
             <span *ngIf="!resp?.id" jhiTranslate="scanexam.noneval">non évalué</span>
           </div>
-          <div *ngIf="resp" style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-3 xl:col-12">
+          <div *ngIf="resp" style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <label jhiTranslate="scanexam.excellente">Excellente réponse: </label>
             <p-inputSwitch [(ngModel)]="resp!.star" (onChange)="updateResponse()"></p-inputSwitch>
           </div>
-          <div *ngIf="resp" style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-3 xl:col-12">
+          <div *ngIf="resp" style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <label jhiTranslate="scanexam.badanswer">Mauvaise réponse remarquable: </label>
             <p-inputSwitch [(ngModel)]="resp!.worststar" (onChange)="updateResponse()"></p-inputSwitch>
           </div>
-          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-3 xl:col-12">
+          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <div class="grid">
               <div style="padding-bottom: 1rem" class="col-12">
                 <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
@@ -220,14 +220,14 @@
             </div>
           </div>
 
-          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-3 xl:col-12">
+          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <!--  <p-button icon="pi pi-refresh"></p-button>-->
             <jhi-graphical-toolbarcorrection></jhi-graphical-toolbarcorrection>
           </div>
         </div>
 
         <div class="grid" *ngIf="currentQuestion && currentQuestion?.gradeType === 'DIRECT' && currentQuestion?.typeAlgoName !== 'QCM'">
-          <div *ngFor="let comment of currentTextComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-3 xl:col-12">
+          <div *ngFor="let comment of currentTextComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <div class="card" [style]="getStyle(comment)">
               <div class="card-body">
                 <span class="float-end" (click)="removeTextComment(comment)"><fa-icon icon="times"></fa-icon></span>
@@ -279,7 +279,7 @@
         </div>
 
         <div class="grid" *ngIf="(currentQuestion && currentQuestion?.gradeType !== 'DIRECT') || currentQuestion?.typeAlgoName === 'QCM'">
-          <div *ngFor="let comment of currentGradedComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-3 xl:col-12">
+          <div *ngFor="let comment of currentGradedComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <div class="card" [style]="getStyle(comment)">
               <div class="card-body">
                 <span *ngIf="currentQuestion?.typeAlgoName !== 'QCM'" class="float-end clickable" (click)="removeGradedComment(comment)"
@@ -359,7 +359,7 @@
           </div>
         </div>
         <div class="grid" *ngIf="currentQuestion && currentQuestion?.typeAlgoName !== 'QCM'">
-          <div class="sm:col-6 md:col-6 lg:col-6 xl:col-12">
+          <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
             <div class="card">
               <div class="card-body">
                 <h5 class="card-title" jhiTranslate="scanexam.newcomment">Nouveau commentaire</h5>
