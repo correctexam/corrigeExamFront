@@ -91,7 +91,10 @@
               <div class="card-body">
                 <h5 class="card-title">{{ comment.text }}</h5>
                 <p class="card-text">{{ comment.description }}</p>
-                <p class="card-text" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
+                <p
+                  class="card-text"
+                  *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT' && currentQuestion?.typeAlgoName !== 'QCM'"
+                >
                   <span jhiTranslate="scanexam.noteassociecomment"> Note associée à ce commentaire :</span>
                   <span *ngIf="currentQuestion && currentQuestion?.gradeType === 'NEGATIVE'"> - </span
                   ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'POSITIVE'"> + </span>
