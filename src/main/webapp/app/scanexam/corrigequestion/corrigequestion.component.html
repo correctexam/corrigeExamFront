@@ -196,33 +196,21 @@
             <p-inputSwitch [(ngModel)]="resp!.worststar" (onChange)="updateResponse()"></p-inputSwitch>
           </div>
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
-            <div class="grid">
-              <div style="padding-bottom: 1rem" class="col-12">
-                <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
-                <p-inputSwitch [(ngModel)]="noalign" (onChange)="changeAlign()"></p-inputSwitch>
-              </div>
-              <div style="padding-bottom: 1rem" class="col-12">
-                <label><span jhiTranslate="scanexam.zoomfactor"> Facteur agrandissement : </span>({{ factor }})</label>
-                <p-slider
-                  *ngIf="noteSteps > 0"
-                  [ngModel]="factor"
-                  [min]="1"
-                  [max]="2"
-                  [step]="0.1"
-                  (onChange)="reloadImageGrowFactor($event)"
-                >
-                </p-slider>
-              </div>
-              <div style="padding-bottom: 1rem" class="col-12">
-                <label><span jhiTranslate="scanexam.pageshift">Décallage de page(s) : </span>({{ pageOffset }})</label>
-                <p-slider [ngModel]="pageOffset" [min]="-5" [max]="5" [step]="1" (onChange)="reloadImageOffset($event)"> </p-slider>
-              </div>
-            </div>
+            <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
+            <p-inputSwitch [(ngModel)]="noalign" (onChange)="changeAlign()"></p-inputSwitch>
+          </div>
+          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
+            <jhi-graphical-toolbarcorrection></jhi-graphical-toolbarcorrection>
           </div>
 
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
-            <!--  <p-button icon="pi pi-refresh"></p-button>-->
-            <jhi-graphical-toolbarcorrection></jhi-graphical-toolbarcorrection>
+            <label><span jhiTranslate="scanexam.zoomfactor"> Facteur agrandissement : </span>({{ factor }})</label>
+            <p-slider *ngIf="noteSteps > 0" [ngModel]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImageGrowFactor($event)">
+            </p-slider>
+          </div>
+          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
+            <label><span jhiTranslate="scanexam.pageshift">Décallage de page(s) : </span>({{ pageOffset }})</label>
+            <p-slider [ngModel]="pageOffset" [min]="-5" [max]="5" [step]="1" (onChange)="reloadImageOffset($event)"> </p-slider>
           </div>
         </div>
 
