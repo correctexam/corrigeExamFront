@@ -68,6 +68,8 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
   sheet: IExamSheet | undefined;
   currentTextComment4Question: ITextComment[] | undefined;
   currentGradedComment4Question: IGradedComment[] | undefined;
+  scale = 1;
+  windowWidth = 1;
 
   constructor(
     public examService: ExamService,
@@ -92,6 +94,7 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.href = this.router.url;
+    this.windowWidth = window.innerWidth;
 
     this.activatedRoute.paramMap.subscribe(params => {
       this.blocked = true;
@@ -219,11 +222,16 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
 
   displayImage(v: ImageZone, imageRef: ElementRef<any> | undefined, show: (s: boolean) => void): void {
     if (imageRef !== undefined) {
-      imageRef!.nativeElement.width = v.w;
-      imageRef!.nativeElement.height = v.h;
+      imageRef!.nativeElement.width = v.w * this.scale;
+      imageRef!.nativeElement.height = v.h * this.scale;
       const ctx1 = imageRef!.nativeElement.getContext('2d');
-      ctx1.putImageData(v.i, 0, 0);
-      //  this.addEventListeners( imageRef!.nativeElement)
+      const editedImage: HTMLCanvasElement = <HTMLCanvasElement>document.createElement('canvas');
+      editedImage.width = v.w;
+      editedImage.height = v.h;
+      const ctx2 = editedImage.getContext('2d');
+      ctx2!.putImageData(v.i, 0, 0);
+      ctx1!.scale(this.scale, this.scale);
+      ctx1!.drawImage(editedImage, 0, 0);
       show(true);
     }
   }
@@ -330,6 +338,12 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
       i.onload = () => {
         const editedImage: HTMLCanvasElement = <HTMLCanvasElement>document.createElement('canvas');
         editedImage.width = i.width;
+        let factorScale = 0.75;
+        if (this.windowWidth < 991) {
+          factorScale = 0.95;
+        }
+        this.scale = (window.innerWidth * factorScale) / i.width;
+
         editedImage.height = i.height;
         const ctx = editedImage.getContext('2d');
         ctx!.drawImage(i, 0, 0);

@@ -17,10 +17,9 @@
       </div>
       <div class="col-4 flex flex-row-reverse"></div>
     </div>
-    <div class="col-12 md:col-12">
-      <div class="grid align-items-center">
-        <div class="col-1"></div>
-        <div class="col-7">
+    <div class="grid grid-nogutter" style="padding-bottom: 1rem; padding-top: 1rem">
+      <div class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-10">
+        <div class="d-flex justify-content-center" ng-if="questionnofirst !== -1">
           <p-paginator
             [currentPageReportTemplate]="'scanexam.currentpagetemplate' | translate"
             [rows]="1"
@@ -31,73 +30,74 @@
             [showPageLinks]="false"
           ></p-paginator>
         </div>
-        <div class="col-4 grid justify-content-end"></div>
       </div>
-
-      <div class="grid">
-        <div class="col-9">
-          <div class="d-flex justify-content-center">
-            <h2><span jhiTranslate="scanexam.question1">Question </span>{{ questionno + 1 }}</h2>
-          </div>
-          <div class="d-flex justify-content-center" *ngFor="let k of questions; let i = index">
-            <div>
-              <canvas [hidden]="!showImage[i]" #nomImage></canvas>
-            </div>
-          </div>
-          <div style="padding-bottom: 2rem"></div>
-          <div class="d-flex justify-content-center">
-            <span jhiTranslate="scanexam.showsample"> Voir des exemples de solutions correctes pour cette question :</span>&nbsp;<span
-              *ngFor="let item of bestSolutions; let index = index"
-              ><a target="_blank" [routerLink]="item">{{ index + 1 }}</a> <span *ngIf="index !== bestSolutions.length - 1">, </span></span
-            >
-            <span *ngIf="bestSolutions.length === 0" jhiTranslate="scanexam.nogoodsolution">Aucune bonne solution identifiée</span>
-          </div>
-          <div style="padding-bottom: 1rem"></div>
-          <div class="d-flex justify-content-center">
-            <a target="_blank" [href]="getEmail()" jhiTranslate="scanexam.echangemail"
-              >Echange avec l'équipe pédagogique suite à une incompréhension de la correction</a
-            >
+    </div>
+    <div class="grid grid-nogutter" style="padding-bottom: 1rem; padding-top: 1rem">
+      <div class="col-12 sm:col-12 md:col-12 lg:col-9 xl:col-10">
+        <div class="d-flex justify-content-center">
+          <h2><span jhiTranslate="scanexam.question1">Question </span>{{ questionno + 1 }}</h2>
+        </div>
+        <div class="d-flex justify-content-center" *ngFor="let k of questions; let i = index">
+          <div>
+            <canvas [hidden]="!showImage[i]" #nomImage></canvas>
           </div>
         </div>
+        <div style="padding-top: 1rem; padding-bottom: 1rem"></div>
+        <div class="d-flex justify-content-center">
+          <span jhiTranslate="scanexam.showsample"> Voir des exemples de solutions correctes pour cette question :</span>&nbsp;<span
+            *ngFor="let item of bestSolutions; let index = index"
+            ><a target="_blank" [routerLink]="item">{{ index + 1 }}</a> <span *ngIf="index !== bestSolutions.length - 1">, </span></span
+          >
+          <span *ngIf="bestSolutions.length === 0" jhiTranslate="scanexam.nogoodsolution">Aucune bonne solution identifiée</span>
+        </div>
+        <div class="d-flex justify-content-center">
+          <a target="_blank" [href]="getEmail()" jhiTranslate="scanexam.echangemail"
+            >Echange avec l'équipe pédagogique suite à une incompréhension de la correction</a
+          >
+        </div>
+        <div style="padding-top: 1rem; padding-bottom: 1rem"></div>
+      </div>
 
-        <div class="col-3">
-          <div>
-            <div style="padding-bottom: 1rem">
-              <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
-              <p-inputSwitch [(ngModel)]="noalign" (onChange)="changeAlign()"></p-inputSwitch>
-            </div>
-            <div style="padding-bottom: 1rem">
-              <label jhiTranslate="scanexam.zoomfactor">Facteur agrandissement: </label>
-              <p-slider *ngIf="noteSteps > 0" [(ngModel)]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImage()"> </p-slider>
-            </div>
+      <div class="col-12 sm:col-12 md:col-12 lg:col-3 xl:col-2">
+        <div class="grid grid-nogutter">
+          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <p-rating [disabled]="true" *ngIf="noteSteps > 0" [stars]="noteSteps" [(ngModel)]="currentNote"></p-rating>
             <span jhiTranslate="scanexam.noteattribuee">Note attribuée :</span>
             <span *ngIf="questionStep > 0">{{ currentNote / questionStep }}</span>
             <span *ngIf="questionStep <= 0">{{ currentNote }}</span>
             <!--  <p-button icon="pi pi-refresh"></p-button>-->
           </div>
-          <div>
-            <div *ngIf="currentQuestion && currentQuestion?.gradeType === 'DIRECT' && currentQuestion?.typeAlgoName !== 'QCM'">
-              <div *ngFor="let comment of currentTextComment4Question | sort: 'checked'" class="card" [style]="getStyle(comment)">
+          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
+            <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
+            <p-inputSwitch [(ngModel)]="noalign" (onChange)="changeAlign()"></p-inputSwitch>
+          </div>
+          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
+            <label jhiTranslate="scanexam.zoomfactor">Facteur agrandissement: </label>
+            <p-slider *ngIf="noteSteps > 0" [(ngModel)]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImage()"> </p-slider>
+          </div>
+
+          <div class="grid" *ngIf="currentQuestion && currentQuestion?.gradeType === 'DIRECT' && currentQuestion?.typeAlgoName !== 'QCM'">
+            <div *ngFor="let comment of currentTextComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
+              <div class="card" [style]="getStyle(comment)">
                 <div class="card-body">
                   <h5 class="card-title">{{ comment.text }}</h5>
                   <p class="card-text">{{ comment.description }}</p>
                 </div>
               </div>
             </div>
-            <div *ngIf="(currentQuestion && currentQuestion?.gradeType !== 'DIRECT') || currentQuestion?.typeAlgoName === 'QCM'">
-              <div *ngFor="let comment of currentGradedComment4Question | sort: 'checked'" class="card" [style]="getStyle(comment)">
-                <div class="card-body">
-                  <h5 class="card-title">{{ comment.text }}</h5>
-                  <p class="card-text">{{ comment.description }}</p>
-                  <p class="card-text" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
-                    <span jhiTranslate="scanexam.noteassociecomment"> Note associée à ce commentaire :</span>
-                    <span *ngIf="currentQuestion && currentQuestion?.gradeType === 'NEGATIVE'"> - </span
-                    ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'POSITIVE'"> + </span>
-                    <span *ngIf="questionStep > 0">{{ comment.grade! / questionStep }}</span>
-                    <span *ngIf="questionStep <= 0">{{ comment.grade! }}</span>
-                  </p>
-                </div>
+          </div>
+          <div *ngIf="(currentQuestion && currentQuestion?.gradeType !== 'DIRECT') || currentQuestion?.typeAlgoName === 'QCM'">
+            <div *ngFor="let comment of currentGradedComment4Question | sort: 'checked'" class="card" [style]="getStyle(comment)">
+              <div class="card-body">
+                <h5 class="card-title">{{ comment.text }}</h5>
+                <p class="card-text">{{ comment.description }}</p>
+                <p class="card-text" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
+                  <span jhiTranslate="scanexam.noteassociecomment"> Note associée à ce commentaire :</span>
+                  <span *ngIf="currentQuestion && currentQuestion?.gradeType === 'NEGATIVE'"> - </span
+                  ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'POSITIVE'"> + </span>
+                  <span *ngIf="questionStep > 0">{{ comment.grade! / questionStep }}</span>
+                  <span *ngIf="questionStep <= 0">{{ comment.grade! }}</span>
+                </p>
               </div>
             </div>
           </div>
