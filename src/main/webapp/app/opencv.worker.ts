@@ -6,7 +6,16 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 import { MLModel } from './scanexam/ml/model';
-import { doQCMResolution, IPreference } from './qcm';
+import {
+  decoupe,
+  diffGrayAvecCaseBlanche,
+  doQCMResolution,
+  getDimensions,
+  getPosition,
+  IPreference,
+  trouveCases,
+  __comparePositionX,
+} from './qcm';
 
 /// <reference lib="webworker" />
 declare let cv: any;
@@ -53,6 +62,11 @@ addEventListener('message', e => {
       return doPrediction(e.data, true);
     case 'ineprediction':
       return doPrediction(e.data, false);
+    case 'namepredictionTemplate':
+      return doPredictionTemplate(e.data, true);
+    case 'inepredictionTemplate':
+      return doPredictionTemplate(e.data, false);
+
     case 'qcmresolution':
       return doQCMResolution(e.data);
     default:
@@ -124,6 +138,26 @@ function doPrediction(p: { msg: any; payload: any; uid: string }, letter: boolea
   });
 }
 
+function doPredictionTemplate(p: { msg: any; payload: any; uid: string }, letter: boolean): void {
+  // You can try more different parameters
+  let src = cv.matFromImageData(p.payload.image);
+  let template = cv.matFromImageData(p.payload.template);
+  const m = getModel(letter);
+  m.isWarmedUp.then(() => {
+    const res1 = fpredictionTemplate(template, src, p.payload.match, m, true, letter, p.payload.preference);
+    postMessage({
+      msg: p.msg,
+      payload: {
+        solution: res1.solution,
+      },
+      uid: p.uid,
+    });
+    res1.debug.delete();
+    src.delete();
+    template.delete();
+  });
+}
+
 /**
  * This function is to convert again from cv.Mat to ImageData
  */
@@ -153,6 +187,130 @@ function imageDataFromMat(mat: any): any {
   return clampedArray;
 }
 
+function fpredictionTemplate(
+  nomTemplate: any,
+  nomCopie: any,
+  cand: string[],
+  m: MLModel,
+  lookingForMissingLetter: boolean,
+  onlyletter: boolean,
+  preference: IPreference
+): any {
+  let candidate: any[] = [];
+  cand.forEach(e => {
+    candidate.push([e.padEnd(22, ' '), 0.0]);
+  });
+
+  let graynomTemplate = new cv.Mat();
+  cv.cvtColor(nomTemplate, graynomTemplate, cv.COLOR_RGBA2GRAY, 0);
+  let graynomCopie = new cv.Mat();
+  cv.cvtColor(nomCopie, graynomCopie, cv.COLOR_RGBA2GRAY, 0);
+  const casesTemplate = trouveCases(graynomTemplate, preference);
+  const letters = new Map();
+  console.error('casesTemplate.cases.length ', casesTemplate.cases.length);
+  for (let k = 0; k < casesTemplate.cases.length; k++) {
+    const forme = casesTemplate.cases.sort(__comparePositionX)[k];
+    const dim = getDimensions(forme);
+    const pos = getPosition(forme);
+
+    let dst2 = new cv.Mat();
+    let dst3 = new cv.Mat();
+    let dsize = new cv.Size(26, 26);
+    const m1 = decoupe(graynomCopie, pos, dim);
+    cv.resize(m1, dst2, dsize, 0, 0, cv.INTER_AREA);
+    // let dsizeb = new cv.Size(28, 28);
+    // cv.resize(img, dst3, dsizeb, 0, 0, cv.INTER_AREA);
+    let s = new cv.Scalar(255, 0, 0, 255);
+    cv.copyMakeBorder(dst2, dst3, 1, 1, 1, 1, cv.BORDER_CONSTANT, s);
+    letters.set(pos, dst3);
+    dst2.delete();
+    m1.delete();
+  }
+  const prepredict: any[] = [];
+  for (let i = 0; i < [...letters].length; i++) {
+    const s = diffGrayAvecCaseBlanche([...letters][i][1]);
+    if (s > 0.15) {
+      let res1 = m.predict(imageDataFromMat([...letters][i][1]));
+      if (onlyletter) {
+        if (res1[0] === '1') {
+          res1[0] = 'i';
+        }
+        if (res1[0] === '0') {
+          res1[0] = 'o';
+        }
+        if (res1[0] === '5') {
+          res1[0] = 's';
+        }
+        if (res1[0] === '3') {
+          res1[0] = 'b';
+        }
+        if (res1[0] === '9') {
+          res1[0] = 'g';
+        }
+      }
+      prepredict.push(res1);
+    } else {
+      prepredict.push(['', 1]);
+    }
+  }
+  console.error('predict', prepredict);
+
+  let lastcharacter = 0;
+  prepredict.forEach((v, index) => {
+    if (v[0] !== '') {
+      lastcharacter = index;
+    }
+  });
+  let predict = prepredict.slice(0, lastcharacter + 1);
+
+  for (let k = 0; k < candidate.length; k++) {
+    for (let j = 0; j < 13; j++) {
+      if (j < predict.length) {
+        let letter = candidate[k][0].substring(j, j + 1).toLowerCase();
+        if (letter === predict[j][0].toLowerCase()) {
+          candidate[k][1] = candidate[k][1] + predict[j][1];
+        } else {
+          if (onlyletter) {
+            candidate[k][1] = candidate[k][1] + (1 - predict[j][1]) / 35;
+            // console.log(predict[j][1])
+          } else {
+            candidate[k][1] = candidate[k][1] + (1 - predict[j][1]) / 9;
+          }
+        }
+      }
+    }
+    candidate[k][1] = candidate[k][1] / predict.length;
+  }
+
+  for (let k = 0; k < candidate.length; k++) {
+    candidate[k][0] = candidate[k][0].trim();
+    candidate[k][1] = candidate[k][1] - Math.abs(candidate[k][0].length - predict.length) / candidate[k][0].length;
+  }
+
+  candidate.sort((a, b) => {
+    if (a[1] < b[1]) {
+      return 1;
+    } else {
+      return -1;
+    }
+  });
+  graynomTemplate.delete();
+  graynomCopie.delete();
+  for (let i = 0; i < [...letters].length; i++) {
+    [...letters][i][1].delete();
+  }
+  for (let i = 0; i < casesTemplate.cases.length; i++) {
+    casesTemplate.cases[i].delete();
+  }
+  for (let i = 0; i < casesTemplate.img_cases.length; i++) {
+    casesTemplate.img_cases[i].delete();
+  }
+
+  return {
+    solution: candidate[0],
+  };
+}
+
 function fprediction(
   src: any,
   cand: string[],
@@ -164,7 +322,7 @@ function fprediction(
   const res = extractImage(src, false, lookingForMissingLetter, preference);
   let candidate: any[] = [];
   cand.forEach(e => {
-    candidate.push([e.padEnd(13, ' '), 0.0]);
+    candidate.push([e.padEnd(22, ' '), 0.0]);
   });
   const predict = [];
   for (let i = 0; i < res.letter.length; i++) {

@@ -36,6 +36,7 @@ export interface IPage {
 }
 
 export interface ImageZone {
+  t?: ImageData;
   i: ImageData;
   w: number;
   h: number;
@@ -91,7 +92,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
 
   students: IStudent[] = [];
   assisted = true;
-
+  baseTemplate = false;
   studentsOptions: () => SelectItem[] = () => this.getStudentOptions();
 
   getStudentOptions(): SelectItem[] {
@@ -485,12 +486,23 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   async predictText(p: ImageZone, zoneletter: boolean, candidatematch: string[], debugimageRef: ElementRef): Promise<(string | number)[]> {
     return new Promise<(string | number)[]>(resolve => {
       if (p !== null && p !== undefined && this.assisted) {
-        const c = { image: p.i, match: candidatematch, preference: this.preferenceService.getPreference() };
-        this.alignImagesService.prediction(c, zoneletter).subscribe(result => {
-          const ctx2 = debugimageRef?.nativeElement.getContext('2d');
-          ctx2.putImageData(result.debug, 0, 0);
-          resolve(result.solution!);
-        });
+        if (p.t !== undefined) {
+          const c = { template: p.t!, image: p.i, match: candidatematch, preference: this.preferenceService.getPreference() };
+          //        this.alignImagesService.prediction(c, zoneletter).subscribe(result => {
+          this.alignImagesService.predictionTemplate(c, zoneletter).subscribe(result => {
+            //          const ctx2 = debugimageRef?.nativeElement.getContext('2d');
+            //          ctx2.putImageData(result.debug, 0, 0);
+            resolve(result.solution!);
+          });
+        } else {
+          const c = { image: p.i, match: candidatematch, preference: this.preferenceService.getPreference() };
+          //        this.alignImagesService.prediction(c, zoneletter).subscribe(result => {
+          this.alignImagesService.prediction(c, zoneletter).subscribe(result => {
+            //          const ctx2 = debugimageRef?.nativeElement.getContext('2d');
+            //          ctx2.putImageData(result.debug, 0, 0);
+            resolve(result.solution!);
+          });
+        }
       } else {
         resolve([]);
       }
@@ -603,7 +615,51 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                   width: finalW,
                   height: finalH,
                 })
-                .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
+                .subscribe(res => {
+                  let page1 = pageInscan % this.nbreFeuilleParCopie;
+                  if (page1 === 0) {
+                    page1 = this.nbreFeuilleParCopie;
+                  }
+                  db.templates
+                    .where({ examId: +this.examId, pageNumber: page1 })
+                    .first()
+                    .then(e3 => {
+                      if (!this.baseTemplate) {
+                        resolve({ i: res, w: finalW, h: finalH });
+                      } else {
+                        const image1 = JSON.parse(e3!.value, this.reviver);
+                        this.loadImage(image1.pages, pageInscan % this.nbreFeuilleParCopie).then(v1 => {
+                          let finalW1 = (zone.width! * v1.width! * this.factor) / 100000;
+                          let finalH1 = (zone.height! * v1.height! * this.factor) / 100000;
+                          let initX1 =
+                            (zone.xInit! * v1.width!) / 100000 -
+                            ((zone.width! * v1.width! * this.factor) / 100000 - (zone.width! * v1.width!) / 100000) / 2;
+                          if (initX1 < 0) {
+                            finalW1 = finalW1 + initX1;
+                            initX1 = 0;
+                          }
+                          let initY1 =
+                            (zone.yInit! * v1.height!) / 100000 -
+                            ((zone.height! * v1.height! * this.factor) / 100000 - (zone.height! * v1.height!) / 100000) / 2;
+                          if (initY1 < 0) {
+                            finalH1 = finalH1 + initY1;
+                            initY1 = 0;
+                          }
+                          this.alignImagesService
+                            .imageCrop({
+                              image: v1.image,
+                              x: initX1,
+                              y: initY1,
+                              width: finalW1,
+                              height: finalH1,
+                            })
+                            .subscribe(res1 => {
+                              resolve({ t: res1, i: res, w: finalW, h: finalH });
+                            });
+                        });
+                      }
+                    });
+                });
             });
           });
       });

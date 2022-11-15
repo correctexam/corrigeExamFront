@@ -86,6 +86,12 @@ export interface IImagePredictionInput {
   match?: string[];
   preference: IPreference;
 }
+export interface IImagePredictionTemplateInput {
+  template: ImageData;
+  image: ImageData;
+  match: string[];
+  preference: IPreference;
+}
 export interface IImagePredictionOutput {
   solution?: (string | number)[];
   debug: ImageData;
@@ -174,6 +180,14 @@ export class AlignImagesService {
       return this._dispatch('nameprediction', payload);
     } else {
       return this._dispatch('ineprediction', payload);
+    }
+  }
+
+  public predictionTemplate(payload: IImagePredictionTemplateInput, letter: boolean): Observable<IImagePredictionOutput> {
+    if (letter) {
+      return this._dispatch('namepredictionTemplate', payload);
+    } else {
+      return this._dispatch('inepredictionTemplate', payload);
     }
   }
 

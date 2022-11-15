@@ -127,7 +127,7 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
 
 // Installation/Settup
 
-function getDimensions(forme: any): any {
+export function getDimensions(forme: any): any {
   const rect = cv.boundingRect(forme);
   return {
     w: rect.width,
@@ -149,7 +149,7 @@ function __moy(coordonnees: any[]): any {
   }
 }
 
-function getPosition(forme: any): any {
+export function getPosition(forme: any): any {
   const rect = cv.boundingRect(forme);
   return { x: rect.x, y: rect.y };
 }
@@ -186,7 +186,7 @@ function interpretationForme(contour: any, preference: IPreference): any {
 
 function detectFormes(img: any, nomsFormes: string[] = [], preference: IPreference): any[] {
   const thrash = new cv.Mat();
-  cv.threshold(img, thrash, 240, 255, cv.THRESH_BINARY);
+  cv.threshold(img, thrash, 245, 255, cv.THRESH_BINARY);
   let contours = new cv.MatVector();
   let hierarchy = new cv.Mat();
   cv.findContours(thrash, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_NONE);
@@ -234,6 +234,13 @@ function __comparePosition(f1: any, f2: any): number {
   }
 }
 
+// Comparaison personnalisée de positions (lecture haut-bas,gauche-droite)
+export function __comparePositionX(f1: any, f2: any): number {
+  let p1 = getPosition(f1);
+  let p2 = getPosition(f2);
+  return p1.x - p2.x;
+}
+
 // Indique si une forme contient (entièrement ou partiellement) une autre
 function intersection(f1: any, f2: any): boolean {
   return __f2Inf1(f1, f2) || __f2Inf1(f2, f1);
@@ -262,7 +269,7 @@ function faitDoublon(indice: any, formes: any): boolean {
 }
 
 // Trouve les cases qui composent l'image désignée par le chemin
-function trouveCases(img: any, preference: IPreference): any {
+export function trouveCases(img: any, preference: IPreference): any {
   const formes_cases = detectFormes(img, ['CARRE', 'RECTANGLE'], preference);
   const cases: any[] = [];
   const img_cases: any[] = [];
@@ -277,7 +284,7 @@ function trouveCases(img: any, preference: IPreference): any {
   return { cases: cases, img_cases: img_cases };
 }
 
-function decoupe(img: any, pos: any, dims: any): any {
+export function decoupe(img: any, pos: any, dims: any): any {
   let dst = new cv.Mat();
   // You can try more different parameters
   const rect = new cv.Rect(pos.x, pos.y, dims.w, dims.h);
@@ -410,4 +417,38 @@ function diffCouleurAvecCaseBlanche(img_case: any): number {
   let nonzerorationforeleve = cv.countNonZero(thresh) / (img_case.rows * img_case.cols);
 
   return nonzerorationforeleve;
+}
+
+export function diffGrayAvecCaseBlanche(img_case: any): number {
+  let thresh = new cv.Mat();
+  //     cv.threshold(img_case, thresh, 230, 255, cv.THRESH_BINARY_INV );
+  cv.adaptiveThreshold(img_case, thresh, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 3, 2);
+
+  let contours = new cv.MatVector();
+  let hierarchy = new cv.Mat();
+  cv.findContours(thresh, contours, hierarchy, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE);
+
+  let finalrect = undefined;
+
+  for (let i = 0; i < contours.size(); ++i) {
+    let cnt = contours.get(i);
+    let rect = cv.boundingRect(cnt);
+    if (rect.width > 1 && rect.height > 1) {
+      if (!(finalrect !== undefined && (finalrect.width > rect.width || finalrect.height > rect.height))) {
+        finalrect = rect;
+      }
+    }
+  }
+
+  if (finalrect !== undefined) {
+    let dst = new cv.Mat();
+    dst = thresh.roi(finalrect);
+    let nonzerorationforeleve = cv.countNonZero(dst) / (finalrect.width * finalrect.height);
+    dst.delete();
+    thresh.delete();
+    return nonzerorationforeleve;
+  } else {
+    thresh.delete();
+    return 0;
+  }
 }
