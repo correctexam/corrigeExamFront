@@ -714,12 +714,14 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
           )
       );
     } else {
-      this.list._filterValue = '';
+      // this.list._filterValue = '';
       this.list._filteredOptions = this.list._options;
     }
   }
 
   refreshLocalStudentList(): void {
+    this.list._filterValue = '';
+
     this.preferenceService.saveFilterStudentPreference(this.filterbindstudent);
     this.filterLocalStudentList();
 
