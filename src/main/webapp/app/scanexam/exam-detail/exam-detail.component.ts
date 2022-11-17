@@ -25,6 +25,7 @@ import { ExportOptions } from 'dexie-export-import';
 import { MessageService } from 'primeng/api';
 import { CacheUploadService } from './cacheUpload.service';
 import { TranslateService } from '@ngx-translate/core';
+import { ImportProgress } from 'dexie-export-import/dist/import';
 
 @Component({
   selector: 'jhi-exam-detail',
@@ -256,48 +257,64 @@ export class ExamDetailComponent implements OnInit {
         accept: () => {
           const o: ExportOptions = {};
           o.filter = (table: string, value: any) =>
-            (table === 'exams' && value.id === +this.examId) ||
+            (table === 'exams' && value.id === +this.examId) /* && value.pageNumber <10*/ ||
             (table === 'templates' && value.examId === +this.examId) ||
             (table === 'nonAlignImages' && value.examId === +this.examId) ||
             (table === 'alignImages' && value.examId === +this.examId);
+
           this.blocked = true;
           this.translateService.get('scanexam.exportcacheencours').subscribe(res => (this.message = '' + res));
-          db.export(o).then((value: Blob) => {
-            const file = new File([value], this.examId + 'indexdb.json');
-            this.progress = 0;
-            this.translateService.get('scanexam.uploadcacheencours').subscribe(res => (this.message = '' + res));
-            this.translateService.get('scanexam.uploadcacheencoursdetail').subscribe(res => (this.submessage = '' + res));
 
-            this.cacheUploadService.uploadCache(file).subscribe(
-              e => {
-                this.progress = e.progress;
+          db.export(o)
+            .then((value: Blob) => {
+              const file = new File([value], this.examId + 'indexdb.json');
+              this.progress = 0;
+              this.translateService.get('scanexam.uploadcacheencours').subscribe(res => (this.message = '' + res));
+              this.translateService.get('scanexam.uploadcacheencoursdetail').subscribe(res => (this.submessage = '' + res));
 
-                if (e.state === 'DONE') {
-                  this.blocked = false;
+              this.cacheUploadService.uploadCache(file).subscribe(
+                e => {
+                  this.progress = e.progress;
+
+                  if (e.state === 'DONE') {
+                    this.blocked = false;
+                    this.messageService.add({
+                      severity: 'success',
+                      summary: this.translateService.instant('scanexam.uploadcacheok'),
+                      detail: this.translateService.instant('scanexam.uploadcacheokdetail'),
+                    });
+                    this.message = '';
+                    this.submessage = '';
+                  }
+                },
+                () => {
                   this.messageService.add({
-                    severity: 'success',
-                    summary: this.translateService.instant('scanexam.uploadcacheok'),
-                    detail: this.translateService.instant('scanexam.uploadcacheokdetail'),
+                    severity: 'error',
+                    summary: this.translateService.instant('scanexam.uploadcacheko'),
+                    detail: this.translateService.instant('scanexam.uploadcachekodetail'),
                   });
+
+                  this.blocked = false;
                   this.message = '';
                   this.submessage = '';
                 }
-              },
-              () => {
-                this.messageService.add({
-                  severity: 'error',
-                  summary: this.translateService.instant('scanexam.uploadcacheko'),
-                  detail: this.translateService.instant('scanexam.uploadcachekodetail'),
-                });
-
-                this.blocked = false;
-                this.message = '';
-                this.submessage = '';
-              }
-            );
-          });
+              );
+            })
+            .catch(e2 => {
+              console.error(e2);
+            });
         },
       });
+    });
+  }
+
+  readBlob(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onabort = ev => reject(new Error('file read aborted'));
+      reader.onerror = ev => reject((ev.target as any).error);
+      reader.onload = ev => resolve((ev.target as any).result);
+      reader.readAsText(blob);
     });
   }
 
