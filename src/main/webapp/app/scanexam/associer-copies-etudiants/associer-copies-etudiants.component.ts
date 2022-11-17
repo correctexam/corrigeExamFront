@@ -309,16 +309,16 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         this.predictText(
           value[0]!,
           true,
-          this.students.map(student => student.name!),
-          this.nomImageReco!
+          this.students.map(student => student.name!)
+          //  this.nomImageReco!
         )
       );
       ppredics.push(
         this.predictText(
           value[1]!,
           true,
-          this.students.map(student => student.firstname!),
-          this.prenomImageReco!
+          this.students.map(student => student.firstname!)
+          // this.prenomImageReco!
         )
       );
 
@@ -326,8 +326,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         this.predictText(
           value[2]!,
           false,
-          this.students.map(student => student.ine!),
-          this.ineImageReco!
+          this.students.map(student => student.ine!)
+          //   this.ineImageReco!
         )
       );
       Promise.all(ppredics).then(predicts => {
@@ -483,7 +483,11 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     this.loadAllPages();
   }
 
-  async predictText(p: ImageZone, zoneletter: boolean, candidatematch: string[], debugimageRef: ElementRef): Promise<(string | number)[]> {
+  async predictText(
+    p: ImageZone,
+    zoneletter: boolean,
+    candidatematch: string[] /* , debugimageRef: ElementRef */
+  ): Promise<(string | number)[]> {
     return new Promise<(string | number)[]>(resolve => {
       if (p !== null && p !== undefined && this.assisted) {
         if (p.t !== undefined) {

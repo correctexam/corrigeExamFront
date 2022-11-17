@@ -30,9 +30,18 @@ export class ScanService {
 
   updateWithProgress(scan: IScan): Observable<HttpEvent<IScan>> {
     // eslint-disable-next-line no-console
-    console.log('update with progress');
-
     return this.http.put<IScan>(`${this.resourceUrl}`, scan, { reportProgress: true, observe: 'events' } /* { observe: 'response' }*/);
+  }
+
+  uploadScan(file: File, scanId: number): Observable<HttpEvent<any>> {
+    const formData: FormData = new FormData();
+    formData.append('file', file);
+
+    return this.http.post(`${this.applicationConfigService.getEndpointFor('api/uploadScan')}/${scanId} `, formData, {
+      reportProgress: true,
+      responseType: 'json',
+      observe: 'events',
+    });
   }
 
   partialUpdate(scan: IScan): Observable<EntityResponseType> {
