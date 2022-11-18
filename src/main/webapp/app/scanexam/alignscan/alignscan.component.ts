@@ -29,7 +29,6 @@ import { fromWorkerPool } from 'observable-webworker';
 import { Observable, Subscriber } from 'rxjs';
 import { worker1 } from '../services/workerimport';
 import { PreferenceService } from '../preference-page/preference.service';
-import { cp } from 'fs';
 
 export interface IPage {
   image?: ArrayBuffer;
@@ -433,9 +432,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
           };
           const s = this.fgetBase64Image(napage.image!);
 
-          console.error('before save');
-          // await this.saveEligneImage(pagen, s)
-          // console.error('after save')
           await this.saveNonAligneImage(pagen, s);
 
           this.saveEligneImage(apage.page!, s).then(() => {
@@ -453,9 +449,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
               this.observer?.complete();
             }
           });
-
-          console.error('after save non align');
-          this.avancement = pagen;
           resolve(apage);
         }
       };
