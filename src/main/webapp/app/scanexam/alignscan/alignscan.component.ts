@@ -29,6 +29,7 @@ import { fromWorkerPool } from 'observable-webworker';
 import { Observable, Subscriber } from 'rxjs';
 import { worker1 } from '../services/workerimport';
 import { PreferenceService } from '../preference-page/preference.service';
+import { cp } from 'fs';
 
 export interface IPage {
   image?: ArrayBuffer;
@@ -344,11 +345,13 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
       },
       err => console.log(err),
       () => {
+        console.error('complete');
         this.saveData();
       }
     );
 
     this.currentPageAlign = 1;
+    console.error(navigator.hardwareConcurrency - 1);
     while (
       this.currentPageAlign < 1 + (navigator.hardwareConcurrency - 1) * 2 &&
       this.currentPageAlign < this.pdfService.numberOfPages() + 1
@@ -379,7 +382,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     i.src = file;
   }
 
-  async aligneImages(file: any, pagen: number): Promise<IPage> {
+  aligneImages(file: any, pagen: number): Promise<IPage> {
     return new Promise(resolve => {
       const i = new Image();
       i.onload = async () => {
@@ -428,13 +431,32 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
             width: i.width,
             height: i.height,
           };
-          const pixels = new ImageData(new Uint8ClampedArray(apage.image), apage.width, apage.height);
-          this.saveEligneImage(pagen, this.fgetBase64Image(pixels)).then(() => {
-            this.saveNonAligneImage(pagen, this.fgetBase64Image(pixels)).then(() => {
-              this.avancement = pagen;
-              resolve(apage);
-            });
+          const s = this.fgetBase64Image(napage.image!);
+
+          console.error('before save');
+          // await this.saveEligneImage(pagen, s)
+          // console.error('after save')
+          await this.saveNonAligneImage(pagen, s);
+
+          this.saveEligneImage(apage.page!, s).then(() => {
+            if (this.currentPageAlign < this.numberPagesInScan + 1) {
+              this.observerPage?.next(this.currentPageAlign);
+              this.currentPageAlign = this.currentPageAlign + 1;
+            }
+            if (this.currentPageAlignOver < this.numberPagesInScan) {
+              this.avancement = this.currentPageAlignOver;
+              this.currentPageAlignOver = this.currentPageAlignOver + 1;
+            } else {
+              this.avancement = this.currentPageAlignOver;
+              this.currentPageAlignOver = this.currentPageAlignOver + 1;
+              this.observerPage?.complete();
+              this.observer?.complete();
+            }
           });
+
+          console.error('after save non align');
+          this.avancement = pagen;
+          resolve(apage);
         }
       };
       i.src = file;
