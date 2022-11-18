@@ -23,8 +23,7 @@ import { faObjectGroup } from '@fortawesome/free-solid-svg-icons';
 
 import { db } from '../db/db';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { ExportOptions } from 'dexie-export-import';
-import { CacheUploadService } from '../exam-detail/cacheUpload.service';
+import { CacheUploadService, CacheUploadNotification } from '../exam-detail/cacheUpload.service';
 import { TranslateService } from '@ngx-translate/core';
 import { fromWorkerPool } from 'observable-webworker';
 import { Observable, Subscriber } from 'rxjs';
@@ -44,7 +43,7 @@ export interface IPage {
   styleUrls: ['./alignscan.component.scss'],
   providers: [MessageService],
 })
-export class AlignScanComponent implements OnInit {
+export class AlignScanComponent implements OnInit, CacheUploadNotification {
   faObjectGroup = faObjectGroup as IconProp;
   examId = '';
   exam!: IExam;
@@ -97,6 +96,18 @@ export class AlignScanComponent implements OnInit {
     private messageService: MessageService,
     private preferenceService: PreferenceService
   ) {}
+  setMessage(v: string): void {
+    this.message = v;
+  }
+  setSubMessage(v: string): void {
+    this.submessage = v;
+  }
+  setBlocked(v: boolean): void {
+    this.blocked = v;
+  }
+  setProgress(v: number): void {
+    this.progress = v;
+  }
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
@@ -233,16 +244,14 @@ export class AlignScanComponent implements OnInit {
       });
     }
 
-    const o: ExportOptions = {};
-    o.filter = (table: string, value: any) =>
-      (table === 'exams' && value.id === +this.examId) ||
-      (table === 'templates' && value.examId === +this.examId) ||
-      (table === 'nonAlignImages' && value.examId === +this.examId) ||
-      (table === 'alignImages' && value.examId === +this.examId);
-
     this.translateService.get('scanexam.exportcacheencours').subscribe(res => (this.message = '' + res));
-
-    db.export(o)
+    this.cacheUploadService.exportCache(+this.examId, this.translateService, this.messageService, this.numberPagesInScan, this).then(() => {
+      setTimeout(() => {
+        this.blocked = false;
+        this.router.navigateByUrl('/exam/' + this.examId);
+      }, 2000);
+    });
+    /* db.export(o)
       .then((value: Blob) => {
         const file = new File([value], this.examId + 'indexdb.json');
         this.progress = 0;
@@ -291,7 +300,7 @@ export class AlignScanComponent implements OnInit {
           summary: this.translateService.instant('scanexam.downloadcacheko'),
           detail: this.translateService.instant('scanexam.downloadcachekodetail'),
         });
-      });
+      }); */
   }
 
   async saveEligneImage(pageN: number, imageString: string): Promise<void> {

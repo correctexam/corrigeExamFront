@@ -207,7 +207,6 @@ function fpredictionTemplate(
   cv.cvtColor(nomCopie, graynomCopie, cv.COLOR_RGBA2GRAY, 0);
   const casesTemplate = trouveCases(graynomTemplate, preference);
   const letters = new Map();
-  console.error('casesTemplate.cases.length ', casesTemplate.cases.length);
   for (let k = 0; k < casesTemplate.cases.length; k++) {
     const forme = casesTemplate.cases.sort(__comparePositionX)[k];
     const dim = getDimensions(forme);
@@ -253,7 +252,6 @@ function fpredictionTemplate(
       prepredict.push(['', 1]);
     }
   }
-  console.error('predict', prepredict);
 
   let lastcharacter = 0;
   prepredict.forEach((v, index) => {

@@ -171,7 +171,7 @@ export class ChargerscanComponent implements OnInit {
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IScan>>): void {
     result.pipe(finalize(() => this.onSaveFinalize())).subscribe({
-      next: e => this.onSaveSuccess(),
+      next: () => this.onSaveSuccess(),
       error: () => this.onSaveError(),
     });
   }
