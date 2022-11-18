@@ -8,6 +8,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const WebpackNotifierPlugin = require('webpack-notifier');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const { ESBuildMinifyPlugin } = require('esbuild-loader');
 
 const environment = require('./environment');
 const proxyConfig = require('./proxy.conf');
@@ -23,6 +24,16 @@ module.exports = async (config, options, targetOptions) => {
 
   // PLUGINS
   if (config.mode === 'development') {
+    // remove 2 first minimizers, hoping they are the TerserPlugin
+    config.optimization.minimizer.shift();
+    config.optimization.minimizer.shift();
+
+    config.optimization.minimizer.unshift(
+      new ESBuildMinifyPlugin({
+        target: 'es2015', // Syntax to compile to (see options below for possible values)
+      })
+    );
+
     config.plugins.push(
       new ESLintPlugin({
         extensions: ['js', 'ts'],
@@ -53,6 +64,16 @@ module.exports = async (config, options, targetOptions) => {
   }
 
   if (targetOptions.target === 'serve' || config.watch) {
+    // remove 2 first minimizers, hoping they are the TerserPlugin
+    config.optimization.minimizer.shift();
+    config.optimization.minimizer.shift();
+
+    config.optimization.minimizer.unshift(
+      new ESBuildMinifyPlugin({
+        target: 'es2015', // Syntax to compile to (see options below for possible values)
+      })
+    );
+
     config.plugins.push(
       new BrowserSyncPlugin(
         {

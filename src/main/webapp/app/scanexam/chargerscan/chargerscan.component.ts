@@ -115,15 +115,47 @@ export class ChargerscanComponent implements OnInit {
     this.blocked = true;
     const scan1 = this.createFromForm();
     this.progress = 0;
+    //    const byteCharacters = atob(scan1.content!);
+    /*    console.log(byteCharacters.length)
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    } */
+    //    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new File([scan1.content!], scan1.id + '.pdf', {
+      type: 'text/plain',
+    });
+
     if (scan1.id !== undefined) {
       // this.scanService.updateWithProgress(scan1).subscribe(e=> console.log(e))
-      this.pipeToSaveResponse(this.scanService.updateWithProgress(scan1));
+      this.scanService
+        .update({
+          id: scan1.id,
+          name: scan1.name,
+          contentContentType: scan1.contentContentType,
+        })
+        .subscribe(e => {
+          this.exam.scanfileId = e.body?.id;
+          this.examService.update(this.exam).subscribe(() => {
+            this.pipeToSaveResponse(this.scanService.uploadScan(blob, e.body?.id!));
+          });
+        });
+      //      this.pipeToSaveResponse(this.scanService.updateWithProgress(scan1));
     } else {
-      this.pipeToSaveResponse(this.scanService.createWithProgress(scan1));
+      this.scanService
+        .create({
+          name: scan1.name,
+          contentContentType: scan1.contentContentType,
+        })
+        .subscribe(e => {
+          this.exam.scanfileId = e.body?.id;
+          this.examService.update(this.exam).subscribe(() => this.pipeToSaveResponse(this.scanService.uploadScan(blob, e.body?.id!)));
+        });
+      //      this.pipeToSaveResponse(this.scanService.createWithProgress(scan1));
     }
   }
 
-  protected pipeToSaveResponse(result: Observable<HttpEvent<IScan>>): void {
+  protected pipeToSaveResponse(result: Observable<HttpEvent<Upload>>): void {
     //  console.log(result)
     result.pipe(scan(calculateState, initialState)).subscribe(data => {
       this.progress = data.progress;
@@ -132,28 +164,21 @@ export class ChargerscanComponent implements OnInit {
       }
 
       if (data.state === 'DONE') {
-        this.onSaveSuccess(data.body!);
+        this.onSaveSuccess();
       }
     });
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IScan>>): void {
     result.pipe(finalize(() => this.onSaveFinalize())).subscribe({
-      next: e => this.onSaveSuccess(e.body),
+      next: () => this.onSaveSuccess(),
       error: () => this.onSaveError(),
     });
   }
 
-  protected onSaveSuccess(s: IScan | null): void {
-    this.exam.scanfileId = s?.id;
-    this.examService.update(this.exam).subscribe(
-      () => {
-        this.blocked = false;
-
-        this.gotoUE();
-      },
-      () => this.onSaveError()
-    );
+  protected onSaveSuccess(): void {
+    this.blocked = false;
+    this.gotoUE();
   }
 
   protected onSaveError(): void {

@@ -128,7 +128,6 @@ export class FabricCanvasComponent implements AfterViewInit {
       const pageHandler = new PageHandler(evt.source, page, this.eventHandler);
       this.eventHandler.pages[page] = pageHandler;
     }
-    console.error(this.eventHandler.pages[page].pageViewer.canvas.clientWidth);
 
     const canvas = this.eventHandler.pages[page].updateCanvas(evt.source);
     if (this.zones[page] !== undefined) {
