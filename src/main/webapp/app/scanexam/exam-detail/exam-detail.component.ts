@@ -21,11 +21,9 @@ import { IStudent } from 'app/entities/student/student.model';
 import { db } from '../db/db';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { AccountService } from '../../core/auth/account.service';
-import { ExportOptions } from 'dexie-export-import';
 import { MessageService } from 'primeng/api';
-import { CacheUploadService } from './cacheUpload.service';
+import { CacheDownloadNotification, CacheUploadNotification, CacheUploadService } from './cacheUpload.service';
 import { TranslateService } from '@ngx-translate/core';
-import { ImportProgress } from 'dexie-export-import/dist/import';
 
 @Component({
   selector: 'jhi-exam-detail',
@@ -33,7 +31,7 @@ import { ImportProgress } from 'dexie-export-import/dist/import';
   styleUrls: ['./exam-detail.component.scss'],
   providers: [ConfirmationService, MessageService],
 })
-export class ExamDetailComponent implements OnInit {
+export class ExamDetailComponent implements OnInit, CacheUploadNotification, CacheDownloadNotification {
   blocked = false;
   farCircle = farCircle as IconProp;
   fasMotorcycle = fasMotorcycle as IconProp;
@@ -66,6 +64,12 @@ export class ExamDetailComponent implements OnInit {
     public cacheUploadService: CacheUploadService,
     private translateService: TranslateService
   ) {}
+  setShowAssociation(v: boolean): void {
+    this.showAssociation = v;
+  }
+  setShowCorrection(v: boolean): void {
+    this.showCorrection = v;
+  }
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
@@ -94,28 +98,7 @@ export class ExamDetailComponent implements OnInit {
                 this.showAssociation = true;
                 this.initTemplate();
               } else {
-                db.removeElementForExam(+this.examId).then(() => {
-                  this.cacheUploadService.getCache(this.examId + 'indexdb.json').subscribe(
-                    data => {
-                      db.import(data)
-                        .then(() => {
-                          this.messageService.add({
-                            severity: 'success',
-                            summary: this.translateService.instant('scanexam.downloadcacheokc'),
-                            detail: this.translateService.instant('scanexam.downloadcacheokdetail'),
-                          });
-                          this.showAssociation = true;
-                          this.initTemplate();
-                        })
-                        .catch(() => {
-                          this.blocked = false;
-                        });
-                    },
-                    () => {
-                      this.blocked = false;
-                    }
-                  );
-                });
+                this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this);
               }
             });
         });
@@ -255,67 +238,22 @@ export class ExamDetailComponent implements OnInit {
         message: data,
         // eslint-disable-next-line object-shorthand
         accept: () => {
-          const o: ExportOptions = {};
-          o.filter = (table: string, value: any) =>
-            (table === 'exams' && value.id === +this.examId) /* && value.pageNumber <10*/ ||
-            (table === 'templates' && value.examId === +this.examId) ||
-            (table === 'nonAlignImages' && value.examId === +this.examId) ||
-            (table === 'alignImages' && value.examId === +this.examId);
-
-          this.blocked = true;
-          this.translateService.get('scanexam.exportcacheencours').subscribe(res => (this.message = '' + res));
-
-          db.export(o)
-            .then((value: Blob) => {
-              const file = new File([value], this.examId + 'indexdb.json');
-              this.progress = 0;
-              this.translateService.get('scanexam.uploadcacheencours').subscribe(res => (this.message = '' + res));
-              this.translateService.get('scanexam.uploadcacheencoursdetail').subscribe(res => (this.submessage = '' + res));
-
-              this.cacheUploadService.uploadCache(file).subscribe(
-                e => {
-                  this.progress = e.progress;
-
-                  if (e.state === 'DONE') {
-                    this.blocked = false;
-                    this.messageService.add({
-                      severity: 'success',
-                      summary: this.translateService.instant('scanexam.uploadcacheok'),
-                      detail: this.translateService.instant('scanexam.uploadcacheokdetail'),
-                    });
-                    this.message = '';
-                    this.submessage = '';
-                  }
-                },
-                () => {
-                  this.messageService.add({
-                    severity: 'error',
-                    summary: this.translateService.instant('scanexam.uploadcacheko'),
-                    detail: this.translateService.instant('scanexam.uploadcachekodetail'),
-                  });
-
-                  this.blocked = false;
-                  this.message = '';
-                  this.submessage = '';
-                }
-              );
-            })
-            .catch(e2 => {
-              console.error(e2);
-            });
+          this.cacheUploadService.exportCache(+this.examId, this.translateService, this.messageService, this.numberPagesInScan, this);
         },
       });
     });
   }
-
-  readBlob(blob: Blob): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onabort = ev => reject(new Error('file read aborted'));
-      reader.onerror = ev => reject((ev.target as any).error);
-      reader.onload = ev => resolve((ev.target as any).result);
-      reader.readAsText(blob);
-    });
+  setMessage(v: string): void {
+    this.message = v;
+  }
+  setSubMessage(v: string): void {
+    this.submessage = v;
+  }
+  setBlocked(v: boolean): void {
+    this.blocked = v;
+  }
+  setProgress(v: number): void {
+    this.progress = v;
   }
 
   confirmDownload(): any {
@@ -325,40 +263,7 @@ export class ExamDetailComponent implements OnInit {
         // eslint-disable-next-line object-shorthand
         accept: () => {
           this.blocked = true;
-          db.removeElementForExam(+this.examId).then(() => {
-            this.cacheUploadService.getCache(this.examId + 'indexdb.json').subscribe(
-              data => {
-                db.import(data)
-                  .then(() => {
-                    this.messageService.add({
-                      severity: 'success',
-                      summary: this.translateService.instant('scanexam.downloadcacheok'),
-                      detail: this.translateService.instant('scanexam.downloadcacheokdetail'),
-                    });
-                    this.blocked = false;
-                    this.showAssociation = true;
-                    this.showCorrection = true;
-                  })
-                  .catch(() => {
-                    this.messageService.add({
-                      severity: 'error',
-                      summary: this.translateService.instant('scanexam.downloadcacheko'),
-                      detail: this.translateService.instant('scanexam.downloadcachekodetail'),
-                    });
-                    this.blocked = false;
-                  });
-              },
-              () => {
-                this.messageService.add({
-                  severity: 'error',
-                  summary: this.translateService.instant('scanexam.downloadcacheko'),
-                  detail: this.translateService.instant('scanexam.downloadcachekodetail'),
-                });
-
-                this.blocked = false;
-              }
-            );
-          });
+          this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this);
         },
       });
     });
