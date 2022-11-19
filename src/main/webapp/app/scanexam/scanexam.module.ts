@@ -75,6 +75,7 @@ import { MessageModule } from 'primeng/message';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { PreferencePageComponent } from './preference-page/preference-page.component';
+import { PartialAlignModalComponent } from './alignscan/partial-align-modal/partial-align-modal.component';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -281,6 +282,7 @@ export const ShowResults_ROUTE: Route = {
     VoirReponsesStarUnstarComponent,
     SharecourseComponent,
     PreferencePageComponent,
+    PartialAlignModalComponent,
   ],
   imports: [
     CommonModule,
