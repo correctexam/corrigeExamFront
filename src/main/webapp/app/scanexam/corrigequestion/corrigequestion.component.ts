@@ -425,7 +425,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                           questionId: qid,
                         })
                         .subscribe(sr => {
-                          console.error(sr);
                           if (sr.body !== null && sr.body.length > 0) {
                             this.resp = sr.body![0];
                             this.computeNote(false, this.resp);
