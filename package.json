@@ -14,7 +14,7 @@
     "copy:404": "cp target/classes/static/index.html target/classes/static/404.html",
     "deploy": "ng deploy --base-href=/corrigeExamFront/",
     "jest": "jest --coverage --logHeapUsage --maxWorkers=2 --config jest.conf.js",
-    "lint": "eslint . --ext --allow-empty .js,.ts",
+    "lint": "eslint . --ext .js,.ts ",
     "lint:fix": "npm run lint -- --fix",
     "prepare": "husky install",
     "prettier:check": "prettier --check \"{,src/**/,webpack/}*.{md,json,yml,html,cjs,mjs,js,ts,tsx,css,scss}\"",
