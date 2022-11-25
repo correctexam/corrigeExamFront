@@ -237,7 +237,7 @@ export class CacheUploadService {
           datas.push(data);
           part = part + 1;
           p = new Promise(resolve => {
-            this.getCache(examId + +'_part_' + part + '_indexdb.json').subscribe(d => {
+            this.getCache(examId + '_part_' + part + '_indexdb.json').subscribe(d => {
               resolve(d);
             });
           });

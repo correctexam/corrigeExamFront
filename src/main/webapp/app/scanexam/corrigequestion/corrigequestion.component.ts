@@ -817,7 +817,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       if (c > 0) {
         this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno! + 1) + '/' + c);
       } else if (q1 > 0) {
-        this.router.navigateByUrl('/answer/' + this.examId! + '/' + q1 + '/' + this.numberPagesInScan! / this.nbreFeuilleParCopie!);
+        const prevSt = this.numberPagesInScan! / this.nbreFeuilleParCopie!;
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + q1 + '/' + prevSt);
       }
     }
   }
