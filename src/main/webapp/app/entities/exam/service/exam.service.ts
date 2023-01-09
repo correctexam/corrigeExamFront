@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { lastValueFrom, Observable } from 'rxjs';
 
 import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
@@ -13,6 +13,7 @@ export type EntityArrayResponseType = HttpResponse<IExam[]>;
 @Injectable({ providedIn: 'root' })
 export class ExamService {
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/exams');
+  protected resourceUrlCustom = this.applicationConfigService.getEndpointFor('api/getExamStatus');
 
   constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {}
 
@@ -68,4 +69,31 @@ export class ExamService {
     }
     return examCollection;
   }
+
+  /**
+   * Gets the summary data of an exam marking
+   * @param examId The ID of the exam to get
+   * @returns A promise of the query
+   */
+  public getExamDetails(examId: number): Promise<MarkingExamStateDTO> {
+    return lastValueFrom(this.http.get<MarkingExamStateDTO>(`${this.resourceUrlCustom}/${examId}`));
+  }
+}
+
+export interface QuestionStateDTO {
+  id: number;
+  answeredSheets: number;
+  firstUnmarkedSheet: number;
+}
+
+export interface SheetStateDTO {
+  id: number;
+  answeredSheets: number;
+  firstUnmarkedQuestion: number;
+}
+
+export interface MarkingExamStateDTO {
+  nameExam: string;
+  questions: Array<QuestionStateDTO>;
+  sheets: Array<SheetStateDTO>;
 }
