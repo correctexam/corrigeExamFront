@@ -76,7 +76,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { PreferencePageComponent } from './preference-page/preference-page.component';
 import { PartialAlignModalComponent } from './alignscan/partial-align-modal/partial-align-modal.component';
-import { MarkingSummaryComponent } from './marking-summary/marking-summary/marking-summary.component';
+import { MarkingSummaryComponent } from './marking-summary/marking-summary.component';
 import { TabViewModule } from 'primeng/tabview';
 
 // set the location of the OpenCV files
