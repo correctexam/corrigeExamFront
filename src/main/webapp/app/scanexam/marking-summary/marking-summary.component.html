@@ -19,7 +19,7 @@
           </div>
           <div class="col">
             <button
-              [routerLink]="'/answer/' + this.examId + '/' + q.id + '/' + q.firstUnmarkedSheet"
+              [routerLink]="'/answer/' + this.examId + '/' + q.numero + '/' + q.firstUnmarkedSheet"
               class="p-element p-ripple"
               pButton
               type="button"
@@ -54,7 +54,7 @@
           </div>
           <div class="col">
             <button
-              [routerLink]="'/answer/' + this.examId + '/' + s.firstUnmarkedQuestion + '/' + s.id"
+              [routerLink]="'/answer/' + this.examId + '/' + s.firstUnmarkedQuestion + '/' + s.numero"
               class="p-element p-ripple"
               pButton
               type="button"

@@ -80,18 +80,29 @@ export class ExamService {
   }
 }
 
+/**
+ * DTO for `getExamDetails`. See MarkingExamStateDTO
+ */
 export interface QuestionStateDTO {
   id: number;
+  numero: number;
   answeredSheets: number;
   firstUnmarkedSheet: number;
 }
 
+/**
+ * DTO for `getExamDetails`. See MarkingExamStateDTO
+ */
 export interface SheetStateDTO {
   id: number;
+  numero: number;
   answeredSheets: number;
   firstUnmarkedQuestion: number;
 }
 
+/**
+ * DTO for `getExamDetails`
+ */
 export interface MarkingExamStateDTO {
   nameExam: string;
   questions: Array<QuestionStateDTO>;
