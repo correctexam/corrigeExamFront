@@ -13,7 +13,7 @@
     <p-tabPanel [header]="'scanexam.questions' | translate">
       <div class="container">
         <div class="row row-striped" *ngFor="let q of dataExam.questions">
-          <div class="col align-self-center">{{ 'scanexam.questionLow' | translate }} {{ q.id }}</div>
+          <div class="col align-self-center">{{ 'scanexam.questionLow' | translate }} {{ q.numero }}</div>
           <div class="col align-self-center">
             {{ q.answeredSheets }} / {{ dataExam.sheets.length }} ({{ q.answeredSheets / dataExam.sheets.length | percent }})
           </div>
@@ -48,7 +48,7 @@
     <p-tabPanel [header]="'scanexam.sheets' | translate">
       <div class="container">
         <div class="row row-striped" *ngFor="let s of dataExam.sheets">
-          <div class="col align-self-center">{{ 'scanexam.sheet' | translate }} {{ s.id }}</div>
+          <div class="col align-self-center">{{ 'scanexam.sheet' | translate }} {{ s.numero }}</div>
           <div class="col align-self-center">
             {{ s.answeredSheets }} / {{ dataExam.questions.length }} ({{ s.answeredSheets / dataExam.questions.length | percent }})
           </div>
