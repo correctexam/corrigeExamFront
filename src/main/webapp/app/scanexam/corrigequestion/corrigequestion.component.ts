@@ -58,7 +58,7 @@ import { EntityResponseType } from '../../entities/exam-sheet/service/exam-sheet
   providers: [ConfirmationService, MessageService],
 })
 export class CorrigequestionComponent implements OnInit, AfterViewInit {
-  debug = true;
+  debug = false;
   @ViewChild('qcmcorrect')
   qcmcorrect!: ElementRef;
   @ViewChild('imageQcmDebugs')
@@ -239,7 +239,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                               if (sheets !== undefined && sheets!.length > 0) {
                                 this.resp.sheetId = sheets[0]?.id;
                               }
-                              console.error('query for', this.resp.sheetId, this.resp.questionId);
 
                               this.studentResponseService
                                 .query({
@@ -247,8 +246,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                                   questionId: this.resp.questionId,
                                 })
                                 .subscribe(sr => {
-                                  console.error(sr.body);
-
                                   if (sr.body !== null && sr.body.length > 0) {
                                     this.resp = sr.body![0];
                                     this.currentNote = this.resp.note!;
