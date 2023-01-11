@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MarkingExamStateDTO, ExamService } from 'app/entities/exam/service/exam.service';
+import { db } from '../db/db';
 
 @Component({
   selector: 'jhi-marking-summary',
@@ -14,6 +15,7 @@ export class MarkingSummaryComponent implements OnInit {
     questions: [],
     sheets: [],
   };
+  public pageInTemplate = 1;
   public errorMsg: string | undefined = undefined;
 
   public constructor(private activatedRoute: ActivatedRoute, private examService: ExamService, private router: Router) {}
@@ -22,13 +24,23 @@ export class MarkingSummaryComponent implements OnInit {
     this.activatedRoute.paramMap.subscribe(params => {
       this.examId = parseInt(params.get('examid') ?? '-1', 10);
 
-      this.examService
-        .getExamDetails(this.examId)
-        .then(dataExam => {
-          this.dataExam = dataExam;
-        })
-        .catch(() => {
-          this.errorMsg = 'scanexam.error';
+      db.templates
+        .where('examId')
+        .equals(+this.examId)
+        .count()
+        .then(pageInTemplate => {
+          this.pageInTemplate = pageInTemplate;
+
+          this.examService
+            .getExamDetails(this.examId)
+            .then(dataExam => {
+              this.dataExam = dataExam;
+              // eslint-disable-next-line no-console
+              console.log(this.dataExam);
+            })
+            .catch(() => {
+              this.errorMsg = 'scanexam.error';
+            });
         });
     });
   }

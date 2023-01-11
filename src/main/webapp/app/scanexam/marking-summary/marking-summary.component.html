@@ -13,13 +13,13 @@
     <p-tabPanel [header]="'scanexam.questions' | translate">
       <div class="container">
         <div class="row row-striped" *ngFor="let q of dataExam.questions">
-          <div class="col align-self-center">{{ 'scanexam.questionLow' | translate }} {{ q.id }}</div>
+          <div class="col align-self-center">{{ 'scanexam.questionLow' | translate }} {{ q.numero }}</div>
           <div class="col align-self-center">
             {{ q.answeredSheets }} / {{ dataExam.sheets.length }} ({{ q.answeredSheets / dataExam.sheets.length | percent }})
           </div>
           <div class="col">
             <button
-              [routerLink]="'/answer/' + this.examId + '/' + q.numero + '/' + q.firstUnmarkedSheet"
+              [routerLink]="'/answer/' + this.examId + '/' + q.numero + '/' + (q.firstUnmarkedSheet / pageInTemplate + 1)"
               class="p-element p-ripple"
               pButton
               type="button"
@@ -47,14 +47,14 @@
 
     <p-tabPanel [header]="'scanexam.sheets' | translate">
       <div class="container">
-        <div class="row row-striped" *ngFor="let s of dataExam.sheets">
-          <div class="col align-self-center">{{ 'scanexam.sheet' | translate }} {{ s.id }}</div>
+        <div class="row row-striped" *ngFor="let s of dataExam.sheets; let index = index">
+          <div class="col align-self-center">{{ 'scanexam.sheet' | translate }} {{ index + 1 }}</div>
           <div class="col align-self-center">
             {{ s.answeredSheets }} / {{ dataExam.questions.length }} ({{ s.answeredSheets / dataExam.questions.length | percent }})
           </div>
           <div class="col">
             <button
-              [routerLink]="'/answer/' + this.examId + '/' + s.firstUnmarkedQuestion + '/' + s.numero"
+              [routerLink]="'/answer/' + this.examId + '/' + s.firstUnmarkedQuestion + '/' + (index + 1)"
               class="p-element p-ripple"
               pButton
               type="button"
