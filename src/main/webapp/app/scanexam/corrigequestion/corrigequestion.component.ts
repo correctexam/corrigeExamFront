@@ -58,7 +58,7 @@ import { EntityResponseType } from '../../entities/exam-sheet/service/exam-sheet
   providers: [ConfirmationService, MessageService],
 })
 export class CorrigequestionComponent implements OnInit, AfterViewInit {
-  debug = true;
+  debug = false;
   @ViewChild('qcmcorrect')
   qcmcorrect!: ElementRef;
   @ViewChild('imageQcmDebugs')
