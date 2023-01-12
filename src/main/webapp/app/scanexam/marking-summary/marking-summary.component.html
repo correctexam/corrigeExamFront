@@ -17,14 +17,24 @@
           <div class="col align-self-center">
             {{ q.answeredSheets }} / {{ dataExam.sheets.length }} ({{ q.answeredSheets / dataExam.sheets.length | percent }})
           </div>
-          <div class="col">
+          <div class="col" *ngIf="q.answeredSheets < dataExam.sheets.length">
             <button
               [routerLink]="'/answer/' + this.examId + '/' + q.numero + '/' + (q.firstUnmarkedSheet / pageInTemplate + 1)"
-              class="p-element p-ripple"
+              class="p-element p-ripple w-3"
               pButton
               type="button"
             >
               <span jhiTranslate="scanexam.continue"></span>
+            </button>
+          </div>
+          <div class="col" *ngIf="q.answeredSheets === dataExam.sheets.length">
+            <button
+              [routerLink]="'/answer/' + this.examId + '/' + q.numero + '/' + '1'"
+              class="p-element p-ripple w-3"
+              pButton
+              type="button"
+            >
+              <span jhiTranslate="scanexam.voir"></span>
             </button>
           </div>
         </div>
@@ -52,14 +62,24 @@
           <div class="col align-self-center">
             {{ s.answeredSheets }} / {{ dataExam.questions.length }} ({{ s.answeredSheets / dataExam.questions.length | percent }})
           </div>
-          <div class="col">
+          <div class="col" *ngIf="s.answeredSheets < dataExam.questions.length">
             <button
               [routerLink]="'/answer/' + this.examId + '/' + s.firstUnmarkedQuestion + '/' + (index + 1)"
-              class="p-element p-ripple"
+              class="p-element p-ripple w-3"
               pButton
               type="button"
             >
               <span>{{ 'scanexam.continue' | translate }}</span>
+            </button>
+          </div>
+          <div class="col" *ngIf="s.answeredSheets === dataExam.questions.length">
+            <button
+              [routerLink]="'/answer/' + this.examId + '/' + '1' + '/' + (index + 1)"
+              class="p-element p-ripple w-3"
+              pButton
+              type="button"
+            >
+              <span>{{ 'scanexam.voir' | translate }}</span>
             </button>
           </div>
         </div>
