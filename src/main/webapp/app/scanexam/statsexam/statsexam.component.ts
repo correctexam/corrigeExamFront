@@ -211,14 +211,16 @@ export class StatsExamComponent implements OnInit {
     this.triNotes(this.infosStudents);
     const qn: QuestionNotee[] = [];
     for (const q of this.infosQuestions) {
+      const numero = q.numero ?? 0;
       const bareme = q.point ?? 0;
-      const label = ` Question ${q.numero ?? '0'}`;
+      const labelBegin: string = this.translateService.instant('scanexam.questionLow');
+      const label = `${labelBegin} ${numero}`;
       const notesAssociees: number[] = [];
       const quest_divisee = qn.find(quest => quest.label === label);
       if (quest_divisee === undefined) {
         // On ne prend pas en compte la notation de la deuxième partie s'il y en a une
         // (même comportement que lorsque l'on note la question dans la partie  correction)
-        qn.push({ bareme, label, notesAssociees });
+        qn.push({ bareme, numero, label, notesAssociees });
       }
     }
     this.infosStudents
@@ -232,7 +234,7 @@ export class StatsExamComponent implements OnInit {
         const note = s.note === undefined ? 0 : this.s2f(s.note);
         this.notes_eleves.push(note);
       });
-    this.q_notees = qn.sort((a, b) => a.label.localeCompare(b.label));
+    this.q_notees = qn.sort((a, b) => a.numero - b.numero);
   }
 
   public s2f(str: string): number {
@@ -687,6 +689,7 @@ export interface ISort {
 }
 export interface QuestionNotee {
   label: string;
+  numero: number;
   bareme: number;
   notesAssociees: number[];
 }
