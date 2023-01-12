@@ -76,6 +76,8 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { PreferencePageComponent } from './preference-page/preference-page.component';
 import { PartialAlignModalComponent } from './alignscan/partial-align-modal/partial-align-modal.component';
+import { MarkingSummaryComponent } from './marking-summary/marking-summary.component';
+import { TabViewModule } from 'primeng/tabview';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -189,6 +191,16 @@ export const AssocierCopiesEtudiants_ROUTE: Route = {
   },
 };
 
+export const MarkingSummary_ROUTE: Route = {
+  path: 'marking-summary/:examid',
+  canActivate: [UserRouteAccessService],
+  component: MarkingSummaryComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.answer',
+  },
+};
+
 export const AssocierCopiesEtudiantsToStudent_ROUTE: Route = {
   path: 'studentbindings/:examid/:currentStudent',
   canActivate: [UserRouteAccessService],
@@ -283,6 +295,7 @@ export const ShowResults_ROUTE: Route = {
     SharecourseComponent,
     PreferencePageComponent,
     PartialAlignModalComponent,
+    MarkingSummaryComponent,
   ],
   imports: [
     CommonModule,
@@ -340,12 +353,14 @@ export const ShowResults_ROUTE: Route = {
       CorrigerCopiesEtudiantsToQuestion_ROUTE,
       CorrigerCopiesEtudiants_ROUTE,
       AssocierCopiesEtudiantsToStudent_ROUTE,
+      MarkingSummary_ROUTE,
       VoirCopieEtudiants_ROUTE,
       ShowResults_ROUTE,
       STATS_ROUTE,
       VoirReponseEtudiants_ROUTE,
       VoirReponsesstarunstar_ROUTE,
     ]),
+    TabViewModule,
   ],
   exports: [
     MesCoursComponent,

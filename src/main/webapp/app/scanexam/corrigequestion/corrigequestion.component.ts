@@ -239,6 +239,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                               if (sheets !== undefined && sheets!.length > 0) {
                                 this.resp.sheetId = sheets[0]?.id;
                               }
+
                               this.studentResponseService
                                 .query({
                                   sheetId: this.resp.sheetId,

@@ -1,5 +1,14 @@
 {
   "scanexam": {
+    "error": "Cannot retreive the information",
+    "questions": "Questions",
+    "questionLow": "Question",
+    "continue": "Continue",
+    "sheets": "Sheets",
+    "sheet": "Sheet",
+    "total": "Total",
+    "titleSummary": "Current state of the exam marking:",
+    "errorExamId": "Invalid exam ID",
     "align": "Align scans",
     "gobackexam": "Go back to exam",
     "gobackue": "Go back to module",
