@@ -1,5 +1,14 @@
 {
   "scanexam": {
+    "error": "Impossible de récupérer les informations",
+    "questions": "Questions",
+    "questionLow": "Question",
+    "continue": "Continuer",
+    "sheets": "Copies",
+    "sheet": "Copie",
+    "total": "Total",
+    "titleSummary": "État courant de la correction de l'examen :",
+    "errorExamId": "Numéro de l'examen invalide",
     "align": "Aligner scans",
     "gobackexam": "Retourner à l'exam",
     "gobackue": "Retourner au module",
