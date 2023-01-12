@@ -239,6 +239,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                               if (sheets !== undefined && sheets!.length > 0) {
                                 this.resp.sheetId = sheets[0]?.id;
                               }
+
                               this.studentResponseService
                                 .query({
                                   sheetId: this.resp.sheetId,
@@ -429,6 +430,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                             this.resp = sr.body![0];
                             this.computeNote(false, this.resp);
                             this.blocked = false;
+                          } else {
+                            this.blocked = false;
                           }
                         });
                     });
@@ -505,7 +508,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async processAnswer(e: IQCMSolution) {
-    if (e.solution !== undefined && e.solution !== '') {
+    if (e.solution !== undefined /* && e.solution !== '' */) {
       const resp = await this.getStudentResponse(this.questions![0].id!, e.numero!);
 
       resp.gradedcomments?.forEach(gc => {
@@ -632,10 +635,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       const ret = await this.updateResponseRequest(this.resp!).toPromise();
       this.resp = ret!.body!;
     }
-    console.log(this.resp?.textcomments!.length);
 
     this.resp!.textcomments = this.resp?.textcomments!.filter(e => e.id !== comment.id);
-    console.log(this.resp?.textcomments!.length);
     this.blocked = true;
     this.updateResponseRequest(this.resp!).subscribe(resp1 => {
       this.resp = resp1.body!;
@@ -817,7 +818,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       if (c > 0) {
         this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno! + 1) + '/' + c);
       } else if (q1 > 0) {
-        this.router.navigateByUrl('/answer/' + this.examId! + '/' + q1 + '/' + this.numberPagesInScan! / this.nbreFeuilleParCopie!);
+        const prevSt = this.numberPagesInScan! / this.nbreFeuilleParCopie!;
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + q1 + '/' + prevSt);
       }
     }
   }

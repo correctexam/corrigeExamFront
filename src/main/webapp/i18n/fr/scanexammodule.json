@@ -1,5 +1,14 @@
 {
   "scanexam": {
+    "error": "Impossible de récupérer les informations",
+    "questions": "Questions",
+    "questionLow": "Question",
+    "continue": "Continuer",
+    "sheets": "Copies",
+    "sheet": "Copie",
+    "total": "Total",
+    "titleSummary": "État courant de la correction de l'examen :",
+    "errorExamId": "Numéro de l'examen invalide",
     "align": "Aligner scans",
     "gobackexam": "Retourner à l'exam",
     "gobackue": "Retourner au module",
@@ -206,6 +215,11 @@
     "filterboundstudent": "Filtrer les étudiant(e)s déjà affectée(s):",
     "removeallbinding": "Supprimer toutes les associations",
     "removeallbindingtooltip": "⚠️ à faire uniquement si la correction n'a pas commencé",
-    "noneval": "non évalué"
+    "noneval": "non évalué",
+    "partialalignscan": "Sélection des pages",
+    "partialalignscanstartpage": "première page",
+    "partialalignscanendpage": "dernière page",
+    "partialalignscanprocess": "lancer l'alignement",
+    "partialalignscantooltip": "Sert principalement si le pdf de scan a été modifié (par exemple pour retourner/inverser quelques pages) afin de ne pas devoir réalignement complètement l'ensemble des images"
   }
 }

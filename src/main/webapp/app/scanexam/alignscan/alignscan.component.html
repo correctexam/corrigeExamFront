@@ -33,6 +33,14 @@
         <button (click)="process()" class="p-button p-button-primary" [disabled]="!loaded">
           <fa-icon [icon]="faObjectGroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.alignscan"> Alignement des scans</span>
         </button>
+        <button
+          (click)="show()"
+          class="p-button p-button-primary"
+          [disabled]="!loaded"
+          [pTooltip]="'scanexam.partialalignscantooltip' | translate"
+        >
+          <fa-icon [icon]="faObjectGroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.partialalignscan"> Alignement des scans</span>
+        </button>
       </div>
     </div>
     <div class="col-12 md:col-12">

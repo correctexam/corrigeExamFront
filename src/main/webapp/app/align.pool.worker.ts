@@ -88,6 +88,9 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
                 input.preference.numberofpointToMatch,
                 input.pageNumber
               );
+              input.imageA = undefined;
+              input.imageB = undefined;
+
               res.pageNumber = input.pageNumber;
               observer.next(res);
               observer.complete();
@@ -145,7 +148,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     return clampedArray;
   }
 
-  roi(src: any, rect: any, dst: any): any {
+  roi(src: any, rect: any): any {
     const srcMWidth = src.size().width;
     const srcMHeight = src.size().height;
 
@@ -161,8 +164,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     if (rect.y < 0) {
       rect.y = 0;
     }
-    dst = src.roi(rect); // You can try more different parameters
-    return dst;
+    return src.roi(rect); // You can try more different parameters
   }
 
   alignImage(
@@ -301,6 +303,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       result['imageAlignedHeight'] = image_B_final_result.size().height;
       mat1.delete();
       mat2.delete();
+      M.delete();
       image_B_final_result.delete();
       console.log('Good match for page ' + pageNumber);
     } else {
@@ -332,12 +335,12 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     // console.log("pass par la 4 ", "page ", pageNumber + "zone " + ii)
 
     let im1Graydst = new cv.Mat();
-    im1Graydst = this.roi(im1Gray, zone1, im1Graydst);
+    im1Graydst = this.roi(im1Gray, zone1);
 
     //   console.log("pass par la 45 ", "page ", pageNumber + "zone " + ii)
 
     let im2Graydst = new cv.Mat();
-    im2Graydst = this.roi(im2Gray, zone1, im2Graydst);
+    im2Graydst = this.roi(im2Gray, zone1);
     //  console.log("pass par la 5 ", "page ", pageNumber + "zone " + ii)
 
     let keypoints1 = new cv.KeyPointVector();
@@ -381,6 +384,18 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     let distances = [];
 
     if (good_matches.size() === 0) {
+      orb.delete();
+      keypoints1.delete();
+      keypoints2.delete();
+      descriptors1.delete();
+      descriptors2.delete();
+      tmp1.delete();
+      tmp2.delete();
+      im1Graydst.delete();
+      im2Graydst.delete();
+      matches.delete();
+      good_matches.delete();
+      bf.delete();
       return false;
     }
     //  console.log("pass par la 7 ", "page ", pageNumber + "zone " + ii)
@@ -603,7 +618,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
 
       let rect1 = new cv.Rect(x - r3, y - r3, width1, height1);
       let dstrect1 = new cv.Mat();
-      dstrect1 = this.roi(srcMat1, rect1, dstrect1);
+      dstrect1 = this.roi(srcMat1, rect1);
       cv.threshold(dstrect1, dstrect1, 0, 255, cv.THRESH_OTSU + cv.THRESH_BINARY);
       if (cv.countNonZero(dstrect1) < seuil) {
         goodpointsx.push(x);

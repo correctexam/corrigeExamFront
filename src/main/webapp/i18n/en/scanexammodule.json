@@ -1,5 +1,14 @@
 {
   "scanexam": {
+    "error": "Cannot retreive the information",
+    "questions": "Questions",
+    "questionLow": "Question",
+    "continue": "Continue",
+    "sheets": "Sheets",
+    "sheet": "Sheet",
+    "total": "Total",
+    "titleSummary": "Current state of the exam marking:",
+    "errorExamId": "Invalid exam ID",
     "align": "Align scans",
     "gobackexam": "Go back to exam",
     "gobackue": "Go back to module",
@@ -205,6 +214,11 @@
     "filterboundstudent": "Filter the students already assigned:",
     "removeallbinding": "Remove all bindings",
     "removeallbindingtooltip": "⚠️ to be done only if the correction has not started",
-    "noneval": "not evaluated"
+    "noneval": "not evaluated",
+    "partialalignscan": "Pages selection",
+    "partialalignscanstartpage": "first page",
+    "partialalignscanendpage": "last page",
+    "partialalignscanprocess": "Start processing",
+    "partialalignscantooltip": "Mainly used if the scan pdf has been modified (e.g. to flip/reverse some pages) in order not to have to realign the whole set of images"
   }
 }

@@ -73,7 +73,7 @@ export class CacheUploadService {
     const o: ExportOptions = {};
     cacheUploadNotification.setBlocked(true);
     const step = 50;
-    let nbrPart = Math.trunc(numberPageInScan / step) + 2;
+    let nbrPart = Math.trunc((numberPageInScan - 1) / step) + 2;
     const lastPart = numberPageInScan % step;
     if (lastPart === 0) {
       nbrPart = nbrPart - 1;
@@ -91,7 +91,7 @@ export class CacheUploadService {
         // || (table === 'templates' && value.examId === examId);
         (table === 'nonAlignImages' && value.examId === examId && value.pageNumber <= (k + 1) * step && value.pageNumber > step * k) ||
         (table === 'alignImages' && value.examId === examId && value.pageNumber <= (k + 1) * step && value.pageNumber > step * k);
-      const filename1 = examId + '_part_' + k + '_indexdb.json';
+      const filename1 = examId + '_part_' + (k + 1) + '_indexdb.json';
 
       const success = await this.exportPart(
         examId,
@@ -237,7 +237,7 @@ export class CacheUploadService {
           datas.push(data);
           part = part + 1;
           p = new Promise(resolve => {
-            this.getCache(examId + +'_part_' + part + '_indexdb.json').subscribe(d => {
+            this.getCache(examId + '_part_' + part + '_indexdb.json').subscribe(d => {
               resolve(d);
             });
           });
