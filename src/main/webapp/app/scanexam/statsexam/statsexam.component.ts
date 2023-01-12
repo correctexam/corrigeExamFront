@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable guard-for-in */
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -98,31 +98,32 @@ export class StatsExamComponent implements OnInit {
     this.activatedRoute.paramMap.subscribe(params => {
       this.examid = params.get('examid') ?? '-1';
 
-      if (this.examid !== '-1') {
-        if (this.images.length === 0) {
-          this.loadAllPages();
-        }
-
-        this.translateService.get('scanexam.noteattribuee').subscribe(() => {
-          this.initStudents().then(() =>
-            this.requeteInfoQuestions().subscribe(b => {
-              this.infosQuestions = b.body;
-              this.initStatVariables();
-              this.initDisplayVariables();
-              this.style();
-            })
-          );
-
-          this.translateService.onLangChange.subscribe(() => {
-            this.requeteInfoQuestions().subscribe(b => {
-              this.infosQuestions = b.body;
-              this.initStatVariables();
-              this.initDisplayVariables();
-              this.style();
-            });
-          });
-        });
+      if (this.examid === '-1') {
+        return;
       }
+      if (this.images.length === 0) {
+        this.loadAllPages();
+      }
+
+      this.translateService.get('scanexam.noteattribuee').subscribe(() => {
+        this.initStudents().then(() => {
+          this.performInfoQuestionsQuery();
+        });
+
+        this.translateService.onLangChange.subscribe(() => {
+          this.performInfoQuestionsQuery();
+        });
+      });
+    });
+  }
+
+  private performInfoQuestionsQuery(): void {
+    this.requeteInfoQuestions().subscribe(b => {
+      // Getting and sorting the questions
+      this.infosQuestions = (b.body ?? []).sort((i1, i2) => (i1.numero ?? 0) - (i2.numero ?? 0));
+      this.initStatVariables();
+      this.initDisplayVariables();
+      this.style();
     });
   }
 
@@ -190,11 +191,11 @@ export class StatsExamComponent implements OnInit {
     this.initMobileSelection();
   }
 
-  private async initStudents(): Promise<any> {
+  private async initStudents(): Promise<void> {
     this.infosStudents = await this.loadStudents();
   }
 
-  private requeteInfoQuestions(): Observable<any> {
+  private requeteInfoQuestions(): Observable<HttpResponse<IQuestion[]>> {
     return this.questionService.query({ examId: this.examid });
   }
 
@@ -231,12 +232,13 @@ export class StatsExamComponent implements OnInit {
         const note = s.note === undefined ? 0 : this.s2f(s.note);
         this.notes_eleves.push(note);
       });
-    this.q_notees = qn;
+    this.q_notees = qn.sort((a, b) => a.label.localeCompare(b.label));
   }
 
   public s2f(str: string): number {
     return parseFloat(str.replace(',', '.'));
   }
+
   public triSelection(event: ISort): void {
     switch (event.field) {
       case 'ine':
@@ -306,14 +308,11 @@ export class StatsExamComponent implements OnInit {
     return diff;
   }
 
-  /** @return le barème associé à chaque question */
+  /** @return The notation for each question */
   public getBaremes(stats: QuestionNotee[]): number[] {
-    const baremes: number[] = [];
-    for (const stat of stats) {
-      baremes.push(stat.bareme);
-    }
-    return baremes;
+    return stats.map(s => s.bareme);
   }
+
   public getBaremeExam(): number {
     return this.sum(this.getBaremes(this.q_notees));
   }
@@ -338,42 +337,21 @@ export class StatsExamComponent implements OnInit {
     return this.sum(this.getNotesSelect());
   }
 
-  /** @return la moyenne associée à chaque question */
+  /** @return Average mark for all the questions (ordered) */
   private getMoyennesQuestions(): number[] {
-    const moyennes: number[] = [];
-    console.log('in getMoyennesQuestions');
-    console.log(this.q_notees);
-    console.log('avg:');
-    for (const qn of this.q_notees) {
-      moyennes.push(this.avg(qn.notesAssociees));
-      console.log(this.avg(qn.notesAssociees));
-    }
-    return moyennes;
+    return this.q_notees.map(ns => this.avg(ns.notesAssociees));
   }
 
   private updateKnobs(): void {
     const knobsNb = this.etudiantSelec !== null && this.etudiantSelec !== undefined ? this.getNotesSelect() : this.getMoyennesQuestions();
     this.knobsCourants = [];
-    console.log('==>');
-    console.log(this.etudiantSelec);
-    console.log(knobsNb);
     knobsNb.forEach(knobValue => {
       this.knobsCourants.push(knobValue.toFixed(2));
     });
-    console.log(this.knobsCourants);
   }
 
   public getMoyenneExam(): number {
     return this.sum(this.notes_eleves) / this.notes_eleves.length;
-  }
-
-  /** @return la médiane associée à chaque question */
-  private getMedianeQuestions(): number[] {
-    const medianes: number[] = [];
-    for (const qn of this.q_notees) {
-      medianes.push(this.med(qn.notesAssociees));
-    }
-    return medianes;
   }
 
   public getMedianeExam(): number {
@@ -386,23 +364,6 @@ export class StatsExamComponent implements OnInit {
 
   public getEcartTypeExam(): number {
     return this.ecart_type(this.notes_eleves);
-  }
-
-  /** @return la note la plus élevée associée à chaque question */
-  private getMaxNoteQuestions(): number[] {
-    const maxnotes: number[] = [];
-    for (const qn of this.q_notees) {
-      maxnotes.push(this.max(qn.notesAssociees));
-    }
-    return maxnotes;
-  }
-  /** @return la note la moins élevée associée à chaque question */
-  private getMinNoteQuestions(): number[] {
-    const minnotes: number[] = [];
-    for (const qn of this.q_notees) {
-      minnotes.push(this.min(qn.notesAssociees));
-    }
-    return minnotes;
   }
 
   public getMaxNoteExam(): number {
@@ -458,7 +419,6 @@ export class StatsExamComponent implements OnInit {
   }
 
   private normaliseNotes(notes: number[], baremes: number[], norme = 100): number[] {
-    //  expect(notes.length).toBe(baremes.length);
     notes.forEach((note, indice) => {
       note /= baremes[indice];
       notes[indice] = note * norme;
@@ -499,12 +459,9 @@ export class StatsExamComponent implements OnInit {
 
   /** Initialises radar data to display **/
   private initGlobalRadarData(stats: QuestionNotee[], pourcents = false): IRadar {
-    const labels: string[] = [];
-    for (const stat of stats) {
-      labels.push(stat.label);
-    }
+    const labels = stats.map(e => e.label);
     const datasets = [this.radarMoy(), this.radarMed(), this.radarMaxNote(), this.radarMinNote()];
-    // Traitements pourcentages
+
     if (pourcents) {
       datasets.forEach((ds, indice) => {
         datasets[indice].data = this.normaliseNotes(ds.data, this.getBaremes(stats));
@@ -527,27 +484,37 @@ export class StatsExamComponent implements OnInit {
   }
 
   private radarMoy(): IRadarDataset {
-    const dataMoy: number[] = this.getMoyennesQuestions();
-    return this.basicDataset(this.translateService.instant('scanexam.average'), BLEU_AERO, TRANSPARENT, dataMoy);
+    return this.basicDataset(this.translateService.instant('scanexam.average'), BLEU_AERO, TRANSPARENT, this.getMoyennesQuestions());
   }
 
   private radarMed(): IRadarDataset {
-    const dataMed: number[] = this.getMedianeQuestions();
-    return this.basicDataset(this.translateService.instant('scanexam.mediane'), BLEU_FONCE, TRANSPARENT, dataMed);
+    return this.basicDataset(
+      this.translateService.instant('scanexam.mediane'),
+      BLEU_FONCE,
+      TRANSPARENT,
+      this.q_notees.map(ns => this.med(ns.notesAssociees))
+    );
   }
 
   private radarMaxNote(): IRadarDataset {
-    const dataMaxNote: number[] = this.getMaxNoteQuestions();
-    return this.basicDataset(this.translateService.instant('scanexam.notemax1'), VERT, TRANSPARENT, dataMaxNote);
+    return this.basicDataset(
+      this.translateService.instant('scanexam.notemax1'),
+      VERT,
+      TRANSPARENT,
+      this.q_notees.map(ns => this.max(ns.notesAssociees))
+    );
   }
   private radarMinNote(): IRadarDataset {
-    const dataMinNote: number[] = this.getMinNoteQuestions();
-    return this.basicDataset(this.translateService.instant('scanexam.notemin1'), ROUGE, TRANSPARENT, dataMinNote);
+    return this.basicDataset(
+      this.translateService.instant('scanexam.notemin1'),
+      ROUGE,
+      TRANSPARENT,
+      this.q_notees.map(ns => this.min(ns.notesAssociees))
+    );
   }
 
   private radarStudent(etudiant: StudentRes): IRadarDataset {
-    const notesEtudiant: number[] = this.getNotes(etudiant);
-    return this.basicDataset(this.translateService.instant('scanexam.notes'), VIOLET, VIOLET_LEGER, notesEtudiant);
+    return this.basicDataset(this.translateService.instant('scanexam.notes'), VIOLET, VIOLET_LEGER, this.getNotes(etudiant));
   }
 
   private basicDataset(label: string, couleurForte: string, couleurLegere: string, data: number[]): IRadarDataset {
@@ -580,7 +547,6 @@ export class StatsExamComponent implements OnInit {
 
   onStudentSelect(): void {
     if (this.etudiantSelec !== null && this.etudiantSelec !== undefined) {
-      //  this.updateCarte('selection_etudiant', undefined, this.etudiantSelec.prenom + ' ' + this.etudiantSelec.nom, undefined);
       this.data_radar_courant = this.initStudentRadarData(
         this.etudiantSelec,
         this.data_radar_courant.vue === this.translateService.instant('scanexam.pourcents')
@@ -591,7 +557,6 @@ export class StatsExamComponent implements OnInit {
     }
   }
   onStudentUnselect(): void {
-    // this.updateCarte('selection_etudiant', undefined, this.translateService.instant('scanexam.nostudentselected'), undefined);
     this.updateCarteRadar();
     this.updateKnobs();
     this.COLOR_KNOBS = BLEU_AERO_TIEDE;
