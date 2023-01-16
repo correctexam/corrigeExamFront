@@ -10,7 +10,7 @@ import { CourseService } from 'app/entities/course/service/course.service';
 import { IQuestion } from 'app/entities/question/question.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
 import { Observable } from 'rxjs';
-import { db } from '../db/db';
+import { CacheServiceImpl } from '../db/CacheServiceImpl';
 
 // Couleurs à utiliser
 const GRIS = 'rgba(179,181,198,1)';
@@ -91,7 +91,8 @@ export class StatsExamComponent implements OnInit {
     public questionService: QuestionService,
     protected activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
-    public router: Router
+    public router: Router,
+    private db: CacheServiceImpl
   ) {}
 
   ngOnInit(): void {
@@ -128,44 +129,34 @@ export class StatsExamComponent implements OnInit {
   }
 
   loadAllPages(): void {
-    db.templates
-      .where('examId')
-      .equals(+this.examid)
-      .count()
-      .then(e2 => {
-        this.nbreFeuilleParCopie = e2;
-      });
+    this.db.countPageTemplate(+this.examid).then(e2 => {
+      this.nbreFeuilleParCopie = e2;
+    });
     this.images = [];
 
     if (this.noalign) {
-      db.nonAlignImages
-        .where({ examId: +this.examid })
-        .sortBy('pageNumber')
-        .then(e1 =>
-          e1.forEach(e => {
-            const image = JSON.parse(e.value, this.reviver);
+      this.db.getNonAlignSortByPageNumber(+this.examid).then(e1 =>
+        e1.forEach(e => {
+          const image = JSON.parse(e.value, this.reviver);
 
-            this.images.push({
-              src: image.pages,
-              alt: 'Description for Image 2',
-              title: 'Exam',
-            });
-          })
-        );
+          this.images.push({
+            src: image.pages,
+            alt: 'Description for Image 2',
+            title: 'Exam',
+          });
+        })
+      );
     } else {
-      db.alignImages
-        .where({ examId: +this.examid })
-        .sortBy('pageNumber')
-        .then(e1 =>
-          e1.forEach(e => {
-            const image = JSON.parse(e.value, this.reviver);
-            this.images.push({
-              src: image.pages,
-              alt: 'Description for Image 2',
-              title: 'Exam',
-            });
-          })
-        );
+      this.db.getAlignSortByPageNumber(+this.examid).then(e1 =>
+        e1.forEach(e => {
+          const image = JSON.parse(e.value, this.reviver);
+          this.images.push({
+            src: image.pages,
+            alt: 'Description for Image 2',
+            title: 'Exam',
+          });
+        })
+      );
     }
   }
 

@@ -1,12 +1,13 @@
+/* eslint-disable arrow-body-style */
+import { ExportOptions } from 'dexie-export-import';
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse } from '@angular/common/http';
 import { Observable, scan } from 'rxjs';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
-import { ExportOptions } from 'dexie-export-import';
-import { db } from '../db/db';
 import { TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
+import { CacheServiceImpl } from '../db/CacheServiceImpl';
 
 export interface CacheUploadNotification {
   setMessage(v: string): void;
@@ -61,7 +62,7 @@ const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
   providedIn: 'root',
 })
 export class CacheUploadService {
-  constructor(private http: HttpClient, public applicationConfigService: ApplicationConfigService) {}
+  constructor(private http: HttpClient, public applicationConfigService: ApplicationConfigService, private db: CacheServiceImpl) {}
 
   async exportCache(
     examId: number,
@@ -70,7 +71,10 @@ export class CacheUploadService {
     numberPageInScan: number,
     cacheUploadNotification: CacheUploadNotification
   ): Promise<void> {
-    const o: ExportOptions = {};
+    const o: ExportOptions = {
+      noTransaction: true,
+      numRowsPerChunk: 100,
+    };
     cacheUploadNotification.setBlocked(true);
     const step = 50;
     let nbrPart = Math.trunc((numberPageInScan - 1) / step) + 2;
@@ -78,19 +82,31 @@ export class CacheUploadService {
     if (lastPart === 0) {
       nbrPart = nbrPart - 1;
     }
-    o.filter = (table: string, value: any) =>
-      (table === 'exams' && value.id === examId) /* && value.pageNumber <10*/ || (table === 'templates' && value.examId === examId);
+    o.filter = (table: string, value: any) => {
+      return (table === 'exams' && value.id === examId) /* && value.pageNumber <10*/ || (table === 'templates' && value.examId === examId);
+    };
     //        (table === 'nonAlignImages' && value.examId === examId) ||
     //        (table === 'alignImages' && value.examId === examId);
     const filename = examId + '_exam_template_indexdb.json';
     await this.exportPart(examId, translateService, messageService, 1, nbrPart, o, cacheUploadNotification, filename);
 
     for (let k = 0; k < nbrPart - 2; k++) {
-      o.filter = (table: string, value: any) =>
+      o.filter = (table: string, value: any) => {
         // (table === 'exams' && value.id === examId) /* && value.pageNumber <10*/
         // || (table === 'templates' && value.examId === examId);
-        (table === 'nonAlignImages' && value.examId === examId && value.pageNumber <= (k + 1) * step && value.pageNumber > step * k) ||
-        (table === 'alignImages' && value.examId === examId && value.pageNumber <= (k + 1) * step && value.pageNumber > step * k);
+        return (
+          (table === 'nonAlignImages' &&
+            value.examId === examId &&
+            value.examId === examId &&
+            value.pageNumber <= (k + 1) * step &&
+            value.pageNumber > step * k) ||
+          (table === 'alignImages' &&
+            value.examId === examId &&
+            value.examId === examId &&
+            value.pageNumber <= (k + 1) * step &&
+            value.pageNumber > step * k)
+        );
+      };
       const filename1 = examId + '_part_' + (k + 1) + '_indexdb.json';
 
       const success = await this.exportPart(
@@ -142,8 +158,10 @@ export class CacheUploadService {
       .get('scanexam.exportcacheencours')
       .subscribe(res => cacheUploadNotification.setMessage('' + res + ' Part ' + part + '/' + nbrPart));
     try {
-      const value = await db.export(o);
+      const value = await this.db.export(examId, o);
+
       const file = new File([value], filename);
+
       cacheUploadNotification.setProgress(0);
       translateService
         .get('scanexam.uploadcacheencours')
@@ -199,7 +217,7 @@ export class CacheUploadService {
     messageService: MessageService,
     cacheDownloadNotification: CacheDownloadNotification
   ): Promise<void> {
-    await db.removeElementForExam(examId);
+    await this.db.removeElementForExam(examId);
     let p = new Promise(resolve => {
       this.getCache(examId + 'indexdb.json').subscribe(data => {
         resolve(data);
@@ -249,7 +267,7 @@ export class CacheUploadService {
     }
     for (let i = 0; i < datas.length; i++) {
       try {
-        await db.import(datas[i]);
+        await this.db.import(examId, datas[i]);
       } catch {
         messageService.add({
           severity: 'error',
