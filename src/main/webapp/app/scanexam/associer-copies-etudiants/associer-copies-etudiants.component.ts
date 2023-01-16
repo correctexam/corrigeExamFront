@@ -890,7 +890,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         })
       );
     } else {
-      this.db.getAlignSortByPageNumber(+this.examId!).then(e1 =>
+      this.db.getAlignSortByPageNumber(+this.examId!).then(e1 => {
+        console.error(e1);
         e1.forEach(e => {
           const image = JSON.parse(e!.value, this.reviver);
           this.images.push({
@@ -898,8 +899,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
             alt: 'Description for Image 2',
             title: 'Exam',
           });
-        })
-      );
+        });
+      });
     }
   }
 

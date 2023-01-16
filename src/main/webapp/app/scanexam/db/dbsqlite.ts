@@ -21,7 +21,7 @@ export class SqliteCacheService implements CacheService {
     if (typeof Worker !== 'undefined') {
       //  Create a new
       workersqllite.onmessage = ({ data }) => {
-        console.error(' receive message ', data);
+        //        console.error(' receive message ', data);
         if (this.subjects.has(data.uid)) {
           // console.log( ' receive message '  + data.uid)
 
@@ -82,8 +82,8 @@ export class SqliteCacheService implements CacheService {
     return p.asObservable();
   }
 
-  load(examName: number) {
-    workersqllite.postMessage({ msg: 'load', exam: examName, uid: '0' });
+  load() {
+    workersqllite.postMessage({ msg: 'load', uid: '0' });
   }
 
   async addAligneImage(elt: ImageDB) {
@@ -95,10 +95,11 @@ export class SqliteCacheService implements CacheService {
   }
 
   export(examId: number, options?: ExportOptions | undefined): Promise<any> {
-    return this._dispatch('export', {
+    /*    return this._dispatch('export', {
       examId: examId,
       options: options,
-    }).toPromise();
+    }).toPromise();*/
+    return new Promise<any>((resolve, reject) => resolve(null));
   }
   import(examId: number, blob: Blob, options?: ImportOptions | undefined): Promise<any> {
     return this._dispatch('import', {

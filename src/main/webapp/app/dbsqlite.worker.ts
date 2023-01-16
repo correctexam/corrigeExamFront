@@ -19,284 +19,243 @@ addEventListener('message', e => {
     }
     case 'load': {
       // Import let script
-      const self1 = self as any;
-      self1['Module'] = {
-        scriptUrl: 'content/sqlite/sqlite3.js',
-      };
+      try {
+        const self1 = self as any;
+        self1['Module'] = {
+          scriptUrl: 'content/sqlite/sqlite3.js',
+        };
 
-      // Load and await the .js OpenCV
-      self1.importScripts(self1['Module'].scriptUrl);
-      const db1 = new DB(e.data.exam);
-      dbs.set(e.data.exam, db1);
-      self1
-        .sqlite3InitModule({
-          print: console.log,
-          printErr: db1.error,
-        })
-        .then(function (sqlite3var: any) {
-          _sqlite3 = sqlite3var;
-          console.log('Done initializing. Running demo...');
-          try {
-            db1.start(_sqlite3);
-          } catch (e1: any) {
-            db1.error('Exception:', e1.message);
-          }
-        });
-
+        // Load and await the .js OpenCV
+        self1.importScripts(self1['Module'].scriptUrl);
+        // const db1 = new DB(e.data.exam);
+        // dbs.set(e.data.exam, db1);
+        self1
+          .sqlite3InitModule({
+            print: console.log,
+            printErr: console.error,
+          })
+          .then(function (sqlite3var: any) {
+            _sqlite3 = sqlite3var;
+            console.log('Done initializing. Running demo...');
+            postMessage({ msg: 'databaseReady', uid: '0' });
+          });
+      } finally {
+        //       postMessage({ msg: 'databaseNotReady', uid: '0'});
+      }
       break;
     }
     case 'addAligneImage': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.addAligneImage(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        dbs.set(e.data.exam, db1);
       }
+      db1.addAligneImage(_sqlite3, e.data);
       break;
     }
     case 'addNonAligneImage': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.addNonAligneImage(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.addNonAligneImage(_sqlite3, e.data);
       break;
     }
 
     case 'resetDatabase': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.resetDatabase(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.resetDatabase(_sqlite3, e.data);
       break;
     }
     case 'removeExam': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.removeExam(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.removeExam(_sqlite3, e.data);
       break;
     }
     case 'removeElementForExam': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.removeElementForExam(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.removeElementForExam(_sqlite3, e.data);
       break;
     }
     case 'export': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.export(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.export(_sqlite3, e.data);
       break;
     }
     case 'import': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.import(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.import(_sqlite3, e.data);
       break;
     }
     case 'countPageTemplate': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.countPageTemplate(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.countPageTemplate(_sqlite3, e.data);
       break;
     }
     case 'countAlignImage': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.countAlignImage(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.countAlignImage(_sqlite3, e.data);
       break;
     }
     case 'countNonAlignImage': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.countNonAlignImage(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.countNonAlignImage(_sqlite3, e.data);
       break;
     }
     case 'getFirstNonAlignImage': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.getFirstNonAlignImage(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.getFirstNonAlignImage(_sqlite3, e.data);
       break;
     }
     case 'getFirstAlignImage': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.getFirstAlignImage(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.getFirstAlignImage(_sqlite3, e.data);
       break;
     }
     case 'getFirstTemplate': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.getFirstTemplate(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.getFirstTemplate(_sqlite3, e.data);
       break;
     }
+
     case 'getNonAlignImageBetweenAndSortByPageNumber': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.getNonAlignImageBetweenAndSortByPageNumber(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.getNonAlignImageBetweenAndSortByPageNumber(_sqlite3, e.data);
       break;
     }
 
     case 'getAlignImageBetweenAndSortByPageNumber': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.getAlignImageBetweenAndSortByPageNumber(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.getAlignImageBetweenAndSortByPageNumber(_sqlite3, e.data);
       break;
     }
+
     case 'getNonAlignSortByPageNumber': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.getNonAlignSortByPageNumber(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.getNonAlignSortByPageNumber(_sqlite3, e.data);
       break;
     }
+
     case 'getAlignSortByPageNumber': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.getAlignSortByPageNumber(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.getAlignSortByPageNumber(_sqlite3, e.data);
       break;
     }
     case 'addExam': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.addExam(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.addExam(_sqlite3, e.data);
       break;
     }
     case 'addTemplate': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.addTemplate(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.addTemplate(_sqlite3, e.data);
       break;
     }
     case 'countNonAlignWithPageNumber': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.countNonAlignWithPageNumber(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.countNonAlignWithPageNumber(_sqlite3, e.data);
       break;
     }
     case 'countAlignWithPageNumber': {
-      const db1 = dbs.get(e.data.payload.examId);
-      if (db1 !== undefined) {
-        db1.countAlignWithPageNumber(_sqlite3, e.data);
-      } else {
-        postMessage({
-          msg: e.data.msg,
-          uid: e.data.uid,
-        });
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.exam);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
       }
+      db1.countAlignWithPageNumber(_sqlite3, e.data);
       break;
     }
   }
@@ -341,19 +300,6 @@ class DB {
     }
   }
 
-  start(sqlite3: any) {
-    this.initDb(sqlite3);
-
-    try {
-      this.db.exec('CREATE TABLE IF NOT EXISTS template(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
-      this.db.exec('CREATE TABLE IF NOT EXISTS align(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
-      this.db.exec('CREATE TABLE IF NOT EXISTS nonalign(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
-    } finally {
-      this.db.close();
-      postMessage({ msg: 'databaseReady', uid: '0', examId: +this.examName });
-    }
-  }
-
   //   addAligneImage(elt: AlignImage) :Promise<any>;
 
   addAligneImage(sqlite3: any, data: any) {
@@ -385,6 +331,7 @@ class DB {
 
   addNonAligneImage(sqlite3: any, data: any) {
     const payload = data.payload;
+
     this.initDb(sqlite3);
 
     try {
@@ -413,16 +360,15 @@ class DB {
   addTemplate(sqlite3: any, data: any) {
     const payload = data.payload;
     this.initDb(sqlite3);
-
     try {
-      if (this.db.selectValue('select count(*) from template where page=' + payload.pageNumber) > 0) {
+      if (this.db.selectValue('select count(*) from template where page=' + payload.elt.pageNumber) > 0) {
         this.db.exec({
-          sql: 'delete from template where page=' + payload.pageNumber,
+          sql: 'delete from template where page=' + payload.elt.pageNumber,
         });
       }
       this.db.exec({
         sql: 'INSERT INTO template(page,imageData ) VALUES (?,?)',
-        bind: [payload.pageNumber, payload.value],
+        bind: [payload.elt.pageNumber, payload.elt.value],
       });
     } finally {
       this.db.close();
@@ -506,9 +452,11 @@ class DB {
   // export(examId: number,options?: ExportOptions) :Promise<Blob>;
 
   export(sqlite3: any, data: any) {
-    const payload = data.payload;
+    // TODO
+    //    const payload = data.payload;
     this.initDb(sqlite3);
     try {
+      // TODO
     } finally {
       this.db.close();
       postMessage({
@@ -520,9 +468,12 @@ class DB {
 
   // import(examId: number,blob: Blob, options?: ImportOptions):Promise<void>;
   import(sqlite3: any, data: any) {
-    const payload = data.payload;
+    // TODO
+
+    //    const payload = data.payload;
     this.initDb(sqlite3);
     try {
+      // TODO
     } finally {
       this.db.close();
       postMessage({
@@ -586,7 +537,7 @@ class DB {
     const payload = data.payload;
     this.initDb(sqlite3);
     try {
-      const value = this.db.selectValue('select imageData from nonalign where pageNumber=' + payload.pageInscan);
+      const value = this.db.selectValue('select imageData from nonalign where page=' + payload.pageInscan);
       postMessage({
         msg: data.msg,
         uid: data.uid,
@@ -606,7 +557,7 @@ class DB {
     const payload = data.payload;
     this.initDb(sqlite3);
     try {
-      const value = this.db.selectValue('select imageData from align where pageNumber=' + payload.pageInscan);
+      const value = this.db.selectValue('select imageData from align where page=' + payload.pageInscan);
       postMessage({
         msg: data.msg,
         uid: data.uid,
@@ -627,7 +578,8 @@ class DB {
     const payload = data.payload;
     this.initDb(sqlite3);
     try {
-      const value = this.db.selectValue('select imageData from template where pageNumber=' + payload.pageInscan);
+      const value = this.db.selectValue('select imageData from template where page=' + payload.pageInscan);
+
       postMessage({
         msg: data.msg,
         uid: data.uid,
@@ -646,14 +598,24 @@ class DB {
 
   getNonAlignImageBetweenAndSortByPageNumber(sqlite3: any, data: any) {
     const payload = data.payload;
+    /*
+    this.alignImages
+      .where({ examId: this.examId })
+      .filter(e2 => e2.pageNumber <= p1 && e2.pageNumber < p2)
+      .sortBy('pageNumber');
+    */
     this.initDb(sqlite3);
     try {
-    } finally {
-      this.db.close();
+      const value = this.db.selectValue(
+        'select imageData from nonalign where page<=' + payload.p1 + ' and e2.page < ' + payload.p2 + ' order by pageNumber asc'
+      );
       postMessage({
         msg: data.msg,
         uid: data.uid,
+        payload: value,
       });
+    } finally {
+      this.db.close();
     }
   }
 
@@ -662,12 +624,16 @@ class DB {
     const payload = data.payload;
     this.initDb(sqlite3);
     try {
-    } finally {
-      this.db.close();
+      const value = this.db.selectValue(
+        'select imageData from align where page<=' + payload.p1 + ' and e2.page < ' + payload.p2 + ' order by page asc'
+      );
       postMessage({
         msg: data.msg,
         uid: data.uid,
+        payload: value,
       });
+    } finally {
+      this.db.close();
     }
   }
 
@@ -677,27 +643,46 @@ class DB {
     // const payload = data.payload
     this.initDb(sqlite3);
     try {
-    } finally {
-      this.db.close();
+      const value = this.db.selectArrays('select page,imageData from nonalign order by page asc');
+      const res: any[] = [];
+      value.forEach((e: any) => {
+        res.push({
+          pageNumber: e[0],
+          examId: this.examName,
+          value: e[1],
+        });
+      });
       postMessage({
         msg: data.msg,
         uid: data.uid,
+        payload: res,
       });
+    } finally {
+      this.db.close();
     }
   }
 
   // getAlignSortByPageNumber(examId:number): Promise<ImageDB[]>;
 
   getAlignSortByPageNumber(sqlite3: any, data: any) {
-    const payload = data.payload;
     this.initDb(sqlite3);
     try {
-    } finally {
-      this.db.close();
+      const value = this.db.selectArrays('select page,imageData from align order by page asc');
+      const res: any[] = [];
+      value.forEach((e: any) => {
+        res.push({
+          pageNumber: e[0],
+          examId: this.examName,
+          value: e[1],
+        });
+      });
       postMessage({
         msg: data.msg,
         uid: data.uid,
+        payload: res,
       });
+    } finally {
+      this.db.close();
     }
   }
 
@@ -720,12 +705,14 @@ class DB {
     const payload = data.payload;
     this.initDb(sqlite3);
     try {
-    } finally {
-      this.db.close();
+      const count = this.db.selectValue('select count(*) from nonalign where page=' + payload.pageInscan);
       postMessage({
         msg: data.msg,
         uid: data.uid,
+        payload: count,
       });
+    } finally {
+      this.db.close();
     }
   }
   // countAlignWithPageNumber(examId:number, pageInscan:number): Promise<number>;
@@ -734,12 +721,14 @@ class DB {
     const payload = data.payload;
     this.initDb(sqlite3);
     try {
-    } finally {
-      this.db.close();
+      const count = this.db.selectValue('select count(*) from align where page=' + payload.pageInscan);
       postMessage({
         msg: data.msg,
         uid: data.uid,
+        payload: count,
       });
+    } finally {
+      this.db.close();
     }
   }
 }

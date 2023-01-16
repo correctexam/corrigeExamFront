@@ -30,7 +30,7 @@ import { worker1 } from '../services/workerimport';
 import { PreferenceService } from '../preference-page/preference.service';
 import { DialogService } from 'primeng/dynamicdialog';
 import { PartialAlignModalComponent } from './partial-align-modal/partial-align-modal.component';
-import { db as dbsqlite } from '../db/dbsqlite';
+// import { db as dbsqlite } from '../db/dbsqlite';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 
 export interface IPage {
@@ -126,7 +126,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('examid') !== null) {
         this.examId = params.get('examid')!;
-        dbsqlite.load(+this.examId);
+        // dbsqlite.load();
         if (this.preferenceService.getPreference().pdfscale !== undefined) {
           this.scale = this.preferenceService.getPreference().pdfscale;
         }
@@ -266,7 +266,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
       await this.db.addExam(+this.examId);
 
       for (let e of templatePages64.keys()) {
-        await dbsqlite.addTemplate({
+        /* await dbsqlite.addTemplate({
           examId: +this.examId,
           pageNumber: e,
           value: JSON.stringify(
@@ -275,7 +275,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
             },
             this.replacer
           ),
-        });
+        });*/
 
         await this.db.addTemplate({
           examId: +this.examId,
@@ -352,7 +352,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   async saveEligneImage(pageN: number, imageD: ImageData): Promise<void> {
     const imageString = this.fgetBase64Image(imageD);
 
-    await dbsqlite.addAligneImage({
+    /* await dbsqlite.addAligneImage({
       examId: +this.examId,
       //    colorSpace: (imageD as any).colorSpace,
       //    height: imageD.height,
@@ -360,7 +360,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
       //   width: imageD.width,
 
       pageNumber: pageN,
-    });
+    }); */
     await this.db.addAligneImage({
       examId: +this.examId,
       pageNumber: pageN,
@@ -375,14 +375,14 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
 
   async saveNonAligneImage(pageN: number, imageD: ImageData): Promise<void> {
     const imageString = this.fgetBase64Image(imageD);
-    await dbsqlite.addNonAligneImage({
+    /* await dbsqlite.addNonAligneImage({
       examId: +this.examId,
       //    colorSpace: (imageD as any).colorSpace,
       //    height: imageD.height,
       value: imageString,
       //   width: imageD.width,
       pageNumber: pageN,
-    });
+    });*/
     await this.db.addNonAligneImage({
       examId: +this.examId,
       pageNumber: pageN,

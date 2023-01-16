@@ -15,6 +15,7 @@ export class CacheServiceImpl implements CacheService {
     this.service = new AppDB();
     if (preference.getPreference().cacheDb === 'sqlite') {
       this.service = new SqliteCacheService();
+      (this.service as SqliteCacheService).load();
     }
   }
 
