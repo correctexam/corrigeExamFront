@@ -47,7 +47,7 @@ addEventListener('message', e => {
     case 'addAligneImage': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         dbs.set(e.data.exam, db1);
       }
       db1.addAligneImage(_sqlite3, e.data);
@@ -56,7 +56,7 @@ addEventListener('message', e => {
     case 'addNonAligneImage': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -67,7 +67,7 @@ addEventListener('message', e => {
     case 'resetDatabase': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -77,7 +77,7 @@ addEventListener('message', e => {
     case 'removeExam': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -87,7 +87,7 @@ addEventListener('message', e => {
     case 'removeElementForExam': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -97,7 +97,7 @@ addEventListener('message', e => {
     case 'export': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -107,7 +107,7 @@ addEventListener('message', e => {
     case 'import': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -117,7 +117,7 @@ addEventListener('message', e => {
     case 'countPageTemplate': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -127,7 +127,7 @@ addEventListener('message', e => {
     case 'countAlignImage': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -137,7 +137,7 @@ addEventListener('message', e => {
     case 'countNonAlignImage': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -147,7 +147,7 @@ addEventListener('message', e => {
     case 'getFirstNonAlignImage': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -157,7 +157,7 @@ addEventListener('message', e => {
     case 'getFirstAlignImage': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -167,7 +167,7 @@ addEventListener('message', e => {
     case 'getFirstTemplate': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -178,7 +178,7 @@ addEventListener('message', e => {
     case 'getNonAlignImageBetweenAndSortByPageNumber': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -189,7 +189,7 @@ addEventListener('message', e => {
     case 'getAlignImageBetweenAndSortByPageNumber': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -200,7 +200,7 @@ addEventListener('message', e => {
     case 'getNonAlignSortByPageNumber': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -211,7 +211,7 @@ addEventListener('message', e => {
     case 'getAlignSortByPageNumber': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -221,7 +221,7 @@ addEventListener('message', e => {
     case 'addExam': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -231,7 +231,7 @@ addEventListener('message', e => {
     case 'addTemplate': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -241,7 +241,7 @@ addEventListener('message', e => {
     case 'countNonAlignWithPageNumber': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -251,7 +251,7 @@ addEventListener('message', e => {
     case 'countAlignWithPageNumber': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
-        db1 = new DB(e.data.exam);
+        db1 = new DB(e.data.payload.examId);
         db1.initemptyDb(_sqlite3);
         dbs.set(e.data.exam, db1);
       }
@@ -281,10 +281,10 @@ class DB {
     const oo = sqlite3.oo1; /*high-level OO API*/
     if (sqlite3.opfs) {
       this.db = new oo.OpfsDb('/' + this.examName + '.sqlite3');
-      console.log('The OPFS is available.');
+      //       console.log('The OPFS is available.');
     } else {
       this.db = new oo.DB('/' + this.examName + '.sqlite3', 'ct');
-      console.log('The OPFS is not available.');
+      //      console.log('The OPFS is not available.');
     }
   }
 
@@ -606,13 +606,22 @@ class DB {
     */
     this.initDb(sqlite3);
     try {
-      const value = this.db.selectValue(
-        'select imageData from nonalign where page<=' + payload.p1 + ' and e2.page < ' + payload.p2 + ' order by pageNumber asc'
+      const value = this.db.selectArrays(
+        'select page,imageData from nonalign where page<=' + payload.p1 + ' and page < ' + payload.p2 + ' order by pageNumber asc'
       );
+      const res: any[] = [];
+      value.forEach((e: any) => {
+        res.push({
+          pageNumber: e[0],
+          examId: this.examName,
+          value: e[1],
+        });
+      });
+
       postMessage({
         msg: data.msg,
         uid: data.uid,
-        payload: value,
+        payload: res,
       });
     } finally {
       this.db.close();
@@ -624,13 +633,23 @@ class DB {
     const payload = data.payload;
     this.initDb(sqlite3);
     try {
-      const value = this.db.selectValue(
-        'select imageData from align where page<=' + payload.p1 + ' and e2.page < ' + payload.p2 + ' order by page asc'
+      const value = this.db.selectArrays(
+        'select page,imageData from align where page<=' + payload.p1 + ' and page < ' + payload.p2 + ' order by page asc'
       );
+
+      const res: any[] = [];
+      value.forEach((e: any) => {
+        res.push({
+          pageNumber: e[0],
+          examId: this.examName,
+          value: e[1],
+        });
+      });
+
       postMessage({
         msg: data.msg,
         uid: data.uid,
-        payload: value,
+        payload: res,
       });
     } finally {
       this.db.close();
