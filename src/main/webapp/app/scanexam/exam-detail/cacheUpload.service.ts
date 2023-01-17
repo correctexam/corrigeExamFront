@@ -220,6 +220,7 @@ export class CacheUploadService {
     await this.db.removeElementForExam(examId);
     let p = new Promise(resolve => {
       this.getCache(examId + 'indexdb.json').subscribe(data => {
+        console.error(data);
         resolve(data);
       });
     });
