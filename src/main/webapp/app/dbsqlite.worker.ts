@@ -386,18 +386,21 @@ class DB {
 
   async resetDatabase(sqlite3: any, data: any) {
     try {
-      const root = await navigator.storage.getDirectory();
-      const keys = (root as any).keys();
-      let next = await keys.next();
-      while (next.value !== undefined) {
-        if (next.value.endsWith('.sqlite3')) {
-          await root.removeEntry(next.value);
-        } else if (next.value.endsWith('sqlite3-journal')) {
-          await root.removeEntry(next.value);
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (navigator.storage.getDirectory !== undefined) {
+        const root = await navigator.storage.getDirectory();
+        const keys = (root as any).keys();
+        let next = await keys.next();
+        while (next.value !== undefined) {
+          if (next.value.endsWith('.sqlite3')) {
+            await root.removeEntry(next.value);
+          } else if (next.value.endsWith('sqlite3-journal')) {
+            await root.removeEntry(next.value);
+          }
+          next = await keys.next();
         }
-        next = await keys.next();
+        this.initemptyDb(sqlite3);
       }
-      this.initemptyDb(sqlite3);
     } finally {
       postMessage({
         msg: data.msg,
@@ -409,18 +412,21 @@ class DB {
   // removeExam(examId: number) :Promise<void>;
   async removeExam(sqlite3: any, data: any) {
     try {
-      const root = await navigator.storage.getDirectory();
-      const keys = (root as any).keys();
-      let next = await keys.next();
-      while (next.value !== undefined) {
-        if (next.value === this.examName + '.sqlite3') {
-          await root.removeEntry(this.examName + '.sqlite3');
-        } else if (next.value === this.examName + '.sqlite3-journal') {
-          await root.removeEntry(this.examName + '.sqlite3-journal');
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (navigator.storage.getDirectory !== undefined) {
+        const root = await navigator.storage.getDirectory();
+        const keys = (root as any).keys();
+        let next = await keys.next();
+        while (next.value !== undefined) {
+          if (next.value === this.examName + '.sqlite3') {
+            await root.removeEntry(this.examName + '.sqlite3');
+          } else if (next.value === this.examName + '.sqlite3-journal') {
+            await root.removeEntry(this.examName + '.sqlite3-journal');
+          }
+          next = await keys.next();
         }
-        next = await keys.next();
+        this.initemptyDb(sqlite3);
       }
-      this.initemptyDb(sqlite3);
     } finally {
       postMessage({
         msg: data.msg,
@@ -432,18 +438,21 @@ class DB {
   // removeElementForExam(examId: number) :Promise<void>;
   async removeElementForExam(sqlite3: any, data: any) {
     try {
-      const root = await navigator.storage.getDirectory();
-      const keys = (root as any).keys();
-      let next = await keys.next();
-      while (next.value !== undefined) {
-        if (next.value === this.examName + '.sqlite3') {
-          await root.removeEntry(this.examName + '.sqlite3');
-        } else if (next.value === this.examName + '.sqlite3-journal') {
-          await root.removeEntry(this.examName + '.sqlite3-journal');
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (navigator.storage.getDirectory !== undefined) {
+        const root = await navigator.storage.getDirectory();
+        const keys = (root as any).keys();
+        let next = await keys.next();
+        while (next.value !== undefined) {
+          if (next.value === this.examName + '.sqlite3') {
+            await root.removeEntry(this.examName + '.sqlite3');
+          } else if (next.value === this.examName + '.sqlite3-journal') {
+            await root.removeEntry(this.examName + '.sqlite3-journal');
+          }
+          next = await keys.next();
         }
-        next = await keys.next();
+        this.initemptyDb(sqlite3);
       }
-      this.initemptyDb(sqlite3);
     } finally {
       postMessage({
         msg: data.msg,
@@ -455,24 +464,32 @@ class DB {
   // export(examId: number,options?: ExportOptions) :Promise<Blob>;
 
   async export(sqlite3: any, data: any) {
-    const root = await navigator.storage.getDirectory();
-    const keys = (root as any).keys();
-    let next = await keys.next();
-    while (next.value !== undefined) {
-      if (next.value === this.examName + '.sqlite3') {
-        const savedFile = await root.getFileHandle(this.examName + '.sqlite3'); // Surprisingly there isn't a "fileExists()" function: instead you need to iterate over all files, which is odd... https://wicg.github.io/file-system-access/
-        const dbFile = await savedFile.getFile();
-        const arrayBuffer = await dbFile.arrayBuffer();
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (navigator.storage.getDirectory !== undefined) {
+      const root = await navigator.storage.getDirectory();
+      const keys = (root as any).keys();
+      let next = await keys.next();
+      while (next.value !== undefined) {
+        if (next.value === this.examName + '.sqlite3') {
+          const savedFile = await root.getFileHandle(this.examName + '.sqlite3'); // Surprisingly there isn't a "fileExists()" function: instead you need to iterate over all files, which is odd... https://wicg.github.io/file-system-access/
+          const dbFile = await savedFile.getFile();
+          const arrayBuffer = await dbFile.arrayBuffer();
 
-        const blob = new Blob([new Uint8Array(arrayBuffer)], { type: dbFile.type });
-        postMessage({
-          msg: data.msg,
-          uid: data.uid,
-          payload: blob,
-        });
-        break;
+          const blob = new Blob([new Uint8Array(arrayBuffer)], { type: dbFile.type });
+          postMessage({
+            msg: data.msg,
+            uid: data.uid,
+            payload: blob,
+          });
+          break;
+        }
+        next = await keys.next();
       }
-      next = await keys.next();
+    } else {
+      postMessage({
+        msg: data.msg,
+        uid: data.uid,
+      });
     }
   }
 
@@ -480,29 +497,31 @@ class DB {
   async import(sqlite3: any, data: any) {
     const payload = data.payload;
     const blob = payload.blob;
-
-    const root = await navigator.storage.getDirectory();
-    const keys = (root as any).keys();
-    let next = await keys.next();
-    while (next.value !== undefined) {
-      if (next.value === this.examName + '.sqlite3') {
-        await root.removeEntry(this.examName + '.sqlite3');
-      } else if (next.value === this.examName + '.sqlite3-journal') {
-        await root.removeEntry(this.examName + '.sqlite3-journal');
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (navigator.storage.getDirectory !== undefined) {
+      const root = await navigator.storage.getDirectory();
+      const keys = (root as any).keys();
+      let next = await keys.next();
+      while (next.value !== undefined) {
+        if (next.value === this.examName + '.sqlite3') {
+          await root.removeEntry(this.examName + '.sqlite3');
+        } else if (next.value === this.examName + '.sqlite3-journal') {
+          await root.removeEntry(this.examName + '.sqlite3-journal');
+        }
+        next = await keys.next();
       }
-      next = await keys.next();
-    }
 
-    const newFile = await root.getFileHandle(this.examName + '.sqlite3', { create: true });
+      const newFile = await root.getFileHandle(this.examName + '.sqlite3', { create: true });
 
-    // Open the `mywaifu.png` file as a writable stream ( FileSystemWritableFileStream ):
-    const wtr = await (newFile as any).createWritable();
-    try {
-      // Then write the Blob object directly:
-      await wtr.write(blob);
-    } finally {
-      // And safely close the file stream writer:
-      await wtr.close();
+      // Open the `mywaifu.png` file as a writable stream ( FileSystemWritableFileStream ):
+      const wtr = await (newFile as any).createWritable();
+      try {
+        // Then write the Blob object directly:
+        await wtr.write(blob);
+      } finally {
+        // And safely close the file stream writer:
+        await wtr.close();
+      }
     }
 
     //    const payload = data.payload;
