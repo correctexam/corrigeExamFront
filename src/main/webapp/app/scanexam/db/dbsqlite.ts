@@ -23,7 +23,7 @@ export class SqliteCacheService implements CacheService {
       workersqllite.onmessage = ({ data }) => {
         //        console.error(' receive message ', data);
         if (this.subjects.has(data.uid)) {
-          // console.log( ' receive message '  + data.uid)
+          //   console.error( ' receive message '  + data.uid)
 
           this.subjects.get(data.uid)?.next(data.payload);
           this.subjects.get(data.uid)?.complete();
@@ -63,7 +63,7 @@ export class SqliteCacheService implements CacheService {
   private _dispatch<T>(msg1: any, pay: any): Observable<T> {
     const uuid1 = uuid(); // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
     this.ready.then(() => {
-      // console.log( ' send message ' + msg1 + ' ' + uuid1)
+      //  console.error( ' send message ' + msg1 + ' ' + uuid1)
       this.worker.postMessage({ msg: msg1, uid: uuid1, payload: pay });
     });
     const p = new Subject<T>();

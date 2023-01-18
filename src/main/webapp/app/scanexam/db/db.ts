@@ -142,14 +142,14 @@ class ExamIndexDB extends Dexie {
   async getNonAlignImageBetweenAndSortByPageNumber(p1: number, p2: number) {
     return await this.nonAlignImages
       .where({ examId: this.examId })
-      .filter(e2 => e2.pageNumber <= p1 && e2.pageNumber < p2)
+      .filter(e2 => e2.pageNumber >= p1 && e2.pageNumber <= p2)
       .sortBy('pageNumber');
   }
 
   async getAlignImageBetweenAndSortByPageNumber(p1: number, p2: number) {
     return await this.alignImages
       .where({ examId: this.examId })
-      .filter(e2 => e2.pageNumber <= p1 && e2.pageNumber < p2)
+      .filter(e2 => e2.pageNumber >= p1 && e2.pageNumber <= p2)
       .sortBy('pageNumber');
   }
 

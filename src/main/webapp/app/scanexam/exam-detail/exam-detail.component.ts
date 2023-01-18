@@ -90,7 +90,6 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
           //          this.examSheetService.
 
           this.db.countPageTemplate(+this.examId).then(c => {
-            console.error(c);
             if (c !== 0) {
               this.blocked = true;
               this.showAssociation = true;

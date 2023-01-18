@@ -204,7 +204,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         if (this.examId !== params.get('examid')!) {
           this.examId = params.get('examid')!;
           this.images = [];
-          this.loadAllPages();
+          // this.loadAllPages();
 
           if (params.get('currentStudent') !== null) {
             this.currentStudent = +params.get('currentStudent')! - 1;
@@ -476,7 +476,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     promiseload.push(p2);
 
     Promise.all(promiseload).then(() => (this.blocked = false));
-    this.loadAllPages();
+    // this.loadAllPages();
   }
 
   async predictText(
@@ -720,7 +720,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   }
 
   public alignementChange(): any {
-    this.loadAllPages();
+    // this.loadAllPages();
     // this.exportAsImage();
   }
 
@@ -871,37 +871,79 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   }
 
   showGalleria(): void {
-    this.displayBasic = true;
+    this.loadAllPages().then(() => {
+      this.displayBasic = true;
+    });
   }
 
-  loadAllPages(): void {
+  loadAllPages(): Promise<void> {
     this.images = [];
+    return new Promise<void>(resolve => {
+      this.db.countNonAlignImage(+this.examId!).then(page => {
+        if (page > 30) {
+          this.db.countPageTemplate(+this.examId!).then(page1 => {
+            if (this.noalign) {
+              this.db
+                .getNonAlignImageBetweenAndSortByPageNumber(+this.examId!, this.currentStudent * page1, (this.currentStudent + 1) * page1)
+                .then(e1 => {
+                  console.error(e1);
+                  e1.forEach(e => {
+                    const image = JSON.parse(e!.value, this.reviver);
+                    this.images.push({
+                      src: image.pages,
+                      alt: 'Description for Image 2',
+                      title: 'Exam',
+                    });
+                  });
 
-    if (this.noalign) {
-      this.db.getNonAlignSortByPageNumber(+this.examId!).then(e1 =>
-        e1.forEach(e => {
-          const image = JSON.parse(e!.value, this.reviver);
+                  resolve();
+                });
+            } else {
+              this.db
+                .getAlignImageBetweenAndSortByPageNumber(+this.examId!, this.currentStudent * page1 + 1, (this.currentStudent + 1) * page1)
+                .then(e1 => {
+                  e1.forEach(e => {
+                    const image = JSON.parse(e!.value, this.reviver);
+                    this.images.push({
+                      src: image.pages,
+                      alt: 'Description for Image 2',
+                      title: 'Exam',
+                    });
+                  });
+                  resolve();
+                });
+            }
+          });
+        } else {
+          if (this.noalign) {
+            this.db.getNonAlignSortByPageNumber(+this.examId!).then(e1 => {
+              e1.forEach(e => {
+                const image = JSON.parse(e!.value, this.reviver);
 
-          this.images.push({
-            src: image.pages,
-            alt: 'Description for Image 2',
-            title: 'Exam',
-          });
-        })
-      );
-    } else {
-      this.db.getAlignSortByPageNumber(+this.examId!).then(e1 => {
-        console.error(e1);
-        e1.forEach(e => {
-          const image = JSON.parse(e!.value, this.reviver);
-          this.images.push({
-            src: image.pages,
-            alt: 'Description for Image 2',
-            title: 'Exam',
-          });
-        });
+                this.images.push({
+                  src: image.pages,
+                  alt: 'Description for Image 2',
+                  title: 'Exam',
+                });
+              });
+              resolve();
+            });
+          } else {
+            this.db.getAlignSortByPageNumber(+this.examId!).then(e1 => {
+              e1.forEach(e => {
+                const image = JSON.parse(e!.value, this.reviver);
+                this.images.push({
+                  src: image.pages,
+                  alt: 'Description for Image 2',
+                  title: 'Exam',
+                });
+              });
+              resolve();
+            });
+          }
+        }
       });
-    }
+    });
   }
 
   cleanBinding(): void {

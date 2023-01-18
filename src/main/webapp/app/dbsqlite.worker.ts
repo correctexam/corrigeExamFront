@@ -295,6 +295,9 @@ class DB {
       this.db.exec('CREATE TABLE IF NOT EXISTS template(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
       this.db.exec('CREATE TABLE IF NOT EXISTS align(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
       this.db.exec('CREATE TABLE IF NOT EXISTS nonalign(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
+      //  this.db.exec('CREATE UNIQUE INDEX templatepage ON template(page)');
+      //   this.db.exec('CREATE UNIQUE INDEX alignpage ON align(page)');
+      //  this.db.exec('CREATE UNIQUE INDEX nonalignpage ON nonalign(page)');
     } finally {
       this.db.close();
     }
@@ -459,7 +462,6 @@ class DB {
       if (next.value === this.examName + '.sqlite3') {
         const savedFile = await root.getFileHandle(this.examName + '.sqlite3'); // Surprisingly there isn't a "fileExists()" function: instead you need to iterate over all files, which is odd... https://wicg.github.io/file-system-access/
         const dbFile = await savedFile.getFile();
-        console.log(dbFile);
         const arrayBuffer = await dbFile.arrayBuffer();
 
         const blob = new Blob([new Uint8Array(arrayBuffer)], { type: dbFile.type });
@@ -636,7 +638,7 @@ class DB {
     this.initDb(sqlite3);
     try {
       const value = this.db.selectArrays(
-        'select page,imageData from nonalign where page<=' + payload.p1 + ' and page < ' + payload.p2 + ' order by pageNumber asc'
+        'select page,imageData from nonalign where page>=' + payload.p1 + ' and page <= ' + payload.p2 + ' order by page asc'
       );
       const res: any[] = [];
       value.forEach((e: any) => {
@@ -663,9 +665,8 @@ class DB {
     this.initDb(sqlite3);
     try {
       const value = this.db.selectArrays(
-        'select page,imageData from align where page<=' + payload.p1 + ' and page < ' + payload.p2 + ' order by page asc'
+        'select page,imageData from align where page>=' + payload.p1 + ' and page <= ' + payload.p2 + ' order by page asc'
       );
-
       const res: any[] = [];
       value.forEach((e: any) => {
         res.push({

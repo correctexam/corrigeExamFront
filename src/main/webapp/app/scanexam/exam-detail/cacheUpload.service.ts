@@ -155,7 +155,6 @@ export class CacheUploadService {
     } else {
       cacheUploadNotification.setBlocked(true);
       const blob = await this.db.export(examId, {});
-      console.log('not export for sqlite');
       const file = new File([blob], examId + '.sqlite3');
       cacheUploadNotification.setProgress(0);
       translateService.get('scanexam.uploadcacheencours').subscribe(res => cacheUploadNotification.setMessage('' + res + ' db '));
@@ -282,7 +281,6 @@ export class CacheUploadService {
       await this.db.removeElementForExam(examId);
       let p = new Promise(resolve => {
         this.getCache(examId + 'indexdb.json').subscribe(data => {
-          console.error(data);
           resolve(data);
         });
       });

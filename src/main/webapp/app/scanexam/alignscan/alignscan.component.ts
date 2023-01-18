@@ -350,6 +350,8 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   }
 
   async saveEligneImage(pageN: number, imageD: ImageData): Promise<void> {
+    // const imagePngBlob = await new Promise(resolve => canvasElem.toBlob( resolve, 'image/png' ) );
+
     const imageString = this.fgetBase64Image(imageD);
 
     /* await dbsqlite.addAligneImage({
@@ -373,8 +375,33 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     });
   }
 
-  async saveNonAligneImage(pageN: number, imageD: ImageData): Promise<void> {
-    const imageString = this.fgetBase64Image(imageD);
+  async saveEligneImageBase64(pageN: number, imageD: any): Promise<void> {
+    // const imagePngBlob = await new Promise(resolve => canvasElem.toBlob( resolve, 'image/png' ) );
+    /* await dbsqlite.addAligneImage({
+      examId: +this.examId,
+      //    colorSpace: (imageD as any).colorSpace,
+      //    height: imageD.height,
+      value: imageString,
+      //   width: imageD.width,
+
+      pageNumber: pageN,
+    }); */
+    await this.db.addAligneImage({
+      examId: +this.examId,
+      pageNumber: pageN,
+      value: JSON.stringify(
+        {
+          pages: imageD!,
+        },
+        this.replacer
+      ),
+    });
+  }
+
+  async saveNonAligneImage(pageN: number, imageD: any): Promise<void> {
+    // const imageString = this.fgetBase64Image(imageD);
+    // const imageString = this.fgetBase64Image(imageD);
+
     /* await dbsqlite.addNonAligneImage({
       examId: +this.examId,
       //    colorSpace: (imageD as any).colorSpace,
@@ -388,7 +415,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
       pageNumber: pageN,
       value: JSON.stringify(
         {
-          pages: imageString!,
+          pages: imageD!,
         },
         this.replacer
       ),
@@ -433,7 +460,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     const scale = { scale: this.scale };
     const dataURL = await this.pdfService.getPageAsImage(page, scale);
     const p = await this.aligneImages(dataURL, page);
-    return p.page! + 1;
+    return p! + 1;
   }
 
   loadImage(file: any, page: number, cb: (image: ImageData, page: number, w: number, h: number) => void): void {
@@ -450,28 +477,25 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     i.src = file;
   }
 
-  aligneImages(file: any, pagen: number): Promise<IPage> {
+  async aligneImages(file: any, pagen: number): Promise<number> {
+    await this.saveNonAligneImage(pagen, file);
+    // console.error(file)
     return new Promise(resolve => {
-      const i = new Image();
-      i.onload = async () => {
-        const editedImage = <HTMLCanvasElement>document.createElement('canvas');
-        editedImage.width = i.width;
-        editedImage.height = i.height;
-        const ctx = editedImage.getContext('2d');
-        ctx!.drawImage(i, 0, 0);
-        const inputimage1 = ctx!.getImageData(0, 0, i.width, i.height);
-        const napage = {
-          image: inputimage1,
-          page: pagen,
-          width: i.width!,
-          height: i.height,
-        };
-        if (this.alignement !== 'off') {
+      if (this.alignement !== 'off') {
+        const i = new Image();
+        i.onload = () => {
+          const editedImage = <HTMLCanvasElement>document.createElement('canvas');
+          editedImage.width = i.width;
+          editedImage.height = i.height;
+          const ctx = editedImage.getContext('2d');
+          ctx!.drawImage(i, 0, 0);
+          const inputimage1 = ctx!.getImageData(0, 0, i.width, i.height);
+
           let paget = pagen % this.nbreFeuilleParCopie;
           if (paget === 0) {
             paget = this.nbreFeuilleParCopie;
           }
-          await this.saveNonAligneImage(pagen, napage.image!);
+          // await this.saveNonAligneImage(pagen, napage.image!);
           const pref = this.preferenceService.getPreference();
 
           this.observer!.next({
@@ -485,42 +509,29 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
             pageNumber: pagen,
             preference: pref,
           });
-          const apage = {
-            page: pagen,
-            width: i.width!,
-            height: i.height,
-            pageNumber: pagen,
-          };
-          resolve(apage);
-        } else {
-          const apage = {
-            image: inputimage1.data.buffer,
-            page: pagen,
-            width: i.width,
-            height: i.height,
-          };
 
-          await this.saveNonAligneImage(pagen, napage.image!);
+          resolve(pagen);
+        };
 
-          this.saveEligneImage(apage.page!, napage.image!).then(() => {
-            if (this.currentPageAlign < this.numberPagesInScan + 1) {
-              this.observerPage?.next(this.currentPageAlign);
-              this.currentPageAlign = this.currentPageAlign + 1;
-            }
-            if (this.currentPageAlignOver < this.numberPagesInScan) {
-              this.avancement = this.currentPageAlignOver;
-              this.currentPageAlignOver = this.currentPageAlignOver + 1;
-            } else {
-              this.avancement = this.currentPageAlignOver;
-              this.currentPageAlignOver = this.currentPageAlignOver + 1;
-              this.observerPage?.complete();
-              this.observer?.complete();
-            }
-          });
-          resolve(apage);
-        }
-      };
-      i.src = file;
+        i.src = file;
+      } else {
+        this.saveEligneImageBase64(pagen, pagen).then(() => {
+          if (this.currentPageAlign < this.numberPagesInScan + 1) {
+            this.observerPage?.next(this.currentPageAlign);
+            this.currentPageAlign = this.currentPageAlign + 1;
+          }
+          if (this.currentPageAlignOver < this.numberPagesInScan) {
+            this.avancement = this.currentPageAlignOver;
+            this.currentPageAlignOver = this.currentPageAlignOver + 1;
+          } else {
+            this.avancement = this.currentPageAlignOver;
+            this.currentPageAlignOver = this.currentPageAlignOver + 1;
+            this.observerPage?.complete();
+            this.observer?.complete();
+          }
+        });
+        resolve(pagen);
+      }
     });
   }
 

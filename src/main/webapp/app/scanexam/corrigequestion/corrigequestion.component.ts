@@ -160,19 +160,18 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.resp = undefined;
       //      'answer/:examid/:questionno/:studentid',
       if (params.get('examid') !== null) {
-        if (this.examId !== params.get('examid')! || this.images.length === 0) {
+        this.examId = params.get('examid')!;
+        if (this.images.length === 0) {
           this.examId = params.get('examid')!;
-          this.loadAllPages();
           forceRefreshStudent = true;
         } else {
           const changeStudent = params.get('studentid') !== null && this.studentid !== +params.get('studentid')!;
           this.db.countNonAlignImage(+this.examId!).then(page => {
             if (page > 30 && changeStudent) {
-              this.loadAllPages();
+              //              this.loadAllPages();
             }
           });
         }
-        this.examId = params.get('examid')!;
         this.pageOffset = 0;
 
         if (params.get('studentid') !== null) {
@@ -996,66 +995,73 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  loadAllPages(): void {
+  loadAllPages(): Promise<void> {
     this.images = [];
-    this.db.countNonAlignImage(+this.examId!).then(page => {
-      if (page > 30) {
-        this.db.countPageTemplate(+this.examId!).then(page1 => {
-          if (this.noalign) {
-            this.db
-              .getNonAlignImageBetweenAndSortByPageNumber(+this.examId!, this.currentStudent * page1, (this.currentStudent + 1) * page1)
-              .then(e1 =>
-                e1.forEach(e => {
-                  const image = JSON.parse(e!.value, this.reviver);
-
-                  this.images.push({
-                    src: image.pages,
-                    alt: 'Description for Image 2',
-                    title: 'Exam',
+    return new Promise<void>(resolve => {
+      this.db.countNonAlignImage(+this.examId!).then(page => {
+        if (page > 30) {
+          this.db.countPageTemplate(+this.examId!).then(page1 => {
+            if (this.noalign) {
+              this.db
+                .getNonAlignImageBetweenAndSortByPageNumber(+this.examId!, this.currentStudent * page1, (this.currentStudent + 1) * page1)
+                .then(e1 => {
+                  console.error(e1);
+                  e1.forEach(e => {
+                    const image = JSON.parse(e!.value, this.reviver);
+                    this.images.push({
+                      src: image.pages,
+                      alt: 'Description for Image 2',
+                      title: 'Exam',
+                    });
                   });
-                })
-              );
-          } else {
-            this.db
-              .getAlignImageBetweenAndSortByPageNumber(+this.examId!, this.currentStudent * page1 + 1, (this.currentStudent + 1) * page1)
-              .then(e1 =>
-                e1.forEach(e => {
-                  const image = JSON.parse(e!.value, this.reviver);
-                  this.images.push({
-                    src: image.pages,
-                    alt: 'Description for Image 2',
-                    title: 'Exam',
-                  });
-                })
-              );
-          }
-        });
-      } else {
-        if (this.noalign) {
-          this.db.getNonAlignSortByPageNumber(+this.examId!).then(e1 =>
-            e1.forEach(e => {
-              const image = JSON.parse(e!.value, this.reviver);
 
-              this.images.push({
-                src: image.pages,
-                alt: 'Description for Image 2',
-                title: 'Exam',
-              });
-            })
-          );
+                  resolve();
+                });
+            } else {
+              this.db
+                .getAlignImageBetweenAndSortByPageNumber(+this.examId!, this.currentStudent * page1 + 1, (this.currentStudent + 1) * page1)
+                .then(e1 => {
+                  e1.forEach(e => {
+                    const image = JSON.parse(e!.value, this.reviver);
+                    this.images.push({
+                      src: image.pages,
+                      alt: 'Description for Image 2',
+                      title: 'Exam',
+                    });
+                  });
+                  resolve();
+                });
+            }
+          });
         } else {
-          this.db.getAlignSortByPageNumber(+this.examId!).then(e1 =>
-            e1.forEach(e => {
-              const image = JSON.parse(e!.value, this.reviver);
-              this.images.push({
-                src: image.pages,
-                alt: 'Description for Image 2',
-                title: 'Exam',
+          if (this.noalign) {
+            this.db.getNonAlignSortByPageNumber(+this.examId!).then(e1 => {
+              e1.forEach(e => {
+                const image = JSON.parse(e!.value, this.reviver);
+
+                this.images.push({
+                  src: image.pages,
+                  alt: 'Description for Image 2',
+                  title: 'Exam',
+                });
               });
-            })
-          );
+              resolve();
+            });
+          } else {
+            this.db.getAlignSortByPageNumber(+this.examId!).then(e1 => {
+              e1.forEach(e => {
+                const image = JSON.parse(e!.value, this.reviver);
+                this.images.push({
+                  src: image.pages,
+                  alt: 'Description for Image 2',
+                  title: 'Exam',
+                });
+              });
+              resolve();
+            });
+          }
         }
-      }
+      });
     });
   }
 
@@ -1195,7 +1201,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   showGalleria(): void {
-    this.displayBasic = true;
+    this.loadAllPages().then(() => {
+      this.displayBasic = true;
+    });
   }
 
   async loadImage(file: any, page1: number): Promise<IPage> {
@@ -1239,7 +1247,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   changeAlign(): void {
     this.images = [];
-    this.loadAllPages();
+    // this.loadAllPages();
     this.reloadImage();
   }
   getStudentName(): string | undefined {
@@ -1418,7 +1426,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       ),
     });
     this.images = [];
-    this.loadAllPages();
+    //  this.loadAllPages();
     this.reloadImage();
   }
   replacer(key: any, value: any): any {
