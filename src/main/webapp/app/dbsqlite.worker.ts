@@ -451,36 +451,65 @@ class DB {
 
   // export(examId: number,options?: ExportOptions) :Promise<Blob>;
 
-  export(sqlite3: any, data: any) {
-    // TODO
-    //    const payload = data.payload;
-    this.initDb(sqlite3);
-    try {
-      // TODO
-    } finally {
-      this.db.close();
-      postMessage({
-        msg: data.msg,
-        uid: data.uid,
-      });
+  async export(sqlite3: any, data: any) {
+    const root = await navigator.storage.getDirectory();
+    const keys = (root as any).keys();
+    let next = await keys.next();
+    while (next.value !== undefined) {
+      if (next.value === this.examName + '.sqlite3') {
+        const savedFile = await root.getFileHandle(this.examName + '.sqlite3'); // Surprisingly there isn't a "fileExists()" function: instead you need to iterate over all files, which is odd... https://wicg.github.io/file-system-access/
+        const dbFile = await savedFile.getFile();
+        console.log(dbFile);
+        const arrayBuffer = await dbFile.arrayBuffer();
+
+        const blob = new Blob([new Uint8Array(arrayBuffer)], { type: dbFile.type });
+        postMessage({
+          msg: data.msg,
+          uid: data.uid,
+          payload: blob,
+        });
+        break;
+      }
+      next = await keys.next();
     }
   }
 
   // import(examId: number,blob: Blob, options?: ImportOptions):Promise<void>;
-  import(sqlite3: any, data: any) {
-    // TODO
+  async import(sqlite3: any, data: any) {
+    const payload = data.payload;
+    const blob = payload.blob;
+
+    const root = await navigator.storage.getDirectory();
+    const keys = (root as any).keys();
+    let next = await keys.next();
+    while (next.value !== undefined) {
+      if (next.value === this.examName + '.sqlite3') {
+        await root.removeEntry(this.examName + '.sqlite3');
+      } else if (next.value === this.examName + '.sqlite3-journal') {
+        await root.removeEntry(this.examName + '.sqlite3-journal');
+      }
+      next = await keys.next();
+    }
+
+    const newFile = await root.getFileHandle(this.examName + '.sqlite3', { create: true });
+
+    // Open the `mywaifu.png` file as a writable stream ( FileSystemWritableFileStream ):
+    const wtr = await (newFile as any).createWritable();
+    try {
+      // Then write the Blob object directly:
+      await wtr.write(blob);
+    } finally {
+      // And safely close the file stream writer:
+      await wtr.close();
+    }
 
     //    const payload = data.payload;
     this.initDb(sqlite3);
-    try {
-      // TODO
-    } finally {
-      this.db.close();
-      postMessage({
-        msg: data.msg,
-        uid: data.uid,
-      });
-    }
+    this.db.close();
+    postMessage({
+      msg: data.msg,
+      uid: data.uid,
+    });
   }
 
   // countPageTemplate(examId:number):Promise<number>;

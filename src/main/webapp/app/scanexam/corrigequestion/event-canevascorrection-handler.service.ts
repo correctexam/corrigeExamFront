@@ -283,7 +283,7 @@ export class EventCanevascorrectionHandlerService {
         return this.commentsService.create(c);
       } else {
         const draw = SVG(canvas.toSVG().split('\n').splice(2).join('\n'));
-        draw.scale(1.5 / this.scale, 1.0 / this.scale, 0, 0);
+        draw.scale(1 / this.scale, 1.0 / this.scale, 0, 0);
         e1!.body![0].jsonData = draw.svg(); // this.canvas.toSVG();
         return this.commentsService.update(e1!.body![0]);
       }

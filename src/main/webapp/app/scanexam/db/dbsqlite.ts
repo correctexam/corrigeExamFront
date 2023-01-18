@@ -95,11 +95,11 @@ export class SqliteCacheService implements CacheService {
   }
 
   export(examId: number, options?: ExportOptions | undefined): Promise<any> {
-    /*    return this._dispatch('export', {
+    return this._dispatch('export', {
       examId: examId,
       options: options,
-    }).toPromise();*/
-    return new Promise<any>((resolve, reject) => resolve(null));
+    }).toPromise();
+    //    return new Promise<any>((resolve, reject) => resolve(null));
   }
   import(examId: number, blob: Blob, options?: ImportOptions | undefined): Promise<any> {
     return this._dispatch('import', {
