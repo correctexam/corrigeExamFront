@@ -328,8 +328,14 @@ export class CacheUploadService {
       }
       for (let i = 0; i < datas.length; i++) {
         try {
-          await this.db.import(examId, datas[i]);
-        } catch {
+          await this.db.import(examId, datas[i], {
+            acceptNameDiff: true,
+            acceptMissingTables: true,
+            acceptVersionDiff: true,
+            acceptChangedPrimaryKey: true,
+          });
+        } catch (err: any) {
+          console.error(err);
           messageService.add({
             severity: 'error',
             summary: translateService.instant('scanexam.downloadcacheko'),
@@ -367,7 +373,12 @@ export class CacheUploadService {
         return;
       } else {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        await this.db.import(examId, data, {});
+        await this.db.import(examId, data, {
+          acceptNameDiff: true,
+          acceptMissingTables: true,
+          acceptVersionDiff: true,
+          acceptChangedPrimaryKey: true,
+        });
         messageService.add({
           severity: 'success',
           summary: translateService.instant('scanexam.downloadcacheok'),
