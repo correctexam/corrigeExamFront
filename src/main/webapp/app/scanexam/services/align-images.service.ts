@@ -34,6 +34,8 @@ export interface IPreference {
   numberofpointToMatch: number;
   numberofgoodpointToMatch: number;
   defaultAlignAlgowithMarker: boolean;
+  pdfscale: number;
+  cacheDb: string;
 }
 
 export interface IImageAlignementInput {

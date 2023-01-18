@@ -1,3 +1,4 @@
+/* eslint-disable object-shorthand */
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
@@ -11,6 +12,12 @@ export interface Exam {
 
 export interface Template {
   id?: number;
+  examId: number;
+  pageNumber: number;
+  value: string;
+}
+
+export interface ImageDB {
   examId: number;
   pageNumber: number;
   value: string;
@@ -30,14 +37,15 @@ export interface NonAlignImage {
   value: string;
 }
 
-export class AppDB extends Dexie {
-  exams!: Table<Exam, number>;
-  templates!: Table<Template, number>;
-  alignImages!: Table<AlignImage, number>;
-  nonAlignImages!: Table<NonAlignImage, number>;
+class ExamIndexDB extends Dexie {
+  private exams!: Table<Exam, number>;
+  private templates!: Table<Template, number>;
+  private alignImages!: Table<AlignImage, number>;
+  private nonAlignImages!: Table<NonAlignImage, number>;
 
-  constructor() {
-    super('ngdexieliveQuery');
+  constructor(private examId: number) {
+    //    super('ngdexieliveQuery');
+    super('correctExam' + examId);
     this.version(3).stores({
       exams: '++id',
       templates: '++id, examId, [examId+pageNumber]',
@@ -47,12 +55,9 @@ export class AppDB extends Dexie {
     //    this.on('populate', () => this.populate());
   }
 
-  /* async populate() {
-  } */
-
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   async resetDatabase() {
-    await db.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
+    await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
       this.exams.clear();
       this.templates.clear();
       this.alignImages.clear();
@@ -62,29 +67,28 @@ export class AppDB extends Dexie {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  async removeElementForExam(examId: number) {
-    await db.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
-      db.exams.delete(examId);
+  async removeElementForExam() {
+    await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
+      this.exams.delete(this.examId);
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      db.templates
+      this.templates
         .where('examId')
-        .equals(examId)
+        .equals(this.examId)
         .toArray()
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         .then(templates => this.templates.bulkDelete(templates.map(t => t.id!)));
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      db.alignImages
+      this.alignImages
         .where('examId')
-        .equals(examId)
+        .equals(this.examId)
         .toArray()
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         .then(a => this.alignImages.bulkDelete(a.map(t => t.id!)));
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      db.nonAlignImages
+      this.nonAlignImages
         .where('examId')
-        .equals(examId)
+        .equals(this.examId)
         .toArray()
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         .then(a => this.nonAlignImages.bulkDelete(a.map(t => t.id!)));
@@ -92,18 +96,18 @@ export class AppDB extends Dexie {
     });
   }
 
-  async removeExam(examId: number) {
-    await db.transaction('rw', 'exams', () => {
-      this.exams.delete(examId);
+  async removeExam() {
+    await this.transaction('rw', 'exams', () => {
+      this.exams.delete(this.examId);
     });
   }
 
   async addAligneImage(elt: AlignImage) {
-    await db.alignImages.add(elt);
+    await this.alignImages.put(elt);
   }
 
   async addNonAligneImage(elt: AlignImage) {
-    await db.nonAlignImages.add(elt);
+    await this.nonAlignImages.put(elt);
   }
 
   export(options?: ExportOptions): Promise<Blob> {
@@ -112,6 +116,290 @@ export class AppDB extends Dexie {
   import(blob: Blob, options?: ImportOptions): Promise<void> {
     return super.import(blob, options);
   }
+
+  async countPageTemplate() {
+    return await this.templates.where('examId').equals(this.examId).count();
+  }
+
+  async countAlignImage() {
+    return await this.alignImages.where('examId').equals(this.examId).count();
+  }
+
+  async countNonAlignImage() {
+    return await this.nonAlignImages.where('examId').equals(this.examId).count();
+  }
+
+  async getFirstNonAlignImage(pageInscan: number) {
+    return await this.nonAlignImages.where({ examId: this.examId, pageNumber: pageInscan }).first();
+  }
+  async getFirstAlignImage(pageInscan: number) {
+    return await this.alignImages.where({ examId: this.examId, pageNumber: pageInscan }).first();
+  }
+  async getFirstTemplate(pageInscan: number) {
+    return await this.templates.where({ examId: this.examId, pageNumber: pageInscan }).first();
+  }
+
+  async getNonAlignImageBetweenAndSortByPageNumber(p1: number, p2: number) {
+    return await this.nonAlignImages
+      .where({ examId: this.examId })
+      .filter(e2 => e2.pageNumber >= p1 && e2.pageNumber <= p2)
+      .sortBy('pageNumber');
+  }
+
+  async getAlignImageBetweenAndSortByPageNumber(p1: number, p2: number) {
+    return await this.alignImages
+      .where({ examId: this.examId })
+      .filter(e2 => e2.pageNumber >= p1 && e2.pageNumber <= p2)
+      .sortBy('pageNumber');
+  }
+
+  async getNonAlignSortByPageNumber() {
+    return await this.nonAlignImages.where({ examId: this.examId }).sortBy('pageNumber');
+  }
+
+  async getAlignSortByPageNumber() {
+    return await this.alignImages.where({ examId: this.examId }).sortBy('pageNumber');
+  }
+  async addExam() {
+    return await this.exams.add({
+      id: this.examId,
+    });
+  }
+
+  async addTemplate(elt: AlignImage) {
+    return await this.templates.add({
+      examId: this.examId,
+      pageNumber: elt.pageNumber,
+      value: elt.value,
+    });
+  }
+
+  async countNonAlignWithPageNumber(pageInscan: number) {
+    return await this.nonAlignImages.where({ examId: this.examId, pageInscan }).count();
+  }
+
+  async countAlignWithPageNumber(pageInscan: number) {
+    return await this.alignImages.where({ examId: this.examId, pageInscan }).count();
+  }
+}
+
+export class AppDB implements CacheService {
+  dbs: Map<number, ExamIndexDB> = new Map<number, ExamIndexDB>();
+
+  /* async populate() {
+  } */
+
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  async resetDatabase(examId: number): Promise<void> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.resetDatabase();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+
+  async removeExam(examId: number): Promise<void> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.removeExam();
+  }
+
+  async removeElementForExam(examId: number): Promise<void> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.removeElementForExam();
+  }
+
+  async addAligneImage(elt: AlignImage): Promise<void> {
+    let db1 = this.dbs.get(elt.examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(elt.examId);
+      this.dbs.set(elt.examId, db1);
+    }
+    return db1.addAligneImage(elt);
+  }
+
+  async addNonAligneImage(elt: AlignImage): Promise<void> {
+    let db1 = this.dbs.get(elt.examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(elt.examId);
+      this.dbs.set(elt.examId, db1);
+    }
+    return db1.addNonAligneImage(elt);
+  }
+
+  export(examId: number, options?: ExportOptions): Promise<Blob> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.export(options);
+  }
+  import(examId: number, blob: Blob, options?: ImportOptions): Promise<void> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.import(blob, options);
+  }
+
+  async countPageTemplate(examId: number): Promise<number> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.countPageTemplate();
+  }
+
+  async countAlignImage(examId: number): Promise<number> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.countAlignImage();
+  }
+
+  async countNonAlignImage(examId: number): Promise<number> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.countNonAlignImage();
+  }
+
+  async getFirstNonAlignImage(examId: number, pageInscan: number): Promise<NonAlignImage | undefined> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.getFirstNonAlignImage(pageInscan);
+  }
+  async getFirstAlignImage(examId: number, pageInscan: number): Promise<AlignImage | undefined> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.getFirstAlignImage(pageInscan);
+  }
+  async getFirstTemplate(examId: number, pageInscan: number): Promise<Template | undefined> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.getFirstTemplate(pageInscan);
+  }
+
+  async getNonAlignImageBetweenAndSortByPageNumber(examId: number, p1: number, p2: number): Promise<NonAlignImage[]> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.getNonAlignImageBetweenAndSortByPageNumber(p1, p2);
+  }
+
+  async getAlignImageBetweenAndSortByPageNumber(examId: number, p1: number, p2: number): Promise<AlignImage[]> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.getAlignImageBetweenAndSortByPageNumber(p1, p2);
+  }
+
+  async getNonAlignSortByPageNumber(examId: number): Promise<NonAlignImage[]> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.getNonAlignSortByPageNumber();
+  }
+
+  async getAlignSortByPageNumber(examId: number): Promise<AlignImage[]> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.getAlignSortByPageNumber();
+  }
+  async addExam(examId: number): Promise<number> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.addExam();
+  }
+
+  async addTemplate(elt: AlignImage): Promise<number> {
+    let db1 = this.dbs.get(elt.examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(elt.examId);
+      this.dbs.set(elt.examId, db1);
+    }
+    return db1.addTemplate(elt);
+  }
+
+  async countNonAlignWithPageNumber(examId: number, pageInscan: number): Promise<number> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.countNonAlignWithPageNumber(pageInscan);
+  }
+
+  async countAlignWithPageNumber(examId: number, pageInscan: number): Promise<number> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.countAlignWithPageNumber(pageInscan);
+  }
+}
+
+export interface CacheService {
+  resetDatabase(examId: number): Promise<void>;
+  removeExam(examId: number): Promise<void>;
+  removeElementForExam(examId: number): Promise<void>;
+  addAligneImage(elt: AlignImage): Promise<any>;
+  addNonAligneImage(elt: AlignImage): Promise<any>;
+  export(examId: number, options?: ExportOptions): Promise<Blob>;
+  import(examId: number, blob: Blob, options?: ImportOptions): Promise<void>;
+  countPageTemplate(examId: number): Promise<number>;
+  countAlignImage(examId: number): Promise<number>;
+  countNonAlignImage(examId: number): Promise<number>;
+  getFirstNonAlignImage(examId: number, pageInscan: number): Promise<ImageDB | undefined>;
+  getFirstAlignImage(examId: number, pageInscan: number): Promise<ImageDB | undefined>;
+  getFirstTemplate(examId: number, pageInscan: number): Promise<Template | undefined>;
+  getNonAlignImageBetweenAndSortByPageNumber(examId: number, p1: number, p2: number): Promise<ImageDB[]>;
+  getAlignImageBetweenAndSortByPageNumber(examId: number, p1: number, p2: number): Promise<ImageDB[]>;
+  getNonAlignSortByPageNumber(examId: number): Promise<ImageDB[]>;
+  getAlignSortByPageNumber(examId: number): Promise<ImageDB[]>;
+  addExam(examId: number): Promise<number>;
+  addTemplate(elt: AlignImage): Promise<number>;
+  countNonAlignWithPageNumber(examId: number, pageInscan: number): Promise<number>;
+  countAlignWithPageNumber(examId: number, pageInscan: number): Promise<number>;
 }
 
 export const db = new AppDB();

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 // import { faCoffee } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 import { faMotorcycle as fasMotorcycle } from '@fortawesome/free-solid-svg-icons';
@@ -21,6 +21,10 @@ export class MesCoursComponent implements OnInit {
   fasMotorcycle = fasMotorcycle as IconProp;
   faGraduationCap = faGraduationCap as IconProp;
   courses!: ICourse[];
+
+  @Input()
+  showImage = true;
+
   constructor(public courseService: CourseService) {}
 
   ngOnInit(): void {

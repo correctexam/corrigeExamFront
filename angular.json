@@ -98,7 +98,12 @@
           "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
             "browserTarget": "grade-scope-istic:build:development",
-            "port": 4200
+            "port": 4200,
+            "headers": {
+              "Cross-Origin-Opener-Policy": "same-origin",
+              "Cross-Origin-Embedder-Policy": "require-corp",
+              "Access-Control-Allow-Origin": "domain"
+            }
           },
           "configurations": {
             "production": {

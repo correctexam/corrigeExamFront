@@ -1,5 +1,5 @@
 <div class="wizard-v2-content">
-  <div class="wizard-image"></div>
+  <div *ngIf="showImage" class="wizard-image"></div>
   <div class="wizard-form">
     <div class="wizard-header">
       <h3 jhiTranslate="scanexam.mescours">Mes cours</h3>
@@ -19,8 +19,14 @@
           <fa-stack>
             <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
             <fa-icon [icon]="faGraduationCap" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
-          ><BR />
-          <span>{{ course.name }}</span>
+          ><BR /> <span>{{ course.name }}</span
+          ><span *jhiHasAnyAuthority="'ROLE_ADMIN'"
+            >(
+            <span *ngFor="let prof of course.profs; let index = index; let isFirst = first"
+              ><span *ngIf="!isFirst">, </span>{{ prof.login }}</span
+            >
+            )</span
+          >
         </button>
       </div>
     </div>
