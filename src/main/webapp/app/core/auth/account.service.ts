@@ -55,7 +55,7 @@ export class AccountService {
 
           // After retrieve the account info, the language will be changed to
           // the user's preferred language configured in the account setting
-          // unless user have choosed other language in the current session
+          // unless user have chose other language in the current session
           if (!this.sessionStorageService.retrieve('locale')) {
             this.translateService.use(account.langKey);
           }

@@ -32,6 +32,18 @@ export class AuthServerProvider {
       .pipe(map(response => this.authenticateSuccess(response, credentials.rememberMe)));
   }
 
+  login_cas(cas_ticket: string): Observable<void> {
+    // eslint-disable-next-line no-console
+    console.log(`http://localhost/api/cas/authenticate/${cas_ticket}`);
+    return this.http.get<JwtToken>(`http://localhost/api/cas/authenticate/${cas_ticket}`).pipe(
+      map(response => {
+        // eslint-disable-next-line no-console
+        console.log(response);
+        this.authenticateSuccess(response, true);
+      })
+    );
+  }
+
   logout(): Observable<void> {
     return new Observable(observer => {
       this.localStorageService.clear('authenticationToken');
