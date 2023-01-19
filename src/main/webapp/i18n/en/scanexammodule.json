@@ -220,6 +220,9 @@
     "partialalignscanstartpage": "first page",
     "partialalignscanendpage": "last page",
     "partialalignscanprocess": "Start processing",
-    "partialalignscantooltip": "Mainly used if the scan pdf has been modified (e.g. to flip/reverse some pages) in order not to have to realign the whole set of images"
+    "partialalignscantooltip": "Mainly used if the scan pdf has been modified (e.g. to flip/reverse some pages) in order not to have to realign the whole set of images",
+    "downloadcacheencours": "Downloading the image cache from the current server",
+    "downloadcacheencoursdetail": "(This may take some time)",
+    "importToDexie": "Import in the current local database"
   }
 }
