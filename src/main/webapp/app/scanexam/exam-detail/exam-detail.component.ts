@@ -246,7 +246,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
   }
 
   confirmDownload(): any {
-    this.translateService.get('scanexam.confirmuploadcache').subscribe(data1 => {
+    this.translateService.get('scanexam.confirmdownloadcache').subscribe(data1 => {
       this.confirmationService.confirm({
         message: data1,
         // eslint-disable-next-line object-shorthand

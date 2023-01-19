@@ -277,6 +277,10 @@ export class CacheUploadService {
     messageService: MessageService,
     cacheDownloadNotification: CacheDownloadNotification
   ): Promise<void> {
+    translateService.get('scanexam.downloadcacheencours').subscribe(res => cacheDownloadNotification.setMessage('' + res + ''));
+    translateService.get('scanexam.downloadcacheencoursdetail').subscribe(res => cacheDownloadNotification.setSubMessage('' + res));
+    cacheDownloadNotification.setProgress(-1);
+
     if (this.preferenceService.getPreference().cacheDb !== 'sqlite') {
       await this.db.removeElementForExam(examId);
       let p = new Promise(resolve => {
@@ -302,10 +306,13 @@ export class CacheUploadService {
             detail: translateService.instant('scanexam.downloadcachekodetail'),
           });
           cacheDownloadNotification.setBlocked(false);
+          cacheDownloadNotification.setMessage('');
           return;
         } else {
           datas.push(data);
           let part = 1;
+          cacheDownloadNotification.setSubMessage('Part ' + part);
+
           p = new Promise(resolve => {
             this.getCache(examId + '_part_' + part + '_indexdb.json').subscribe(d => {
               resolve(d);
@@ -315,6 +322,8 @@ export class CacheUploadService {
           while (data.size > 0) {
             datas.push(data);
             part = part + 1;
+            cacheDownloadNotification.setSubMessage('Part ' + part);
+
             p = new Promise(resolve => {
               this.getCache(examId + '_part_' + part + '_indexdb.json').subscribe(d => {
                 resolve(d);
@@ -328,6 +337,9 @@ export class CacheUploadService {
       }
       for (let i = 0; i < datas.length; i++) {
         try {
+          translateService.get('scanexam.importToDexie').subscribe(res => cacheDownloadNotification.setMessage('' + res + ''));
+          cacheDownloadNotification.setSubMessage('Part ' + (i + 1));
+
           await this.db.import(examId, datas[i], {
             acceptNameDiff: true,
             acceptMissingTables: true,
@@ -342,6 +354,9 @@ export class CacheUploadService {
             detail: translateService.instant('scanexam.downloadcachekodetail'),
           });
           cacheDownloadNotification.setBlocked(false);
+          cacheDownloadNotification.setMessage('');
+          cacheDownloadNotification.setSubMessage('');
+
           return;
         }
       }
