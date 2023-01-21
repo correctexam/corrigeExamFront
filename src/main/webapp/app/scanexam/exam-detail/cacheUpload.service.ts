@@ -82,7 +82,8 @@ export class CacheUploadService {
     if (this.preferenceService.getPreference().cacheDb !== 'sqlite') {
       const o: ExportOptions = {
         noTransaction: true,
-        numRowsPerChunk: 100,
+        //        numRowsPerChunk: 100,
+        prettyJson: true,
       };
       cacheUploadNotification.setBlocked(true);
       const step = 50;
