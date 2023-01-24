@@ -52,6 +52,11 @@ jobs:
       - name: Copy 404
         run: |
           npm run copy:404
+      - name: prepare header fire sharearraybuffer support
+        run: |
+          echo "/*" > ./target/classes/static/_headers
+          echo "  Cross-Origin-Opener-Policy: same-origin" >> ./target/classes/static/_headers
+          echo "  Cross-Origin-Embedder-Policy: require-corp" >> ./target/classes/static/_headers
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.ref == 'refs/heads/main' }}
