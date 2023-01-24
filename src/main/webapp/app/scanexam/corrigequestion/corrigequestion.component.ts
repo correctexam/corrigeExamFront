@@ -1201,7 +1201,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   showGalleria(): void {
+    this.blocked = true;
     this.loadAllPages().then(() => {
+      this.blocked = false;
+
       this.displayBasic = true;
     });
   }

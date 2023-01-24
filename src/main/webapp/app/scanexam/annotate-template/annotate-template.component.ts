@@ -28,7 +28,6 @@ export class AnnotateTemplateComponent implements OnInit {
     public examService: ExamService,
     public templateService: TemplateService,
     protected activatedRoute: ActivatedRoute,
-    public confirmationService: ConfirmationService,
     public router: Router
   ) {}
 
