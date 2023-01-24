@@ -16,6 +16,7 @@ import {
   faPencil,
 } from '@fortawesome/free-solid-svg-icons';
 import { TranslateService } from '@ngx-translate/core';
+import { ConfirmationService } from 'primeng/api';
 import { EventHandlerService } from '../event-handler.service';
 import { DrawingTools } from '../models';
 
@@ -40,7 +41,7 @@ export class GraphicalToolbarComponent {
 
   constructor(
     private eventService: EventHandlerService,
-
+    private confirmationService: ConfirmationService,
     public translateService: TranslateService
   ) {}
 
@@ -48,9 +49,11 @@ export class GraphicalToolbarComponent {
     this.eventService.registerSelectedToolObserver(s => {
       this.selected = s;
     });
+    this.eventService.setConfirmationService(this.confirmationService);
   }
 
   async select(tool: DrawingTools) {
+    //    console.error('select',tool )
     this.eventService.selectedTool = tool;
     this.selected = this.eventService.selectedTool;
   }

@@ -871,7 +871,10 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   }
 
   showGalleria(): void {
+    this.blocked = true;
+
     this.loadAllPages().then(() => {
+      this.blocked = false;
       this.displayBasic = true;
     });
   }
