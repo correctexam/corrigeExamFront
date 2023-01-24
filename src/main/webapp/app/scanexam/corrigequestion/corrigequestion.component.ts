@@ -553,6 +553,65 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
+  isTextInput(ele: any): boolean {
+    const tagName = ele.tagName;
+    if (tagName === 'INPUT') {
+      const validType = [
+        'text',
+        'password',
+        'number',
+        'email',
+        'tel',
+        'url',
+        'search',
+        'date',
+        'datetime',
+        'datetime-local',
+        'time',
+        'month',
+        'week',
+      ];
+      const eleType = ele.type;
+      return validType.includes(eleType);
+    } else if (tagName === 'TEXTAREA') {
+      return true;
+    }
+    return false;
+  }
+
+  @HostListener('window:keyup.shift.1', ['$event'])
+  @HostListener('window:keyup.shift.2', ['$event'])
+  @HostListener('window:keyup.shift.3', ['$event'])
+  @HostListener('window:keyup.shift.4', ['$event'])
+  @HostListener('window:keyup.shift.5', ['$event'])
+  @HostListener('window:keyup.shift.6', ['$event'])
+  @HostListener('window:keyup.shift.7', ['$event'])
+  @HostListener('window:keyup.shift.8', ['$event'])
+  @HostListener('window:keyup.shift.9', ['$event'])
+  @HostListener('window:keyup.shift.0', ['$event'])
+  @HostListener('window:keyup.1', ['$event'])
+  @HostListener('window:keyup.2', ['$event'])
+  @HostListener('window:keyup.3', ['$event'])
+  @HostListener('window:keyup.4', ['$event'])
+  @HostListener('window:keyup.5', ['$event'])
+  @HostListener('window:keyup.6', ['$event'])
+  @HostListener('window:keyup.7', ['$event'])
+  @HostListener('window:keyup.8', ['$event'])
+  @HostListener('window:keyup.9', ['$event'])
+  @HostListener('window:keyup.0', ['$event'])
+  changeNote1(event: KeyboardEvent): void {
+    if (
+      this.currentQuestion !== undefined &&
+      !(this.currentQuestion.gradeType !== 'DIRECT' || this.currentQuestion.typeAlgoName === 'QCM') &&
+      !this.isTextInput(event.target) &&
+      this.resp !== undefined &&
+      this.noteSteps >= +event.key
+    ) {
+      this.currentNote = +event.key;
+      this.changeNote();
+    }
+  }
+
   updateResponseRequest(studentResp: IStudentResponse): Observable<EntityResponseType> {
     if (studentResp.id !== undefined) {
       return this.studentResponseService.update(studentResp); // .subscribe(sr1 => (this.resp = sr1.body!));
