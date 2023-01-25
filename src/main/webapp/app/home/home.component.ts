@@ -47,8 +47,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     // Check if user has been redirected from cas login page
     const matchTicket = window.location.href.match(/(.*)[&?]ticket=([^&?]*)$/);
     if (matchTicket) {
-      // startValidationProcedure
-      // const [_, x, ticket] = matchTicket;
       const ticket = matchTicket[2];
       this.loginService.login_cas(ticket).subscribe({
         next: () => {
