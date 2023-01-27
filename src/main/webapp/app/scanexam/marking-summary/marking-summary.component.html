@@ -20,7 +20,7 @@
           <div class="col" *ngIf="q.answeredSheets < dataExam.sheets.length">
             <button
               [routerLink]="'/answer/' + this.examId + '/' + q.numero + '/' + (q.firstUnmarkedSheet / pageInTemplate + 1)"
-              class="p-element p-ripple w-3"
+              class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
               pButton
               type="button"
             >
@@ -30,7 +30,7 @@
           <div class="col" *ngIf="q.answeredSheets === dataExam.sheets.length">
             <button
               [routerLink]="'/answer/' + this.examId + '/' + q.numero + '/' + '1'"
-              class="p-element p-ripple w-3"
+              class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
               pButton
               type="button"
             >
@@ -65,7 +65,7 @@
           <div class="col" *ngIf="s.answeredSheets < dataExam.questions.length">
             <button
               [routerLink]="'/answer/' + this.examId + '/' + s.firstUnmarkedQuestion + '/' + (index + 1)"
-              class="p-element p-ripple w-3"
+              class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
               pButton
               type="button"
             >
@@ -75,7 +75,7 @@
           <div class="col" *ngIf="s.answeredSheets === dataExam.questions.length">
             <button
               [routerLink]="'/answer/' + this.examId + '/' + '1' + '/' + (index + 1)"
-              class="p-element p-ripple w-3"
+              class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
               pButton
               type="button"
             >
