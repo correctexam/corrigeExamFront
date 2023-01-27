@@ -35,7 +35,6 @@ export class GraphicalToolbarComponent {
   faHandPointer = faHandPointer;
   faTrash = faTrash;
   faPencil = faPencil;
-
   DrawingTools = DrawingTools;
   selected = this.eventService.selectedTool;
 
