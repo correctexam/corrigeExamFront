@@ -12,6 +12,7 @@ import { ProfileService } from 'app/layouts/profiles/profile.service';
 import { EntityNavbarItems } from 'app/entities/entity-navbar-items';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { PreferencePageComponent } from '../../scanexam/preference-page/preference-page.component';
+import { environment } from '../../environment/environment';
 
 @Component({
   selector: 'jhi-navbar',
@@ -28,6 +29,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   account: Account | null = null;
   entitiesNavbarItems: any[] = [];
   ref: DynamicDialogRef | undefined;
+  cas_url: string;
+  service_url: string;
 
   constructor(
     private loginService: LoginService,
@@ -41,6 +44,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (VERSION) {
       this.version = VERSION.toLowerCase().startsWith('v') ? VERSION : `v${VERSION}`;
     }
+    this.cas_url = environment.cas_server_url;
+    this.service_url = environment.service_url;
   }
 
   ngOnInit(): void {
