@@ -367,7 +367,7 @@
             </li>
 
             <li *ngSwitchCase="false">
-              <a class="dropdown-item" (click)="login()" id="login" data-cy="login">
+              <a href="{{ cas_url }}/login?service={{ service_url }}" class="dropdown-item" id="login" data-cy="login">
                 <fa-icon icon="sign-in-alt" [fixedWidth]="true"></fa-icon>
                 <span jhiTranslate="global.menu.account.login">Sign in</span>
               </a>
