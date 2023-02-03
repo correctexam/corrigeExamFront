@@ -81,6 +81,7 @@
     "ngx-infinite-scroll": "14.0.0",
     "ngx-perfect-scrollbar": "^10.1.1",
     "ngx-webstorage": "10.0.1",
+    "node-polyfill-webpack-plugin": "^2.0.1",
     "observable-webworker": "4.0.1",
     "perfect-scrollbar": "1.5.5",
     "primeflex": "3.2.1",
