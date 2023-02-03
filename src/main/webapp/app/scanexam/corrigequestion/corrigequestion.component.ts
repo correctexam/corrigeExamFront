@@ -25,7 +25,6 @@ import { StudentService } from 'app/entities/student/service/student.service';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AlignImagesService, IImageAlignement, IImageAlignementInput, IQCMInput } from '../services/align-images.service';
-import { db } from '../db/db';
 import { IExam } from '../../entities/exam/exam.model';
 import { ICourse } from 'app/entities/course/course.model';
 import { IStudent } from '../../entities/student/student.model';
@@ -50,6 +49,7 @@ import { fromWorkerPool } from 'observable-webworker';
 import { worker1 } from '../services/workerimport';
 import { PreferenceService } from '../preference-page/preference.service';
 import { EntityResponseType } from '../../entities/exam-sheet/service/exam-sheet.service';
+import { CacheServiceImpl } from '../db/CacheServiceImpl';
 
 @Component({
   selector: 'jhi-corrigequestion',
@@ -142,7 +142,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     private changeDetector: ChangeDetectorRef,
     private eventHandler: EventCanevascorrectionHandlerService,
     private translateService: TranslateService,
-    private preferenceService: PreferenceService
+    private preferenceService: PreferenceService,
+    private db: CacheServiceImpl
   ) {}
 
   ngOnInit(): void {
@@ -159,146 +160,134 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.resp = undefined;
       //      'answer/:examid/:questionno/:studentid',
       if (params.get('examid') !== null) {
-        if (this.examId !== params.get('examid')! || this.images.length === 0) {
+        this.examId = params.get('examid')!;
+        if (this.images.length === 0) {
           this.examId = params.get('examid')!;
-          this.loadAllPages();
           forceRefreshStudent = true;
         } else {
           const changeStudent = params.get('studentid') !== null && this.studentid !== +params.get('studentid')!;
-          db.nonAlignImages
-            .where('examId')
-            .equals(+this.examId!)
-            .count()
-            .then(page => {
-              if (page > 30 && changeStudent) {
-                this.loadAllPages();
-              }
-            });
+          this.db.countNonAlignImage(+this.examId!).then(page => {
+            if (page > 30 && changeStudent) {
+              //              this.loadAllPages();
+            }
+          });
         }
-        this.examId = params.get('examid')!;
         this.pageOffset = 0;
 
         if (params.get('studentid') !== null) {
           this.studentid = +params.get('studentid')!;
           this.currentStudent = this.studentid - 1;
           // Step 1 Query templates
-          db.templates
-            .where('examId')
-            .equals(+this.examId)
-            .count()
-            .then(e2 => {
-              this.nbreFeuilleParCopie = e2;
-              // Step 2 Query Scan in local DB
+          this.db.countPageTemplate(+this.examId).then(e2 => {
+            this.nbreFeuilleParCopie = e2;
+            // Step 2 Query Scan in local DB
 
-              db.alignImages
-                .where('examId')
-                .equals(+this.examId!)
-                .count()
-                .then(e1 => {
-                  this.numberPagesInScan = e1;
-                  this.examService.find(+this.examId!).subscribe(data => {
-                    this.exam = data.body!;
-                    this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
-                    // Step 3 Query Students for Exam
+            this.db.countAlignImage(+this.examId!).then(e1 => {
+              this.numberPagesInScan = e1;
+              this.examService.find(+this.examId!).subscribe(data => {
+                this.exam = data.body!;
+                this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
+                // Step 3 Query Students for Exam
 
-                    this.refreshStudentList(forceRefreshStudent).then(() => {
-                      this.getSelectedStudent();
-                      // Step 4 Query zone 4 questions
+                this.refreshStudentList(forceRefreshStudent).then(() => {
+                  this.getSelectedStudent();
+                  // Step 4 Query zone 4 questions
 
-                      this.questionService.query({ examId: this.exam?.id }).subscribe(b => {
-                        let maxquestions = 0;
+                  this.questionService.query({ examId: this.exam?.id }).subscribe(b => {
+                    let maxquestions = 0;
 
-                        b.body!.forEach(q => {
-                          if (q.numero! > maxquestions) {
-                            maxquestions = q.numero!;
+                    b.body!.forEach(q => {
+                      if (q.numero! > maxquestions) {
+                        maxquestions = q.numero!;
+                      }
+                    });
+                    this.nbreQuestions = maxquestions;
+                    if (params.get('questionno') !== null) {
+                      this.questionno = +params.get('questionno')! - 1;
+                    }
+
+                    this.questionService.query({ examId: this.exam?.id, numero: this.questionno! + 1 }).subscribe(q1 => {
+                      this.questions = q1.body!;
+
+                      if (this.questions.length > 0) {
+                        this.noteSteps = this.questions[0].point! * this.questions[0].step!;
+                        this.questionStep = this.questions[0].step!;
+                        this.maxNote = this.questions[0].point!;
+                        this.currentQuestion = this.questions[0];
+                        if (this.resp === undefined) {
+                          this.resp = new StudentResponse(undefined, this.currentNote);
+                          this.resp.note = this.currentNote;
+                          this.resp.questionId = this.questions![0].id;
+                          const sheets = (this.selectionStudents?.map(st => st.examSheets) as any)
+                            .flat()
+                            .filter(
+                              (ex: any) =>
+                                ex?.scanId === this.exam!.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie!
+                            );
+                          if (sheets !== undefined && sheets!.length > 0) {
+                            this.resp.sheetId = sheets[0]?.id;
                           }
-                        });
-                        this.nbreQuestions = maxquestions;
-                        if (params.get('questionno') !== null) {
-                          this.questionno = +params.get('questionno')! - 1;
-                        }
 
-                        this.questionService.query({ examId: this.exam?.id, numero: this.questionno! + 1 }).subscribe(q1 => {
-                          this.questions = q1.body!;
-
-                          if (this.questions.length > 0) {
-                            this.noteSteps = this.questions[0].point! * this.questions[0].step!;
-                            this.questionStep = this.questions[0].step!;
-                            this.maxNote = this.questions[0].point!;
-                            this.currentQuestion = this.questions[0];
-                            if (this.resp === undefined) {
-                              this.resp = new StudentResponse(undefined, this.currentNote);
-                              this.resp.note = this.currentNote;
-                              this.resp.questionId = this.questions![0].id;
-                              const sheets = (this.selectionStudents?.map(st => st.examSheets) as any)
-                                .flat()
-                                .filter(
-                                  (ex: any) =>
-                                    ex?.scanId === this.exam!.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie!
-                                );
-                              if (sheets !== undefined && sheets!.length > 0) {
-                                this.resp.sheetId = sheets[0]?.id;
+                          this.studentResponseService
+                            .query({
+                              sheetId: this.resp.sheetId,
+                              questionId: this.resp.questionId,
+                            })
+                            .subscribe(sr => {
+                              if (sr.body !== null && sr.body.length > 0) {
+                                this.resp = sr.body![0];
+                                this.currentNote = this.resp.note!;
+                                this.computeNote(false, this.resp!);
+                                if (this.questions![0].gradeType === GradeType.DIRECT && this.questions![0].typeAlgoName !== 'QCM') {
+                                  this.textCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
+                                    this.resp?.textcomments!.forEach(com1 => {
+                                      const elt = com.body!.find(com2 => com2.id === com1.id);
+                                      if (elt !== undefined) {
+                                        (elt as any).checked = true;
+                                      }
+                                    });
+                                    this.currentTextComment4Question = com.body!;
+                                    this.blocked = false;
+                                  });
+                                } else {
+                                  this.gradedCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
+                                    this.resp?.gradedcomments!.forEach(com1 => {
+                                      const elt = com.body!.find(com2 => com2.id === com1.id);
+                                      if (elt !== undefined) {
+                                        (elt as any).checked = true;
+                                      }
+                                    });
+                                    this.currentGradedComment4Question = com.body!;
+                                    this.blocked = false;
+                                    //                                      this.computeNote(false, this.resp!);
+                                  });
+                                }
+                              } else {
+                                //            this.studentResponseService.create(this.resp!).subscribe(sr1 => {
+                                //                                      this.resp = sr1.body!;
+                                if (this.questions![0].gradeType === GradeType.DIRECT) {
+                                  this.textCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
+                                    this.currentTextComment4Question = com.body!;
+                                    this.blocked = false;
+                                  });
+                                } else {
+                                  this.gradedCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
+                                    this.currentGradedComment4Question = com.body!;
+                                    this.blocked = false;
+                                  });
+                                }
+                                //                                    });
                               }
-                              this.studentResponseService
-                                .query({
-                                  sheetId: this.resp.sheetId,
-                                  questionId: this.resp.questionId,
-                                })
-                                .subscribe(sr => {
-                                  if (sr.body !== null && sr.body.length > 0) {
-                                    this.resp = sr.body![0];
-                                    this.currentNote = this.resp.note!;
-                                    this.computeNote(false, this.resp!);
-                                    if (this.questions![0].gradeType === GradeType.DIRECT && this.questions![0].typeAlgoName !== 'QCM') {
-                                      this.textCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
-                                        this.resp?.textcomments!.forEach(com1 => {
-                                          const elt = com.body!.find(com2 => com2.id === com1.id);
-                                          if (elt !== undefined) {
-                                            (elt as any).checked = true;
-                                          }
-                                        });
-                                        this.currentTextComment4Question = com.body!;
-                                        this.blocked = false;
-                                      });
-                                    } else {
-                                      this.gradedCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
-                                        this.resp?.gradedcomments!.forEach(com1 => {
-                                          const elt = com.body!.find(com2 => com2.id === com1.id);
-                                          if (elt !== undefined) {
-                                            (elt as any).checked = true;
-                                          }
-                                        });
-                                        this.currentGradedComment4Question = com.body!;
-                                        this.blocked = false;
-                                        //                                      this.computeNote(false, this.resp!);
-                                      });
-                                    }
-                                  } else {
-                                    //            this.studentResponseService.create(this.resp!).subscribe(sr1 => {
-                                    //                                      this.resp = sr1.body!;
-                                    if (this.questions![0].gradeType === GradeType.DIRECT) {
-                                      this.textCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
-                                        this.currentTextComment4Question = com.body!;
-                                        this.blocked = false;
-                                      });
-                                    } else {
-                                      this.gradedCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
-                                        this.currentGradedComment4Question = com.body!;
-                                        this.blocked = false;
-                                      });
-                                    }
-                                    //                                    });
-                                  }
-                                });
-                            }
-                          }
-                          this.showImage = new Array<boolean>(this.questions.length);
-                        });
-                      });
+                            });
+                        }
+                      }
+                      this.showImage = new Array<boolean>(this.questions.length);
                     });
                   });
                 });
+              });
             });
+          });
         } else {
           const c = this.currentStudent + 1;
           this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno! + 1) + '/' + c);
@@ -561,6 +550,65 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.resp = sr1.body!;
         this.blocked = false;
       });
+    }
+  }
+
+  isTextInput(ele: any): boolean {
+    const tagName = ele.tagName;
+    if (tagName === 'INPUT') {
+      const validType = [
+        'text',
+        'password',
+        'number',
+        'email',
+        'tel',
+        'url',
+        'search',
+        'date',
+        'datetime',
+        'datetime-local',
+        'time',
+        'month',
+        'week',
+      ];
+      const eleType = ele.type;
+      return validType.includes(eleType);
+    } else if (tagName === 'TEXTAREA') {
+      return true;
+    }
+    return false;
+  }
+
+  @HostListener('window:keyup.shift.1', ['$event'])
+  @HostListener('window:keyup.shift.2', ['$event'])
+  @HostListener('window:keyup.shift.3', ['$event'])
+  @HostListener('window:keyup.shift.4', ['$event'])
+  @HostListener('window:keyup.shift.5', ['$event'])
+  @HostListener('window:keyup.shift.6', ['$event'])
+  @HostListener('window:keyup.shift.7', ['$event'])
+  @HostListener('window:keyup.shift.8', ['$event'])
+  @HostListener('window:keyup.shift.9', ['$event'])
+  @HostListener('window:keyup.shift.0', ['$event'])
+  @HostListener('window:keyup.1', ['$event'])
+  @HostListener('window:keyup.2', ['$event'])
+  @HostListener('window:keyup.3', ['$event'])
+  @HostListener('window:keyup.4', ['$event'])
+  @HostListener('window:keyup.5', ['$event'])
+  @HostListener('window:keyup.6', ['$event'])
+  @HostListener('window:keyup.7', ['$event'])
+  @HostListener('window:keyup.8', ['$event'])
+  @HostListener('window:keyup.9', ['$event'])
+  @HostListener('window:keyup.0', ['$event'])
+  changeNote1(event: KeyboardEvent): void {
+    if (
+      this.currentQuestion !== undefined &&
+      !(this.currentQuestion.gradeType !== 'DIRECT' || this.currentQuestion.typeAlgoName === 'QCM') &&
+      !this.isTextInput(event.target) &&
+      this.resp !== undefined &&
+      this.noteSteps >= +event.key
+    ) {
+      this.currentNote = +event.key;
+      this.changeNote();
     }
   }
 
@@ -1006,159 +1054,141 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  loadAllPages(): void {
+  loadAllPages(): Promise<void> {
     this.images = [];
-    db.nonAlignImages
-      .where('examId')
-      .equals(+this.examId!)
-      .count()
-      .then(page => {
+    return new Promise<void>(resolve => {
+      this.db.countNonAlignImage(+this.examId!).then(page => {
         if (page > 30) {
-          db.templates
-            .where({ examId: +this.examId! })
-            .count()
-            .then(page1 => {
-              if (this.noalign) {
-                db.nonAlignImages
-                  .where({ examId: +this.examId! })
-                  .filter(e2 => e2.pageNumber <= this.currentStudent * page1 && e2.pageNumber < (this.currentStudent + 1) * page1)
-                  .sortBy('pageNumber')
-                  .then(e1 =>
-                    e1.forEach(e => {
-                      const image = JSON.parse(e!.value, this.reviver);
+          this.db.countPageTemplate(+this.examId!).then(page1 => {
+            if (this.noalign) {
+              this.db
+                .getNonAlignImageBetweenAndSortByPageNumber(+this.examId!, this.currentStudent * page1, (this.currentStudent + 1) * page1)
+                .then(e1 => {
+                  console.error(e1);
+                  e1.forEach(e => {
+                    const image = JSON.parse(e!.value, this.reviver);
+                    this.images.push({
+                      src: image.pages,
+                      alt: 'Description for Image 2',
+                      title: 'Exam',
+                    });
+                  });
 
-                      this.images.push({
-                        src: image.pages,
-                        alt: 'Description for Image 2',
-                        title: 'Exam',
-                      });
-                    })
-                  );
-              } else {
-                db.alignImages
-                  .where({ examId: +this.examId! })
-                  .filter(e2 => e2.pageNumber >= this.currentStudent * page1 + 1 && e2.pageNumber <= (this.currentStudent + 1) * page1)
-                  .sortBy('pageNumber')
-                  .then(e1 =>
-                    e1.forEach(e => {
-                      const image = JSON.parse(e!.value, this.reviver);
-                      this.images.push({
-                        src: image.pages,
-                        alt: 'Description for Image 2',
-                        title: 'Exam',
-                      });
-                    })
-                  );
-              }
-            });
+                  resolve();
+                });
+            } else {
+              this.db
+                .getAlignImageBetweenAndSortByPageNumber(+this.examId!, this.currentStudent * page1 + 1, (this.currentStudent + 1) * page1)
+                .then(e1 => {
+                  e1.forEach(e => {
+                    const image = JSON.parse(e!.value, this.reviver);
+                    this.images.push({
+                      src: image.pages,
+                      alt: 'Description for Image 2',
+                      title: 'Exam',
+                    });
+                  });
+                  resolve();
+                });
+            }
+          });
         } else {
           if (this.noalign) {
-            db.nonAlignImages
-              .where({ examId: +this.examId! })
-              .sortBy('pageNumber')
-              .then(e1 =>
-                e1.forEach(e => {
-                  const image = JSON.parse(e!.value, this.reviver);
+            this.db.getNonAlignSortByPageNumber(+this.examId!).then(e1 => {
+              e1.forEach(e => {
+                const image = JSON.parse(e!.value, this.reviver);
 
-                  this.images.push({
-                    src: image.pages,
-                    alt: 'Description for Image 2',
-                    title: 'Exam',
-                  });
-                })
-              );
+                this.images.push({
+                  src: image.pages,
+                  alt: 'Description for Image 2',
+                  title: 'Exam',
+                });
+              });
+              resolve();
+            });
           } else {
-            db.alignImages
-              .where({ examId: +this.examId! })
-              .sortBy('pageNumber')
-              .then(e1 =>
-                e1.forEach(e => {
-                  const image = JSON.parse(e!.value, this.reviver);
-                  this.images.push({
-                    src: image.pages,
-                    alt: 'Description for Image 2',
-                    title: 'Exam',
-                  });
-                })
-              );
+            this.db.getAlignSortByPageNumber(+this.examId!).then(e1 => {
+              e1.forEach(e => {
+                const image = JSON.parse(e!.value, this.reviver);
+                this.images.push({
+                  src: image.pages,
+                  alt: 'Description for Image 2',
+                  title: 'Exam',
+                });
+              });
+              resolve();
+            });
           }
         }
       });
+    });
   }
 
   async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
     if (this.noalign) {
       return new Promise(resolve => {
-        db.nonAlignImages
-          .where({ examId: +this.examId!, pageNumber: pageInscan })
-          .first()
-          .then(e2 => {
-            const image = JSON.parse(e2!.value, this.reviver);
-            this.loadImage(image.pages, pageInscan).then(v => {
-              let finalW = (zone.width! * v.width! * this.factor) / 100000;
-              let finalH = (zone.height! * v.height! * this.factor) / 100000;
-              let initX =
-                (zone.xInit! * v.width!) / 100000 -
-                ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
-              if (initX < 0) {
-                finalW = finalW + initX;
-                initX = 0;
-              }
-              let initY =
-                (zone.yInit! * v.height!) / 100000 -
-                ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
-              if (initY < 0) {
-                finalH = finalH + initY;
-                initY = 0;
-              }
-              this.alignImagesService
-                .imageCrop({
-                  image: v.image,
-                  x: initX,
-                  y: initY,
-                  width: finalW,
-                  height: finalH,
-                })
-                .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
-            });
+        this.db.getFirstNonAlignImage(+this.examId!, pageInscan).then(e2 => {
+          const image = JSON.parse(e2!.value, this.reviver);
+          this.loadImage(image.pages, pageInscan).then(v => {
+            let finalW = (zone.width! * v.width! * this.factor) / 100000;
+            let finalH = (zone.height! * v.height! * this.factor) / 100000;
+            let initX =
+              (zone.xInit! * v.width!) / 100000 - ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
+            if (initX < 0) {
+              finalW = finalW + initX;
+              initX = 0;
+            }
+            let initY =
+              (zone.yInit! * v.height!) / 100000 -
+              ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
+            if (initY < 0) {
+              finalH = finalH + initY;
+              initY = 0;
+            }
+            this.alignImagesService
+              .imageCrop({
+                image: v.image,
+                x: initX,
+                y: initY,
+                width: finalW,
+                height: finalH,
+              })
+              .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
           });
+        });
       });
     } else {
       return new Promise(resolve => {
-        db.alignImages
-          .where({ examId: +this.examId!, pageNumber: pageInscan })
-          .first()
-          .then(e2 => {
-            const image = JSON.parse(e2!.value, this.reviver);
+        this.db.getFirstAlignImage(+this.examId!, pageInscan).then(e2 => {
+          const image = JSON.parse(e2!.value, this.reviver);
 
-            this.loadImage(image.pages, pageInscan).then(v => {
-              let finalW = (zone.width! * v.width! * this.factor) / 100000;
-              let finalH = (zone.height! * v.height! * this.factor) / 100000;
-              let initX =
-                (zone.xInit! * v.width!) / 100000 -
-                ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
-              if (initX < 0) {
-                finalW = finalW + initX;
-                initX = 0;
-              }
-              let initY =
-                (zone.yInit! * v.height!) / 100000 -
-                ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
-              if (initY < 0) {
-                finalH = finalH + initY;
-                initY = 0;
-              }
-              this.alignImagesService
-                .imageCrop({
-                  image: v.image,
-                  x: initX,
-                  y: initY,
-                  width: finalW,
-                  height: finalH,
-                })
-                .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
-            });
+          this.loadImage(image.pages, pageInscan).then(v => {
+            let finalW = (zone.width! * v.width! * this.factor) / 100000;
+            let finalH = (zone.height! * v.height! * this.factor) / 100000;
+            let initX =
+              (zone.xInit! * v.width!) / 100000 - ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
+            if (initX < 0) {
+              finalW = finalW + initX;
+              initX = 0;
+            }
+            let initY =
+              (zone.yInit! * v.height!) / 100000 -
+              ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
+            if (initY < 0) {
+              finalH = finalH + initY;
+              initY = 0;
+            }
+            this.alignImagesService
+              .imageCrop({
+                image: v.image,
+                x: initX,
+                y: initY,
+                width: finalW,
+                height: finalH,
+              })
+              .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
           });
+        });
       });
     }
   }
@@ -1197,43 +1227,45 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   async getTemplateImage4Zone(zone: IZone): Promise<ImageZone> {
     return new Promise(resolve => {
-      db.templates
-        .where({ examId: +this.examId!, pageNumber: zone.pageNumber })
-        .first()
-        .then(e2 => {
-          const image = JSON.parse(e2!.value, this.reviver);
-          this.loadImage(image.pages, zone.pageNumber!).then(v => {
-            let finalW = (zone.width! * v.width! * this.factor) / 100000;
-            let finalH = (zone.height! * v.height! * this.factor) / 100000;
-            let initX =
-              (zone.xInit! * v.width!) / 100000 - ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
-            if (initX < 0) {
-              finalW = finalW + initX;
-              initX = 0;
-            }
-            let initY =
-              (zone.yInit! * v.height!) / 100000 -
-              ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
-            if (initY < 0) {
-              finalH = finalH + initY;
-              initY = 0;
-            }
-            this.alignImagesService
-              .imageCrop({
-                image: v.image,
-                x: initX,
-                y: initY,
-                width: finalW,
-                height: finalH,
-              })
-              .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
-          });
+      this.db.getFirstTemplate(+this.examId!, zone.pageNumber!).then(e2 => {
+        const image = JSON.parse(e2!.value, this.reviver);
+        this.loadImage(image.pages, zone.pageNumber!).then(v => {
+          let finalW = (zone.width! * v.width! * this.factor) / 100000;
+          let finalH = (zone.height! * v.height! * this.factor) / 100000;
+          let initX =
+            (zone.xInit! * v.width!) / 100000 - ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
+          if (initX < 0) {
+            finalW = finalW + initX;
+            initX = 0;
+          }
+          let initY =
+            (zone.yInit! * v.height!) / 100000 -
+            ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
+          if (initY < 0) {
+            finalH = finalH + initY;
+            initY = 0;
+          }
+          this.alignImagesService
+            .imageCrop({
+              image: v.image,
+              x: initX,
+              y: initY,
+              width: finalW,
+              height: finalH,
+            })
+            .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
         });
+      });
     });
   }
 
   showGalleria(): void {
-    this.displayBasic = true;
+    this.blocked = true;
+    this.loadAllPages().then(() => {
+      this.blocked = false;
+
+      this.displayBasic = true;
+    });
   }
 
   async loadImage(file: any, page1: number): Promise<IPage> {
@@ -1277,7 +1309,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   changeAlign(): void {
     this.images = [];
-    this.loadAllPages();
+    // this.loadAllPages();
     this.reloadImage();
   }
   getStudentName(): string | undefined {
@@ -1388,35 +1420,29 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
           page = pagewithoffset;
         }
-        db.templates
-          .where({ examId: +this.examId!, pageNumber: z!.pageNumber! })
-          .first()
-          .then(e2 => {
-            const image = JSON.parse(e2!.value, this.reviver);
-            this.loadImage(image.pages, z!.pageNumber!).then(v => {
-              db.nonAlignImages
-                .where({ examId: +this.examId!, pageNumber: page })
-                .first()
-                .then(e3 => {
-                  const image1 = JSON.parse(e3!.value, this.reviver);
-                  this.loadImage(image1.pages, page).then(v1 => {
-                    const inp: IImageAlignementInput = {
-                      imageA: v.image!.data.buffer,
-                      imageB: v1.image!.data.buffer,
-                      heightA: v.height,
-                      widthA: v.width,
-                      heightB: v1.height,
-                      widthB: v1.width,
-                      pageNumber: page,
-                      marker: mark,
-                      preference: this.preferenceService.getPreference(),
-                    };
+        this.db.getFirstTemplate(+this.examId!, z!.pageNumber!).then(e2 => {
+          const image = JSON.parse(e2!.value, this.reviver);
+          this.loadImage(image.pages, z!.pageNumber!).then(v => {
+            this.db.getFirstNonAlignImage(+this.examId!, page).then(e3 => {
+              const image1 = JSON.parse(e3!.value, this.reviver);
+              this.loadImage(image1.pages, page).then(v1 => {
+                const inp: IImageAlignementInput = {
+                  imageA: v.image!.data.buffer,
+                  imageB: v1.image!.data.buffer,
+                  heightA: v.height,
+                  widthA: v.width,
+                  heightB: v1.height,
+                  widthB: v1.width,
+                  pageNumber: page,
+                  marker: mark,
+                  preference: this.preferenceService.getPreference(),
+                };
 
-                    this.observer!.next(inp);
-                  });
-                });
+                this.observer!.next(inp);
+              });
             });
           });
+        });
       });
     });
   }
@@ -1451,7 +1477,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     );
   }
   async saveEligneImage(pageN: number, imageString: string): Promise<void> {
-    await db.addAligneImage({
+    await this.db.addAligneImage({
       examId: +this.examId!,
       pageNumber: pageN,
       value: JSON.stringify(
@@ -1462,7 +1488,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       ),
     });
     this.images = [];
-    this.loadAllPages();
+    //  this.loadAllPages();
     this.reloadImage();
   }
   replacer(key: any, value: any): any {

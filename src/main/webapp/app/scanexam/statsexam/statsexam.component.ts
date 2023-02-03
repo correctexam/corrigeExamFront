@@ -1,12 +1,7 @@
-/* eslint-disable @typescript-eslint/no-inferrable-types */
-/* eslint-disable @typescript-eslint/member-ordering */
-/* eslint-disable no-empty */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable guard-for-in */
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-import { HttpClient } from '@angular/common/http';
+/* eslint-disable @typescript-eslint/member-ordering */
+/* eslint-disable guard-for-in */
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -15,16 +10,12 @@ import { CourseService } from 'app/entities/course/service/course.service';
 import { IQuestion } from 'app/entities/question/question.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
 import { Observable } from 'rxjs';
-import { db } from '../db/db';
+import { CacheServiceImpl } from '../db/CacheServiceImpl';
 
 // Couleurs à utiliser
-const GRIS_LEGER = 'rgba(179,181,198,0.2)';
 const GRIS = 'rgba(179,181,198,1)';
-const VERT_LEGER = 'rgba(120,255,132,0.2)';
 const VERT = 'rgba(120,255,132,1)';
-const ROUGE_LEGER = 'rgb(255, 120, 120,0.2)';
 const ROUGE = 'rgb(255, 120, 120)';
-const BLEU_FONCE_LEGER = 'rgb(72, 61, 139,0.2)';
 const BLEU_FONCE = 'rgb(72, 61, 139)';
 const BLANC = 'rgba(255,255,255,1)';
 const VIOLET = 'rgb(233, 120, 255)';
@@ -32,7 +23,6 @@ const VIOLET_TIEDE = 'rgb(233, 120, 255,0.6)';
 const VIOLET_LEGER = 'rgb(233, 120, 255,0.2)';
 const BLEU_AERO = 'rgb(142, 184, 229)';
 const BLEU_AERO_TIEDE = 'rgb(142, 184, 229,0.6)';
-const BLEU_AERO_LEGER = 'rgb(142, 184, 229,0.2)';
 const TRANSPARENT = 'rgba(255,255,255,0.0)';
 
 @Component({
@@ -42,15 +32,19 @@ const TRANSPARENT = 'rgba(255,255,255,0.0)';
 })
 export class StatsExamComponent implements OnInit {
   // Page related variables
-  examid: string | undefined = undefined;
+  examid = '-1';
   infosQuestions: IQuestion[] = [];
   infosStudents: StudentRes[] = [];
   q_notees: QuestionNotee[] = [];
   notes_eleves: number[] = [];
-  choixTri: boolean = true;
+  choixTri = true;
 
-  // Variables d'affichage
-  data_radar_courant!: IRadar;
+  // Graphical data
+  data_radar_courant: IRadar = {
+    labels: [],
+    datasets: [],
+    vue: '',
+  };
   etudiantSelec: StudentRes | null | undefined;
   listeMobileEtudiant: StudSelecMobile[] = [];
   mobileSortChoices: ISortMobile[] = [
@@ -61,9 +55,9 @@ export class StatsExamComponent implements OnInit {
   mobileSortChoice: ISortMobile = this.mobileSortChoices[2];
   knobsCourants: string[] = [];
   COLOR_KNOBS = BLEU_AERO_TIEDE;
-  idQuestionSelected: number = 0;
-  questionSelectionnee: boolean = false;
-  texte_correction: string = 'Correction';
+  idQuestionSelected = 0;
+  questionSelectionnee = false;
+  texte_correction = 'Correction';
   readonly ICONSORTUP = 'pi pi-sort-amount-up-alt'; // Permet d'éviter une étrange erreur de vscode (Unexpected keyword or identifier.javascript)
 
   activeIndex = 1;
@@ -97,56 +91,46 @@ export class StatsExamComponent implements OnInit {
     public questionService: QuestionService,
     protected activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
-    public router: Router
+    public router: Router,
+    private db: CacheServiceImpl
   ) {}
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
-      if (params.get('examid') !== null) {
-        this.examid = params.get('examid')!;
+      this.examid = params.get('examid') ?? '-1';
 
-        if (this.examid !== params.get('examid')! || this.images.length === 0) {
-          this.examid = params.get('examid')!;
-          this.loadAllPages();
-        }
-        this.translateService.get('scanexam.noteattribuee').subscribe(data => {
-          this.initStudents().then(() =>
-            this.requeteInfoQuestions().subscribe(b => {
-              this.infosQuestions = b.body;
-              this.initStatVariables();
-              this.initDisplayVariables();
-              this.style();
-            })
-          );
-
-          this.translateService.onLangChange.subscribe(() => {
-            this.requeteInfoQuestions().subscribe(b => {
-              this.infosQuestions = b.body;
-              this.initStatVariables();
-              this.initDisplayVariables();
-              this.style();
-            });
-          });
-        });
+      if (this.examid === '-1') {
+        return;
       }
+
+      this.translateService.get('scanexam.noteattribuee').subscribe(() => {
+        this.initStudents().then(() => {
+          this.performInfoQuestionsQuery();
+        });
+
+        this.translateService.onLangChange.subscribe(() => {
+          this.performInfoQuestionsQuery();
+        });
+      });
     });
   }
 
-  loadAllPages(): void {
-    db.templates
-      .where('examId')
-      .equals(+this.examid!)
-      .count()
-      .then(e2 => {
-        this.nbreFeuilleParCopie = e2;
-      });
+  private performInfoQuestionsQuery(): void {
+    this.requeteInfoQuestions().subscribe(b => {
+      // Getting and sorting the questions
+      this.infosQuestions = (b.body ?? []).sort((i1, i2) => (i1.numero ?? 0) - (i2.numero ?? 0));
+      this.initStatVariables();
+      this.initDisplayVariables();
+      this.style();
+    });
+  }
+
+  async loadAllPages(): Promise<void> {
     this.images = [];
-
-    if (this.noalign) {
-      db.nonAlignImages
-        .where({ examId: +this.examid! })
-        .sortBy('pageNumber')
-        .then(e1 =>
+    this.nbreFeuilleParCopie = await this.db.countPageTemplate(+this.examid);
+    return new Promise<void>(resolve => {
+      if (this.noalign) {
+        this.db.getNonAlignSortByPageNumber(+this.examid).then(e1 => {
           e1.forEach(e => {
             const image = JSON.parse(e.value, this.reviver);
 
@@ -155,13 +139,11 @@ export class StatsExamComponent implements OnInit {
               alt: 'Description for Image 2',
               title: 'Exam',
             });
-          })
-        );
-    } else {
-      db.alignImages
-        .where({ examId: +this.examid! })
-        .sortBy('pageNumber')
-        .then(e1 =>
+          });
+          resolve();
+        });
+      } else {
+        this.db.getAlignSortByPageNumber(+this.examid).then(e1 => {
           e1.forEach(e => {
             const image = JSON.parse(e.value, this.reviver);
             this.images.push({
@@ -169,9 +151,11 @@ export class StatsExamComponent implements OnInit {
               alt: 'Description for Image 2',
               title: 'Exam',
             });
-          })
-        );
-    }
+          });
+          resolve();
+        });
+      }
+    });
   }
 
   private reviver(key: any, value: any): any {
@@ -196,18 +180,17 @@ export class StatsExamComponent implements OnInit {
     this.initMobileSelection();
   }
 
-  private async initStudents(): Promise<any> {
+  private async initStudents(): Promise<void> {
     this.infosStudents = await this.loadStudents();
   }
 
-  private requeteInfoQuestions(): Observable<any> {
+  private requeteInfoQuestions(): Observable<HttpResponse<IQuestion[]>> {
     return this.questionService.query({ examId: this.examid });
   }
 
   private async loadStudents(): Promise<StudentRes[]> {
     return new Promise<StudentRes[]>(res => {
-      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-      this.http.get<StudentRes[]>(this.applicationConfigService.getEndpointFor('api/showResult/' + this.examid)).subscribe(s => {
+      this.http.get<StudentRes[]>(this.applicationConfigService.getEndpointFor(`api/showResult/${this.examid}`)).subscribe(s => {
         res(s);
       });
     });
@@ -217,36 +200,36 @@ export class StatsExamComponent implements OnInit {
     this.triNotes(this.infosStudents);
     const qn: QuestionNotee[] = [];
     for (const q of this.infosQuestions) {
-      const bareme: number = q.point !== undefined ? q.point : 0;
-      const label: string = ' Question ' + (q.numero !== undefined ? q.numero : '0').toString();
+      const numero = q.numero ?? 0;
+      const bareme = q.point ?? 0;
+      const labelBegin: string = this.translateService.instant('scanexam.questionLow');
+      const label = `${labelBegin} ${numero}`;
       const notesAssociees: number[] = [];
       const quest_divisee = qn.find(quest => quest.label === label);
       if (quest_divisee === undefined) {
         // On ne prend pas en compte la notation de la deuxième partie s'il y en a une
         // (même comportement que lorsque l'on note la question dans la partie  correction)
-        qn.push({ bareme, label, notesAssociees });
+        qn.push({ bareme, numero, label, notesAssociees });
       }
     }
-    for (const s of this.infosStudents) {
-      if (s.ine !== '') {
-        let indiceNote = 0; // On suppose que l'ordre entre infosQuestions et notequestions est le même
+    this.infosStudents
+      .filter(s => s.ine !== '')
+      .forEach(s => {
         for (const key in s.notequestions) {
-          // const indiceNote = parseInt(key, 10);
-          const note = this.s2f(s.notequestions[key]); // La note associée est décrite avec une virgule et non un point comme séparateur décimal
-          qn[indiceNote].notesAssociees.push(note);
-          indiceNote++;
+          // semi-column char instead of decimal dot, so:
+          const note = this.s2f(s.notequestions[key]);
+          qn[parseFloat(key) - 1]?.notesAssociees?.push(note);
         }
-        // Stockage de la note de l'élève
         const note = s.note === undefined ? 0 : this.s2f(s.note);
         this.notes_eleves.push(note);
-      }
-    }
-    this.q_notees = qn;
+      });
+    this.q_notees = qn.sort((a, b) => a.numero - b.numero);
   }
 
   public s2f(str: string): number {
     return parseFloat(str.replace(',', '.'));
   }
+
   public triSelection(event: ISort): void {
     switch (event.field) {
       case 'ine':
@@ -316,14 +299,11 @@ export class StatsExamComponent implements OnInit {
     return diff;
   }
 
-  /** @return le barème associé à chaque question */
+  /** @return The notation for each question */
   public getBaremes(stats: QuestionNotee[]): number[] {
-    const baremes: number[] = [];
-    for (const stat of stats) {
-      baremes.push(stat.bareme);
-    }
-    return baremes;
+    return stats.map(s => s.bareme);
   }
+
   public getBaremeExam(): number {
     return this.sum(this.getBaremes(this.q_notees));
   }
@@ -348,13 +328,9 @@ export class StatsExamComponent implements OnInit {
     return this.sum(this.getNotesSelect());
   }
 
-  /** @return la moyenne associée à chaque question */
+  /** @return Average mark for all the questions (ordered) */
   private getMoyennesQuestions(): number[] {
-    const moyennes: number[] = [];
-    for (const qn of this.q_notees) {
-      moyennes.push(this.avg(qn.notesAssociees));
-    }
-    return moyennes;
+    return this.q_notees.map(ns => this.avg(ns.notesAssociees));
   }
 
   private updateKnobs(): void {
@@ -369,15 +345,6 @@ export class StatsExamComponent implements OnInit {
     return this.sum(this.notes_eleves) / this.notes_eleves.length;
   }
 
-  /** @return la médiane associée à chaque question */
-  private getMedianeQuestions(): number[] {
-    const medianes: number[] = [];
-    for (const qn of this.q_notees) {
-      medianes.push(this.med(qn.notesAssociees));
-    }
-    return medianes;
-  }
-
   public getMedianeExam(): number {
     return this.med(this.notes_eleves);
   }
@@ -388,23 +355,6 @@ export class StatsExamComponent implements OnInit {
 
   public getEcartTypeExam(): number {
     return this.ecart_type(this.notes_eleves);
-  }
-
-  /** @return la note la plus élevée associée à chaque question */
-  private getMaxNoteQuestions(): number[] {
-    const maxnotes: number[] = [];
-    for (const qn of this.q_notees) {
-      maxnotes.push(this.max(qn.notesAssociees));
-    }
-    return maxnotes;
-  }
-  /** @return la note la moins élevée associée à chaque question */
-  private getMinNoteQuestions(): number[] {
-    const minnotes: number[] = [];
-    for (const qn of this.q_notees) {
-      minnotes.push(this.min(qn.notesAssociees));
-    }
-    return minnotes;
   }
 
   public getMaxNoteExam(): number {
@@ -459,8 +409,7 @@ export class StatsExamComponent implements OnInit {
     return Math.sqrt(this.var(tab));
   }
 
-  private normaliseNotes(notes: number[], baremes: number[], norme: number = 100): number[] {
-    //  expect(notes.length).toBe(baremes.length);
+  private normaliseNotes(notes: number[], baremes: number[], norme = 100): number[] {
     notes.forEach((note, indice) => {
       note /= baremes[indice];
       notes[indice] = note * norme;
@@ -492,21 +441,18 @@ export class StatsExamComponent implements OnInit {
     }
   }
 
-  private s_red(s: string, length: number = 3, abrevSymbol: string = '.'): string {
+  private s_red(s: string, length = 3, abrevSymbol = '.'): string {
     if (length >= s.length) {
       return s;
     }
     return s.slice(0, length) + abrevSymbol;
   }
 
-  /** @initialise les données à afficher dans le radar de visualisation globale*/
-  private initGlobalRadarData(stats: QuestionNotee[], pourcents: boolean = false): IRadar {
-    const labels: string[] = [];
-    for (const stat of stats) {
-      labels.push(stat.label);
-    }
+  /** Initialises radar data to display **/
+  private initGlobalRadarData(stats: QuestionNotee[], pourcents = false): IRadar {
+    const labels = stats.map(e => e.label);
     const datasets = [this.radarMoy(), this.radarMed(), this.radarMaxNote(), this.radarMinNote()];
-    // Traitements pourcentages
+
     if (pourcents) {
       datasets.forEach((ds, indice) => {
         datasets[indice].data = this.normaliseNotes(ds.data, this.getBaremes(stats));
@@ -516,7 +462,7 @@ export class StatsExamComponent implements OnInit {
     return { labels, datasets, vue };
   }
 
-  private initStudentRadarData(etudiant: StudentRes, pourcents: boolean = false): IRadar {
+  private initStudentRadarData(etudiant: StudentRes, pourcents = false): IRadar {
     const labels = this.data_radar_courant.labels;
     const datasets = [this.radarStudent(etudiant), this.radarMoy(), this.radarMed()];
     if (pourcents) {
@@ -529,27 +475,37 @@ export class StatsExamComponent implements OnInit {
   }
 
   private radarMoy(): IRadarDataset {
-    const dataMoy: number[] = this.getMoyennesQuestions();
-    return this.basicDataset(this.translateService.instant('scanexam.average'), BLEU_AERO, TRANSPARENT, dataMoy);
+    return this.basicDataset(this.translateService.instant('scanexam.average'), BLEU_AERO, TRANSPARENT, this.getMoyennesQuestions());
   }
 
   private radarMed(): IRadarDataset {
-    const dataMed: number[] = this.getMedianeQuestions();
-    return this.basicDataset(this.translateService.instant('scanexam.mediane'), BLEU_FONCE, TRANSPARENT, dataMed);
+    return this.basicDataset(
+      this.translateService.instant('scanexam.mediane'),
+      BLEU_FONCE,
+      TRANSPARENT,
+      this.q_notees.map(ns => this.med(ns.notesAssociees))
+    );
   }
 
   private radarMaxNote(): IRadarDataset {
-    const dataMaxNote: number[] = this.getMaxNoteQuestions();
-    return this.basicDataset(this.translateService.instant('scanexam.notemax1'), VERT, TRANSPARENT, dataMaxNote);
+    return this.basicDataset(
+      this.translateService.instant('scanexam.notemax1'),
+      VERT,
+      TRANSPARENT,
+      this.q_notees.map(ns => this.max(ns.notesAssociees))
+    );
   }
   private radarMinNote(): IRadarDataset {
-    const dataMinNote: number[] = this.getMinNoteQuestions();
-    return this.basicDataset(this.translateService.instant('scanexam.notemin1'), ROUGE, TRANSPARENT, dataMinNote);
+    return this.basicDataset(
+      this.translateService.instant('scanexam.notemin1'),
+      ROUGE,
+      TRANSPARENT,
+      this.q_notees.map(ns => this.min(ns.notesAssociees))
+    );
   }
 
   private radarStudent(etudiant: StudentRes): IRadarDataset {
-    const notesEtudiant: number[] = this.getNotes(etudiant);
-    return this.basicDataset(this.translateService.instant('scanexam.notes'), VIOLET, VIOLET_LEGER, notesEtudiant);
+    return this.basicDataset(this.translateService.instant('scanexam.notes'), VIOLET, VIOLET_LEGER, this.getNotes(etudiant));
   }
 
   private basicDataset(label: string, couleurForte: string, couleurLegere: string, data: number[]): IRadarDataset {
@@ -580,9 +536,8 @@ export class StatsExamComponent implements OnInit {
     this.updateCarte('questions_stats', undefined, selection, infosExam);
   }
 
-  onStudentSelect(event: any): void {
+  onStudentSelect(): void {
     if (this.etudiantSelec !== null && this.etudiantSelec !== undefined) {
-      //  this.updateCarte('selection_etudiant', undefined, this.etudiantSelec.prenom + ' ' + this.etudiantSelec.nom, undefined);
       this.data_radar_courant = this.initStudentRadarData(
         this.etudiantSelec,
         this.data_radar_courant.vue === this.translateService.instant('scanexam.pourcents')
@@ -592,8 +547,7 @@ export class StatsExamComponent implements OnInit {
       this.COLOR_KNOBS = VIOLET_TIEDE;
     }
   }
-  onStudentUnselect(event: any): void {
-    // this.updateCarte('selection_etudiant', undefined, this.translateService.instant('scanexam.nostudentselected'), undefined);
+  onStudentUnselect(): void {
     this.updateCarteRadar();
     this.updateKnobs();
     this.COLOR_KNOBS = BLEU_AERO_TIEDE;
@@ -694,20 +648,20 @@ export class StatsExamComponent implements OnInit {
   }
 
   public goToCorrection(): void {
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-    location.href = 'answer/' + this.examid + '/' + (this.idQuestionSelected + 1) + '/' + this.etudiantSelec?.studentNumber?.toString();
+    location.href = `answer/${this.examid}/${this.idQuestionSelected + 1}/${this.etudiantSelec?.studentNumber?.toString() ?? ''}`;
   }
   public voirLaCopie(): void {
-    if (this.etudiantSelec?.studentNumber?.toString() !== undefined) {
-      this.activeIndex = (+this.etudiantSelec.studentNumber.toString() - 1) * this.nbreFeuilleParCopie!;
-    } else {
-      this.activeIndex = 1;
-    }
-    this.displayBasic = true;
+    this.loadAllPages().then(() => {
+      if (this.etudiantSelec?.studentNumber?.toString() !== undefined) {
+        this.activeIndex = (+this.etudiantSelec.studentNumber.toString() - 1) * this.nbreFeuilleParCopie!;
+      } else {
+        this.activeIndex = 1;
+      }
+      this.displayBasic = true;
+    });
   }
   gotoResultat(): void {
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-    this.router.navigateByUrl('/showresults/' + this.examid);
+    this.router.navigateByUrl(`/showresults/${this.examid}`);
   }
 }
 export interface ISortMobile {
@@ -726,6 +680,7 @@ export interface ISort {
 }
 export interface QuestionNotee {
   label: string;
+  numero: number;
   bareme: number;
   notesAssociees: number[];
 }

@@ -18,12 +18,12 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { ExamSheetService } from '../../entities/exam-sheet/service/exam-sheet.service';
 import { StudentService } from '../../entities/student/service/student.service';
 import { IStudent } from 'app/entities/student/student.model';
-import { db } from '../db/db';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { AccountService } from '../../core/auth/account.service';
 import { MessageService } from 'primeng/api';
 import { CacheDownloadNotification, CacheUploadNotification, CacheUploadService } from './cacheUpload.service';
 import { TranslateService } from '@ngx-translate/core';
+import { CacheServiceImpl } from '../db/CacheServiceImpl';
 
 @Component({
   selector: 'jhi-exam-detail',
@@ -62,7 +62,8 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     public accountService: AccountService,
     private messageService: MessageService,
     public cacheUploadService: CacheUploadService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private db: CacheServiceImpl
   ) {}
   setShowAssociation(v: boolean): void {
     this.showAssociation = v;
@@ -88,19 +89,15 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
 
           //          this.examSheetService.
 
-          db.exams
-            .where('id')
-            .equals(+this.examId)
-            .count()
-            .then(c => {
-              if (c !== 0) {
-                this.blocked = true;
-                this.showAssociation = true;
-                this.initTemplate();
-              } else {
-                this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this);
-              }
-            });
+          this.db.countPageTemplate(+this.examId).then(c => {
+            if (c !== 0) {
+              this.blocked = true;
+              this.showAssociation = true;
+              this.initTemplate();
+            } else {
+              this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this);
+            }
+          });
         });
 
         this.translateService.get('scanexam.removeexam').subscribe(() => {
@@ -160,37 +157,28 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
   }
 
   initTemplate(): void {
-    db.templates
-      .where('examId')
-      .equals(+this.examId)
-      .count()
-      .then(e2 => {
-        this.nbreFeuilleParCopie = e2;
-        // Step 2 Query Scan in local DB
+    this.db.countPageTemplate(+this.examId).then(e2 => {
+      this.nbreFeuilleParCopie = e2;
+      // Step 2 Query Scan in local DB
+      this.db.countAlignImage(+this.examId).then(e1 => {
+        this.numberPagesInScan = e1;
 
-        db.alignImages
-          .where('examId')
-          .equals(+this.examId)
-          .count()
-          .then(e1 => {
-            this.numberPagesInScan = e1;
+        this.studentService.query({ courseId: this.exam!.courseId }).subscribe(
+          studentsbody => {
+            this.blocked = false;
 
-            this.studentService.query({ courseId: this.exam!.courseId }).subscribe(
-              studentsbody => {
-                this.blocked = false;
-
-                this.students = studentsbody.body!;
-                const ex2 = (this.students.map(s => s.examSheets) as any)
-                  .flat()
-                  .filter((ex1: any) => ex1.scanId === this.exam!.scanfileId && ex1.pagemin !== -1).length;
-                this.showCorrection = ex2 === this.numberPagesInScan / this.nbreFeuilleParCopie;
-              },
-              () => {
-                this.blocked = false;
-              }
-            );
-          });
+            this.students = studentsbody.body!;
+            const ex2 = (this.students.map(s => s.examSheets) as any)
+              .flat()
+              .filter((ex1: any) => ex1.scanId === this.exam!.scanfileId && ex1.pagemin !== -1).length;
+            this.showCorrection = ex2 === this.numberPagesInScan / this.nbreFeuilleParCopie;
+          },
+          () => {
+            this.blocked = false;
+          }
+        );
       });
+    });
   }
 
   confirmeDelete(): any {
@@ -199,7 +187,8 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
         message: data,
         accept: () => {
           this.examService.delete(this.exam!.id!).subscribe(() => {
-            db.removeElementForExam(+this.examId)
+            this.db
+              .removeElementForExam(+this.examId)
               .then(() => {
                 this.router.navigateByUrl('/course/' + this.course!.id);
               })
@@ -223,7 +212,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
         message: data,
         // eslint-disable-next-line object-shorthand
         accept: () => {
-          db.removeElementForExam(+this.examId).then(() => {
+          this.db.removeElementForExam(+this.examId).then(() => {
             this.showAssociation = false;
             this.showCorrection = false;
           });
@@ -257,7 +246,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
   }
 
   confirmDownload(): any {
-    this.translateService.get('scanexam.confirmuploadcache').subscribe(data1 => {
+    this.translateService.get('scanexam.confirmdownloadcache').subscribe(data1 => {
       this.confirmationService.confirm({
         message: data1,
         // eslint-disable-next-line object-shorthand

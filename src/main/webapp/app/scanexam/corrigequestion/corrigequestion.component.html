@@ -140,9 +140,7 @@
             <h2>Question {{ questionno! + 1 }}</h2>
           </div>
           <div class="col-4">
-            <button pButton [disabled]="images.length === 0" (click)="showGalleria()" jhiTranslate="scanexam.showgalleria">
-              Show full page
-            </button>
+            <button pButton [disabled]="!examId" (click)="showGalleria()" jhiTranslate="scanexam.showgalleria">Show full page</button>
             <fa-icon [size]="'2x'" [pTooltip]="getStudentName()!" tooltipPosition="left" icon="eye"></fa-icon>
           </div>
         </div>

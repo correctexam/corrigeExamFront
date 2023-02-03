@@ -20,7 +20,6 @@ import { ApplicationConfigService } from '../../core/config/application-config.s
 import { DialogService } from 'primeng/dynamicdialog';
 import { SharecourseComponent } from '../sharecourse/sharecourse.component';
 import { TranslateService } from '@ngx-translate/core';
-
 @Component({
   selector: 'jhi-coursdetails',
   templateUrl: './coursdetails.component.html',

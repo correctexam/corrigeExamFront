@@ -1,0 +1,103 @@
+<div *ngIf="examId === -1">{{ 'scanexam.errorExamId' | translate }}</div>
+<div *ngIf="errorMsg !== undefined">{{ errorMsg | translate }}</div>
+<div *ngIf="examId !== -1 && errorMsg === undefined">
+  <h1>
+    {{ 'scanexam.titleSummary' | translate }} {{ dataExam.nameExam }}
+    <button type="submit" class="p-button p-button-primary" (click)="goToExam()">
+      <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam"></span>
+    </button>
+  </h1>
+  <br />
+
+  <p-tabView>
+    <p-tabPanel [header]="'scanexam.questions' | translate">
+      <div class="container">
+        <div class="row row-striped" *ngFor="let q of dataExam.questions">
+          <div class="col align-self-center">{{ 'scanexam.questionLow' | translate }} {{ q.numero }}</div>
+          <div class="col align-self-center">
+            {{ q.answeredSheets }} / {{ dataExam.sheets.length }} ({{ q.answeredSheets / dataExam.sheets.length | percent }})
+          </div>
+          <div class="col" *ngIf="q.answeredSheets < dataExam.sheets.length">
+            <button
+              [routerLink]="'/answer/' + this.examId + '/' + q.numero + '/' + (q.firstUnmarkedSheet / pageInTemplate + 1)"
+              class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
+              pButton
+              type="button"
+            >
+              <span jhiTranslate="scanexam.continue"></span>
+            </button>
+          </div>
+          <div class="col" *ngIf="q.answeredSheets === dataExam.sheets.length">
+            <button
+              [routerLink]="'/answer/' + this.examId + '/' + q.numero + '/' + '1'"
+              class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
+              pButton
+              type="button"
+            >
+              <span jhiTranslate="scanexam.voir"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="row row-striped">
+          <div class="col align-self-center fw-bold">
+            <p class="font-weight-bold">{{ 'scanexam.total' | translate }}</p>
+          </div>
+          <div class="col align-self-center fw-bold">
+            <p class="font-weight-bold">
+              {{ getTotalAnswered() }} / {{ dataExam.sheets.length * dataExam.questions.length }} ({{
+                getTotalAnswered() / (dataExam.sheets.length * dataExam.questions.length) | percent
+              }})
+            </p>
+          </div>
+          <div class="col"></div>
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <p-tabPanel [header]="'scanexam.sheets' | translate">
+      <div class="container">
+        <div class="row row-striped" *ngFor="let s of dataExam.sheets; let index = index">
+          <div class="col align-self-center">{{ 'scanexam.sheet' | translate }} {{ index + 1 }}</div>
+          <div class="col align-self-center">
+            {{ s.answeredSheets }} / {{ dataExam.questions.length }} ({{ s.answeredSheets / dataExam.questions.length | percent }})
+          </div>
+          <div class="col" *ngIf="s.answeredSheets < dataExam.questions.length">
+            <button
+              [routerLink]="'/answer/' + this.examId + '/' + s.firstUnmarkedQuestion + '/' + (index + 1)"
+              class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
+              pButton
+              type="button"
+            >
+              <span>{{ 'scanexam.continue' | translate }}</span>
+            </button>
+          </div>
+          <div class="col" *ngIf="s.answeredSheets === dataExam.questions.length">
+            <button
+              [routerLink]="'/answer/' + this.examId + '/' + '1' + '/' + (index + 1)"
+              class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
+              pButton
+              type="button"
+            >
+              <span>{{ 'scanexam.voir' | translate }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="row row-striped">
+          <div class="col align-self-center fw-bold">
+            <p class="font-weight-bold">{{ 'scanexam.total' | translate }}</p>
+          </div>
+          <div class="col align-self-center fw-bold">
+            <p class="font-weight-bold">
+              {{ getTotalAnswered() }} / {{ dataExam.sheets.length * dataExam.questions.length }} ({{
+                getTotalAnswered() / (dataExam.sheets.length * dataExam.questions.length) | percent
+              }})
+            </p>
+          </div>
+          <div class="col"></div>
+        </div>
+      </div>
+    </p-tabPanel>
+  </p-tabView>
+</div>

@@ -239,67 +239,55 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
   async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
     if (this.noalign) {
       return new Promise((resolve, reject) => {
-        db.nonAlignImages
-          .where({ examId: +this.exam!.id!, pageNumber: pageInscan })
-          .count()
-          .then(count => {
-            if (count === 0) {
-              this.cacheUploadService.getNoAlignImage(this.exam!.id!, pageInscan).subscribe(body => {
-                const image = JSON.parse(body, this.reviver);
-                db.addNonAligneImage({
-                  examId: this.exam!.id!,
-                  pageNumber: pageInscan,
-                  value: body,
-                }).then(() => {
-                  this.loadImage1(image, pageInscan, zone, resolve);
-                });
+        db.countNonAlignWithPageNumber(+this.exam!.id!, pageInscan).then(count => {
+          if (count === 0) {
+            this.cacheUploadService.getNoAlignImage(this.exam!.id!, pageInscan).subscribe(body => {
+              const image = JSON.parse(body, this.reviver);
+              db.addNonAligneImage({
+                examId: this.exam!.id!,
+                pageNumber: pageInscan,
+                value: body,
+              }).then(() => {
+                this.loadImage1(image, pageInscan, zone, resolve);
               });
-            } else if (count > 0) {
-              db.nonAlignImages
-                .where({ examId: +this.exam!.id!, pageNumber: pageInscan })
-                .first()
-                .then(e2 => {
-                  const image = JSON.parse(e2!.value, this.reviver);
-                  this.loadImage1(image, pageInscan, zone, resolve);
-                });
-            } else {
-              db.resetDatabase().then(() => {
-                reject('no image in cache');
-              });
-            }
-          });
+            });
+          } else if (count > 0) {
+            db.getFirstNonAlignImage(+this.exam!.id!, pageInscan).then(e2 => {
+              const image = JSON.parse(e2!.value, this.reviver);
+              this.loadImage1(image, pageInscan, zone, resolve);
+            });
+          } else {
+            db.resetDatabase().then(() => {
+              reject('no image in cache');
+            });
+          }
+        });
       });
     } else {
       return new Promise((resolve, reject) => {
-        db.alignImages
-          .where({ examId: +this.exam!.id!, pageNumber: pageInscan })
-          .count()
-          .then(count => {
-            if (count === 0) {
-              this.cacheUploadService.getAlignImage(this.exam!.id!, pageInscan).subscribe(body => {
-                const image = JSON.parse(body, this.reviver);
-                db.addAligneImage({
-                  examId: this.exam!.id!,
-                  pageNumber: pageInscan,
-                  value: body,
-                }).then(() => {
-                  this.loadImage1(image, pageInscan, zone, resolve);
-                });
+        db.countAlignWithPageNumber(+this.exam!.id!, pageInscan).then(count => {
+          if (count === 0) {
+            this.cacheUploadService.getAlignImage(this.exam!.id!, pageInscan).subscribe(body => {
+              const image = JSON.parse(body, this.reviver);
+              db.addAligneImage({
+                examId: this.exam!.id!,
+                pageNumber: pageInscan,
+                value: body,
+              }).then(() => {
+                this.loadImage1(image, pageInscan, zone, resolve);
               });
-            } else if (count > 0) {
-              db.alignImages
-                .where({ examId: +this.exam!.id!, pageNumber: pageInscan })
-                .first()
-                .then(e2 => {
-                  const image = JSON.parse(e2!.value, this.reviver);
-                  this.loadImage1(image, pageInscan, zone, resolve);
-                });
-            } else {
-              db.resetDatabase().then(() => {
-                reject('no image in cache');
-              });
-            }
-          });
+            });
+          } else if (count > 0) {
+            db.getFirstAlignImage(+this.exam!.id!, pageInscan).then(e2 => {
+              const image = JSON.parse(e2!.value, this.reviver);
+              this.loadImage1(image, pageInscan, zone, resolve);
+            });
+          } else {
+            db.resetDatabase().then(() => {
+              reject('no image in cache');
+            });
+          }
+        });
       });
     }
   }

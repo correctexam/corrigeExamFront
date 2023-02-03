@@ -1,3 +1,12 @@
+<p-confirmDialog #cd icon="pi pi-exclamation-triangle">
+  <ng-template pTemplate="header">
+    <h3 jhiTranslate="scanexam.confirmremove"></h3>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <button type="button" pButton icon="pi pi-times" [label]="'scanexam.no' | translate" (click)="cd.reject()"></button>
+    <button type="button" pButton icon="pi pi-check" [label]="'scanexam.yes' | translate" (click)="cd.accept()"></button>
+  </ng-template>
+</p-confirmDialog>
 <div>
   <div class="d-flex flex-wrap">
     <div

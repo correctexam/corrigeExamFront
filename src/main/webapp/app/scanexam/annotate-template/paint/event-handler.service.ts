@@ -38,6 +38,7 @@ import { PageHandler } from './fabric-canvas/PageHandler';
 import { TranslateService } from '@ngx-translate/core';
 import { PreferenceService } from '../../preference-page/preference.service';
 import { CustomZone } from './fabric-canvas/fabric-canvas.component';
+import { ConfirmationService } from 'primeng/api';
 
 const RANGE_AROUND_CENTER = 20;
 
@@ -58,6 +59,7 @@ export class EventHandlerService {
   pages: { [page: number]: PageHandler } = {};
   zonesRendering: { [page: number]: CustomZone[] } = {};
   private cb!: (qid: number | undefined) => void;
+  confService!: ConfirmationService;
 
   set selectedTool(t: DrawingTools) {
     this.allcanvas.forEach(e => {
@@ -80,16 +82,23 @@ export class EventHandlerService {
       this.objectsSelectable(false);
     }
     if (this.selectedTool === DrawingTools.GARBAGE) {
-      //      const background = this.canvas.backgroundImage;
-      this.allcanvas.forEach(c => {
-        c.getObjects().forEach(o => this.canvas.remove(o));
-        c.clear();
-        c.renderAll();
+      this.translateService.get('scanexam.removeAllAnnotation').subscribe(name => {
+        this.confService.confirm({
+          message: name,
+          accept: () => {
+            //      const background = this.canvas.backgroundImage;
+            this.allcanvas.forEach(c => {
+              c.getObjects().forEach(o => this.canvas.remove(o));
+              c.clear();
+              c.renderAll();
+            });
+            this.modelViewpping.forEach((e, id1) => {
+              this.zoneService.delete(e).subscribe();
+            });
+            this.modelViewpping.clear();
+          },
+        });
       });
-      this.modelViewpping.forEach((e, id1) => {
-        this.zoneService.delete(e).subscribe();
-      });
-      this.modelViewpping.clear();
     }
   }
   get selectedTool(): DrawingTools {
@@ -161,6 +170,10 @@ export class EventHandlerService {
 
   registerSelectedToolObserver(f: (d: DrawingTools) => void): any {
     this.drawingToolObserver = f;
+  }
+
+  setConfirmationService(confService: ConfirmationService): void {
+    this.confService = confService;
   }
 
   addBGImageSrcToCanvas(): Promise<void> {

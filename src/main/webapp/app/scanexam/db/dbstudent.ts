@@ -1,3 +1,4 @@
+/* eslint-disable object-shorthand */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import Dexie, { Table } from 'dexie';
 
@@ -27,10 +28,10 @@ export interface NonAlignImage {
 }
 
 export class AppDB extends Dexie {
-  exams!: Table<Exam, number>;
-  templates!: Table<Template, number>;
-  alignImages!: Table<AlignImage, number>;
-  nonAlignImages!: Table<NonAlignImage, number>;
+  private exams!: Table<Exam, number>;
+  private templates!: Table<Template, number>;
+  private alignImages!: Table<AlignImage, number>;
+  private nonAlignImages!: Table<NonAlignImage, number>;
 
   constructor() {
     super('correctExamStudent');
@@ -92,12 +93,63 @@ export class AppDB extends Dexie {
     });
   }
 
+  async countPageTemplate(examId: number) {
+    return await this.templates.where('examId').equals(examId).count();
+  }
+
+  async countAlignImage(examId: number) {
+    return await this.alignImages.where('examId').equals(examId).count();
+  }
+
+  async countNonAlignImage(examId: number) {
+    return await this.nonAlignImages.where('examId').equals(examId).count();
+  }
+
+  async getFirstNonAlignImage(examId: number, pageInscan: number) {
+    return await this.nonAlignImages.where({ examId: examId, pageNumber: pageInscan }).first();
+  }
+  async getFirstAlignImage(examId: number, pageInscan: number) {
+    return await this.alignImages.where({ examId: examId, pageNumber: pageInscan }).first();
+  }
+  async getFirstTemplate(examId: number, pageInscan: number) {
+    return await this.templates.where({ examId: examId, pageNumber: pageInscan }).first();
+  }
+
+  async getNonAlignImageBetweenAndSortByPageNumber(examId: number, p1: number, p2: number) {
+    return await this.nonAlignImages
+      .where({ examId: examId })
+      .filter(e2 => e2.pageNumber <= p1 && e2.pageNumber < p2)
+      .sortBy('pageNumber');
+  }
+
+  async getAlignImageBetweenAndSortByPageNumber(examId: number, p1: number, p2: number) {
+    return await this.alignImages
+      .where({ examId: examId })
+      .filter(e2 => e2.pageNumber <= p1 && e2.pageNumber < p2)
+      .sortBy('pageNumber');
+  }
+
+  async getNonAlignSortByPageNumber(examId: number) {
+    return await this.nonAlignImages.where({ examId: examId }).sortBy('pageNumber');
+  }
+
+  async getAlignSortByPageNumber(examId: number) {
+    return await this.alignImages.where({ examId: examId }).sortBy('pageNumber');
+  }
   async addAligneImage(elt: AlignImage) {
-    await db.alignImages.add(elt);
+    await db.alignImages.put(elt);
   }
 
   async addNonAligneImage(elt: AlignImage) {
-    await db.nonAlignImages.add(elt);
+    await db.nonAlignImages.put(elt);
+  }
+
+  async countNonAlignWithPageNumber(examId: number, pageInscan: number) {
+    return await this.nonAlignImages.where({ examId: examId, pageInscan }).count();
+  }
+
+  async countAlignWithPageNumber(examId: number, pageInscan: number) {
+    return await this.alignImages.where({ examId: examId, pageInscan }).count();
   }
 }
 
