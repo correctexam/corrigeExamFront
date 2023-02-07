@@ -33,6 +33,7 @@ import { AlignImagesService } from '../services/align-images.service';
 import { IComments } from '../../entities/comments/comments.model';
 import { HttpClient } from '@angular/common/http';
 import { Location } from '@angular/common';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
 
 export interface Zone4SameCommentOrSameGrade {
   answers: Answer[];
@@ -113,6 +114,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     private preferenceService: PreferenceService,
     private db: CacheServiceImpl,
     private http: HttpClient,
+    private applicationConfigService: ApplicationConfigService,
     private location: Location
   ) {}
 
@@ -127,21 +129,29 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
         this.pageOffset = 0;
         if (params.get('commentid') !== null && this.router.url.includes('comparetextcomment')) {
           this.http
-            .get<Zone4SameCommentOrSameGrade>('/api/getZone4TextComment/' + this.examId + '/' + params.get('commentid'))
+            .get<Zone4SameCommentOrSameGrade>(
+              this.applicationConfigService.getEndpointFor('api/getZone4TextComment/' + this.examId + '/' + params.get('commentid'))
+            )
             .subscribe(res => {
               this.zones4comments = res;
             });
         } else if (params.get('commentid') !== null && this.router.url.includes('comparegradedcomment')) {
           this.http
-            .get<Zone4SameCommentOrSameGrade>('/api/getZone4GradedComment/' + this.examId + '/' + params.get('commentid'))
+            .get<Zone4SameCommentOrSameGrade>(
+              this.applicationConfigService.getEndpointFor('api/getZone4GradedComment/' + this.examId + '/' + params.get('commentid'))
+            )
             .subscribe(res => {
               this.zones4comments = res;
               // console.error(this.zones4comments)
             });
         } else if (params.get('respid') !== null && this.router.url.includes('comparemark')) {
-          this.http.get<Zone4SameCommentOrSameGrade>('/api/getZone4Mark/' + this.examId + '/' + params.get('respid')).subscribe(res => {
-            this.zones4comments = res;
-          });
+          this.http
+            .get<Zone4SameCommentOrSameGrade>(
+              this.applicationConfigService.getEndpointFor('api/getZone4Mark/' + this.examId + '/' + params.get('respid'))
+            )
+            .subscribe(res => {
+              this.zones4comments = res;
+            });
         }
       }
     });
