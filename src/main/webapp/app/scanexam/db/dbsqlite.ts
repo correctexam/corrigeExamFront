@@ -156,9 +156,26 @@ export class SqliteCacheService implements CacheService {
       p2: p2,
     }).toPromise();
   }
-  getNonAlignSortByPageNumber(examId: number): Promise<ImageDB[]> {
-    throw new Error('Method not implemented.');
+
+  getNonAlignImagesForPageNumbers(examId: number, pages: number[]): Promise<any> {
+    return this._dispatch('getNonAlignImagesForPageNumbers', {
+      examId: examId,
+      pages: pages,
+    }).toPromise();
   }
+  getAlignImagesForPageNumbers(examId: number, pages: number[]): Promise<any> {
+    return this._dispatch('getAlignImagesForPageNumbers', {
+      examId: examId,
+      pages: pages,
+    }).toPromise();
+  }
+
+  getNonAlignSortByPageNumber(examId: number): Promise<any> {
+    return this._dispatch('getNonAlignSortByPageNumber', {
+      examId: examId,
+    }).toPromise();
+  }
+
   getAlignSortByPageNumber(examId: number): Promise<any> {
     return this._dispatch('getAlignSortByPageNumber', {
       examId: examId,

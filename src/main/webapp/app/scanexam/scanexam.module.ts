@@ -78,6 +78,7 @@ import { PreferencePageComponent } from './preference-page/preference-page.compo
 import { PartialAlignModalComponent } from './alignscan/partial-align-modal/partial-align-modal.component';
 import { MarkingSummaryComponent } from './marking-summary/marking-summary.component';
 import { TabViewModule } from 'primeng/tabview';
+import { ComparestudentanswerComponent } from './comparestudentanswer/comparestudentanswer.component';
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -265,6 +266,35 @@ export const ShowResults_ROUTE: Route = {
   },
 };
 
+export const CompareTextCommentAnswer_ROUTE: Route = {
+  path: 'comparetextcomment/:examid/:commentid',
+  canActivate: [UserRouteAccessService],
+  component: ComparestudentanswerComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'scanexam.comparecopie',
+  },
+};
+export const CompareGradedCommentAnswer_ROUTE: Route = {
+  path: 'comparegradedcomment/:examid/:commentid',
+  canActivate: [UserRouteAccessService],
+  component: ComparestudentanswerComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'scanexam.comparecopie',
+  },
+};
+
+export const CompareMarkAnswer_ROUTE: Route = {
+  path: 'comparemark/:examid/:respid',
+  canActivate: [UserRouteAccessService],
+  component: ComparestudentanswerComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'scanexam.comparecopie',
+  },
+};
+
 @NgModule({
   declarations: [
     MesCoursComponent,
@@ -296,6 +326,7 @@ export const ShowResults_ROUTE: Route = {
     PreferencePageComponent,
     PartialAlignModalComponent,
     MarkingSummaryComponent,
+    ComparestudentanswerComponent,
   ],
   imports: [
     CommonModule,
@@ -359,6 +390,9 @@ export const ShowResults_ROUTE: Route = {
       STATS_ROUTE,
       VoirReponseEtudiants_ROUTE,
       VoirReponsesstarunstar_ROUTE,
+      CompareTextCommentAnswer_ROUTE,
+      CompareGradedCommentAnswer_ROUTE,
+      CompareMarkAnswer_ROUTE,
     ]),
     TabViewModule,
   ],
