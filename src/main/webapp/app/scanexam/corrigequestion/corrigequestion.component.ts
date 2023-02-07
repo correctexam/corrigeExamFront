@@ -58,6 +58,15 @@ import { CacheServiceImpl } from '../db/CacheServiceImpl';
   providers: [ConfirmationService, MessageService],
 })
 export class CorrigequestionComponent implements OnInit, AfterViewInit {
+  compareGradedComment(comment: IGradedComment) {
+    this.router.navigate(['/comparegradedcomment/' + this.examId + '/' + comment.id]);
+  }
+  compareTextComment(comment: ITextComment) {
+    this.router.navigate(['/comparetextcomment/' + this.examId + '/' + comment.id]);
+  }
+  compareMark(response: IStudentResponse) {
+    this.router.navigate(['/comparemark/' + this.examId + '/' + response.id]);
+  }
   debug = false;
   @ViewChild('qcmcorrect')
   qcmcorrect!: ElementRef;
@@ -237,7 +246,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                               if (sr.body !== null && sr.body.length > 0) {
                                 this.resp = sr.body![0];
                                 this.currentNote = this.resp.note!;
-                                this.computeNote(false, this.resp!);
+                                this.computeNote(false, this.resp!, this.currentQuestion!);
                                 if (this.questions![0].gradeType === GradeType.DIRECT && this.questions![0].typeAlgoName !== 'QCM') {
                                   this.textCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
                                     this.resp?.textcomments!.forEach(com1 => {
@@ -416,7 +425,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                         .subscribe(sr => {
                           if (sr.body !== null && sr.body.length > 0) {
                             this.resp = sr.body![0];
-                            this.computeNote(false, this.resp);
+                            this.computeNote(false, this.resp, this.currentQuestion!);
                             this.blocked = false;
                           } else {
                             this.blocked = false;
@@ -533,7 +542,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (this.currentStudent === numero) {
           (comment as any).checked = true;
         }
-        this.computeNote(true, resp1.body!).then(value => {
+        this.computeNote(true, resp1.body!, this.currentQuestion!).then(value => {
           resolve(value);
         });
       });
@@ -674,7 +683,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.updateResponseRequest(this.resp!).subscribe(resp1 => {
       this.resp = resp1.body!;
       (comment as any).checked = true;
-      this.computeNote(true, this.resp!).then(() => (this.blocked = false));
+      this.computeNote(true, this.resp!, this.currentQuestion!).then(() => (this.blocked = false));
     });
   }
   async retirerTComment(comment: ITextComment) {
@@ -702,13 +711,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.resp = resp1.body!;
 
       (comment as any).checked = false;
-      this.computeNote(true, this.resp!).then(() => (this.blocked = false));
+      this.computeNote(true, this.resp!, this.currentQuestion!).then(() => (this.blocked = false));
     });
   }
 
-  computeNote(update: boolean, resp: IStudentResponse): Promise<IStudentResponse> {
+  computeNote(update: boolean, resp: IStudentResponse, currentQ: IQuestion): Promise<IStudentResponse> {
     return new Promise<IStudentResponse>((resolve, reject) => {
-      if (this.currentQuestion?.gradeType === GradeType.POSITIVE && this.currentQuestion.typeAlgoName !== 'QCM') {
+      if (currentQ.gradeType === GradeType.POSITIVE && currentQ.typeAlgoName !== 'QCM') {
         let currentNote = 0;
         resp.gradedcomments?.forEach(g => {
           if (g.grade !== undefined && g.grade !== null) {
@@ -731,7 +740,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         } else {
           resolve(resp);
         }
-      } else if (this.currentQuestion?.gradeType === GradeType.NEGATIVE && this.currentQuestion.typeAlgoName !== 'QCM') {
+      } else if (currentQ.gradeType === GradeType.NEGATIVE && currentQ.typeAlgoName !== 'QCM') {
         let currentNote = this.noteSteps;
         resp.gradedcomments?.forEach(g => {
           if (g.grade !== undefined && g.grade !== null) {
@@ -754,13 +763,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         } else {
           resolve(resp);
         }
-      } else if (this.currentQuestion?.typeAlgoName === 'QCM' && this.questions![0].step! > 0) {
+      } else if (currentQ.typeAlgoName === 'QCM' && currentQ.step! > 0) {
         let currentNote = 0;
         resp.gradedcomments?.forEach(g => {
           if (g.description?.startsWith('correct')) {
-            currentNote = currentNote + this.questions![0].point! * this.questions![0].step!;
+            currentNote = currentNote + currentQ.point! * currentQ.step!;
           } else if (g.description?.startsWith('incorrect')) {
-            currentNote = currentNote - this.questions![0].point!;
+            currentNote = currentNote - currentQ.point!;
           }
         });
         if (resp === this.resp) {
@@ -778,11 +787,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         } else {
           resolve(resp);
         }
-      } else if (this.currentQuestion?.typeAlgoName === 'QCM' && this.questions![0].step! <= 0) {
+      } else if (currentQ.typeAlgoName === 'QCM' && currentQ.step! <= 0) {
         let currentNote = 0;
         resp.gradedcomments?.forEach(g => {
           if (g.description?.startsWith('correct')) {
-            currentNote = currentNote + this.questions![0].point!;
+            currentNote = currentNote + currentQ.point!;
           }
         });
         if (resp === this.resp) {
@@ -844,7 +853,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
             (currentComment as any).checked = true;
             this.currentGradedComment4Question?.push(currentComment);
-            this.computeNote(false, this.resp!);
+            this.computeNote(false, this.resp!, this.currentQuestion!);
             this.titreCommentaire = '';
             this.descCommentaire = '';
             this.noteCommentaire = 0;
@@ -1064,7 +1073,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               this.db
                 .getNonAlignImageBetweenAndSortByPageNumber(+this.examId!, this.currentStudent * page1, (this.currentStudent + 1) * page1)
                 .then(e1 => {
-                  console.error(e1);
                   e1.forEach(e => {
                     const image = JSON.parse(e!.value, this.reviver);
                     this.images.push({
@@ -1299,7 +1307,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         const coms = this.resp?.gradedcomments?.filter(c => c.id === l.id!);
         if (coms !== undefined && coms.length > 0) {
           coms[0].grade = (l as any).grade;
-          this.computeNote(true, this.resp!);
+          this.computeNote(true, this.resp!, this.currentQuestion!);
         }
       });
     } else {

@@ -197,6 +197,28 @@ addEventListener('message', e => {
       break;
     }
 
+    case 'getNonAlignImagesForPageNumbers': {
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.payload.examId);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
+      }
+      db1.getNonAlignImagesForPageNumbers(_sqlite3, e.data);
+      break;
+    }
+
+    case 'getAlignImagesForPageNumbers': {
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.payload.examId);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
+      }
+      db1.getAlignImagesForPageNumbers(_sqlite3, e.data);
+      break;
+    }
+
     case 'getNonAlignSortByPageNumber': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
@@ -645,6 +667,64 @@ class DB {
   }
 
   // getNonAlignImageBetweenAndSortByPageNumber(examId:number,p1:number, p2:number ):Promise<ImageDB[]>;
+
+  getNonAlignImagesForPageNumbers(sqlite3: any, data: any) {
+    const payload = data.payload;
+    // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
+    if (payload.pages !== undefined && payload.pages.joins !== undefined) {
+      this.initDb(sqlite3);
+      try {
+        const value = this.db.selectArrays(
+          'select page,imageData from nonalign where page in (' + payload.pages.join(',') + ') order by page asc'
+        );
+        const res: any[] = [];
+        value.forEach((e: any) => {
+          res.push({
+            pageNumber: e[0],
+            examId: this.examName,
+            value: e[1],
+          });
+        });
+
+        postMessage({
+          msg: data.msg,
+          uid: data.uid,
+          payload: res,
+        });
+      } finally {
+        this.db.close();
+      }
+    }
+  }
+
+  getAlignImagesForPageNumbers(sqlite3: any, data: any) {
+    const payload = data.payload;
+    // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
+    if (payload.pages !== undefined && payload.pages.joins !== undefined) {
+      this.initDb(sqlite3);
+      try {
+        const value = this.db.selectArrays(
+          'select page,imageData from align where page in (' + payload.pages.join(',') + ') order by page asc'
+        );
+        const res: any[] = [];
+        value.forEach((e: any) => {
+          res.push({
+            pageNumber: e[0],
+            examId: this.examName,
+            value: e[1],
+          });
+        });
+
+        postMessage({
+          msg: data.msg,
+          uid: data.uid,
+          payload: res,
+        });
+      } finally {
+        this.db.close();
+      }
+    }
+  }
 
   getNonAlignImageBetweenAndSortByPageNumber(sqlite3: any, data: any) {
     const payload = data.payload;
