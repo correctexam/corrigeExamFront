@@ -126,6 +126,15 @@
             <div class="row">
               <div class="col-md-6">
                 <span style="float: left">{{ table.label }}</span>
+                <span style="float: left; width: '1rem'">&nbsp;</span>
+
+                <button
+                  icon="pi pi-check"
+                  style="width: '1.5rem'; height: '1.5rem'"
+                  class="p-button-sm p-button-raised p-button-text p-button-rounded"
+                  pButton
+                  (click)="selectStudents(table.value)"
+                ></button>
               </div>
               <div class="col-md-6 text-right">
                 <button style="padding: '0.1rem'" pButton (click)="selectStudents(table.value)" jhiTranslate="scanexam.next">Next</button>
