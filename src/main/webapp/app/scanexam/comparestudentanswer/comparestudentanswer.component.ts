@@ -164,12 +164,6 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     });
   }
 
-  /*  getTextComments(id:number){
-    if (this.zones4comments.filter(e=> e.id
-      ))
-
-  }*/
-
   reloadImageGrowFactor(event: any): void {
     if (event.value !== this.factor) {
       this.factor = event.value;

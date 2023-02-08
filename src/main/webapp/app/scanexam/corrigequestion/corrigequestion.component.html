@@ -189,7 +189,13 @@
               ><b>{{ currentNote }}</b></span
             >
             <span *ngIf="!resp?.id" jhiTranslate="scanexam.noneval">non évalué</span>
-            <span *ngIf="resp?.id" class="float-end" [pTooltip]="'scanexam.tooltipCompareMark' | translate" (click)="compareMark(resp!)">
+            <span
+              *ngIf="resp?.id"
+              class="float-end"
+              [tooltipPosition]="'left'"
+              [pTooltip]="'scanexam.tooltipCompareMark' | translate"
+              (click)="compareMark(resp!)"
+            >
               <fa-icon icon="code-compare"></fa-icon>
             </span>
           </div>
@@ -228,7 +234,12 @@
                   <fa-icon icon="times"></fa-icon>
                 </span>
                 <span class="float-end">&nbsp;&nbsp;</span>
-                <span class="float-end" [pTooltip]="'scanexam.tooltipCompareComment' | translate" (click)="compareTextComment(comment)">
+                <span
+                  class="float-end"
+                  [tooltipPosition]="'left'"
+                  [pTooltip]="'scanexam.tooltipCompareComment' | translate"
+                  (click)="compareTextComment(comment)"
+                >
                   <fa-icon icon="code-compare"></fa-icon>
                 </span>
                 <p-inplace [closable]="true">
@@ -286,7 +297,12 @@
                   ><fa-icon icon="times"></fa-icon
                 ></span>
                 <span class="float-end">&nbsp;&nbsp;</span>
-                <span class="float-end" [pTooltip]="'scanexam.tooltipCompareComment' | translate" (click)="compareGradedComment(comment)">
+                <span
+                  class="float-end"
+                  [tooltipPosition]="'left'"
+                  [pTooltip]="'scanexam.tooltipCompareComment' | translate"
+                  (click)="compareGradedComment(comment)"
+                >
                   <fa-icon icon="code-compare"></fa-icon>
                 </span>
 
