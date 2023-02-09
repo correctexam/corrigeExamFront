@@ -78,7 +78,9 @@ import { PreferencePageComponent } from './preference-page/preference-page.compo
 import { PartialAlignModalComponent } from './alignscan/partial-align-modal/partial-align-modal.component';
 import { MarkingSummaryComponent } from './marking-summary/marking-summary.component';
 import { TabViewModule } from 'primeng/tabview';
+import { SummaryTemplateComponent } from './annotate-template/summary/summary-template.component';
 import { ComparestudentanswerComponent } from './comparestudentanswer/comparestudentanswer.component';
+
 
 // set the location of the OpenCV files
 registerAllModules();
@@ -326,6 +328,7 @@ export const CompareMarkAnswer_ROUTE: Route = {
     PreferencePageComponent,
     PartialAlignModalComponent,
     MarkingSummaryComponent,
+    SummaryTemplateComponent,
     ComparestudentanswerComponent,
   ],
   imports: [

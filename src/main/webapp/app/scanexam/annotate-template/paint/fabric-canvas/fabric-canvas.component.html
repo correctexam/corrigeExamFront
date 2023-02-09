@@ -1,23 +1,26 @@
-<div class="canvas-wrapper foo">
-  <ngx-extended-pdf-viewer
-    [base64Src]="content"
-    [useBrowserLocale]="true"
-    style="flex: 1 1 100%"
-    #viewer
-    [height]="'90vh'"
-    [page]="1"
-    [handTool]="false"
-    [showHandToolButton]="false"
-    [textLayer]="false"
-    [(scrollMode)]="scrollMode"
-    [handTool]="false"
-    [showToolbar]="false"
-    [pageViewMode]="'infinite-scroll'"
-    [showSecondaryToolbarButton]="false"
-    (pageRendered)="pageRendered($event)"
-    backgroundColor="#ffffff"
-    [zoom]="'100%'"
-    [minZoom]="0.5"
-    [maxZoom]="3"
-  ></ngx-extended-pdf-viewer>
+<div class="flex-container">
+  <jhi-summary-template class="summary" [questions]="questions"></jhi-summary-template>
+  <div class="canvas-wrapper foo">
+    <ngx-extended-pdf-viewer
+      [base64Src]="content"
+      [useBrowserLocale]="true"
+      style="flex: 1 1 100%"
+      #viewer
+      [height]="'90vh'"
+      [page]="1"
+      [handTool]="false"
+      [showHandToolButton]="false"
+      [textLayer]="false"
+      [(scrollMode)]="scrollMode"
+      [handTool]="false"
+      [showToolbar]="false"
+      [pageViewMode]="'infinite-scroll'"
+      [showSecondaryToolbarButton]="false"
+      (pageRendered)="pageRendered($event)"
+      backgroundColor="#ffffff"
+      [zoom]="'100%'"
+      [minZoom]="0.5"
+      [maxZoom]="3"
+    ></ngx-extended-pdf-viewer>
+  </div>
 </div>

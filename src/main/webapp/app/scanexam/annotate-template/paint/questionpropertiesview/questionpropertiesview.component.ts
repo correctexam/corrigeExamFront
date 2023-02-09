@@ -179,16 +179,16 @@ export class QuestionpropertiesviewComponent implements OnInit {
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IQuestion>>): void {
-    result.subscribe(
-      () => this.onSaveSuccess(),
-      () => this.onSaveError()
-    );
+    result.subscribe({
+      complete: () => this.onSaveSuccess(),
+      error: () => this.onSaveError(),
+    });
   }
 
   protected onSaveSuccess(): void {
     this.isSaving = false;
-    // eslint-disable-next-line no-console
     this.eventHandler.setCurrentQuestionNumber(this.editForm.get(['numero'])!.value);
+    this.updatenumero.next(this.editForm.get(['numero'])!.value);
   }
 
   protected onSaveError(): void {
@@ -200,8 +200,6 @@ export class QuestionpropertiesviewComponent implements OnInit {
   }
 
   pointChange($event: any): void {
-    // eslint-disable-next-line no-console
-    console.log($event.target.value);
     if ($event.target.value % 1 === 0) {
       this.pasPointResponseOptions = [
         { name: '1', value: 1 },

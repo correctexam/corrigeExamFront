@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable no-empty */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
@@ -39,6 +37,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { PreferenceService } from '../../preference-page/preference.service';
 import { CustomZone } from './fabric-canvas/fabric-canvas.component';
 import { ConfirmationService } from 'primeng/api';
+import { IText } from 'fabric/fabric-impl';
 
 const RANGE_AROUND_CENTER = 20;
 
@@ -59,6 +58,7 @@ export class EventHandlerService {
   pages: { [page: number]: PageHandler } = {};
   zonesRendering: { [page: number]: CustomZone[] } = {};
   private cb!: (qid: number | undefined) => void;
+  private onQuestionAddDelCB: (qIdOrNum: number, add: boolean) => void = () => {};
   confService!: ConfirmationService;
 
   set selectedTool(t: DrawingTools) {
@@ -86,14 +86,14 @@ export class EventHandlerService {
         this.confService.confirm({
           message: name,
           accept: () => {
-            //      const background = this.canvas.backgroundImage;
             this.allcanvas.forEach(c => {
               c.getObjects().forEach(o => this.canvas.remove(o));
               c.clear();
               c.renderAll();
             });
-            this.modelViewpping.forEach((e, id1) => {
-              this.zoneService.delete(e).subscribe();
+            this.modelViewpping.forEach((zoneId, _) => {
+              this.zoneService.delete(zoneId).subscribe();
+              this.eraseAddQuestion(zoneId, false);
             });
             this.modelViewpping.clear();
           },
@@ -461,6 +461,9 @@ export class EventHandlerService {
           ),
         };
         const uid = this._elementUnderDrawing.id;
+
+        const customObject = this._elementUnderDrawing!;
+
         this.zoneService.create(z).subscribe(z1 => {
           const ezone = z1.body! as CustomZone;
           ezone.type = DrawingTools.QUESTIONBOX;
@@ -476,9 +479,17 @@ export class EventHandlerService {
           q.point = pref.point;
           q.step = pref.step;
           q.gradeType = pref.gradeType;
-          this.questionService.create(q).subscribe(e => {
+
+          this.questionService.create(q).subscribe(_ => {
             this.selectedTool = DrawingTools.SELECT;
             this.cb(z1.body!.id!);
+
+            // Selecting the new question
+            if (this.selectQuestion(customObject)) {
+              this.eraseAddQuestion(z1.body!.id!, true);
+              this.canvas.setActiveObject(customObject);
+              this.canvas.renderAll();
+            }
           });
         });
       });
@@ -510,7 +521,20 @@ export class EventHandlerService {
 
   currentSelected: fabric.Object | undefined;
 
-  objectSelected(object: CustomFabricObject): void {
+  /**
+   * Selects the given question (if it is a question)
+   * @returns True if the question is selected, false otherwise
+   */
+  private selectQuestion(object: CustomFabricObject): boolean {
+    if (this.isAQuestion(object)) {
+      this.cb(this.modelViewpping.get(object.id));
+      this.currentSelected = (object as CustomFabricGroup).getObjects()[1];
+      return true;
+    }
+    return false;
+  }
+
+  public objectSelected(object: CustomFabricObject): void {
     this.cb(undefined);
     this.previousLeft = object.left!;
     this.previousTop = object.top!;
@@ -518,29 +542,73 @@ export class EventHandlerService {
     this.previousScaleY = object.scaleY!;
     switch (this._selectedTool) {
       case DrawingTools.SELECT:
-        if (object.type === FabricObjectType.GROUP) {
-          if (((object as CustomFabricGroup).getObjects()[1] as any).text.startsWith('Question')) {
-            this.cb(this.modelViewpping.get(object.id));
-            this.currentSelected = (object as CustomFabricGroup).getObjects()[1];
-          }
-        }
-
+        this.selectQuestion(object);
         break;
 
       case DrawingTools.ERASER:
-        if (object.type === FabricObjectType.ELLIPSE) {
-          const otherEllipses = this.getOtherEllipses(object.id);
-          otherEllipses.forEach(e => this.canvas.remove(e));
-        }
-        this.zoneService.delete(this.modelViewpping.get(object.id)!).subscribe();
-        this.modelViewpping.delete(object.id);
-        this.canvas.remove(object);
-
+        this.eraseObject(object);
         break;
+
       case DrawingTools.FILL:
         this.fabricShapeService.fillShape(object, this._selectedColour);
         break;
     }
+  }
+
+  /**
+   * Erases the given object from the canvas
+   */
+  private eraseObject(object: fabric.Object): void {
+    const customObject = object as CustomFabricObject;
+    // Getting the zone id
+    const zid = this.modelViewpping.get(customObject.id);
+
+    if (zid !== undefined) {
+      this.zoneService.delete(zid).subscribe();
+      this.modelViewpping.delete(customObject.id);
+
+      // Have to delete the question from the summary
+      if (this.isAQuestion(object)) {
+        this.eraseAddQuestion(zid, false);
+      }
+    }
+
+    if (object.type === FabricObjectType.GROUP) {
+      const custObj = object as CustomFabricGroup;
+
+      custObj.getObjects().forEach(o => {
+        this.eraseObject(o);
+      });
+    }
+
+    if (object.type === FabricObjectType.ELLIPSE) {
+      const otherEllipses = this.getOtherEllipses((object as CustomFabricObject).id);
+      otherEllipses.forEach(e => this.canvas.remove(e));
+    }
+
+    this.canvas.remove(object);
+  }
+
+  /**
+   * States whether the given object is a question
+   * @returns True if it is a question.
+   */
+  private isAQuestion(object: fabric.Object): boolean {
+    return (
+      object.type === FabricObjectType.GROUP &&
+      (((object as CustomFabricGroup).getObjects()[1] as IText).text?.startsWith('Question') ?? false)
+    );
+  }
+
+  /**
+   * Adds or remove the question that corresponds to the given zone id.
+   * @param zoneId The id of the zone that contains the question
+   * @param add True: add the question. Otherwise, removes the question.
+   */
+  private eraseAddQuestion(zoneId: number, add: boolean): void {
+    this.questionService.query({ zoneId }).subscribe(res => {
+      this.onQuestionAddDelCB(add ? res.body?.[0]?.numero! : res.body?.[0]?.id!, add);
+    });
   }
 
   objectMoving(id: string, type: FabricObjectType, newLeft: number, newTop: number) {
@@ -623,5 +691,9 @@ export class EventHandlerService {
 
   registerQuestionCallBack(cb: (qid: number | undefined) => void) {
     this.cb = cb;
+  }
+
+  public registerOnQuestionAddRemoveCallBack(cb: (qid: number, add: boolean) => void) {
+    this.onQuestionAddDelCB = cb;
   }
 }
