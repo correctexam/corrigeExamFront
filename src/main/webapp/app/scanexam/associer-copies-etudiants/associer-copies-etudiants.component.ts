@@ -18,7 +18,6 @@ import { IScan } from '../../entities/scan/scan.model';
 import { IZone } from 'app/entities/zone/zone.model';
 import { AlignImagesService } from '../services/align-images.service';
 import { ITemplate } from 'app/entities/template/template.model';
-import { db } from '../db/db';
 import { StudentService } from 'app/entities/student/service/student.service';
 import { IStudent } from '../../entities/student/student.model';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
@@ -27,6 +26,7 @@ import { v4 as uuid } from 'uuid';
 import { faHouseSignal } from '@fortawesome/free-solid-svg-icons';
 import { Listbox } from 'primeng/listbox';
 import { PreferenceService } from '../preference-page/preference.service';
+import { CacheServiceImpl } from '../db/CacheServiceImpl';
 
 export interface IPage {
   image?: ImageData;
@@ -191,7 +191,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     private alignImagesService: AlignImagesService,
     public messageService: MessageService,
     public sheetService: ExamSheetService,
-    private preferenceService: PreferenceService
+    private preferenceService: PreferenceService,
+    private db: CacheServiceImpl
   ) {}
 
   ngOnInit(): void {
@@ -203,17 +204,16 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         if (this.examId !== params.get('examid')!) {
           this.examId = params.get('examid')!;
           this.images = [];
-          this.loadAllPages();
+          // this.loadAllPages();
 
           if (params.get('currentStudent') !== null) {
             this.currentStudent = +params.get('currentStudent')! - 1;
 
             // const startTime = performance.now();
             // Step 1 Query templates
-            db.templates
-              .where('examId')
-              .equals(+this.examId)
-              .count()
+            this.db
+              .countPageTemplate(+this.examId)
+
               .then(e2 => {
                 this.nbreFeuilleParCopie = e2;
 
@@ -224,28 +224,24 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
               console.log(' step 1 ' + totalTime);*/
                 this.factor = 1;
                 this.noalign = false;
-                db.alignImages
-                  .where('examId')
-                  .equals(+this.examId)
-                  .count()
-                  .then(e1 => {
-                    /* endTime = performance.now();
+                this.db.countAlignImage(+this.examId).then(e1 => {
+                  /* endTime = performance.now();
                   totalTime = endTime - startTime; // ti
                   //   console.log(' step 2 ' + totalTime);*/
 
-                    this.numberPagesInScan = e1;
-                    this.examService.find(+this.examId).subscribe(data => {
-                      // Step 3 Query Exam
-                      /* endTime = performance.now();
+                  this.numberPagesInScan = e1;
+                  this.examService.find(+this.examId).subscribe(data => {
+                    // Step 3 Query Exam
+                    /* endTime = performance.now();
                     totalTime = endTime - startTime; // ti
                     //  console.log(' step 3 ' + totalTime);*/
 
-                      this.exam = data.body!;
-                      this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
-                      // Step 4 Query Students for Exam
-                      this.refreshStudentList().then(() => this.loadImageAndPredict());
-                    });
+                    this.exam = data.body!;
+                    this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
+                    // Step 4 Query Students for Exam
+                    this.refreshStudentList().then(() => this.loadImageAndPredict());
                   });
+                });
               });
           } else {
             const c = this.currentStudent + 1;
@@ -480,7 +476,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     promiseload.push(p2);
 
     Promise.all(promiseload).then(() => (this.blocked = false));
-    this.loadAllPages();
+    // this.loadAllPages();
   }
 
   async predictText(
@@ -552,120 +548,109 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     if (this.noalign) {
       return new Promise(resolve => {
         // const startTime = performance.now();
-        db.nonAlignImages
-          .where({ examId: +this.examId, pageNumber: pageInscan })
-          .first()
-          .then(e2 => {
-            const image = JSON.parse(e2!.value, this.reviver);
-            this.loadImage(image.pages, pageInscan).then(v => {
-              let finalW = (zone.width! * v.width! * this.factor) / 100000;
-              let finalH = (zone.height! * v.height! * this.factor) / 100000;
-              let initX =
-                (zone.xInit! * v.width!) / 100000 -
-                ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
-              if (initX < 0) {
-                finalW = finalW + initX;
-                initX = 0;
-              }
-              let initY =
-                (zone.yInit! * v.height!) / 100000 -
-                ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
-              if (initY < 0) {
-                finalH = finalH + initY;
-                initY = 0;
-              }
-              this.alignImagesService
-                .imageCrop({
-                  image: v.image,
-                  x: initX,
-                  y: initY,
-                  width: finalW,
-                  height: finalH,
-                })
-                .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
-            });
+        this.db.getFirstNonAlignImage(+this.examId, pageInscan).then(e2 => {
+          const image = JSON.parse(e2!.value, this.reviver);
+          this.loadImage(image.pages, pageInscan).then(v => {
+            let finalW = (zone.width! * v.width! * this.factor) / 100000;
+            let finalH = (zone.height! * v.height! * this.factor) / 100000;
+            let initX =
+              (zone.xInit! * v.width!) / 100000 - ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
+            if (initX < 0) {
+              finalW = finalW + initX;
+              initX = 0;
+            }
+            let initY =
+              (zone.yInit! * v.height!) / 100000 -
+              ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
+            if (initY < 0) {
+              finalH = finalH + initY;
+              initY = 0;
+            }
+            this.alignImagesService
+              .imageCrop({
+                image: v.image,
+                x: initX,
+                y: initY,
+                width: finalW,
+                height: finalH,
+              })
+              .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
           });
+        });
       });
     } else {
       return new Promise(resolve => {
         // const startTime = performance.now();
-        db.alignImages
-          .where({ examId: +this.examId, pageNumber: pageInscan })
-          .first()
-          .then(e2 => {
-            const image = JSON.parse(e2!.value, this.reviver);
-            this.loadImage(image.pages, pageInscan).then(v => {
-              let finalW = (zone.width! * v.width! * this.factor) / 100000;
-              let finalH = (zone.height! * v.height! * this.factor) / 100000;
-              let initX =
-                (zone.xInit! * v.width!) / 100000 -
-                ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
-              if (initX < 0) {
-                finalW = finalW + initX;
-                initX = 0;
-              }
-              let initY =
-                (zone.yInit! * v.height!) / 100000 -
-                ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
-              if (initY < 0) {
-                finalH = finalH + initY;
-                initY = 0;
-              }
-              this.alignImagesService
-                .imageCrop({
-                  image: v.image,
-                  x: initX,
-                  y: initY,
-                  width: finalW,
-                  height: finalH,
-                })
-                .subscribe(res => {
-                  let page1 = pageInscan % this.nbreFeuilleParCopie;
-                  if (page1 === 0) {
-                    page1 = this.nbreFeuilleParCopie;
-                  }
-                  db.templates
-                    .where({ examId: +this.examId, pageNumber: page1 })
-                    .first()
-                    .then(e3 => {
-                      if (!this.baseTemplate) {
-                        resolve({ i: res, w: finalW, h: finalH });
-                      } else {
-                        const image1 = JSON.parse(e3!.value, this.reviver);
-                        this.loadImage(image1.pages, pageInscan % this.nbreFeuilleParCopie).then(v1 => {
-                          let finalW1 = (zone.width! * v1.width! * this.factor) / 100000;
-                          let finalH1 = (zone.height! * v1.height! * this.factor) / 100000;
-                          let initX1 =
-                            (zone.xInit! * v1.width!) / 100000 -
-                            ((zone.width! * v1.width! * this.factor) / 100000 - (zone.width! * v1.width!) / 100000) / 2;
-                          if (initX1 < 0) {
-                            finalW1 = finalW1 + initX1;
-                            initX1 = 0;
-                          }
-                          let initY1 =
-                            (zone.yInit! * v1.height!) / 100000 -
-                            ((zone.height! * v1.height! * this.factor) / 100000 - (zone.height! * v1.height!) / 100000) / 2;
-                          if (initY1 < 0) {
-                            finalH1 = finalH1 + initY1;
-                            initY1 = 0;
-                          }
-                          this.alignImagesService
-                            .imageCrop({
-                              image: v1.image,
-                              x: initX1,
-                              y: initY1,
-                              width: finalW1,
-                              height: finalH1,
-                            })
-                            .subscribe(res1 => {
-                              resolve({ t: res1, i: res, w: finalW, h: finalH });
-                            });
-                        });
+        this.db.getFirstAlignImage(+this.examId, pageInscan).then(e2 => {
+          const image = JSON.parse(e2!.value, this.reviver);
+          this.loadImage(image.pages, pageInscan).then(v => {
+            let finalW = (zone.width! * v.width! * this.factor) / 100000;
+            let finalH = (zone.height! * v.height! * this.factor) / 100000;
+            let initX =
+              (zone.xInit! * v.width!) / 100000 - ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
+            if (initX < 0) {
+              finalW = finalW + initX;
+              initX = 0;
+            }
+            let initY =
+              (zone.yInit! * v.height!) / 100000 -
+              ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
+            if (initY < 0) {
+              finalH = finalH + initY;
+              initY = 0;
+            }
+            this.alignImagesService
+              .imageCrop({
+                image: v.image,
+                x: initX,
+                y: initY,
+                width: finalW,
+                height: finalH,
+              })
+              .subscribe(res => {
+                let page1 = pageInscan % this.nbreFeuilleParCopie;
+                if (page1 === 0) {
+                  page1 = this.nbreFeuilleParCopie;
+                }
+                this.db.getFirstTemplate(+this.examId, page1).then(e3 => {
+                  if (!this.baseTemplate) {
+                    resolve({ i: res, w: finalW, h: finalH });
+                  } else {
+                    const image1 = JSON.parse(e3!.value, this.reviver);
+                    this.loadImage(image1.pages, pageInscan % this.nbreFeuilleParCopie).then(v1 => {
+                      let finalW1 = (zone.width! * v1.width! * this.factor) / 100000;
+                      let finalH1 = (zone.height! * v1.height! * this.factor) / 100000;
+                      let initX1 =
+                        (zone.xInit! * v1.width!) / 100000 -
+                        ((zone.width! * v1.width! * this.factor) / 100000 - (zone.width! * v1.width!) / 100000) / 2;
+                      if (initX1 < 0) {
+                        finalW1 = finalW1 + initX1;
+                        initX1 = 0;
                       }
+                      let initY1 =
+                        (zone.yInit! * v1.height!) / 100000 -
+                        ((zone.height! * v1.height! * this.factor) / 100000 - (zone.height! * v1.height!) / 100000) / 2;
+                      if (initY1 < 0) {
+                        finalH1 = finalH1 + initY1;
+                        initY1 = 0;
+                      }
+                      this.alignImagesService
+                        .imageCrop({
+                          image: v1.image,
+                          x: initX1,
+                          y: initY1,
+                          width: finalW1,
+                          height: finalH1,
+                        })
+                        .subscribe(res1 => {
+                          resolve({ t: res1, i: res, w: finalW, h: finalH });
+                        });
                     });
+                  }
                 });
-            });
+              });
           });
+        });
       });
     }
   }
@@ -735,7 +720,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   }
 
   public alignementChange(): any {
-    this.loadAllPages();
+    // this.loadAllPages();
     // this.exportAsImage();
   }
 
@@ -886,42 +871,86 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   }
 
   showGalleria(): void {
-    this.displayBasic = true;
+    this.blocked = true;
+
+    this.loadAllPages().then(() => {
+      this.blocked = false;
+      this.displayBasic = true;
+    });
   }
 
-  loadAllPages(): void {
+  loadAllPages(): Promise<void> {
     this.images = [];
+    return new Promise<void>(resolve => {
+      this.db.countNonAlignImage(+this.examId!).then(page => {
+        if (page > 30) {
+          this.activeIndex = 0;
+          this.db.countPageTemplate(+this.examId!).then(page1 => {
+            if (this.noalign) {
+              this.db
+                .getNonAlignImageBetweenAndSortByPageNumber(
+                  +this.examId!,
+                  this.currentStudent * page1 + 1,
+                  (this.currentStudent + 1) * page1
+                )
+                .then(e1 => {
+                  e1.forEach(e => {
+                    const image = JSON.parse(e!.value, this.reviver);
+                    this.images.push({
+                      src: image.pages,
+                      alt: 'Description for Image 2',
+                      title: 'Exam',
+                    });
+                  });
 
-    if (this.noalign) {
-      db.nonAlignImages
-        .where({ examId: +this.examId! })
-        .sortBy('pageNumber')
-        .then(e1 =>
-          e1.forEach(e => {
-            const image = JSON.parse(e!.value, this.reviver);
+                  resolve();
+                });
+            } else {
+              this.db
+                .getAlignImageBetweenAndSortByPageNumber(+this.examId!, this.currentStudent * page1 + 1, (this.currentStudent + 1) * page1)
+                .then(e1 => {
+                  e1.forEach(e => {
+                    const image = JSON.parse(e!.value, this.reviver);
+                    this.images.push({
+                      src: image.pages,
+                      alt: 'Description for Image 2',
+                      title: 'Exam',
+                    });
+                  });
+                  resolve();
+                });
+            }
+          });
+        } else {
+          if (this.noalign) {
+            this.db.getNonAlignSortByPageNumber(+this.examId!).then(e1 => {
+              e1.forEach(e => {
+                const image = JSON.parse(e!.value, this.reviver);
 
-            this.images.push({
-              src: image.pages,
-              alt: 'Description for Image 2',
-              title: 'Exam',
+                this.images.push({
+                  src: image.pages,
+                  alt: 'Description for Image 2',
+                  title: 'Exam',
+                });
+              });
+              resolve();
             });
-          })
-        );
-    } else {
-      db.alignImages
-        .where({ examId: +this.examId! })
-        .sortBy('pageNumber')
-        .then(e1 =>
-          e1.forEach(e => {
-            const image = JSON.parse(e!.value, this.reviver);
-            this.images.push({
-              src: image.pages,
-              alt: 'Description for Image 2',
-              title: 'Exam',
+          } else {
+            this.db.getAlignSortByPageNumber(+this.examId!).then(e1 => {
+              e1.forEach(e => {
+                const image = JSON.parse(e!.value, this.reviver);
+                this.images.push({
+                  src: image.pages,
+                  alt: 'Description for Image 2',
+                  title: 'Exam',
+                });
+              });
+              resolve();
             });
-          })
-        );
-    }
+          }
+        }
+      });
+    });
   }
 
   cleanBinding(): void {

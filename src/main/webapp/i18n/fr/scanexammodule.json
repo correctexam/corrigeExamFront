@@ -11,6 +11,7 @@
     "errorExamId": "Numéro de l'examen invalide",
     "align": "Aligner scans",
     "gobackexam": "Retourner à l'exam",
+    "gobackcorrection": "Retourner à la correction",
     "gobackue": "Retourner au module",
     "alignscan": "Alignement des scans",
     "alignscanalgo": "Algorithme d'alignement",
@@ -183,6 +184,9 @@
     "alignementencours": "Alignement en cours",
     "uploadcacheencours": "Upload du cache des images vers le serveur en cours",
     "uploadcacheencoursdetail": "(Cela peut prendre un peu de temps)",
+    "downloadcacheencours": "Download du cache des images depuis le serveur en cours",
+    "downloadcacheencoursdetail": "(Cela peut prendre un peu de temps)",
+    "importToDexie": "Import dans la base de données locale en cours",
     "savetemplateencours": "Savegarde du cache du template",
     "exportcacheencours": "export du cache local",
     "listestudentvalid": "Veuillez fournir une liste d'étudiants valide (puis cliquer sur le bouton Importer ...)",
@@ -221,6 +225,10 @@
     "partialalignscanstartpage": "première page",
     "partialalignscanendpage": "dernière page",
     "partialalignscanprocess": "lancer l'alignement",
-    "partialalignscantooltip": "Sert principalement si le pdf de scan a été modifié (par exemple pour retourner/inverser quelques pages) afin de ne pas devoir réalignement complètement l'ensemble des images"
+    "partialalignscantooltip": "Sert principalement si le pdf de scan a été modifié (par exemple pour retourner/inverser quelques pages) afin de ne pas devoir réalignement complètement l'ensemble des images",
+    "removeAllAnnotation": "Êtes vous sur de vouloir supprimer l'ensemble des annotations de cet examen?",
+    "comparecopie": "Comparaison des copies",
+    "tooltipCompareComment": "Comparaison des copies avec le même commentaire",
+    "tooltipCompareMark": "Comparaison des copies avec la même note"
   }
 }

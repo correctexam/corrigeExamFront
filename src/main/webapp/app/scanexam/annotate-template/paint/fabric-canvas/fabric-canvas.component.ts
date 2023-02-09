@@ -1,13 +1,9 @@
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-/* eslint-disable @angular-eslint/use-lifecycle-interface */
 /* eslint-disable @typescript-eslint/member-ordering */
-import { AfterViewInit, Component, Inject, Input, NgZone } from '@angular/core';
+import { AfterViewInit, Component, Inject, Input, OnInit } from '@angular/core';
 import { NgxExtendedPdfViewerService, ScrollModeType } from 'ngx-extended-pdf-viewer';
 import { EventHandlerService } from '../event-handler.service';
 import { DrawingTools, DrawingColours } from '../models';
@@ -22,6 +18,8 @@ import { FabricShapeService } from '../shape.service';
 import { QuestionService } from '../../../../entities/question/service/question.service';
 import { Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
+import { IQuestion } from 'app/entities/question/question.model';
+import { ActivatedRoute } from '@angular/router';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
 };
@@ -40,7 +38,7 @@ export type CustomZone = IZone & { type: DrawingTools };
     },
   ],
 })
-export class FabricCanvasComponent implements AfterViewInit {
+export class FabricCanvasComponent implements AfterViewInit, OnInit {
   @Input()
   content: any;
   @Input()
@@ -51,12 +49,17 @@ export class FabricCanvasComponent implements AfterViewInit {
 
   zones: { [page: number]: CustomZone[] } = {};
 
+  public questions: Map<number, IQuestion> = new Map();
+
+  public examId = -1;
+
   title = 'gradeScopeFree';
-  public scrollbar: any = undefined;
+
+  public scrollbar: PerfectScrollbar | undefined = undefined;
 
   constructor(
+    private activatedRoute: ActivatedRoute,
     private eventHandler: EventHandlerService,
-    private ngZone: NgZone,
     @Inject(PERFECT_SCROLLBAR_CONFIG)
     public config: PerfectScrollbarConfigInterface,
     public zoneService: ZoneService,
@@ -66,9 +69,28 @@ export class FabricCanvasComponent implements AfterViewInit {
   ) {}
 
   public scrollMode: ScrollModeType = ScrollModeType.vertical;
-  ngOnInit(): void {
+
+  public ngOnInit(): void {
     this.eventHandler.exam = this.exam;
     this.eventHandler.zonesRendering = this.zones;
+
+    this.eventHandler.registerOnQuestionAddRemoveCallBack((qid, add) => {
+      if (add) {
+        this.getQuestion(qid);
+      } else {
+        this.questions.delete(qid);
+      }
+    });
+
+    this.activatedRoute.paramMap.subscribe(params => {
+      this.examId = parseInt(params.get('examid') ?? '-1', 10);
+
+      // Reacting on a change in a question
+      this.numeroEvent.subscribe(numero => {
+        this.getQuestion(parseInt(numero, 10));
+      });
+    });
+
     if (this.exam.namezoneId !== undefined) {
       this.zoneService.find(this.exam.namezoneId!).subscribe(z => {
         const ezone = z.body as CustomZone;
@@ -101,6 +123,9 @@ export class FabricCanvasComponent implements AfterViewInit {
     }
     this.questionService.query({ examId: this.exam.id! }).subscribe(qs => {
       qs.body?.forEach(q => {
+        if (q.id !== undefined) {
+          this.questions.set(q.id, q);
+        }
         this.zoneService.find(q.zoneId!).subscribe(z => {
           const ezone = z.body as CustomZone;
           ezone.type = DrawingTools.QUESTIONBOX;
@@ -112,6 +137,20 @@ export class FabricCanvasComponent implements AfterViewInit {
       });
     });
   }
+
+  /**
+   * Getting the questions corresponding to the given number (REST query) and adding them to `questions`
+   */
+  private getQuestion(numero: number): void {
+    this.questionService.query({ examId: this.examId, numero }).subscribe(qs => {
+      qs.body?.forEach(q => {
+        if (q.id !== undefined) {
+          this.questions.set(q.id, q);
+        }
+      });
+    });
+  }
+
   public ngAfterViewInit(): void {
     const container = document.querySelector('#viewerContainer');
     this.scrollbar = new PerfectScrollbar(container!, this.config);

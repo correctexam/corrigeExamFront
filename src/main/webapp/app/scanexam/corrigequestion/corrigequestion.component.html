@@ -140,9 +140,7 @@
             <h2>Question {{ questionno! + 1 }}</h2>
           </div>
           <div class="col-4">
-            <button pButton [disabled]="images.length === 0" (click)="showGalleria()" jhiTranslate="scanexam.showgalleria">
-              Show full page
-            </button>
+            <button pButton [disabled]="!examId" (click)="showGalleria()" jhiTranslate="scanexam.showgalleria">Show full page</button>
             <fa-icon [size]="'2x'" [pTooltip]="getStudentName()!" tooltipPosition="left" icon="eye"></fa-icon>
           </div>
         </div>
@@ -172,7 +170,12 @@
               [disabled]="
                 currentQuestion !== undefined && (currentQuestion.gradeType !== 'DIRECT' || currentQuestion.typeAlgoName === 'QCM')
               "
-              *ngIf="noteSteps > 0 && currentQuestion?.typeAlgoName !== 'QCM'"
+              *ngIf="
+                currentQuestion !== undefined &&
+                currentQuestion.gradeType === 'DIRECT' &&
+                noteSteps > 0 &&
+                currentQuestion.typeAlgoName !== 'QCM'
+              "
               [stars]="noteSteps"
               [(ngModel)]="currentNote"
               (onRate)="changeNote()"
@@ -186,18 +189,27 @@
               ><b>{{ currentNote }}</b></span
             >
             <span *ngIf="!resp?.id" jhiTranslate="scanexam.noneval">non évalué</span>
+            <span
+              *ngIf="resp?.id"
+              class="float-end"
+              [tooltipPosition]="'left'"
+              [pTooltip]="'scanexam.tooltipCompareMark' | translate"
+              (click)="compareMark(resp!)"
+            >
+              <fa-icon icon="code-compare"></fa-icon>
+            </span>
           </div>
           <div *ngIf="resp" style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <label jhiTranslate="scanexam.excellente">Excellente réponse: </label>
-            <p-inputSwitch [(ngModel)]="resp!.star" (onChange)="updateResponse()"></p-inputSwitch>
+            <p-inputSwitch class="float-end" [(ngModel)]="resp!.star" (onChange)="updateResponse()"></p-inputSwitch>
           </div>
           <div *ngIf="resp" style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <label jhiTranslate="scanexam.badanswer">Mauvaise réponse remarquable: </label>
-            <p-inputSwitch [(ngModel)]="resp!.worststar" (onChange)="updateResponse()"></p-inputSwitch>
+            <p-inputSwitch class="float-end" [(ngModel)]="resp!.worststar" (onChange)="updateResponse()"></p-inputSwitch>
           </div>
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
-            <p-inputSwitch [(ngModel)]="noalign" (onChange)="changeAlign()"></p-inputSwitch>
+            <p-inputSwitch class="float-end" [(ngModel)]="noalign" (onChange)="changeAlign()"></p-inputSwitch>
           </div>
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <jhi-graphical-toolbarcorrection></jhi-graphical-toolbarcorrection>
@@ -218,7 +230,18 @@
           <div *ngFor="let comment of currentTextComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <div class="card" [style]="getStyle(comment)">
               <div class="card-body">
-                <span class="float-end" (click)="removeTextComment(comment)"><fa-icon icon="times"></fa-icon></span>
+                <span class="float-end" (click)="removeTextComment(comment)">
+                  <fa-icon icon="times"></fa-icon>
+                </span>
+                <span class="float-end">&nbsp;&nbsp;</span>
+                <span
+                  class="float-end"
+                  [tooltipPosition]="'left'"
+                  [pTooltip]="'scanexam.tooltipCompareComment' | translate"
+                  (click)="compareTextComment(comment)"
+                >
+                  <fa-icon icon="code-compare"></fa-icon>
+                </span>
                 <p-inplace [closable]="true">
                   <ng-template pTemplate="display">
                     <h5 class="card-title">{{ comment.text }}</h5>
@@ -273,6 +296,16 @@
                 <span *ngIf="currentQuestion?.typeAlgoName !== 'QCM'" class="float-end clickable" (click)="removeGradedComment(comment)"
                   ><fa-icon icon="times"></fa-icon
                 ></span>
+                <span class="float-end">&nbsp;&nbsp;</span>
+                <span
+                  class="float-end"
+                  [tooltipPosition]="'left'"
+                  [pTooltip]="'scanexam.tooltipCompareComment' | translate"
+                  (click)="compareGradedComment(comment)"
+                >
+                  <fa-icon icon="code-compare"></fa-icon>
+                </span>
+
                 <div *ngIf="currentQuestion?.typeAlgoName === 'QCM'">
                   <h5 class="card-title">{{ comment.text }}</h5>
                   <p class="card-text">{{ comment.description }}</p>

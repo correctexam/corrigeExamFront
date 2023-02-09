@@ -11,7 +11,7 @@
       /></a>
     </ng-template>
   </p-dock>
-  <p-confirmDialog [header]="'scanexam.confirmremove' | translate" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+  <p-confirmDialog [header]="'scanexam.confirmation' | translate" icon="pi pi-exclamation-triangle"></p-confirmDialog>
   <div class="wizard-v2-content">
     <p-blockUI [blocked]="blocked">
       <div class="grid" style="width: 90vw">
@@ -21,7 +21,7 @@
           <div *ngIf="message !== undefined && message.length > 0">
             {{ message }} <BR />
             {{ submessage }}
-            <span *ngIf="submessage !== undefined && submessage.length > 0">{{ progress }} / 100</span>
+            <span *ngIf="submessage !== undefined && submessage.length > 0 && progress !== -1">{{ progress }} / 100</span>
             <BR />
           </div>
         </div>

@@ -36,6 +36,10 @@ export class PreferenceService {
         numberofpointToMatch: 5,
         numberofgoodpointToMatch: 0,
         defaultAlignAlgowithMarker: true,
+        pdfscale: 2,
+        cacheDb: 'indexdb',
+        imageTypeExport: 'image/webp',
+        exportImageCompression: 0.8,
       };
       this.localStorageService.store('preferences', defaultvalue);
       pref = defaultvalue;
@@ -64,6 +68,10 @@ export class PreferenceService {
       numberofpointToMatch: 5,
       numberofgoodpointToMatch: 0,
       defaultAlignAlgowithMarker: true,
+      pdfscale: 2,
+      cacheDb: 'indexdb',
+      imageTypeExport: 'image/webp',
+      exportImageCompression: 0.8,
     };
     this.localStorageService.store('preferences', defaultvalue);
     return defaultvalue;

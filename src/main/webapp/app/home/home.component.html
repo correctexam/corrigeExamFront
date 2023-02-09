@@ -35,13 +35,10 @@
         <a [routerLink]="item.route"><img [src]="item.icon" [alt]="item.label" class="imageDock" [pTooltip]="item.title" /></a>
       </ng-template>
     </p-dock>
-    <jhi-mes-cours></jhi-mes-cours>
+    <jhi-mes-cours [showImage]="true"></jhi-mes-cours>
   </div>
   <div *ngIf="this.account?.authorities?.includes('ROLE_ADMIN')" class="row">
-    <div class="col-md-3">
-      <span class="hipster img-fluid rounded"></span>
-    </div>
-    <div class="col-md-9">
+    <div class="col-md-12">
       <h1 class="display-4"><span jhiTranslate="home.welcomeadmin">Bienvenue sur la page d'administration de cette application</span></h1>
 
       <p class="lead" jhiTranslate="home.welcomeadminsub">Vous pouvez accéder aux données depuis le menu entité</p>
@@ -49,6 +46,7 @@
       <BR />
       <p jhiTranslate="home.textadmin">Vous pouvez gérer les utilsiateurs et les services depuis le menu administration.</p>
       <BR />
+      <jhi-mes-cours [showImage]="false"></jhi-mes-cours>
     </div>
   </div>
 </div>

@@ -11,6 +11,7 @@
     "errorExamId": "Invalid exam ID",
     "align": "Align scans",
     "gobackexam": "Go back to exam",
+    "gobackcorrection": "Go back to correction",
     "gobackue": "Go back to module",
     "alignscan": "Alignment of scans",
     "alignscanalgo": "Alignment algorithm",
@@ -220,6 +221,13 @@
     "partialalignscanstartpage": "first page",
     "partialalignscanendpage": "last page",
     "partialalignscanprocess": "Start processing",
-    "partialalignscantooltip": "Mainly used if the scan pdf has been modified (e.g. to flip/reverse some pages) in order not to have to realign the whole set of images"
+    "partialalignscantooltip": "Mainly used if the scan pdf has been modified (e.g. to flip/reverse some pages) in order not to have to realign the whole set of images",
+    "downloadcacheencours": "Downloading the image cache from the current server",
+    "downloadcacheencoursdetail": "(This may take some time)",
+    "importToDexie": "Import in the current local database",
+    "removeAllAnnotation": "Are you sure you want to delete all the annotations for this exam?",
+    "comparecopie": "Sheet comparison",
+    "tooltipCompareComment": "Comparison of copies with the same commentary",
+    "tooltipCompareMark": "Comparison of copies with the same score"
   }
 }

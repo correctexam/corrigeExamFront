@@ -12,6 +12,10 @@ import { PreferenceService } from './preference.service';
 })
 export class PreferencePageComponent implements OnInit {
   editForm = this.fb.group({
+    pdfscale: [],
+    cacheDb: [],
+    imageTypeExport: [],
+    exportImageCompression: [],
     qcm_min_width_shape: [],
     qcm_min_height_shape: [],
     qcm_epsilon: [],

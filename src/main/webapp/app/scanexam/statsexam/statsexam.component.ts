@@ -10,7 +10,7 @@ import { CourseService } from 'app/entities/course/service/course.service';
 import { IQuestion } from 'app/entities/question/question.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
 import { Observable } from 'rxjs';
-import { db } from '../db/db';
+import { CacheServiceImpl } from '../db/CacheServiceImpl';
 
 // Couleurs à utiliser
 const GRIS = 'rgba(179,181,198,1)';
@@ -91,7 +91,8 @@ export class StatsExamComponent implements OnInit {
     public questionService: QuestionService,
     protected activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
-    public router: Router
+    public router: Router,
+    private db: CacheServiceImpl
   ) {}
 
   ngOnInit(): void {
@@ -100,9 +101,6 @@ export class StatsExamComponent implements OnInit {
 
       if (this.examid === '-1') {
         return;
-      }
-      if (this.images.length === 0) {
-        this.loadAllPages();
       }
 
       this.translateService.get('scanexam.noteattribuee').subscribe(() => {
@@ -127,21 +125,12 @@ export class StatsExamComponent implements OnInit {
     });
   }
 
-  loadAllPages(): void {
-    db.templates
-      .where('examId')
-      .equals(+this.examid)
-      .count()
-      .then(e2 => {
-        this.nbreFeuilleParCopie = e2;
-      });
+  async loadAllPages(): Promise<void> {
     this.images = [];
-
-    if (this.noalign) {
-      db.nonAlignImages
-        .where({ examId: +this.examid })
-        .sortBy('pageNumber')
-        .then(e1 =>
+    this.nbreFeuilleParCopie = await this.db.countPageTemplate(+this.examid);
+    return new Promise<void>(resolve => {
+      if (this.noalign) {
+        this.db.getNonAlignSortByPageNumber(+this.examid).then(e1 => {
           e1.forEach(e => {
             const image = JSON.parse(e.value, this.reviver);
 
@@ -150,13 +139,11 @@ export class StatsExamComponent implements OnInit {
               alt: 'Description for Image 2',
               title: 'Exam',
             });
-          })
-        );
-    } else {
-      db.alignImages
-        .where({ examId: +this.examid })
-        .sortBy('pageNumber')
-        .then(e1 =>
+          });
+          resolve();
+        });
+      } else {
+        this.db.getAlignSortByPageNumber(+this.examid).then(e1 => {
           e1.forEach(e => {
             const image = JSON.parse(e.value, this.reviver);
             this.images.push({
@@ -164,9 +151,11 @@ export class StatsExamComponent implements OnInit {
               alt: 'Description for Image 2',
               title: 'Exam',
             });
-          })
-        );
-    }
+          });
+          resolve();
+        });
+      }
+    });
   }
 
   private reviver(key: any, value: any): any {
@@ -662,12 +651,14 @@ export class StatsExamComponent implements OnInit {
     location.href = `answer/${this.examid}/${this.idQuestionSelected + 1}/${this.etudiantSelec?.studentNumber?.toString() ?? ''}`;
   }
   public voirLaCopie(): void {
-    if (this.etudiantSelec?.studentNumber?.toString() !== undefined) {
-      this.activeIndex = (+this.etudiantSelec.studentNumber.toString() - 1) * this.nbreFeuilleParCopie!;
-    } else {
-      this.activeIndex = 1;
-    }
-    this.displayBasic = true;
+    this.loadAllPages().then(() => {
+      if (this.etudiantSelec?.studentNumber?.toString() !== undefined) {
+        this.activeIndex = (+this.etudiantSelec.studentNumber.toString() - 1) * this.nbreFeuilleParCopie!;
+      } else {
+        this.activeIndex = 1;
+      }
+      this.displayBasic = true;
+    });
   }
   gotoResultat(): void {
     this.router.navigateByUrl(`/showresults/${this.examid}`);
