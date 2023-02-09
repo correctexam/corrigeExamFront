@@ -36,6 +36,8 @@ export interface IPreference {
   defaultAlignAlgowithMarker: boolean;
   pdfscale: number;
   cacheDb: string;
+  imageTypeExport: string;
+  exportImageCompression: number;
 }
 
 export interface IImageAlignementInput {

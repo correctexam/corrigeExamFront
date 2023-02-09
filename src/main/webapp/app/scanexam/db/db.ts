@@ -153,6 +153,19 @@ class ExamIndexDB extends Dexie {
       .sortBy('pageNumber');
   }
 
+  async getNonAlignImagesForPageNumbers(pages: number[]) {
+    return await this.nonAlignImages
+      .where({ examId: this.examId })
+      .filter(e2 => pages.includes(e2.pageNumber))
+      .sortBy('pageNumber');
+  }
+  async getAlignImagesForPageNumbers(pages: number[]) {
+    return await this.alignImages
+      .where({ examId: this.examId })
+      .filter(e2 => pages.includes(e2.pageNumber))
+      .sortBy('pageNumber');
+  }
+
   async getNonAlignSortByPageNumber() {
     return await this.nonAlignImages.where({ examId: this.examId }).sortBy('pageNumber');
   }
@@ -324,6 +337,23 @@ export class AppDB implements CacheService {
     return db1.getAlignImageBetweenAndSortByPageNumber(p1, p2);
   }
 
+  async getNonAlignImagesForPageNumbers(examId: number, pages: number[]): Promise<ImageDB[]> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.getNonAlignImagesForPageNumbers(pages);
+  }
+  async getAlignImagesForPageNumbers(examId: number, pages: number[]): Promise<ImageDB[]> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.getAlignImagesForPageNumbers(pages);
+  }
+
   async getNonAlignSortByPageNumber(examId: number): Promise<NonAlignImage[]> {
     let db1 = this.dbs.get(examId);
     if (db1 === undefined) {
@@ -394,6 +424,9 @@ export interface CacheService {
   getFirstTemplate(examId: number, pageInscan: number): Promise<Template | undefined>;
   getNonAlignImageBetweenAndSortByPageNumber(examId: number, p1: number, p2: number): Promise<ImageDB[]>;
   getAlignImageBetweenAndSortByPageNumber(examId: number, p1: number, p2: number): Promise<ImageDB[]>;
+  getNonAlignImagesForPageNumbers(examId: number, pages: number[]): Promise<ImageDB[]>;
+  getAlignImagesForPageNumbers(examId: number, pages: number[]): Promise<ImageDB[]>;
+
   getNonAlignSortByPageNumber(examId: number): Promise<ImageDB[]>;
   getAlignSortByPageNumber(examId: number): Promise<ImageDB[]>;
   addExam(examId: number): Promise<number>;

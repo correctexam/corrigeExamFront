@@ -884,12 +884,16 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     return new Promise<void>(resolve => {
       this.db.countNonAlignImage(+this.examId!).then(page => {
         if (page > 30) {
+          this.activeIndex = 0;
           this.db.countPageTemplate(+this.examId!).then(page1 => {
             if (this.noalign) {
               this.db
-                .getNonAlignImageBetweenAndSortByPageNumber(+this.examId!, this.currentStudent * page1, (this.currentStudent + 1) * page1)
+                .getNonAlignImageBetweenAndSortByPageNumber(
+                  +this.examId!,
+                  this.currentStudent * page1 + 1,
+                  (this.currentStudent + 1) * page1
+                )
                 .then(e1 => {
-                  console.error(e1);
                   e1.forEach(e => {
                     const image = JSON.parse(e!.value, this.reviver);
                     this.images.push({
