@@ -228,6 +228,9 @@
     "removeAllAnnotation": "Are you sure you want to delete all the annotations for this exam?",
     "comparecopie": "Sheet comparison",
     "tooltipCompareComment": "Comparison of copies with the same commentary",
-    "tooltipCompareMark": "Comparison of copies with the same score"
+    "tooltipCompareMark": "Comparison of copies with the same score",
+    "resumebareme": "Summary of the rating scale",
+    "pointincr": "points, incr. of ",
+    "suite": "following"
   }
 }
