@@ -148,7 +148,7 @@
     "badanswers": "Answers containing a typical mistake",
     "nobadsolution": "No answer with a typical mistake identified",
     "statexam": "Exam statistics ",
-    "statgeneral": "Global statistics",
+    "statexam2": "Statistics (absent excluded)",
     "nbrstudents": "Number of students",
     "average": "Average",
     "ecarttype": "Standard deviation (σ)",

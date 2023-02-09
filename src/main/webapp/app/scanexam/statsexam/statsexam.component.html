@@ -39,10 +39,11 @@
 </div>
 <div class="cards">
   <div class="card" id="statgen">
-    <p-card [header]="'scanexam.statexam' | translate" [subheader]="'scanexam.statgeneral' | translate">
+    <p-card [header]="'scanexam.statexam2' | translate">
       <div class="statsgenerales-container">
         <div class="statgenerale">
-          <span jhiTranslate="scanexam.nbrstudents"></span><span>{{ this.notes_eleves.length }}</span>
+          <span jhiTranslate="scanexam.nbrstudents"></span
+          ><span>{{ this.notes_eleves.length }} ({{ this.nbStdABI }} {{ this.nbStdABI > 1 ? 'absences' : 'absence' }})</span>
         </div>
         <div class="statgenerale">
           <span jhiTranslate="scanexam.average"></span><span>{{ this.getMoyenneExam().toFixed(2) }}/{{ this.getBaremeExam() }}</span>

@@ -149,7 +149,7 @@
     "badanswers": "Réponses contenant une erreur représentatives",
     "nobadsolution": "Aucune mauvaise réponse identifiée",
     "statexam": "Statistiques de l'examen ",
-    "statgeneral": "Statistiques générales",
+    "statexam2": "Statistiques (hors absents)",
     "nbrstudents": "Nombre d'étudiants",
     "average": "Moyenne",
     "ecarttype": "Écart type (σ)",
