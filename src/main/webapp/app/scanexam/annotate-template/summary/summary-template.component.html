@@ -1,0 +1,10 @@
+<div>
+  <h3>Résumé du sujet</h3>
+  <hr />
+
+  <div *ngFor="let q of getSortedQuestions(); index as i">
+    <b>Q{{ q.numero }}</b> {{ isFollowingQuestion(i, q) ? '(suite)' : '- ' + q.point + ' points, incr. de ' + 1 / (q.step ?? 1) }}
+  </div>
+  <br />
+  <strong>Total: {{ sumPoints() }} points</strong>
+</div>
