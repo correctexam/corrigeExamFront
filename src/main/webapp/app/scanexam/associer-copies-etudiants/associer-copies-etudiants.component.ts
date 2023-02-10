@@ -791,6 +791,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
       this.blocked = false;
 
       this.goToStudent(this.currentStudent);
+    } else {
+      this.blocked = false;
     }
   }
 
