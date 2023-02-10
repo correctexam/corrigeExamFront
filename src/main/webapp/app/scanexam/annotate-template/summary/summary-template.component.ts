@@ -19,6 +19,7 @@ export class SummaryTemplateComponent {
    */
   public sumPoints(): number {
     return this.getSortedQuestions()
+      .filter((q, i) => !this.isFollowingQuestion(i, q))
       .map(q => q.point ?? 0)
       .reduce((a, b) => a + b, 0);
   }
