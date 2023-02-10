@@ -39,7 +39,7 @@ export class PreferenceService {
         pdfscale: 2,
         cacheDb: 'indexdb',
         imageTypeExport: 'image/webp',
-        exportImageCompression: 0.8,
+        exportImageCompression: 0.66,
       };
       this.localStorageService.store('preferences', defaultvalue);
       pref = defaultvalue;
@@ -71,7 +71,7 @@ export class PreferenceService {
       pdfscale: 2,
       cacheDb: 'indexdb',
       imageTypeExport: 'image/webp',
-      exportImageCompression: 0.8,
+      exportImageCompression: 0.66,
     };
     this.localStorageService.store('preferences', defaultvalue);
     return defaultvalue;

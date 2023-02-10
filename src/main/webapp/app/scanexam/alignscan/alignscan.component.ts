@@ -488,7 +488,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
         ctx!.drawImage(i, 0, 0);
         const inputimage1 = ctx!.getImageData(0, 0, i.width, i.height);
         let exportImageType = 'image/webp';
-        let compression = 0.8;
+        let compression = 0.65;
         if (
           this.preferenceService.getPreference().exportImageCompression !== undefined &&
           this.preferenceService.getPreference().exportImageCompression > 0 &&
@@ -558,7 +558,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
 
     const ctx = canvas.getContext('2d');
     ctx?.putImageData(img, 0, 0);
-    let compression = 0.8;
+    let compression = 0.65;
     let exportImageType = 'image/webp';
 
     if (
