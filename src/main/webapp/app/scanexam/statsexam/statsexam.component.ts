@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable guard-for-in */
 import { HttpClient, HttpResponse } from '@angular/common/http';
@@ -38,6 +37,7 @@ export class StatsExamComponent implements OnInit {
   q_notees: QuestionNotee[] = [];
   notes_eleves: number[] = [];
   choixTri = true;
+  nbStdABI = 0;
 
   // Graphical data
   data_radar_courant: IRadar = {
@@ -215,14 +215,20 @@ export class StatsExamComponent implements OnInit {
     this.infosStudents
       .filter(s => s.ine !== '')
       .forEach(s => {
-        for (const key in s.notequestions) {
-          // semi-column char instead of decimal dot, so:
-          const note = this.s2f(s.notequestions[key]);
-          qn[parseFloat(key) - 1]?.notesAssociees?.push(note);
+        if (s.abi) {
+          this.nbStdABI++;
+        } else {
+          for (const key in s.notequestions) {
+            // semi-column char instead of decimal dot, so:
+            const note = this.s2f(s.notequestions[key]);
+            qn[parseFloat(key) - 1]?.notesAssociees?.push(note);
+          }
+          const note = s.note === undefined ? 0 : this.s2f(s.note);
+          this.notes_eleves.push(note);
         }
-        const note = s.note === undefined ? 0 : this.s2f(s.note);
-        this.notes_eleves.push(note);
       });
+    // eslint-disable-next-line no-console
+    console.log(this.notes_eleves);
     this.q_notees = qn.sort((a, b) => a.numero - b.numero);
   }
 
