@@ -1,0 +1,14 @@
+<div>
+  <h3 jhiTranslate="scanexam.resumebareme">Résumé du sujet</h3>
+  <hr />
+  <div *ngFor="let q of getSortedQuestions(); index as i">
+    <b>Q{{ q.numero }}</b>
+    <div *ngIf="isFollowingQuestion(i, q); then follow; else nofollow"></div>
+    <ng-template #follow>( <span jhiTranslate="scanexam.suite"></span> )</ng-template>
+    <ng-template #nofollow
+      >- {{ q.point }} <span jhiTranslate="scanexam.pointincr">points, incr. de </span>{{ 1 / (q.step ?? 1) }}</ng-template
+    >
+  </div>
+  <br />
+  <strong>Total: {{ sumPoints() }} points</strong>
+</div>

@@ -20,7 +20,6 @@ export class PaintComponent {
   }
 
   updateNumero(numero: string): void {
-    // eslint-disable-next-line no-console
     this.numero.next(numero);
   }
 }

@@ -11,6 +11,7 @@
     "errorExamId": "Numéro de l'examen invalide",
     "align": "Aligner scans",
     "gobackexam": "Retourner à l'exam",
+    "gobackcorrection": "Retourner à la correction",
     "gobackue": "Retourner au module",
     "alignscan": "Alignement des scans",
     "alignscanalgo": "Algorithme d'alignement",
@@ -148,7 +149,7 @@
     "badanswers": "Réponses contenant une erreur représentatives",
     "nobadsolution": "Aucune mauvaise réponse identifiée",
     "statexam": "Statistiques de l'examen ",
-    "statgeneral": "Statistiques générales",
+    "statexam2": "Statistiques (hors absents)",
     "nbrstudents": "Nombre d'étudiants",
     "average": "Moyenne",
     "ecarttype": "Écart type (σ)",
@@ -225,6 +226,12 @@
     "partialalignscanendpage": "dernière page",
     "partialalignscanprocess": "lancer l'alignement",
     "partialalignscantooltip": "Sert principalement si le pdf de scan a été modifié (par exemple pour retourner/inverser quelques pages) afin de ne pas devoir réalignement complètement l'ensemble des images",
-    "removeAllAnnotation": "Êtes vous sur de vouloir supprimer l'ensemble des annotations de cet examen?"
+    "removeAllAnnotation": "Êtes vous sur de vouloir supprimer l'ensemble des annotations de cet examen?",
+    "comparecopie": "Comparaison des copies",
+    "tooltipCompareComment": "Comparaison des copies avec le même commentaire",
+    "tooltipCompareMark": "Comparaison des copies avec la même note",
+    "resumebareme": "Résumé du barème",
+    "pointincr": "points, incr. de ",
+    "suite": "suite"
   }
 }

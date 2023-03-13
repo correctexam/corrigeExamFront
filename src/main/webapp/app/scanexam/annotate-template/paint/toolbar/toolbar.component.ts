@@ -52,7 +52,6 @@ export class GraphicalToolbarComponent {
   }
 
   async select(tool: DrawingTools) {
-    //    console.error('select',tool )
     this.eventService.selectedTool = tool;
     this.selected = this.eventService.selectedTool;
   }

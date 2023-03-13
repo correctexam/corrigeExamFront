@@ -126,7 +126,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('examid') !== null) {
         this.examId = params.get('examid')!;
-        // dbsqlite.load();
         if (this.preferenceService.getPreference().pdfscale !== undefined) {
           this.scale = this.preferenceService.getPreference().pdfscale;
         }
@@ -478,23 +477,41 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   }
 
   async aligneImages(file: any, pagen: number): Promise<number> {
-    await this.saveNonAligneImage(pagen, file);
-    // console.error(file)
+    // await this.saveNonAligneImage(pagen, file);
     return new Promise(resolve => {
-      if (this.alignement !== 'off') {
-        const i = new Image();
-        i.onload = () => {
-          const editedImage = <HTMLCanvasElement>document.createElement('canvas');
-          editedImage.width = i.width;
-          editedImage.height = i.height;
-          const ctx = editedImage.getContext('2d');
-          ctx!.drawImage(i, 0, 0);
-          const inputimage1 = ctx!.getImageData(0, 0, i.width, i.height);
+      const i = new Image();
+      i.onload = async () => {
+        const editedImage = <HTMLCanvasElement>document.createElement('canvas');
+        editedImage.width = i.width;
+        editedImage.height = i.height;
+        const ctx = editedImage.getContext('2d');
+        ctx!.drawImage(i, 0, 0);
+        const inputimage1 = ctx!.getImageData(0, 0, i.width, i.height);
+        let exportImageType = 'image/webp';
+        let compression = 0.65;
+        if (
+          this.preferenceService.getPreference().exportImageCompression !== undefined &&
+          this.preferenceService.getPreference().exportImageCompression > 0 &&
+          this.preferenceService.getPreference().exportImageCompression <= 1
+        ) {
+          compression = this.preferenceService.getPreference().exportImageCompression;
+        }
+        if (
+          this.preferenceService.getPreference().imageTypeExport !== undefined &&
+          ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
+        ) {
+          exportImageType = this.preferenceService.getPreference().imageTypeExport;
+        }
 
-          let paget = pagen % this.nbreFeuilleParCopie;
-          if (paget === 0) {
-            paget = this.nbreFeuilleParCopie;
-          }
+        const webPImageURL = editedImage.toDataURL(exportImageType, compression);
+        await this.saveNonAligneImage(pagen, webPImageURL);
+
+        let paget = pagen % this.nbreFeuilleParCopie;
+        if (paget === 0) {
+          paget = this.nbreFeuilleParCopie;
+        }
+
+        if (this.alignement !== 'off') {
           // await this.saveNonAligneImage(pagen, napage.image!);
           const pref = this.preferenceService.getPreference();
 
@@ -511,27 +528,26 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
           });
 
           resolve(pagen);
-        };
-
-        i.src = file;
-      } else {
-        this.saveEligneImageBase64(pagen, pagen).then(() => {
-          if (this.currentPageAlign < this.numberPagesInScan + 1) {
-            this.observerPage?.next(this.currentPageAlign);
-            this.currentPageAlign = this.currentPageAlign + 1;
-          }
-          if (this.currentPageAlignOver < this.numberPagesInScan) {
-            this.avancement = this.currentPageAlignOver;
-            this.currentPageAlignOver = this.currentPageAlignOver + 1;
-          } else {
-            this.avancement = this.currentPageAlignOver;
-            this.currentPageAlignOver = this.currentPageAlignOver + 1;
-            this.observerPage?.complete();
-            this.observer?.complete();
-          }
-        });
-        resolve(pagen);
-      }
+        } else {
+          this.saveEligneImageBase64(pagen, webPImageURL).then(() => {
+            if (this.currentPageAlign < this.numberPagesInScan + 1) {
+              this.observerPage?.next(this.currentPageAlign);
+              this.currentPageAlign = this.currentPageAlign + 1;
+            }
+            if (this.currentPageAlignOver < this.numberPagesInScan) {
+              this.avancement = this.currentPageAlignOver;
+              this.currentPageAlignOver = this.currentPageAlignOver + 1;
+            } else {
+              this.avancement = this.currentPageAlignOver;
+              this.currentPageAlignOver = this.currentPageAlignOver + 1;
+              this.observerPage?.complete();
+              this.observer?.complete();
+            }
+          });
+          resolve(pagen);
+        }
+      };
+      i.src = file;
     });
   }
 
@@ -542,7 +558,23 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
 
     const ctx = canvas.getContext('2d');
     ctx?.putImageData(img, 0, 0);
-    const dataURL = canvas.toDataURL('image/png');
+    let compression = 0.65;
+    let exportImageType = 'image/webp';
+
+    if (
+      this.preferenceService.getPreference().exportImageCompression !== undefined &&
+      this.preferenceService.getPreference().exportImageCompression > 0 &&
+      this.preferenceService.getPreference().exportImageCompression <= 1
+    ) {
+      compression = this.preferenceService.getPreference().exportImageCompression;
+    }
+    if (
+      this.preferenceService.getPreference().imageTypeExport !== undefined &&
+      ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
+    ) {
+      exportImageType = this.preferenceService.getPreference().imageTypeExport;
+    }
+    const dataURL = canvas.toDataURL(exportImageType, compression);
     return dataURL;
     // return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
   }

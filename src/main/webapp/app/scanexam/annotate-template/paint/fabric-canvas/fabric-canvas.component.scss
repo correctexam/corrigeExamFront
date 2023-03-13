@@ -1,6 +1,17 @@
 .canvas-wrapper {
   overflow-y: scroll;
   overflow-x: hidden;
-  width: 80vw;
+  width: 65vw;
   height: 80vh;
+}
+
+.flex-container {
+  display: flex;
+}
+
+.summary {
+  width: 15vw;
+  border: 2px solid lightgray;
+  padding: 10px;
+  border-radius: 5px;
 }
