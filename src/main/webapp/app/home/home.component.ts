@@ -56,6 +56,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       });
     }
 
+    // check if shibboleth header are present
+
     this.accountService
       .getAuthenticationState()
       .pipe(takeUntil(this.destroy$))
