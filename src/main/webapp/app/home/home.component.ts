@@ -15,6 +15,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { LoginService } from 'app/login/login.service';
 
 import { environment } from 'app/environment/environment';
+import { HttpRequest } from '@angular/common/http';
 
 @Component({
   selector: 'jhi-home',
@@ -57,11 +58,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     // check if shibboleth header are present
-    const req = new XMLHttpRequest();
-    req.open('GET', document.location.toString() + '/Shibboleth.sso/Login', false);
-    req.send(null);
-    const headers = req.getAllResponseHeaders().toLowerCase();
-    alert(headers);
+    const request = new XMLHttpRequest();
+    request.open('GET', document.location.toString() + '/Shibboleth.sso/Session', false);
+    request.send(null);
+    console.log(request.getAllResponseHeaders());
 
     this.accountService
       .getAuthenticationState()
