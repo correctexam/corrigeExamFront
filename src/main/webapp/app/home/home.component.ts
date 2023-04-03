@@ -58,10 +58,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     // check if shibboleth header are present
-    const request = new XMLHttpRequest();
-    request.open('GET', document.location.toString() + 'Shibboleth.sso/Session', false);
-    request.send(null);
-    console.log(request.getAllResponseHeaders());
 
     this.accountService
       .getAuthenticationState()

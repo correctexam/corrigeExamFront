@@ -9,7 +9,7 @@
       <!--      <button (click)="login()" pbutton type="button" class="p-element mr-3 p-button p-component">-->
       <!--        <span class="p-button-label" jhiTranslate="home.login">Authentifiez vous</span><span class="p-ink"></span>-->
       <!--      </button>-->
-      <a href="/Shibboleth.sso/Login" class="p-element mr-3 p-button p-component">
+      <a href="/Shibboleth.sso/Login?target={{ this.service_url }}/back/api/shib" class="p-element mr-3 p-button p-component">
         <span class="p-button-label" jhiTranslate="home.login">>Authentifiez vous</span><span class="p-ink"></span>
       </a>
       <!--      <button-->
