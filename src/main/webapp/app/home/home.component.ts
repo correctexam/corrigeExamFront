@@ -58,7 +58,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     // check if shibboleth header are present
-    const shibPresent = window.location.href.match('?shib=true');
+    const shibPresent = window.location.href.match(/\?shib=true/);
     if (shibPresent) {
       console.log('SHIB PRESENT');
       this.loginService.login_shib().subscribe({
