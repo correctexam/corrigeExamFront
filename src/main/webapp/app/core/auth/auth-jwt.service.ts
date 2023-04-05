@@ -39,7 +39,18 @@ export class AuthServerProvider {
   login_cas(cas_ticket: string): Observable<void> {
     const adrr = `${this.service_url}/api/cas/authenticate/${cas_ticket}`;
     // eslint-disable-next-line no-console
-    console.log(adrr);
+    return this.http.get<JwtToken>(adrr).pipe(
+      map(response => {
+        // eslint-disable-next-line no-console
+        console.log(response);
+        this.authenticateSuccess(response, true);
+      })
+    );
+  }
+
+  login_shib(): Observable<void> {
+    const adrr = `${this.service_url}/api/shib/authenticate`;
+    // eslint-disable-next-line no-console
     return this.http.get<JwtToken>(adrr).pipe(
       map(response => {
         // eslint-disable-next-line no-console

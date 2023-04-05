@@ -19,6 +19,10 @@ export class LoginService {
     return this.authServerProvider.login_cas(ticket_cas).pipe(mergeMap(() => this.accountService.identity(true)));
   }
 
+  login_shib(): Observable<Account | null> {
+    return this.authServerProvider.login_shib().pipe(mergeMap(() => this.accountService.identity(true)));
+  }
+
   logout(): void {
     this.authServerProvider.logout().subscribe({ complete: () => this.accountService.authenticate(null) });
   }
