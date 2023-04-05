@@ -367,7 +367,16 @@
             </li>
 
             <li *ngSwitchCase="false">
-              <a href="{{ cas_url }}/login?service={{ service_url }}" class="dropdown-item" id="login" data-cy="login">
+              <!--              <a href="{{ cas_url }}/login?service={{ service_url }}" class="dropdown-item" id="login" data-cy="login">-->
+              <!--                <fa-icon icon="sign-in-alt" [fixedWidth]="true"></fa-icon>-->
+              <!--                <span jhiTranslate="global.menu.account.login">Sign in</span>-->
+              <!--              </a>-->
+              <a
+                href="/Shibboleth.sso/Login?target={{ this.service_url }}/api/shib/redirection"
+                class="dropdown-item"
+                id="login"
+                data-cy="login"
+              >
                 <fa-icon icon="sign-in-alt" [fixedWidth]="true"></fa-icon>
                 <span jhiTranslate="global.menu.account.login">Sign in</span>
               </a>
