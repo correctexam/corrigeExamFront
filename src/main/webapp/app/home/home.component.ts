@@ -57,10 +57,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       });
     }
 
-    // check if shibboleth header are present
+    // Check if user has been redirected from shib login page
     const shibPresent = window.location.href.match(/\?shib=true/);
     if (shibPresent) {
-      console.log('SHIB PRESENT');
       this.loginService.login_shib().subscribe({
         next: () => {
           this.router.navigate(['']);
