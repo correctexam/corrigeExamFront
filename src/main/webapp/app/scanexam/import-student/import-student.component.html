@@ -1,90 +1,184 @@
-<div class="grid-nogutter flex">
+<div class="grid-nogutter flex center-screen">
   <p-toast></p-toast>
   <p-blockUI [blocked]="blocked">
     <i class="pi pi-lock" style="font-size: 3rem"></i>
   </p-blockUI>
 
-  <div class="sm:col-12 md:col-12 lg:col-8 xl:col-8">
-    <div class="grid flex">
-      <div class="sm:col-12 md:col-6 lg:col-6 xl:col-6">
-        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" jhiTranslate="scanexam.importstudent">Importer étudiants</h2>
-        <p-message *ngIf="!canImport()" severity="warn" [text]="'scanexam.listestudentvalid' | translate"></p-message>
+  <p-tabView class="tabs" (onChange)="selectTab($event)">
+    <p-tabPanel [header]="'scanexam.importstudent' | translate">
+      <div class="container">
+        <div class="grid flex">
+          <div class="sm:col-12 md:col-6 lg:col-6 xl:col-6">
+            <p-message *ngIf="!canImport()" severity="warn" [text]="'scanexam.listestudentvalid' | translate"></p-message>
+          </div>
+          <div class="sm:col-12 md:col-6 lg:col-6 xl:col-6">
+            <div class="md:flex lg:flex xl:flex md:flex-row-reverse lg:flex-row-reverse">
+              <div class="">
+                <button
+                  [disabled]="!this.courseid"
+                  type="submit"
+                  id="save-entity"
+                  data-cy="entityCreateSaveButton"
+                  class="p-button p-button-primary flex-initial flex align-items-center"
+                  (click)="gotoUE()"
+                >
+                  <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackue">Retourner au module</span>
+                </button>
+              </div>
+              <div class="">
+                <button
+                  [disabled]="!this.courseid || !canImport()"
+                  type="submit"
+                  id="save-entity"
+                  data-cy="entityCreateSaveButton"
+                  class="p-button flex-initial flex align-items-center"
+                  [ngClass]="{ 'p-button-primary': this.courseid && canImport(), 'p-button-secondary': !this.courseid || !canImport() }"
+                  (click)="envoiEtudiants()"
+                >
+                  <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="scanexam.importfollowingstudent"
+                    >Importer étudiants ci-dessous</span
+                  >
+                </button>
+              </div>
+              <div class="">
+                <button
+                  (click)="download()"
+                  type="submit"
+                  id="save-entity"
+                  data-cy="entityCreateSaveButton"
+                  class="p-button p-button-primary flex-initial flex align-items-center"
+                >
+                  <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="scanexam.downloadtemplate">Download template</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sm:col-offset-0 sm:col-12 md:col-offset-0 md:col-12 lg:col-offset-8 lg:col-4">
+          <label for="slider" jhiTranslate="scanexam.nbrligne">Nombre de lignes dans le tableau (entre 100 et 300)</label>
+          <p-slider id="slider" [(ngModel)]="val" (onChange)="updateTableSize()" [step]="20" [min]="100" [max]="300"></p-slider>
+        </div>
+
+        <div class="col-12 md:col-12">
+          <hot-table
+            [hotId]="id"
+            class="hot"
+            [data]="dataset"
+            [colHeaders]="true"
+            [rowHeaders]="true"
+            [stretchH]="'all'"
+            [colHeaders]="true"
+            [rowHeaders]="true"
+            licenseKey="non-commercial-and-evaluation"
+            [stretchH]="'all'"
+            [afterChange]="detectChanges"
+          >
+            <!--<hot-column data="id" [readOnly]="true" title="ID"></hot-column>-->
+            <hot-column data="ine" [title]="'scanexam.ine' | translate"></hot-column>>
+            <hot-column data="nom" [title]="'scanexam.nom' | translate"></hot-column>>
+            <hot-column data="prenom" [title]="'scanexam.prenom' | translate"></hot-column>>
+            <hot-column data="mail" [title]="'scanexam.mail' | translate"></hot-column>>
+            <hot-column data="groupe" [title]="'scanexam.groupe' | translate"></hot-column>>
+          </hot-table>
+        </div>
       </div>
-      <div class="sm:col-12 md:col-6 lg:col-6 xl:col-6">
-        <div class="md:flex lg:flex xl:flex md:flex-row-reverse lg:flex-row-reverse">
-          <div class="">
+    </p-tabPanel>
+
+    <p-tabPanel [header]="'scanexam.liststudents' | translate">
+      <p-confirmDialog [header]="'scanexam.confirmremove' | translate" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+      <div class="container">
+        <div class="grid grid-nogutter">
+          <div class="col-12 flex flex-row-reverse">
             <button
               [disabled]="!this.courseid"
               type="submit"
               id="save-entity"
               data-cy="entityCreateSaveButton"
-              class="p-button p-button-primary flex-initial flex align-items-center"
+              class="p-button p-button-primary"
               (click)="gotoUE()"
             >
               <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackue">Retourner au module</span>
             </button>
-          </div>
-          <div class="">
-            <button
-              [disabled]="!this.courseid || !canImport()"
-              type="submit"
-              id="save-entity"
-              data-cy="entityCreateSaveButton"
-              class="p-button flex-initial flex align-items-center"
-              [ngClass]="{ 'p-button-primary': this.courseid && canImport(), 'p-button-secondary': !this.courseid || !canImport() }"
-              (click)="envoiEtudiants()"
-            >
-              <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="scanexam.importfollowingstudent">Importer étudiants ci-dessous</span>
-            </button>
-          </div>
-          <div class="">
-            <button
-              (click)="download()"
-              type="submit"
-              id="save-entity"
-              data-cy="entityCreateSaveButton"
-              class="p-button p-button-primary flex-initial flex align-items-center"
-            >
-              <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="scanexam.downloadtemplate">Download template</span>
+            <button (click)="reset()" type="submit" id="save-entity" data-cy="entityCreateSaveButton" class="btn btn-danger">
+              <fa-icon icon="times"></fa-icon>&nbsp;<span jhiTranslate="scanexam.vider">Vider</span>
             </button>
           </div>
         </div>
+        <div class="sm:col-12 md:col-12 lg:col-12 xl:col-12">
+          <p-table [value]="students" responsiveLayout="scroll" sortMode="single" [sortField]="'ine'">
+            <ng-template pTemplate="header">
+              <tr>
+                <th jhiTranslate="scanexam.ine">INE</th>
+                <th jhiTranslate="scanexam.nom">NOM</th>
+                <th jhiTranslate="scanexam.prenom">PRENOM</th>
+                <th jhiTranslate="scanexam.mail">MAIL</th>
+                <th jhiTranslate="scanexam.groupe">GROUPE</th>
+                <th jhiTranslate="scanexam.supprimer">SUPPRIMER</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-student>
+              <tr>
+                <td>
+                  <p-inplace [closable]="true">
+                    <ng-template pTemplate="display">
+                      {{ student.ine }}
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <input type="text" [(ngModel)]="student.ine" (change)="updateStudentINE(student)" pInputText />
+                    </ng-template>
+                  </p-inplace>
+                </td>
+                <td>
+                  <p-inplace [closable]="true">
+                    <ng-template pTemplate="display">
+                      {{ student.nom }}
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <input type="text" [(ngModel)]="student.nom" (change)="updateStudent(student)" pInputText />
+                    </ng-template>
+                  </p-inplace>
+                </td>
+                <td>
+                  <p-inplace [closable]="true">
+                    <ng-template pTemplate="display">
+                      {{ student.prenom }}
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <input type="text" [(ngModel)]="student.prenom" (change)="updateStudent(student)" pInputText />
+                    </ng-template>
+                  </p-inplace>
+                </td>
+                <td>
+                  <p-inplace [closable]="true">
+                    <ng-template pTemplate="display">
+                      {{ student.mail }}
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <input type="text" [(ngModel)]="student.mail" (change)="updateStudent(student)" pInputText />
+                    </ng-template>
+                  </p-inplace>
+                </td>
+                <td>
+                  <p-inplace [closable]="true">
+                    <ng-template pTemplate="display">
+                      {{ student.groupe }}
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <input type="text" [(ngModel)]="student.groupe" (change)="updateStudentgroup(student)" pInputText />
+                    </ng-template>
+                  </p-inplace>
+                </td>
+                <td>
+                  <button class="btn btn-danger" (click)="removeStudent(student)">
+                    <fa-icon icon="times"></fa-icon>
+                  </button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
       </div>
-    </div>
-    <div class="sm:col-offset-0 sm:col-12 md:col-offset-0 md:col-12 lg:col-offset-8 lg:col-4">
-      <label for="slider" jhiTranslate="scanexam.nbrligne">Nombre de lignes dans le tableau (entre 100 et 300)</label>
-      <p-slider id="slider" [(ngModel)]="val" (onChange)="updateTableSize()" [step]="20" [min]="100" [max]="300"></p-slider>
-    </div>
-
-    <div class="col-12 md:col-12">
-      <hot-table
-        [hotId]="id"
-        class="hot"
-        [data]="dataset"
-        [colHeaders]="true"
-        [rowHeaders]="true"
-        [stretchH]="'all'"
-        [colHeaders]="true"
-        [rowHeaders]="true"
-        licenseKey="non-commercial-and-evaluation"
-        [stretchH]="'all'"
-        [afterChange]="detectChanges"
-      >
-        <!--<hot-column data="id" [readOnly]="true" title="ID"></hot-column>-->
-        <hot-column data="ine" [title]="'scanexam.ine' | translate"></hot-column>>
-        <hot-column data="nom" [title]="'scanexam.nom' | translate"></hot-column>>
-        <hot-column data="prenom" [title]="'scanexam.prenom' | translate"></hot-column>>
-        <hot-column data="mail" [title]="'scanexam.mail' | translate"></hot-column>>
-        <hot-column data="groupe" [title]="'scanexam.groupe' | translate"></hot-column>>
-      </hot-table>
-    </div>
-  </div>
-  <div class="lg:col-4 xl:col-4 overflow-hidden sm:hidden md:hidden lg:flex xl:flex">
-    <img
-      src="content/images/bannerright.jpg"
-      alt="Image"
-      class="md:ml-auto block md:h-full"
-      style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
-    />
-  </div>
+    </p-tabPanel>
+  </p-tabView>
 </div>
