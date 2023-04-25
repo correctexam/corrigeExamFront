@@ -1,29 +1,24 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/member-ordering */
-/* eslint-disable @angular-eslint/use-lifecycle-interface */
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HotTableRegisterer } from '@handsontable/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { IStudent } from 'app/entities/student/student.model';
 import Handsontable from 'handsontable';
 import { CellChange, ChangeSource } from 'handsontable/common';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 @Component({
   selector: 'jhi-import-student',
   templateUrl: './import-student.component.html',
   styleUrls: ['./import-student.component.scss'],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
 })
-export class ImportStudentComponent implements OnInit {
+export class ImportStudentComponent implements OnInit, AfterViewInit {
   dataset!: any[];
   blocked = false;
   private hotRegisterer = new HotTableRegisterer();
@@ -36,6 +31,7 @@ export class ImportStudentComponent implements OnInit {
     columns: [{}, {}, {}, {}, {}],
     licenseKey: 'non-commercial-and-evaluation',
   };
+  students: IStudent[] = [];
 
   constructor(
     protected applicationConfigService: ApplicationConfigService,
@@ -43,7 +39,8 @@ export class ImportStudentComponent implements OnInit {
     private translate: TranslateService,
     private messageService: MessageService,
     protected activatedRoute: ActivatedRoute,
-    protected router: Router
+    protected router: Router,
+    public confirmationService: ConfirmationService
   ) {}
 
   ngOnInit(): void {
@@ -55,7 +52,9 @@ export class ImportStudentComponent implements OnInit {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   detectChanges = (changes: CellChange[] | null, source: ChangeSource) => {};
+
   updateTableSize(): void {
     this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val);
   }
@@ -76,8 +75,7 @@ export class ImportStudentComponent implements OnInit {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     this.hotRegisterer.getInstance(this.id).render();
   }
 
@@ -99,6 +97,7 @@ export class ImportStudentComponent implements OnInit {
 
     return fullLine && uniqemail && uniqine;
   }
+
   envoiEtudiants(): void {
     const c = {
       course: this.courseid,
@@ -117,7 +116,6 @@ export class ImportStudentComponent implements OnInit {
             detail: this.translate.instant('scanexam.importsuccessdetail'),
           });
           this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val);
-          this.router.navigateByUrl('/liststudents/' + this.courseid);
         });
       },
       err => {
@@ -133,4 +131,64 @@ export class ImportStudentComponent implements OnInit {
       }
     );
   }
+
+  reset(): void {
+    this.translate.get('scanexam.confirmremovestudents').subscribe(data => {
+      this.confirmationService.confirm({
+        message: data,
+        accept: () => {
+          this.blocked = true;
+
+          this.http.delete(this.applicationConfigService.getEndpointFor('api/deletegroupstudents/' + this.courseid)).subscribe(() => {
+            this.loadEtudiants();
+            this.blocked = false;
+          });
+        },
+      });
+    });
+  }
+
+  updateStudent(student: IStudent): void {
+    this.http.put(this.applicationConfigService.getEndpointFor('api/updatestudent/' + this.courseid), student).subscribe();
+  }
+
+  updateStudentINE(student: IStudent): void {
+    this.http.put(this.applicationConfigService.getEndpointFor('api/updatestudentine/' + this.courseid), student).subscribe();
+  }
+
+  updateStudentgroup(student: IStudent): void {
+    this.http.put(this.applicationConfigService.getEndpointFor('api/updatestudentgroup/' + this.courseid), student).subscribe();
+  }
+
+  removeStudent(student: IStudent): void {
+    this.translate.get('scanexam.confirmremovestudent').subscribe(data => {
+      this.confirmationService.confirm({
+        message: data,
+        accept: () => {
+          this.blocked = true;
+
+          this.http.put(this.applicationConfigService.getEndpointFor('api/deletestudentgroup/' + this.courseid), student).subscribe(() => {
+            this.loadEtudiants();
+            this.blocked = false;
+          });
+        },
+      });
+    });
+  }
+
+  loadEtudiants(): void {
+    this.http.get<Array<IStudent>>(this.applicationConfigService.getEndpointFor('api/getstudentcours/' + this.courseid)).subscribe(s => {
+      this.students = s;
+    });
+  }
+
+  selectTab(evt: Index): void {
+    if (evt.index === 1) {
+      this.loadEtudiants();
+    }
+  }
+}
+
+interface Index {
+  index: number;
 }
