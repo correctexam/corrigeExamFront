@@ -95,12 +95,6 @@ export class CoursdetailsComponent implements OnInit {
         route: '/registerstudents/' + this.courseId,
       },
       {
-        label: this.translateService.instant('scanexam.listeetudiant'),
-        icon: this.appConfig.getFrontUrl() + 'content/images/studentslist.svg',
-        title: this.translateService.instant('scanexam.listeetudiant'),
-        route: '/liststudents/' + this.courseId,
-      },
-      {
         label: this.translateService.instant('scanexam.shareue'),
         icon: this.appConfig.getFrontUrl() + 'content/images/share-button-svgrepo-com.svg',
         title: this.translateService.instant('scanexam.shareuedetail'),
