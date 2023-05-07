@@ -70,7 +70,7 @@
     "wordtemplate": "Word template",
     "odttemplate": "LibreOffice template",
     "latextemplate": "LaTeX template",
-    "enonceexam": "Exam statement:",
+    "enonceexam": "Exam statement (PDF format):",
     "annotatetemplate": "Annotate template",
     "loadscan": "Load students scans",
     "alignscan1": "Straighten scans",

@@ -1,13 +1,7 @@
-/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
-import { TranslateService } from '@ngx-translate/core';
 import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { Exam } from 'app/entities/exam/exam.model';
@@ -39,8 +33,6 @@ export class CreerexamComponent implements OnInit {
   });
 
   constructor(
-    private translate: TranslateService,
-    private messageService: MessageService,
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
     public confirmationService: ConfirmationService,
@@ -54,15 +46,18 @@ export class CreerexamComponent implements OnInit {
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
-      if (params.get('courseid') !== null) {
-        this.courseid = params.get('courseid')!;
-        this.courseService.find(+this.courseid).subscribe(c => (this.coursName = c.body?.name!));
+      const id = params.get('courseid');
+      if (id !== null) {
+        this.courseid = id;
+        this.courseService.find(+this.courseid).subscribe(c => (this.coursName = c.body?.name ?? ''));
       }
     });
   }
 
   gotoUE(): void {
-    this.router.navigateByUrl('/course/' + this.courseid);
+    if (this.courseid !== undefined) {
+      this.router.navigateByUrl(`/course/${this.courseid}`);
+    }
   }
 
   byteSize(base64String: string): string {
@@ -83,7 +78,7 @@ export class CreerexamComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     const template = new Template();
-    template.name = this.editForm.get(['name'])!.value + 'Template';
+    template.name = `${String(this.editForm.get(['name'])!.value)}Template`;
     template.content = this.editForm.get(['content'])!.value;
     template.contentContentType = this.editForm.get(['contentContentType'])!.value;
     (template.mark = this.editForm.get(['mark'])!.value), (template.autoMapStudentCopyToList = true);
@@ -97,7 +92,7 @@ export class CreerexamComponent implements OnInit {
         this.examService.create(exam).subscribe(
           () => {
             this.isSaving = false;
-            this.router.navigateByUrl('/course/' + this.courseid);
+            this.gotoUE();
           },
           () => {
             this.isSaving = false;

@@ -70,7 +70,7 @@
     "wordtemplate": "Modèle de sujet Word",
     "odttemplate": "Modèle de sujet LibreOffice",
     "latextemplate": "Modèle de sujet LaTeX",
-    "enonceexam": "Enoncé de l'examen :",
+    "enonceexam": "Enoncé de l'examen (au format PDF) :",
     "annotatetemplate": "Annoter template",
     "loadscan": "Charger scan étudiants",
     "alignscan1": "Redresser scan",
