@@ -10,7 +10,8 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { CourseService } from '../../entities/course/service/course.service';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { TemplateService } from '../../entities/template/service/template.service';
-import { Template } from '../../entities/template/template.model';
+import { ITemplate, Template } from '../../entities/template/template.model';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'jhi-creerexam',
@@ -86,26 +87,26 @@ export class CreerexamComponent implements OnInit {
     template.contentContentType = this.editForm.get(['contentContentType'])!.value;
     (template.mark = this.editForm.get(['mark'])!.value), (template.autoMapStudentCopyToList = true);
 
-    this.templateService.create(template).subscribe(
-      res => {
+    this.templateService.create(template).subscribe({
+      next: (res: HttpResponse<ITemplate>) => {
         const exam = new Exam();
         exam.name = this.editForm.get(['name'])!.value;
         exam.templateId = res.body?.id;
         exam.courseId = +this.courseid!;
-        this.examService.create(exam).subscribe(
-          () => {
+        this.examService.create(exam).subscribe({
+          next: () => {
             this.isSaving = false;
             this.gotoUE();
           },
-          () => {
+          error: () => {
             this.isSaving = false;
-          }
-        );
+          },
+        });
       },
-      () => {
+      error: () => {
         this.isSaving = false;
-      }
-    );
+      },
+    });
   }
 
   downloadTemplateWord(): void {
