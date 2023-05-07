@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
@@ -19,7 +19,7 @@ import { HttpResponse } from '@angular/common/http';
   styleUrls: ['./creerexam.component.scss'],
   providers: [MessageService, ConfirmationService],
 })
-export class CreerexamComponent implements OnInit {
+export class CreerexamComponent implements OnInit, AfterViewInit {
   blocked = false;
   courseid: string | undefined = undefined;
   isSaving = false;
@@ -55,6 +55,11 @@ export class CreerexamComponent implements OnInit {
         this.courseService.find(+this.courseid).subscribe(c => (this.coursName = c.body?.name ?? ''));
       }
     });
+  }
+
+  ngAfterViewInit(): void {
+    // Forcing the message explaining the name of required.
+    this.editForm.markAllAsTouched();
   }
 
   gotoUE(): void {
