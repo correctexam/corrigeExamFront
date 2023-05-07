@@ -71,6 +71,7 @@
     "odttemplate": "LibreOffice template",
     "latextemplate": "LaTeX template",
     "enonceexam": "Exam statement (PDF format):",
+    "pdferror": "Invalid or corrupted PDF file",
     "annotatetemplate": "Annotate template",
     "loadscan": "Load students scans",
     "alignscan1": "Straighten scans",

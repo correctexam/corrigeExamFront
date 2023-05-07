@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
@@ -31,6 +31,7 @@ export class CreerexamComponent implements OnInit {
     mark: [true],
     autoMapStudentCopyToList: [true],
   });
+  errorParsingPdf = false;
 
   constructor(
     protected activatedRoute: ActivatedRoute,
@@ -41,7 +42,8 @@ export class CreerexamComponent implements OnInit {
     protected eventManager: EventManager,
     protected courseService: CourseService,
     protected examService: ExamService,
-    protected templateService: TemplateService
+    protected templateService: TemplateService,
+    private ref: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -70,8 +72,9 @@ export class CreerexamComponent implements OnInit {
 
   setFileData(event: Event, field: string, isImage: boolean): void {
     this.dataUtils.loadFileToForm(event, this.editForm, field, isImage).subscribe({
-      error: (err: FileLoadError) =>
-        this.eventManager.broadcast(new EventWithContent<AlertError>('gradeScopeIsticApp.error', { ...err, key: 'error.file.' + err.key })),
+      error: (err: FileLoadError) => {
+        this.eventManager.broadcast(new EventWithContent<AlertError>('gradeScopeIsticApp.error', { ...err, key: 'error.file.' + err.key }));
+      },
     });
   }
 
@@ -108,10 +111,24 @@ export class CreerexamComponent implements OnInit {
   downloadTemplateWord(): void {
     window.open('content/templateWord.docx', '_blank');
   }
+
   downloadTemplateOdt(): void {
     window.open('content/templateExample.odt', '_blank');
   }
+
   downloadTemplateLatex(): void {
     window.open('content/latex-template.zip', '_blank');
+  }
+
+  public onPdfError(): void {
+    this.errorParsingPdf = true;
+    this.editForm.patchValue({ content: null });
+    this.editForm.patchValue({ contentContentType: null });
+    // Certainly because of async, have to force the update to render the previous changes
+    this.ref.detectChanges();
+  }
+
+  public onPdfLoaded(): void {
+    this.errorParsingPdf = false;
   }
 }

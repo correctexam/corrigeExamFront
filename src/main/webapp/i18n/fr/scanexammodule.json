@@ -71,6 +71,7 @@
     "odttemplate": "Modèle de sujet LibreOffice",
     "latextemplate": "Modèle de sujet LaTeX",
     "enonceexam": "Enoncé de l'examen (au format PDF) :",
+    "pdferror": "Fichier PDF invalide ou corrompu",
     "annotatetemplate": "Annoter template",
     "loadscan": "Charger scan étudiants",
     "alignscan1": "Redresser scan",
