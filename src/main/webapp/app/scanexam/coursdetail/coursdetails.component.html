@@ -14,7 +14,13 @@
     <div class="wizard-image"></div>
     <div class="wizard-form">
       <div class="wizard-header">
-        <h3>{{ course?.name }}</h3>
+        <jhi-usable-text-input
+          [name]="this.course?.name ?? ''"
+          [tooltip]="'scanexam.tooltipeditcoursename' | translate"
+          [placeholder]="'scanexam.placeholdereditcoursename' | translate"
+          (newValue)="onCourseNameChanged($event)"
+        >
+        </jhi-usable-text-input>
         <p jhiTranslate="scanexam.slogan">Vos exams accessibles en un clic</p>
       </div>
       <div id="form-total" #formTotal>
