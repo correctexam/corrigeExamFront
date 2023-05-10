@@ -1,5 +1,9 @@
 {
   "scanexam": {
+    "tooltipeditcoursename": "Change the course name",
+    "tooltipeditexamname": "Change the exam name",
+    "placeholdereditcoursename": "Set here the course name",
+    "placeholdereditexamname": "Set here the exam name",
     "error": "Cannot retreive the information",
     "questions": "Questions",
     "questionLow": "Question",
@@ -70,7 +74,8 @@
     "wordtemplate": "Word template",
     "odttemplate": "LibreOffice template",
     "latextemplate": "LaTeX template",
-    "enonceexam": "Exam statement:",
+    "enonceexam": "Exam statement (PDF format):",
+    "pdferror": "Invalid or corrupted PDF file",
     "annotatetemplate": "Annotate template",
     "loadscan": "Load students scans",
     "alignscan1": "Straighten scans",

@@ -1,9 +1,5 @@
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 import { Component, OnInit } from '@angular/core';
-// import { faCoffee } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 import { faMotorcycle as fasMotorcycle } from '@fortawesome/free-solid-svg-icons';
 import { faGraduationCap as faGraduationCap } from '@fortawesome/free-solid-svg-icons';
@@ -24,6 +20,7 @@ import { MessageService } from 'primeng/api';
 import { CacheDownloadNotification, CacheUploadNotification, CacheUploadService } from './cacheUpload.service';
 import { TranslateService } from '@ngx-translate/core';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'jhi-exam-detail',
@@ -49,6 +46,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
   message = '';
   submessage = '';
   progress = 0;
+  onExamNameEdit = false;
 
   constructor(
     public courseService: CourseService,
@@ -86,8 +84,6 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
               this.router.navigateByUrl('/');
             }
           );
-
-          //          this.examSheetService.
 
           this.db.countPageTemplate(+this.examId).then(c => {
             if (c !== 0) {
@@ -210,7 +206,6 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     this.translateService.get('scanexam.confirmcleancache').subscribe(data => {
       this.confirmationService.confirm({
         message: data,
-        // eslint-disable-next-line object-shorthand
         accept: () => {
           this.db.removeElementForExam(+this.examId).then(() => {
             this.showAssociation = false;
@@ -225,7 +220,6 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     this.translateService.get('scanexam.confirmuploadcache').subscribe(data => {
       this.confirmationService.confirm({
         message: data,
-        // eslint-disable-next-line object-shorthand
         accept: () => {
           this.cacheUploadService.exportCache(+this.examId, this.translateService, this.messageService, this.numberPagesInScan, this);
         },
@@ -249,7 +243,6 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     this.translateService.get('scanexam.confirmdownloadcache').subscribe(data1 => {
       this.confirmationService.confirm({
         message: data1,
-        // eslint-disable-next-line object-shorthand
         accept: () => {
           this.blocked = true;
           this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this);
@@ -267,8 +260,40 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
   }
 
   gobacktomodule(): void {
-    if (this.course !== undefined) {
-      this.router.navigateByUrl('/course/' + this.course.id);
+    const id = this.course?.id;
+    if (id !== undefined) {
+      this.router.navigateByUrl(`/course/${id}`);
     }
+  }
+
+  onExamNameToggleButton(nameInput: HTMLInputElement): void {
+    if (this.onExamNameEdit && this.exam?.name !== undefined && this.exam.name !== nameInput.value) {
+      const oldName = this.exam.name;
+
+      this.exam.name = nameInput.value;
+
+      firstValueFrom(this.examService.update(this.exam)).catch(() => {
+        nameInput.value = oldName;
+      });
+    }
+
+    this.onExamNameEdit = !this.onExamNameEdit;
+  }
+
+  cancelEdit(nameInput: HTMLInputElement): void {
+    this.onExamNameEdit = false;
+    nameInput.value = this.exam!.name!;
+    // Dirty, but required to launch the validation
+    nameInput.dispatchEvent(new Event('input'));
+  }
+
+  onExamNameChanged(newName: string): void {
+    const oldName = this.exam!.name;
+
+    this.exam!.name = newName;
+
+    firstValueFrom(this.examService.update(this.exam!)).catch(() => {
+      this.exam!.name = oldName;
+    });
   }
 }

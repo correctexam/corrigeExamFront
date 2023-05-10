@@ -20,6 +20,7 @@ import { ApplicationConfigService } from '../../core/config/application-config.s
 import { DialogService } from 'primeng/dynamicdialog';
 import { SharecourseComponent } from '../sharecourse/sharecourse.component';
 import { TranslateService } from '@ngx-translate/core';
+import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'jhi-coursdetails',
   templateUrl: './coursdetails.component.html',
@@ -48,7 +49,6 @@ export class CoursdetailsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // eslint-disable-next-line no-console
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('courseid') !== null) {
         this.courseId = params.get('courseid')!;
@@ -147,5 +147,15 @@ export class CoursdetailsComponent implements OnInit {
 
   gobacktomodulelist(): void {
     this.router.navigateByUrl('/');
+  }
+
+  onCourseNameChanged(newName: string): void {
+    const oldName = this.course!.name;
+
+    this.course!.name = newName;
+
+    firstValueFrom(this.courseService.update(this.course!)).catch(() => {
+      this.course!.name = oldName;
+    });
   }
 }

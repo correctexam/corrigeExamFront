@@ -72,7 +72,7 @@
         </div>
 
         <div class="row">
-          <label class="form-label col-2" for="field_content" jhiTranslate="scanexam.enonceexam">Enoncé de l'examen :</label>
+          <label class="form-label col-3" for="field_content" jhiTranslate="scanexam.enonceexam"></label>
           <div class="col-6">
             <div *ngIf="editForm.get('content')!.value" class="form-text text-danger clearfix">
               <a
@@ -94,6 +94,7 @@
             </div>
             <input
               type="file"
+              accept=".pdf"
               id="file_content"
               data-cy="content"
               (change)="setFileData($event, 'content', false)"
@@ -109,6 +110,21 @@
             formControlName="contentContentType"
           />
         </div>
+
+        <div class="row err" *ngIf="errorParsingPdf" jhiTranslate="scanexam.pdferror"></div>
+
+        <div class="row" *ngIf="editForm.get(['content'])?.value !== null">
+          <ngx-extended-pdf-viewer
+            [base64Src]="editForm.get(['content'])!.value"
+            [useBrowserLocale]="true"
+            [textLayer]="true"
+            [height]="'95%'"
+            [showToolbar]="false"
+            (pdfLoadingFailed)="onPdfError()"
+            (pdfLoaded)="onPdfLoaded()"
+          ></ngx-extended-pdf-viewer>
+        </div>
+
         <div class="row">
           <label class="form-label col-4" jhiTranslate="gradeScopeIsticApp.template.mark" for="field_mark">Mark</label>
           <input type="checkbox" class="form-check col-1" name="mark" id="field_mark" data-cy="mark" formControlName="mark" />
