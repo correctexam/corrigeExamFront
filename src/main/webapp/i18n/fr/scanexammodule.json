@@ -1,5 +1,9 @@
 {
   "scanexam": {
+    "tooltipeditcoursename": "Changer le nom du cours",
+    "tooltipeditexamname": "Changer le nom de l'examen",
+    "placeholdereditcoursename": "Définir ici le nom du cours",
+    "placeholdereditexamname": "Définir ici le nom de l'examen",
     "error": "Impossible de récupérer les informations",
     "questions": "Questions",
     "questionLow": "Question",
