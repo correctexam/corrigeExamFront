@@ -48,7 +48,6 @@ export class CoursdetailsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // eslint-disable-next-line no-console
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('courseid') !== null) {
         this.courseId = params.get('courseid')!;
