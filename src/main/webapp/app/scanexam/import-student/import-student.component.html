@@ -4,7 +4,7 @@
     <i class="pi pi-lock" style="font-size: 3rem"></i>
   </p-blockUI>
 
-  <p-tabView class="tabs" (onChange)="selectTab($event)">
+  <p-tabView class="tabs" (onChange)="selectTab($event)" [(activeIndex)]="activeIndex">
     <p-tabPanel [header]="'scanexam.importstudent' | translate">
       <div class="container">
         <div class="grid flex">
