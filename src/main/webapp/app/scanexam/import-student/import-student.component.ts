@@ -24,6 +24,7 @@ export class ImportStudentComponent implements OnInit, AfterViewInit {
   private hotRegisterer = new HotTableRegisterer();
   id = 'hotInstance';
   val = 100;
+  activeIndex = 0;
   courseid: string | undefined = undefined;
   settings = {
     rowHeaders: true,
@@ -116,6 +117,8 @@ export class ImportStudentComponent implements OnInit, AfterViewInit {
             detail: this.translate.instant('scanexam.importsuccessdetail'),
           });
           this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val);
+          this.activeIndex = 1;
+          this.loadEtudiants();
         });
       },
       err => {
