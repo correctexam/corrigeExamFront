@@ -108,7 +108,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   currentTextComment4Question: ITextComment[] | undefined;
   currentGradedComment4Question: IGradedComment[] | undefined;
   windowWidth = 0;
-  currentZoneCorrectionHandler: ZoneCorrectionHandler | undefined;
+  currentZoneCorrectionHandler: Map<string, ZoneCorrectionHandler> = new Map(); // | undefined;
 
   activeIndex = 1;
   responsiveOptions2: any[] = [
@@ -1035,29 +1035,25 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       ctx1!.drawImage(editedImage, 0, 0);
       show(true);
       if (updateanotationcanvas) {
-        if (this.currentZoneCorrectionHandler === undefined) {
+        if (
+          this.currentZoneCorrectionHandler.get(
+            '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index
+          ) === undefined
+        ) {
           const zh = new ZoneCorrectionHandler(
             '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index,
             this.eventHandler,
             this.resp?.id
           );
           zh.updateCanvas(imageRef!.nativeElement);
-          this.currentZoneCorrectionHandler = zh;
+          this.currentZoneCorrectionHandler.set(
+            '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index,
+            zh
+          );
         } else {
-          if (
-            this.currentZoneCorrectionHandler.zoneid ===
-            '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index
-          ) {
-            this.currentZoneCorrectionHandler.updateCanvas(imageRef!.nativeElement);
-          } else {
-            const zh = new ZoneCorrectionHandler(
-              '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index,
-              this.eventHandler,
-              this.resp?.id
-            );
-            zh.updateCanvas(imageRef!.nativeElement);
-            this.currentZoneCorrectionHandler = zh;
-          }
+          this.currentZoneCorrectionHandler
+            .get('' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index)!
+            .updateCanvas(imageRef!.nativeElement);
         }
       }
     }
