@@ -236,6 +236,8 @@
     "resumebareme": "Summary of the rating scale",
     "pointincr": "points, incr. of ",
     "suite": "following",
-    "tooltipResetAnswer": "Remove the marking for this question and this sheet"
+    "tooltipResetAnswer": "Remove the marking for this question and this sheet",
+    "layoutoptions": "Layout options",
+    "minimizeComment": "Minimal layout for comments"
   }
 }

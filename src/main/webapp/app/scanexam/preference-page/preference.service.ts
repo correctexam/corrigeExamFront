@@ -93,6 +93,22 @@ export class PreferenceService {
     this.localStorageService.store('shortcut', true);
   }
 
+  minimizeComments(): boolean {
+    const pref: boolean | null = this.localStorageService.retrieve('minimizeComments');
+    if (pref === null) {
+      this.localStorageService.store('minimizeComments', false);
+      return false;
+    }
+    return pref;
+  }
+  setMinimizeComments(shortcut: boolean): void {
+    this.localStorageService.store('minimizeComments', shortcut);
+  }
+
+  resetminimizeComment(): void {
+    this.localStorageService.store('minimizeComments', false);
+  }
+
   getPreferenceForQuestion(): IPreferenceForQuestion {
     let pref: IPreferenceForQuestion | null = this.localStorageService.retrieve('preferences4question');
     if (pref === null) {

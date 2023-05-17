@@ -67,6 +67,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   compareMark(response: IStudentResponse) {
     this.router.navigate(['/comparemark/' + this.examId + '/' + response.id]);
   }
+  minimizeComment = false;
+  layoutsidebarVisible = false;
   debug = false;
   @ViewChild('qcmcorrect')
   qcmcorrect!: ElementRef;
@@ -159,6 +161,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.windowWidth = window.innerWidth;
     this.shortcut = this.preferenceService.showKeyboardShortcuts();
     this.shortcutvalue = this.preferenceService.showKeyboardShortcuts();
+    this.minimizeComment = this.preferenceService.minimizeComments();
     this.shortcutvalue;
     this.activatedRoute.paramMap.subscribe(params => {
       this.blocked = true;
@@ -700,6 +703,22 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       (comment as any).checked = false;
     });
   }
+
+  toggleGComment(comment: IGradedComment) {
+    if (!this.checked(comment)) {
+      this.ajouterGComment(comment);
+    } else {
+      this.retirerGComment(comment);
+    }
+  }
+  toggleTComment(comment: ITextComment) {
+    if (!this.checked(comment)) {
+      this.ajouterTComment(comment);
+    } else {
+      this.retirerTComment(comment);
+    }
+  }
+
   async retirerGComment(comment: IGradedComment) {
     if (!this.resp!.id) {
       const ret = await this.updateResponseRequest(this.resp!).toPromise();
@@ -1535,5 +1554,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     if (old / event.target.innerWidth > 1.15 || old / event.target.innerWidth < 0.85) {
       this.reloadImage();
     }
+  }
+
+  toggleCommentLayout() {
+    this.minimizeComment = !this.minimizeComment;
+    this.preferenceService.setMinimizeComments(this.minimizeComment);
   }
 }
