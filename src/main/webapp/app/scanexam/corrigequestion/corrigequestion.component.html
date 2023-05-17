@@ -193,6 +193,17 @@
               *ngIf="resp?.id"
               class="float-end"
               [tooltipPosition]="'left'"
+              [pTooltip]="'scanexam.tooltipResetAnswer' | translate"
+              (click)="removeAnswer()"
+            >
+              <fa-icon icon="times"></fa-icon>
+            </span>
+            <span *ngIf="resp?.id" class="float-end" [tooltipPosition]="'left'" [pTooltip]="''"> &nbsp; &nbsp; </span>
+
+            <span
+              *ngIf="resp?.id"
+              class="float-end"
+              [tooltipPosition]="'left'"
               [pTooltip]="'scanexam.tooltipCompareMark' | translate"
               (click)="compareMark(resp!)"
             >

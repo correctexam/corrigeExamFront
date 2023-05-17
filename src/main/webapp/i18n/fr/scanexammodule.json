@@ -236,6 +236,7 @@
     "tooltipCompareMark": "Comparaison des copies avec la même note",
     "resumebareme": "Résumé du barème",
     "pointincr": "points, incr. de ",
-    "suite": "suite"
+    "suite": "suite",
+    "tooltipResetAnswer": "Suppression de la correction pour cette question et cette copie"
   }
 }
