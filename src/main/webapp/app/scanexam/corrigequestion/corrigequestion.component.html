@@ -10,6 +10,33 @@
     </ng-template>
   </p-confirmDialog>
 
+  <p-sidebar [(visible)]="layoutsidebarVisible">
+    <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
+      <p-inputSwitch class="float-end" [(ngModel)]="noalign" (onChange)="changeAlign()"></p-inputSwitch>
+    </div>
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <label><span jhiTranslate="scanexam.zoomfactor"> Facteur agrandissement : </span>({{ factor }})</label>
+      <p-slider *ngIf="noteSteps > 0" [ngModel]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImageGrowFactor($event)">
+      </p-slider>
+    </div>
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <label><span jhiTranslate="scanexam.pageshift">Décallage de page(s) : </span>({{ pageOffset }})</label>
+      <p-slider [ngModel]="pageOffset" [min]="-5" [max]="5" [step]="1" (onChange)="reloadImageOffset($event)"> </p-slider>
+    </div>
+
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <button
+        type="text"
+        pButton
+        [pTooltip]="'scanexam.realign' | translate"
+        [label]="'scanexam.realignlabel' | translate"
+        (click)="realign()"
+      ></button>
+    </div>
+  </p-sidebar>
+
   <p-dialog [header]="'scanexam.shortcut' | translate" [(visible)]="shortcut" [style]="{ width: '50vw' }">
     <span jhiTranslate="scanexam.shortcutdetail"></span>
     <BR />
@@ -56,7 +83,7 @@
   </p-galleria>
 
   <div class="col-12">
-    <div class="grid grid-nogutter">
+    <!-- <div class="grid grid-nogutter">
       <div class="col-8">
         <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" jhiTranslate="scanexam.correction">Correction</h2>
       </div>
@@ -72,7 +99,7 @@
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam">Retourner à l'exam</span>
         </button>
       </div>
-    </div>
+    </div>-->
     <!-- <div class="grid align-items-center">
       <div class="col-1">
       </div>
@@ -91,7 +118,7 @@
         <fa-icon [size]="'2x'" [pTooltip]="getStudentName()!" tooltipPosition="left" icon="eye"></fa-icon>
       </div>
     </div>-->
-    <div class="grid grid-nogutter">
+    <!--<div class="grid grid-nogutter">
       <div class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-10">
         <div class="d-flex justify-content-center" ng-if="questionnofirst !== -1">
           <p-paginator
@@ -105,13 +132,22 @@
           ></p-paginator>
         </div>
       </div>
-    </div>
+    </div>-->
 
     <div class="grid grid-nogutter">
       <div class="col-12 sm:col-12 md:col-12 lg:col-9 xl:col-10">
         <div class="d-flex justify-content-center">
           <div class="col-5">
+            <p-button
+              class="sm:text-xs md:text-xs lg:text-base"
+              styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
+              (click)="layoutsidebarVisible = true"
+              icon="pi pi-arrow-right"
+            ></p-button>
+
             <button
+              class="sm:text-xs md:text-xs lg:text-base"
+              styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
               *ngIf="this.currentQuestion?.typeAlgoName === 'QCM'"
               pButton
               (click)="workOnQCM()"
@@ -119,6 +155,8 @@
               [label]="'scanexam.qcmcorrectlabel' | translate"
             ></button>
             <button
+              class="sm:text-xs md:text-xs lg:text-base"
+              styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
               type="text"
               *ngIf="this.currentQuestion?.typeAlgoName === 'QCM'"
               pButton
@@ -126,24 +164,53 @@
               [label]="'scanexam.showqcmcorrectlabel' | translate"
               (click)="showQCMCorrect($event)"
             ></button>
-            <button
-              type="text"
-              pButton
-              [pTooltip]="'scanexam.realign' | translate"
-              [label]="'scanexam.realignlabel' | translate"
-              (click)="realign()"
-            ></button>
+
             <button [hidden]="!debug" type="text" pButton [label]="'reset'" (click)="removeAllAnswer()"></button>
           </div>
 
-          <div class="col-3">
-            <h2>Question {{ questionno! + 1 }}</h2>
+          <div class="col-2">
+            <button
+              class="sm:text-xs md:text-xs lg:text-base"
+              pButton
+              [disabled]="!examId"
+              (click)="showGalleria()"
+              jhiTranslate="scanexam.showgalleria"
+            >
+              Show full page
+            </button>
+            <!--            <h2>Question {{ questionno! + 1 }}</h2>-->
           </div>
-          <div class="col-4">
-            <button pButton [disabled]="!examId" (click)="showGalleria()" jhiTranslate="scanexam.showgalleria">Show full page</button>
+          <div class="col-1">
             <fa-icon [size]="'2x'" [pTooltip]="getStudentName()!" tooltipPosition="left" icon="eye"></fa-icon>
           </div>
+
+          <div class="col-4 flex flex-row-reverse">
+            <button
+              [disabled]="!this.examId"
+              type="submit"
+              id="save-entity"
+              data-cy="entityCreateSaveButton"
+              class="p-button p-button-primary mr-5"
+              (click)="gotoUE()"
+            >
+              <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span class="sm:text-xs md:text-xs lg:text-base" jhiTranslate="scanexam.gobackexam"
+                >Retourner à l'exam</span
+              >
+            </button>
+          </div>
         </div>
+        <div class="d-flex justify-content-center" ng-if="questionnofirst !== -1">
+          <p-paginator
+            [currentPageReportTemplate]="'scanexam.currentpage' | translate"
+            [rows]="1"
+            [first]="questionno!"
+            [totalRecords]="nbreQuestions!"
+            (onPageChange)="changeQuestion($event)"
+            [showJumpToPageDropdown]="true"
+            [showPageLinks]="false"
+          ></p-paginator>
+        </div>
+
         <div class="d-flex justify-content-center" *ngFor="let k of questions; let i = index">
           <div>
             <canvas [hidden]="!showImage[i]" #nomImage></canvas>
@@ -163,6 +230,7 @@
           </p-paginator>
         </div>
       </div>
+
       <div class="col-12 sm:col-12 md:col-12 lg:col-3 xl:col-2">
         <div class="grid grid-nogutter">
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
@@ -219,21 +287,7 @@
             <p-inputSwitch class="float-end" [(ngModel)]="resp!.worststar" (onChange)="updateResponse()"></p-inputSwitch>
           </div>
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
-            <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
-            <p-inputSwitch class="float-end" [(ngModel)]="noalign" (onChange)="changeAlign()"></p-inputSwitch>
-          </div>
-          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <jhi-graphical-toolbarcorrection></jhi-graphical-toolbarcorrection>
-          </div>
-
-          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
-            <label><span jhiTranslate="scanexam.zoomfactor"> Facteur agrandissement : </span>({{ factor }})</label>
-            <p-slider *ngIf="noteSteps > 0" [ngModel]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImageGrowFactor($event)">
-            </p-slider>
-          </div>
-          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
-            <label><span jhiTranslate="scanexam.pageshift">Décallage de page(s) : </span>({{ pageOffset }})</label>
-            <p-slider [ngModel]="pageOffset" [min]="-5" [max]="5" [step]="1" (onChange)="reloadImageOffset($event)"> </p-slider>
           </div>
         </div>
 
@@ -253,48 +307,63 @@
                 >
                   <fa-icon icon="code-compare"></fa-icon>
                 </span>
-                <p-inplace [closable]="true">
-                  <ng-template pTemplate="display">
-                    <h5 class="card-title">{{ comment.text }}</h5>
-                  </ng-template>
-                  <ng-template pTemplate="content">
-                    <input
-                      pInputText
-                      type="text"
-                      [(ngModel)]="comment.text"
-                      [style]="{ width: '80%' }"
-                      (change)="updateComment($event, comment, false)"
-                    />
-                  </ng-template>
-                </p-inplace>
-                <p-inplace [closable]="true">
-                  <ng-template pTemplate="display">
-                    <p class="card-text">{{ comment.description }}</p>
-                  </ng-template>
-                  <ng-template pTemplate="content">
-                    <input
-                      pInputText
-                      type="text"
-                      [(ngModel)]="comment.description"
-                      (change)="updateComment($event, comment, false)"
-                      [style]="{ width: '80%' }"
-                    />
-                  </ng-template>
-                </p-inplace>
-                <a
-                  *ngIf="!checked(comment)"
-                  class="p-button p-button-primary"
-                  (click)="ajouterTComment(comment)"
-                  jhiTranslate="scanexam.add"
-                  >Ajouter</a
+                <span class="float-end">&nbsp;&nbsp;</span>
+                <span
+                  class="float-end"
+                  [tooltipPosition]="'left'"
+                  [pTooltip]="'scanexam.minimizeComment' | translate"
+                  (click)="toggleCommentLayout()"
                 >
-                <a
-                  *ngIf="checked(comment)"
-                  class="p-button p-button-primary"
-                  (click)="retirerTComment(comment)"
-                  jhiTranslate="scanexam.remove"
-                  >Retirer</a
-                >
+                  <fa-icon *ngIf="!minimizeComment" icon="minus"></fa-icon>
+                  <fa-icon *ngIf="minimizeComment" icon="maximize"></fa-icon>
+                </span>
+                <div *ngIf="!minimizeComment">
+                  <p-inplace [closable]="true">
+                    <ng-template pTemplate="display">
+                      <h5 class="card-title">{{ comment.text }}</h5>
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <input
+                        pInputText
+                        type="text"
+                        [(ngModel)]="comment.text"
+                        [style]="{ width: '80%' }"
+                        (change)="updateComment($event, comment, false)"
+                      />
+                    </ng-template>
+                  </p-inplace>
+                  <p-inplace [closable]="true">
+                    <ng-template pTemplate="display">
+                      <p class="card-text">{{ comment.description }}</p>
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <input
+                        pInputText
+                        type="text"
+                        [(ngModel)]="comment.description"
+                        (change)="updateComment($event, comment, false)"
+                        [style]="{ width: '80%' }"
+                      />
+                    </ng-template>
+                  </p-inplace>
+                  <a
+                    *ngIf="!checked(comment)"
+                    class="p-button p-button-primary"
+                    (click)="ajouterTComment(comment)"
+                    jhiTranslate="scanexam.add"
+                    >Ajouter</a
+                  >
+                  <a
+                    *ngIf="checked(comment)"
+                    class="p-button p-button-primary"
+                    (click)="retirerTComment(comment)"
+                    jhiTranslate="scanexam.remove"
+                    >Retirer</a
+                  >
+                </div>
+                <div *ngIf="minimizeComment" (click)="toggleTComment(comment)">
+                  <h5 [pTooltip]="comment.description" tooltipPosition="left" class="card-title">{{ comment.text }}</h5>
+                </div>
               </div>
             </div>
           </div>
@@ -316,81 +385,116 @@
                 >
                   <fa-icon icon="code-compare"></fa-icon>
                 </span>
-
-                <div *ngIf="currentQuestion?.typeAlgoName === 'QCM'">
-                  <h5 class="card-title">{{ comment.text }}</h5>
-                  <p class="card-text">{{ comment.description }}</p>
-                </div>
-
-                <div *ngIf="currentQuestion?.typeAlgoName !== 'QCM'">
-                  <p-inplace [closable]="true">
-                    <ng-template pTemplate="display">
-                      <h5 class="card-title">{{ comment.text }}</h5>
-                    </ng-template>
-                    <ng-template pTemplate="content">
-                      <input
-                        pInputText
-                        type="text"
-                        [(ngModel)]="comment.text"
-                        [style]="{ width: '80%' }"
-                        (change)="updateComment($event, comment, true)"
-                      />
-                    </ng-template>
-                  </p-inplace>
-                  <p-inplace [closable]="true">
-                    <ng-template pTemplate="display">
-                      <p class="card-text">{{ comment.description }}</p>
-                    </ng-template>
-                    <ng-template pTemplate="content">
-                      <input
-                        pInputText
-                        type="text"
-                        [(ngModel)]="comment.description"
-                        (change)="updateComment($event, comment, true)"
-                        [style]="{ width: '80%' }"
-                      />
-                    </ng-template>
-                  </p-inplace>
-                  <p-inplace [closable]="true">
-                    <ng-template pTemplate="display">
-                      <p class="card-text" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
-                        <span jhiTranslate="scanexam.noteassociecomment"> Note associée à ce commentaire : </span>
-                        <span *ngIf="currentQuestion && currentQuestion?.gradeType === 'NEGATIVE'"> - </span
-                        ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'POSITIVE'"> + </span>
-                        <span *ngIf="questionStep > 0">{{ comment.grade! / questionStep }}</span>
-                        <span *ngIf="questionStep <= 0">{{ comment.grade! }}</span>
-                      </p>
-                    </ng-template>
-                    <ng-template pTemplate="content">
-                      <p-rating
-                        *ngIf="noteSteps > 0 && currentQuestion && currentQuestion?.gradeType !== 'DIRECT'"
-                        [cancel]="true"
-                        [stars]="noteSteps"
-                        [(ngModel)]="comment.grade"
-                        (ngModelChange)="updateComment($event, comment, true)"
-                      ></p-rating>
-                    </ng-template>
-                  </p-inplace>
-                </div>
-                <a
-                  *ngIf="!checked(comment)"
-                  class="p-button p-button-primary"
-                  (click)="ajouterGComment(comment)"
-                  jhiTranslate="scanexam.add"
-                  >Ajouter</a
+                <span class="float-end">&nbsp;&nbsp;</span>
+                <span
+                  class="float-end"
+                  [tooltipPosition]="'left'"
+                  [pTooltip]="'scanexam.minimizeComment' | translate"
+                  (click)="toggleCommentLayout()"
                 >
-                <a
-                  *ngIf="checked(comment)"
-                  class="p-button p-button-primary"
-                  (click)="retirerGComment(comment)"
-                  jhiTranslate="scanexam.remove"
-                  >Retirer</a
-                >
+                  <fa-icon *ngIf="!minimizeComment" icon="minus"></fa-icon>
+                  <fa-icon *ngIf="minimizeComment" icon="maximize"></fa-icon>
+                </span>
+                <div *ngIf="!minimizeComment">
+                  <div *ngIf="currentQuestion?.typeAlgoName === 'QCM'">
+                    <h5 class="card-title">{{ comment.text }}</h5>
+                    <p class="card-text">{{ comment.description }}</p>
+                  </div>
+
+                  <div *ngIf="currentQuestion?.typeAlgoName !== 'QCM'">
+                    <p-inplace [closable]="true">
+                      <ng-template pTemplate="display">
+                        <h5 class="card-title">{{ comment.text }}</h5>
+                      </ng-template>
+                      <ng-template pTemplate="content">
+                        <input
+                          pInputText
+                          type="text"
+                          [(ngModel)]="comment.text"
+                          [style]="{ width: '80%' }"
+                          (change)="updateComment($event, comment, true)"
+                        />
+                      </ng-template>
+                    </p-inplace>
+                    <p-inplace [closable]="true">
+                      <ng-template pTemplate="display">
+                        <p class="card-text">{{ comment.description }}</p>
+                      </ng-template>
+                      <ng-template pTemplate="content">
+                        <input
+                          pInputText
+                          type="text"
+                          [(ngModel)]="comment.description"
+                          (change)="updateComment($event, comment, true)"
+                          [style]="{ width: '80%' }"
+                        />
+                      </ng-template>
+                    </p-inplace>
+                    <p-inplace [closable]="true">
+                      <ng-template pTemplate="display">
+                        <p class="card-text" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
+                          <span jhiTranslate="scanexam.noteassociecomment"> Note associée à ce commentaire : </span>
+                          <span *ngIf="currentQuestion && currentQuestion?.gradeType === 'NEGATIVE'"> - </span
+                          ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'POSITIVE'"> + </span>
+                          <span *ngIf="questionStep > 0">{{ comment.grade! / questionStep }}</span>
+                          <span *ngIf="questionStep <= 0">{{ comment.grade! }}</span>
+                        </p>
+                      </ng-template>
+                      <ng-template pTemplate="content">
+                        <p-rating
+                          *ngIf="noteSteps > 0 && currentQuestion && currentQuestion?.gradeType !== 'DIRECT'"
+                          [cancel]="true"
+                          [stars]="noteSteps"
+                          [(ngModel)]="comment.grade"
+                          (ngModelChange)="updateComment($event, comment, true)"
+                        ></p-rating>
+                      </ng-template>
+                    </p-inplace>
+                  </div>
+                  <a
+                    *ngIf="!checked(comment)"
+                    class="p-button p-button-primary"
+                    (click)="ajouterGComment(comment)"
+                    jhiTranslate="scanexam.add"
+                    >Ajouter</a
+                  >
+                  <a
+                    *ngIf="checked(comment)"
+                    class="p-button p-button-primary"
+                    (click)="retirerGComment(comment)"
+                    jhiTranslate="scanexam.remove"
+                    >Retirer</a
+                  >
+                </div>
+                <div *ngIf="minimizeComment" (click)="toggleGComment(comment)">
+                  <div *ngIf="currentQuestion?.typeAlgoName! === 'QCM'">
+                    <h5 [pTooltip]="comment.description" tooltipPosition="left" class="card-title">{{ comment.text }}</h5>
+                  </div>
+                  <div *ngIf="currentQuestion?.typeAlgoName! !== 'QCM'" (click)="toggleGComment(comment)">
+                    <h5 [pTooltip]="comment!.description!" tooltipPosition="left" class="card-title">
+                      {{ comment.text }} ( <span *ngIf="currentQuestion && currentQuestion?.gradeType! === 'NEGATIVE'"> - </span
+                      ><span *ngIf="currentQuestion && currentQuestion?.gradeType! === 'POSITIVE'"> + </span>
+                      <span *ngIf="questionStep > 0">{{ comment.grade! / questionStep }}</span>
+                      <span *ngIf="questionStep <= 0">{{ comment.grade! }}</span>
+
+                      pt)
+                    </h5>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="grid" *ngIf="currentQuestion && currentQuestion?.typeAlgoName !== 'QCM'">
+        <div
+          class="grid"
+          *ngIf="
+            (!minimizeComment ||
+              ((currentGradedComment4Question === undefined || currentGradedComment4Question?.length === 0) &&
+                (currentTextComment4Question === undefined || currentTextComment4Question?.length === 0))) &&
+            currentQuestion &&
+            currentQuestion?.typeAlgoName !== 'QCM'
+          "
+        >
           <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
             <div class="card">
               <div class="card-body">

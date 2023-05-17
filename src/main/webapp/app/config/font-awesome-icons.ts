@@ -38,6 +38,10 @@ import {
   faUsersCog,
   faWrench,
   faCodeCompare,
+  faMinus,
+  faWindowMaximize,
+  faMaximize,
+
   // jhipster-needle-add-icon-import
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -81,5 +85,8 @@ export const fontAwesomeIcons = [
   faUsersCog,
   faWrench,
   faCodeCompare,
+  faMinus,
+  faWindowMaximize,
+  faMaximize,
   // jhipster-needle-add-icon-import
 ];
