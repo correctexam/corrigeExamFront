@@ -235,6 +235,7 @@
     "tooltipCompareMark": "Comparison of copies with the same score",
     "resumebareme": "Summary of the rating scale",
     "pointincr": "points, incr. of ",
-    "suite": "following"
+    "suite": "following",
+    "tooltipResetAnswer": "Remove the marking for this question and this sheet"
   }
 }

@@ -53,6 +53,12 @@ export class ExamService {
     });
   }
 
+  deleteAnswer(srid: number): Observable<HttpResponse<{}>> {
+    return this.http.delete(this.applicationConfigService.getEndpointFor('api') + '/deleteAnswerAndUnsetComment' + `/${srid}`, {
+      observe: 'response',
+    });
+  }
+
   addExamToCollectionIfMissing(examCollection: IExam[], ...examsToCheck: (IExam | null | undefined)[]): IExam[] {
     const exams: IExam[] = examsToCheck.filter(isPresent);
     if (exams.length > 0) {
