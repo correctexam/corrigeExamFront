@@ -143,12 +143,13 @@ export class EventHandlerService {
   setCurrentQuestionNumber(number: string) {
     if (this.currentSelected !== undefined) {
       (this.currentSelected as any).text = 'Question ' + number;
-      this.currentSelected = undefined;
+
+      // this.currentSelected = undefined;
       this.allcanvas.forEach(e => {
-        e.discardActiveObject();
+        // e.discardActiveObject();
         e.renderAll();
       });
-      this.cb(undefined);
+      // this.cb(undefined);
 
       // this.canvas.discardActiveObject();
       // this.canvas.renderAll();

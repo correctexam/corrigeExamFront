@@ -239,6 +239,7 @@
     "suite": "suite",
     "tooltipResetAnswer": "Suppression de la correction pour cette question et cette copie",
     "layoutoptions": "Options de mise en page",
-    "minimizeComment": "Mise en page minimale pour les commentaires"
+    "minimizeComment": "Mise en page minimale pour les commentaires",
+    "invalidexpression": "Expression non valide"
   }
 }

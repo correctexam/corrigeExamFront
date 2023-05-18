@@ -238,6 +238,7 @@
     "suite": "following",
     "tooltipResetAnswer": "Remove the marking for this question and this sheet",
     "layoutoptions": "Layout options",
-    "minimizeComment": "Minimal layout for comments"
+    "minimizeComment": "Minimal layout for comments",
+    "invalidexpression": "Not a valid expression"
   }
 }
