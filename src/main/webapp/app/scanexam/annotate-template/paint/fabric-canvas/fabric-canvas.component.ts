@@ -227,6 +227,10 @@ export class FabricCanvasComponent implements AfterViewInit, OnInit {
             this.translateService.get('scanexam.questionuc1').subscribe(e1 => {
               this.questionService.query({ zoneId: z.id }).subscribe(e => {
                 if (e.body !== undefined && e.body!.length > 0) {
+                  if (this.eventHandler.nextQuestionNumero <= e.body![0].numero!) {
+                    this.eventHandler.nextQuestionNumero = e.body![0].numero! + 1;
+                  }
+
                   const r = this.fabricShapeService.createBoxFromScratch(
                     canvas,
                     {
@@ -239,9 +243,6 @@ export class FabricCanvasComponent implements AfterViewInit, OnInit {
                     DrawingColours.GREEN
                   );
                   this.eventHandler.modelViewpping.set(r.id, z.id!);
-                  if (this.eventHandler.nextQuestionNumero <= e.body![0].numero!) {
-                    this.eventHandler.nextQuestionNumero = this.eventHandler.nextQuestionNumero + 1;
-                  }
                 }
               });
             });

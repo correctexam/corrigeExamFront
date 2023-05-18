@@ -79,6 +79,8 @@ import { MarkingSummaryComponent } from './marking-summary/marking-summary.compo
 import { TabViewModule } from 'primeng/tabview';
 import { SummaryTemplateComponent } from './annotate-template/summary/summary-template.component';
 import { ComparestudentanswerComponent } from './comparestudentanswer/comparestudentanswer.component';
+import { SplitterModule } from 'primeng/splitter';
+
 import { SidebarModule } from 'primeng/sidebar';
 // set the location of the OpenCV files
 registerAllModules();
@@ -349,6 +351,7 @@ export const CompareMarkAnswer_ROUTE: Route = {
     InputSwitchModule,
     RatingModule,
     InputTextareaModule,
+    SplitterModule,
     DialogModule,
     InplaceModule,
     InputTextModule,
