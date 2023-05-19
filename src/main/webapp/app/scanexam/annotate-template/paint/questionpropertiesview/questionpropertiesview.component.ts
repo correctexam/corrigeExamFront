@@ -87,7 +87,6 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
 
   editForm!: UntypedFormGroup;
 
-  // ViewChild('form') form!: NgForm;
   constructor(
     protected questionService: QuestionService,
     protected zoneService: ZoneService,
@@ -147,12 +146,6 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.unsubscribe.next();
-  }
-
-  numeroUpdate(): any {
-    //    this.updatenumero.emit(this.editForm.get(['numero'])!.value)
-    // eslint-disable-next-line no-console
-    //    console.log(this.editForm.get(['numero'])!.value)
   }
 
   updateForm(question: IQuestion): void {

@@ -54,7 +54,10 @@ export class EventHandlerService {
   private previousScaleX!: number;
   private previousScaleY!: number;
   public modelViewpping = new Map<string, number>();
-  public nextQuestionNumero = 1;
+  //  public nextQuestionNumero = 1;
+
+  public nextQuestionNumeros: Array<number> = [];
+
   pages: { [page: number]: PageHandler } = {};
   zonesRendering: { [page: number]: CustomZone[] } = {};
   private cb!: (qid: number | undefined) => void;
@@ -146,15 +149,8 @@ export class EventHandlerService {
 
       // this.currentSelected = undefined;
       this.allcanvas.forEach(e => {
-        // e.discardActiveObject();
         e.renderAll();
       });
-      // this.cb(undefined);
-
-      // this.canvas.discardActiveObject();
-      // this.canvas.renderAll();
-
-      //   this.selectedTool = DrawingTools.SELECT
     }
   }
 
@@ -436,8 +432,8 @@ export class EventHandlerService {
         });
       });
     } else if (this._selectedTool === DrawingTools.QUESTIONBOX) {
-      const numero = this.nextQuestionNumero;
-      this.nextQuestionNumero = this.nextQuestionNumero + 1;
+      const numero = this.getNextQuestionNumero();
+      this.nextQuestionNumeros.push(numero);
       this.translateService.get('scanexam.questionuc1').subscribe(name => {
         this._elementUnderDrawing = this.fabricShapeService.createBox(
           this.canvas,
@@ -696,5 +692,13 @@ export class EventHandlerService {
 
   public registerOnQuestionAddRemoveCallBack(cb: (qid: number, add: boolean) => void) {
     this.onQuestionAddDelCB = cb;
+  }
+
+  getNextQuestionNumero(): number {
+    let i = 1;
+    while (this.nextQuestionNumeros.includes(i)) {
+      i = i + 1;
+    }
+    return i;
   }
 }
