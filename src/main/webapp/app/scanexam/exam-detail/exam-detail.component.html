@@ -11,7 +11,12 @@
       /></a>
     </ng-template>
   </p-dock>
-  <p-confirmDialog [header]="'scanexam.confirmation' | translate" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+  <p-confirmDialog
+    [header]="'scanexam.confirmation' | translate"
+    icon="pi pi-exclamation-triangle"
+    [acceptLabel]="'scanexam.yes' | translate"
+    [rejectLabel]="'scanexam.no' | translate"
+  ></p-confirmDialog>
   <div class="wizard-v2-content">
     <p-blockUI [blocked]="blocked">
       <div class="grid" style="width: 90vw">

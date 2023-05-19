@@ -85,7 +85,12 @@
     </p-tabPanel>
 
     <p-tabPanel [header]="'scanexam.liststudents' | translate">
-      <p-confirmDialog [header]="'scanexam.confirmremove' | translate" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+      <p-confirmDialog
+        [header]="'scanexam.confirmremove' | translate"
+        icon="pi pi-exclamation-triangle"
+        [acceptLabel]="'scanexam.yes' | translate"
+        [rejectLabel]="'scanexam.no' | translate"
+      ></p-confirmDialog>
 
       <div class="container">
         <div class="grid grid-nogutter">
