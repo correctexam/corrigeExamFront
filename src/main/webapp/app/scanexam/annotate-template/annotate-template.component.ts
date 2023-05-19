@@ -41,7 +41,7 @@ export class AnnotateTemplateComponent implements OnInit {
           this.exam = data.body!;
           this.templateService.find(this.exam.templateId!).subscribe(t => {
             this.template = t.body!;
-            this.eventHandler.nextQuestionNumero = 1;
+            this.eventHandler.nextQuestionNumeros = [];
           });
         });
       }
