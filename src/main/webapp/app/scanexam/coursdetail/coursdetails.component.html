@@ -9,7 +9,12 @@
       /></a>
     </ng-template>
   </p-dock>
-  <p-confirmDialog [header]="'scanexam.confirmremove' | translate" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+  <p-confirmDialog
+    [header]="'scanexam.confirmremove' | translate"
+    icon="pi pi-exclamation-triangle"
+    [acceptLabel]="'scanexam.yes' | translate"
+    [rejectLabel]="'scanexam.no' | translate"
+  ></p-confirmDialog>
   <div class="wizard-v2-content">
     <div class="wizard-image"></div>
     <div class="wizard-form">
