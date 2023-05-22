@@ -4,7 +4,12 @@
     <i class="pi pi-lock" style="font-size: 3rem"></i>
   </p-blockUI>
 
-  <p-confirmDialog header="Confirmation envoie mail" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+  <p-confirmDialog
+    header="Confirmation envoie mail"
+    icon="pi pi-exclamation-triangle"
+    [acceptLabel]="'scanexam.yes' | translate"
+    [rejectLabel]="'scanexam.no' | translate"
+  ></p-confirmDialog>
   <p-dialog [(visible)]="showEmail" [modal]="true">
     <ng-template pTemplate="header">
       <h4 jhiTranslate="scanexam.confirmemail">Confirmation envoi mail</h4>

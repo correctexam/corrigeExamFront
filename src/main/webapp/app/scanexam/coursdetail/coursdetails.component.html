@@ -9,12 +9,23 @@
       /></a>
     </ng-template>
   </p-dock>
-  <p-confirmDialog [header]="'scanexam.confirmremove' | translate" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+  <p-confirmDialog
+    [header]="'scanexam.confirmremove' | translate"
+    icon="pi pi-exclamation-triangle"
+    [acceptLabel]="'scanexam.yes' | translate"
+    [rejectLabel]="'scanexam.no' | translate"
+  ></p-confirmDialog>
   <div class="wizard-v2-content">
     <div class="wizard-image"></div>
     <div class="wizard-form">
       <div class="wizard-header">
-        <h3>{{ course?.name }}</h3>
+        <jhi-usable-text-input
+          [name]="this.course?.name ?? ''"
+          [tooltip]="'scanexam.tooltipeditcoursename' | translate"
+          [placeholder]="'scanexam.placeholdereditcoursename' | translate"
+          (newValue)="onCourseNameChanged($event)"
+        >
+        </jhi-usable-text-input>
         <p jhiTranslate="scanexam.slogan">Vos exams accessibles en un clic</p>
       </div>
       <div id="form-total" #formTotal>

@@ -16,10 +16,10 @@ import { ZoneService } from '../../../../entities/zone/service/zone.service';
 import { IZone } from 'app/entities/zone/zone.model';
 import { FabricShapeService } from '../shape.service';
 import { QuestionService } from '../../../../entities/question/service/question.service';
-import { Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { IQuestion } from 'app/entities/question/question.model';
 import { ActivatedRoute } from '@angular/router';
+import { Subject } from 'rxjs';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
 };
@@ -79,6 +79,8 @@ export class FabricCanvasComponent implements AfterViewInit, OnInit {
         this.getQuestion(qid);
       } else {
         this.questions.delete(qid);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        this.eventHandler.nextQuestionNumeros = Array.from(this.questions).map(([key, value]) => value.numero!);
       }
     });
 
@@ -148,6 +150,8 @@ export class FabricCanvasComponent implements AfterViewInit, OnInit {
           this.questions.set(q.id, q);
         }
       });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      this.eventHandler.nextQuestionNumeros = Array.from(this.questions).map(([key, value]) => value.numero!);
     });
   }
 
@@ -227,6 +231,11 @@ export class FabricCanvasComponent implements AfterViewInit, OnInit {
             this.translateService.get('scanexam.questionuc1').subscribe(e1 => {
               this.questionService.query({ zoneId: z.id }).subscribe(e => {
                 if (e.body !== undefined && e.body!.length > 0) {
+                  /* if (this.eventHandler.nextQuestionNumero <= e.body![0].numero!) {
+                    this.eventHandler.nextQuestionNumero = e.body![0].numero! + 1;
+                  }*/
+                  this.eventHandler.nextQuestionNumeros.push(e.body![0].numero!);
+
                   const r = this.fabricShapeService.createBoxFromScratch(
                     canvas,
                     {
@@ -239,9 +248,6 @@ export class FabricCanvasComponent implements AfterViewInit, OnInit {
                     DrawingColours.GREEN
                   );
                   this.eventHandler.modelViewpping.set(r.id, z.id!);
-                  if (this.eventHandler.nextQuestionNumero <= e.body![0].numero!) {
-                    this.eventHandler.nextQuestionNumero = this.eventHandler.nextQuestionNumero + 1;
-                  }
                 }
               });
             });

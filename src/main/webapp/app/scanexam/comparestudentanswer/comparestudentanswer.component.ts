@@ -180,14 +180,14 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
 
   reloadImage() {
     this.zones4comments?.answers!.forEach((a, i) => {
-      const pagewithoffset = a.pagemin + this.zones4comments?.zones[0].pageNumber! + this.pageOffset;
-      const pagewithoutoffset = a.pagemin + this.zones4comments?.zones[0].pageNumber!;
-      let page = pagewithoutoffset;
-      if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
-        page = pagewithoffset;
-      }
-
       this.zones4comments?.zones.forEach((z, j) => {
+        const pagewithoffset = a.pagemin + this.zones4comments?.zones[j].pageNumber! + this.pageOffset;
+        const pagewithoutoffset = a.pagemin + this.zones4comments?.zones[j].pageNumber!;
+        let page = pagewithoutoffset;
+        if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
+          page = pagewithoffset;
+        }
+
         this.showImage[i * this.zones4comments!.zones.length + j] = false;
         this.getAllImage4Zone(page, z).then(p => {
           this.displayImage(p, this.canvass.get(i * this.zones4comments!.zones.length + j), b => {
