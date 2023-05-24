@@ -56,6 +56,7 @@
     "commentnote": "Note :",
     "commentnotbind": "Note associée à ce commentaire : ",
     "commentaddapply": "Ajouter et appliquer",
+    "commentadd": "Ajouter",
     "edittext": "Champ de texte modifiable",
     "creerexam": "Créer un examen",
     "enregistreretudiant": "Enregistrer et consulter liste étudiants",
@@ -240,6 +241,18 @@
     "tooltipResetAnswer": "Suppression de la correction pour cette question et cette copie",
     "layoutoptions": "Options de mise en page",
     "minimizeComment": "Mise en page minimale pour les commentaires",
-    "invalidexpression": "Expression non valide"
+    "invalidexpression": "Expression non valide",
+    "commentsmanagement": "Gestion des commentaires",
+    "commentsmanagementtooltip": "Gestion des commentaires pour cette question (Ajout, retrait, export, import)",
+    "commentimportexport": "Import/Export",
+    "commentimport": "Import",
+    "commentexport": "Export",
+    "commentimporttooltip": "Importer des commentaires en json",
+    "commentexporttooltip": "Exporter des commentaires en json",
+    "adddefault": "Commentaires par defaut",
+    "adddefaulttooltip": "Ajout des commentaires par defaut (Excellent, faux, vide, ...)",
+    "adddefaultexcellent": "Excellent",
+    "adddefaultvide": "Pas de réponse",
+    "adddefaultfaux": "Faux"
   }
 }

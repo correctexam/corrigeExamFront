@@ -56,6 +56,7 @@
     "commentnote": "Grade :",
     "commentnotbind": "Grade associated with this comment: ",
     "commentaddapply": "Add and apply",
+    "commentadd": "Add",
     "edittext": "Editable textfield",
     "creerexam": "Create exam",
     "enregistreretudiant": "Import and show students list",
@@ -239,6 +240,18 @@
     "tooltipResetAnswer": "Remove the marking for this question and this sheet",
     "layoutoptions": "Layout options",
     "minimizeComment": "Minimal layout for comments",
-    "invalidexpression": "Not a valid expression"
+    "invalidexpression": "Not a valid expression",
+    "commentsmanagement": "Comments management",
+    "commentsmanagementtooltip": "Comment management for this question (Add, remove, export, import)",
+    "commentimportexport": "Import/Export",
+    "commentimport": "Import",
+    "commentexport": "Export",
+    "commentimporttooltip": "Import comments using json format",
+    "commentexporttooltip": "Export comments using json format",
+    "adddefault": "Default comments",
+    "adddefaulttooltip": "Add default comments (Excellent, wrong answer, void, ...)",
+    "adddefaultexcellent": "Excellent",
+    "adddefaultvide": "Void",
+    "adddefaultfaux": "Wrong"
   }
 }
