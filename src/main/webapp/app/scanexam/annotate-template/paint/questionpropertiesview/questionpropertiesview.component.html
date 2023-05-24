@@ -1,3 +1,7 @@
+<p-sidebar [position]="'right'" [(visible)]="layoutsidebarVisible">
+  <jhi-create-comments [question]="question"></jhi-create-comments>
+</p-sidebar>
+
 <hr *ngIf="question" />
 <div *ngIf="question" class="d-flex justify-content-center">
   <div class="col-8">
@@ -132,5 +136,14 @@
         </button>-->
       </div>
     </form>
+    <BR />
+    <p-button
+      class="sm:text-xs md:text-xs lg:text-base"
+      styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
+      (click)="layoutsidebarVisible = true"
+      icon="pi pi-arrow-left"
+      [label]="'scanexam.commentsmanagement' | translate"
+      [pTooltip]="'scanexam.commentsmanagementtooltip' | translate"
+    ></p-button>
   </div>
 </div>
