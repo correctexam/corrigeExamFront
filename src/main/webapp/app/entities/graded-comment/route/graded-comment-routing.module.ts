@@ -13,6 +13,7 @@ const gradedCommentRoute: Routes = [
     component: GradedCommentComponent,
     data: {
       defaultSort: 'id,asc',
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },
@@ -22,6 +23,10 @@ const gradedCommentRoute: Routes = [
     resolve: {
       gradedComment: GradedCommentRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
+
     canActivate: [UserRouteAccessService],
   },
   {
@@ -30,6 +35,10 @@ const gradedCommentRoute: Routes = [
     resolve: {
       gradedComment: GradedCommentRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
+
     canActivate: [UserRouteAccessService],
   },
   {
@@ -38,6 +47,10 @@ const gradedCommentRoute: Routes = [
     resolve: {
       gradedComment: GradedCommentRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
+
     canActivate: [UserRouteAccessService],
   },
 ];

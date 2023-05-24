@@ -13,6 +13,7 @@ const commentsRoute: Routes = [
     component: CommentsComponent,
     data: {
       defaultSort: 'id,asc',
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },
@@ -22,6 +23,10 @@ const commentsRoute: Routes = [
     resolve: {
       comments: CommentsRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
+
     canActivate: [UserRouteAccessService],
   },
   {
@@ -30,6 +35,9 @@ const commentsRoute: Routes = [
     resolve: {
       comments: CommentsRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -37,6 +45,9 @@ const commentsRoute: Routes = [
     component: CommentsUpdateComponent,
     resolve: {
       comments: CommentsRoutingResolveService,
+    },
+    data: {
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },

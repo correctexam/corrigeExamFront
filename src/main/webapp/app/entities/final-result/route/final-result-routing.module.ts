@@ -13,6 +13,7 @@ const finalResultRoute: Routes = [
     component: FinalResultComponent,
     data: {
       defaultSort: 'id,asc',
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },
@@ -22,6 +23,10 @@ const finalResultRoute: Routes = [
     resolve: {
       finalResult: FinalResultRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
+
     canActivate: [UserRouteAccessService],
   },
   {
@@ -30,6 +35,9 @@ const finalResultRoute: Routes = [
     resolve: {
       finalResult: FinalResultRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -37,6 +45,9 @@ const finalResultRoute: Routes = [
     component: FinalResultUpdateComponent,
     resolve: {
       finalResult: FinalResultRoutingResolveService,
+    },
+    data: {
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },
