@@ -26,7 +26,7 @@
 
       <ng-template [ngIf]="CONNECTION_METHOD === CONNECTION_METHOD_SHIB">
         <div>
-          <a href="/Shibboleth.sso/Login?target={{ this.service_url }}/api/shib/redirection" class="p-element mr-3 p-button p-component">
+          <a href="/Shibboleth.sso/Login?target={{ SERVICE_URL }}/api/shib/redirection" class="p-element mr-3 p-button p-component">
             <span class="p-button-label" jhiTranslate="home.login">Authentifiez vous</span><span class="p-ink"></span>
           </a>
         </div>
@@ -34,9 +34,9 @@
 
       <ng-template [ngIf]="CONNECTION_METHOD === CONNECTION_METHOD_CAS">
         <div>
-          <a href="{{ cas_url }}/login?service={{ service_url }}" class="p-element mr-3 p-button p-component">
-            <span class="p-button-label" jhiTranslate="home.login">>Authentifiez vous</span><span class="p-ink"></span> </a
-          >protected readonly CONNECTION_METHOD = CONNECTION_METHOD;
+          <a href="{{ CAS_SERVER_URL }}/login?service={{ SERVICE_URL }}" class="p-element mr-3 p-button p-component">
+            <span class="p-button-label" jhiTranslate="home.login">>Authentifiez vous</span><span class="p-ink"></span>
+          </a>
         </div>
       </ng-template>
     </section>

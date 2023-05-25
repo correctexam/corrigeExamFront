@@ -6,7 +6,7 @@ import { LocalStorageService, SessionStorageService } from 'ngx-webstorage';
 
 import { ApplicationConfigService } from '../config/application-config.service';
 import { Login } from 'app/login/login.model';
-import { environment } from 'app/environment/environment';
+import { SERVICE_URL } from '../../app.constants';
 
 type JwtToken = {
   id_token: string;
@@ -14,15 +14,12 @@ type JwtToken = {
 
 @Injectable({ providedIn: 'root' })
 export class AuthServerProvider {
-  service_url: string;
   constructor(
     private http: HttpClient,
     private localStorageService: LocalStorageService,
     private sessionStorageService: SessionStorageService,
     private applicationConfigService: ApplicationConfigService
-  ) {
-    this.service_url = environment.service_url;
-  }
+  ) {}
 
   getToken(): string {
     const tokenInLocalStorage: string | null = this.localStorageService.retrieve('authenticationToken');
@@ -37,7 +34,7 @@ export class AuthServerProvider {
   }
 
   login_cas(cas_ticket: string): Observable<void> {
-    const adrr = `${this.service_url}/api/cas/authenticate/${cas_ticket}`;
+    const adrr = `${SERVICE_URL}/api/cas/authenticate/${cas_ticket}`;
     return this.http.get<JwtToken>(adrr).pipe(
       map(response => {
         this.authenticateSuccess(response, true);
@@ -46,7 +43,7 @@ export class AuthServerProvider {
   }
 
   login_shib(): Observable<void> {
-    const adrr = `${this.service_url}/api/shib/authenticate`;
+    const adrr = `${SERVICE_URL}/api/shib/authenticate`;
     return this.http.get<JwtToken>(adrr).pipe(
       map(response => {
         this.authenticateSuccess(response, true);

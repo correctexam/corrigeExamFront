@@ -14,8 +14,7 @@ import { ApplicationConfigService } from '../core/config/application-config.serv
 import { TranslateService } from '@ngx-translate/core';
 import { LoginService } from 'app/login/login.service';
 
-import { environment } from 'app/environment/environment';
-import { CONNECTION_METHOD } from 'app/app.constants';
+import { CONNECTION_METHOD, CAS_SERVER_URL, SERVICE_URL } from 'app/app.constants';
 
 @Component({
   selector: 'jhi-home',
@@ -25,15 +24,15 @@ import { CONNECTION_METHOD } from 'app/app.constants';
 export class HomeComponent implements OnInit, OnDestroy {
   account: Account | null = null;
   dockItems!: any[];
-  cas_url: string;
-  service_url: string;
 
   faPlus = faPlus;
 
+  public readonly CONNECTION_METHOD_LOCAL = 'local';
+  public readonly CONNECTION_METHOD_CAS = 'cas';
+  public readonly CONNECTION_METHOD_SHIB = 'shib';
   protected readonly CONNECTION_METHOD = CONNECTION_METHOD;
-  protected readonly CONNECTION_METHOD_LOCAL = 'local';
-  protected readonly CONNECTION_METHOD_CAS = 'cas';
-  protected readonly CONNECTION_METHOD_SHIB = 'shib';
+  protected readonly SERVICE_URL = SERVICE_URL;
+  protected readonly CAS_SERVER_URL = CAS_SERVER_URL;
   private readonly destroy$ = new Subject<void>();
 
   constructor(
@@ -43,10 +42,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private appConfig: ApplicationConfigService,
     private translateService: TranslateService,
     private loginService: LoginService
-  ) {
-    this.cas_url = environment.cas_server_url;
-    this.service_url = environment.service_url;
-  }
+  ) {}
 
   ngOnInit(): void {
     switch (CONNECTION_METHOD) {

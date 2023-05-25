@@ -367,32 +367,55 @@
             </li>
 
             <li *ngSwitchCase="false">
-              <!--              <a href="{{ cas_url }}/login?service={{ service_url }}" class="dropdown-item" id="login" data-cy="login">-->
-              <!--                <fa-icon icon="sign-in-alt" [fixedWidth]="true"></fa-icon>-->
-              <!--                <span jhiTranslate="global.menu.account.login">Sign in</span>-->
-              <!--              </a>-->
-              <a
-                href="/Shibboleth.sso/Login?target={{ this.service_url }}/api/shib/redirection"
-                class="dropdown-item"
-                id="login"
-                data-cy="login"
-              >
-                <fa-icon icon="sign-in-alt" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.account.login">Sign in</span>
-              </a>
+              <ng-template [ngIf]="CONNECTION_METHOD === CONNECTION_METHOD_LOCAL">
+                <div>
+                  <a class="dropdown-item" (click)="login()" id="login" data-cy="login">
+                    <fa-icon icon="sign-in-alt" [fixedWidth]="true"></fa-icon>
+                    <span jhiTranslate="global.menu.account.login">Sign in</span>
+                  </a>
+                </div>
+              </ng-template>
+
+              <ng-template [ngIf]="CONNECTION_METHOD === CONNECTION_METHOD_CAS">
+                <div>
+                  <a href="{{ CAS_SERVER_URL }}/login?service={{ SERVICE_URL }}" class="dropdown-item" id="login" data-cy="login">
+                    <fa-icon icon="sign-in-alt" [fixedWidth]="true"></fa-icon>
+                    <span jhiTranslate="global.menu.account.login">Sign in</span>
+                  </a>
+                </div>
+              </ng-template>
+
+              <ng-template [ngIf]="CONNECTION_METHOD === CONNECTION_METHOD_SHIB">
+                <div>
+                  <a
+                    href="/Shibboleth.sso/Login?target={{ SERVICE_URL }}/api/shib/redirection"
+                    class="dropdown-item"
+                    id="login"
+                    data-cy="login"
+                  >
+                    <fa-icon icon="sign-in-alt" [fixedWidth]="true"></fa-icon>
+                    <span jhiTranslate="global.menu.account.login">Sign in</span>
+                  </a>
+                </div>
+              </ng-template>
             </li>
-            <li *ngSwitchCase="false">
-              <a
-                class="dropdown-item"
-                routerLink="account/register"
-                routerLinkActive="active"
-                (click)="collapseNavbar()"
-                data-cy="register"
-              >
-                <fa-icon icon="user-plus" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.account.register">Register</span>
-              </a>
-            </li>
+            <!--            You can create an account only if connection mode is local-->
+            <ng-template [ngIf]="CONNECTION_METHOD === CONNECTION_METHOD_LOCAL">
+              <div>
+                <li *ngSwitchCase="false">
+                  <a
+                    class="dropdown-item"
+                    routerLink="account/register"
+                    routerLinkActive="active"
+                    (click)="collapseNavbar()"
+                    data-cy="register"
+                  >
+                    <fa-icon icon="user-plus" [fixedWidth]="true"></fa-icon>
+                    <span jhiTranslate="global.menu.account.register">Register</span>
+                  </a>
+                </li>
+              </div>
+            </ng-template>
           </ul>
         </li>
       </ul>
