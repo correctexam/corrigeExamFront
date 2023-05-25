@@ -36,6 +36,7 @@ export class ZoneCorrectionHandler {
         (this.canvas as any)['wrapperEl'].parentNode.removeChild((this.canvas as any)['wrapperEl']);
       }
     }
+
     this.canvasInitialCanvas = canvas1;
     this.annotationCanvas = document.createElement('CANVAS') as HTMLCanvasElement;
 

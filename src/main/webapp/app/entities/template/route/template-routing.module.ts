@@ -13,6 +13,7 @@ const templateRoute: Routes = [
     component: TemplateComponent,
     data: {
       defaultSort: 'id,asc',
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },
@@ -22,6 +23,9 @@ const templateRoute: Routes = [
     resolve: {
       template: TemplateRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -30,6 +34,9 @@ const templateRoute: Routes = [
     resolve: {
       template: TemplateRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -37,6 +44,9 @@ const templateRoute: Routes = [
     component: TemplateUpdateComponent,
     resolve: {
       template: TemplateRoutingResolveService,
+    },
+    data: {
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },

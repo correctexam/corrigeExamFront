@@ -34,6 +34,11 @@ export class CacheServiceImpl implements CacheService {
   removeElementForExam(examId: number): Promise<void> {
     return this.service.removeElementForExam(examId);
   }
+
+  removeElementForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<void> {
+    return this.service.removeElementForExamForPages(examId, pageStart, pageEnd);
+  }
+
   addAligneImage(elt: AlignImage): Promise<any> {
     return this.service.addAligneImage(elt);
   }

@@ -9,6 +9,7 @@ import { ExamService } from 'app/entities/exam/service/exam.service';
 import { ConfirmationService } from 'primeng/api';
 import { TemplateService } from '../../entities/template/service/template.service';
 import { ITemplate } from '../../entities/template/template.model';
+import { EventHandlerService } from './paint/event-handler.service';
 
 @Component({
   selector: 'jhi-annotate-template',
@@ -28,7 +29,8 @@ export class AnnotateTemplateComponent implements OnInit {
     public examService: ExamService,
     public templateService: TemplateService,
     protected activatedRoute: ActivatedRoute,
-    public router: Router
+    public router: Router,
+    private eventHandler: EventHandlerService
   ) {}
 
   ngOnInit(): void {
@@ -39,6 +41,7 @@ export class AnnotateTemplateComponent implements OnInit {
           this.exam = data.body!;
           this.templateService.find(this.exam.templateId!).subscribe(t => {
             this.template = t.body!;
+            this.eventHandler.nextQuestionNumeros = [];
           });
         });
       }

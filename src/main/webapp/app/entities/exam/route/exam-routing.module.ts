@@ -13,6 +13,7 @@ const examRoute: Routes = [
     component: ExamComponent,
     data: {
       defaultSort: 'id,asc',
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },
@@ -22,6 +23,10 @@ const examRoute: Routes = [
     resolve: {
       exam: ExamRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
+
     canActivate: [UserRouteAccessService],
   },
   {
@@ -30,6 +35,9 @@ const examRoute: Routes = [
     resolve: {
       exam: ExamRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -37,6 +45,9 @@ const examRoute: Routes = [
     component: ExamUpdateComponent,
     resolve: {
       exam: ExamRoutingResolveService,
+    },
+    data: {
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },

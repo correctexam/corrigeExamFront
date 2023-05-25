@@ -1,0 +1,30 @@
+<div class="usable-input-text">
+  <p-button
+    class="no-label"
+    icon="pi pi-times"
+    [ngStyle]="{ visibility: textIsEditing ? '' : 'hidden' }"
+    (onClick)="cancelEdit(nameInput)"
+  ></p-button>
+  <p-toggleButton
+    #editButton
+    [pTooltip]="tooltip"
+    offIcon="pi pi-pencil"
+    onIcon="pi pi-check"
+    [attr.aria-label]="tooltip"
+    (onChange)="onToggleButton(nameInput)"
+    [disabled]="nameInput.value.length === 0"
+    [ngModel]="textIsEditing"
+  >
+  </p-toggleButton>
+  <input
+    #nameInput
+    pInputText
+    class="nameedit"
+    id="examname"
+    [placeholder]="placeholder"
+    [readonly]="!textIsEditing"
+    [ngModel]="name"
+    required
+  />
+  <!-- TODO error message on REST query error -->
+</div>

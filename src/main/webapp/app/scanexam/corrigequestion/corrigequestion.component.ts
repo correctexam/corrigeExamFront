@@ -67,6 +67,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   compareMark(response: IStudentResponse) {
     this.router.navigate(['/comparemark/' + this.examId + '/' + response.id]);
   }
+  minimizeComment = false;
+  layoutsidebarVisible = false;
   debug = false;
   @ViewChild('qcmcorrect')
   qcmcorrect!: ElementRef;
@@ -108,7 +110,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   currentTextComment4Question: ITextComment[] | undefined;
   currentGradedComment4Question: IGradedComment[] | undefined;
   windowWidth = 0;
-  currentZoneCorrectionHandler: ZoneCorrectionHandler | undefined;
+  currentZoneCorrectionHandler: Map<string, ZoneCorrectionHandler> = new Map(); // | undefined;
 
   activeIndex = 1;
   responsiveOptions2: any[] = [
@@ -159,6 +161,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.windowWidth = window.innerWidth;
     this.shortcut = this.preferenceService.showKeyboardShortcuts();
     this.shortcutvalue = this.preferenceService.showKeyboardShortcuts();
+    this.minimizeComment = this.preferenceService.minimizeComments();
     this.shortcutvalue;
     this.activatedRoute.paramMap.subscribe(params => {
       this.blocked = true;
@@ -700,6 +703,22 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       (comment as any).checked = false;
     });
   }
+
+  toggleGComment(comment: IGradedComment) {
+    if (!this.checked(comment)) {
+      this.ajouterGComment(comment);
+    } else {
+      this.retirerGComment(comment);
+    }
+  }
+  toggleTComment(comment: ITextComment) {
+    if (!this.checked(comment)) {
+      this.ajouterTComment(comment);
+    } else {
+      this.retirerTComment(comment);
+    }
+  }
+
   async retirerGComment(comment: IGradedComment) {
     if (!this.resp!.id) {
       const ret = await this.updateResponseRequest(this.resp!).toPromise();
@@ -1035,29 +1054,25 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       ctx1!.drawImage(editedImage, 0, 0);
       show(true);
       if (updateanotationcanvas) {
-        if (this.currentZoneCorrectionHandler === undefined) {
+        if (
+          this.currentZoneCorrectionHandler.get(
+            '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index
+          ) === undefined
+        ) {
           const zh = new ZoneCorrectionHandler(
             '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index,
             this.eventHandler,
             this.resp?.id
           );
           zh.updateCanvas(imageRef!.nativeElement);
-          this.currentZoneCorrectionHandler = zh;
+          this.currentZoneCorrectionHandler.set(
+            '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index,
+            zh
+          );
         } else {
-          if (
-            this.currentZoneCorrectionHandler.zoneid ===
-            '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index
-          ) {
-            this.currentZoneCorrectionHandler.updateCanvas(imageRef!.nativeElement);
-          } else {
-            const zh = new ZoneCorrectionHandler(
-              '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index,
-              this.eventHandler,
-              this.resp?.id
-            );
-            zh.updateCanvas(imageRef!.nativeElement);
-            this.currentZoneCorrectionHandler = zh;
-          }
+          this.currentZoneCorrectionHandler
+            .get('' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index)!
+            .updateCanvas(imageRef!.nativeElement);
         }
       }
     }
@@ -1528,6 +1543,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.examService.deleteAllAnswerAndComment(+this.examId!).subscribe(() => window.location.reload());
   }
 
+  removeAnswer(): void {
+    this.examService.deleteAllAnswerAndComment(+this.examId!).subscribe(() => this.ngOnInit() /* window.location.reload() */);
+  }
+
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
     const old = this.windowWidth;
@@ -1535,5 +1554,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     if (old / event.target.innerWidth > 1.15 || old / event.target.innerWidth < 0.85) {
       this.reloadImage();
     }
+  }
+
+  toggleCommentLayout() {
+    this.minimizeComment = !this.minimizeComment;
+    this.preferenceService.setMinimizeComments(this.minimizeComment);
   }
 }

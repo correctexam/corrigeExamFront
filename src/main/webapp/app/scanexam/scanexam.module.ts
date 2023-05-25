@@ -5,7 +5,6 @@ import { MesCoursComponent } from './mes-cours/mes-cours.component';
 import { CreercoursComponent } from './creercours/creercours.component';
 import { CoursdetailsComponent } from './coursdetail/coursdetails.component';
 import { ImportStudentComponent } from './import-student/import-student.component';
-import { ListstudentcourseComponent } from './liststudentcourse/liststudentcourse.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ButtonModule } from 'primeng/button';
 import { BlockUIModule } from 'primeng/blockui';
@@ -80,8 +79,11 @@ import { MarkingSummaryComponent } from './marking-summary/marking-summary.compo
 import { TabViewModule } from 'primeng/tabview';
 import { SummaryTemplateComponent } from './annotate-template/summary/summary-template.component';
 import { ComparestudentanswerComponent } from './comparestudentanswer/comparestudentanswer.component';
+import { SplitterModule } from 'primeng/splitter';
+import { FileUploadModule } from 'primeng/fileupload';
 
-
+import { SidebarModule } from 'primeng/sidebar';
+import { CreateCommentsComponent } from './annotate-template/create-comments/create-comments.component';
 // set the location of the OpenCV files
 registerAllModules();
 
@@ -111,16 +113,6 @@ export const REGISTERSTUDENT_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.registerstudents',
-  },
-};
-
-export const LISTESTUDENT_ROUTE: Route = {
-  path: 'liststudents/:courseid',
-  canActivate: [UserRouteAccessService],
-  component: ListstudentcourseComponent,
-  data: {
-    authorities: ['ROLE_USER'],
-    pageTitle: 'home.liststudents',
   },
 };
 
@@ -303,7 +295,6 @@ export const CompareMarkAnswer_ROUTE: Route = {
     CreercoursComponent,
     CoursdetailsComponent,
     ImportStudentComponent,
-    ListstudentcourseComponent,
     CreerexamComponent,
     ExamDetailComponent,
     AnnotateTemplateComponent,
@@ -330,6 +321,7 @@ export const CompareMarkAnswer_ROUTE: Route = {
     MarkingSummaryComponent,
     SummaryTemplateComponent,
     ComparestudentanswerComponent,
+    CreateCommentsComponent,
   ],
   imports: [
     CommonModule,
@@ -362,22 +354,24 @@ export const CompareMarkAnswer_ROUTE: Route = {
     InputSwitchModule,
     RatingModule,
     InputTextareaModule,
+    SplitterModule,
     DialogModule,
     InplaceModule,
     InputTextModule,
     GalleriaModule,
     DynamicDialogModule,
+    FileUploadModule,
     PickListModule,
     KeyFilterModule,
     MessagesModule,
     MessageModule,
     OverlayPanelModule,
+    SidebarModule,
     ProgressBarModule,
     RouterModule.forChild([
       CREERCOURS_ROUTE,
       COURSMAIN_ROUTE,
       REGISTERSTUDENT_ROUTE,
-      LISTESTUDENT_ROUTE,
       CREEREXAM_ROUTE,
       EXAMDETAIL_ROUTE,
       ANNOTATETEMPLATE_ROUTE,
@@ -404,7 +398,6 @@ export const CompareMarkAnswer_ROUTE: Route = {
     CreercoursComponent,
     CoursdetailsComponent,
     ImportStudentComponent,
-    ListstudentcourseComponent,
     CorrigequestionComponent,
     AssocierCopiesEtudiantsComponent,
     SortByDirective,

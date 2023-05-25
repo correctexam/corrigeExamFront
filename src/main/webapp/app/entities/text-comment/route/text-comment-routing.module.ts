@@ -13,6 +13,7 @@ const textCommentRoute: Routes = [
     component: TextCommentComponent,
     data: {
       defaultSort: 'id,asc',
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },
@@ -22,6 +23,9 @@ const textCommentRoute: Routes = [
     resolve: {
       textComment: TextCommentRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -30,6 +34,9 @@ const textCommentRoute: Routes = [
     resolve: {
       textComment: TextCommentRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -37,6 +44,9 @@ const textCommentRoute: Routes = [
     component: TextCommentUpdateComponent,
     resolve: {
       textComment: TextCommentRoutingResolveService,
+    },
+    data: {
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },

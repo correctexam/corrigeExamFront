@@ -13,6 +13,7 @@ const zoneRoute: Routes = [
     component: ZoneComponent,
     data: {
       defaultSort: 'id,asc',
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },
@@ -22,6 +23,9 @@ const zoneRoute: Routes = [
     resolve: {
       zone: ZoneRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -30,6 +34,9 @@ const zoneRoute: Routes = [
     resolve: {
       zone: ZoneRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -37,6 +44,9 @@ const zoneRoute: Routes = [
     component: ZoneUpdateComponent,
     resolve: {
       zone: ZoneRoutingResolveService,
+    },
+    data: {
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },

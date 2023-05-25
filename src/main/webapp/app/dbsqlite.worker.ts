@@ -94,6 +94,16 @@ addEventListener('message', e => {
       db1.removeElementForExam(_sqlite3, e.data);
       break;
     }
+    case 'removeElementForExamForPages': {
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.payload.examId);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
+      }
+      db1.removeElementForExamForPages(_sqlite3, e.data);
+      break;
+    }
     case 'export': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
@@ -303,16 +313,15 @@ class DB {
     const oo = sqlite3.oo1; /*high-level OO API*/
     if (sqlite3.opfs) {
       this.db = new oo.OpfsDb('/' + this.examName + '.sqlite3');
-      //       console.log('The OPFS is available.');
+      console.log('The OPFS is available.');
     } else {
       this.db = new oo.DB('/' + this.examName + '.sqlite3', 'ct');
-      //      console.log('The OPFS is not available.');
+      console.log('The OPFS is not available.');
     }
   }
 
   initemptyDb(sqlite3: any) {
     this.initDb(sqlite3);
-
     try {
       this.db.exec('CREATE TABLE IF NOT EXISTS template(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
       this.db.exec('CREATE TABLE IF NOT EXISTS align(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
@@ -481,6 +490,45 @@ class DB {
         uid: data.uid,
       });
     }
+  }
+
+  removeElementForExamForPages(sqlite3: any, data: any) {
+    const payload = data.payload;
+
+    this.initDb(sqlite3);
+    try {
+      this.db.exec('delete from nonalign where page>=' + payload.pageStart + ' and page <= ' + payload.pageEnd + '');
+      this.db.exec('delete from align where page>=' + payload.pageStart + ' and page <= ' + payload.pageEnd + '');
+      postMessage({
+        msg: data.msg,
+        uid: data.uid,
+        payload: {},
+      });
+    } finally {
+      this.db.close();
+    }
+
+    /* await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
+//      this.exams.delete(this.examId);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      this.alignImages
+      .where({ examId: this.examId })
+      .filter(e2 => e2.pageNumber >= pageStart && e2.pageNumber <= pageEnd)
+      .toArray()
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        .then(a => this.alignImages.bulkDelete(a.map(t => t.id!)));
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
+      this.nonAlignImages
+      .where({ examId: this.examId })
+      .filter(e2 => e2.pageNumber >= pageStart && e2.pageNumber <= pageEnd)
+      .toArray()
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        .then(a => this.nonAlignImages.bulkDelete(a.map(t => t.id!)));
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
+    });*/
   }
 
   // export(examId: number,options?: ExportOptions) :Promise<Blob>;

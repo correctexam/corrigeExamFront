@@ -185,6 +185,9 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   async removeElement(examId: number): Promise<any> {
     await this.db.removeElementForExam(examId);
   }
+  async removeElementForPages(examId: number, pageStart: number, pageEnd: number): Promise<any> {
+    await this.db.removeElementForExamForPages(examId, pageStart, pageEnd);
+  }
 
   public pdfloaded(): void {
     if (!this.phase1) {
@@ -219,6 +222,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     if (this.partialAlign) {
       this.currentPageAlignOver = this.startPage;
       this.avancement = this.startPage;
+      this.removeElementForPages(+this.examId, this.startPage, this.endPage);
     } else {
       this.removeElement(+this.examId);
       this.currentPageAlignOver = 1;

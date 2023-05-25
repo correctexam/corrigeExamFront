@@ -96,6 +96,29 @@ class ExamIndexDB extends Dexie {
     });
   }
 
+  async removeElementForExamForPages(pageStart: number, pageEnd: number) {
+    await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
+      //      this.exams.delete(this.examId);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      this.alignImages
+        .where({ examId: this.examId })
+        .filter(e2 => e2.pageNumber >= pageStart && e2.pageNumber <= pageEnd)
+        .toArray()
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        .then(a => this.alignImages.bulkDelete(a.map(t => t.id!)));
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
+      this.nonAlignImages
+        .where({ examId: this.examId })
+        .filter(e2 => e2.pageNumber >= pageStart && e2.pageNumber <= pageEnd)
+        .toArray()
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        .then(a => this.nonAlignImages.bulkDelete(a.map(t => t.id!)));
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    });
+  }
+
   async removeExam() {
     await this.transaction('rw', 'exams', () => {
       this.exams.delete(this.examId);
@@ -230,6 +253,15 @@ export class AppDB implements CacheService {
       this.dbs.set(examId, db1);
     }
     return db1.removeElementForExam();
+  }
+
+  async removeElementForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<void> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.removeElementForExamForPages(pageStart, pageEnd);
   }
 
   async addAligneImage(elt: AlignImage): Promise<void> {
@@ -412,6 +444,7 @@ export interface CacheService {
   resetDatabase(examId: number): Promise<void>;
   removeExam(examId: number): Promise<void>;
   removeElementForExam(examId: number): Promise<void>;
+  removeElementForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<void>;
   addAligneImage(elt: AlignImage): Promise<any>;
   addNonAligneImage(elt: AlignImage): Promise<any>;
   export(examId: number, options?: ExportOptions): Promise<Blob>;

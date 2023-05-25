@@ -216,6 +216,13 @@ export class SqliteCacheService implements CacheService {
       examId: examId,
     }).toPromise();
   }
+  removeElementForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<any> {
+    return this._dispatch('removeElementForExamForPages', {
+      examId: examId,
+      pageStart: pageStart,
+      pageEnd: pageEnd,
+    }).toPromise();
+  }
 }
 
 export const db = new SqliteCacheService();
