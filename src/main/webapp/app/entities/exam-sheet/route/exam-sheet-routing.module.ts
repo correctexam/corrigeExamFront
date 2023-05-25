@@ -13,6 +13,7 @@ const examSheetRoute: Routes = [
     component: ExamSheetComponent,
     data: {
       defaultSort: 'id,asc',
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },
@@ -22,6 +23,9 @@ const examSheetRoute: Routes = [
     resolve: {
       examSheet: ExamSheetRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -30,6 +34,9 @@ const examSheetRoute: Routes = [
     resolve: {
       examSheet: ExamSheetRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -37,6 +44,9 @@ const examSheetRoute: Routes = [
     component: ExamSheetUpdateComponent,
     resolve: {
       examSheet: ExamSheetRoutingResolveService,
+    },
+    data: {
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },

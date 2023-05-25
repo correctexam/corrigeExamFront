@@ -15,9 +15,9 @@ import { ZoneService } from '../../../../entities/zone/service/zone.service';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { PreferenceService } from '../../../preference-page/preference.service';
-import { EntityResponseType } from 'app/entities/course/service/course.service';
 
 type SelectableEntity = IQuestionType;
+export type EntityResponseType = HttpResponse<IQuestion>;
 
 @Component({
   selector: 'jhi-questionpropertiesview',
@@ -47,7 +47,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
 
   question: IQuestion | undefined;
   gradeTypeValues = Object.keys(GradeType);
-
+  layoutsidebarVisible = false;
   manualid = 2;
   qcmid = 3;
   //  validexp = '';
@@ -116,9 +116,9 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
         takeUntil(this.unsubscribe)
         // eslint-disable-next-line no-console
       )
-      .subscribe(() => this.onSaveSuccess());
+      .subscribe(e => this.onSaveSuccess(e));
 
-    // this.updateForm(this.question);
+    // this.updateForm(this.questionIQuestion);
 
     this.questionTypeService.query().subscribe((res: HttpResponse<IQuestionType[]>) => {
       this.questiontypes = res.body || [];
@@ -149,6 +149,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   }
 
   updateForm(question: IQuestion): void {
+    this.unsubscribe.next();
     this.editForm.patchValue({
       numero: question.numero,
       point: question.point,
@@ -157,6 +158,14 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       gradeType: question.gradeType,
       typeId: question.typeId,
     });
+    this.editForm.valueChanges
+      .pipe(
+        debounceTime(500),
+        switchMap(() => this.save()),
+        takeUntil(this.unsubscribe)
+        // eslint-disable-next-line no-console
+      )
+      .subscribe(e => this.onSaveSuccess(e));
   }
 
   save(): Observable<EntityResponseType> {
@@ -188,14 +197,8 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
     return this.question!;
   }
 
-  protected subscribeToSaveResponse(result: Observable<HttpResponse<IQuestion>>): void {
-    result.subscribe({
-      complete: () => this.onSaveSuccess(),
-      error: () => this.onSaveError(),
-    });
-  }
-
-  protected onSaveSuccess(): void {
+  protected onSaveSuccess(e: EntityResponseType): void {
+    this.question = e.body!;
     this.isSaving = false;
     this.eventHandler.setCurrentQuestionNumber(this.editForm.get(['numero'])!.value);
     this.updatenumero.next(this.editForm.get(['numero'])!.value);

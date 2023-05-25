@@ -13,12 +13,16 @@ const courseRoute: Routes = [
     component: CourseComponent,
     data: {
       defaultSort: 'id,asc',
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },
   {
     path: ':id/view',
     component: CourseDetailComponent,
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
     resolve: {
       course: CourseRoutingResolveService,
     },
@@ -30,6 +34,9 @@ const courseRoute: Routes = [
     resolve: {
       course: CourseRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -37,6 +44,9 @@ const courseRoute: Routes = [
     component: CourseUpdateComponent,
     resolve: {
       course: CourseRoutingResolveService,
+    },
+    data: {
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },
