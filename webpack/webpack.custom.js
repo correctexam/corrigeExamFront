@@ -54,6 +54,7 @@ module.exports = async (config, options, targetOptions) => {
         // (see the `jhipster.cors` common JHipster property in the `application-*.yml` configurations)
         SERVER_API_URL: JSON.stringify(environment.SERVER_API_URL),
         FRONT_URL: JSON.stringify(environment.FRONT_URL),
+        __CONNECTION_METHOD__: JSON.stringify(environment.__CONNECTION_METHOD__),
       })
     );
   }
@@ -128,6 +129,7 @@ module.exports = async (config, options, targetOptions) => {
         // (see the `jhipster.cors` common JHipster property in the `application-*.yml` configurations)
         SERVER_API_URL: JSON.stringify(environment.SERVER_API_URL),
         FRONT_URL: JSON.stringify(environment.FRONT_URL),
+        __CONNECTION_METHOD__: JSON.stringify(environment.__CONNECTION_METHOD__),
       })
     );
   }

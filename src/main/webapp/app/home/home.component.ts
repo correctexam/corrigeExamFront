@@ -15,7 +15,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { LoginService } from 'app/login/login.service';
 
 import { environment } from 'app/environment/environment';
-import { HttpRequest } from '@angular/common/http';
+import { CONNECTION_METHOD } from 'app/app.constants';
 
 @Component({
   selector: 'jhi-home',
@@ -30,6 +30,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   faPlus = faPlus;
 
+  protected readonly CONNECTION_METHOD = CONNECTION_METHOD;
+  protected readonly CONNECTION_METHOD_LOCAL = 'local';
+  protected readonly CONNECTION_METHOD_CAS = 'cas';
+  protected readonly CONNECTION_METHOD_SHIB = 'shib';
   private readonly destroy$ = new Subject<void>();
 
   constructor(
@@ -45,27 +49,34 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Check if user has been redirected from cas login page
-    const matchTicket = window.location.href.match(/(.*)[&?]ticket=([^&?]*)$/);
-    if (matchTicket) {
-      const ticket = matchTicket[2];
-      this.loginService.login_cas(ticket).subscribe({
-        next: () => {
-          this.router.navigate(['']);
-        },
-        error: () => console.log('failed to connect'),
-      });
-    }
-
-    // Check if user has been redirected from shib login page
-    const shibPresent = window.location.href.match(/\?shib=true/);
-    if (shibPresent) {
-      this.loginService.login_shib().subscribe({
-        next: () => {
-          this.router.navigate(['']);
-        },
-        error: () => console.log('failed to connect'),
-      });
+    switch (CONNECTION_METHOD) {
+      case this.CONNECTION_METHOD_CAS:
+        // Check if user has been redirected from cas login page
+        // eslint-disable-next-line no-case-declarations
+        const matchTicket = window.location.href.match(/(.*)[&?]ticket=([^&?]*)$/);
+        if (matchTicket) {
+          const ticket = matchTicket[2];
+          this.loginService.login_cas(ticket).subscribe({
+            next: () => {
+              this.router.navigate(['']);
+            },
+            error: () => console.log('failed to connect'),
+          });
+        }
+        break;
+      case this.CONNECTION_METHOD_SHIB:
+        // Check if user has been redirected from shib login page
+        // eslint-disable-next-line no-case-declarations
+        const shibPresent = window.location.href.match(/\?shib=true/);
+        if (shibPresent) {
+          this.loginService.login_shib().subscribe({
+            next: () => {
+              this.router.navigate(['']);
+            },
+            error: () => console.log('failed to connect'),
+          });
+        }
+        break;
     }
 
     this.accountService

@@ -4,6 +4,8 @@
 
 declare const __DEBUG_INFO_ENABLED__: boolean;
 declare const __VERSION__: string;
+declare const __CONNECTION_METHOD__: string;
 
 export const VERSION = __VERSION__;
 export const DEBUG_INFO_ENABLED = __DEBUG_INFO_ENABLED__;
+export const CONNECTION_METHOD = __CONNECTION_METHOD__;
