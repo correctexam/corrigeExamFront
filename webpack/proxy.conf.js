@@ -1,5 +1,5 @@
 function setupProxy({ tls }) {
-  const conf = [
+  return [
     {
       context: ['/api', '/services', '/management', 'swagger-ui', '/v3/api-docs', '/h2-console', '/auth', '/health'],
       target: `http${tls ? 's' : ''}://127.0.0.1:8080`,
@@ -7,7 +7,6 @@ function setupProxy({ tls }) {
       changeOrigin: tls,
     },
   ];
-  return conf;
 }
 
 module.exports = setupProxy;
