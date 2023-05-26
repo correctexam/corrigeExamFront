@@ -138,6 +138,7 @@
     </form>
     <BR />
     <p-button
+      *ngIf="editForm.get(['typeId'])!.value !== qcmid"
       class="sm:text-xs md:text-xs lg:text-base"
       styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
       (click)="layoutsidebarVisible = true"
