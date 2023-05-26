@@ -138,7 +138,6 @@ export class CreateCommentsComponent implements OnInit {
 
   exportComment(): void {
     if (this._q !== undefined && this._q.gradeType === GradeType.DIRECT) {
-      console.error(this.currentTextComment4Question);
       const coms: ITextComment[] = [];
       this.currentTextComment4Question?.forEach(com => {
         const comCopy = { ...com };
@@ -147,7 +146,6 @@ export class CreateCommentsComponent implements OnInit {
       });
       return saveAs(new Blob([JSON.stringify(coms, null, 2)], { type: 'JSON' }), 'commentsQ' + this._q.numero! + '.json');
     } else if (this._q !== undefined) {
-      console.error(this.currentGradedComment4Question);
       const coms: IGradedComment[] = [];
       this.currentGradedComment4Question?.forEach(com => {
         const comCopy = { ...com };
@@ -235,17 +233,17 @@ export class CreateCommentsComponent implements OnInit {
           {
             questionId: this._q.id,
             text: this.translate.instant('scanexam.adddefaultexcellent'),
-            grade: this._q.gradeType === GradeType.NEGATIVE ? 0 : this._q.step,
+            grade: this._q.gradeType === GradeType.NEGATIVE ? 0 : this._q.step! * this._q.point!,
           },
           {
             questionId: this._q.id,
             text: this.translate.instant('scanexam.adddefaultvide'),
-            grade: this._q.gradeType === GradeType.NEGATIVE ? this._q.step : 0,
+            grade: this._q.gradeType === GradeType.NEGATIVE ? this._q.step! * this._q.point! : 0,
           },
           {
             questionId: this._q.id,
             text: this.translate.instant('scanexam.adddefaultfaux'),
-            grade: this._q.gradeType === GradeType.NEGATIVE ? this._q.step : 0,
+            grade: this._q.gradeType === GradeType.NEGATIVE ? this._q.step! * this._q.point! : 0,
           },
         ];
         comments.forEach(com => {

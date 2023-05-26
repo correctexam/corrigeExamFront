@@ -20,7 +20,58 @@ import { ApplicationConfigService } from '../../core/config/application-config.s
 import { DialogService } from 'primeng/dynamicdialog';
 import { SharecourseComponent } from '../sharecourse/sharecourse.component';
 import { TranslateService } from '@ngx-translate/core';
-import { firstValueFrom } from 'rxjs';
+import { Observable, firstValueFrom, scan } from 'rxjs';
+import { HttpClient, HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse } from '@angular/common/http';
+
+export interface CacheUploadNotification {
+  setMessage(v: string): void;
+  setSubMessage(v: string): void;
+  setBlocked(v: boolean): void;
+  setProgress(v: number): void;
+}
+
+export interface CacheDownloadNotification {
+  setMessage(v: string): void;
+  setSubMessage(v: string): void;
+  setBlocked(v: boolean): void;
+  setProgress(v: number): void;
+  setShowAssociation(v: boolean): void;
+  setShowCorrection(v: boolean): void;
+}
+
+interface Upload {
+  progress: number;
+  state: 'PENDING' | 'IN_PROGRESS' | 'DONE';
+  body?: any;
+}
+
+function isHttpResponse<T>(event: HttpEvent<T>): event is HttpResponse<T> {
+  return event.type === HttpEventType.Response;
+}
+
+function isHttpProgressEvent(event: HttpEvent<unknown>): event is HttpProgressEvent {
+  return event.type === HttpEventType.DownloadProgress || event.type === HttpEventType.UploadProgress;
+}
+
+const initialState: Upload = { state: 'PENDING', progress: 0 };
+const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
+  if (isHttpProgressEvent(event)) {
+    return {
+      progress: event.total ? Math.round((100 * event.loaded) / event.total) : upload.progress,
+      state: 'IN_PROGRESS',
+    };
+  }
+  if (isHttpResponse(event)) {
+    // eslint-disable-next-line no-console
+    return {
+      progress: 100,
+      state: 'DONE',
+      body: event.body,
+    };
+  }
+  return upload;
+};
+
 @Component({
   selector: 'jhi-coursdetails',
   templateUrl: './coursdetails.component.html',
@@ -36,8 +87,11 @@ export class CoursdetailsComponent implements OnInit {
   course: ICourse | undefined;
   dockItems!: any[];
   courseId = '';
+  layoutsidebarVisible = false;
 
   constructor(
+    protected applicationConfigService: ApplicationConfigService,
+
     public courseService: CourseService,
     public examService: ExamService,
     protected activatedRoute: ActivatedRoute,
@@ -45,7 +99,8 @@ export class CoursdetailsComponent implements OnInit {
     public router: Router,
     public appConfig: ApplicationConfigService,
     public dialogService: DialogService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -70,6 +125,62 @@ export class CoursdetailsComponent implements OnInit {
         );
       }
     });
+  }
+
+  // component.ts
+  // getFileName not necessary, you can just set this as a string if you wish
+  getFileName(response: HttpResponse<Blob>): string {
+    let filename: string;
+    try {
+      const contentDisposition: string = response.headers.get('content-disposition')!;
+      const r = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+      filename = r.exec(contentDisposition)![1];
+    } catch (e) {
+      filename = this.courseId + '.json';
+    }
+    return filename;
+  }
+
+  exportCourse(): void {
+    this.http
+      .get<Blob>(this.applicationConfigService.getEndpointFor(`api/exportCourse/${this.courseId}`), {
+        observe: 'response',
+        responseType: 'blob' as 'json',
+      })
+      .subscribe(response => {
+        // this.downLoadFile(s, "application/json")
+        const filename: string = this.getFileName(response);
+        const binaryData = [];
+        binaryData.push(response.body!);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, { type: 'blob' }));
+        downloadLink.setAttribute('download', filename);
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+      });
+  }
+  onUpload($event: any): void {
+    if ($event.files && $event.files.length > 0) {
+      this.uploadCache($event.files[0]).subscribe(response => {
+        if (response.state === 'DONE') {
+          this.layoutsidebarVisible = false;
+          //            this.router.navigateByUrl('/course/' + response.body.id);
+          this.router.navigateByUrl('/');
+        }
+      });
+    }
+  }
+  uploadCache(file: File): Observable<Upload> {
+    const formData: FormData = new FormData();
+    formData.append('file', file);
+
+    return this.http
+      .post(this.applicationConfigService.getEndpointFor('api/importCourse'), formData, {
+        reportProgress: true,
+        responseType: 'json',
+        observe: 'events',
+      })
+      .pipe(scan(calculateState, initialState));
   }
 
   initCmpt(): void {
@@ -108,6 +219,14 @@ export class CoursdetailsComponent implements OnInit {
         title: this.translateService.instant('scanexam.removeuedetail'),
         command1: () => {
           this.confirmeDelete();
+        },
+      },
+      {
+        label: this.translateService.instant('scanexam.importexport'),
+        icon: this.appConfig.getFrontUrl() + 'content/images/import-export-outline-icon.svg',
+        title: this.translateService.instant('scanexam.importexportcoursetooltip'),
+        command1: () => {
+          this.layoutsidebarVisible = true;
         },
       },
     ];
