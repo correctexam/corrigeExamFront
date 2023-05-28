@@ -26,6 +26,11 @@
                 <h5 class="card-title" jhiTranslate="scanexam.courseimportexport">Import/Export</h5>
 
                 <div class="card-text">
+                  <label for="switch1" jhiTranslate="scanexam.studentdata" [pTooltip]="'scanexam.studentdatatooltip' | translate"
+                    >données étudiantes:</label
+                  >
+                  <p-inputSwitch inputId="switch1" [(ngModel)]="includeStudentsData"></p-inputSwitch>
+
                   <div class="flex align-content-center flex-wrap card-container">
                     <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
                       <p-fileUpload
