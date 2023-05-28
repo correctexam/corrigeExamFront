@@ -258,6 +258,8 @@
     "adddefaulttooltip": "Add default comments (Excellent, wrong answer, void, ...)",
     "adddefaultexcellent": "Excellent",
     "adddefaultvide": "Void",
-    "adddefaultfaux": "Wrong"
+    "adddefaultfaux": "Wrong",
+    "studentdata": "Students's data",
+    "studentdatatooltip": "Include students's data"
   }
 }

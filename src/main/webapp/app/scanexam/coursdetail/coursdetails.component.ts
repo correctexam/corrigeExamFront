@@ -88,6 +88,7 @@ export class CoursdetailsComponent implements OnInit {
   dockItems!: any[];
   courseId = '';
   layoutsidebarVisible = false;
+  includeStudentsData = true;
 
   constructor(
     protected applicationConfigService: ApplicationConfigService,
@@ -142,8 +143,12 @@ export class CoursdetailsComponent implements OnInit {
   }
 
   exportCourse(): void {
+    let endpoint = 'api/exportCourse/';
+    if (!this.includeStudentsData) {
+      endpoint = 'api/exportCourseWithoutStudentData/';
+    }
     this.http
-      .get<Blob>(this.applicationConfigService.getEndpointFor(`api/exportCourse/${this.courseId}`), {
+      .get<Blob>(this.applicationConfigService.getEndpointFor(`${endpoint}${this.courseId}`), {
         observe: 'response',
         responseType: 'blob' as 'json',
       })
@@ -174,8 +179,13 @@ export class CoursdetailsComponent implements OnInit {
     const formData: FormData = new FormData();
     formData.append('file', file);
 
+    let endpoint = 'api/importCourse';
+    if (!this.includeStudentsData) {
+      endpoint = 'api/importCourseWithoutStudentData';
+    }
+
     return this.http
-      .post(this.applicationConfigService.getEndpointFor('api/importCourse'), formData, {
+      .post(this.applicationConfigService.getEndpointFor(endpoint), formData, {
         reportProgress: true,
         responseType: 'json',
         observe: 'events',
