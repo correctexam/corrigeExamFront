@@ -260,6 +260,8 @@
     "adddefaultvide": "Void",
     "adddefaultfaux": "Wrong",
     "studentdata": "Students's data",
-    "studentdatatooltip": "Include students's data"
+    "studentdatatooltip": "Include students's data",
+    "importencours": "Import in progress",
+    "exportencours": "Export in progess"
   }
 }

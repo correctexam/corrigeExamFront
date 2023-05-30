@@ -261,6 +261,8 @@
     "adddefaultvide": "Pas de réponse",
     "adddefaultfaux": "Faux",
     "studentdata": "Données étudiantes",
-    "studentdatatooltip": "Inclure les données des étudiant(e)s"
+    "studentdatatooltip": "Inclure les données des étudiant(e)s",
+    "importencours": "Import en cours",
+    "exportencours": "Export en cours"
   }
 }
