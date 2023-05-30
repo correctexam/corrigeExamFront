@@ -90,6 +90,9 @@ export class CoursdetailsComponent implements OnInit {
   layoutsidebarVisible = false;
   includeStudentsData = true;
 
+  blocked = false;
+  message = '';
+
   constructor(
     protected applicationConfigService: ApplicationConfigService,
 
@@ -147,6 +150,10 @@ export class CoursdetailsComponent implements OnInit {
     if (!this.includeStudentsData) {
       endpoint = 'api/exportCourseWithoutStudentData/';
     }
+    this.layoutsidebarVisible = false;
+    this.message = this.translateService.instant('scanexam.exportencours');
+    this.blocked = true;
+
     this.http
       .get<Blob>(this.applicationConfigService.getEndpointFor(`${endpoint}${this.courseId}`), {
         observe: 'response',
@@ -161,6 +168,10 @@ export class CoursdetailsComponent implements OnInit {
         downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, { type: 'blob' }));
         downloadLink.setAttribute('download', filename);
         document.body.appendChild(downloadLink);
+
+        this.blocked = false;
+        this.message = '';
+
         downloadLink.click();
       });
   }
@@ -169,6 +180,8 @@ export class CoursdetailsComponent implements OnInit {
       this.uploadCache($event.files[0]).subscribe(response => {
         if (response.state === 'DONE') {
           this.layoutsidebarVisible = false;
+          this.blocked = false;
+          this.message = '';
           //            this.router.navigateByUrl('/course/' + response.body.id);
           this.router.navigateByUrl('/');
         }
@@ -176,6 +189,10 @@ export class CoursdetailsComponent implements OnInit {
     }
   }
   uploadCache(file: File): Observable<Upload> {
+    this.layoutsidebarVisible = false;
+    this.message = this.translateService.instant('scanexam.importencours');
+    this.blocked = true;
+
     const formData: FormData = new FormData();
     formData.append('file', file);
 
