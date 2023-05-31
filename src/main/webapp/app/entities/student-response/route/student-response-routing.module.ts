@@ -13,6 +13,7 @@ const studentResponseRoute: Routes = [
     component: StudentResponseComponent,
     data: {
       defaultSort: 'id,asc',
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },
@@ -22,6 +23,9 @@ const studentResponseRoute: Routes = [
     resolve: {
       studentResponse: StudentResponseRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -30,6 +34,9 @@ const studentResponseRoute: Routes = [
     resolve: {
       studentResponse: StudentResponseRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -37,6 +44,9 @@ const studentResponseRoute: Routes = [
     component: StudentResponseUpdateComponent,
     resolve: {
       studentResponse: StudentResponseRoutingResolveService,
+    },
+    data: {
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },

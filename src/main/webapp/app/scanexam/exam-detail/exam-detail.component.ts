@@ -91,7 +91,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
               this.showAssociation = true;
               this.initTemplate();
             } else {
-              this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this);
+              this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, false);
             }
           });
         });
@@ -245,7 +245,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
         message: data1,
         accept: () => {
           this.blocked = true;
-          this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this);
+          this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, true);
         },
       });
     });

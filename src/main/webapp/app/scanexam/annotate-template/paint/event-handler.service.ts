@@ -59,6 +59,7 @@ export class EventHandlerService {
   private previousLeft!: number;
   private previousScaleX!: number;
   private previousScaleY!: number;
+  private nextQuestionNumeros: Array<number> = [];
   private cb!: (qid: number | undefined) => void;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private onQuestionAddDelCB: (qIdOrNum: number, add: boolean) => void = () => {};
@@ -147,12 +148,11 @@ export class EventHandlerService {
   public setCurrentQuestionNumber(number: string): void {
     if (this.currentSelected !== undefined) {
       (this.currentSelected as any).text = 'Question ' + number;
-      this.currentSelected = undefined;
+
+      // this.currentSelected = undefined;
       this.allcanvas.forEach(e => {
-        e.discardActiveObject();
         e.renderAll();
       });
-      this.cb(undefined);
     }
   }
 
@@ -335,7 +335,8 @@ export class EventHandlerService {
         break;
 
       case DrawingTools.QUESTIONBOX:
-        this.nextQuestionNumero = this.nextQuestionNumero + 1;
+        const numero = this.getNextQuestionNumero();
+        this.nextQuestionNumeros.push(numero);
         this.translateService.get('scanexam.questionuc1').subscribe((name: string) => {
           this.createBlueBox(DrawingTools.QUESTIONBOX, name + String(num), num);
         });
@@ -476,9 +477,7 @@ export class EventHandlerService {
             DrawingColours.GREEN
           );
           this.modelViewpping.set(r.id, zone.id!);
-          if (this.nextQuestionNumero <= e.body[0].numero!) {
-            this.nextQuestionNumero = this.nextQuestionNumero + 1;
-          }
+          this.nextQuestionNumeros.push(e.body[0].numero!);
         }
       });
     });
@@ -683,5 +682,13 @@ export class EventHandlerService {
     this._selectedTool = DrawingTools.SELECT;
     this.exam = exam;
     this.zonesRendering = zones;
+  }
+  
+  public getNextQuestionNumero(): number {
+    let i = 1;
+    while (this.nextQuestionNumeros.includes(i)) {
+      i = i + 1;
+    }
+    return i;
   }
 }

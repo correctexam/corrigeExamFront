@@ -9,10 +9,72 @@
       /></a>
     </ng-template>
   </p-dock>
-  <p-confirmDialog [header]="'scanexam.confirmremove' | translate" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+  <p-confirmDialog
+    [header]="'scanexam.confirmremove' | translate"
+    icon="pi pi-exclamation-triangle"
+    [acceptLabel]="'scanexam.yes' | translate"
+    [rejectLabel]="'scanexam.no' | translate"
+  ></p-confirmDialog>
   <div class="wizard-v2-content">
+    <p-blockUI [blocked]="blocked">
+      <div class="grid" style="width: 90vw">
+        <div class="col-4"></div>
+        <div class="col-4 text-center">
+          <i class="pi pi-lock" style="font-size: 3rem"> </i><BR />
+          <div *ngIf="message !== undefined && message.length > 0">{{ message }} <BR /></div>
+        </div>
+        <div class="col-4"></div>
+      </div>
+    </p-blockUI>
+
     <div class="wizard-image"></div>
     <div class="wizard-form">
+      <p-sidebar [position]="'right'" [(visible)]="layoutsidebarVisible">
+        <div class="grid">
+          <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title" jhiTranslate="scanexam.courseimportexport">Import/Export</h5>
+
+                <div class="card-text">
+                  <label for="switch1" jhiTranslate="scanexam.studentdata" [pTooltip]="'scanexam.studentdatatooltip' | translate"
+                    >données étudiantes:</label
+                  >
+                  <p-inputSwitch inputId="switch1" [(ngModel)]="includeStudentsData"></p-inputSwitch>
+
+                  <div class="flex align-content-center flex-wrap card-container">
+                    <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
+                      <p-fileUpload
+                        [chooseIcon]="''"
+                        [chooseStyleClass]="'p-button p-button-primary'"
+                        mode="basic"
+                        [auto]="true"
+                        [customUpload]="true"
+                        [pTooltip]="'scanexam.courseimporttooltip' | translate"
+                        [chooseLabel]="'scanexam.courseimport' | translate"
+                        name="import[]"
+                        accept="application/json"
+                        [maxFileSize]="2000000000"
+                        (uploadHandler)="onUpload($event)"
+                      ></p-fileUpload>
+                    </div>
+                    <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
+                      <button
+                        class="p-button p-button-primary"
+                        (click)="exportCourse()"
+                        [pTooltip]="'scanexam.courseexporttooltip' | translate"
+                        jhiTranslate="scanexam.courseexport"
+                      >
+                        Export
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-sidebar>
       <div class="wizard-header">
         <jhi-usable-text-input
           [name]="this.course?.name ?? ''"

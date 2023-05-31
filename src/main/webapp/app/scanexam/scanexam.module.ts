@@ -79,7 +79,11 @@ import { MarkingSummaryComponent } from './marking-summary/marking-summary.compo
 import { TabViewModule } from 'primeng/tabview';
 import { SummaryTemplateComponent } from './annotate-template/summary/summary-template.component';
 import { ComparestudentanswerComponent } from './comparestudentanswer/comparestudentanswer.component';
+import { SplitterModule } from 'primeng/splitter';
+import { FileUploadModule } from 'primeng/fileupload';
 
+import { SidebarModule } from 'primeng/sidebar';
+import { CreateCommentsComponent } from './annotate-template/create-comments/create-comments.component';
 // set the location of the OpenCV files
 registerAllModules();
 
@@ -317,6 +321,7 @@ export const CompareMarkAnswer_ROUTE: Route = {
     MarkingSummaryComponent,
     SummaryTemplateComponent,
     ComparestudentanswerComponent,
+    CreateCommentsComponent,
   ],
   imports: [
     CommonModule,
@@ -349,16 +354,19 @@ export const CompareMarkAnswer_ROUTE: Route = {
     InputSwitchModule,
     RatingModule,
     InputTextareaModule,
+    SplitterModule,
     DialogModule,
     InplaceModule,
     InputTextModule,
     GalleriaModule,
     DynamicDialogModule,
+    FileUploadModule,
     PickListModule,
     KeyFilterModule,
     MessagesModule,
     MessageModule,
     OverlayPanelModule,
+    SidebarModule,
     ProgressBarModule,
     RouterModule.forChild([
       CREERCOURS_ROUTE,

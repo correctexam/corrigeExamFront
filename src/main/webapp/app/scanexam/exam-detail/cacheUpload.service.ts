@@ -276,7 +276,8 @@ export class CacheUploadService {
     examId: number,
     translateService: TranslateService,
     messageService: MessageService,
-    cacheDownloadNotification: CacheDownloadNotification
+    cacheDownloadNotification: CacheDownloadNotification,
+    showFailMessage: boolean
   ): Promise<void> {
     translateService.get('scanexam.downloadcacheencours').subscribe(res => cacheDownloadNotification.setMessage('' + res + ''));
     translateService.get('scanexam.downloadcacheencoursdetail').subscribe(res => cacheDownloadNotification.setSubMessage('' + res));
@@ -301,11 +302,14 @@ export class CacheUploadService {
         data = (await p) as Blob;
 
         if (data.size === 0) {
-          messageService.add({
-            severity: 'error',
-            summary: translateService.instant('scanexam.downloadcacheko'),
-            detail: translateService.instant('scanexam.downloadcachekodetail'),
-          });
+          if (showFailMessage) {
+            messageService.add({
+              severity: 'error',
+              summary: translateService.instant('scanexam.downloadcacheko'),
+              detail: translateService.instant('scanexam.downloadcachekodetail'),
+            });
+          }
+
           cacheDownloadNotification.setBlocked(false);
           cacheDownloadNotification.setMessage('');
           return;

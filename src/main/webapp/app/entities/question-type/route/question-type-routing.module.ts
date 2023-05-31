@@ -13,6 +13,7 @@ const questionTypeRoute: Routes = [
     component: QuestionTypeComponent,
     data: {
       defaultSort: 'id,asc',
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },
@@ -22,6 +23,10 @@ const questionTypeRoute: Routes = [
     resolve: {
       questionType: QuestionTypeRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
+
     canActivate: [UserRouteAccessService],
   },
   {
@@ -30,6 +35,9 @@ const questionTypeRoute: Routes = [
     resolve: {
       questionType: QuestionTypeRoutingResolveService,
     },
+    data: {
+      authorities: ['ROLE_ADMIN'],
+    },
     canActivate: [UserRouteAccessService],
   },
   {
@@ -37,6 +45,9 @@ const questionTypeRoute: Routes = [
     component: QuestionTypeUpdateComponent,
     resolve: {
       questionType: QuestionTypeRoutingResolveService,
+    },
+    data: {
+      authorities: ['ROLE_ADMIN'],
     },
     canActivate: [UserRouteAccessService],
   },

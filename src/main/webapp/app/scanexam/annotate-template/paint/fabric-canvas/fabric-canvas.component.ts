@@ -64,6 +64,8 @@ export class FabricCanvasComponent implements OnInit {
         this.getQuestion(qid);
       } else {
         this.questions.delete(qid);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        this.eventHandler.nextQuestionNumeros = Array.from(this.questions).map(([key, value]) => value.numero!);
       }
     });
 
@@ -127,6 +129,8 @@ export class FabricCanvasComponent implements OnInit {
           this.questions.set(q.id, q);
         }
       });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      this.eventHandler.nextQuestionNumeros = Array.from(this.questions).map(([key, value]) => value.numero!);
     });
   }
 

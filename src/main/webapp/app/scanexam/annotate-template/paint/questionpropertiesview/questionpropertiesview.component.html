@@ -1,7 +1,11 @@
+<p-sidebar [position]="'right'" [(visible)]="layoutsidebarVisible">
+  <jhi-create-comments [question]="question"></jhi-create-comments>
+</p-sidebar>
+
 <hr *ngIf="question" />
 <div *ngIf="question" class="d-flex justify-content-center">
   <div class="col-8">
-    <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+    <form name="editForm" role="form" novalidate [formGroup]="editForm">
       <div>
         <jhi-alert-error></jhi-alert-error>
 
@@ -100,7 +104,7 @@
           />
           <p-message
             severity="error"
-            text="Not a valid expression"
+            [text]="'scanexam.invalidexpression' | translate"
             [@errorState]="editForm.dirty && !editForm.valid ? 'visible' : 'hidden'"
           ></p-message>
         </div>
@@ -121,7 +125,7 @@
           ></p-listbox>
         </div>
 
-        <button
+        <!-- <button
           type="submit"
           id="save-entity"
           data-cy="entityCreateSaveButton"
@@ -129,8 +133,18 @@
           class="p-button p-button-primary"
         >
           <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-        </button>
+        </button>-->
       </div>
     </form>
+    <BR />
+    <p-button
+      *ngIf="editForm.get(['typeId'])!.value !== qcmid"
+      class="sm:text-xs md:text-xs lg:text-base"
+      styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
+      (click)="layoutsidebarVisible = true"
+      icon="pi pi-arrow-left"
+      [label]="'scanexam.commentsmanagement' | translate"
+      [pTooltip]="'scanexam.commentsmanagementtooltip' | translate"
+    ></p-button>
   </div>
 </div>

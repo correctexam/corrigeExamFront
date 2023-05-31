@@ -1,0 +1,191 @@
+<div>
+  <div class="grid" *ngIf="_q && _q?.gradeType === 'DIRECT' && _q?.typeAlgoName !== 'QCM'">
+    <div *ngFor="let comment of currentTextComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
+      <div class="card">
+        <div class="card-body">
+          <span class="float-end" (click)="removeTextComment(comment)">
+            <fa-icon icon="times"></fa-icon>
+          </span>
+          <div>
+            <p-inplace [closable]="true">
+              <ng-template pTemplate="display">
+                <h5 class="card-title">{{ comment.text }}</h5>
+              </ng-template>
+              <ng-template pTemplate="content">
+                <input
+                  pInputText
+                  type="text"
+                  [(ngModel)]="comment.text"
+                  [style]="{ width: '80%' }"
+                  (change)="updateComment($event, comment, false)"
+                />
+              </ng-template>
+            </p-inplace>
+            <p-inplace [closable]="true">
+              <ng-template pTemplate="display">
+                <p class="card-text">{{ comment.description }}</p>
+              </ng-template>
+              <ng-template pTemplate="content">
+                <input
+                  pInputText
+                  type="text"
+                  [(ngModel)]="comment.description"
+                  (change)="updateComment($event, comment, false)"
+                  [style]="{ width: '80%' }"
+                />
+              </ng-template>
+            </p-inplace>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid" *ngIf="_q && _q?.gradeType !== 'DIRECT' && _q?.typeAlgoName !== 'QCM'">
+    <div *ngFor="let comment of currentGradedComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
+      <div class="card">
+        <div class="card-body">
+          <span *ngIf="_q?.typeAlgoName !== 'QCM'" class="float-end clickable" (click)="removeGradedComment(comment)"
+            ><fa-icon icon="times"></fa-icon
+          ></span>
+          <div>
+            <div *ngIf="_q?.typeAlgoName === 'QCM'">
+              <h5 class="card-title">{{ comment.text }}</h5>
+              <p class="card-text">{{ comment.description }}</p>
+            </div>
+
+            <div *ngIf="_q?.typeAlgoName !== 'QCM'">
+              <p-inplace [closable]="true">
+                <ng-template pTemplate="display">
+                  <h5 class="card-title">{{ comment.text }}</h5>
+                </ng-template>
+                <ng-template pTemplate="content">
+                  <input
+                    pInputText
+                    type="text"
+                    [(ngModel)]="comment.text"
+                    [style]="{ width: '80%' }"
+                    (change)="updateComment($event, comment, true)"
+                  />
+                </ng-template>
+              </p-inplace>
+              <p-inplace [closable]="true">
+                <ng-template pTemplate="display">
+                  <p class="card-text">{{ comment.description }}</p>
+                </ng-template>
+                <ng-template pTemplate="content">
+                  <input
+                    pInputText
+                    type="text"
+                    [(ngModel)]="comment.description"
+                    (change)="updateComment($event, comment, true)"
+                    [style]="{ width: '80%' }"
+                  />
+                </ng-template>
+              </p-inplace>
+              <p-inplace [closable]="true">
+                <ng-template pTemplate="display">
+                  <p class="card-text" *ngIf="_q && _q?.gradeType !== 'DIRECT'">
+                    <span jhiTranslate="scanexam.noteassociecomment"> Note associée à ce commentaire : </span>
+                    <span *ngIf="_q && _q?.gradeType === 'NEGATIVE'"> - </span><span *ngIf="_q && _q?.gradeType === 'POSITIVE'"> + </span>
+                    <span *ngIf="questionStep > 0">{{ comment.grade! / questionStep }}</span>
+                    <span *ngIf="questionStep <= 0">{{ comment.grade! }}</span>
+                  </p>
+                </ng-template>
+                <ng-template pTemplate="content">
+                  <p-rating
+                    *ngIf="noteSteps > 0 && _q && _q?.gradeType !== 'DIRECT'"
+                    [cancel]="true"
+                    [stars]="noteSteps"
+                    [(ngModel)]="comment.grade"
+                    (ngModelChange)="updateComment($event, comment, true)"
+                  ></p-rating>
+                </ng-template>
+              </p-inplace>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid" *ngIf="_q && _q?.typeAlgoName !== 'QCM'">
+    <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title" jhiTranslate="scanexam.newcomment">Nouveau commentaire</h5>
+          <p class="card-text">
+            <label jhiTranslate="scanexam.commenttitle">Titre :</label>
+            <input type="text" pInputText [(ngModel)]="titreCommentaire" [style]="{ width: '100%' }" />
+            <BR />
+            <label jhiTranslate="scanexam.commentdesc">Description :</label>
+            <textarea [style]="{ width: '100%' }" pInputTextarea [(ngModel)]="descCommentaire"></textarea>
+            <label *ngIf="_q && _q?.gradeType !== 'DIRECT'" jhiTranslate="scanexam.commentnote">Note :</label>
+            <p-rating
+              *ngIf="noteSteps > 0 && _q && _q?.gradeType !== 'DIRECT'"
+              [stars]="noteSteps"
+              [(ngModel)]="noteCommentaire"
+              [style]="{ width: '100%' }"
+            ></p-rating>
+            <span *ngIf="_q && _q?.gradeType !== 'DIRECT'">
+              <span jhiTranslate="scanexam.commentnotbind">Note associée à ce commentaire : </span
+              ><span *ngIf="_q && _q?.gradeType === 'NEGATIVE'"> - </span
+              ><span *ngIf="questionStep > 0">{{ noteCommentaire / questionStep }}</span>
+              <span *ngIf="questionStep <= 0">{{ noteCommentaire }}</span></span
+            >
+          </p>
+          <a class="p-button p-button-primary" (click)="addComment()" jhiTranslate="scanexam.commentadd">Ajouter</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="_q?.typeAlgoName !== 'QCM'" class="grid">
+    <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title" jhiTranslate="scanexam.commentimportexport">Import/Export</h5>
+
+          <div class="card-text">
+            <div class="flex align-content-center flex-wrap card-container">
+              <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
+                <p-fileUpload
+                  [chooseIcon]="''"
+                  [chooseStyleClass]="'p-button p-button-primary'"
+                  mode="basic"
+                  [auto]="true"
+                  [customUpload]="true"
+                  [pTooltip]="'scanexam.commentimporttooltip' | translate"
+                  [chooseLabel]="'scanexam.commentimport' | translate"
+                  name="import[]"
+                  accept="application/json"
+                  [maxFileSize]="1000000"
+                  (uploadHandler)="onUpload($event)"
+                ></p-fileUpload>
+              </div>
+              <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
+                <button
+                  class="p-button p-button-primary"
+                  (click)="exportComment()"
+                  [pTooltip]="'scanexam.commentexporttooltip' | translate"
+                  jhiTranslate="scanexam.commentexport"
+                >
+                  Export
+                </button>
+              </div>
+
+              <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
+                <button
+                  class="p-button p-button-primary"
+                  (click)="addDefault()"
+                  [pTooltip]="'scanexam.commentadddefaulttooltip' | translate"
+                  jhiTranslate="scanexam.adddefault"
+                >
+                  Add Default
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
