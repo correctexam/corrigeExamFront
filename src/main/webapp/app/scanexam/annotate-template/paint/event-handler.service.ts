@@ -40,6 +40,7 @@ export class EventHandlerService {
   public canvas!: PagedCanvas;
   public allcanvas: PagedCanvas[] = [];
   public pages: { [page: number]: PageHandler } = {};
+  public nextQuestionNumeros: Array<number> = [];
   private currentSelected: fabric.Object | undefined;
   private imageDataUrl!: string;
   private zonesRendering: { [page: number]: CustomZone[] } = {};
@@ -59,7 +60,6 @@ export class EventHandlerService {
   private previousLeft!: number;
   private previousScaleX!: number;
   private previousScaleY!: number;
-  private nextQuestionNumeros: Array<number> = [];
   private cb!: (qid: number | undefined) => void;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private onQuestionAddDelCB: (qIdOrNum: number, add: boolean) => void = () => {};
@@ -69,7 +69,6 @@ export class EventHandlerService {
   private drawingToolObserver: (d: DrawingTools) => void = () => {};
   private confService!: ConfirmationService;
   private modelViewpping = new Map<string, number>();
-  private nextQuestionNumero = 1;
 
   public constructor(
     private fabricShapeService: FabricShapeService,
@@ -307,7 +306,7 @@ export class EventHandlerService {
   }
 
   public mouseUp(): void {
-    const num = this.nextQuestionNumero;
+    const num = this.getNextQuestionNumero();
 
     this._isMouseDown = false;
 
@@ -335,8 +334,7 @@ export class EventHandlerService {
         break;
 
       case DrawingTools.QUESTIONBOX:
-        const numero = this.getNextQuestionNumero();
-        this.nextQuestionNumeros.push(numero);
+        this.nextQuestionNumeros.push(num);
         this.translateService.get('scanexam.questionuc1').subscribe((name: string) => {
           this.createBlueBox(DrawingTools.QUESTIONBOX, name + String(num), num);
         });
@@ -683,7 +681,7 @@ export class EventHandlerService {
     this.exam = exam;
     this.zonesRendering = zones;
   }
-  
+
   public getNextQuestionNumero(): number {
     let i = 1;
     while (this.nextQuestionNumeros.includes(i)) {

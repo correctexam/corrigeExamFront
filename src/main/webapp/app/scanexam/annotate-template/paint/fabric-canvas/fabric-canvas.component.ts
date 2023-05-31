@@ -129,8 +129,7 @@ export class FabricCanvasComponent implements OnInit {
           this.questions.set(q.id, q);
         }
       });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      this.eventHandler.nextQuestionNumeros = Array.from(this.questions).map(([key, value]) => value.numero!);
+      this.eventHandler.nextQuestionNumeros = Array.from(this.questions).map(([, value]) => value.numero!);
     });
   }
 
