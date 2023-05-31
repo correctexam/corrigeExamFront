@@ -1,42 +1,41 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-/* eslint-disable @typescript-eslint/prefer-optional-chain */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/member-ordering */
 import { fabric } from 'fabric';
 import { EventHandlerService } from '../event-handler.service';
+import { IEvent, Transform } from 'fabric/fabric-impl';
 
-export type AnnotationPageRect = {
+type AnnotationPageRect = {
   page: number;
-  pos1: { x: any; y: any };
-  pos2: { x: any; y: any };
+  pos1: { x: number; y: number };
+  pos2: { x: number; y: number };
 };
 
+interface CanvasModifiedEvent extends IEvent {
+  action: 'drag' | 'scale';
+  transform: Transform;
+  target: any;
+}
+
+export interface PagedCanvas extends fabric.Canvas {
+  page: number;
+}
+
 export class PageHandler {
-  private ctx!: CanvasRenderingContext2D;
-  isActive = false;
-  pos!: { x: number; y: number };
-  isDrawing!: boolean;
-  currentAnnotationId!: string;
-
   private annotationCanvas!: HTMLCanvasElement;
-  private canvas!: any;
+  private canvas!: PagedCanvas;
   private pdfCanvas!: HTMLCanvasElement;
-  noteImg!: HTMLImageElement;
 
-  constructor(public pageViewer: any, public page: number, public eventHandler: EventHandlerService) {
+  public constructor(public pageViewer: any, private page: number, private eventHandler: EventHandlerService) {
     // this.updateCanvas(pageViewer);
     //    window.addEventListener('mouseup', this.mouseUpHandler.bind(this));
     //    window.addEventListener('touchend', this.mouseUpHandler.bind(this));
   }
 
-  mapToPageRect(rect: DOMRect): AnnotationPageRect | undefined {
+  public mapToPageRect(rect: DOMRect): AnnotationPageRect | undefined {
     if (!this.pageViewer.textLayer) {
       return;
     }
-    const pageRect = this.pageViewer.textLayer.textLayerDiv.getBoundingClientRect();
+    const pageRect = this.pageViewer.textLayer.textLayerDiv.getBoundingClientRect() as DOMRect;
 
     if (!(rect.y >= pageRect.top && rect.y <= pageRect.bottom)) {
       return;
@@ -53,7 +52,6 @@ export class PageHandler {
       return;
     }
 
-    // console.log({ pageRect, rect });
     // const { xOffset, yOffset } = getPosOfElement(this.pageViewer.canvas);
     const xOffset = pageRect.x;
     const yOffset = pageRect.y;
@@ -81,13 +79,13 @@ export class PageHandler {
   //   }
   // }
 
-  cursorToReal(e: { x: any; y: any }) {
+  public cursorToReal(e: { x: number; y: number }): { x: number; y: number } {
     const z = this.pageViewer.viewport.convertToPdfPoint(e.x, e.y);
 
     return { x: z[0], y: z[1] };
   }
 
-  realToCanvas(pos: { x: number; y: number }) {
+  public realToCanvas(pos: { x: number; y: number }): { x: number; y: number } {
     const z = this.pageViewer.viewport.convertToViewportPoint(pos.x, pos.y);
     return {
       x: z[0] * this.pageViewer.outputScale.sx,
@@ -95,14 +93,14 @@ export class PageHandler {
     };
   }
 
-  updateCanvas(pageViewer: any): fabric.Canvas {
+  public updateCanvas(pageViewer: any): PagedCanvas {
     // Add the event listeners for mousedown, mousemove, and mouseup
 
     // console.log(' UPDATE CANVAS ');
 
     //    this.detachPen();
 
-    if (this.annotationCanvas && this.annotationCanvas.parentNode) {
+    if (this.annotationCanvas?.parentNode) {
       this.annotationCanvas.parentNode.removeChild(this.annotationCanvas);
     }
     this.pageViewer = pageViewer;
@@ -118,18 +116,18 @@ export class PageHandler {
     this.pdfCanvas.style.touchAction = 'none';
     this.annotationCanvas.style.position = 'absolute';
     this.annotationCanvas.style.touchAction = 'none';
-    this.annotationCanvas.id = 'mycanvas' + this.page;
+    this.annotationCanvas.id = 'mycanvas' + String(this.page);
 
     // this.canvas.style['z-index'] = '30';
     // this.pdfCanvas.style['z-index'] = '20';
 
     this.pdfCanvas.parentElement!.appendChild(this.annotationCanvas);
 
-    const canvas = new fabric.Canvas(this.annotationCanvas, {
+    const canvas: PagedCanvas = new fabric.Canvas(this.annotationCanvas, {
       selection: false,
       preserveObjectStacking: true,
-    });
-    (canvas as any).page = this.page;
+    }) as PagedCanvas;
+    canvas.page = this.page;
 
     this.eventHandler.canvas = canvas;
     this.eventHandler.allcanvas.push(canvas);
@@ -158,64 +156,65 @@ export class PageHandler {
     return canvas;
   }
 
-  private addEventListeners(canvas: any) {
-    canvas.on('mouse:down', (e: any) => this.onCanvasMouseDown(e));
-
-    canvas.on('mouse:move', (e: any) => this.onCanvasMouseMove(e));
+  private addEventListeners(canvas: PagedCanvas): void {
+    canvas.on('mouse:down', e => this.onCanvasMouseDown(e));
+    canvas.on('mouse:move', e => this.onCanvasMouseMove(e));
     canvas.on('mouse:up', () => this.onCanvasMouseUp());
-    canvas.on('selection:created', (e: any) => this.onSelectionCreated(e as any));
-    canvas.on('selection:updated', (e: any) => this.onSelectionUpdated(e as any));
-    canvas.on('object:moving', (e: any) => this.onObjectMoving(e as any));
-    canvas.on('object:scaling', (e: any) => this.onObjectScaling(e as any));
+    canvas.on('selection:created', e => this.onSelectionCreated(e));
+    canvas.on('selection:updated', e => this.onSelectionUpdated(e));
+    canvas.on('object:modified', e => this.onObjectModified(e as CanvasModifiedEvent));
   }
 
-  private onCanvasMouseDown(event: { e: Event }) {
+  private onCanvasMouseDown(event: IEvent<MouseEvent>): void {
     this.eventHandler.canvas = this.canvas;
     this.eventHandler.mouseDown(event.e);
     this.avoidDragAndClickEventsOfOtherUILibs(event.e);
   }
-  private onCanvasMouseMove(event: { e: Event }) {
+
+  private onCanvasMouseMove(event: IEvent<MouseEvent>): void {
     this.eventHandler.canvas = this.canvas;
     this.eventHandler.mouseMove(event.e);
   }
-  private onCanvasMouseUp() {
+
+  private onCanvasMouseUp(): void {
     this.eventHandler.canvas = this.canvas;
     this.eventHandler.mouseUp();
   }
-  private onSelectionCreated(e: any) {
+
+  private onSelectionCreated(e: any): void {
     this.eventHandler.canvas = this.canvas;
 
     this.eventHandler.objectSelected(e.selected[0]);
   }
-  private onSelectionUpdated(e: any) {
+
+  private onSelectionUpdated(e: any): void {
     this.eventHandler.canvas = this.canvas;
 
     this.eventHandler.objectSelected(e.selected[0]);
   }
-  private onObjectMoving(e: any) {
-    this.eventHandler.canvas = this.canvas;
-    this.eventHandler.objectMoving(e.target.id, e.target.type, e.target.left, e.target.top);
-  }
-  private onObjectScaling(e: any) {
-    this.eventHandler.canvas = this.canvas;
-    this.eventHandler.objectScaling(
-      e.target.id,
-      e.target.type,
-      { x: e.target.scaleX, y: e.target.scaleY },
-      { left: e.target.left, top: e.target.top }
-    );
+
+  private onObjectModified(e: CanvasModifiedEvent): void {
+    if (e.action === 'drag') {
+      this.eventHandler.canvas = this.canvas;
+      this.eventHandler.objectMoving(e.target.id, e.target.type, e.target.left, e.target.top);
+    } else {
+      this.eventHandler.canvas = this.canvas;
+      this.eventHandler.objectScaling(
+        e.target.id,
+        e.target.type,
+        { x: e.target.scaleX, y: e.target.scaleY },
+        { left: e.target.left, top: e.target.top }
+      );
+    }
   }
 
-  private avoidDragAndClickEventsOfOtherUILibs(e: Event) {
+  private avoidDragAndClickEventsOfOtherUILibs(e: Event): void {
     e.stopPropagation();
   }
 
   // Copy source contents to annotation canvas.
 
-  // console.log(this.canvas);
-
-  public clear() {
-    // eslint-disable-next-line no-console
+  public clear(): void {
     const context = this.annotationCanvas.getContext('2d');
     context!.clearRect(0, 0, this.annotationCanvas.width, this.annotationCanvas.height);
 
@@ -224,7 +223,7 @@ export class PageHandler {
     ctx!.drawImage(this.pdfCanvas, 0, 0);
   }
 
-  visible(yes: boolean) {
+  public visible(yes: boolean): void {
     if (!this.annotationCanvas) {
       return;
     }
@@ -235,7 +234,7 @@ export class PageHandler {
     }
   }
 
-  detachPen() {
+  public detachPen(): void {
     if (this.annotationCanvas) {
       this.annotationCanvas.style.cursor = 'default';
       this.annotationCanvas.onmousedown = null;
