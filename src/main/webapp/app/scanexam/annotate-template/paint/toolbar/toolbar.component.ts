@@ -45,13 +45,14 @@ export class GraphicalToolbarComponent {
   ) {}
 
   ngOnInit(): void {
+    this.selected = DrawingTools.SELECT;
     this.eventService.registerSelectedToolObserver(s => {
       this.selected = s;
     });
     this.eventService.setConfirmationService(this.confirmationService);
   }
 
-  async select(tool: DrawingTools) {
+  select(tool: DrawingTools) {
     this.eventService.selectedTool = tool;
     this.selected = this.eventService.selectedTool;
   }
