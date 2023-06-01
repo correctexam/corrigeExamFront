@@ -663,45 +663,52 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async ajouterTComment(comment: ITextComment) {
-    if (!this.resp!.id) {
-      const ret = await this.updateResponseRequest(this.resp!).toPromise();
-      this.resp = ret!.body!;
-    }
+    if (!this.blocked) {
+      this.blocked = true;
+      if (!this.resp!.id) {
+        const ret = await this.updateResponseRequest(this.resp!).toPromise();
+        this.resp = ret!.body!;
+      }
 
-    this.resp?.textcomments?.push(comment);
-    this.blocked = true;
-    this.updateResponseRequest(this.resp!).subscribe(resp1 => {
-      this.resp = resp1.body!;
-      (comment as any).checked = true;
-      this.blocked = false;
-    });
+      this.resp?.textcomments?.push(comment);
+      this.updateResponseRequest(this.resp!).subscribe(resp1 => {
+        this.resp = resp1.body!;
+        (comment as any).checked = true;
+        this.blocked = false;
+      });
+    }
   }
   async ajouterGComment(comment: IGradedComment) {
-    if (!this.resp!.id) {
-      const ret = await this.updateResponseRequest(this.resp!).toPromise();
-      this.resp = ret!.body!;
+    if (!this.blocked) {
+      this.blocked = true;
+      if (!this.resp!.id) {
+        const ret = await this.updateResponseRequest(this.resp!).toPromise();
+        this.resp = ret!.body!;
+      }
+      this.resp?.gradedcomments?.push(comment);
+      this.updateResponseRequest(this.resp!).subscribe(resp1 => {
+        this.resp = resp1.body!;
+        (comment as any).checked = true;
+        this.computeNote(true, this.resp!, this.currentQuestion!).then(() => (this.blocked = false));
+      });
     }
-    this.resp?.gradedcomments?.push(comment);
-    this.blocked = true;
-    this.updateResponseRequest(this.resp!).subscribe(resp1 => {
-      this.resp = resp1.body!;
-      (comment as any).checked = true;
-      this.computeNote(true, this.resp!, this.currentQuestion!).then(() => (this.blocked = false));
-    });
   }
   async retirerTComment(comment: ITextComment) {
-    if (!this.resp!.id) {
-      const ret = await this.updateResponseRequest(this.resp!).toPromise();
-      this.resp = ret!.body!;
-    }
+    if (!this.blocked) {
+      this.blocked = true;
+      if (!this.resp!.id) {
+        const ret = await this.updateResponseRequest(this.resp!).toPromise();
+        this.resp = ret!.body!;
+      }
 
-    this.resp!.textcomments = this.resp?.textcomments!.filter(e => e.id !== comment.id);
-    this.blocked = true;
-    this.updateResponseRequest(this.resp!).subscribe(resp1 => {
-      this.resp = resp1.body!;
-      this.blocked = false;
-      (comment as any).checked = false;
-    });
+      this.resp!.textcomments = this.resp?.textcomments!.filter(e => e.id !== comment.id);
+      this.blocked = true;
+      this.updateResponseRequest(this.resp!).subscribe(resp1 => {
+        this.resp = resp1.body!;
+        this.blocked = false;
+        (comment as any).checked = false;
+      });
+    }
   }
 
   toggleGComment(comment: IGradedComment) {
@@ -720,18 +727,21 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async retirerGComment(comment: IGradedComment) {
-    if (!this.resp!.id) {
-      const ret = await this.updateResponseRequest(this.resp!).toPromise();
-      this.resp = ret!.body!;
-    }
-    this.resp!.gradedcomments = this.resp?.gradedcomments!.filter(e => e.id !== comment.id);
-    this.blocked = true;
-    this.updateResponseRequest(this.resp!).subscribe(resp1 => {
-      this.resp = resp1.body!;
+    if (!this.blocked) {
+      this.blocked = true;
+      if (!this.resp!.id) {
+        const ret = await this.updateResponseRequest(this.resp!).toPromise();
+        this.resp = ret!.body!;
+      }
+      this.resp!.gradedcomments = this.resp?.gradedcomments!.filter(e => e.id !== comment.id);
+      this.blocked = true;
+      this.updateResponseRequest(this.resp!).subscribe(resp1 => {
+        this.resp = resp1.body!;
 
-      (comment as any).checked = false;
-      this.computeNote(true, this.resp!, this.currentQuestion!).then(() => (this.blocked = false));
-    });
+        (comment as any).checked = false;
+        this.computeNote(true, this.resp!, this.currentQuestion!).then(() => (this.blocked = false));
+      });
+    }
   }
 
   computeNote(update: boolean, resp: IStudentResponse, currentQ: IQuestion): Promise<IStudentResponse> {
