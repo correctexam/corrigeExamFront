@@ -125,12 +125,18 @@ export class EventHandlerService {
             c.clear();
             c.renderAll();
           });
-           this.modelViewpping.forEach((zoneId, _) => {
-              // TODO avoid removing all zone by Azone
-              this.eraseAddQuestion(zoneId, false).then(() => {
-                this.zoneService.delete(zoneId).subscribe();
-              });
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          this.modelViewpping.forEach((zoneId, _) => {
+            const promises = [];
+            promises.push(this.eraseAddQuestion(zoneId, false));
+            Promise.all(promises).then(() => {
+              console.error(this._exam.id);
+              this.examService.deleteAllZone(this._exam.id!).subscribe();
             });
+            /* .then(() => {
+                this.zoneService.delete(zoneId).subscribe();
+              });*/
+          });
           this.modelViewpping.clear();
         },
       });
