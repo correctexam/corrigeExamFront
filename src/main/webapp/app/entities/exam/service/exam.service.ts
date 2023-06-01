@@ -59,6 +59,12 @@ export class ExamService {
     });
   }
 
+  deleteAllZone(id: number): Observable<HttpResponse<{}>> {
+    return this.http.delete(this.applicationConfigService.getEndpointFor('api') + '/cleanExam' + `/${id}`, {
+      observe: 'response',
+    });
+  }
+
   addExamToCollectionIfMissing(examCollection: IExam[], ...examsToCheck: (IExam | null | undefined)[]): IExam[] {
     const exams: IExam[] = examsToCheck.filter(isPresent);
     if (exams.length > 0) {
