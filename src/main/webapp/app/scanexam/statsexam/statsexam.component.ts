@@ -53,7 +53,7 @@ export class StatsExamComponent implements OnInit {
     { icon: 'pi pi-sort-numeric-up', sort: 'note' },
   ];
   mobileSortChoice: ISortMobile = this.mobileSortChoices[2];
-  knobsCourants: string[] = [];
+  knobsCourants: Map<number, string> = new Map();
   COLOR_KNOBS = BLEU_AERO_TIEDE;
   idQuestionSelected = 0;
   questionSelectionnee = false;
@@ -259,23 +259,48 @@ export class StatsExamComponent implements OnInit {
   }
 
   private triNotes(etudiants: StudentRes[]): StudentRes[] {
-    etudiants.sort((s1: StudentRes, s2: StudentRes) => {
-      const note1 = s1.note;
-      const note2 = s2.note;
-      if (note1 === undefined && note2 === undefined) {
-        return 0;
-      } else if (note1 === undefined) {
-        return -1;
-      } else if (note2 === undefined) {
+    if (this.questionSelectionnee) {
+      etudiants.sort((s1: StudentRes, s2: StudentRes) => {
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+        const note1 = s1.notequestions['' + this.idQuestionSelected];
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+        const note2 = s2.notequestions['' + this.idQuestionSelected];
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (note1 === undefined && note2 === undefined) {
+          return 0;
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        } else if (note1 === undefined) {
+          return -1;
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        } else if (note2 === undefined) {
+          return 1;
+        } else if (this.s2f(note1) < this.s2f(note2)) {
+          return -1;
+        } else if (this.s2f(note1) === this.s2f(note2)) {
+          return this.compareAlpha(s1, s2);
+        }
         return 1;
-      } else if (this.s2f(note1) < this.s2f(note2)) {
-        return -1;
-      } else if (this.s2f(note1) === this.s2f(note2)) {
-        return this.compareAlpha(s1, s2);
-      }
-      return 1;
-    });
-    return etudiants.reverse();
+      });
+      return etudiants.reverse();
+    } else {
+      etudiants.sort((s1: StudentRes, s2: StudentRes) => {
+        const note1 = s1.note;
+        const note2 = s2.note;
+        if (note1 === undefined && note2 === undefined) {
+          return 0;
+        } else if (note1 === undefined) {
+          return -1;
+        } else if (note2 === undefined) {
+          return 1;
+        } else if (this.s2f(note1) < this.s2f(note2)) {
+          return -1;
+        } else if (this.s2f(note1) === this.s2f(note2)) {
+          return this.compareAlpha(s1, s2);
+        }
+        return 1;
+      });
+      return etudiants.reverse();
+    }
   }
 
   private triINE(etudiants: StudentRes[]): StudentRes[] {
@@ -314,24 +339,24 @@ export class StatsExamComponent implements OnInit {
     return this.sum(this.getBaremes(this.q_notees));
   }
 
-  private getNotes(etudiant: StudentRes): number[] {
-    const notes: number[] = [];
+  private getNotes(etudiant: StudentRes): Map<number, number> {
+    const notes: Map<number, number> = new Map();
     for (const key in etudiant.notequestions) {
-      notes.push(this.s2f(etudiant.notequestions[key]));
+      notes.set(+key - 1, this.s2f(etudiant.notequestions[key]));
     }
     return notes;
   }
   // Permet de pouvoir accéder facilement aux notes de l'étudiant sélectionné et de ne pas devoir gérer les erreurs en cas d'étudiant non sélectionné
-  public getNotesSelect(): number[] {
+  public getNotesSelect(): Map<number, number> {
     if (this.etudiantSelec !== null && this.etudiantSelec !== undefined) {
       return this.getNotes(this.etudiantSelec);
     } else {
-      return [];
+      return new Map();
     }
   }
 
   getNoteSelect(): number {
-    return this.sum(this.getNotesSelect());
+    return this.sum(Array.from(this.getNotesSelect().values()));
   }
 
   /** @return Average mark for all the questions (ordered) */
@@ -341,9 +366,9 @@ export class StatsExamComponent implements OnInit {
 
   private updateKnobs(): void {
     const knobsNb = this.etudiantSelec !== null && this.etudiantSelec !== undefined ? this.getNotesSelect() : this.getMoyennesQuestions();
-    this.knobsCourants = [];
-    knobsNb.forEach(knobValue => {
-      this.knobsCourants.push(knobValue.toFixed(2));
+    this.knobsCourants = new Map<number, string>();
+    knobsNb.forEach((e, k) => {
+      this.knobsCourants.set(k, e.toFixed(2));
     });
   }
 
@@ -511,7 +536,12 @@ export class StatsExamComponent implements OnInit {
   }
 
   private radarStudent(etudiant: StudentRes): IRadarDataset {
-    return this.basicDataset(this.translateService.instant('scanexam.notes'), VIOLET, VIOLET_LEGER, this.getNotes(etudiant));
+    return this.basicDataset(
+      this.translateService.instant('scanexam.notes'),
+      VIOLET,
+      VIOLET_LEGER,
+      Array.from(this.getNotes(etudiant).values())
+    );
   }
 
   private basicDataset(label: string, couleurForte: string, couleurLegere: string, data: number[]): IRadarDataset {
@@ -628,9 +658,9 @@ export class StatsExamComponent implements OnInit {
 
   public selectQuestion(idQuestion: number): void {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (this.etudiantSelec == null || this.etudiantSelec === undefined) {
+    /* if (this.etudiantSelec == null || this.etudiantSelec === undefined) {
       return;
-    }
+    }*/
     let q_selectionne = true;
     if (this.idQuestionSelected === idQuestion) {
       // Effet toggle
