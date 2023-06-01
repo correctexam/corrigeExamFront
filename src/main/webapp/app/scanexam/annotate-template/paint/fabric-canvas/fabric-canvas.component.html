@@ -1,5 +1,5 @@
 <div class="flex-container">
-  <jhi-summary-template class="summary" [questions]="questions"></jhi-summary-template>
+  <jhi-summary-template class="summary" [questions]="eventHandler.questions"></jhi-summary-template>
   <div class="canvas-wrapper foo">
     <ngx-extended-pdf-viewer
       [base64Src]="content"
