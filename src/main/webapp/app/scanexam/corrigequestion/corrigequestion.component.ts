@@ -553,7 +553,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   changeNote(): void {
-    if (this.resp !== undefined) {
+    if (this.resp !== undefined && !this.blocked) {
       this.blocked = true;
       // When cancelling the marking, in fact it means marking to 0
       this.currentNote ??= 0;
