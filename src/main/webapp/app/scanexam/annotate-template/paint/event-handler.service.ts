@@ -95,8 +95,10 @@ export class EventHandlerService {
               c.renderAll();
             });
             this.modelViewpping.forEach((zoneId, _) => {
-              this.zoneService.delete(zoneId).subscribe();
-              this.eraseAddQuestion(zoneId, false);
+              // TODO avoid removing all zone by Azone
+              this.eraseAddQuestion(zoneId, false).then(() => {
+                this.zoneService.delete(zoneId).subscribe();
+              });
             });
             this.modelViewpping.clear();
           },
@@ -561,13 +563,17 @@ export class EventHandlerService {
     const zid = this.modelViewpping.get(customObject.id);
 
     if (zid !== undefined) {
-      this.zoneService.delete(zid).subscribe();
-      this.modelViewpping.delete(customObject.id);
+      if (this.isAQuestion(object)) {
+        this.eraseAddQuestion(zid, false).then(() => {
+          this.zoneService.delete(zid).subscribe();
+          this.modelViewpping.delete(customObject.id);
+        });
+      } else {
+        this.zoneService.delete(zid).subscribe();
+        this.modelViewpping.delete(customObject.id);
+      }
 
       // Have to delete the question from the summary
-      if (this.isAQuestion(object)) {
-        this.eraseAddQuestion(zid, false);
-      }
     }
 
     if (object.type === FabricObjectType.GROUP) {
@@ -602,9 +608,12 @@ export class EventHandlerService {
    * @param zoneId The id of the zone that contains the question
    * @param add True: add the question. Otherwise, removes the question.
    */
-  private eraseAddQuestion(zoneId: number, add: boolean): void {
-    this.questionService.query({ zoneId }).subscribe(res => {
-      this.onQuestionAddDelCB(add ? res.body?.[0]?.numero! : res.body?.[0]?.id!, add);
+  private eraseAddQuestion(zoneId: number, add: boolean): Promise<void> {
+    return new Promise(res1 => {
+      this.questionService.query({ zoneId }).subscribe(res => {
+        this.onQuestionAddDelCB(add ? res.body?.[0]?.numero! : res.body?.[0]?.id!, add);
+        res1();
+      });
     });
   }
 
