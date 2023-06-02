@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/member-ordering */
 import { HttpClient } from '@angular/common/http';
@@ -12,6 +11,17 @@ import Handsontable from 'handsontable';
 import { CellChange, ChangeSource } from 'handsontable/common';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
+/**
+ * Used to type to data spreadsheet
+ */
+interface Std {
+  ine?: string;
+  nom?: string;
+  prenom?: string;
+  mail?: string;
+  groupe?: string;
+}
+
 @Component({
   selector: 'jhi-import-student',
   templateUrl: './import-student.component.html',
@@ -19,7 +29,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
   providers: [MessageService, ConfirmationService],
 })
 export class ImportStudentComponent implements OnInit, AfterViewInit {
-  dataset!: any[];
+  dataset: Std[] = [];
   blocked = false;
   private hotRegisterer = new HotTableRegisterer();
   id = 'hotInstance';
@@ -45,7 +55,7 @@ export class ImportStudentComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val);
+    this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val) as Std[];
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('courseid') !== null) {
         this.courseid = params.get('courseid')!;
@@ -57,7 +67,7 @@ export class ImportStudentComponent implements OnInit, AfterViewInit {
   detectChanges = (changes: CellChange[] | null, source: ChangeSource) => {};
 
   updateTableSize(): void {
-    this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val);
+    this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val) as Std[];
   }
 
   download(): void {
@@ -84,19 +94,49 @@ export class ImportStudentComponent implements OnInit, AfterViewInit {
     this.router.navigateByUrl('/course/' + this.courseid);
   }
 
-  canImport(): boolean {
-    const fullLine =
-      this.dataset.filter(e => e.mail !== undefined && e.mail !== '' && e.mail !== null).length > 0 &&
-      this.dataset.filter(e => e.ine !== undefined && e.ine !== '' && e.ine !== null).length ===
-        this.dataset.filter(e => e.mail !== undefined && e.mail !== '' && e.mail !== null).length &&
-      this.dataset.filter(e => e.ine !== undefined && e.ine !== '' && e.ine !== null).length ===
-        this.dataset.filter(e => e.groupe !== undefined && e.groupe !== '' && e.groupe !== null).length;
-    const duplicatemail: any[] = this.dataset.filter(e => e.mail !== undefined && e.mail !== '' && e.mail !== null).map(e => e.mail);
-    const uniqemail = duplicatemail.length === [...new Set(duplicatemail)].length;
-    const duplicatine: any[] = this.dataset.filter(e => e.ine !== undefined && e.ine !== '' && e.ine !== null).map(e => e.ine);
-    const uniqine = duplicatine.length === [...new Set(duplicatine)].length;
+  /**
+   *
+   * @returns Checks whether the current data is ok to be imported
+   */
+  public canImport(): boolean {
+    return (
+      this.getNonEmptyPropValues('mail').length > 0 &&
+      this.canImportSameColSize() &&
+      this.canImportUniqueINE() &&
+      this.canImportUniqueMails()
+    );
+  }
 
-    return fullLine && uniqemail && uniqine;
+  public canImportSameColSize(): boolean {
+    const mails = this.getNonEmptyPropValues('mail');
+    const ines = this.getNonEmptyPropValues('ine');
+    const groups = this.getNonEmptyPropValues('groupe');
+    const lastname = this.getNonEmptyPropValues('nom');
+    const firstname = this.getNonEmptyPropValues('prenom');
+
+    return (
+      ines.length === mails.length &&
+      ines.length === groups.length &&
+      lastname.length === groups.length &&
+      firstname.length === lastname.length
+    );
+  }
+
+  public canImportUniqueMails(): boolean {
+    const mails = this.getNonEmptyPropValues('mail');
+    return mails.length === [...new Set(mails)].length;
+  }
+
+  public canImportUniqueINE(): boolean {
+    const ines = this.getNonEmptyPropValues('ine');
+    return ines.length === [...new Set(ines)].length;
+  }
+
+  /**
+   * Associated to canImport to check columns (their size).
+   */
+  private getNonEmptyPropValues(prop: keyof Std): string[] {
+    return this.dataset.map(e => e[prop]).filter((str): str is string => typeof str === 'string' && str.length > 0);
   }
 
   envoiEtudiants(): void {
@@ -116,7 +156,7 @@ export class ImportStudentComponent implements OnInit, AfterViewInit {
             summary: data,
             detail: this.translate.instant('scanexam.importsuccessdetail'),
           });
-          this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val);
+          this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val) as Std[];
           this.activeIndex = 1;
           this.loadEtudiants();
         });
