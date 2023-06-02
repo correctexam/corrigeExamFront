@@ -45,6 +45,8 @@ export class FabricCanvasComponent implements OnInit {
   public questions: Map<number, IQuestion> = new Map();
   public examId = -1;
   public title = 'gradeScopeFree';
+  // For locking the page during the pdf rendering
+  public blocked = false;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -170,6 +172,7 @@ export class FabricCanvasComponent implements OnInit {
     // to have all the canvases up to date.
     if (this.pdfViewerService.isRenderQueueEmpty()) {
       this.loadingPdfMetadata();
+      this.blocked = false;
     }
   }
 

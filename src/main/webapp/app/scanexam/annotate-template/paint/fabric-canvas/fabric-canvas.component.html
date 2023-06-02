@@ -1,6 +1,9 @@
 <div class="flex-container">
   <jhi-summary-template class="summary" [questions]="questions"></jhi-summary-template>
   <div class="canvas-wrapper foo">
+    <p-blockUI [blocked]="blocked">
+      <i class="pi pi-lock" style="font-size: 3rem"></i>
+    </p-blockUI>
     <ngx-extended-pdf-viewer
       [base64Src]="content"
       [useBrowserLocale]="true"
@@ -16,6 +19,7 @@
       [showToolbar]="false"
       [pageViewMode]="'infinite-scroll'"
       [showSecondaryToolbarButton]="false"
+      (pageRender)="blocked = true"
       (pageRendered)="pageRendered($event)"
       backgroundColor="#ffffff"
       [zoom]="'100%'"
