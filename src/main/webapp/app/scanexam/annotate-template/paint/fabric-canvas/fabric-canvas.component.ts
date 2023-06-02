@@ -10,8 +10,8 @@ import { IExam } from 'app/entities/exam/exam.model';
 import { ZoneService } from '../../../../entities/zone/service/zone.service';
 import { IZone } from 'app/entities/zone/zone.model';
 import { QuestionService } from '../../../../entities/question/service/question.service';
-import { Subject, firstValueFrom } from 'rxjs';
-import { Question } from 'app/entities/question/question.model';
+import { Subject } from 'rxjs';
+import { IQuestion, Question } from 'app/entities/question/question.model';
 import { ActivatedRoute } from '@angular/router';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { PreferenceService } from 'app/scanexam/preference-page/preference.service';
@@ -42,14 +42,15 @@ export class FabricCanvasComponent implements OnInit {
   public numeroEvent!: Subject<string>;
   public zones: { [page: number]: CustomZone[] } = {};
   public scrollMode: ScrollModeType = ScrollModeType.vertical;
+  public questions: Map<number, IQuestion> = new Map();
   public examId = -1;
   public title = 'gradeScopeFree';
   // For locking the page during the pdf rendering
   public blocked = false;
 
   constructor(
-    public eventHandler: EventHandlerService,
     private activatedRoute: ActivatedRoute,
+    private eventHandler: EventHandlerService,
     private zoneService: ZoneService,
     private questionService: QuestionService,
     private examService: ExamService,
@@ -60,12 +61,22 @@ export class FabricCanvasComponent implements OnInit {
   public ngOnInit(): void {
     this.eventHandler.reinit(this.exam, this.zones);
 
+    this.eventHandler.registerOnQuestionAddRemoveCallBack((qid, add) => {
+      if (add) {
+        this.getQuestion(qid);
+      } else {
+        this.questions.delete(qid);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        this.eventHandler.nextQuestionNumeros = Array.from(this.questions).map(([key, value]) => value.numero!);
+      }
+    });
+
     this.activatedRoute.paramMap.subscribe(params => {
       this.examId = parseInt(params.get('examid') ?? '-1', 10);
 
       // Reacting on a change in a question
       this.numeroEvent.subscribe(numero => {
-        this.eventHandler.addQuestion(parseInt(numero, 10));
+        this.getQuestion(parseInt(numero, 10));
       });
     });
 
@@ -93,7 +104,7 @@ export class FabricCanvasComponent implements OnInit {
     this.questionService.query({ examId: this.exam.id! }).subscribe(qs => {
       qs.body?.forEach(q => {
         if (q.id !== undefined) {
-          this.eventHandler.questions.set(q.id, q);
+          this.questions.set(q.id, q);
         }
         this.zoneService.find(q.zoneId!).subscribe(z => {
           const ezone = z.body as CustomZone;
@@ -108,6 +119,20 @@ export class FabricCanvasComponent implements OnInit {
     if (zone.pageNumber) {
       this.eventHandler.addZoneRendering(zone.pageNumber, zone);
     }
+  }
+
+  /**
+   * Getting the questions corresponding to the given number (REST query) and adding them to `questions`
+   */
+  private getQuestion(numero: number): void {
+    this.questionService.query({ examId: this.examId, numero }).subscribe(qs => {
+      qs.body?.forEach(q => {
+        if (q.id !== undefined) {
+          this.questions.set(q.id, q);
+        }
+      });
+      this.eventHandler.nextQuestionNumeros = Array.from(this.questions).map(([, value]) => value.numero!);
+    });
   }
 
   public pageRendered(evt: PageRenderedEvent): void {
@@ -155,43 +180,42 @@ export class FabricCanvasComponent implements OnInit {
     const rects = await this.getCustomPdfProperties();
     const qs: Record<number, Array<Rect>> = {};
     let qnum = 0;
-    const promises: Array<Promise<void>> = [];
 
     rects.forEach(rect => {
       switch (rect.type) {
         case DrawingTools.INEBOX:
           if (this.exam.idzoneId === undefined) {
-            promises.push(
-              firstValueFrom(this.zoneService.create(this.createZone(rect))).then(z1 => {
-                this.exam.idzoneId = z1.body!.id!;
-                this.renderZone(z1.body as CustomZone);
-                this.eventHandler.createRedBox('scanexam.ineuc1', z1.body!, rect.p);
-              })
-            );
+            this.zoneService.create(this.createZone(rect)).subscribe(z1 => {
+              this.exam.idzoneId = z1.body!.id!;
+              // maybe only one time if one modification
+              this.updateExam();
+              this.renderZone(z1.body as CustomZone);
+              this.eventHandler.createRedBox('scanexam.ineuc1', z1.body!, rect.p);
+            });
           }
           break;
 
         case DrawingTools.PRENOMBOX:
           if (this.exam.firstnamezoneId === undefined) {
-            promises.push(
-              firstValueFrom(this.zoneService.create(this.createZone(rect))).then(z1 => {
-                this.exam.firstnamezoneId = z1.body!.id!;
-                this.renderZone(z1.body as CustomZone);
-                this.eventHandler.createRedBox('scanexam.prenomuc1', z1.body!, rect.p);
-              })
-            );
+            this.zoneService.create(this.createZone(rect)).subscribe(z1 => {
+              this.exam.firstnamezoneId = z1.body!.id!;
+              // maybe only one time if one modification
+              this.updateExam();
+              this.renderZone(z1.body as CustomZone);
+              this.eventHandler.createRedBox('scanexam.prenomuc1', z1.body!, rect.p);
+            });
           }
           break;
 
         case DrawingTools.NOMBOX:
           if (this.exam.namezoneId === undefined) {
-            promises.push(
-              firstValueFrom(this.zoneService.create(this.createZone(rect))).then(z1 => {
-                this.exam.namezoneId = z1.body!.id!;
-                this.renderZone(z1.body as CustomZone);
-                this.eventHandler.createRedBox('scanexam.nomuc1', z1.body!, rect.p);
-              })
-            );
+            this.zoneService.create(this.createZone(rect)).subscribe(z1 => {
+              this.exam.namezoneId = z1.body!.id!;
+              // maybe only one time if one modification
+              this.updateExam();
+              this.renderZone(z1.body as CustomZone);
+              this.eventHandler.createRedBox('scanexam.nomuc1', z1.body!, rect.p);
+            });
           }
           break;
 
@@ -205,12 +229,7 @@ export class FabricCanvasComponent implements OnInit {
       }
     });
 
-    // Once all the queries done, updating the exam
-    Promise.all(promises).then(() => {
-      this.updateExam();
-    });
-
-    const arrayquestions = Array.from(this.eventHandler.questions.values());
+    const arrayquestions = Array.from(this.questions.values());
     for (const [key, value] of Object.entries(qs)) {
       qnum = parseInt(key, 10);
 
@@ -233,7 +252,7 @@ export class FabricCanvasComponent implements OnInit {
 
               this.questionService.create(q).subscribe(resq => {
                 if (resq.body?.id !== undefined) {
-                  this.eventHandler.questions.set(resq.body.id, q);
+                  this.questions.set(resq.body.id, q);
                   this.renderZone(zone);
                   this.eventHandler.createRedQuestionBox(zone, subq.p);
                 }
