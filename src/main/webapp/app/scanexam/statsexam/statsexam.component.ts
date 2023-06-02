@@ -228,7 +228,7 @@ export class StatsExamComponent implements OnInit {
         }
       });
     // eslint-disable-next-line no-console
-    console.log(this.notes_eleves);
+    //  console.log(this.notes_eleves);
     this.q_notees = qn.sort((a, b) => a.numero - b.numero);
   }
 
@@ -262,9 +262,10 @@ export class StatsExamComponent implements OnInit {
     if (this.questionSelectionnee) {
       etudiants.sort((s1: StudentRes, s2: StudentRes) => {
         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        const note1 = s1.notequestions['' + this.idQuestionSelected];
+        const note1 = s1.notequestions['' + (this.idQuestionSelected + 1)];
         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        const note2 = s2.notequestions['' + this.idQuestionSelected];
+        const note2 = s2.notequestions['' + (this.idQuestionSelected + 1)];
+        // console.error(note1, note2, this.idQuestionSelected, s1, s2);
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (note1 === undefined && note2 === undefined) {
           return 0;
