@@ -62,8 +62,6 @@ export class EventHandlerService {
   private previousScaleX!: number;
   private previousScaleY!: number;
   private cb!: (qid: number | undefined) => void;
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  private onQuestionAddDelCB: (qIdOrNum: number, add: boolean) => void = () => {};
   private _isMouseDown = false;
   private _selectedColour: DrawingColours = DrawingColours.BLACK;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -126,19 +124,11 @@ export class EventHandlerService {
             c.clear();
             c.renderAll();
           });
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          this.modelViewpping.forEach((zoneId, _) => {
-            const promises = [];
-            promises.push(this.eraseAddQuestion(zoneId, false));
-            Promise.all(promises).then(() => {
-              console.error(this._exam.id);
-              this.examService.deleteAllZone(this._exam.id!).subscribe();
-            });
-            /* .then(() => {
-                this.zoneService.delete(zoneId).subscribe();
-              });*/
-          });
+
+          this.examService.deleteAllZone(this._exam.id!).subscribe();
           this.modelViewpping.clear();
+          this.questions.clear();
+          this.zonesRendering = [];
         },
       });
     });
@@ -696,10 +686,6 @@ export class EventHandlerService {
     this.cb = cb;
   }
 
-  public registerOnQuestionAddRemoveCallBack(cb: (qid: number, add: boolean) => void): void {
-    this.onQuestionAddDelCB = cb;
-  }
-
   public reinit(exam: IExam, zones: { [page: number]: CustomZone[] }): void {
     // Requires to flush all the cached canvases to compute new ones
     this.allcanvas = [];
@@ -708,6 +694,7 @@ export class EventHandlerService {
     this._selectedTool = DrawingTools.SELECT;
     this._exam = exam;
     this.zonesRendering = zones;
+    this.questions.clear();
   }
 
   public getNextQuestionNumero(): number {
