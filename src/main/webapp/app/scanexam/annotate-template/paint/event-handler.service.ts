@@ -41,7 +41,6 @@ export class EventHandlerService {
   public canvas!: PagedCanvas;
   public allcanvas: PagedCanvas[] = [];
   public pages: { [page: number]: PageHandler } = {};
-  public nextQuestionNumeros: Array<number> = [];
   public questions: Map<number, IQuestion> = new Map();
   private currentSelected: fabric.Object | undefined;
   private imageDataUrl!: string;
@@ -334,7 +333,6 @@ export class EventHandlerService {
         break;
 
       case DrawingTools.QUESTIONBOX:
-        this.nextQuestionNumeros.push(num);
         this.translateService.get('scanexam.questionuc1').subscribe((name: string) => {
           this.createBlueBox(DrawingTools.QUESTIONBOX, name + String(num), num);
         });
@@ -425,7 +423,7 @@ export class EventHandlerService {
         });
       } else {
         this.examService.update(this._exam).subscribe(e => {
-          this.exam = e.body!;
+          this._exam = e.body!;
           this.selectedTool = DrawingTools.SELECT;
         });
       }
@@ -475,7 +473,6 @@ export class EventHandlerService {
             DrawingColours.GREEN
           );
           this.modelViewpping.set(r.id, zone.id!);
-          this.nextQuestionNumeros.push(e.body[0].numero!);
         }
       });
     });
@@ -599,13 +596,12 @@ export class EventHandlerService {
    * Getting the questions corresponding to the given number (REST query) and adding them to `questions`
    */
   public addQuestion(numero: number): void {
-    this.questionService.query({ examId: this.exam.id!, numero }).subscribe(qs => {
+    this.questionService.query({ examId: this._exam.id!, numero }).subscribe(qs => {
       qs.body?.forEach(q => {
         if (q.id !== undefined) {
           this.questions.set(q.id, q);
         }
       });
-      this.nextQuestionNumeros = Array.from(this.questions.values()).map(value => value.numero!);
     });
   }
 
@@ -696,14 +692,15 @@ export class EventHandlerService {
     this.currentSelected = undefined;
     this._elementUnderDrawing = undefined;
     this._selectedTool = DrawingTools.SELECT;
-    this.exam = exam;
+    this._exam = exam;
     this.zonesRendering = zones;
     this.questions.clear();
   }
 
   public getNextQuestionNumero(): number {
+    const next = new Set(Array.from(this.questions.values()).map(value => value.numero!));
     let i = 1;
-    while (this.nextQuestionNumeros.includes(i)) {
+    while (next.has(i)) {
       i = i + 1;
     }
     return i;
