@@ -75,22 +75,16 @@
       <div class="card-body">
         <div class="knobs">
           <div
-            *ngFor="let note of this.knobsCourants; let iQuest = index"
-            [class]="
-              etudiantSelec === null || etudiantSelec === undefined
-                ? 'knobQuestion knobNonSelectionnable'
-                : questionSelectionnee && iQuest == idQuestionSelected
-                ? 'knobQuestion knobSelected'
-                : 'knobQuestion'
-            "
+            *ngFor="let note of knobsCourants | keyvalue"
+            [class]="questionSelectionnee && note.key == idQuestionSelected ? 'knobQuestion knobSelected' : 'knobQuestion'"
             tabindex="0"
-            (click)="this.selectQuestion(iQuest)"
-            id="knobquest{{ iQuest }}"
+            (click)="selectQuestion(note.key)"
+            id="knobquest{{ note.key }}"
           >
-            <h6>Question {{ iQuest + 1 }}</h6>
+            <h6>Question {{ note.key + 1 }}</h6>
             <p-knob
-              [(ngModel)]="this.knobsCourants[iQuest]"
-              [max]="getBaremes(this.q_notees)[iQuest]"
+              [ngModel]="this.knobsCourants.get(note.key)"
+              [max]="getBaremes(this.q_notees)[note.key]"
               [size]="70"
               [readonly]="true"
               valueColor="{{ COLOR_KNOBS }}"
@@ -117,6 +111,7 @@
     <p-card id="selection_etudiant" [header]="'scanexam.studentselection' | translate">
       <ng-template pTemplate="header">
         <p-table
+          *ngIf="!questionSelectionnee"
           class="computer-view"
           [value]="this.infosStudents"
           selectionMode="single"
@@ -147,6 +142,39 @@
             </tr>
           </ng-template>
         </p-table>
+        <p-table
+          *ngIf="questionSelectionnee"
+          class="computer-view"
+          [value]="this.infosStudents"
+          selectionMode="single"
+          [(selection)]="this.etudiantSelec"
+          notequestnotequestionsions
+          dataKey="ine"
+          responsiveLayout="scroll"
+          [scrollable]="true"
+          scrollHeight="500px"
+          (sortFunction)="triSelection($event)"
+          [customSort]="true"
+          (onRowSelect)="onStudentSelect()"
+          (onRowUnselect)="onStudentUnselect()"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="ine"><span jhiTranslate="scanexam.ine"></span><p-sortIcon field="ine"></p-sortIcon></th>
+              <th pSortableColumn="nom"><span jhiTranslate="scanexam.nom"></span> <p-sortIcon field="nom"></p-sortIcon></th>
+              <th pSortableColumn="prenom"><span jhiTranslate="scanexam.prenom"></span><p-sortIcon field="prenom"></p-sortIcon></th>
+              <th pSortableColumn="note"><span jhiTranslate="scanexam.note"></span><p-sortIcon field="note"></p-sortIcon></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-student>
+            <tr [pSelectableRow]="student">
+              <td>{{ student.ine }}</td>
+              <td>{{ student.nom }}</td>
+              <td>{{ student.prenom }}</td>
+              <td>{{ student.notequestions['' + (idQuestionSelected + 1)] }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
         <div class="mobile-view">
           <div class="selectstudentmobile">
             <p-dropdown
@@ -161,7 +189,7 @@
               (onChange)="onStudentSelect()"
               (onClear)="onStudentUnselect()"
               scrollHeight="150px"
-              showTransitionOptions=".4s ease-in-out"
+              showTransitionOptions="0.25.4s ease-in-out"
               hideTransitionOptions=".5s ease-in-out"
             ></p-dropdown>
             <div class="changementTriMobile">
@@ -173,8 +201,8 @@
               >
                 <ng-template let-item>
                   <i [class]="item.icon"></i>
-                </ng-template>
-              </p-selectButton>
+                </ng-template> </p-selectButton
+              >0.25
               <p-toggleButton
                 (onChange)="changementTriMobile()"
                 [(ngModel)]="choixTri"

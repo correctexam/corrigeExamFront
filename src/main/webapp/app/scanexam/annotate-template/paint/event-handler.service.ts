@@ -22,7 +22,7 @@ import { IZone } from '../../../entities/zone/zone.model';
 import { ZoneService } from '../../../entities/zone/service/zone.service';
 import { ExamService } from '../../../entities/exam/service/exam.service';
 import { IExam } from '../../../entities/exam/exam.model';
-import { IQuestion, Question } from '../../../entities/question/question.model';
+import { Question } from '../../../entities/question/question.model';
 import { QuestionService } from '../../../entities/question/service/question.service';
 import { PageHandler, PagedCanvas } from './fabric-canvas/PageHandler';
 import { TranslateService } from '@ngx-translate/core';
@@ -30,7 +30,6 @@ import { PreferenceService } from '../../preference-page/preference.service';
 import { CustomZone } from './fabric-canvas/fabric-canvas.component';
 import { ConfirmationService } from 'primeng/api';
 import { IText } from 'fabric/fabric-impl';
-import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -62,6 +61,8 @@ export class EventHandlerService {
   private previousScaleX!: number;
   private previousScaleY!: number;
   private cb!: (qid: number | undefined) => void;
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  private onQuestionAddDelCB: (qIdOrNum: number, add: boolean) => void = () => {};
   private _isMouseDown = false;
   private _selectedColour: DrawingColours = DrawingColours.BLACK;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -124,11 +125,19 @@ export class EventHandlerService {
             c.clear();
             c.renderAll();
           });
-
-          this.examService.deleteAllZone(this._exam.id!).subscribe();
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          this.modelViewpping.forEach((zoneId, _) => {
+            const promises = [];
+            promises.push(this.eraseAddQuestion(zoneId, false));
+            Promise.all(promises).then(() => {
+              console.error(this._exam.id);
+              this.examService.deleteAllZone(this._exam.id!).subscribe();
+            });
+            /* .then(() => {
+                this.zoneService.delete(zoneId).subscribe();
+              });*/
+          });
           this.modelViewpping.clear();
-          this.questions.clear();
-          this.zonesRendering = [];
         },
       });
     });
@@ -686,6 +695,10 @@ export class EventHandlerService {
     this.cb = cb;
   }
 
+  public registerOnQuestionAddRemoveCallBack(cb: (qid: number, add: boolean) => void): void {
+    this.onQuestionAddDelCB = cb;
+  }
+
   public reinit(exam: IExam, zones: { [page: number]: CustomZone[] }): void {
     // Requires to flush all the cached canvases to compute new ones
     this.allcanvas = [];
@@ -694,7 +707,6 @@ export class EventHandlerService {
     this._selectedTool = DrawingTools.SELECT;
     this._exam = exam;
     this.zonesRendering = zones;
-    this.questions.clear();
   }
 
   public getNextQuestionNumero(): number {
