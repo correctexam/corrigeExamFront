@@ -22,7 +22,7 @@ import { IZone } from '../../../entities/zone/zone.model';
 import { ZoneService } from '../../../entities/zone/service/zone.service';
 import { ExamService } from '../../../entities/exam/service/exam.service';
 import { IExam } from '../../../entities/exam/exam.model';
-import { Question } from '../../../entities/question/question.model';
+import { IQuestion, Question } from '../../../entities/question/question.model';
 import { QuestionService } from '../../../entities/question/service/question.service';
 import { PageHandler, PagedCanvas } from './fabric-canvas/PageHandler';
 import { TranslateService } from '@ngx-translate/core';
@@ -30,6 +30,7 @@ import { PreferenceService } from '../../preference-page/preference.service';
 import { CustomZone } from './fabric-canvas/fabric-canvas.component';
 import { ConfirmationService } from 'primeng/api';
 import { IText } from 'fabric/fabric-impl';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -591,7 +592,7 @@ export class EventHandlerService {
    * @param zoneId The id of the zone that contains the question
    * @param add True: add the question. Otherwise, removes the question.
    */
-  private eraseAddQuestion(zoneId: number, add: boolean): Promise<void> {
+  private async eraseAddQuestion(zoneId: number, add: boolean): Promise<void> {
     return firstValueFrom(this.questionService.query({ zoneId })).then(res => {
       if (add) {
         this.addQuestion(res.body?.[0]?.numero!);
