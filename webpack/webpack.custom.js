@@ -10,6 +10,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const { ESBuildMinifyPlugin } = require('esbuild-loader');
 
+const { CycloneDxWebpackPlugin } = require('@cyclonedx/webpack-plugin');
+
 const environment = require('./environment');
 const proxyConfig = require('./proxy.conf');
 
@@ -39,7 +41,7 @@ module.exports = async (config, options, targetOptions) => {
         extensions: ['js', 'ts'],
       }),
       new WebpackNotifierPlugin({
-        title: 'Grade Scope Istic',
+        title: 'CorrectExam',
         contentImage: path.join(__dirname, 'logo-jhipster.png'),
       }),
       new webpack.DefinePlugin({
@@ -140,6 +142,13 @@ module.exports = async (config, options, targetOptions) => {
   }
 
   config.plugins.push(
+    new CycloneDxWebpackPlugin({
+      specVersion: '1.4',
+      outputLocation: './bom',
+    })
+  );
+
+  config.plugins.push(
     /*new webpack.DefinePlugin({
       I18N_HASH: JSON.stringify(languagesHash.hash),
       // APP_VERSION is passed as an environment variable from the Gradle / Maven build tasks.
@@ -151,6 +160,7 @@ module.exports = async (config, options, targetOptions) => {
       // (see the `jhipster.cors` common JHipster property in the `application-*.yml` configurations)
       SERVER_API_URL: JSON.stringify(environment.SERVER_API_URL),
     }),*/
+
     new MergeJsonWebpackPlugin({
       output: {
         groupBy: [
