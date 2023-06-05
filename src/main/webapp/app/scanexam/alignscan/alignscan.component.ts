@@ -20,6 +20,7 @@ import { IImageAlignement, IImageAlignementInput } from '../services/align-image
 import { TemplateService } from '../../entities/template/service/template.service';
 import { ITemplate } from 'app/entities/template/template.model';
 import { faObjectGroup } from '@fortawesome/free-solid-svg-icons';
+import { faObjectUngroup } from '@fortawesome/free-solid-svg-icons';
 
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { CacheUploadService, CacheUploadNotification } from '../exam-detail/cacheUpload.service';
@@ -48,6 +49,7 @@ export interface IPage {
 })
 export class AlignScanComponent implements OnInit, CacheUploadNotification {
   faObjectGroup = faObjectGroup as IconProp;
+  faObjectUngroup = faObjectUngroup as IconProp;
   examId = '';
   exam!: IExam;
   course!: ICourse;
