@@ -30,7 +30,7 @@ import { PreferenceService } from '../../preference-page/preference.service';
 import { CustomZone } from './fabric-canvas/fabric-canvas.component';
 import { ConfirmationService } from 'primeng/api';
 import { IText } from 'fabric/fabric-impl';
-import { firstValueFrom } from 'rxjs';
+import { Observable, Subject, firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -61,13 +61,14 @@ export class EventHandlerService {
   private previousLeft!: number;
   private previousScaleX!: number;
   private previousScaleY!: number;
-  private cb!: (qid: number | undefined) => void;
   private _isMouseDown = false;
   private _selectedColour: DrawingColours = DrawingColours.BLACK;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private drawingToolObserver: (d: DrawingTools) => void = () => {};
   private confService!: ConfirmationService;
   private modelViewpping = new Map<string, number>();
+  /** Used to notify about newly selected or unselected question */
+  private readonly _selectedQuestion: Subject<Array<IQuestion>> = new Subject();
 
   public constructor(
     private fabricShapeService: FabricShapeService,
@@ -412,14 +413,13 @@ export class EventHandlerService {
 
         this.questionService.create(q).subscribe(() => {
           this.selectedTool = DrawingTools.SELECT;
-          this.cb(z1.body?.id);
 
-          // Selecting the new question
-          if (this.selectQuestion(customObject)) {
-            this.eraseAddQuestion(z1.body!.id!, true);
+          // Adding the question to the canvas and selecting it
+          this.eraseAddQuestion(z1.body!.id!, true).then(() => {
+            this.selectQuestion(customObject);
             this.canvas.setActiveObject(customObject);
             this.canvas.renderAll();
-          }
+          });
         });
       } else {
         this.examService.update(this._exam).subscribe(e => {
@@ -495,20 +495,35 @@ export class EventHandlerService {
   }
 
   /**
+   * Triggers unselection of objects
+   */
+  public unselectObject(): void {
+    // No more question selected
+    this._selectedQuestion.next([]);
+  }
+
+  /**
    * Selects the given question (if it is a question)
    * @returns True if the question is selected, false otherwise
    */
-  private selectQuestion(object: CustomFabricObject): boolean {
-    if (this.isAQuestion(object)) {
-      this.cb(this.modelViewpping.get(object.id));
+  private selectQuestion(object: CustomFabricObject): void {
+    const id = this.modelViewpping.get(object.id);
+    // Finding the question corresponding to the zone id from the cache
+    const question = typeof id === 'number' ? [...this.questions.values()].find(q => q.zoneId === id) : undefined;
+
+    if (question !== undefined && this.isAQuestion(object)) {
+      // Getting all the questions with the same number (one question divided into several parts)
+      let questions = [...this.questions.values()].filter(q => q.numero === question.numero);
+      // Need to put the truely selected question at first position in the array
+      questions = [question, ...questions.filter(q => q.id !== question.id)];
+      // Notifying that this bunch of questions is selected
+      this._selectedQuestion.next(questions);
+
       this.currentSelected = (object as CustomFabricGroup).getObjects()[1];
-      return true;
     }
-    return false;
   }
 
   public objectSelected(object: CustomFabricObject): void {
-    this.cb(undefined);
     this.previousLeft = object.left!;
     this.previousTop = object.top!;
     this.previousScaleX = object.scaleX!;
@@ -584,19 +599,19 @@ export class EventHandlerService {
    */
   private async eraseAddQuestion(zoneId: number, add: boolean): Promise<void> {
     return firstValueFrom(this.questionService.query({ zoneId })).then(res => {
+      // 'return' for chaining the promises
       if (add) {
-        this.addQuestion(res.body?.[0]?.numero!);
-      } else {
-        this.questions.delete(res.body?.[0]?.id!);
+        return this.addQuestion(res.body?.[0]?.numero!);
       }
+      return new Promise(() => this.questions.delete(res.body?.[0]?.id!));
     });
   }
 
   /**
    * Getting the questions corresponding to the given number (REST query) and adding them to `questions`
    */
-  public addQuestion(numero: number): void {
-    this.questionService.query({ examId: this._exam.id!, numero }).subscribe(qs => {
+  public async addQuestion(numero: number): Promise<void> {
+    return firstValueFrom(this.questionService.query({ examId: this._exam.id!, numero })).then(qs => {
       qs.body?.forEach(q => {
         if (q.id !== undefined) {
           this.questions.set(q.id, q);
@@ -682,10 +697,6 @@ export class EventHandlerService {
       .filter(e => e.id !== notIncludedId);
   }
 
-  public registerQuestionCallBack(cb: (qid: number | undefined) => void): void {
-    this.cb = cb;
-  }
-
   public reinit(exam: IExam, zones: { [page: number]: CustomZone[] }): void {
     // Requires to flush all the cached canvases to compute new ones
     this.allcanvas = [];
@@ -704,5 +715,15 @@ export class EventHandlerService {
       i = i + 1;
     }
     return i;
+  }
+
+  /**
+   * An observable for being notified on question selection change.
+   * Returns an array since several questions can have the same number (numero).
+   * But the first question of the array (if not empty) is the truely selected question.
+   * Can be empty is nothing is selected.
+   */
+  public get selectedQuestion(): Observable<Array<IQuestion>> {
+    return this._selectedQuestion;
   }
 }

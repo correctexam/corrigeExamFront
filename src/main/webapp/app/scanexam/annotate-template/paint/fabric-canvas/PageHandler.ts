@@ -162,6 +162,7 @@ export class PageHandler {
     canvas.on('mouse:up', () => this.onCanvasMouseUp());
     canvas.on('selection:created', e => this.onSelectionCreated(e));
     canvas.on('selection:updated', e => this.onSelectionUpdated(e));
+    canvas.on('selection:cleared', () => this.eventHandler.unselectObject());
     canvas.on('object:modified', e => this.onObjectModified(e as CanvasModifiedEvent));
   }
 

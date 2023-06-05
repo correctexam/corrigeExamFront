@@ -1,14 +1,12 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { HttpResponse } from '@angular/common/http';
 import { Component, OnInit, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { UntypedFormBuilder, Validators, UntypedFormGroup } from '@angular/forms';
 import { IQuestionType } from 'app/entities/question-type/question-type.model';
 import { QuestionTypeService } from 'app/entities/question-type/service/question-type.service';
 import { QuestionService } from 'app/entities/question/service/question.service';
-import { Observable, Subject, debounceTime, switchMap, takeUntil } from 'rxjs';
+import { Subject, debounceTime, lastValueFrom, switchMap, takeUntil } from 'rxjs';
 import { IQuestion } from '../../../../entities/question/question.model';
 import { EventHandlerService } from '../event-handler.service';
 import { ZoneService } from '../../../../entities/zone/service/zone.service';
@@ -44,13 +42,14 @@ export type EntityResponseType = HttpResponse<IQuestion>;
 })
 export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   private unsubscribe = new Subject<void>();
-
-  question: IQuestion | undefined;
+  /** The selected questions. This is an array since a same question can be divided into several parts.
+   * The first question of the array, if not empty, is the truely selected question. An empty array means no selection. */
+  public questions: Array<IQuestion> = [];
   gradeTypeValues = Object.keys(GradeType);
   layoutsidebarVisible = false;
   manualid = 2;
   qcmid = 3;
-  //  validexp = '';
+
   validexpRegex: () => RegExp = () => {
     if (this.editForm.get(['typeId'])!.value === this.qcmid) {
       return /^[a-z]{1}([&|][a-z])*$/;
@@ -118,8 +117,6 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       )
       .subscribe(e => this.onSaveSuccess(e));
 
-    // this.updateForm(this.questionIQuestion);
-
     this.questionTypeService.query().subscribe((res: HttpResponse<IQuestionType[]>) => {
       this.questiontypes = res.body || [];
       this.questiontypes.forEach(q => {
@@ -130,16 +127,11 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
         }
       });
     });
-    this.eventHandler.registerQuestionCallBack(zid => {
-      if (zid !== undefined) {
-        this.questionService.query({ zoneId: zid }).subscribe(q => {
-          if (q.body !== null && q.body.length > 0) {
-            this.question = q.body[0];
-            this.updateForm(this.question);
-          }
-        });
-      } else {
-        this.question = undefined;
+
+    this.eventHandler.selectedQuestion.subscribe(qs => {
+      this.questions = qs;
+      if (this.questions.length > 0) {
+        this.updateForm();
       }
     });
   }
@@ -148,7 +140,9 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
     this.unsubscribe.next();
   }
 
-  updateForm(question: IQuestion): void {
+  public updateForm(): void {
+    const question = this.questions[0];
+
     this.unsubscribe.next();
     this.editForm.patchValue({
       numero: question.numero,
@@ -158,47 +152,56 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       gradeType: question.gradeType,
       typeId: question.typeId,
     });
+
     this.editForm.valueChanges
       .pipe(
         debounceTime(500),
         switchMap(() => this.save()),
         takeUntil(this.unsubscribe)
-        // eslint-disable-next-line no-console
       )
-      .subscribe(e => this.onSaveSuccess(e));
+      .subscribe(updatedQuestions => this.onSaveSuccess(updatedQuestions));
   }
 
-  save(): Observable<EntityResponseType> {
+  public async save(): Promise<IQuestion[]> {
     this.isSaving = true;
-    const question = this.createFromForm();
-    this.preferenceService.savePref4Question({
-      point: question.point!,
-      step: question.step!,
-      gradeType: question.gradeType!,
-      typeId: question.typeId!,
-    });
 
-    if (question.id !== undefined) {
-      return this.questionService.update(question);
-      //      this.subscribeToSaveResponse();
-    } else {
-      return this.questionService.create(question);
+    this.updateFromForm();
+
+    // Saving the current preferences
+    if (this.questions.length > 0) {
+      this.preferenceService.savePref4Question({
+        point: this.questions[0].point!,
+        step: this.questions[0].step!,
+        gradeType: this.questions[0].gradeType!,
+        typeId: this.questions[0].typeId!,
+      });
     }
+
+    // TODO In the back-end updating a question may update all the related questions
+    // i.e. all the questions of the exam with the same 'numero'. This would avoid here
+    // to update each question (with the same 'numero') through a REST query.
+    return (
+      Promise
+        // Creating or updating the questions
+        .all(this.questions.map(q => lastValueFrom(q.id === undefined ? this.questionService.create(q) : this.questionService.update(q))))
+        // and then getting all the non-null resulting questions
+        .then(res => res.map(r => r.body).filter((b): b is IQuestion => b !== null))
+    );
   }
 
-  private createFromForm(): IQuestion {
-    this.question!.numero = this.editForm.get(['numero'])!.value;
-    this.question!.point = this.editForm.get(['point'])!.value;
-    this.question!.step = this.editForm.get(['step'])!.value;
-    this.question!.validExpression = this.editForm.get(['validExpression'])!.value;
-    this.question!.gradeType = this.editForm.get(['gradeType'])!.value;
-
-    this.question!.typeId = this.editForm.get(['typeId'])!.value;
-    return this.question!;
+  private updateFromForm(): void {
+    this.questions.forEach(q => {
+      q.numero = this.editForm.get(['numero'])!.value;
+      q.point = this.editForm.get(['point'])!.value;
+      q.step = this.editForm.get(['step'])!.value;
+      q.validExpression = this.editForm.get(['validExpression'])!.value;
+      q.gradeType = this.editForm.get(['gradeType'])!.value;
+      q.typeId = this.editForm.get(['typeId'])!.value;
+    });
   }
 
-  protected onSaveSuccess(e: EntityResponseType): void {
-    this.question = e.body!;
+  protected onSaveSuccess(updatedQuestions: Array<IQuestion>): void {
+    this.questions = updatedQuestions;
     this.isSaving = false;
     this.eventHandler.setCurrentQuestionNumber(this.editForm.get(['numero'])!.value);
     this.updatenumero.next(this.editForm.get(['numero'])!.value);

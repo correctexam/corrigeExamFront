@@ -1,9 +1,9 @@
 <p-sidebar [position]="'right'" [(visible)]="layoutsidebarVisible">
-  <jhi-create-comments [question]="question"></jhi-create-comments>
+  <jhi-create-comments [question]="questions[0]"></jhi-create-comments>
 </p-sidebar>
 
-<hr *ngIf="question" />
-<div *ngIf="question" class="d-flex justify-content-center">
+<hr *ngIf="questions.length > 0" />
+<div *ngIf="questions.length > 0" class="d-flex justify-content-center">
   <div class="col-8">
     <form name="editForm" role="form" novalidate [formGroup]="editForm">
       <div>
