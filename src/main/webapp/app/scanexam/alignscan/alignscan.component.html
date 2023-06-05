@@ -30,7 +30,12 @@
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam">Retourner à l'exam</span>
         </button>
 
-        <button (click)="process()" class="p-button p-button-primary" [disabled]="!loaded">
+        <button
+          (click)="process()"
+          class="p-button p-button-primary"
+          [disabled]="!loaded"
+          [pTooltip]="'scanexam.alignscantooltip' | translate"
+        >
           <fa-icon [icon]="faObjectGroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.alignscan"> Alignement des scans</span>
         </button>
         <button
@@ -39,7 +44,7 @@
           [disabled]="!loaded"
           [pTooltip]="'scanexam.partialalignscantooltip' | translate"
         >
-          <fa-icon [icon]="faObjectGroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.partialalignscan"> Alignement des scans</span>
+          <fa-icon [icon]="faObjectUngroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.partialalignscan"> Alignement des scans</span>
         </button>
       </div>
     </div>

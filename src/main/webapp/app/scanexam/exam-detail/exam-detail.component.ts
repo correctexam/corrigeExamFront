@@ -4,6 +4,12 @@ import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 import { faMotorcycle as fasMotorcycle } from '@fortawesome/free-solid-svg-icons';
 import { faGraduationCap as faGraduationCap } from '@fortawesome/free-solid-svg-icons';
 import { faBookOpenReader as faBookOpenReader } from '@fortawesome/free-solid-svg-icons';
+import { faCloudArrowUp as faCloudArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { faDiagramPredecessor as faDiagramPredecessor } from '@fortawesome/free-solid-svg-icons';
+import { faPersonArrowDownToLine as faPersonArrowDownToLine } from '@fortawesome/free-solid-svg-icons';
+import { faSquarePollVertical as faSquarePollVertical } from '@fortawesome/free-solid-svg-icons';
+
+import { faPenToSquare as faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { CourseService } from '../../entities/course/service/course.service';
 import { ICourse } from '../../entities/course/course.model';
 import { IExam } from '../../entities/exam/exam.model';
@@ -34,6 +40,11 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
   fasMotorcycle = fasMotorcycle as IconProp;
   faGraduationCap = faGraduationCap as IconProp;
   faBookOpenReader = faBookOpenReader as IconProp;
+  faCloudArrowUp = faCloudArrowUp as IconProp;
+  faDiagramPredecessor = faDiagramPredecessor as IconProp;
+  faSquarePollVertical = faSquarePollVertical as IconProp;
+  faPersonArrowDownToLine = faPersonArrowDownToLine as IconProp;
+  faPenToSquare = faPenToSquare as IconProp;
   examId = '';
   exam: IExam | undefined;
   course: ICourse | undefined;
