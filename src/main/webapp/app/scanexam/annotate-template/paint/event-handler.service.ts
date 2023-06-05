@@ -22,7 +22,7 @@ import { IZone } from '../../../entities/zone/zone.model';
 import { ZoneService } from '../../../entities/zone/service/zone.service';
 import { ExamService } from '../../../entities/exam/service/exam.service';
 import { IExam } from '../../../entities/exam/exam.model';
-import { Question } from '../../../entities/question/question.model';
+import { IQuestion, Question } from '../../../entities/question/question.model';
 import { QuestionService } from '../../../entities/question/service/question.service';
 import { PageHandler, PagedCanvas } from './fabric-canvas/PageHandler';
 import { TranslateService } from '@ngx-translate/core';
@@ -30,6 +30,7 @@ import { PreferenceService } from '../../preference-page/preference.service';
 import { CustomZone } from './fabric-canvas/fabric-canvas.component';
 import { ConfirmationService } from 'primeng/api';
 import { IText } from 'fabric/fabric-impl';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -40,7 +41,7 @@ export class EventHandlerService {
   public canvas!: PagedCanvas;
   public allcanvas: PagedCanvas[] = [];
   public pages: { [page: number]: PageHandler } = {};
-  public nextQuestionNumeros: Array<number> = [];
+  public questions: Map<number, IQuestion> = new Map();
   private currentSelected: fabric.Object | undefined;
   private imageDataUrl!: string;
   private zonesRendering: { [page: number]: CustomZone[] } = {};
@@ -61,8 +62,6 @@ export class EventHandlerService {
   private previousScaleX!: number;
   private previousScaleY!: number;
   private cb!: (qid: number | undefined) => void;
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  private onQuestionAddDelCB: (qIdOrNum: number, add: boolean) => void = () => {};
   private _isMouseDown = false;
   private _selectedColour: DrawingColours = DrawingColours.BLACK;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -125,19 +124,11 @@ export class EventHandlerService {
             c.clear();
             c.renderAll();
           });
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          this.modelViewpping.forEach((zoneId, _) => {
-            const promises = [];
-            promises.push(this.eraseAddQuestion(zoneId, false));
-            Promise.all(promises).then(() => {
-              console.error(this._exam.id);
-              this.examService.deleteAllZone(this._exam.id!).subscribe();
-            });
-            /* .then(() => {
-                this.zoneService.delete(zoneId).subscribe();
-              });*/
-          });
+
+          this.examService.deleteAllZone(this._exam.id!).subscribe();
           this.modelViewpping.clear();
+          this.questions.clear();
+          this.zonesRendering = [];
         },
       });
     });
@@ -342,7 +333,6 @@ export class EventHandlerService {
         break;
 
       case DrawingTools.QUESTIONBOX:
-        this.nextQuestionNumeros.push(num);
         this.translateService.get('scanexam.questionuc1').subscribe((name: string) => {
           this.createBlueBox(DrawingTools.QUESTIONBOX, name + String(num), num);
         });
@@ -433,7 +423,7 @@ export class EventHandlerService {
         });
       } else {
         this.examService.update(this._exam).subscribe(e => {
-          this.exam = e.body!;
+          this._exam = e.body!;
           this.selectedTool = DrawingTools.SELECT;
         });
       }
@@ -483,7 +473,6 @@ export class EventHandlerService {
             DrawingColours.GREEN
           );
           this.modelViewpping.set(r.id, zone.id!);
-          this.nextQuestionNumeros.push(e.body[0].numero!);
         }
       });
     });
@@ -593,11 +582,25 @@ export class EventHandlerService {
    * @param zoneId The id of the zone that contains the question
    * @param add True: add the question. Otherwise, removes the question.
    */
-  private eraseAddQuestion(zoneId: number, add: boolean): Promise<void> {
-    return new Promise(res1 => {
-      this.questionService.query({ zoneId }).subscribe(res => {
-        this.onQuestionAddDelCB(add ? res.body?.[0]?.numero! : res.body?.[0]?.id!, add);
-        res1();
+  private async eraseAddQuestion(zoneId: number, add: boolean): Promise<void> {
+    return firstValueFrom(this.questionService.query({ zoneId })).then(res => {
+      if (add) {
+        this.addQuestion(res.body?.[0]?.numero!);
+      } else {
+        this.questions.delete(res.body?.[0]?.id!);
+      }
+    });
+  }
+
+  /**
+   * Getting the questions corresponding to the given number (REST query) and adding them to `questions`
+   */
+  public addQuestion(numero: number): void {
+    this.questionService.query({ examId: this._exam.id!, numero }).subscribe(qs => {
+      qs.body?.forEach(q => {
+        if (q.id !== undefined) {
+          this.questions.set(q.id, q);
+        }
       });
     });
   }
@@ -683,23 +686,21 @@ export class EventHandlerService {
     this.cb = cb;
   }
 
-  public registerOnQuestionAddRemoveCallBack(cb: (qid: number, add: boolean) => void): void {
-    this.onQuestionAddDelCB = cb;
-  }
-
   public reinit(exam: IExam, zones: { [page: number]: CustomZone[] }): void {
     // Requires to flush all the cached canvases to compute new ones
     this.allcanvas = [];
     this.currentSelected = undefined;
     this._elementUnderDrawing = undefined;
     this._selectedTool = DrawingTools.SELECT;
-    this.exam = exam;
+    this._exam = exam;
     this.zonesRendering = zones;
+    this.questions.clear();
   }
 
   public getNextQuestionNumero(): number {
+    const next = new Set(Array.from(this.questions.values()).map(value => value.numero!));
     let i = 1;
-    while (this.nextQuestionNumeros.includes(i)) {
+    while (next.has(i)) {
       i = i + 1;
     }
     return i;
