@@ -1,14 +1,12 @@
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/member-ordering */
 import { HttpClient } from '@angular/common/http';
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HotTableRegisterer } from '@handsontable/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { IStudent } from 'app/entities/student/student.model';
-import Handsontable from 'handsontable';
-import { CellChange, ChangeSource } from 'handsontable/common';
+import FileSaver from 'file-saver';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
 /**
@@ -28,20 +26,11 @@ interface Std {
   styleUrls: ['./import-student.component.scss'],
   providers: [MessageService, ConfirmationService],
 })
-export class ImportStudentComponent implements OnInit, AfterViewInit {
+export class ImportStudentComponent implements OnInit {
+  firstLine: Std = { ine: '', nom: '', prenom: '', mail: '', groupe: '' };
   dataset: Std[] = [];
   blocked = false;
-  private hotRegisterer = new HotTableRegisterer();
-  id = 'hotInstance';
-  val = 100;
-  activeIndex = 0;
   courseid: string | undefined = undefined;
-  settings = {
-    rowHeaders: true,
-    colHeaders: true,
-    columns: [{}, {}, {}, {}, {}],
-    licenseKey: 'non-commercial-and-evaluation',
-  };
   students: IStudent[] = [];
 
   constructor(
@@ -55,39 +44,103 @@ export class ImportStudentComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val) as Std[];
+    //    this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val) as Std[];
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('courseid') !== null) {
         this.courseid = params.get('courseid')!;
+        this.loadEtudiants();
       }
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  detectChanges = (changes: CellChange[] | null, source: ChangeSource) => {};
+  data(event: ClipboardEvent): void {
+    event.preventDefault();
 
-  updateTableSize(): void {
-    this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val) as Std[];
+    const clipboardData = event.clipboardData;
+
+    const pastedText = clipboardData?.getData('text');
+    const row_data = pastedText?.split('\n');
+    const data: Std[] = [];
+
+    const column = ['ine', 'nom', 'prenom', 'mail', 'groupe'];
+
+    row_data?.forEach(r => {
+      const row = {};
+      column.forEach((a, index) => {
+        (row as any)[a] = r.split('\t')[index];
+      });
+      data.push(row);
+    });
+    const data1: Std[] = data.filter(
+      d =>
+        typeof d.nom === 'string' &&
+        d.nom.length > 0 &&
+        typeof d.prenom === 'string' &&
+        d.prenom.length > 0 &&
+        typeof d.ine === 'string' &&
+        d.ine.length > 0 &&
+        typeof d.mail === 'string' &&
+        d.mail.length > 0 &&
+        typeof d.groupe === 'string' &&
+        d.groupe.length > 0
+    );
+    this.dataset.push(...data1);
+
+    const selection = window.getSelection();
+    if (selection?.rangeCount) {
+      selection.deleteFromDocument();
+      selection.collapseToEnd();
+    }
+
+    this.firstLine.ine = '';
+  }
+
+  canAddFirstLine(): boolean {
+    return (
+      typeof this.firstLine.nom === 'string' &&
+      this.firstLine.nom.length > 0 &&
+      typeof this.firstLine.prenom === 'string' &&
+      this.firstLine.prenom.length > 0 &&
+      typeof this.firstLine.ine === 'string' &&
+      this.firstLine.ine.length > 0 &&
+      typeof this.firstLine.mail === 'string' &&
+      this.firstLine.mail.length > 0 &&
+      typeof this.firstLine.groupe === 'string' &&
+      this.firstLine.groupe.length > 0
+    );
+  }
+
+  addStudentLine(): void {
+    if (this.canAddFirstLine()) {
+      this.dataset.push(this.firstLine);
+      this.firstLine = {};
+    }
+  }
+
+  removeNonImported(index: number): void {
+    this.dataset.splice(index, 1);
   }
 
   download(): void {
-    const export1 = this.hotRegisterer.getInstance(this.id).getPlugin('exportFile');
-    export1.downloadFile('csv', {
-      bom: false,
-      columnDelimiter: ',',
-      columnHeaders: true,
-      exportHiddenColumns: true,
-      exportHiddenRows: false,
-      fileExtension: 'csv',
-      filename: 'templateEtudiant.csv',
-      mimeType: 'text/csv',
-      rowDelimiter: '\r\n',
-      rowHeaders: false,
+    this.exportExcel();
+  }
+
+  exportExcel(): void {
+    import('xlsx').then(xlsx => {
+      const worksheet = xlsx.utils.json_to_sheet([this.firstLine]);
+      const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
+      const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
+      this.saveAsExcelFile(excelBuffer, 'students');
     });
   }
 
-  ngAfterViewInit(): void {
-    this.hotRegisterer.getInstance(this.id).render();
+  saveAsExcelFile(buffer: any, fileName: string): void {
+    const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    const EXCEL_EXTENSION = '.xlsx';
+    const data: Blob = new Blob([buffer], {
+      type: EXCEL_TYPE,
+    });
+    FileSaver.saveAs(data, fileName + '_import_' + new Date().getTime() + EXCEL_EXTENSION);
   }
 
   gotoUE(): void {
@@ -145,25 +198,21 @@ export class ImportStudentComponent implements OnInit, AfterViewInit {
       students: this.dataset.filter(e => e.mail !== undefined),
     };
     this.blocked = true;
-    this.hotRegisterer.getInstance(this.id).suspendExecution();
     this.http.post<number>(this.applicationConfigService.getEndpointFor('api/createstudentmasse'), c).subscribe(
       () => {
         this.blocked = false;
-        this.hotRegisterer.getInstance(this.id).render();
         this.translate.get('scanexam.importsuccess').subscribe(data => {
           this.messageService.add({
             severity: 'success',
             summary: data,
             detail: this.translate.instant('scanexam.importsuccessdetail'),
           });
-          this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val) as Std[];
-          this.activeIndex = 1;
+          this.dataset.splice(0);
           this.loadEtudiants();
         });
       },
       err => {
         this.blocked = false;
-        this.hotRegisterer.getInstance(this.id).render();
         this.translate.get('scanexam.importerror').subscribe(data => {
           this.messageService.add({
             severity: 'error',
@@ -220,18 +269,8 @@ export class ImportStudentComponent implements OnInit, AfterViewInit {
   }
 
   loadEtudiants(): void {
-    this.http.get<Array<IStudent>>(this.applicationConfigService.getEndpointFor('api/getstudentcours/' + this.courseid)).subscribe(s => {
+    this.http.get<Array<Std>>(this.applicationConfigService.getEndpointFor('api/getstudentcours/' + this.courseid)).subscribe(s => {
       this.students = s;
     });
   }
-
-  selectTab(evt: Index): void {
-    if (evt.index === 1) {
-      this.loadEtudiants();
-    }
-  }
-}
-
-interface Index {
-  index: number;
 }

@@ -11,8 +11,7 @@ import { BlockUIModule } from 'primeng/blockui';
 import { MenuModule } from 'primeng/menu';
 import { TooltipModule } from 'primeng/tooltip';
 import { DockModule } from 'primeng/dock';
-import { HotTableModule } from '@handsontable/angular';
-import { registerAllModules } from 'handsontable/registry';
+
 import { SliderModule } from 'primeng/slider';
 import { KeyFilterModule } from 'primeng/keyfilter';
 
@@ -85,7 +84,7 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { SidebarModule } from 'primeng/sidebar';
 import { CreateCommentsComponent } from './annotate-template/create-comments/create-comments.component';
 // set the location of the OpenCV files
-registerAllModules();
+// registerAllModules();
 
 export const COURSMAIN_ROUTE: Route = {
   path: 'course/:courseid',
@@ -340,7 +339,6 @@ export const CompareMarkAnswer_ROUTE: Route = {
     TooltipModule,
     ToastModule,
     SliderModule,
-    HotTableModule,
     TableModule,
     ConfirmDialogModule,
     FormsModule,

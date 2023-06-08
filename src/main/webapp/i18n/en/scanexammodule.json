@@ -272,6 +272,8 @@
     "studentdata": "Students's data",
     "studentdatatooltip": "Include students's data",
     "importencours": "Import in progress",
-    "exportencours": "Export in progess"
+    "exportencours": "Export in progess",
+    "donneesaimporte": "Data to import, click on the button above to import the data",
+    "donneesdejaimporte": "Data currently in the database"
   }
 }
