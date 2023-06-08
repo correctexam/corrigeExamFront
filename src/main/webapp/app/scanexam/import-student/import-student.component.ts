@@ -189,7 +189,6 @@ export class ImportStudentComponent implements OnInit {
    * Associated to canImport to check columns (their size).
    */
   private getNonEmptyPropValues(prop: keyof Std): string[] {
-    // return [];
     return this.dataset.map(e => e[prop]).filter((str): str is string => typeof str === 'string' && str.length > 0);
   }
 

@@ -4,115 +4,6 @@
     <i class="pi pi-lock" style="font-size: 3rem"></i>
   </p-blockUI>
 
-  <!--  <p-tabView class="tabs" (onChange)="selectTab($event)" [(activeIndex)]="activeIndex">
-    <!--<p-tabPanel [header]="'scanexam.importstudent' | translate">
-      <div class="container">
-        <div class="grid flex">
-          <div class="sm:col-12 md:col-6 lg:col-6 xl:col-6">
-            <p-message *ngIf="!canImport()" severity="warn" [text]="'scanexam.listestudentvalid' | translate"></p-message>
-            <p-message *ngIf="!canImportSameColSize()" severity="warn" [text]="'scanexam.liststderrorcolsize' | translate"></p-message>
-            <p-message *ngIf="!canImportUniqueMails()" severity="warn" [text]="'scanexam.liststderroremails' | translate"></p-message>
-            <p-message *ngIf="!canImportUniqueINE()" severity="warn" [text]="'scanexam.liststderrorINE' | translate"></p-message>
-          </div>
-          <div class="sm:col-12 md:col-6 lg:col-6 xl:col-6">
-            <div class="md:flex lg:flex xl:flex md:flex-row-reverse lg:flex-row-reverse">
-              <div class="">
-                <button  delete?:boolean
-
-                  [disabled]="!this.courseid"
-                  type="submit"
-                  id="save-entity"
-                  data-cy="entityCreateSaveButton"
-                  class="p-button p-button-primary flex-initial flex align-items-center"
-                  (click)="gotoUE()"
-                >
-                  <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackue">Retourner au module</span>
-                </button>
-              </div>
-              <div class="">
-                <button
-                  [disabled]="!this.courseid || !canImport()"
-                  type="submit"
-                  id="save-entity"
-                  data-cy="entityCreateSaveButton"
-                  class="p-button flex-initial flex align-items-center"
-                  [ngClass]="{ 'p-button-primary': this.courseid && canImport(), 'p-button-secondary': !this.courseid || !canImport() }"
-                  (click)="envoiEtudiants()"
-                >
-                  <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="scanexam.importfollowingstudent"
-                    >Importer étudiants ci-dessous</span
-                  >
-                </button>
-              </div>
-              <div class="">
-                <button
-                  (click)="download()"
-                  type="submit"
-                  id="save-entity"
-                  data-cy="entityCreateSaveButton"
-                  class="p-button p-button-primary flex-initial flex align-items-center"
-                >
-                  <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="scanexam.downloadtemplate">Download template</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="sm:col-offset-0 sm:col-12 md:col-offset-0 md:col-12 lg:col-offset-8 lg:col-4">
-          <label for="slider" jhiTranslate="scanexam.nbrligne">Nombre de lignes dans le tableau (entre 100 et 300)</label>
-          <p-slider id="slider" [(ngModel)]="val" (onChange)="updateTableSize()" [step]="20" [min]="100" [max]="300"></p-slider>
-        </div>
-
-        <div class="col-12 md:col-12">
-          <!--<p-table [value]="students" [tableStyle]="{ 'min-width': '50rem' }">
-            <ng-template pTemplate="header">
-                <tr>
-                    <th><span jhiTranslate="scanexam.ine"></span></th>
-                    <th><span jhiTranslate="scanexam.nom"></span></th>
-                    <th><span jhiTranslate="scanexam.prenom"></span></th>
-                    <th><span jhiTranslate="scanexam.mail"></span></th>
-                    <th><span jhiTranslate="scanexam.groupe"></span></th>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-product>
-                <tr>
-                    <td><input type="text"></td>
-                    <td><input type="text" ></td>
-                    <td><input type="text"></td>
-                    <td><input type="text"></td>
-                    <td><input type="text"></td>
-                </tr>
-            </ng-template>
-        </p-table>-->
-  <!-- <div id="luckysheet"></div>
-
-
-
-<!--          <hot-table
-            [hotId]="id"
-            class="hot"
-            [data]="dataset"
-            [colHeaders]="true"
-            [rowHeaders]="true"
-            [stretchH]="'all'"
-            [colHeaders]="true"
-            [rowHeaders]="true"
-            licenseKey="non-commercial-and-evaluation"
-            [stretchH]="'all'"
-            [afterChange]="detectChanges"
-          >
-            <hot-column data="ine" [title]="'scanexam.ine' | translate"></hot-column>>
-            <hot-column data="nom" [title]="'scanexam.nom' | translate"></hot-column>>
-            <hot-column data="prenom" [title]="'scanexam.prenom' | translate"></hot-column>>
-            <hot-column data="mail" [title]="'scanexam.mail' | translate"></hot-column>>
-            <hot-column data="groupe" [title]="'scanexam.groupe' | translate"></hot-column>>
-          </hot-table>-->
-  <!--
-        </div>
-      </div>
-    </p-tabPanel>
--->
-  <!--   <p-tabPanel [header]="'scanexam.liststudents' | translate">-->
   <p-confirmDialog
     [header]="'scanexam.confirmremove' | translate"
     icon="pi pi-exclamation-triangle"
@@ -298,7 +189,5 @@
         </p-table>
       </div>
     </div>
-    <!--    </p-tabPanel>
-  </p-tabView>-->
   </div>
 </div>
