@@ -152,6 +152,15 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             .subscribe(res => {
               this.zones4comments = res;
             });
+        } else if (params.get('qid') !== null && this.router.url.includes('compareanswer')) {
+          this.http
+            .get<Zone4SameCommentOrSameGrade>(
+              this.applicationConfigService.getEndpointFor('api/getZone4Numero/' + this.examId + '/' + params.get('qid'))
+            )
+            .subscribe(res => {
+              this.zones4comments = res;
+              // console.error(this.zones4comments)
+            });
         }
       }
     });
@@ -338,6 +347,16 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
       return this.zones4comments!.gradedComments.filter(t => a.gradedComments.includes(t.id!));
     } else {
       return [];
+    }
+  }
+
+  pointisNan(k: Answer, zones4comments: Zone4SameCommentOrSameGrade | undefined): boolean {
+    if (zones4comments !== undefined && zones4comments.step > 0) {
+      return Number.isNaN(k.note / zones4comments.step) || Number.isNaN(zones4comments.point);
+    } else if (zones4comments !== undefined && zones4comments.step <= 0) {
+      return Number.isNaN(k.note / zones4comments.point);
+    } else {
+      return true;
     }
   }
 }

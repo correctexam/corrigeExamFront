@@ -22,7 +22,7 @@
           </div>
         </div>
         <div class="card-content">
-          <p>
+          <p *ngIf="!pointisNan(k, zones4comments)">
             Note:
             <span *ngIf="zones4comments !== undefined && zones4comments.step > 0"
               ><b>{{ k.note / zones4comments.step }}/{{ zones4comments.point }}</b></span
