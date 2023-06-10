@@ -278,6 +278,7 @@
     "donneesaimporte": "Data to import, click on the button above to import the data",
     "donneesdejaimporte": "Data currently in the database",
     "voirtoutescopies": "Show all",
-    "voirtoutescopiestooltip": "Show all student answers in one page"
+    "voirtoutescopiestooltip": "Show all student answers in one page",
+    "downloadimages": "Download images"
   }
 }

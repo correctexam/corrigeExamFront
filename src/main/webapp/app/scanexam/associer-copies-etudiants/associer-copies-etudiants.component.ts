@@ -355,7 +355,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
             this.recognizedStudent = sts[0];
             this.predictionprecision = ((solutionName[1] as number) + (solutionFirstname[1] as number) + (solutionINE[1] as number)) / 3;
           } else {
-            if (solutionINE[1] > 0.28) {
+            if (+solutionINE[1] > 0.28) {
               sts = this.students.filter(student => (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase());
               if (sts.length > 0) {
                 this.recognizedStudent = sts[0];
@@ -398,14 +398,14 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                 this.predictionprecision = ((solutionName[1] as number) + (solutionINE[1] as number)) / 2;
               }
             }
-            if (this.recognizedStudent === undefined && solutionName[1] > 0.5 && solutionFirstname[1] < solutionName[1]) {
+            if (this.recognizedStudent === undefined && +solutionName[1] > 0.5 && solutionFirstname[1] < solutionName[1]) {
               sts = this.students.filter(student => (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase());
               if (sts.length > 0) {
                 this.recognizedStudent = sts[0];
                 this.predictionprecision = (solutionName[1] as number) / 3;
               }
             }
-            if (this.recognizedStudent === undefined && solutionFirstname[1] > 0.5 && solutionName[1] < solutionFirstname[1]) {
+            if (this.recognizedStudent === undefined && +solutionFirstname[1] > 0.5 && solutionName[1] < solutionFirstname[1]) {
               sts = this.students.filter(student => (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase());
               if (sts.length > 0) {
                 this.recognizedStudent = sts[0];
@@ -438,7 +438,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
             this.recognizedStudent = sts[0];
             this.predictionprecision = ((solutionName[1] as number) + (solutionINE[1] as number)) / 2;
           }
-        } else if (solutionINE !== undefined && solutionINE.length > 0 && solutionINE[1] > 0.25) {
+        } else if (solutionINE !== undefined && solutionINE.length > 0 && +solutionINE[1] > 0.25) {
           let sts = this.students.filter(student => (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase());
           if (sts.length > 0) {
             this.recognizedStudent = sts[0];

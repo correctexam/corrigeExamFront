@@ -280,6 +280,7 @@
     "donneesaimporte": "Données à importer, cliquer sur le bouton ci-dessus pour importer ces données",
     "donneesdejaimporte": "Données actuellement dans la base de données",
     "voirtoutescopies": "Tout voir",
-    "voirtoutescopiestooltip": "Voir l'ensemble des réponses des étudiants"
+    "voirtoutescopiestooltip": "Voir l'ensemble des réponses des étudiants",
+    "downloadimages": "Téléchargement des images"
   }
 }

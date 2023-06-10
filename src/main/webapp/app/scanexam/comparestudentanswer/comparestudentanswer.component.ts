@@ -34,6 +34,8 @@ import { IComments } from '../../entities/comments/comments.model';
 import { HttpClient } from '@angular/common/http';
 import { Location } from '@angular/common';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import jszip from 'jszip';
+import * as FileSaver from 'file-saver';
 
 export interface Zone4SameCommentOrSameGrade {
   answers: Answer[];
@@ -358,5 +360,45 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     } else {
       return true;
     }
+  }
+
+  downloadAll(): void {
+    const zip = new jszip();
+    const img = zip.folder('images');
+
+    this.zones4comments?.answers!.forEach((a, i) => {
+      this.zones4comments?.zones.forEach((z, j) => {
+        let exportImageType = 'image/webp';
+        let compression = 0.65;
+        if (
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          this.preferenceService.getPreference().exportImageCompression !== undefined &&
+          this.preferenceService.getPreference().exportImageCompression > 0 &&
+          this.preferenceService.getPreference().exportImageCompression <= 1
+        ) {
+          compression = this.preferenceService.getPreference().exportImageCompression;
+        }
+        if (
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          this.preferenceService.getPreference().imageTypeExport !== undefined &&
+          ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
+        ) {
+          exportImageType = this.preferenceService.getPreference().imageTypeExport;
+        }
+
+        const webPImageURL = this.canvass
+          .get(i * this.zones4comments!.zones.length + j)!
+          .nativeElement.toDataURL(exportImageType, compression);
+        img!.file(
+          i * this.zones4comments!.zones.length + '_' + (j + 1) + '.webp',
+          webPImageURL.replace(/^data:image\/?[A-z]*;base64,/, ''),
+          { base64: true }
+        );
+      });
+    });
+
+    zip.generateAsync({ type: 'blob' }).then(content => {
+      FileSaver.saveAs(content, 'Exam' + this.examId + '.zip');
+    });
   }
 }
