@@ -77,6 +77,7 @@
     "dexie-export-import": "1.0.3",
     "fabric": "5.2.4",
     "file-saver": "^2.0.5",
+    "jszip": "^3.10.1",
     "ngx-extended-pdf-viewer": "15.0.5",
     "ngx-infinite-scroll": "14.0.0",
     "ngx-perfect-scrollbar": "^10.1.1",

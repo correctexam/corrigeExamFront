@@ -41,6 +41,7 @@ import {
   faMinus,
   faWindowMaximize,
   faMaximize,
+  faDownload,
 
   // jhipster-needle-add-icon-import
 } from '@fortawesome/free-solid-svg-icons';
@@ -88,5 +89,6 @@ export const fontAwesomeIcons = [
   faMinus,
   faWindowMaximize,
   faMaximize,
+  faDownload,
   // jhipster-needle-add-icon-import
 ];
