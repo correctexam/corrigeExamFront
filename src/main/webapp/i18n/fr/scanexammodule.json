@@ -8,6 +8,7 @@
     "questions": "Questions",
     "questionLow": "Question",
     "continue": "Continuer",
+    "continuetooltip": "Accès à la vue correction",
     "sheets": "Copies",
     "sheet": "Copie",
     "total": "Total",
@@ -229,6 +230,7 @@
     "removeallbindingtooltip": "⚠️ à faire uniquement si la correction n'a pas commencé",
     "noneval": "non évalué",
     "voir": "Revérifier",
+    "voirtooltip": "Accès à la vue correction",
     "partialalignscan": "Sélection des pages",
     "partialalignscanstartpage": "première page",
     "partialalignscanendpage": "dernière page",
@@ -276,6 +278,8 @@
     "importencours": "Import en cours",
     "exportencours": "Export en cours",
     "donneesaimporte": "Données à importer, cliquer sur le bouton ci-dessus pour importer ces données",
-    "donneesdejaimporte": "Données actuellement dans la base de données"
+    "donneesdejaimporte": "Données actuellement dans la base de données",
+    "voirtoutescopies": "Tout voir",
+    "voirtoutescopiestooltip": "Voir l'ensemble des réponses des étudiants"
   }
 }

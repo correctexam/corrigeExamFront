@@ -288,6 +288,16 @@ export const CompareMarkAnswer_ROUTE: Route = {
   },
 };
 
+export const CompareAnswer_ROUTE: Route = {
+  path: 'compareanswer/:examid/:qid',
+  canActivate: [UserRouteAccessService],
+  component: ComparestudentanswerComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'scanexam.comparecopie',
+  },
+};
+
 @NgModule({
   declarations: [
     MesCoursComponent,
@@ -388,6 +398,7 @@ export const CompareMarkAnswer_ROUTE: Route = {
       CompareTextCommentAnswer_ROUTE,
       CompareGradedCommentAnswer_ROUTE,
       CompareMarkAnswer_ROUTE,
+      CompareAnswer_ROUTE,
     ]),
     TabViewModule,
   ],
