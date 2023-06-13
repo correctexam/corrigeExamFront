@@ -39,7 +39,7 @@ export class EventHandlerService {
   public readonly coefficient = 100000;
   public selectedThickness: DrawingThickness = DrawingThickness.THIN;
   public canvas!: PagedCanvas;
-  public allcanvas: PagedCanvas[] = [];
+  public allcanvas: Map<number, PagedCanvas> = new Map();
   public pages: { [page: number]: PageHandler } = {};
   public questions: Map<number, IQuestion> = new Map();
   private currentSelected: fabric.Object | undefined;
@@ -344,7 +344,7 @@ export class EventHandlerService {
     }
 
     if (this._selectedTool === DrawingTools.SELECT) {
-      this.allcanvas
+      Array.from(this.allcanvas.values())
         .filter(c => c !== this.canvas)
         .forEach(c => {
           c.discardActiveObject();
@@ -431,7 +431,7 @@ export class EventHandlerService {
   }
 
   public getCanvasForPage(page: number): PagedCanvas | undefined {
-    return this.allcanvas.find(canv => canv.page === page);
+    return this.allcanvas.get(page);
   }
 
   public createRedBox(translationToken: string, zone: IZone, page: number): void {
@@ -456,13 +456,13 @@ export class EventHandlerService {
   }
 
   public createRedQuestionBox(zone: IZone, page: number): void {
-    const canvas = this.allcanvas[page - 1];
+    const canvas = this.allcanvas.get(page);
 
     this.translateService.get('scanexam.questionuc1').subscribe((name: string) => {
       this.questionService.query({ zoneId: zone.id }).subscribe(e => {
         if (e.body !== null && e.body.length > 0) {
           const r = this.fabricShapeService.createBoxFromScratch(
-            canvas,
+            canvas!,
             {
               x: (zone.xInit! * this.pages[page].pageViewer.canvas.clientWidth) / this.coefficient,
               y: (zone.yInit! * this.pages[page].pageViewer.canvas.clientHeight) / this.coefficient,
@@ -688,7 +688,7 @@ export class EventHandlerService {
 
   public reinit(exam: IExam, zones: { [page: number]: CustomZone[] }): void {
     // Requires to flush all the cached canvases to compute new ones
-    this.allcanvas = [];
+    this.allcanvas = new Map();
     this.currentSelected = undefined;
     this._elementUnderDrawing = undefined;
     this._selectedTool = DrawingTools.SELECT;

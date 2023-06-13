@@ -59,6 +59,9 @@ export class ZoneCorrectionHandler {
     });
     (canvas as any).zoneid = this.zoneid;
     (canvas as any).respid = this.respid;
+    console.error((canvas as any).zoneid);
+    console.error((canvas as any).respid);
+    console.error(this.eventHandler.allcanvas);
 
     this.eventHandler.allcanvas.push(canvas);
     this.eventHandler.canvas = canvas;
