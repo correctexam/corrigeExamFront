@@ -7,14 +7,10 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { of, Subject, from } from 'rxjs';
 
 import { StudentResponseService } from '../service/student-response.service';
-import { IStudentResponse, StudentResponse } from '../student-response.model';
-import { IQuestion } from 'app/entities/question/question.model';
+import { StudentResponse } from '../student-response.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
-import { IExamSheet } from 'app/entities/exam-sheet/exam-sheet.model';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
-import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
-import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
 import { GradedCommentService } from 'app/entities/graded-comment/service/graded-comment.service';
 
 import { StudentResponseUpdateComponent } from './student-response-update.component';

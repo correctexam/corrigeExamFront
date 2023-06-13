@@ -7,14 +7,10 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { of, Subject, from } from 'rxjs';
 
 import { ExamService } from '../service/exam.service';
-import { IExam, Exam } from '../exam.model';
-import { ITemplate } from 'app/entities/template/template.model';
+import { Exam } from '../exam.model';
 import { TemplateService } from 'app/entities/template/service/template.service';
-import { IZone } from 'app/entities/zone/zone.model';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
-import { IScan } from 'app/entities/scan/scan.model';
 import { ScanService } from 'app/entities/scan/service/scan.service';
-import { ICourse } from 'app/entities/course/course.model';
 import { CourseService } from 'app/entities/course/service/course.service';
 
 import { ExamUpdateComponent } from './exam-update.component';
