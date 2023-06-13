@@ -12,10 +12,13 @@ export type EntityArrayResponseType = HttpResponse<IExam[]>;
 
 @Injectable({ providedIn: 'root' })
 export class ExamService {
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/exams');
-  protected resourceUrlCustom = this.applicationConfigService.getEndpointFor('api/getExamStatus');
+  protected resourceUrl: string;
+  protected resourceUrlCustom: string;
 
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {}
+  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+    this.resourceUrl = this.applicationConfigService.getEndpointFor('api/exams');
+    this.resourceUrlCustom = this.applicationConfigService.getEndpointFor('api/getExamStatus');
+  }
 
   create(exam: IExam): Observable<EntityResponseType> {
     return this.http.post<IExam>(this.resourceUrl, exam, { observe: 'response' });

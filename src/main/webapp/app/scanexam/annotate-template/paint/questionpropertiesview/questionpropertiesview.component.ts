@@ -51,7 +51,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   manualid = 2;
   qcmid = 3;
   //  validexp = '';
-  validexpRegex: () => RegExp = () => {
+  validexpRegex: () => any = () => {
     if (this.editForm.get(['typeId'])!.value === this.qcmid) {
       return /^[a-z]{1}([&|][a-z])*$/;
     } else {

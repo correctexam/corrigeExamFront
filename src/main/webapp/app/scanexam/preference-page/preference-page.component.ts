@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Component, OnInit } from '@angular/core';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { UntypedFormBuilder } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { PreferenceService } from './preference.service';
 
 @Component({
@@ -11,27 +11,7 @@ import { PreferenceService } from './preference.service';
   styleUrls: ['./preference-page.component.scss'],
 })
 export class PreferencePageComponent implements OnInit {
-  editForm = this.fb.group({
-    pdfscale: [],
-    cacheDb: [],
-    imageTypeExport: [],
-    exportImageCompression: [],
-    qcm_min_width_shape: [],
-    qcm_min_height_shape: [],
-    qcm_epsilon: [],
-    qcm_differences_avec_case_blanche: [],
-    linelength: [],
-    repairsize: [],
-    dilatesize: [],
-    morphsize: [],
-    drawcontoursizeh: [],
-    drawcontoursizev: [],
-    minCircle: [],
-    maxCircle: [],
-    numberofpointToMatch: [],
-    numberofgoodpointToMatch: [],
-    defaultAlignAlgowithMarker: [true],
-  });
+  editForm: UntypedFormGroup;
   /*
 http://angular-form-builder.surge.sh/
 
@@ -59,7 +39,29 @@ http://angular-form-builder.surge.sh/
     public config: DynamicDialogConfig,
     public preferenceService: PreferenceService,
     private fb: UntypedFormBuilder
-  ) {}
+  ) {
+    this.editForm = this.fb.group({
+      pdfscale: [],
+      cacheDb: [],
+      imageTypeExport: [],
+      exportImageCompression: [],
+      qcm_min_width_shape: [],
+      qcm_min_height_shape: [],
+      qcm_epsilon: [],
+      qcm_differences_avec_case_blanche: [],
+      linelength: [],
+      repairsize: [],
+      dilatesize: [],
+      morphsize: [],
+      drawcontoursizeh: [],
+      drawcontoursizev: [],
+      minCircle: [],
+      maxCircle: [],
+      numberofpointToMatch: [],
+      numberofgoodpointToMatch: [],
+      defaultAlignAlgowithMarker: [true],
+    });
+  }
 
   // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
   ngOnInit(): void {

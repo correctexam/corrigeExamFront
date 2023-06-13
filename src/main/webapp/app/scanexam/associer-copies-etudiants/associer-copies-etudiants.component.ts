@@ -96,7 +96,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   studentsOptions: () => SelectItem[] = () => this.getStudentOptions();
 
   getStudentOptions(): SelectItem[] {
-    if (this.list?._options !== undefined && this.list._options.length > 0) {
+    if (this.list?._options !== undefined && this.list._options!.length > 0) {
       this.filterLocalStudentList();
     }
     return this.students.map(student => ({
@@ -749,7 +749,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
 
   filterLocalStudentList(): void {
     if (this.filterbindstudent) {
-      this.list._filteredOptions = this.list._options.filter(
+      this.list._filteredOptions = this.list._options!.filter(
         s =>
           s.value.examSheets === null ||
           s.value.examSheets!.length === 0 ||

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, shareReplay } from 'rxjs/operators';
 import { Observable } from 'rxjs';
@@ -8,10 +8,12 @@ import { ProfileInfo, InfoResponse } from './profile-info.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
-  private infoUrl = this.applicationConfigService.getEndpointFor('management/info');
+  private infoUrl: any;
   private profileInfo$?: Observable<ProfileInfo>;
 
-  constructor(private http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
+  constructor(private http: HttpClient, private applicationConfigService: ApplicationConfigService) {
+    this.infoUrl = this.applicationConfigService.getEndpointFor('management/info');
+  }
 
   getProfileInfo(): Observable<ProfileInfo> {
     if (this.profileInfo$) {

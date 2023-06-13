@@ -12,9 +12,11 @@ export type EntityArrayResponseType = HttpResponse<IScan[]>;
 
 @Injectable({ providedIn: 'root' })
 export class ScanService {
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/scans');
+  protected resourceUrl: string;
 
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {}
+  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+    this.resourceUrl = this.applicationConfigService.getEndpointFor('api/scans');
+  }
 
   create(scan: IScan): Observable<EntityResponseType> {
     return this.http.post<IScan>(this.resourceUrl, scan, { observe: 'response' });

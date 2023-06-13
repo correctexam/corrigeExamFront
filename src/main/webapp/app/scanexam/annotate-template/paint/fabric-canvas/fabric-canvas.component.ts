@@ -4,8 +4,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { NgxExtendedPdfViewerService, PageRenderedEvent, ScrollModeType } from 'ngx-extended-pdf-viewer';
 import { EventHandlerService } from '../event-handler.service';
 import { DrawingTools } from '../models';
-import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
-import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
+// import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
+// import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import { IExam } from 'app/entities/exam/exam.model';
 import { ZoneService } from '../../../../entities/zone/service/zone.service';
 import { IZone } from 'app/entities/zone/zone.model';
@@ -15,9 +15,9 @@ import { Question } from 'app/entities/question/question.model';
 import { ActivatedRoute } from '@angular/router';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { PreferenceService } from 'app/scanexam/preference-page/preference.service';
-const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
-  suppressScrollX: true,
-};
+// const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
+//  suppressScrollX: true,
+// };
 
 export type CustomZone = IZone & { type: DrawingTools };
 
@@ -27,10 +27,10 @@ export type CustomZone = IZone & { type: DrawingTools };
   styleUrls: ['./fabric-canvas.component.scss'],
   providers: [
     NgxExtendedPdfViewerService,
-    {
-      provide: PERFECT_SCROLLBAR_CONFIG,
-      useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG,
-    },
+    //    {
+    //      provide: PERFECT_SCROLLBAR_CONFIG,
+    //      useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG,
+    //    },
   ],
 })
 export class FabricCanvasComponent implements OnInit {

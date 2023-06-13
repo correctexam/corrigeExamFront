@@ -11,7 +11,7 @@ export class ThicknessSliderComponent {
   min = DrawingThickness.THIN;
   max = DrawingThickness.THICK;
   smallStep = 2;
-  private v = this.eventHandler.selectedThickness;
+  private v: DrawingThickness;
   get value(): DrawingThickness {
     return this.v;
   }
@@ -20,5 +20,7 @@ export class ThicknessSliderComponent {
     this.v = this.eventHandler.selectedThickness;
   }
 
-  constructor(private eventHandler: EventHandlerService) {}
+  constructor(private eventHandler: EventHandlerService) {
+    this.v = this.eventHandler.selectedThickness;
+  }
 }

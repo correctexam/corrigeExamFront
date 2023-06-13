@@ -12,9 +12,10 @@ export type EntityArrayResponseType = HttpResponse<ICourseGroup[]>;
 
 @Injectable({ providedIn: 'root' })
 export class CourseGroupService {
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/course-groups');
-
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {}
+  protected resourceUrl: string;
+  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+    this.resourceUrl = this.applicationConfigService.getEndpointFor('api/course-groups');
+  }
 
   create(courseGroup: ICourseGroup): Observable<EntityResponseType> {
     return this.http.post<ICourseGroup>(this.resourceUrl, courseGroup, { observe: 'response' });
@@ -25,7 +26,6 @@ export class CourseGroupService {
       observe: 'response',
     });
   }
-
 
   find(id: number): Observable<EntityResponseType> {
     return this.http.get<ICourseGroup>(`${this.resourceUrl}/${id}`, { observe: 'response' });

@@ -94,7 +94,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   questions: IQuestion[] | undefined;
   blocked = true;
   nbreQuestions = 1;
-  currentNote = 0;
+  currentNote: number | undefined = 0;
   noteSteps = 0;
   maxNote = 0;
   questionStep = 0;

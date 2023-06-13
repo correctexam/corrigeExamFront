@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
@@ -25,13 +25,7 @@ export class CreerexamComponent implements OnInit, AfterViewInit {
   isSaving = false;
   coursName = '';
   faDownload = faDownload;
-  editForm = this.fb.group({
-    name: [null, [Validators.required]],
-    content: [],
-    contentContentType: [null, [Validators.required]],
-    mark: [true],
-    autoMapStudentCopyToList: [true],
-  });
+  editForm: UntypedFormGroup;
   errorParsingPdf = false;
 
   constructor(
@@ -45,7 +39,15 @@ export class CreerexamComponent implements OnInit, AfterViewInit {
     protected examService: ExamService,
     protected templateService: TemplateService,
     private ref: ChangeDetectorRef
-  ) {}
+  ) {
+    this.editForm = this.fb.group({
+      name: [null, [Validators.required]],
+      content: [],
+      contentContentType: [null, [Validators.required]],
+      mark: [true],
+      autoMapStudentCopyToList: [true],
+    });
+  }
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {

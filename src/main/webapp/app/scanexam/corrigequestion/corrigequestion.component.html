@@ -250,8 +250,8 @@
               (onCancel)="changeNote()"
             ></p-rating>
             <span jhiTranslate="scanexam.noteattribuee">Note attribuée : </span
-            ><span *ngIf="questionStep > 0 && resp?.id"
-              ><b>{{ currentNote / questionStep }}</b></span
+            ><span *ngIf="questionStep > 0 && resp?.id && currentNote !== undefined"
+              ><b>{{ currentNote! / questionStep }}</b></span
             >
             <span *ngIf="questionStep <= 0 && resp?.id"
               ><b>{{ currentNote }}</b></span

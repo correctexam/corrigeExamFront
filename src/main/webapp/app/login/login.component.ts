@@ -15,18 +15,20 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   authenticationError = false;
 
-  loginForm = this.fb.group({
-    username: [null, [Validators.required]],
-    password: [null, [Validators.required]],
-    rememberMe: [false],
-  });
+  loginForm: any;
 
   constructor(
     private accountService: AccountService,
     private loginService: LoginService,
     private router: Router,
     private fb: UntypedFormBuilder
-  ) {}
+  ) {
+    this.loginForm = this.fb.group({
+      username: [null, [Validators.required]],
+      password: [null, [Validators.required]],
+      rememberMe: [false],
+    });
+  }
 
   ngOnInit(): void {
     // if already authenticated then navigate to home page

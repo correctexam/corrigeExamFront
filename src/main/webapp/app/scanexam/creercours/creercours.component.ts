@@ -22,10 +22,7 @@ export class CreercoursComponent implements OnInit {
   usersSharedCollection: IUser[] = [];
 
   login: string | undefined;
-  editForm = this.fb.group({
-    id: [],
-    name: [null, [Validators.required]],
-  });
+  editForm: any;
 
   constructor(
     protected courseService: CourseService,
@@ -34,7 +31,12 @@ export class CreercoursComponent implements OnInit {
 
     protected activatedRoute: ActivatedRoute,
     protected fb: UntypedFormBuilder
-  ) {}
+  ) {
+    this.editForm = this.fb.group({
+      id: [],
+      name: [null, [Validators.required]],
+    });
+  }
 
   ngOnInit(): void {
     this.createFromForm();
