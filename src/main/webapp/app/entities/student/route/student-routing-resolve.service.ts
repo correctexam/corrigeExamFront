@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Resolve, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable, of, EMPTY } from 'rxjs';
@@ -9,7 +9,7 @@ import { StudentService } from '../service/student.service';
 
 @Injectable({ providedIn: 'root' })
 export class StudentRoutingResolveService implements Resolve<IStudent> {
-  constructor(protected service: StudentService, protected router: Router) {}
+  constructor(protected service: StudentService, protected router: Router, private zone: NgZone) {}
 
   resolve(route: ActivatedRouteSnapshot): Observable<IStudent> | Observable<never> {
     const id = route.params['id'];
@@ -19,7 +19,9 @@ export class StudentRoutingResolveService implements Resolve<IStudent> {
           if (student.body) {
             return of(student.body);
           } else {
-            this.router.navigate(['404']);
+            this.zone.run(() => {
+              this.router.navigate(['404']);
+            });
             return EMPTY;
           }
         })

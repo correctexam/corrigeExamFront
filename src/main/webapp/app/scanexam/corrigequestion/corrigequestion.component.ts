@@ -16,6 +16,7 @@ import {
   AfterViewInit,
   HostListener,
   ViewChild,
+  NgZone,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CourseService } from 'app/entities/course/service/course.service';
@@ -59,13 +60,19 @@ import { CacheServiceImpl } from '../db/CacheServiceImpl';
 })
 export class CorrigequestionComponent implements OnInit, AfterViewInit {
   compareGradedComment(comment: IGradedComment) {
-    this.router.navigate(['/comparegradedcomment/' + this.examId + '/' + comment.id]);
+    this.zone.run(() => {
+      this.router.navigate(['/comparegradedcomment/' + this.examId + '/' + comment.id]);
+    });
   }
   compareTextComment(comment: ITextComment) {
-    this.router.navigate(['/comparetextcomment/' + this.examId + '/' + comment.id]);
+    this.zone.run(() => {
+      this.router.navigate(['/comparetextcomment/' + this.examId + '/' + comment.id]);
+    });
   }
   compareMark(response: IStudentResponse) {
-    this.router.navigate(['/comparemark/' + this.examId + '/' + response.id]);
+    this.zone.run(() => {
+      this.router.navigate(['/comparemark/' + this.examId + '/' + response.id]);
+    });
   }
   minimizeComment = false;
   layoutsidebarVisible = false;
@@ -154,7 +161,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     private eventHandler: EventCanevascorrectionHandlerService,
     private translateService: TranslateService,
     private preferenceService: PreferenceService,
-    private db: CacheServiceImpl
+    private db: CacheServiceImpl,
+    private zone: NgZone
   ) {}
 
   ngOnInit(): void {

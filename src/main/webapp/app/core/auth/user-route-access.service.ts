@@ -1,4 +1,4 @@
-import { Injectable, isDevMode } from '@angular/core';
+import { Injectable, NgZone, isDevMode } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -8,7 +8,12 @@ import { StateStorageService } from './state-storage.service';
 
 @Injectable({ providedIn: 'root' })
 export class UserRouteAccessService implements CanActivate {
-  constructor(private router: Router, private accountService: AccountService, private stateStorageService: StateStorageService) {}
+  constructor(
+    private router: Router,
+    private accountService: AccountService,
+    private stateStorageService: StateStorageService,
+    private zone: NgZone
+  ) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
     return this.accountService.identity().pipe(
@@ -23,12 +28,16 @@ export class UserRouteAccessService implements CanActivate {
           if (isDevMode()) {
             console.error('User has not any of required authorities: ', authorities);
           }
-          this.router.navigate(['accessdenied']);
+          this.zone.run(() => {
+            this.router.navigate(['accessdenied']);
+          });
           return false;
         }
 
         this.stateStorageService.storeUrl(state.url);
-        this.router.navigate(['/login']);
+        this.zone.run(() => {
+          this.router.navigate(['/login']);
+        });
         return false;
       })
     );

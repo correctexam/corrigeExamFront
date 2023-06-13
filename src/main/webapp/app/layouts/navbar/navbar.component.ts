@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { SessionStorageService } from 'ngx-webstorage';
@@ -36,7 +36,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private accountService: AccountService,
     private profileService: ProfileService,
     private router: Router,
-    public dialogService: DialogService
+    public dialogService: DialogService,
+    private zone: NgZone
   ) {
     if (VERSION) {
       this.version = VERSION.toLowerCase().startsWith('v') ? VERSION : `v${VERSION}`;
@@ -65,13 +66,17 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   login(): void {
-    this.router.navigate(['/login']);
+    this.zone.run(() => {
+      this.router.navigate(['/login']);
+    });
   }
 
   logout(): void {
     this.collapseNavbar();
     this.loginService.logout();
-    this.router.navigate(['']);
+    this.zone.run(() => {
+      this.router.navigate(['']);
+    });
   }
 
   toggleNavbar(): void {

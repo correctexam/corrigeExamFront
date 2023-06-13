@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { PasswordResetFinishService } from './password-reset-finish.service';
@@ -17,17 +17,18 @@ export class PasswordResetFinishComponent implements OnInit, AfterViewInit {
   error = false;
   success = false;
   key = '';
-
-  passwordForm = this.fb.group({
-    newPassword: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(50)]],
-    confirmPassword: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(50)]],
-  });
+  passwordForm: UntypedFormGroup;
 
   constructor(
     private passwordResetFinishService: PasswordResetFinishService,
     private route: ActivatedRoute,
     private fb: UntypedFormBuilder
-  ) {}
+  ) {
+    this.passwordForm = this.fb.group({
+      newPassword: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(50)]],
+      confirmPassword: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(50)]],
+    });
+  }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {

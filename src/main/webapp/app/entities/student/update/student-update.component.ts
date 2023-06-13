@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
@@ -19,22 +19,24 @@ export class StudentUpdateComponent implements OnInit {
 
   examSheetsSharedCollection: IExamSheet[] = [];
 
-  editForm = this.fb.group({
-    id: [],
-    name: [null, [Validators.required]],
-    firstname: [],
-    ine: [null, [Validators.required]],
-    caslogin: [],
-    mail: [],
-    examSheets: [],
-  });
+  editForm: UntypedFormGroup;
 
   constructor(
     protected studentService: StudentService,
     protected examSheetService: ExamSheetService,
     protected activatedRoute: ActivatedRoute,
     protected fb: UntypedFormBuilder
-  ) {}
+  ) {
+    this.editForm = this.fb.group({
+      id: [],
+      name: [null, [Validators.required]],
+      firstname: [],
+      ine: [null, [Validators.required]],
+      caslogin: [],
+      mail: [],
+      examSheets: [],
+    });
+  }
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ student }) => {

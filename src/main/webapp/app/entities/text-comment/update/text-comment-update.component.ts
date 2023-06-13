@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -20,20 +20,22 @@ export class TextCommentUpdateComponent implements OnInit {
 
   questions: IQuestion[] = [];
 
-  editForm = this.fb.group({
-    id: [],
-    text: [],
-    description: [],
-    zonegeneratedid: [],
-    questionId: [],
-  });
+  editForm: UntypedFormGroup;
 
   constructor(
     protected textCommentService: TextCommentService,
     protected questionService: QuestionService,
     protected activatedRoute: ActivatedRoute,
     protected fb: UntypedFormBuilder
-  ) {}
+  ) {
+    this.editForm = this.fb.group({
+      id: [],
+      text: [],
+      description: [],
+      zonegeneratedid: [],
+      questionId: [],
+    });
+  }
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ textComment }) => {

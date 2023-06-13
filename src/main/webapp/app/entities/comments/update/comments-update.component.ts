@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 
@@ -19,19 +19,21 @@ export class CommentsUpdateComponent implements OnInit {
   isSaving = false;
   studentresponses: IStudentResponse[] = [];
 
-  editForm = this.fb.group({
-    id: [],
-    zonegeneratedid: [],
-    jsonData: [],
-    studentResponseId: [],
-  });
+  editForm: UntypedFormGroup;
 
   constructor(
     protected commentsService: CommentsService,
     protected studentResponseService: StudentResponseService,
     protected activatedRoute: ActivatedRoute,
     private fb: UntypedFormBuilder
-  ) {}
+  ) {
+    this.editForm = this.fb.group({
+      id: [],
+      zonegeneratedid: [],
+      jsonData: [],
+      studentResponseId: [],
+    });
+  }
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ comments }) => {

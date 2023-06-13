@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -15,18 +15,20 @@ import { QuestionTypeService } from '../service/question-type.service';
 export class QuestionTypeUpdateComponent implements OnInit {
   isSaving = false;
 
-  editForm = this.fb.group({
-    id: [],
-    algoName: [null, [Validators.required]],
-    endpoint: [],
-    jsFunction: [],
-  });
+  editForm: UntypedFormGroup;
 
   constructor(
     protected questionTypeService: QuestionTypeService,
     protected activatedRoute: ActivatedRoute,
     protected fb: UntypedFormBuilder
-  ) {}
+  ) {
+    this.editForm = this.fb.group({
+      id: [],
+      algoName: [null, [Validators.required]],
+      endpoint: [],
+      jsFunction: [],
+    });
+  }
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ questionType }) => {

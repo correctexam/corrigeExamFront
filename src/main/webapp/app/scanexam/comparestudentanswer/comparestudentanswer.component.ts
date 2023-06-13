@@ -9,7 +9,17 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, QueryList, ViewChildren } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  NgZone,
+  OnInit,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { CourseService } from 'app/entities/course/service/course.service';
@@ -73,7 +83,11 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   }
   goToCopie(pageMin: number, pageMax: number) {
     if (this.zones4comments !== undefined && this.zones4comments.numero > 0 && Number.isInteger(pageMin / (pageMax + 1 - pageMin) + 1)) {
-      this.router.navigate(['/answer/' + this.examId + '/' + this.zones4comments!.numero + '/' + (pageMin / (pageMax + 1 - pageMin) + 1)]);
+      this.zone.run(() => {
+        this.router.navigate([
+          '/answer/' + this.examId + '/' + this.zones4comments!.numero + '/' + (pageMin / (pageMax + 1 - pageMin) + 1),
+        ]);
+      });
     }
   }
   debug = false;
@@ -117,7 +131,8 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     private db: CacheServiceImpl,
     private http: HttpClient,
     private applicationConfigService: ApplicationConfigService,
-    private location: Location
+    private location: Location,
+    private zone: NgZone
   ) {}
 
   ngOnInit(): void {

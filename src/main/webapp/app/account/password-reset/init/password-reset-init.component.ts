@@ -1,5 +1,5 @@
 import { Component, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 
 import { PasswordResetInitService } from './password-reset-init.service';
 
@@ -12,11 +12,13 @@ export class PasswordResetInitComponent implements AfterViewInit {
   email?: ElementRef;
 
   success = false;
-  resetRequestForm = this.fb.group({
-    email: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(254), Validators.email]],
-  });
+  resetRequestForm: UntypedFormGroup;
 
-  constructor(private passwordResetInitService: PasswordResetInitService, private fb: UntypedFormBuilder) {}
+  constructor(private passwordResetInitService: PasswordResetInitService, private fb: UntypedFormBuilder) {
+    this.resetRequestForm = this.fb.group({
+      email: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(254), Validators.email]],
+    });
+  }
 
   ngAfterViewInit(): void {
     if (this.email) {

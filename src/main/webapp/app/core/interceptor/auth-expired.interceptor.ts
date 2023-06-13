@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -14,7 +14,8 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
     private loginService: LoginService,
     private stateStorageService: StateStorageService,
     private router: Router,
-    private accountService: AccountService
+    private accountService: AccountService,
+    private zone: NgZone
   ) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -24,7 +25,9 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
           if (err.status === 401 && err.url && !err.url.includes('api/account') && this.accountService.isAuthenticated()) {
             this.stateStorageService.storeUrl(this.router.routerState.snapshot.url);
             this.loginService.logout();
-            this.router.navigate(['/login']);
+            this.zone.run(() => {
+              this.router.navigate(['/login']);
+            });
           }
         },
       })

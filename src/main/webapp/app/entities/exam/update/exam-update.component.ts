@@ -3,7 +3,7 @@
 /* eslint-disable arrow-body-style */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -35,17 +35,7 @@ export class ExamUpdateComponent implements OnInit {
   scanfiles: IScan[] = [];
   courses: ICourse[] = [];
 
-  editForm = this.fb.group({
-    id: [],
-    name: [null, [Validators.required]],
-    templateId: [],
-    idzoneId: [],
-    namezoneId: [],
-    firstnamezoneId: [],
-    notezoneId: [],
-    scanfileId: [],
-    courseId: [],
-  });
+  editForm: UntypedFormGroup;
 
   constructor(
     protected examService: ExamService,
@@ -55,7 +45,19 @@ export class ExamUpdateComponent implements OnInit {
     protected courseService: CourseService,
     protected activatedRoute: ActivatedRoute,
     private fb: UntypedFormBuilder
-  ) {}
+  ) {
+    this.editForm = this.fb.group({
+      id: [],
+      name: [null, [Validators.required]],
+      templateId: [],
+      idzoneId: [],
+      namezoneId: [],
+      firstnamezoneId: [],
+      notezoneId: [],
+      scanfileId: [],
+      courseId: [],
+    });
+  }
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ exam }) => {
