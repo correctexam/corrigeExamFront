@@ -522,10 +522,10 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       );
 
       good_matchesToKeep.push(intergood_matchesToKeep[0]);
-      //      good_matchesToKeep.push(intergood_matchesToKeep[1]);
-      //      good_matchesToKeep.push(intergood_matchesToKeep[2]);
-      //      good_matchesToKeep.push(intergood_matchesToKeep[3]);
-      //      good_matchesToKeep.push(intergood_matchesToKeep[4]);
+      good_matchesToKeep.push(intergood_matchesToKeep[1]);
+      good_matchesToKeep.push(intergood_matchesToKeep[2]);
+      good_matchesToKeep.push(intergood_matchesToKeep[3]);
+      good_matchesToKeep.push(intergood_matchesToKeep[4]);
 
       console.error('last realgoodmatchtokeep', good_matchesToKeep.length, numberofgoodpointToMatch);
 
