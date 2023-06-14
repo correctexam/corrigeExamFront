@@ -155,10 +155,10 @@ export class FabricCanvasComponent implements OnInit {
       // to have all the canvases up to date.
       if (this.pdfViewerService.isRenderQueueEmpty()) {
         this.loadingPdfMetadata();
+        console.error('block');
         this.blocked = false;
       }
     } else {
-      console.error(this.eventHandler.getCanvasForPage(page));
       this.eventHandler.getCanvasForPage(page);
       this.eventHandler.pages[page].updateCanvas(evt.source);
 
@@ -183,6 +183,11 @@ export class FabricCanvasComponent implements OnInit {
             }
           }
         });
+      }
+      if (this.pdfViewerService.isRenderQueueEmpty()) {
+        this.loadingPdfMetadata();
+        console.error('block');
+        this.blocked = false;
       }
     }
   }

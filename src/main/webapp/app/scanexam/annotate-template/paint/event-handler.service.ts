@@ -441,12 +441,19 @@ export class EventHandlerService {
       this.translateService.get(translationToken).subscribe(e => {
         const r = this.fabricShapeService.createBoxFromScratch(
           c,
-          {
+          /*          {
             x: (zone.xInit! * c.width!) / this.coefficient,
             y: (zone.yInit! * c.height!) / this.coefficient,
           },
           (zone.width! * c.width!) / this.coefficient,
-          (zone.height! * c.height!) / this.coefficient,
+          (zone.height! * c.height!) / this.coefficient,*/
+          {
+            x: (zone.xInit! * this.pages[page].pageViewer.canvas.clientWidth) / this.coefficient,
+            y: (zone.yInit! * this.pages[page].pageViewer.canvas.clientHeight) / this.coefficient,
+          },
+          (zone.width! * this.pages[page].pageViewer.canvas.clientWidth) / this.coefficient,
+          (zone.height! * this.pages[page].pageViewer.canvas.clientHeight) / this.coefficient,
+
           e,
           DrawingColours.RED
         );
