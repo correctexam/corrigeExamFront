@@ -311,14 +311,17 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
          return;
        } */
 
+      //      let mat1 = cv.matFromArray(4, 1, cv.CV_32FC2, points1);
+      //     let mat2 = cv.matFromArray(4, 1, cv.CV_32FC2, points2);
+
       let image_B_final_result = new cv.Mat();
       cv.warpPerspective(im1, image_B_final_result, h, im2.size());
 
-      //      let M = cv.getPerspectiveTransform(mat1, mat2);
+      //            let M = cv.getPerspectiveTransform(mat1, mat2);
       //      let image_B_final_result = new cv.Mat();
       //      console.error(points1, points2);
 
-      //     cv.warpPerspective(im1, image_B_final_result, M, im2.size(), cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
+      //    cv.warpPerspective(im1, image_B_final_result, M, im2.size(), cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
 
       result['imageAligned'] = this.imageDataFromMat(image_B_final_result).data.buffer;
       result['imageAlignedWidth'] = image_B_final_result.size().width;
@@ -519,10 +522,10 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       );
 
       good_matchesToKeep.push(intergood_matchesToKeep[0]);
-      good_matchesToKeep.push(intergood_matchesToKeep[1]);
-      good_matchesToKeep.push(intergood_matchesToKeep[2]);
-      good_matchesToKeep.push(intergood_matchesToKeep[3]);
-      good_matchesToKeep.push(intergood_matchesToKeep[4]);
+      //      good_matchesToKeep.push(intergood_matchesToKeep[1]);
+      //      good_matchesToKeep.push(intergood_matchesToKeep[2]);
+      //      good_matchesToKeep.push(intergood_matchesToKeep[3]);
+      //      good_matchesToKeep.push(intergood_matchesToKeep[4]);
 
       console.error('last realgoodmatchtokeep', good_matchesToKeep.length, numberofgoodpointToMatch);
 

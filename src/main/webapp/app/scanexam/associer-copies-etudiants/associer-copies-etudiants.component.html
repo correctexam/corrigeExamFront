@@ -124,22 +124,38 @@
         [optionValue]="'value'"
       >
         <ng-template let-table pTemplate="item">
-          <div class="ui-helper-clearfix" style="width: '100%'">
-            <div class="row">
-              <div class="col-md-6">
+          <!--         <div class="flex  overflow-hidden" style="width: '100%'">
+              <div class="flex align-items-center justify-content-center flex-grow-1 ">
                 <span style="float: left">{{ table.label }}</span>
                 <span style="float: left; width: '1rem'">&nbsp;</span>
-
+                  <button
+                  icon="pi pi-check"
+                 grid style="width: '1.5rem'; height: '1.5rem'"
+                  class="p-button-sm p-button-raised p-button-text p-button-rounded"
+                  pButton
+                  (click)="selectStudents(table.value)"
+                ></button>
+              </div>
+              <div class="flex-none flex align-items-right justify-content-right">
+                <button style="padding: '0.1rem'" pButton (click)="selectStudents(table.value)" jhiTranslate="scanexam.next">Next</button>
+              </div>-->
+          <div class="col-12" style="width: '100%'">
+            <div class="flex flex-row m-0 p-0">
+              <div class="flex-grow-1 flex-shrink-1 flex align-items-center justify-content-left border-round m-0 p-0">
+                <span style="float: left">{{ table.label }}</span>
+                <span style="float: left; width: '1rem'">&nbsp;</span>
                 <button
                   icon="pi pi-check"
+                  grid
                   style="width: '1.5rem'; height: '1.5rem'"
                   class="p-button-sm p-button-raised p-button-text p-button-rounded"
                   pButton
                   (click)="selectStudents(table.value)"
                 ></button>
               </div>
-              <div class="col-md-6 text-right">
-                <button style="padding: '0.1rem'" pButton (click)="selectStudents(table.value)" jhiTranslate="scanexam.next">Next</button>
+              <div class="flex-shrink-0 flex align-items-center justify-content-right border-round m-0 p-0"></div>
+              <div class="flex-grow-1 flex-shrink-1 flex align-items-end justify-content-end border-round m-0 p-0">
+                <button style="padding: '0.0rem'" pButton (click)="selectStudents(table.value)" jhiTranslate="scanexam.next">Next</button>
               </div>
             </div>
           </div>
