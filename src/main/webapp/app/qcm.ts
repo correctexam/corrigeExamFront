@@ -130,6 +130,13 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
 export function getDimensions(forme: any): any {
   const rect = cv.boundingRect(forme);
   return {
+    w: rect.width + 8,
+    h: rect.height + 8,
+  };
+}
+export function getOrigDimensions(forme: any): any {
+  const rect = cv.boundingRect(forme);
+  return {
     w: rect.width,
     h: rect.height,
   };
@@ -151,7 +158,7 @@ function __moy(coordonnees: any[]): any {
 
 export function getPosition(forme: any): any {
   const rect = cv.boundingRect(forme);
-  return { x: rect.x, y: rect.y };
+  return { x: rect.x - 4, y: rect.y - 4 };
 }
 
 function interpretationForme(contour: any, preference: IPreference): any {
@@ -159,7 +166,7 @@ function interpretationForme(contour: any, preference: IPreference): any {
   const forme = new cv.Mat();
   cv.approxPolyDP(contour, forme, eps, true);
   let nom = undefined;
-  const dims = getDimensions(forme);
+  const dims = getOrigDimensions(forme);
 
   if (dims.w >= preference.qcm_min_width_shape && dims.h >= preference.qcm_min_height_shape) {
     //        console.log(forme)
@@ -310,16 +317,18 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
   const cases_remplies: any[] = [];
   const cases_vides: any[] = [];
   let infos_cases: Map<number, any> = new Map<number, any>();
-  // imgs_template =[]
-  /* casesExamTemplate.cases.forEach((case1,k)=> {
-      imgs_template.push(decoupeMoins1(templateimage,getPosition(case1),getDimensions(case1)))
-    })*/
+  const imgs_templatediffblank: Map<number, number> = new Map();
+  casesExamTemplate.cases.forEach((case1: any, k: number) => {
+    const diff = diffCouleurAvecCaseBlanche(decoupe(templateimage, getPosition(case1), getDimensions(case1)));
+    imgs_templatediffblank.set(k, diff);
+  });
   casesExamTemplate.cases.forEach((case1: any, k: number) => {
     // Pour chaque (x,y) associé à une case du template, on récupère la zone située au même endroit sur la copie
     // et on la compare avec celle du template
     const img_case_eleve = decoupe(studentScanImage, getPosition(case1), getDimensions(case1));
-    const diff = diffCouleurAvecCaseBlanche(img_case_eleve);
-
+    const diff1 = diffCouleurAvecCaseBlanche(img_case_eleve);
+    const diff = diff1 - imgs_templatediffblank.get(k)!;
+    // console.error('diff',k,diff1-imgs_templatediffblank.get(k)!,diff1, imgs_templatediffblank.get(k));
     if (diff > preference.qcm_differences_avec_case_blanche) {
       infos_cases.set(k, { verdict: true, prediction: diff });
       cases_remplies.push(case1);
@@ -327,7 +336,7 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
       infos_cases.set(k, { verdict: false, prediction: diff });
       cases_vides.push(case1);
     }
-    if (diff > 0.16 && diff < 0.25) {
+    if (diff > preference.qcm_differences_avec_case_blanche && diff < preference.qcm_differences_avec_case_blanche * 1.15) {
       cv.putText(
         studentScanImage,
         '' + diff.toFixed(2),
