@@ -385,15 +385,17 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
         ) {
           exportImageType = this.preferenceService.getPreference().imageTypeExport;
         }
+        let extension = '.webp';
+        if (exportImageType === 'image/png') {
+          extension = '.png';
+        } else if (exportImageType === 'image/jpg') {
+          extension = '.jpg';
+        }
 
         const webPImageURL = this.canvass
           .get(i * this.zones4comments!.zones.length + j)!
           .nativeElement.toDataURL(exportImageType, compression);
-        img!.file(
-          i * this.zones4comments!.zones.length + '_' + (j + 1) + '.webp',
-          webPImageURL.replace(/^data:image\/?[A-z]*;base64,/, ''),
-          { base64: true }
-        );
+        img!.file(i + '_' + (j + 1) + extension, webPImageURL.replace(/^data:image\/?[A-z]*;base64,/, ''), { base64: true });
       });
     });
 
