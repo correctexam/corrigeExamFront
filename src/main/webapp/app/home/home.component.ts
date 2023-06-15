@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable no-console */
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -31,7 +31,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     private router: Router,
     private alignImagesService: AlignImagesService,
     private appConfig: ApplicationConfigService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private zone: NgZone
   ) {}
 
   ngOnInit(): void {
@@ -60,7 +61,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   login(): void {
-    this.router.navigate(['/login']);
+    this.zone.run(() => {
+      this.router.navigate(['/login']);
+    });
   }
 
   ngOnDestroy(): void {

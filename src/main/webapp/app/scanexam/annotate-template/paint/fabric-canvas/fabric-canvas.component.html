@@ -19,12 +19,14 @@
       [showToolbar]="false"
       [pageViewMode]="'infinite-scroll'"
       [showSecondaryToolbarButton]="false"
+      [sidebarVisible]="false"
       (pageRender)="blocked = true"
       (pageRendered)="pageRendered($event)"
       backgroundColor="#ffffff"
-      [zoom]="'100%'"
+      [zoom]="'page-width'"
       [minZoom]="0.5"
       [maxZoom]="3"
+      (currentZoomFactor)="updateZoomFactor($event)"
     ></ngx-extended-pdf-viewer>
   </div>
 </div>

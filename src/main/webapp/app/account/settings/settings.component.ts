@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 
 import { AccountService } from 'app/core/auth/account.service';
@@ -14,14 +14,16 @@ export class SettingsComponent implements OnInit {
   account!: Account;
   success = false;
   languages = LANGUAGES;
-  settingsForm = this.fb.group({
-    firstName: [undefined, [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-    lastName: [undefined, [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-    email: [undefined, [Validators.required, Validators.minLength(5), Validators.maxLength(254), Validators.email]],
-    langKey: [undefined],
-  });
+  settingsForm: UntypedFormGroup;
 
-  constructor(private accountService: AccountService, private fb: UntypedFormBuilder, private translateService: TranslateService) {}
+  constructor(private accountService: AccountService, private fb: UntypedFormBuilder, private translateService: TranslateService) {
+    this.settingsForm = this.fb.group({
+      firstName: [undefined, [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
+      lastName: [undefined, [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
+      email: [undefined, [Validators.required, Validators.minLength(5), Validators.maxLength(254), Validators.email]],
+      langKey: [undefined],
+    });
+  }
 
   ngOnInit(): void {
     this.accountService.identity().subscribe(account => {

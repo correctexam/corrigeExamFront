@@ -2,7 +2,7 @@ name: Angular GitHub CI
 on:
   push:
     branches:
-      - main
+      - angular16
 
 jobs:
   ci:
@@ -52,14 +52,5 @@ jobs:
       - name: Test
         run: |
           npm run test
-      - name: Copy 404
-        run: |
-          npm run copy:404
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.ref == 'refs/heads/main' }}
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./target/classes/static
 
 

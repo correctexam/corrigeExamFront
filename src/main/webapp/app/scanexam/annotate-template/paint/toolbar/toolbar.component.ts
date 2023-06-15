@@ -36,13 +36,15 @@ export class GraphicalToolbarComponent {
   faTrash = faTrash;
   faPencil = faPencil;
   DrawingTools = DrawingTools;
-  selected = this.eventService.selectedTool;
+  selected: DrawingTools;
 
   constructor(
     private eventService: EventHandlerService,
     private confirmationService: ConfirmationService,
     public translateService: TranslateService
-  ) {}
+  ) {
+    this.selected = this.eventService.selectedTool;
+  }
 
   ngOnInit(): void {
     this.selected = DrawingTools.SELECT;

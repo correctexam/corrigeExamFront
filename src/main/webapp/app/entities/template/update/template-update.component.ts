@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -18,14 +18,7 @@ import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
 export class TemplateUpdateComponent implements OnInit {
   isSaving = false;
 
-  editForm = this.fb.group({
-    id: [],
-    name: [null, [Validators.required]],
-    content: [],
-    contentContentType: [],
-    mark: [],
-    autoMapStudentCopyToList: [],
-  });
+  editForm: UntypedFormGroup;
 
   constructor(
     protected dataUtils: DataUtils,
@@ -33,7 +26,16 @@ export class TemplateUpdateComponent implements OnInit {
     protected templateService: TemplateService,
     protected activatedRoute: ActivatedRoute,
     protected fb: UntypedFormBuilder
-  ) {}
+  ) {
+    this.editForm = this.fb.group({
+      id: [],
+      name: [null, [Validators.required]],
+      content: [],
+      contentContentType: [],
+      mark: [],
+      autoMapStudentCopyToList: [],
+    });
+  }
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ template }) => {

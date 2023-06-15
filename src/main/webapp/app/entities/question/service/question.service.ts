@@ -12,9 +12,11 @@ export type EntityArrayResponseType = HttpResponse<IQuestion[]>;
 
 @Injectable({ providedIn: 'root' })
 export class QuestionService {
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/questions');
+  protected resourceUrl: string;
 
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {}
+  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+    this.resourceUrl = this.applicationConfigService.getEndpointFor('api/questions');
+  }
 
   create(question: IQuestion): Observable<EntityResponseType> {
     return this.http.post<IQuestion>(this.resourceUrl, question, { observe: 'response' });

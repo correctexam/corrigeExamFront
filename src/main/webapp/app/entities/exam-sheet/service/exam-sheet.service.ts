@@ -12,9 +12,11 @@ export type EntityArrayResponseType = HttpResponse<IExamSheet[]>;
 
 @Injectable({ providedIn: 'root' })
 export class ExamSheetService {
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/exam-sheets');
+  protected resourceUrl: string;
 
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {}
+  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+    this.resourceUrl = this.applicationConfigService.getEndpointFor('api/exam-sheets');
+  }
 
   create(examSheet: IExamSheet): Observable<EntityResponseType> {
     return this.http.post<IExamSheet>(this.resourceUrl, examSheet, { observe: 'response' });

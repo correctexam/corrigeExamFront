@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit, ElementRef, NgZone } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -15,24 +15,29 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   authenticationError = false;
 
-  loginForm = this.fb.group({
-    username: [null, [Validators.required]],
-    password: [null, [Validators.required]],
-    rememberMe: [false],
-  });
+  loginForm: any;
 
   constructor(
     private accountService: AccountService,
     private loginService: LoginService,
     private router: Router,
-    private fb: UntypedFormBuilder
-  ) {}
+    private fb: UntypedFormBuilder,
+    private zone: NgZone
+  ) {
+    this.loginForm = this.fb.group({
+      username: [null, [Validators.required]],
+      password: [null, [Validators.required]],
+      rememberMe: [false],
+    });
+  }
 
   ngOnInit(): void {
     // if already authenticated then navigate to home page
     this.accountService.identity().subscribe(() => {
       if (this.accountService.isAuthenticated()) {
-        this.router.navigate(['']);
+        this.zone.run(() => {
+          this.router.navigate(['']);
+        });
       }
     });
   }
@@ -53,7 +58,9 @@ export class LoginComponent implements OnInit, AfterViewInit {
           this.authenticationError = false;
           if (!this.router.getCurrentNavigation()) {
             // There were no routing during login (eg from navigationToStoredUrl)
-            this.router.navigate(['']);
+            this.zone.run(() => {
+              this.router.navigate(['']);
+            });
           }
         },
         error: () => (this.authenticationError = true),

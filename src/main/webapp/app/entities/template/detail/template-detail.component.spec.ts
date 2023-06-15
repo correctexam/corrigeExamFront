@@ -58,7 +58,7 @@ describe('Template Management Detail Component', () => {
       const newWindow = { ...window };
       newWindow.document.write = jest.fn();
       window.open = jest.fn(() => newWindow);
-      window.onload = jest.fn(() => newWindow);
+      // window.onload = jest.fn(() => newWindow);
       window.URL.createObjectURL = jest.fn();
       // GIVEN
       jest.spyOn(dataUtils, 'openFile');

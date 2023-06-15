@@ -83,6 +83,7 @@ import { FileUploadModule } from 'primeng/fileupload';
 
 import { SidebarModule } from 'primeng/sidebar';
 import { CreateCommentsComponent } from './annotate-template/create-comments/create-comments.component';
+import { ClickDoubleDirective } from './clickdouble.directive';
 // set the location of the OpenCV files
 // registerAllModules();
 
@@ -331,6 +332,7 @@ export const CompareAnswer_ROUTE: Route = {
     SummaryTemplateComponent,
     ComparestudentanswerComponent,
     CreateCommentsComponent,
+    ClickDoubleDirective,
   ],
   imports: [
     CommonModule,
@@ -410,6 +412,7 @@ export const CompareAnswer_ROUTE: Route = {
     CorrigequestionComponent,
     AssocierCopiesEtudiantsComponent,
     SortByDirective,
+    ClickDoubleDirective,
   ],
   providers: [EventHandlerService, FabricShapeService],
 })

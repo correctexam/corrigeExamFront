@@ -12,9 +12,11 @@ export type EntityArrayResponseType = HttpResponse<ITextComment[]>;
 
 @Injectable({ providedIn: 'root' })
 export class TextCommentService {
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/text-comments');
+  protected resourceUrl: string;
 
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {}
+  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+    this.resourceUrl = this.applicationConfigService.getEndpointFor('api/text-comments');
+  }
 
   create(textComment: ITextComment): Observable<EntityResponseType> {
     return this.http.post<ITextComment>(this.resourceUrl, textComment, { observe: 'response' });

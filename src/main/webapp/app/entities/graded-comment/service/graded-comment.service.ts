@@ -12,9 +12,11 @@ export type EntityArrayResponseType = HttpResponse<IGradedComment[]>;
 
 @Injectable({ providedIn: 'root' })
 export class GradedCommentService {
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/graded-comments');
+  protected resourceUrl: string;
 
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {}
+  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+    this.resourceUrl = this.applicationConfigService.getEndpointFor('api/graded-comments');
+  }
 
   create(gradedComment: IGradedComment): Observable<EntityResponseType> {
     return this.http.post<IGradedComment>(this.resourceUrl, gradedComment, { observe: 'response' });

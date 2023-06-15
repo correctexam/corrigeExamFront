@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 
@@ -24,12 +24,7 @@ export class FinalResultUpdateComponent implements OnInit {
   students: IStudent[] = [];
   exams: IExam[] = [];
 
-  editForm = this.fb.group({
-    id: [],
-    note: [],
-    studentId: [],
-    examId: [],
-  });
+  editForm: UntypedFormGroup;
 
   constructor(
     protected finalResultService: FinalResultService,
@@ -37,7 +32,14 @@ export class FinalResultUpdateComponent implements OnInit {
     protected examService: ExamService,
     protected activatedRoute: ActivatedRoute,
     private fb: UntypedFormBuilder
-  ) {}
+  ) {
+    this.editForm = this.fb.group({
+      id: [],
+      note: [],
+      studentId: [],
+      examId: [],
+    });
+  }
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ finalResult }) => {

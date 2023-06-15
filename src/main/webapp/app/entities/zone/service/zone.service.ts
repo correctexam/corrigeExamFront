@@ -18,9 +18,11 @@ export interface ResizeBoxDTO {
 }
 @Injectable({ providedIn: 'root' })
 export class ZoneService {
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/zones');
+  protected resourceUrl: string;
 
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {}
+  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+    this.resourceUrl = this.applicationConfigService.getEndpointFor('api/zones');
+  }
 
   create(zone: IZone): Observable<EntityResponseType> {
     return this.http.post<IZone>(this.resourceUrl, zone, { observe: 'response' });

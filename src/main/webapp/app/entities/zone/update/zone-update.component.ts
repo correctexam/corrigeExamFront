@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -15,16 +15,18 @@ import { ZoneService } from '../service/zone.service';
 export class ZoneUpdateComponent implements OnInit {
   isSaving = false;
 
-  editForm = this.fb.group({
-    id: [],
-    pageNumber: [],
-    xInit: [],
-    yInit: [],
-    width: [],
-    height: [],
-  });
+  editForm: UntypedFormGroup;
 
-  constructor(protected zoneService: ZoneService, protected activatedRoute: ActivatedRoute, protected fb: UntypedFormBuilder) {}
+  constructor(protected zoneService: ZoneService, protected activatedRoute: ActivatedRoute, protected fb: UntypedFormBuilder) {
+    this.editForm = this.fb.group({
+      id: [],
+      pageNumber: [],
+      xInit: [],
+      yInit: [],
+      width: [],
+      height: [],
+    });
+  }
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ zone }) => {

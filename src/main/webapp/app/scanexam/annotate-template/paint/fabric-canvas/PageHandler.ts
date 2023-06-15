@@ -130,7 +130,8 @@ export class PageHandler {
     canvas.page = this.page;
 
     this.eventHandler.canvas = canvas;
-    this.eventHandler.allcanvas.push(canvas);
+    this.eventHandler.allcanvas.set(this.page, canvas);
+    console.error(this.eventHandler.allcanvas);
 
     this.eventHandler.extendToObjectWithId();
     this.canvas = canvas;
