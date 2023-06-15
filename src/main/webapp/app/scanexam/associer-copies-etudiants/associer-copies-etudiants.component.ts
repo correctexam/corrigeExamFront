@@ -667,6 +667,29 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     }
   }
 
+  selectedColor(item: any): string {
+    const list = this.list._options!.filter(
+      s =>
+        s.value.examSheets === null ||
+        s.value.examSheets!.length === 0 ||
+        !s.value.examSheets?.some((ex: any) => ex?.scanId === this.exam.scanfileId) ||
+        s.value.examSheets?.some((ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === -1 && ex?.pagemax === -1)
+    );
+    const list1 = this.list._options!.filter(s =>
+      s.value.examSheets?.some(
+        (ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie
+      )
+    );
+
+    if (list.filter(e => e.label === item.label).length >= 1) {
+      return 'text-green-400';
+    } else if (list1.filter(e => e.label === item.label).length >= 1) {
+      return '';
+    } else {
+      return 'text-red-400';
+    }
+  }
+
   goToStudent(i: number): void {
     this.list._filterValue = '';
     this.list._filteredOptions = this.list._options;
@@ -754,6 +777,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
           s.value.examSheets === null ||
           s.value.examSheets!.length === 0 ||
           !s.value.examSheets?.some((ex: any) => ex?.scanId === this.exam.scanfileId) ||
+          s.value.examSheets?.some((ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === -1 && ex?.pagemax === -1) ||
           s.value.examSheets?.some(
             (ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie
           )
@@ -874,10 +898,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
 
   showGalleria(): void {
     this.blocked = true;
-    console.error('show Galleria');
     this.loadAllPages().then(() => {
-      console.error('show Galleria', this.images);
-
       this.blocked = false;
       this.displayBasic = true;
     });
