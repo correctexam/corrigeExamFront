@@ -16,9 +16,11 @@
     [containerStyle]="{ 'max-height': '90vh' }"
     [numVisible]="7"
     [(activeIndex)]="activeIndex"
+    appendTo="body"
   >
     <ng-template pTemplate="item" let-item>
       <div
+        appendTo="body"
         id="item"
         class="grid grid-nogutter justify-content-center"
         style="overflow-x: hidden; overflow-y: scroll; border: #000000 1px solid; height: 96vh; width: 90vw"
