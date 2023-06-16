@@ -96,7 +96,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   studentsOptions: () => SelectItem[] = () => this.getStudentOptions();
 
   getStudentOptions(): SelectItem[] {
-    if (this.list?._options !== undefined && this.list._options.length > 0) {
+    if (this.list?._options !== undefined && this.list._options!.length > 0) {
       this.filterLocalStudentList();
     }
     return this.students.map(student => ({
@@ -355,7 +355,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
             this.recognizedStudent = sts[0];
             this.predictionprecision = ((solutionName[1] as number) + (solutionFirstname[1] as number) + (solutionINE[1] as number)) / 3;
           } else {
-            if (solutionINE[1] > 0.28) {
+            if (+solutionINE[1] > 0.28) {
               sts = this.students.filter(student => (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase());
               if (sts.length > 0) {
                 this.recognizedStudent = sts[0];
@@ -398,14 +398,14 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                 this.predictionprecision = ((solutionName[1] as number) + (solutionINE[1] as number)) / 2;
               }
             }
-            if (this.recognizedStudent === undefined && solutionName[1] > 0.5 && solutionFirstname[1] < solutionName[1]) {
+            if (this.recognizedStudent === undefined && +solutionName[1] > 0.5 && solutionFirstname[1] < solutionName[1]) {
               sts = this.students.filter(student => (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase());
               if (sts.length > 0) {
                 this.recognizedStudent = sts[0];
                 this.predictionprecision = (solutionName[1] as number) / 3;
               }
             }
-            if (this.recognizedStudent === undefined && solutionFirstname[1] > 0.5 && solutionName[1] < solutionFirstname[1]) {
+            if (this.recognizedStudent === undefined && +solutionFirstname[1] > 0.5 && solutionName[1] < solutionFirstname[1]) {
               sts = this.students.filter(student => (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase());
               if (sts.length > 0) {
                 this.recognizedStudent = sts[0];
@@ -438,7 +438,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
             this.recognizedStudent = sts[0];
             this.predictionprecision = ((solutionName[1] as number) + (solutionINE[1] as number)) / 2;
           }
-        } else if (solutionINE !== undefined && solutionINE.length > 0 && solutionINE[1] > 0.25) {
+        } else if (solutionINE !== undefined && solutionINE.length > 0 && +solutionINE[1] > 0.25) {
           let sts = this.students.filter(student => (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase());
           if (sts.length > 0) {
             this.recognizedStudent = sts[0];
@@ -667,6 +667,29 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     }
   }
 
+  selectedColor(item: any): string {
+    const list = this.list._options!.filter(
+      s =>
+        s.value.examSheets === null ||
+        s.value.examSheets!.length === 0 ||
+        !s.value.examSheets?.some((ex: any) => ex?.scanId === this.exam.scanfileId) ||
+        s.value.examSheets?.some((ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === -1 && ex?.pagemax === -1)
+    );
+    const list1 = this.list._options!.filter(s =>
+      s.value.examSheets?.some(
+        (ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie
+      )
+    );
+
+    if (list.filter(e => e.label === item.label).length >= 1) {
+      return 'text-green-400';
+    } else if (list1.filter(e => e.label === item.label).length >= 1) {
+      return '';
+    } else {
+      return 'text-red-400';
+    }
+  }
+
   goToStudent(i: number): void {
     this.list._filterValue = '';
     this.list._filteredOptions = this.list._options;
@@ -749,11 +772,12 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
 
   filterLocalStudentList(): void {
     if (this.filterbindstudent) {
-      this.list._filteredOptions = this.list._options.filter(
+      this.list._filteredOptions = this.list._options!.filter(
         s =>
           s.value.examSheets === null ||
           s.value.examSheets!.length === 0 ||
           !s.value.examSheets?.some((ex: any) => ex?.scanId === this.exam.scanfileId) ||
+          s.value.examSheets?.some((ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === -1 && ex?.pagemax === -1) ||
           s.value.examSheets?.some(
             (ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie
           )
@@ -874,7 +898,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
 
   showGalleria(): void {
     this.blocked = true;
-
     this.loadAllPages().then(() => {
       this.blocked = false;
       this.displayBasic = true;

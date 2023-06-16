@@ -4,10 +4,10 @@
   <p-dock [styleClass]="'pdock'" [model]="dockItems" position="top">
     <ng-template pTemplate="item" let-item>
       <a *ngIf="item.route" [routerLink]="item.route"
-        ><img [src]="item.icon" [alt]="item.label" class="imageDock" [pTooltip]="item.title"
+        ><img [src]="item.icon" [alt]="item.label" class="imageDock" [tooltipZIndex]="'3000'" [pTooltip]="item.title"
       /></a>
       <a *ngIf="item.command1" (click)="item.command1()"
-        ><img [src]="item.icon" [alt]="item.label" class="imageDock" [pTooltip]="item.title"
+        ><img [src]="item.icon" [alt]="item.label" class="imageDock" [tooltipZIndex]="'3000'" [pTooltip]="item.title"
       /></a>
     </ng-template>
   </p-dock>
@@ -50,6 +50,7 @@
             [style]="{ marginBottom: '1em', margin: '1em' }"
             class="p-element p-ripple button80"
             pButton
+            [tooltipZIndex]="'3000'"
             [pTooltip]="'scanexam.annotatexamtooltip' | translate"
             tooltipPosition="top"
             pRipple
@@ -63,6 +64,7 @@
           <button
             [routerLink]="'/loadscan/' + this.examId"
             [style]="{ marginBottom: '1em', margin: '1em' }"
+            [tooltipZIndex]="'3000'"
             [pTooltip]="'scanexam.chargerscantooltip' | translate"
             tooltipPosition="top"
             class="p-element p-ripple button80"
@@ -78,6 +80,7 @@
           <button
             [routerLink]="'/imagealign/' + this.examId"
             [style]="{ marginBottom: '1em', margin: '1em' }"
+            [tooltipZIndex]="'3000'"
             [pTooltip]="'scanexam.redresserscantooltip' | translate"
             tooltipPosition="top"
             class="p-element p-ripple button80"
@@ -94,6 +97,7 @@
           <button
             [routerLink]="'/studentbindings/' + this.examId"
             [style]="{ marginBottom: '1em', margin: '1em' }"
+            [tooltipZIndex]="'3000'"
             [pTooltip]="'scanexam.associerscantooltip' | translate"
             tooltipPosition="top"
             class="p-element p-ripple button80"
@@ -110,6 +114,7 @@
           <button
             [routerLink]="'/marking-summary/' + this.examId"
             [style]="{ marginBottom: '1em', margin: '1em' }"
+            [tooltipZIndex]="'3000'"
             [pTooltip]="'scanexam.corrigerscantooltip' | translate"
             tooltipPosition="top"
             class="p-element p-ripple button80"
@@ -127,6 +132,7 @@
           <button
             [routerLink]="'/showresults/' + this.examId"
             [style]="{ marginBottom: '1em', margin: '1em' }"
+            [tooltipZIndex]="'3000'"
             [pTooltip]="'scanexam.resultatsscantooltip' | translate"
             tooltipPosition="top"
             class="p-element p-ripple button80"

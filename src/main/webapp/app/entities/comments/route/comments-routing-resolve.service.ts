@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Resolve, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable, of, EMPTY } from 'rxjs';
@@ -9,7 +9,7 @@ import { CommentsService } from '../service/comments.service';
 
 @Injectable({ providedIn: 'root' })
 export class CommentsRoutingResolveService implements Resolve<IComments> {
-  constructor(protected service: CommentsService, protected router: Router) {}
+  constructor(protected service: CommentsService, protected router: Router, private zone: NgZone) {}
 
   resolve(route: ActivatedRouteSnapshot): Observable<IComments> | Observable<never> {
     const id = route.params['id'];
@@ -19,7 +19,9 @@ export class CommentsRoutingResolveService implements Resolve<IComments> {
           if (comments.body) {
             return of(comments.body);
           } else {
-            this.router.navigate(['404']);
+            this.zone.run(() => {
+              this.router.navigate(['404']);
+            });
             return EMPTY;
           }
         })

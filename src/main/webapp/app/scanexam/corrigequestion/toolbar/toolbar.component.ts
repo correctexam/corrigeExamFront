@@ -22,9 +22,11 @@ export class GraphicalToolbarCorrectionComponent {
   faPencil = faPencil;
 
   DrawingTools = DrawingTools;
-  selected = this.eventService.selectedTool;
+  selected: DrawingTools;
 
-  constructor(private eventService: EventCanevascorrectionHandlerService) {}
+  constructor(private eventService: EventCanevascorrectionHandlerService) {
+    this.selected = this.eventService.selectedTool;
+  }
 
   ngOnInit(): void {
     this.eventService.registerSelectedToolObserver(s => {

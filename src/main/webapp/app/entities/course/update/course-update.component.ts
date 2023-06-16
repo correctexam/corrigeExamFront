@@ -3,7 +3,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 
@@ -20,18 +20,20 @@ export class CourseUpdateComponent implements OnInit {
   isSaving = false;
   users: IUser[] = [];
 
-  editForm = this.fb.group({
-    id: [],
-    name: [null, [Validators.required]],
-    profs: [null, Validators.required],
-  });
+  editForm: UntypedFormGroup;
 
   constructor(
     protected courseService: CourseService,
     protected userService: UserService,
     protected activatedRoute: ActivatedRoute,
     private fb: UntypedFormBuilder
-  ) {}
+  ) {
+    this.editForm = this.fb.group({
+      id: [],
+      name: [null, [Validators.required]],
+      profs: [null, Validators.required],
+    });
+  }
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ course }) => {

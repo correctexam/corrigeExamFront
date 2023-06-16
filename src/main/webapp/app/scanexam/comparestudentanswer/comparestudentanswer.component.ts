@@ -9,7 +9,17 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, QueryList, ViewChildren } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  NgZone,
+  OnInit,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { CourseService } from 'app/entities/course/service/course.service';
@@ -34,6 +44,8 @@ import { IComments } from '../../entities/comments/comments.model';
 import { HttpClient } from '@angular/common/http';
 import { Location } from '@angular/common';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import jszip from 'jszip';
+import * as FileSaver from 'file-saver';
 
 export interface Zone4SameCommentOrSameGrade {
   answers: Answer[];
@@ -71,7 +83,11 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   }
   goToCopie(pageMin: number, pageMax: number) {
     if (this.zones4comments !== undefined && this.zones4comments.numero > 0 && Number.isInteger(pageMin / (pageMax + 1 - pageMin) + 1)) {
-      this.router.navigate(['/answer/' + this.examId + '/' + this.zones4comments!.numero + '/' + (pageMin / (pageMax + 1 - pageMin) + 1)]);
+      this.zone.run(() => {
+        this.router.navigate([
+          '/answer/' + this.examId + '/' + this.zones4comments!.numero + '/' + (pageMin / (pageMax + 1 - pageMin) + 1),
+        ]);
+      });
     }
   }
   debug = false;
@@ -115,7 +131,8 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     private db: CacheServiceImpl,
     private http: HttpClient,
     private applicationConfigService: ApplicationConfigService,
-    private location: Location
+    private location: Location,
+    private zone: NgZone
   ) {}
 
   ngOnInit(): void {
@@ -151,6 +168,15 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             )
             .subscribe(res => {
               this.zones4comments = res;
+            });
+        } else if (params.get('qid') !== null && this.router.url.includes('compareanswer')) {
+          this.http
+            .get<Zone4SameCommentOrSameGrade>(
+              this.applicationConfigService.getEndpointFor('api/getZone4Numero/' + this.examId + '/' + params.get('qid'))
+            )
+            .subscribe(res => {
+              this.zones4comments = res;
+              // console.error(this.zones4comments)
             });
         }
       }
@@ -339,5 +365,57 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     } else {
       return [];
     }
+  }
+
+  pointisNan(k: Answer, zones4comments: Zone4SameCommentOrSameGrade | undefined): boolean {
+    if (zones4comments !== undefined && zones4comments.step > 0) {
+      return Number.isNaN(k.note / zones4comments.step) || Number.isNaN(zones4comments.point);
+    } else if (zones4comments !== undefined && zones4comments.step <= 0) {
+      return Number.isNaN(k.note / zones4comments.point);
+    } else {
+      return true;
+    }
+  }
+
+  downloadAll(): void {
+    const zip = new jszip();
+    const img = zip.folder('images');
+
+    this.zones4comments?.answers!.forEach((a, i) => {
+      this.zones4comments?.zones.forEach((z, j) => {
+        let exportImageType = 'image/webp';
+        let compression = 0.65;
+        if (
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          this.preferenceService.getPreference().exportImageCompression !== undefined &&
+          this.preferenceService.getPreference().exportImageCompression > 0 &&
+          this.preferenceService.getPreference().exportImageCompression <= 1
+        ) {
+          compression = this.preferenceService.getPreference().exportImageCompression;
+        }
+        if (
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          this.preferenceService.getPreference().imageTypeExport !== undefined &&
+          ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
+        ) {
+          exportImageType = this.preferenceService.getPreference().imageTypeExport;
+        }
+        let extension = '.webp';
+        if (exportImageType === 'image/png') {
+          extension = '.png';
+        } else if (exportImageType === 'image/jpg') {
+          extension = '.jpg';
+        }
+
+        const webPImageURL = this.canvass
+          .get(i * this.zones4comments!.zones.length + j)!
+          .nativeElement.toDataURL(exportImageType, compression);
+        img!.file(i + '_' + (j + 1) + extension, webPImageURL.replace(/^data:image\/?[A-z]*;base64,/, ''), { base64: true });
+      });
+    });
+
+    zip.generateAsync({ type: 'blob' }).then(content => {
+      FileSaver.saveAs(content, 'Exam' + this.examId + '.zip');
+    });
   }
 }

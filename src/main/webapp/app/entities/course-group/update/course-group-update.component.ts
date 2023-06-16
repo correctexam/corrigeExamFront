@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 
@@ -25,12 +25,7 @@ export class CourseGroupUpdateComponent implements OnInit {
   students: IStudent[] = [];
   courses: ICourse[] = [];
 
-  editForm = this.fb.group({
-    id: [],
-    groupName: [null, [Validators.required]],
-    students: [],
-    courseId: [],
-  });
+  editForm: UntypedFormGroup;
 
   constructor(
     protected courseGroupService: CourseGroupService,
@@ -38,7 +33,14 @@ export class CourseGroupUpdateComponent implements OnInit {
     protected courseService: CourseService,
     protected activatedRoute: ActivatedRoute,
     private fb: UntypedFormBuilder
-  ) {}
+  ) {
+    this.editForm = this.fb.group({
+      id: [],
+      groupName: [null, [Validators.required]],
+      students: [],
+      courseId: [],
+    });
+  }
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ courseGroup }) => {

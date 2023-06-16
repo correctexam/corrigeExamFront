@@ -4,8 +4,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { NgxExtendedPdfViewerService, PageRenderedEvent, ScrollModeType } from 'ngx-extended-pdf-viewer';
 import { EventHandlerService } from '../event-handler.service';
 import { DrawingTools } from '../models';
-import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
-import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
+// import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
+// import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import { IExam } from 'app/entities/exam/exam.model';
 import { ZoneService } from '../../../../entities/zone/service/zone.service';
 import { IZone } from 'app/entities/zone/zone.model';
@@ -15,9 +15,10 @@ import { Question } from 'app/entities/question/question.model';
 import { ActivatedRoute } from '@angular/router';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { PreferenceService } from 'app/scanexam/preference-page/preference.service';
-const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
-  suppressScrollX: true,
-};
+// const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
+//  suppressScrollX: true,
+// };
+import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer';
 
 export type CustomZone = IZone & { type: DrawingTools };
 
@@ -27,10 +28,10 @@ export type CustomZone = IZone & { type: DrawingTools };
   styleUrls: ['./fabric-canvas.component.scss'],
   providers: [
     NgxExtendedPdfViewerService,
-    {
-      provide: PERFECT_SCROLLBAR_CONFIG,
-      useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG,
-    },
+    //    {
+    //      provide: PERFECT_SCROLLBAR_CONFIG,
+    //      useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG,
+    //    },
   ],
 })
 export class FabricCanvasComponent implements OnInit {
@@ -45,7 +46,7 @@ export class FabricCanvasComponent implements OnInit {
   public examId = -1;
   public title = 'gradeScopeFree';
   // For locking the page during the pdf rendering
-  public blocked = false;
+  protected blocked = false;
 
   constructor(
     public eventHandler: EventHandlerService,
@@ -55,7 +56,9 @@ export class FabricCanvasComponent implements OnInit {
     private examService: ExamService,
     private preferenceService: PreferenceService,
     private pdfViewerService: NgxExtendedPdfViewerService
-  ) {}
+  ) {
+    //    pdfDefaultOptions.assetsFolder = 'bleeding-edge';
+  }
 
   public ngOnInit(): void {
     this.eventHandler.reinit(this.exam, this.zones);
@@ -110,44 +113,82 @@ export class FabricCanvasComponent implements OnInit {
     }
   }
 
+  updateZoomFactor($event: any): void {
+    console.error('updateZoomFactor', $event);
+  }
+
   public pageRendered(evt: PageRenderedEvent): void {
+    console.error('pageRendered', evt);
     const page = evt.pageNumber;
+    if (this.eventHandler.pages[page] === undefined) {
+      this.eventHandler.initPage(page, evt.source);
 
-    this.eventHandler.initPage(page, evt.source);
+      // Requires to update the canvas for each page if the pdf contains metadata to process
+      if (this.eventHandler.getCanvasForPage(page) === undefined) {
+        this.eventHandler.pages[page].updateCanvas(evt.source);
+      }
 
-    // Requires to update the canvas for each page if the pdf contains metadata to process
-    if (this.eventHandler.getCanvasForPage(page) === undefined) {
+      if (this.zones[page] !== undefined) {
+        this.zones[page].forEach(z => {
+          switch (z.type) {
+            case DrawingTools.NOMBOX:
+              this.eventHandler.createRedBox('scanexam.nomuc1', z, page);
+              break;
+
+            case DrawingTools.PRENOMBOX: {
+              this.eventHandler.createRedBox('scanexam.prenomuc1', z, page);
+              break;
+            }
+            case DrawingTools.INEBOX: {
+              this.eventHandler.createRedBox('scanexam.ineuc1', z, page);
+              break;
+            }
+            case DrawingTools.QUESTIONBOX: {
+              this.eventHandler.createRedQuestionBox(z, page);
+              break;
+            }
+          }
+        });
+      }
+
+      // Loading the metadata after having rendered all the pages
+      // to have all the canvases up to date.
+      if (this.pdfViewerService.isRenderQueueEmpty()) {
+        this.loadingPdfMetadata();
+        console.error('block');
+        this.blocked = false;
+      }
+    } else {
+      this.eventHandler.getCanvasForPage(page);
       this.eventHandler.pages[page].updateCanvas(evt.source);
-    }
 
-    if (this.zones[page] !== undefined) {
-      this.zones[page].forEach(z => {
-        switch (z.type) {
-          case DrawingTools.NOMBOX:
-            this.eventHandler.createRedBox('scanexam.nomuc1', z, page);
-            break;
+      if (this.zones[page] !== undefined) {
+        this.zones[page].forEach(z => {
+          switch (z.type) {
+            case DrawingTools.NOMBOX:
+              this.eventHandler.createRedBox('scanexam.nomuc1', z, page);
+              break;
 
-          case DrawingTools.PRENOMBOX: {
-            this.eventHandler.createRedBox('scanexam.prenomuc1', z, page);
-            break;
+            case DrawingTools.PRENOMBOX: {
+              this.eventHandler.createRedBox('scanexam.prenomuc1', z, page);
+              break;
+            }
+            case DrawingTools.INEBOX: {
+              this.eventHandler.createRedBox('scanexam.ineuc1', z, page);
+              break;
+            }
+            case DrawingTools.QUESTIONBOX: {
+              this.eventHandler.createRedQuestionBox(z, page);
+              break;
+            }
           }
-          case DrawingTools.INEBOX: {
-            this.eventHandler.createRedBox('scanexam.ineuc1', z, page);
-            break;
-          }
-          case DrawingTools.QUESTIONBOX: {
-            this.eventHandler.createRedQuestionBox(z, page);
-            break;
-          }
-        }
-      });
-    }
-
-    // Loading the metadata after having rendered all the pages
-    // to have all the canvases up to date.
-    if (this.pdfViewerService.isRenderQueueEmpty()) {
-      this.loadingPdfMetadata();
-      this.blocked = false;
+        });
+      }
+      if (this.pdfViewerService.isRenderQueueEmpty()) {
+        this.loadingPdfMetadata();
+        console.error('block');
+        this.blocked = false;
+      }
     }
   }
 

@@ -2,10 +2,23 @@
   <p-dock [styleClass]="'pdock'" [model]="dockItems" position="top">
     <ng-template pTemplate="item" let-item>
       <a *ngIf="item.route" [routerLink]="item.route"
-        ><img [src]="item.icon" [alt]="item.label" class="imageDock" [pTooltip]="item.title"
+        ><img
+          [src]="item.icon"
+          [alt]="item.label"
+          class="imageDock"
+          [tooltipZIndex]="'3000'"
+          [pTooltip]="item.title"
+          [appendTo]="'body'"
+          [tooltipPosition]="'top'"
       /></a>
       <a *ngIf="item.command1" (click)="item.command1()"
-        ><img [src]="item.icon" [alt]="item.label" class="imageDock" [pTooltip]="item.title"
+        ><img
+          [src]="item.icon"
+          [alt]="item.label"
+          class="imageDock"
+          [tooltipZIndex]="'3000'"
+          [pTooltip]="item.title"
+          [tooltipPosition]="'top'"
       /></a>
     </ng-template>
   </p-dock>
@@ -37,7 +50,11 @@
                 <h5 class="card-title" jhiTranslate="scanexam.courseimportexport">Import/Export</h5>
 
                 <div class="card-text">
-                  <label for="switch1" jhiTranslate="scanexam.studentdata" [pTooltip]="'scanexam.studentdatatooltip' | translate"
+                  <label
+                    for="switch1"
+                    jhiTranslate="scanexam.studentdata"
+                    [tooltipZIndex]="'3000'"
+                    [pTooltip]="'scanexam.studentdatatooltip' | translate"
                     >données étudiantes:</label
                   >
                   <p-inputSwitch inputId="switch1" [(ngModel)]="includeStudentsData"></p-inputSwitch>
@@ -51,6 +68,7 @@
                         [auto]="true"
                         [customUpload]="true"
                         [pTooltip]="'scanexam.courseimporttooltip' | translate"
+                        [tooltipZIndex]="'3000'"
                         [chooseLabel]="'scanexam.courseimport' | translate"
                         name="import[]"
                         accept="application/json"
@@ -63,6 +81,7 @@
                         class="p-button p-button-primary"
                         (click)="exportCourse()"
                         [pTooltip]="'scanexam.courseexporttooltip' | translate"
+                        [tooltipZIndex]="'3000'"
                         jhiTranslate="scanexam.courseexport"
                       >
                         Export

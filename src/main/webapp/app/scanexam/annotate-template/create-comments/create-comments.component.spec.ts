@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { CreateCommentsComponent } from './create-comments.component';
 
 describe('CreateCommentsComponent', () => {

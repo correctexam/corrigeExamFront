@@ -154,6 +154,7 @@
                   [auto]="true"
                   [customUpload]="true"
                   [pTooltip]="'scanexam.commentimporttooltip' | translate"
+                  [tooltipZIndex]="'3000'"
                   [chooseLabel]="'scanexam.commentimport' | translate"
                   name="import[]"
                   accept="application/json"
@@ -166,6 +167,7 @@
                   class="p-button p-button-primary"
                   (click)="exportComment()"
                   [pTooltip]="'scanexam.commentexporttooltip' | translate"
+                  [tooltipZIndex]="'3000'"
                   jhiTranslate="scanexam.commentexport"
                 >
                   Export
@@ -177,6 +179,7 @@
                   class="p-button p-button-primary"
                   (click)="addDefault()"
                   [pTooltip]="'scanexam.commentadddefaulttooltip' | translate"
+                  [tooltipZIndex]="'3000'"
                   jhiTranslate="scanexam.adddefault"
                 >
                   Add Default

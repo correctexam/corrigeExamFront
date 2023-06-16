@@ -8,6 +8,7 @@
     "questions": "Questions",
     "questionLow": "Question",
     "continue": "Continue",
+    "continuetooltip": "Go to correction view",
     "sheets": "Sheets",
     "sheet": "Sheet",
     "total": "Total",
@@ -225,6 +226,7 @@
     "removeallbindingtooltip": "⚠️ to be done only if the correction has not started",
     "noneval": "not evaluated",
     "voir": "Recheck",
+    "voirtooltip": "Go to correction view",
     "partialalignscan": "Pages selection",
     "partialalignscanstartpage": "first page",
     "partialalignscanendpage": "last page",
@@ -272,6 +274,11 @@
     "studentdata": "Students's data",
     "studentdatatooltip": "Include students's data",
     "importencours": "Import in progress",
-    "exportencours": "Export in progess"
+    "exportencours": "Export in progess",
+    "donneesaimporte": "Data to import, click on the button above to import the data",
+    "donneesdejaimporte": "Data currently in the database",
+    "voirtoutescopies": "Show all",
+    "voirtoutescopiestooltip": "Show all student answers in one page",
+    "downloadimages": "Download images"
   }
 }

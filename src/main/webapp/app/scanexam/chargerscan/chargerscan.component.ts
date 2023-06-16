@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import { HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { Validators, UntypedFormBuilder } from '@angular/forms';
+import { Validators, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
@@ -61,10 +61,7 @@ export class ChargerscanComponent implements OnInit {
   examid: string | undefined = undefined;
   isSaving = false;
   exam: IExam = {};
-  editForm = this.fb.group({
-    content: [],
-    contentContentType: [null, [Validators.required]],
-  });
+  editForm: UntypedFormGroup;
   progress = 0;
   message = '';
   constructor(
@@ -78,7 +75,12 @@ export class ChargerscanComponent implements OnInit {
     protected eventManager: EventManager,
     protected examService: ExamService,
     protected scanService: ScanService
-  ) {}
+  ) {
+    this.editForm = this.fb.group({
+      content: [],
+      contentContentType: [null, [Validators.required]],
+    });
+  }
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {

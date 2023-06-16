@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 
@@ -31,16 +31,7 @@ export class StudentResponseUpdateComponent implements OnInit {
   textCommentsSharedCollection: ITextComment[] = [];
   gradedCommentsSharedCollection: IGradedComment[] = [];
 
-  editForm = this.fb.group({
-    id: [],
-    note: [],
-    star: [],
-    worststar: [],
-    questionId: [],
-    sheetId: [],
-    textcomments: [],
-    gradedcomments: [],
-  });
+  editForm: UntypedFormGroup;
 
   constructor(
     protected studentResponseService: StudentResponseService,
@@ -50,7 +41,18 @@ export class StudentResponseUpdateComponent implements OnInit {
     protected gradedCommentService: GradedCommentService,
     protected activatedRoute: ActivatedRoute,
     protected fb: UntypedFormBuilder
-  ) {}
+  ) {
+    this.editForm = this.fb.group({
+      id: [],
+      note: [],
+      star: [],
+      worststar: [],
+      questionId: [],
+      sheetId: [],
+      textcomments: [],
+      gradedcomments: [],
+    });
+  }
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ studentResponse }) => {

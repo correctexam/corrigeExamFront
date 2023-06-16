@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { combineLatest } from 'rxjs';
@@ -28,7 +28,8 @@ export class StudentComponent implements OnInit {
     protected studentService: StudentService,
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
-    protected modalService: NgbModal
+    protected modalService: NgbModal,
+    private zone: NgZone
   ) {}
 
   loadPage(page?: number, dontNavigate?: boolean): void {
@@ -99,12 +100,14 @@ export class StudentComponent implements OnInit {
     this.totalItems = Number(headers.get('X-Total-Count'));
     this.page = page;
     if (navigate) {
-      this.router.navigate(['/student'], {
-        queryParams: {
-          page: this.page,
-          size: this.itemsPerPage,
-          sort: this.predicate + ',' + (this.ascending ? ASC : DESC),
-        },
+      this.zone.run(() => {
+        this.router.navigate(['/student'], {
+          queryParams: {
+            page: this.page,
+            size: this.itemsPerPage,
+            sort: this.predicate + ',' + (this.ascending ? ASC : DESC),
+          },
+        });
       });
     }
     this.students = data ?? [];

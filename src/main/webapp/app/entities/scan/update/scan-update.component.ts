@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -18,12 +18,7 @@ import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
 export class ScanUpdateComponent implements OnInit {
   isSaving = false;
 
-  editForm = this.fb.group({
-    id: [],
-    name: [null, [Validators.required]],
-    content: [],
-    contentContentType: [],
-  });
+  editForm: UntypedFormGroup;
 
   constructor(
     protected dataUtils: DataUtils,
@@ -31,7 +26,14 @@ export class ScanUpdateComponent implements OnInit {
     protected scanService: ScanService,
     protected activatedRoute: ActivatedRoute,
     protected fb: UntypedFormBuilder
-  ) {}
+  ) {
+    this.editForm = this.fb.group({
+      id: [],
+      name: [null, [Validators.required]],
+      content: [],
+      contentContentType: [],
+    });
+  }
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ scan }) => {

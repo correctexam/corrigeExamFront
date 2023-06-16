@@ -202,7 +202,6 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
 
     const minPageWidth = Math.min(im1Gray.size().width, im2Gray.size().width);
     const minPageHeight = Math.min(im1Gray.size().height, im2Gray.size().height);
-
     if (!allimage) {
       let squareSize = squareSizeorigin;
       while (!res1 && squareSize < (minPageWidth * 3) / 4 && squareSize < (minPageHeight * 2) / 3) {
@@ -285,25 +284,51 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     } else {
       let zone6 = new cv.Rect(0, 0, minPageWidth, minPageHeight);
       res1 = this.matchSmallImage(im1Gray, im2Gray, points1, points2, zone6, 1, numberofpointToMatch, numberofgoodpointToMatch, pageNumber);
+
       res2 = true;
       res3 = true;
       res4 = true;
     }
     //    console.log('points1:', points1, 'points2:', points2);
     if (res1 && res2 && res3 && res4) {
-      let mat1 = cv.matFromArray(4, 1, cv.CV_32FC2, points1);
-      let mat2 = cv.matFromArray(4, 1, cv.CV_32FC2, points2);
-      let M = cv.getPerspectiveTransform(mat1, mat2);
-      let image_B_final_result = new cv.Mat();
+      /*if (points1.length % 4 !== 0){
+        const t =points1.length % 4;
+        console.error(t);
+        points1 = points1.splice(0,points1.length -t);
 
-      cv.warpPerspective(im1, image_B_final_result, M, im2.size(), cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
+      }*/
+      //      let mat1 = cv.matFromArray(points1.length/2, 1, cv.CV_32FC1, points1);
+      //      let mat2 = cv.matFromArray(4, 1, cv.CV_32FC2, points2);
+
+      let mat1 = cv.matFromArray(points1.length / 2, 1, cv.CV_32FC2, points1);
+      let mat2 = cv.matFromArray(points2.length / 2, 1, cv.CV_32FC2, points2);
+
+      let h = cv.findHomography(mat1, mat2, cv.RANSAC);
+      //let M = cv.getPerspectiveTransform(mat1, mat2);
+
+      /*  if (h.empty()) {
+         console.log('homography matrix empty!');
+         return;
+       } */
+
+      //      let mat1 = cv.matFromArray(4, 1, cv.CV_32FC2, points1);
+      //     let mat2 = cv.matFromArray(4, 1, cv.CV_32FC2, points2);
+
+      let image_B_final_result = new cv.Mat();
+      cv.warpPerspective(im1, image_B_final_result, h, im2.size());
+
+      //            let M = cv.getPerspectiveTransform(mat1, mat2);
+      //      let image_B_final_result = new cv.Mat();
+      //      console.error(points1, points2);
+
+      //    cv.warpPerspective(im1, image_B_final_result, M, im2.size(), cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
 
       result['imageAligned'] = this.imageDataFromMat(image_B_final_result).data.buffer;
       result['imageAlignedWidth'] = image_B_final_result.size().width;
       result['imageAlignedHeight'] = image_B_final_result.size().height;
       mat1.delete();
       mat2.delete();
-      M.delete();
+      h.delete();
       image_B_final_result.delete();
       console.log('Good match for page ' + pageNumber);
     } else {
@@ -372,8 +397,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     }
     //  console.log("pass par la 6 ", "page ", pageNumber + "zone " + ii)
 
-    let points1tmp = [];
-    let points2tmp = [];
+    let points1tmp: number[] = [];
+    let points2tmp: number[] = [];
     for (let i = 0; i < good_matches.size(); i++) {
       points1tmp.push(keypoints1.get(good_matches.get(i).queryIdx).pt.x + zone1.x);
       points1tmp.push(keypoints1.get(good_matches.get(i).queryIdx).pt.y + zone1.y);
@@ -399,21 +424,29 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       return false;
     }
     //  console.log("pass par la 7 ", "page ", pageNumber + "zone " + ii)
-
+    const indexGood = [];
     for (let i = 0; i < good_matches.size(); i++) {
       let distancesquare =
         (points1tmp[2 * i] - points2tmp[2 * i]) * (points1tmp[2 * i] - points2tmp[2 * i]) +
         (points1tmp[2 * i + 1] - points2tmp[2 * i + 1]) * (points1tmp[2 * i + 1] - points2tmp[2 * i + 1]);
       // TODO compute average points
-      if (distancesquare < Math.trunc((3 * im1Graydst.size().width) / 20) * Math.trunc((3 * im1Graydst.size().width) / 20)) {
+      //  console.error('distancesquare', distancesquare)
+      //  console.error('maxdistance', Math.trunc((3 * im1Graydst.size().width) / 20) * Math.trunc((3 * im1Graydst.size().width) / 20))
+
+      if (distancesquare < Math.trunc((3 * im1Graydst.size().width) / 20) * Math.trunc((3 * im1Graydst.size().height) / 20)) {
+        //   console.error('pass par la')
         distances.push(distancesquare);
         goodmatchtokeep = goodmatchtokeep + 1;
+        indexGood.push(i);
       }
     }
 
     const distance = this.numAverage(distances);
-    const devs = this.dev(distances);
-
+    let devs = this.dev(distances);
+    if (devs < 1) {
+      devs = 1;
+    }
+    //    console.error('first match' , goodmatchtokeep, numberofpointToMatch)
     if (goodmatchtokeep <= numberofpointToMatch) {
       orb.delete();
       keypoints1.delete();
@@ -431,20 +464,23 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     }
     let realgoodmatchtokeep = 0;
 
-    let good_matchesToKeep = [];
-    for (let i = 0; i < good_matches.size(); i++) {
+    let intergood_matchesToKeep = [];
+    for (let i = 0; i < indexGood.length; i++) {
       let distancesquare =
-        (points1tmp[2 * i] - points2tmp[2 * i]) * (points1tmp[2 * i] - points2tmp[2 * i]) +
-        (points1tmp[2 * i + 1] - points2tmp[2 * i + 1]) * (points1tmp[2 * i + 1] - points2tmp[2 * i + 1]);
+        (points1tmp[2 * indexGood[i]] - points2tmp[2 * indexGood[i]]) * (points1tmp[2 * indexGood[i]] - points2tmp[2 * indexGood[i]]) +
+        (points1tmp[2 * indexGood[i] + 1] - points2tmp[2 * indexGood[i] + 1]) *
+          (points1tmp[2 * indexGood[i] + 1] - points2tmp[2 * indexGood[i] + 1]);
       // TODO compute average points
-      if (distancesquare < distance + 1 * devs && distancesquare > distance - 1 * devs) {
+      if (distancesquare <= distance + 1 * devs && distancesquare >= distance - 1 * devs) {
         realgoodmatchtokeep = realgoodmatchtokeep + 1;
-        good_matchesToKeep.push(i);
-        break;
+        intergood_matchesToKeep.push(indexGood[i]);
+        // break;
       }
     }
 
     // console.log(realgoodmatchtokeep)
+    console.error('first realgoodmatchtokeep', realgoodmatchtokeep, numberofgoodpointToMatch);
+
     if (realgoodmatchtokeep <= numberofgoodpointToMatch) {
       orb.delete();
       keypoints1.delete();
@@ -460,6 +496,39 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       bf.delete();
       return false;
     } else {
+      let good_matchesToKeep: number[] = [];
+      const distancesfinal: number[] = [];
+      intergood_matchesToKeep.forEach(i => {
+        const distancesquare =
+          (points1tmp[2 * i] - points2tmp[2 * i]) * (points1tmp[2 * i] - points2tmp[2 * i]) +
+          (points1tmp[2 * i + 1] - points2tmp[2 * i + 1]) * (points1tmp[2 * i + 1] - points2tmp[2 * i + 1]);
+        distancesfinal.push(distancesquare);
+      });
+
+      const distanceaverage = this.numAverage(distancesfinal);
+      //let devsdistance = this.dev(distancesfinal);
+      intergood_matchesToKeep.sort(
+        (a, b) =>
+          Math.abs(
+            (points1tmp[2 * a] - points2tmp[2 * a]) * (points1tmp[2 * a] - points2tmp[2 * a]) +
+              (points1tmp[2 * a + 1] - points2tmp[2 * a + 1]) * (points1tmp[2 * a + 1] - points2tmp[2 * a + 1]) -
+              distanceaverage
+          ) -
+          Math.abs(
+            (points1tmp[2 * b] - points2tmp[2 * b]) * (points1tmp[2 * b] - points2tmp[2 * b]) +
+              (points1tmp[2 * b + 1] - points2tmp[2 * b + 1] * (points1tmp[2 * b + 1] - points2tmp[2 * b + 1])) -
+              distanceaverage
+          )
+      );
+
+      good_matchesToKeep.push(intergood_matchesToKeep[0]);
+      good_matchesToKeep.push(intergood_matchesToKeep[1]);
+      good_matchesToKeep.push(intergood_matchesToKeep[2]);
+      good_matchesToKeep.push(intergood_matchesToKeep[3]);
+      good_matchesToKeep.push(intergood_matchesToKeep[4]);
+
+      console.error('last realgoodmatchtokeep', good_matchesToKeep.length, numberofgoodpointToMatch);
+
       good_matchesToKeep.forEach(i => {
         points1.push(keypoints1.get(good_matches.get(+i).queryIdx).pt.x + zone1.x);
         points1.push(keypoints1.get(good_matches.get(+i).queryIdx).pt.y + zone1.y);

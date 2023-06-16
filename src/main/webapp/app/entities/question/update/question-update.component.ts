@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -31,17 +31,7 @@ export class QuestionUpdateComponent implements OnInit {
   questiontypes: IQuestionType[] = [];
   exams: IExam[] = [];
 
-  editForm = this.fb.group({
-    id: [],
-    numero: [null, [Validators.required]],
-    point: [],
-    step: [],
-    validExpression: [],
-    gradeType: [],
-    zoneId: [],
-    typeId: [],
-    examId: [],
-  });
+  editForm: UntypedFormGroup;
 
   constructor(
     protected questionService: QuestionService,
@@ -50,7 +40,19 @@ export class QuestionUpdateComponent implements OnInit {
     protected examService: ExamService,
     protected activatedRoute: ActivatedRoute,
     private fb: UntypedFormBuilder
-  ) {}
+  ) {
+    this.editForm = this.fb.group({
+      id: [],
+      numero: [null, [Validators.required]],
+      point: [],
+      step: [],
+      validExpression: [],
+      gradeType: [],
+      zoneId: [],
+      typeId: [],
+      examId: [],
+    });
+  }
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ question }) => {

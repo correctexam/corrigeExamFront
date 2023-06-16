@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 
@@ -19,20 +19,22 @@ export class ExamSheetUpdateComponent implements OnInit {
   isSaving = false;
   scans: IScan[] = [];
 
-  editForm = this.fb.group({
-    id: [],
-    name: [null, [Validators.required]],
-    pagemin: [],
-    pagemax: [],
-    scanId: [],
-  });
+  editForm: UntypedFormGroup;
 
   constructor(
     protected examSheetService: ExamSheetService,
     protected scanService: ScanService,
     protected activatedRoute: ActivatedRoute,
     private fb: UntypedFormBuilder
-  ) {}
+  ) {
+    this.editForm = this.fb.group({
+      id: [],
+      name: [null, [Validators.required]],
+      pagemin: [],
+      pagemax: [],
+      scanId: [],
+    });
+  }
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ examSheet }) => {

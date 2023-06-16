@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Resolve, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable, of, EMPTY } from 'rxjs';
@@ -9,7 +9,7 @@ import { TemplateService } from '../service/template.service';
 
 @Injectable({ providedIn: 'root' })
 export class TemplateRoutingResolveService implements Resolve<ITemplate> {
-  constructor(protected service: TemplateService, protected router: Router) {}
+  constructor(protected service: TemplateService, protected router: Router, private zone: NgZone) {}
 
   resolve(route: ActivatedRouteSnapshot): Observable<ITemplate> | Observable<never> {
     const id = route.params['id'];
@@ -19,7 +19,9 @@ export class TemplateRoutingResolveService implements Resolve<ITemplate> {
           if (template.body) {
             return of(template.body);
           } else {
-            this.router.navigate(['404']);
+            this.zone.run(() => {
+              this.router.navigate(['404']);
+            });
             return EMPTY;
           }
         })

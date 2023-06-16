@@ -11,8 +11,7 @@ import { BlockUIModule } from 'primeng/blockui';
 import { MenuModule } from 'primeng/menu';
 import { TooltipModule } from 'primeng/tooltip';
 import { DockModule } from 'primeng/dock';
-import { HotTableModule } from '@handsontable/angular';
-import { registerAllModules } from 'handsontable/registry';
+
 import { SliderModule } from 'primeng/slider';
 import { KeyFilterModule } from 'primeng/keyfilter';
 
@@ -84,8 +83,9 @@ import { FileUploadModule } from 'primeng/fileupload';
 
 import { SidebarModule } from 'primeng/sidebar';
 import { CreateCommentsComponent } from './annotate-template/create-comments/create-comments.component';
+import { ClickDoubleDirective } from './clickdouble.directive';
 // set the location of the OpenCV files
-registerAllModules();
+// registerAllModules();
 
 export const COURSMAIN_ROUTE: Route = {
   path: 'course/:courseid',
@@ -289,6 +289,16 @@ export const CompareMarkAnswer_ROUTE: Route = {
   },
 };
 
+export const CompareAnswer_ROUTE: Route = {
+  path: 'compareanswer/:examid/:qid',
+  canActivate: [UserRouteAccessService],
+  component: ComparestudentanswerComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'scanexam.comparecopie',
+  },
+};
+
 @NgModule({
   declarations: [
     MesCoursComponent,
@@ -322,6 +332,7 @@ export const CompareMarkAnswer_ROUTE: Route = {
     SummaryTemplateComponent,
     ComparestudentanswerComponent,
     CreateCommentsComponent,
+    ClickDoubleDirective,
   ],
   imports: [
     CommonModule,
@@ -340,7 +351,6 @@ export const CompareMarkAnswer_ROUTE: Route = {
     TooltipModule,
     ToastModule,
     SliderModule,
-    HotTableModule,
     TableModule,
     ConfirmDialogModule,
     FormsModule,
@@ -390,6 +400,7 @@ export const CompareMarkAnswer_ROUTE: Route = {
       CompareTextCommentAnswer_ROUTE,
       CompareGradedCommentAnswer_ROUTE,
       CompareMarkAnswer_ROUTE,
+      CompareAnswer_ROUTE,
     ]),
     TabViewModule,
   ],
@@ -401,6 +412,7 @@ export const CompareMarkAnswer_ROUTE: Route = {
     CorrigequestionComponent,
     AssocierCopiesEtudiantsComponent,
     SortByDirective,
+    ClickDoubleDirective,
   ],
   providers: [EventHandlerService, FabricShapeService],
 })

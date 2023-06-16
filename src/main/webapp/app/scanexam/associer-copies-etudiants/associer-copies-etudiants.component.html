@@ -4,6 +4,7 @@
     <i class="pi pi-lock" style="font-size: 3rem"></i>
   </p-blockUI>
   <p-galleria
+    id="galleria"
     [value]="images"
     [(visible)]="displayBasic"
     [responsiveOptions]="responsiveOptions2"
@@ -15,9 +16,12 @@
     [containerStyle]="{ 'max-height': '90vh' }"
     [numVisible]="7"
     [(activeIndex)]="activeIndex"
+    appendTo="body"
   >
     <ng-template pTemplate="item" let-item>
       <div
+        appendTo="body"
+        id="item"
         class="grid grid-nogutter justify-content-center"
         style="overflow-x: hidden; overflow-y: scroll; border: #000000 1px solid; height: 96vh; width: 90vw"
       >
@@ -105,11 +109,13 @@
           <button
             pButton
             [pTooltip]="'scanexam.removeallbindingtooltip' | translate"
+            [tooltipZIndex]="'3000'"
             (click)="cleanBinding()"
             jhiTranslate="scanexam.removeallbinding"
           ></button>
         </div>
       </div>
+      <!-- (onClick)="bindStudent()"-->
       <p-listbox
         #list
         [options]="studentsOptions()"
@@ -118,26 +124,42 @@
         [multiple]="true"
         [optionLabel]="'label'"
         [metaKeySelection]="true"
-        (onClick)="bindStudent()"
         [optionValue]="'value'"
+        (onClick)="bindStudent()"
       >
         <ng-template let-table pTemplate="item">
-          <div class="ui-helper-clearfix" style="width: '100%'">
-            <div class="row">
-              <div class="col-md-6">
+          <!--         <div class="flex  overflow-hidden" style="width: '100%'">
+              <div class="flex align-items-center justify-content-center flex-grow-1 ">
                 <span style="float: left">{{ table.label }}</span>
                 <span style="float: left; width: '1rem'">&nbsp;</span>
-
-                <button
+                  <button
                   icon="pi pi-check"
-                  style="width: '1.5rem'; height: '1.5rem'"
+                 grid style="width: '1.5rem'; height: '1.5rem'"
                   class="p-button-sm p-button-raised p-button-text p-button-rounded"
                   pButton
                   (click)="selectStudents(table.value)"
                 ></button>
               </div>
-              <div class="col-md-6 text-right">
+              <div class="flex-none flex align-items-right justify-content-right">
                 <button style="padding: '0.1rem'" pButton (click)="selectStudents(table.value)" jhiTranslate="scanexam.next">Next</button>
+              </div>-->
+          <div class="col-12" style="width: '100%'">
+            <div class="flex flex-row m-0 p-0">
+              <div class="flex-grow-1 flex-shrink-1 flex align-items-center justify-content-left border-round m-0 p-0">
+                <span style="float: left" [ngClass]="selectedColor(table)">{{ table.label }}</span>
+                <!-- <span style="float: left; width: '1rem'">&nbsp;</span>-->
+                <!--<button
+                  icon="pi pi-check"
+                  grid
+                  style="width: '1.5rem'; height: '1.5rem'"
+                  class="p-button-sm p-button-raised p-button-text p-button-rounded"
+                  pButton
+                  (click.single)="single($event)"
+                ></button>-->
+              </div>
+              <div class="flex-shrink-0 flex align-items-center justify-content-right border-round m-0 p-0"></div>
+              <div class="flex-grow-1 flex-shrink-1 flex align-items-end justify-content-end border-round m-0 p-0">
+                <button style="padding: '0.0rem'" pButton (click)="selectStudents(table.value)" jhiTranslate="scanexam.next">Next</button>
               </div>
             </div>
           </div>

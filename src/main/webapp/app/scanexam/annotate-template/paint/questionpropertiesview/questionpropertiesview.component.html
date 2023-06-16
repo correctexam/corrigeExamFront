@@ -69,6 +69,7 @@
             optionValue="value"
             [pTooltip]="'scanexam.steptooltip' | translate"
             (onChange)="contentChange()"
+            [tooltipZIndex]="'3000'"
           ></p-listbox>
         </div>
 
@@ -106,6 +107,7 @@
             style="margin-right: 0.5em"
             [pTooltip]="'scanexam.expressiontooltip' | translate"
             (onChange)="contentChange()"
+            [tooltipZIndex]="'3000'"
           />
           <p-message
             severity="error"
@@ -130,6 +132,7 @@
             optionValue="value"
             [pTooltip]="'scanexam.penaltytooltip' | translate"
             (onChange)="contentChange()"
+            [tooltipZIndex]="'3000'"
           ></p-listbox>
         </div>
       </div>
@@ -144,6 +147,7 @@
       [label]="'scanexam.commentsmanagement' | translate"
       [pTooltip]="'scanexam.commentsmanagementtooltip' | translate"
       id="sidebar-show-button"
+      [tooltipZIndex]="'3000'"
     ></p-button>
   </div>
 </div>
