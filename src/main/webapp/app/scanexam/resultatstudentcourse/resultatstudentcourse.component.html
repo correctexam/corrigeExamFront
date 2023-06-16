@@ -21,7 +21,13 @@
       </div>
       <div class="col-12">
         <label jhiTranslate="scanexam.mailbody">Corps du mail:</label>
-        <fa-icon [size]="'1x'" [pTooltip]="'scanexam.mailtooltip' | translate" tooltipPosition="top" icon="eye"></fa-icon>
+        <fa-icon
+          [size]="'1x'"
+          [tooltipZIndex]="'3000'"
+          [pTooltip]="'scanexam.mailtooltip' | translate"
+          tooltipPosition="top"
+          icon="eye"
+        ></fa-icon>
 
         <textarea [style]="{ width: '100%', height: '12rem' }" type="text" [(ngModel)]="mailBody" pInputTextarea></textarea>
       </div>

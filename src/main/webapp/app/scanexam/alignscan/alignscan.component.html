@@ -35,6 +35,7 @@
           class="p-button p-button-primary"
           [disabled]="!loaded"
           [pTooltip]="'scanexam.alignscantooltip' | translate"
+          [tooltipZIndex]="'3000'"
         >
           <fa-icon [icon]="faObjectGroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.alignscan"> Alignement des scans</span>
         </button>
@@ -43,6 +44,7 @@
           class="p-button p-button-primary"
           [disabled]="!loaded"
           [pTooltip]="'scanexam.partialalignscantooltip' | translate"
+          [tooltipZIndex]="'3000'"
         >
           <fa-icon [icon]="faObjectUngroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.partialalignscan"> Alignement des scans</span>
         </button>
