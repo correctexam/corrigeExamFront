@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { SessionStorageService } from 'ngx-webstorage';
 
-import { VERSION } from 'app/app.constants';
+import { VERSION, CAS_SERVER_URL, SERVICE_URL, CONNECTION_METHOD } from 'app/app.constants';
 import { LANGUAGES } from 'app/config/language.constants';
 import { Account } from 'app/core/auth/account.model';
 import { AccountService } from 'app/core/auth/account.service';
@@ -28,6 +28,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
   account: Account | null = null;
   entitiesNavbarItems: any[] = [];
   ref: DynamicDialogRef | undefined;
+
+  // duplicate in home.component.ts
+  public readonly CONNECTION_METHOD_LOCAL = 'local';
+  public readonly CONNECTION_METHOD_CAS = 'cas';
+  public readonly CONNECTION_METHOD_SHIB = 'shib';
+  protected readonly CONNECTION_METHOD = CONNECTION_METHOD;
+  protected readonly SERVICE_URL = SERVICE_URL;
+  protected readonly CAS_SERVER_URL = CAS_SERVER_URL;
 
   constructor(
     private loginService: LoginService,

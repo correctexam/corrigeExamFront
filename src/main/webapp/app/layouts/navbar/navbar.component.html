@@ -55,6 +55,7 @@
                 class="dropdown-item"
                 [routerLink]="['/course', { outlets: { navbar: null } }]"
                 routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }"
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
@@ -401,18 +402,23 @@
                 <span jhiTranslate="global.menu.account.login">Sign in</span>
               </a>
             </li>
-            <li *ngSwitchCase="false">
-              <a
-                class="dropdown-item"
-                [routerLink]="['/account/register', { outlets: { navbar: null } }]"
-                routerLinkActive="active"
-                (click)="collapseNavbar()"
-                data-cy="register"
-              >
-                <fa-icon icon="user-plus" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.account.register">Register</span>
-              </a>
-            </li>
+            <!--            You can create an account only if connection mode is local-->
+            <ng-template [ngIf]="CONNECTION_METHOD === CONNECTION_METHOD_LOCAL">
+              <div>
+                <li *ngSwitchCase="false">
+                  <a
+                    class="dropdown-item"
+                    [routerLink]="['/account/register', { outlets: { navbar: null } }]"
+                    routerLinkActive="active"
+                    (click)="collapseNavbar()"
+                    data-cy="register"
+                  >
+                    <fa-icon icon="user-plus" [fixedWidth]="true"></fa-icon>
+                    <span jhiTranslate="global.menu.account.register">Register</span>
+                  </a>
+                </li>
+              </div>
+            </ng-template>
           </ul>
         </li>
       </ul>

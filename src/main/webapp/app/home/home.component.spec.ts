@@ -12,12 +12,17 @@ import { HomeComponent } from './home.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { LocalStorageService, NgxWebstorageModule, SessionStorageService } from 'ngx-webstorage';
+
 describe('Home Component', () => {
   let comp: HomeComponent;
   let fixture: ComponentFixture<HomeComponent>;
   let mockAccountService: AccountService;
   let mockTranslateService: TranslateService;
   let mockRouter: Router;
+  let localStorageService: LocalStorageService;
+  let sessionStorageService: SessionStorageService;
 
   const account: Account = {
     activated: true,
@@ -33,7 +38,14 @@ describe('Home Component', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [ReactiveFormsModule, FormsModule, RouterTestingModule.withRoutes([]), TranslateModule.forRoot()],
+        imports: [
+          ReactiveFormsModule,
+          FormsModule,
+          RouterTestingModule.withRoutes([]),
+          TranslateModule.forRoot(),
+          HttpClientTestingModule,
+          NgxWebstorageModule.forRoot(),
+        ],
         declarations: [HomeComponent],
         providers: [AccountService, TranslateService],
       })
