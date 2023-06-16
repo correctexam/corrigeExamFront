@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable @typescript-eslint/member-ordering */
@@ -68,7 +69,7 @@ export class EventHandlerService {
   private confService!: ConfirmationService;
   private modelViewpping = new Map<string, number>();
   /** Used to notify about newly selected or unselected question */
-  private readonly _selectedQuestion: Subject<Array<IQuestion>> = new Subject();
+  private _selectedQuestion: Subject<IQuestion | undefined> = new Subject();
 
   public constructor(
     private fabricShapeService: FabricShapeService,
@@ -499,7 +500,7 @@ export class EventHandlerService {
    */
   public unselectObject(): void {
     // No more question selected
-    this._selectedQuestion.next([]);
+    this._selectedQuestion.next(undefined);
   }
 
   /**
@@ -512,12 +513,12 @@ export class EventHandlerService {
     const question = typeof id === 'number' ? [...this.questions.values()].find(q => q.zoneId === id) : undefined;
 
     if (question !== undefined && this.isAQuestion(object)) {
-      // Getting all the questions with the same number (one question divided into several parts)
-      let questions = [...this.questions.values()].filter(q => q.numero === question.numero);
-      // Need to put the truely selected question at first position in the array
-      questions = [question, ...questions.filter(q => q.id !== question.id)];
+      // // Getting all the questions with the same number (one question divided into several parts)
+      // let questions = [...this.questions.values()].filter(q => q.numero === question.numero);
+      // // Need to put the truely selected question at first position in the array
+      // questions = [question, ...questions.filter(q => q.id !== question.id)];
       // Notifying that this bunch of questions is selected
-      this._selectedQuestion.next(questions);
+      this._selectedQuestion.next(question);
 
       this.currentSelected = (object as CustomFabricGroup).getObjects()[1];
     }
@@ -561,8 +562,6 @@ export class EventHandlerService {
         this.zoneService.delete(zid).subscribe();
         this.modelViewpping.delete(customObject.id);
       }
-
-      // Have to delete the question from the summary
     }
 
     if (object.type === FabricObjectType.GROUP) {
@@ -603,7 +602,10 @@ export class EventHandlerService {
       if (add) {
         return this.addQuestion(res.body?.[0]?.numero!);
       }
-      return new Promise(() => this.questions.delete(res.body?.[0]?.id!));
+      return new Promise(resolve => {
+        this.questions.delete(res.body?.[0]?.id!);
+        resolve();
+      });
     });
   }
 
@@ -618,6 +620,13 @@ export class EventHandlerService {
         }
       });
     });
+  }
+
+  /**
+   * Updates the cache of question using the given question.
+   */
+  public updateQuestion(q: IQuestion): void {
+    this.questions.set(q.id!, q);
   }
 
   public objectMoving(id: string, type: FabricObjectType, newLeft: number, newTop: number): void {
@@ -723,7 +732,7 @@ export class EventHandlerService {
    * But the first question of the array (if not empty) is the truely selected question.
    * Can be empty is nothing is selected.
    */
-  public get selectedQuestion(): Observable<Array<IQuestion>> {
+  public getSelectedQuestion(): Observable<IQuestion | undefined> {
     return this._selectedQuestion;
   }
 }
