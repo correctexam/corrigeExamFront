@@ -43,6 +43,9 @@ jobs:
       - name: Copy patch primeng
         run: |
           cp ./src/main/resources/primeng-galleria.mjs ./node_modules/primeng/fesm2022/primeng-galleria.mjs
+      - name: Copy second patch primeng
+        run: |
+          cp ./src/main/resources/primeng-tooltip.mjs ./node_modules/primeng/fesm2022/primeng-tooltip.mjs
       - name: Build
         run: |
           npm run webapp:build:prodgithubpage

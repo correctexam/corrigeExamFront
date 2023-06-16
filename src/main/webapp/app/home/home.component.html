@@ -32,7 +32,9 @@
   <div *ngIf="!this.account?.authorities?.includes('ROLE_ADMIN')">
     <p-dock [model]="dockItems" position="top" [styleClass]="'pdock'">
       <ng-template pTemplate="item" let-item>
-        <a [routerLink]="item.route"><img [src]="item.icon" [alt]="item.label" class="imageDock" [pTooltip]="item.title" /></a>
+        <a [routerLink]="item.route"
+          ><img [src]="item.icon" [alt]="item.label" class="imageDock" [tooltipZIndex]="'3000'" [pTooltip]="item.title"
+        /></a>
       </ng-template>
     </p-dock>
     <jhi-mes-cours [showImage]="true"></jhi-mes-cours>

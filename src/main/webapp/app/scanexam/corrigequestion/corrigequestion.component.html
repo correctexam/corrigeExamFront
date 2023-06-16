@@ -31,6 +31,7 @@
         type="text"
         pButton
         [pTooltip]="'scanexam.realign' | translate"
+        [tooltipZIndex]="'3000'"
         [label]="'scanexam.realignlabel' | translate"
         (click)="realign()"
       ></button>
@@ -152,6 +153,7 @@
               pButton
               (click)="workOnQCM()"
               [pTooltip]="'scanexam.qcmcorrect' | translate"
+              [tooltipZIndex]="'3000'"
               [label]="'scanexam.qcmcorrectlabel' | translate"
             ></button>
             <button
@@ -161,6 +163,7 @@
               *ngIf="this.currentQuestion?.typeAlgoName === 'QCM'"
               pButton
               [pTooltip]="'scanexam.showqcmcorrect' | translate"
+              [tooltipZIndex]="'3000'"
               [label]="'scanexam.showqcmcorrectlabel' | translate"
               (click)="showQCMCorrect($event)"
             ></button>
@@ -181,7 +184,7 @@
             <!--            <h2>Question {{ questionno! + 1 }}</h2>-->
           </div>
           <div class="col-1">
-            <fa-icon [size]="'2x'" [pTooltip]="getStudentName()!" tooltipPosition="left" icon="eye"></fa-icon>
+            <fa-icon [size]="'2x'" [tooltipZIndex]="'3000'" [pTooltip]="getStudentName()!" tooltipPosition="left" icon="eye"></fa-icon>
           </div>
 
           <div class="col-4 flex flex-row-reverse">
@@ -261,17 +264,21 @@
               *ngIf="resp?.id"
               class="float-end"
               [tooltipPosition]="'left'"
+              [tooltipZIndex]="'3000'"
               [pTooltip]="'scanexam.tooltipResetAnswer' | translate"
               (click)="removeAnswer()"
             >
               <fa-icon icon="times"></fa-icon>
             </span>
-            <span *ngIf="resp?.id" class="float-end" [tooltipPosition]="'left'" [pTooltip]="''"> &nbsp; &nbsp; </span>
+            <span *ngIf="resp?.id" class="float-end" [tooltipPosition]="'left'" [tooltipZIndex]="'3000'" [pTooltip]="''">
+              &nbsp; &nbsp;
+            </span>
 
             <span
               *ngIf="resp?.id"
               class="float-end"
               [tooltipPosition]="'left'"
+              [tooltipZIndex]="'3000'"
               [pTooltip]="'scanexam.tooltipCompareMark' | translate"
               (click)="compareMark(resp!)"
             >
@@ -302,6 +309,7 @@
                 <span
                   class="float-end"
                   [tooltipPosition]="'left'"
+                  [tooltipZIndex]="'3000'"
                   [pTooltip]="'scanexam.tooltipCompareComment' | translate"
                   (click)="compareTextComment(comment)"
                 >
@@ -311,6 +319,7 @@
                 <span
                   class="float-end"
                   [tooltipPosition]="'left'"
+                  [tooltipZIndex]="'3000'"
                   [pTooltip]="'scanexam.minimizeComment' | translate"
                   (click)="toggleCommentLayout()"
                 >
@@ -362,7 +371,9 @@
                   >
                 </div>
                 <div *ngIf="minimizeComment" (click)="toggleTComment(comment)">
-                  <h5 [pTooltip]="comment.description" tooltipPosition="left" class="card-title">{{ comment.text }}</h5>
+                  <h5 [tooltipZIndex]="'3000'" [pTooltip]="comment.description" tooltipPosition="left" class="card-title">
+                    {{ comment.text }}
+                  </h5>
                 </div>
               </div>
             </div>
@@ -380,6 +391,7 @@
                 <span
                   class="float-end"
                   [tooltipPosition]="'left'"
+                  [tooltipZIndex]="'3000'"
                   [pTooltip]="'scanexam.tooltipCompareComment' | translate"
                   (click)="compareGradedComment(comment)"
                 >
@@ -389,6 +401,7 @@
                 <span
                   class="float-end"
                   [tooltipPosition]="'left'"
+                  [tooltipZIndex]="'3000'"
                   [pTooltip]="'scanexam.minimizeComment' | translate"
                   (click)="toggleCommentLayout()"
                 >
@@ -468,10 +481,12 @@
                 </div>
                 <div *ngIf="minimizeComment" (click)="toggleGComment(comment)">
                   <div *ngIf="currentQuestion?.typeAlgoName! === 'QCM'">
-                    <h5 [pTooltip]="comment.description" tooltipPosition="left" class="card-title">{{ comment.text }}</h5>
+                    <h5 [tooltipZIndex]="'3000'" [pTooltip]="comment.description" tooltipPosition="left" class="card-title">
+                      {{ comment.text }}
+                    </h5>
                   </div>
                   <div *ngIf="currentQuestion?.typeAlgoName! !== 'QCM'" (click)="toggleGComment(comment)">
-                    <h5 [pTooltip]="comment!.description!" tooltipPosition="left" class="card-title">
+                    <h5 [tooltipZIndex]="'3000'" [pTooltip]="comment!.description!" tooltipPosition="left" class="card-title">
                       {{ comment.text }} ( <span *ngIf="currentQuestion && currentQuestion?.gradeType! === 'NEGATIVE'"> - </span
                       ><span *ngIf="currentQuestion && currentQuestion?.gradeType! === 'POSITIVE'"> + </span>
                       <span *ngIf="questionStep > 0">{{ comment.grade! / questionStep }}</span>

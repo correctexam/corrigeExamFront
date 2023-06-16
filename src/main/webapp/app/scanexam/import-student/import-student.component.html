@@ -106,19 +106,19 @@
             </tr>
             <tr *ngFor="let st of dataset; let index = index">
               <td>
-                <input [pTooltip]="'scanexam.donneesaimporte' | translate" [(ngModel)]="st.ine" type="text" />
+                <input [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesaimporte' | translate" [(ngModel)]="st.ine" type="text" />
               </td>
               <td>
-                <input [pTooltip]="'scanexam.donneesaimporte' | translate" [(ngModel)]="st.nom" type="text" />
+                <input [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesaimporte' | translate" [(ngModel)]="st.nom" type="text" />
               </td>
               <td>
-                <input [pTooltip]="'scanexam.donneesaimporte' | translate" [(ngModel)]="st.prenom" type="text" />
+                <input [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesaimporte' | translate" [(ngModel)]="st.prenom" type="text" />
               </td>
               <td>
-                <input [pTooltip]="'scanexam.donneesaimporte' | translate" [(ngModel)]="st.mail" type="text" />
+                <input [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesaimporte' | translate" [(ngModel)]="st.mail" type="text" />
               </td>
               <td>
-                <input [pTooltip]="'scanexam.donneesaimporte' | translate" [(ngModel)]="st.groupe" type="text" />
+                <input [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesaimporte' | translate" [(ngModel)]="st.groupe" type="text" />
               </td>
               <td>
                 <button class="btn btn-danger" (click)="removeNonImported(index)">
@@ -132,7 +132,7 @@
               <td>
                 <p-inplace [closable]="true">
                   <ng-template pTemplate="display">
-                    <span [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.ine }}</span>
+                    <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.ine }}</span>
                   </ng-template>
                   <ng-template pTemplate="content">
                     <input type="text" [(ngModel)]="student.ine" (change)="updateStudentINE(student)" pInputText />
@@ -142,7 +142,7 @@
               <td>
                 <p-inplace [closable]="true">
                   <ng-template pTemplate="display">
-                    <span [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.nom }}</span>
+                    <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.nom }}</span>
                   </ng-template>
                   <ng-template pTemplate="content">
                     <input type="text" [(ngModel)]="student.nom" (change)="updateStudent(student)" pInputText />
@@ -152,7 +152,7 @@
               <td>
                 <p-inplace [closable]="true">
                   <ng-template pTemplate="display">
-                    <span [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.prenom }}</span>
+                    <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.prenom }}</span>
                   </ng-template>
                   <ng-template pTemplate="content">
                     <input type="text" [(ngModel)]="student.prenom" (change)="updateStudent(student)" pInputText />
@@ -162,7 +162,7 @@
               <td>
                 <p-inplace [closable]="true">
                   <ng-template pTemplate="display">
-                    <span [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.mail }}</span>
+                    <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.mail }}</span>
                   </ng-template>
                   <ng-template pTemplate="content">
                     <input type="text" [(ngModel)]="student.mail" (change)="updateStudent(student)" pInputText />
@@ -172,7 +172,7 @@
               <td>
                 <p-inplace [closable]="true">
                   <ng-template pTemplate="display">
-                    <span [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.groupe }}</span>
+                    <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.groupe }}</span>
                   </ng-template>
                   <ng-template pTemplate="content">
                     <input type="text" [(ngModel)]="student.groupe" (change)="updateStudentgroup(student)" pInputText />
