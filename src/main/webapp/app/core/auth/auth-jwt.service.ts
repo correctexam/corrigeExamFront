@@ -6,6 +6,7 @@ import { LocalStorageService, SessionStorageService } from 'ngx-webstorage';
 
 import { ApplicationConfigService } from '../config/application-config.service';
 import { Login } from 'app/login/login.model';
+import { SERVICE_URL } from '../../app.constants';
 
 type JwtToken = {
   id_token: string;
@@ -30,6 +31,24 @@ export class AuthServerProvider {
     return this.http
       .post<JwtToken>(this.applicationConfigService.getEndpointFor('api/authenticate'), credentials)
       .pipe(map(response => this.authenticateSuccess(response, credentials.rememberMe)));
+  }
+
+  login_cas(cas_ticket: string): Observable<void> {
+    const adrr = `${SERVICE_URL}/api/cas/authenticate/${cas_ticket}`;
+    return this.http.get<JwtToken>(adrr).pipe(
+      map(response => {
+        this.authenticateSuccess(response, true);
+      })
+    );
+  }
+
+  login_shib(): Observable<void> {
+    const adrr = `${SERVICE_URL}/api/shib/authenticate`;
+    return this.http.get<JwtToken>(adrr).pipe(
+      map(response => {
+        this.authenticateSuccess(response, true);
+      })
+    );
   }
 
   logout(): Observable<void> {

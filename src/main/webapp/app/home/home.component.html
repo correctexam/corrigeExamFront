@@ -6,17 +6,39 @@
       <p class="mt-0 mb-4 text-700 line-height-3" jhiTranslate="home.slogan">
         Scanner, corriger par lots, soyez assisté par de l'IA, faites un retour précis à vos étudiants, depuis un PC ou une tablette
       </p>
-      <button (click)="login()" pbutton type="button" class="p-element mr-3 p-button p-component">
-        <span class="p-button-label" jhiTranslate="home.login">Authentifiez vous</span><span class="p-ink"></span></button
-      ><button
-        routerLink="account/register"
-        pbutton=""
-        pripple=""
-        type="button"
-        class="p-element p-ripple p-button-outlined p-button p-component mr-3"
-      >
-        <span class="p-button-label" jhiTranslate="home.register">Créer un compte</span><span class="p-ink"></span>
-      </button>
+
+      <ng-template [ngIf]="CONNECTION_METHOD === CONNECTION_METHOD_LOCAL">
+        <div>
+          <button (click)="login()" pbutton type="button" class="p-element mr-3 p-button p-component">
+            <span class="p-button-label" jhiTranslate="home.login">Authentifiez vous</span><span class="p-ink"></span>
+          </button>
+          <button
+            routerLink="account/register"
+            pbutton=""
+            pripple=""
+            type="button"
+            class="p-element p-ripple p-button-outlined p-button p-component mr-3"
+          >
+            <span class="p-button-label" jhiTranslate="home.register">Créer un compte</span><span class="p-ink"></span>
+          </button>
+        </div>
+      </ng-template>
+
+      <ng-template [ngIf]="CONNECTION_METHOD === CONNECTION_METHOD_SHIB">
+        <div>
+          <a href="/Shibboleth.sso/Login?target={{ SERVICE_URL }}/api/shib/redirection" class="p-element mr-3 p-button p-component">
+            <span class="p-button-label" jhiTranslate="home.login">Authentifiez vous</span><span class="p-ink"></span>
+          </a>
+        </div>
+      </ng-template>
+
+      <ng-template [ngIf]="CONNECTION_METHOD === CONNECTION_METHOD_CAS">
+        <div>
+          <a href="{{ CAS_SERVER_URL }}/login?service={{ SERVICE_URL }}" class="p-element mr-3 p-button p-component">
+            <span class="p-button-label" jhiTranslate="home.login">>Authentifiez vous</span><span class="p-ink"></span>
+          </a>
+        </div>
+      </ng-template>
     </section>
   </div>
   <div class="sm:col-12 md:col-12 lg:col-6 overflow-hidden sm:hidden md:hidden lg:flex xl:flex">
