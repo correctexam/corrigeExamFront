@@ -1,9 +1,9 @@
 <p-sidebar [position]="'right'" [(visible)]="layoutsidebarVisible">
-  <jhi-create-comments [question]="question"></jhi-create-comments>
+  <jhi-create-comments [question]="questions[0]"></jhi-create-comments>
 </p-sidebar>
 
-<hr *ngIf="question" />
-<div *ngIf="question" class="d-flex justify-content-center">
+<hr *ngIf="questions.length > 0" />
+<div id="panel" *ngIf="questions.length > 0" class="d-flex justify-content-center">
   <div class="col-8">
     <form name="editForm" role="form" novalidate [formGroup]="editForm">
       <div>
@@ -11,7 +11,16 @@
 
         <div class="row">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.numero" for="field_numero">Numero</label>
-          <input type="number" class="form-control" name="numero" id="field_numero" data-cy="numero" formControlName="numero" />
+          <input
+            type="number"
+            class="form-control"
+            name="numero"
+            id="field_numero"
+            data-cy="numero"
+            formControlName="numero"
+            min="1"
+            (change)="numberChange()"
+          />
           <div *ngIf="editForm.get('numero')!.invalid && (editForm.get('numero')!.dirty || editForm.get('numero')!.touched)">
             <small class="form-text text-danger" *ngIf="editForm.get('numero')?.errors?.required" jhiTranslate="entity.validation.required">
               This field is required.
@@ -59,33 +68,28 @@
             optionLabel="name"
             optionValue="value"
             [pTooltip]="'scanexam.steptooltip' | translate"
+            (onChange)="contentChange()"
             [tooltipZIndex]="'3000'"
           ></p-listbox>
         </div>
 
-        <!--    <div class="row" *ngIf="editForm.get(['typeId'])!.value == manualid">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.step" for="field_step">Step</label>
-          <input
-            type="number"
-            class="form-control"
-            name="step"
-            id="field_step"
-            data-cy="step"
-            formControlName="step"
-            [pTooltip]="'scanexam.steptooltip' | translate"
-          />
-        </div>-->
-
-        <div *ngIf="editForm.get(['typeId'])!.value == manualid" class="row">
+        <div *ngIf="editForm.get(['typeId'])!.value === manualid" class="row">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.gradeType" for="field_gradeType">Grade Type</label>
-          <select class="form-control" name="gradeType" formControlName="gradeType" id="field_gradeType" data-cy="gradeType">
+          <select
+            class="form-control"
+            name="gradeType"
+            formControlName="gradeType"
+            id="field_gradeType"
+            data-cy="gradeType"
+            (change)="contentChange()"
+          >
             <option [ngValue]="null">{{ 'gradeScopeIsticApp.GradeType.null' | translate }}</option>
             <option *ngFor="let gradeType of gradeTypeValues" [value]="gradeType">
               {{ 'gradeScopeIsticApp.GradeType.' + gradeType | translate }}
             </option>
           </select>
         </div>
-        <div *ngIf="editForm.get(['typeId'])!.value == qcmid" class="row">
+        <div *ngIf="editForm.get(['typeId'])!.value === qcmid" class="row">
           <label for="validexp" jhiTranslate="scanexam.validanswerexpression" style="display: block; margin-bottom: 4px"
             >Expression valide</label
           >
@@ -97,11 +101,12 @@
             formControlName="validExpression"
             pInputText
             [pKeyFilter]="validexpRegex()"
-            [required]="editForm.get(['typeId'])!.value == qcmid"
-            [pValidateOnly]="editForm.get(['typeId'])!.value == qcmid"
+            [required]="editForm.get(['typeId'])!.value === qcmid"
+            [pValidateOnly]="editForm.get(['typeId'])!.value === qcmid"
             placeholder="a&b|a&c"
             style="margin-right: 0.5em"
             [pTooltip]="'scanexam.expressiontooltip' | translate"
+            (onChange)="contentChange()"
             [tooltipZIndex]="'3000'"
           />
           <p-message
@@ -111,8 +116,10 @@
           ></p-message>
         </div>
 
-        <div *ngIf="editForm.get(['typeId'])!.value == qcmid" class="row">
-          <label class="form-label" jhiTranslate="scanexam.invalidanswerpenalty" for="field_reponsefausse">Pénalité si réponse fause</label>
+        <div *ngIf="editForm.get(['typeId'])!.value === qcmid" class="row">
+          <label class="form-label" jhiTranslate="scanexam.invalidanswerpenalty" for="field_reponsefausse"
+            >Pénalité si réponse fausse</label
+          >
 
           <p-listbox
             [options]="pointmauvaiseReponeOptions"
@@ -124,19 +131,10 @@
             optionLabel="name"
             optionValue="value"
             [pTooltip]="'scanexam.penaltytooltip' | translate"
+            (onChange)="contentChange()"
             [tooltipZIndex]="'3000'"
           ></p-listbox>
         </div>
-
-        <!-- <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving"
-          class="p-button p-button-primary"
-        >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-        </button>-->
       </div>
     </form>
     <BR />
@@ -148,6 +146,7 @@
       icon="pi pi-arrow-left"
       [label]="'scanexam.commentsmanagement' | translate"
       [pTooltip]="'scanexam.commentsmanagementtooltip' | translate"
+      id="sidebar-show-button"
       [tooltipZIndex]="'3000'"
     ></p-button>
   </div>
