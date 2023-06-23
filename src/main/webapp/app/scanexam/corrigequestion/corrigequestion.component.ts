@@ -1562,7 +1562,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   removeAnswer(): void {
-    this.examService.deleteAllAnswerAndComment(+this.examId!).subscribe(() => this.ngOnInit() /* window.location.reload() */);
+    this.examService.deleteAnswer(this.resp!.id!).subscribe(() => this.ngOnInit());
   }
 
   @HostListener('window:resize', ['$event'])
