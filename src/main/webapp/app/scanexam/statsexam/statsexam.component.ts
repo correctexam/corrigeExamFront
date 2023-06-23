@@ -5,7 +5,6 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
-import { CourseService } from 'app/entities/course/service/course.service';
 import { IQuestion } from 'app/entities/question/question.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
 import { Observable } from 'rxjs';
@@ -49,7 +48,7 @@ export class StatsExamComponent implements OnInit {
   listeMobileEtudiant: StudSelecMobile[] = [];
   mobileSortChoices: ISortMobile[] = [
     { icon: 'pi pi-id-card', sort: 'ine' },
-    { icon: 'pi pi-sort-alpha-up', sort: 'alpha' },
+    { icon: 'pi pi-sort-alpha-up', sort: 'nom' },
     { icon: 'pi pi-sort-numeric-up', sort: 'note' },
   ];
   mobileSortChoice: ISortMobile = this.mobileSortChoices[2];
@@ -85,17 +84,16 @@ export class StatsExamComponent implements OnInit {
   nbreFeuilleParCopie: number | undefined;
 
   constructor(
-    protected applicationConfigService: ApplicationConfigService,
+    private applicationConfigService: ApplicationConfigService,
     private http: HttpClient,
-    protected courseService: CourseService,
-    public questionService: QuestionService,
-    protected activatedRoute: ActivatedRoute,
+    private questionService: QuestionService,
+    private activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
-    public router: Router,
+    private router: Router,
     private db: CacheServiceImpl
   ) {}
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
       this.examid = params.get('examid') ?? '-1';
 
@@ -125,7 +123,7 @@ export class StatsExamComponent implements OnInit {
     });
   }
 
-  async loadAllPages(): Promise<void> {
+  public async loadAllPages(): Promise<void> {
     this.images = [];
     this.nbreFeuilleParCopie = await this.db.countPageTemplate(+this.examid);
     return new Promise<void>(resolve => {
@@ -197,7 +195,7 @@ export class StatsExamComponent implements OnInit {
   }
 
   private initStatVariables(): void {
-    this.triNotes(this.infosStudents);
+    this.sortMarks(this.infosStudents);
     const qn: QuestionNotee[] = [];
     for (const q of this.infosQuestions) {
       const numero = q.numero ?? 0;
@@ -227,8 +225,6 @@ export class StatsExamComponent implements OnInit {
           this.notes_eleves.push(note);
         }
       });
-    // eslint-disable-next-line no-console
-    //  console.log(this.notes_eleves);
     this.q_notees = qn.sort((a, b) => a.numero - b.numero);
   }
 
@@ -239,46 +235,51 @@ export class StatsExamComponent implements OnInit {
   public triSelection(event: ISort): void {
     switch (event.field) {
       case 'ine':
-        this.triINE(this.infosStudents);
+        this.sortStdID(this.infosStudents);
         this.mobileSortChoice = this.mobileSortChoices[0];
         break;
-      case 'alpha':
-        this.triAlpha(this.infosStudents);
+      case 'nom':
+        this.sortLastName(this.infosStudents);
+        this.mobileSortChoice = this.mobileSortChoices[1];
+        break;
+      case 'prenom':
+        this.sortFirstName(this.infosStudents);
         this.mobileSortChoice = this.mobileSortChoices[1];
         break;
       default:
-        this.triNotes(this.infosStudents);
+        this.sortMarks(this.infosStudents);
         this.mobileSortChoice = this.mobileSortChoices[2];
         break;
     }
+
     if (event.order === -1) {
       event.data.reverse();
     }
+
     this.choixTri = event.order === 1;
     this.initMobileSelection();
   }
 
-  private triNotes(etudiants: StudentRes[]): StudentRes[] {
+  private sortMarks(etudiants: StudentRes[]): StudentRes[] {
     if (this.questionSelectionnee) {
       etudiants.sort((s1: StudentRes, s2: StudentRes) => {
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        const note1 = s1.notequestions['' + (this.idQuestionSelected + 1)];
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        const note2 = s2.notequestions['' + (this.idQuestionSelected + 1)];
-        // console.error(note1, note2, this.idQuestionSelected, s1, s2);
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        const note1 = s1.notequestions[String(this.idQuestionSelected + 1)] as string | undefined;
+        const note2 = s2.notequestions[String(this.idQuestionSelected + 1)] as string | undefined;
+
         if (note1 === undefined && note2 === undefined) {
           return 0;
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        } else if (note1 === undefined) {
+        }
+        if (note1 === undefined) {
           return -1;
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        } else if (note2 === undefined) {
+        }
+        if (note2 === undefined) {
           return 1;
-        } else if (this.s2f(note1) < this.s2f(note2)) {
+        }
+        if (this.s2f(note1) < this.s2f(note2)) {
           return -1;
-        } else if (this.s2f(note1) === this.s2f(note2)) {
-          return this.compareAlpha(s1, s2);
+        }
+        if (this.s2f(note1) === this.s2f(note2)) {
+          return this.compareLastName(s1, s2);
         }
         return 1;
       });
@@ -289,14 +290,18 @@ export class StatsExamComponent implements OnInit {
         const note2 = s2.note;
         if (note1 === undefined && note2 === undefined) {
           return 0;
-        } else if (note1 === undefined) {
+        }
+        if (note1 === undefined) {
           return -1;
-        } else if (note2 === undefined) {
+        }
+        if (note2 === undefined) {
           return 1;
-        } else if (this.s2f(note1) < this.s2f(note2)) {
+        }
+        if (this.s2f(note1) < this.s2f(note2)) {
           return -1;
-        } else if (this.s2f(note1) === this.s2f(note2)) {
-          return this.compareAlpha(s1, s2);
+        }
+        if (this.s2f(note1) === this.s2f(note2)) {
+          return this.compareLastName(s1, s2);
         }
         return 1;
       });
@@ -304,27 +309,45 @@ export class StatsExamComponent implements OnInit {
     }
   }
 
-  private triINE(etudiants: StudentRes[]): StudentRes[] {
+  private sortStdID(etudiants: StudentRes[]): StudentRes[] {
     etudiants.sort((s1: StudentRes, s2: StudentRes) => {
       const ine1 = s1.ine;
       const ine2 = s2.ine;
-      return ine1.localeCompare(ine2);
+
+      try {
+        // Trying to sort as numbers
+        const num1 = parseInt(ine1, 10);
+        const num2 = parseInt(ine2, 10);
+        return num2 - num1;
+      } catch (_err: unknown) {
+        // If not number, falling back to string comparison
+        return ine1.localeCompare(ine2);
+      }
     });
     return etudiants;
   }
 
-  private triAlpha(etudiants: StudentRes[]): StudentRes[] {
+  private sortLastName(etudiants: StudentRes[]): StudentRes[] {
     etudiants.sort((s1: StudentRes, s2: StudentRes) => {
-      const diff = this.compareAlpha(s1, s2);
+      const diff = this.compareLastName(s1, s2);
       return diff;
     });
     return etudiants;
   }
 
-  private compareAlpha(s1: StudentRes, s2: StudentRes): number {
-    const nom1 = s1.nom;
-    const nom2 = s2.nom;
-    let diff = nom1.localeCompare(nom2);
+  private sortFirstName(etudiants: StudentRes[]): StudentRes[] {
+    etudiants.sort((s1: StudentRes, s2: StudentRes) => {
+      let diff = s1.prenom.localeCompare(s2.prenom);
+      if (diff === 0) {
+        diff = s1.nom.localeCompare(s2.nom);
+      }
+      return diff;
+    });
+    return etudiants;
+  }
+
+  private compareLastName(s1: StudentRes, s2: StudentRes): number {
+    let diff = s1.nom.localeCompare(s2.nom);
     if (diff === 0) {
       diff = s1.prenom.localeCompare(s2.prenom);
     }
@@ -351,12 +374,11 @@ export class StatsExamComponent implements OnInit {
   public getNotesSelect(): Map<number, number> {
     if (this.etudiantSelec !== null && this.etudiantSelec !== undefined) {
       return this.getNotes(this.etudiantSelec);
-    } else {
-      return new Map();
     }
+    return new Map();
   }
 
-  getNoteSelect(): number {
+  public getNoteSelect(): number {
     return this.sum(Array.from(this.getNotesSelect().values()));
   }
 
@@ -408,7 +430,7 @@ export class StatsExamComponent implements OnInit {
   }
 
   /** @param tab un tableau non vide @returns la moyenne  */
-  sum(tab: number[]): number {
+  public sum(tab: number[]): number {
     return tab.reduce((x, y) => x + y, 0);
   }
 
@@ -573,7 +595,7 @@ export class StatsExamComponent implements OnInit {
     this.updateCarte('questions_stats', undefined, selection, infosExam);
   }
 
-  onStudentSelect(): void {
+  public onStudentSelect(): void {
     if (this.etudiantSelec !== null && this.etudiantSelec !== undefined) {
       this.data_radar_courant = this.initStudentRadarData(
         this.etudiantSelec,
@@ -584,7 +606,8 @@ export class StatsExamComponent implements OnInit {
       this.COLOR_KNOBS = VIOLET_TIEDE;
     }
   }
-  onStudentUnselect(): void {
+
+  public onStudentUnselect(): void {
     this.updateCarteRadar();
     this.updateKnobs();
     this.COLOR_KNOBS = BLEU_AERO_TIEDE;
@@ -687,6 +710,7 @@ export class StatsExamComponent implements OnInit {
   public goToCorrection(): void {
     location.href = `answer/${this.examid}/${this.idQuestionSelected + 1}/${this.etudiantSelec?.studentNumber?.toString() ?? ''}`;
   }
+
   public voirLaCopie(): void {
     this.loadAllPages().then(() => {
       if (this.etudiantSelec?.studentNumber?.toString() !== undefined) {
@@ -697,31 +721,37 @@ export class StatsExamComponent implements OnInit {
       this.displayBasic = true;
     });
   }
-  gotoResultat(): void {
+
+  public gotoResultat(): void {
     this.router.navigateByUrl(`/showresults/${this.examid}`);
   }
 }
-export interface ISortMobile {
+
+interface ISortMobile {
   icon: string;
   sort: string;
 }
-export interface StudSelecMobile {
+
+interface StudSelecMobile {
   name: string;
   value: StudentRes;
 }
-export interface ISort {
+
+interface ISort {
   data: StudentRes[];
   mode: string;
   field: string;
   order: number;
 }
-export interface QuestionNotee {
+
+interface QuestionNotee {
   label: string;
   numero: number;
   bareme: number;
   notesAssociees: number[];
 }
-export interface StudentRes {
+
+interface StudentRes {
   ine: string;
   mail: string;
   nom: string;
@@ -732,12 +762,14 @@ export interface StudentRes {
   studentNumber?: string;
   uuid?: string;
 }
-export interface IRadar {
+
+interface IRadar {
   labels: string[];
   datasets: IRadarDataset[];
   vue: string;
 }
-export interface IRadarDataset {
+
+interface IRadarDataset {
   label: string;
   backgroundColor: string;
   borderColor: string;
