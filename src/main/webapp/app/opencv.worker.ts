@@ -79,7 +79,6 @@ function imageCrop(p: { msg: any; payload: any; uid: string }): void {
   let rect = new cv.Rect(p.payload.x, p.payload.y, p.payload.width, p.payload.height);
   let dst = new cv.Mat();
   let src = cv.matFromImageData(p.payload.image);
-
   dst = roi(src, rect, dst);
   postMessage({ msg: p.msg, payload: imageDataFromMat(dst), uid: p.uid });
   dst.delete();
