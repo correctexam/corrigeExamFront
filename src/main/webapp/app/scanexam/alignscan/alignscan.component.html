@@ -13,6 +13,24 @@
     </div>
   </p-blockUI>
 
+  <p-galleria
+    [value]="images"
+    [(visible)]="displayBasic"
+    [responsiveOptions]="responsiveOptions2"
+    [circular]="true"
+    [fullScreen]="true"
+    [showItemNavigators]="true"
+    [baseZIndex]="100000"
+    [showThumbnails]="false"
+    [numVisible]="7"
+  >
+    <ng-template pTemplate="item" let-item>
+      <div class="image-container">
+        <img [src]="item.src" />
+      </div>
+    </ng-template>
+  </p-galleria>
+
   <div class="sm:col-12 md:col-12 lg:col-8 xl:col-8">
     <div class="grid grid-nogutter">
       <div class="col-12 md:col-4">

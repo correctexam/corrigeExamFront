@@ -75,6 +75,10 @@ function imageDataFromMat(mat: any): any {
   return clampedArray;
 }
 
+export function trace(message: any): void {
+  // postMessage({ msg: {log:message}, uid: '-2' })
+}
+
 export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }): void {
   const p1: IQCMOutput = {};
   p1.solutions = [];
@@ -85,42 +89,81 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
   cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
   const res = trouveCases(gray, p.payload.preference);
   // drawRectangle(src,res.cases)
+  trace(src.size());
 
   p.payload.pages?.forEach((srcEE, i) => {
     let grayE = new cv.Mat();
-    let srcE = cv.matFromImageData(srcEE.imageInput);
+    let _srcE = cv.matFromImageData(srcEE.imageInput);
+    let srcE = new cv.Mat();
+    let dsize1 = new cv.Size(src.size().width, src.size().height);
+    // You can try more different parameters
+    cv.resize(_srcE, srcE, dsize1, 0, 0, cv.INTER_AREA);
+
+    trace(srcE.size());
+
+    let ratioWidth = srcE.size().width / src.size().width;
+    let ratioHeight = srcE.size().height / src.size().height;
+    trace(ratioWidth);
+    trace(ratioHeight);
+
     cv.cvtColor(srcE, grayE, cv.COLOR_RGBA2GRAY, 0);
-    const casesvideseleves = trouveCases(grayE, p.payload.preference);
-    const decalage = computeDecallage(casesvideseleves, res);
 
-    const dstE = applyTranslation(srcE, decalage);
-    let results = analyseStudentSheet(res, src, dstE, p.payload.preference);
-    let e = imageDataFromMat(dstE);
-    let solution: string[] = [];
+    // eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
+    if (true) {
+      const casesvideseleves = trouveCases(grayE, p.payload.preference);
+      const decalage = computeDecallage(casesvideseleves, res);
 
-    results.forEach((v, k) => {
-      if (v.verdict) {
-        solution.push(String.fromCharCode(97 + k));
+      const dstE = applyTranslation(srcE, decalage);
+      let results = analyseStudentSheet(res, src, dstE, p.payload.preference);
+      let e = imageDataFromMat(dstE);
+
+      let solution: string[] = [];
+
+      results.forEach((v, k) => {
+        if (v.verdict) {
+          solution.push(String.fromCharCode(97 + k));
+        }
+      });
+      p1.solutions?.push({
+        imageSolution: e,
+        numero: i,
+        solution: solution.join('&'),
+      });
+      grayE.delete();
+      srcE.delete();
+      _srcE.delete();
+
+      if (dstE !== srcE) {
+        dstE.delete();
       }
-    });
-    p1.solutions?.push({
-      imageSolution: e,
-      numero: i,
-      solution: solution.join('&'),
-    });
-    grayE.delete();
-    srcE.delete();
-    if (dstE !== srcE) {
-      dstE.delete();
-    }
 
-    casesvideseleves.cases.forEach((ca: any) => ca.delete());
-    casesvideseleves.img_cases.forEach((ca: any) => ca.delete());
+      casesvideseleves.cases.forEach((ca: any) => ca.delete());
+      casesvideseleves.img_cases.forEach((ca: any) => ca.delete());
+    } else {
+      let results = analyseStudentSheet(res, src, srcE, p.payload.preference);
+      let e = imageDataFromMat(srcE);
+
+      let solution: string[] = [];
+
+      results.forEach((v, k) => {
+        if (v.verdict) {
+          solution.push(String.fromCharCode(97 + k));
+        }
+      });
+      p1.solutions?.push({
+        imageSolution: e,
+        numero: i,
+        solution: solution.join('&'),
+      });
+      grayE.delete();
+      _srcE.delete();
+      srcE.delete();
+    }
   });
 
   src.delete();
   gray.delete();
-  res.cases.forEach((ca: any) => ca.delete());
+  // res.cases.forEach((ca: any) => ca.delete());
   res.img_cases.forEach((ca: any) => ca.delete());
   postMessage({ msg: p.msg, payload: p1, uid: p.uid });
 }
@@ -283,7 +326,11 @@ export function trouveCases(img: any, preference: IPreference): any {
   // Enregistrement des cases de l'image (tous les carrés détectés)
   formes_cases.forEach(forme => {
     const dim = getDimensions(forme);
+    trace('dim case template');
+    trace(dim);
     const pos = getPosition(forme);
+    trace('pos case template');
+    trace(pos);
     cases.push(forme);
     img_cases.push(decoupe(img, pos, dim));
   });
@@ -293,17 +340,45 @@ export function trouveCases(img: any, preference: IPreference): any {
 
 export function decoupe(img: any, pos: any, dims: any): any {
   let dst = new cv.Mat();
+
+  let x = pos.x;
+  let y = pos.y;
+  let width = dims.w;
+  let height = dims.h;
+  if (x < 0) {
+    x = 0;
+  }
+  if (y < 0) {
+    y = 0;
+  }
+
+  if (x + width > img.size().width) {
+    width = img.size().width - x;
+  }
+  if (height + y > img.size().height) {
+    height = img.size().height - y;
+  }
+
   // You can try more different parameters
-  const rect = new cv.Rect(pos.x, pos.y, dims.w, dims.h);
-  dst = img.roi(rect);
-  return dst;
+  const rect = new cv.Rect(x, y, width, height);
+
+  if (width <= 0 || height <= 0) {
+    return img;
+  } else {
+    dst = img.roi(rect);
+    return dst;
+  }
 }
 
 function drawRectangle(img: any, formes: any, couleur: any = new cv.Scalar(255, 0, 0, 128), epaisseur = 2): any {
   // Attention on est ici en bgr et non en rgb
   formes.forEach((forme: any) => {
     const pos = getPosition(forme);
+    trace('poscase');
+    trace(pos);
     const dim = getDimensions(forme);
+    trace('dimcase');
+    trace(dim);
     //    dim.h = dim.h;
     //    dim.w = dim.w - 4;
     let pointMin = new cv.Point(pos.x, pos.y);
@@ -325,10 +400,12 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
   casesExamTemplate.cases.forEach((case1: any, k: number) => {
     // Pour chaque (x,y) associé à une case du template, on récupère la zone située au même endroit sur la copie
     // et on la compare avec celle du template
+
     const img_case_eleve = decoupe(studentScanImage, getPosition(case1), getDimensions(case1));
     const diff1 = diffCouleurAvecCaseBlanche(img_case_eleve);
     const diff = diff1 - imgs_templatediffblank.get(k)!;
     // console.error('diff',k,diff1-imgs_templatediffblank.get(k)!,diff1, imgs_templatediffblank.get(k));
+    trace(diff);
     if (diff > preference.qcm_differences_avec_case_blanche) {
       infos_cases.set(k, { verdict: true, prediction: diff });
       cases_remplies.push(case1);
@@ -360,8 +437,8 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
     img_case_eleve.delete();
   });
 
-  drawRectangle(studentScanImage, cases_remplies, new cv.Scalar(0, 255, 0, 128));
-  drawRectangle(studentScanImage, cases_vides, new cv.Scalar(0, 0, 255, 128));
+  drawRectangle(studentScanImage, cases_remplies, new cv.Scalar(0, 255, 0, 128), 2);
+  drawRectangle(studentScanImage, cases_vides, new cv.Scalar(0, 0, 255, 128), 2);
   /* imgs_template.forEach(img=> {
       //  img.delete();
     })*/
