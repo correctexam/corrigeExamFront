@@ -15,6 +15,7 @@ import {
   IPreference,
   trouveCases,
   __comparePositionX,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   trace,
 } from './qcm';
 
@@ -143,10 +144,7 @@ function doPredictionTemplate(p: { msg: any; payload: any; uid: string }, letter
   let src = cv.matFromImageData(p.payload.image);
   let template = cv.matFromImageData(p.payload.template);
   const m = getModel(letter);
-  trace('test');
   m.isWarmedUp.then(() => {
-    trace('test');
-
     const res1 = fpredictionTemplate(template, src, p.payload.match, m, true, letter, p.payload.preference);
     postMessage({
       msg: p.msg,
@@ -322,7 +320,6 @@ function fprediction(
   preference: IPreference
 ): any {
   const res = extractImage(src, false, lookingForMissingLetter, preference);
-  trace(res);
 
   let candidate: any[] = [];
   cand.forEach(e => {
@@ -425,7 +422,6 @@ function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingFor
   let thresh = new cv.Mat();
   cv.threshold(gray, thresh, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
   let anchor = new cv.Point(-1, -1);
-  trace(removeHorizonzalAndVertical);
   if (removeHorizonzalAndVertical) {
     // Step 1 remove vertical lines
     let remove_vertical = new cv.Mat();
