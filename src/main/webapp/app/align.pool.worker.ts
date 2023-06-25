@@ -32,6 +32,7 @@ interface IImageAlignementInput {
   heightB?: number;
   pageNumber: number;
   preference: IPreference;
+  debug: boolean;
 }
 
 export interface IPreference {
@@ -90,7 +91,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
                 false,
                 input.preference.numberofpointToMatch,
                 input.preference.numberofpointToMatch,
-                input.pageNumber
+                input.pageNumber,
+                input.debug
               );
               input.imageA = undefined;
               input.imageB = undefined;
@@ -110,7 +112,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
               input.widthB!,
               input.heightB!,
               input.pageNumber,
-              input.preference
+              input.preference,
+              input.debug
             );
             res.pageNumber = input.pageNumber;
             observer.next(res);
@@ -181,7 +184,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     allimage: boolean,
     numberofpointToMatch: number,
     numberofgoodpointToMatch: number,
-    pageNumber: number
+    pageNumber: number,
+    debug: boolean
   ): any {
     //im2 is the original reference image we are trying to align to
     const image_A = new ImageData(new Uint8ClampedArray(image_Aba), widthA, heightA);
@@ -318,24 +322,6 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
 
       let h = cv.findHomography(mat1, mat2, cv.RANSAC);
 
-      let matVec = new cv.MatVector();
-      // Push a Mat back into MatVector
-      matVec.push_back(im2);
-      matVec.push_back(im1);
-
-      let dstdebug = new cv.Mat();
-
-      cv.hconcat(matVec, dstdebug);
-      const nbrePoints = points2.length / 2;
-      for (let i = 0; i < nbrePoints; i++) {
-        let p1 = { x: points2[i * 2], y: points2[i * 2 + 1] };
-        let p2 = { x: im2.size().width + points1[i * 2], y: points1[i * 2 + 1] };
-        cv.circle(dstdebug, p1, 5, [0, 255, 0, 255], 1);
-        cv.circle(dstdebug, p2, 5, [0, 255, 0, 255], 1);
-
-        cv.line(dstdebug, p1, p2, [0, 255, 0, 255], 1);
-      }
-
       /*      if (h.empty())
       {
 
@@ -389,9 +375,29 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       result['imageAligned'] = this.imageDataFromMat(image_B_final_result).data.buffer;
       result['imageAlignedWidth'] = image_B_final_result.size().width;
       result['imageAlignedHeight'] = image_B_final_result.size().height;
-      result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
-      result['imagesDebugTracesWidth'] = dstdebug.size().width;
-      result['imagesDebugTracesHeight'] = dstdebug.size().height;
+      if (debug) {
+        let matVec = new cv.MatVector();
+        // Push a Mat back into MatVector
+        matVec.push_back(im2);
+        matVec.push_back(im1);
+
+        let dstdebug = new cv.Mat();
+
+        cv.hconcat(matVec, dstdebug);
+        const nbrePoints = points2.length / 2;
+        for (let i = 0; i < nbrePoints; i++) {
+          let p1 = { x: points2[i * 2], y: points2[i * 2 + 1] };
+          let p2 = { x: im2.size().width + points1[i * 2], y: points1[i * 2 + 1] };
+          cv.circle(dstdebug, p1, 5, [0, 255, 0, 255], 1);
+          cv.circle(dstdebug, p2, 5, [0, 255, 0, 255], 1);
+
+          cv.line(dstdebug, p1, p2, [0, 255, 0, 255], 1);
+        }
+
+        result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
+        result['imagesDebugTracesWidth'] = dstdebug.size().width;
+        result['imagesDebugTracesHeight'] = dstdebug.size().height;
+      }
 
       mat1.delete();
       mat2.delete();
@@ -412,15 +418,17 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       result['imagesDebugTracesWidth'] = widthB;
       result['imagesDebugTracesHeight'] = heightB; */
 
-      let matVec = new cv.MatVector();
-      // Push a Mat back into MatVector
-      matVec.push_back(im2);
-      matVec.push_back(im1);
-      let dstdebug = new cv.Mat();
-      cv.hconcat(matVec, dstdebug);
-      result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
-      result['imagesDebugTracesWidth'] = dstdebug.size().width;
-      result['imagesDebugTracesHeight'] = dstdebug.size().height;
+      if (debug) {
+        let matVec = new cv.MatVector();
+        // Push a Mat back into MatVector
+        matVec.push_back(im2);
+        matVec.push_back(im1);
+        let dstdebug = new cv.Mat();
+        cv.hconcat(matVec, dstdebug);
+        result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
+        result['imagesDebugTracesWidth'] = dstdebug.size().width;
+        result['imagesDebugTracesHeight'] = dstdebug.size().height;
+      }
 
       console.log('no match for page ' + pageNumber);
     }
@@ -677,7 +685,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     widthB: number,
     heightB: number,
     pageNumber: number,
-    preference: IPreference
+    preference: IPreference,
+    debug: boolean
   ): any {
     //im2 is the original reference image we are trying to align to
     const imageA = new ImageData(new Uint8ClampedArray(image_Aba), widthA, heightA);
@@ -875,45 +884,44 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       // result['imagesDebugTracesWidth'] = dst1.size().width;
       // result['imagesDebugTracesHeight'] = dst1.size().height;
 
-      let matVec = new cv.MatVector();
-      // Push a Mat back into MatVector
-      matVec.push_back(_srcMat);
-      matVec.push_back(srcMat2);
+      if (debug) {
+        let matVec = new cv.MatVector();
+        // Push a Mat back into MatVector
+        matVec.push_back(_srcMat);
+        matVec.push_back(srcMat2);
 
-      console.error(srcMat.size());
-      console.error(srcMat2.size());
-      let dsize2 = new cv.Size(_srcMat.size().width * 2, srcMat.size().height);
+        let dsize2 = new cv.Size(_srcMat.size().width * 2, srcMat.size().height);
 
-      let dstdebug = new cv.Mat(dsize2, _srcMat.type());
-      cv.hconcat(matVec, dstdebug);
+        let dstdebug = new cv.Mat(dsize2, _srcMat.type());
+        cv.hconcat(matVec, dstdebug);
 
-      // await new Promise(r => setTimeout(r, 5000));
+        // await new Promise(r => setTimeout(r, 5000));
 
-      let p1 = { x: x1, y: y1 };
-      let p2 = { x: srcMat.size().width + x5, y: y5 };
-      cv.circle(dstdebug, p1, 15, [0, 255, 0, 255], 1);
-      cv.circle(dstdebug, p2, 15, [0, 255, 0, 255], 1);
-      cv.line(dstdebug, p1, p2, [0, 255, 0, 255], 1);
-      p1 = { x: x2, y: y2 };
-      p2 = { x: srcMat.size().width + x6, y: y6 };
-      cv.circle(dstdebug, p1, 15, [0, 255, 0, 255], 1);
-      cv.circle(dstdebug, p2, 15, [0, 255, 0, 255], 1);
-      cv.line(dstdebug, p1, p2, [0, 255, 0, 255], 1);
-      p1 = { x: x3, y: y3 };
-      p2 = { x: srcMat.size().width + x7, y: y7 };
-      cv.circle(dstdebug, p1, 15, [0, 255, 0, 255], 1);
-      cv.circle(dstdebug, p2, 15, [0, 255, 0, 255], 1);
-      cv.line(dstdebug, p1, p2, [0, 255, 0, 255], 1);
-      p1 = { x: x4, y: y4 };
-      p2 = { x: srcMat.size().width + x8, y: y8 };
-      cv.circle(dstdebug, p1, 15, [0, 255, 0, 255], 1);
-      cv.circle(dstdebug, p2, 15, [0, 255, 0, 255], 1);
-      cv.line(dstdebug, p1, p2, [0, 255, 0, 255], 1);
+        let p1 = { x: x1, y: y1 };
+        let p2 = { x: srcMat.size().width + x5, y: y5 };
+        cv.circle(dstdebug, p1, 15, [0, 255, 0, 255], 1);
+        cv.circle(dstdebug, p2, 15, [0, 255, 0, 255], 1);
+        cv.line(dstdebug, p1, p2, [0, 255, 0, 255], 1);
+        p1 = { x: x2, y: y2 };
+        p2 = { x: srcMat.size().width + x6, y: y6 };
+        cv.circle(dstdebug, p1, 15, [0, 255, 0, 255], 1);
+        cv.circle(dstdebug, p2, 15, [0, 255, 0, 255], 1);
+        cv.line(dstdebug, p1, p2, [0, 255, 0, 255], 1);
+        p1 = { x: x3, y: y3 };
+        p2 = { x: srcMat.size().width + x7, y: y7 };
+        cv.circle(dstdebug, p1, 15, [0, 255, 0, 255], 1);
+        cv.circle(dstdebug, p2, 15, [0, 255, 0, 255], 1);
+        cv.line(dstdebug, p1, p2, [0, 255, 0, 255], 1);
+        p1 = { x: x4, y: y4 };
+        p2 = { x: srcMat.size().width + x8, y: y8 };
+        cv.circle(dstdebug, p1, 15, [0, 255, 0, 255], 1);
+        cv.circle(dstdebug, p2, 15, [0, 255, 0, 255], 1);
+        cv.line(dstdebug, p1, p2, [0, 255, 0, 255], 1);
 
-      result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
-      result['imagesDebugTracesWidth'] = dstdebug.size().width;
-      result['imagesDebugTracesHeight'] = dstdebug.size().height;
-
+        result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
+        result['imagesDebugTracesWidth'] = dstdebug.size().width;
+        result['imagesDebugTracesHeight'] = dstdebug.size().height;
+      }
       _srcMat.delete();
 
       srcMat.delete();
@@ -951,7 +959,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         false,
         preference.numberofpointToMatch,
         preference.numberofgoodpointToMatch,
-        pageNumber
+        pageNumber,
+        debug
       );
     }
   }
