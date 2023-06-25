@@ -1,3 +1,23 @@
+<div class="grid">
+  <p-galleria
+    [value]="images"
+    [(visible)]="displayBasic"
+    [responsiveOptions]="responsiveOptions2"
+    [circular]="true"
+    [fullScreen]="true"
+    [showItemNavigators]="true"
+    [baseZIndex]="100000"
+    [showThumbnails]="false"
+    [numVisible]="7"
+    [containerStyle]="{ 'max-height': '90vh' }"
+  >
+    <ng-template pTemplate="item" let-item>
+      <div class="grid grid-nogutter justify-content-center">
+        <img [src]="item.src" style="width: 80%; max-height: 100vh" />
+      </div>
+    </ng-template>
+  </p-galleria>
+</div>
 <div class="grid-nogutter flex">
   <p-toast></p-toast>
   <p-blockUI [blocked]="blocked">
@@ -12,24 +32,6 @@
       <div class="col-4"></div>
     </div>
   </p-blockUI>
-
-  <p-galleria
-    [value]="images"
-    [(visible)]="displayBasic"
-    [responsiveOptions]="responsiveOptions2"
-    [circular]="true"
-    [fullScreen]="true"
-    [showItemNavigators]="true"
-    [baseZIndex]="100000"
-    [showThumbnails]="false"
-    [numVisible]="7"
-  >
-    <ng-template pTemplate="item" let-item>
-      <div class="image-container">
-        <img [src]="item.src" />
-      </div>
-    </ng-template>
-  </p-galleria>
 
   <div class="sm:col-12 md:col-12 lg:col-8 xl:col-8">
     <div class="grid grid-nogutter">

@@ -57,6 +57,7 @@ export interface IImageAlignementInput {
   heightB?: number;
   pageNumber?: number;
   preference: IPreference;
+  debug: boolean;
 }
 export interface IImageCropInput {
   image?: ImageData;

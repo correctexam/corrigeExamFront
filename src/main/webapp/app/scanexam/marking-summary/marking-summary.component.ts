@@ -37,7 +37,7 @@ export class MarkingSummaryComponent implements OnInit {
           .then(dataExam => {
             this.dataExam = dataExam;
             // eslint-disable-next-line no-console
-            console.log(this.dataExam);
+            console.error(this.dataExam);
           })
           .catch(() => {
             this.errorMsg = 'scanexam.error';

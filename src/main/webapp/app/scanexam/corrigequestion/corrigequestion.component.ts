@@ -1477,6 +1477,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                   pageNumber: page,
                   marker: mark,
                   preference: this.preferenceService.getPreference(),
+                  debug: false,
                 };
 
                 this.observer!.next(inp);
