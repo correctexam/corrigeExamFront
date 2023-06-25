@@ -77,7 +77,7 @@ function imageDataFromMat(mat: any): any {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function trace(message: any): void {
-  // postMessage({ msg: {log:message}, uid: '-2' })
+  postMessage({ msg: { log: message }, uid: '-2' });
 }
 
 export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }): void {
@@ -90,7 +90,6 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
   cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
   const res = trouveCases(gray, p.payload.preference);
   // drawRectangle(src,res.cases)
-  trace(src.size());
 
   p.payload.pages?.forEach((srcEE, i) => {
     let grayE = new cv.Mat();
@@ -99,13 +98,6 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
     let dsize1 = new cv.Size(src.size().width, src.size().height);
     // You can try more different parameters
     cv.resize(_srcE, srcE, dsize1, 0, 0, cv.INTER_AREA);
-
-    trace(srcE.size());
-
-    let ratioWidth = srcE.size().width / src.size().width;
-    let ratioHeight = srcE.size().height / src.size().height;
-    trace(ratioWidth);
-    trace(ratioHeight);
 
     cv.cvtColor(srcE, grayE, cv.COLOR_RGBA2GRAY, 0);
 
@@ -171,7 +163,7 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
 
 // Installation/Settup
 
-export function getDimensions(forme: any): any {
+function getDimensions(forme: any): any {
   const rect = cv.boundingRect(forme);
   return {
     w: rect.width + 8,
@@ -200,9 +192,14 @@ function __moy(coordonnees: any[]): any {
   }
 }
 
-export function getPosition(forme: any): any {
+function getPosition(forme: any): any {
   const rect = cv.boundingRect(forme);
   return { x: rect.x - 4, y: rect.y - 4 };
+}
+
+export function getOrigPosition(forme: any): any {
+  const rect = cv.boundingRect(forme);
+  return { x: rect.x, y: rect.y };
 }
 
 function interpretationForme(contour: any, preference: IPreference): any {
@@ -327,11 +324,7 @@ export function trouveCases(img: any, preference: IPreference): any {
   // Enregistrement des cases de l'image (tous les carrés détectés)
   formes_cases.forEach(forme => {
     const dim = getDimensions(forme);
-    trace('dim case template');
-    trace(dim);
     const pos = getPosition(forme);
-    trace('pos case template');
-    trace(pos);
     cases.push(forme);
     img_cases.push(decoupe(img, pos, dim));
   });
@@ -375,11 +368,7 @@ function drawRectangle(img: any, formes: any, couleur: any = new cv.Scalar(255, 
   // Attention on est ici en bgr et non en rgb
   formes.forEach((forme: any) => {
     const pos = getPosition(forme);
-    trace('poscase');
-    trace(pos);
     const dim = getDimensions(forme);
-    trace('dimcase');
-    trace(dim);
     //    dim.h = dim.h;
     //    dim.w = dim.w - 4;
     let pointMin = new cv.Point(pos.x, pos.y);
@@ -406,7 +395,6 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
     const diff1 = diffCouleurAvecCaseBlanche(img_case_eleve);
     const diff = diff1 - imgs_templatediffblank.get(k)!;
     // console.error('diff',k,diff1-imgs_templatediffblank.get(k)!,diff1, imgs_templatediffblank.get(k));
-    trace(diff);
     if (diff > preference.qcm_differences_avec_case_blanche) {
       infos_cases.set(k, { verdict: true, prediction: diff });
       cases_remplies.push(case1);

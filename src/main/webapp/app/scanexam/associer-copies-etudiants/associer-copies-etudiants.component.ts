@@ -819,6 +819,11 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
       this.blocked = false;
     }
   }
+  async bindStudentOnClick(): Promise<void> {
+    this.blocked = true;
+    await this.bindStudent();
+    this.blocked = false;
+  }
 
   async bindStudent(): Promise<void> {
     return new Promise<void>(resolve1 => {
