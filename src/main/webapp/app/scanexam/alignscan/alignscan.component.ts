@@ -323,21 +323,23 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     }
 
     this.translateService.get('scanexam.exportcacheencours').subscribe(res => (this.message = '' + res));
-    this.cacheUploadService.exportCache(+this.examId, this.translateService, this.messageService, this.numberPagesInScan, this).then(() => {
-      this.blocked = false;
-      if (!this.partialAlign) {
-        setTimeout(() => {
-          this.router.navigateByUrl('/exam/' + this.examId);
-        }, 2000);
-      } else {
-        this.partialAlign = false;
-        this.displayBasic = true;
-        this.startPage = 1;
-        this.currentPageAlign = 1;
-        this.endPage = this.pdfService.numberOfPages();
-        this.numberPagesInScan = this.pdfService.numberOfPages();
-      }
-    });
+    this.cacheUploadService
+      .exportCache(+this.examId, this.translateService, this.messageService, this.pdfService.numberOfPages(), this)
+      .then(() => {
+        this.blocked = false;
+        if (!this.partialAlign) {
+          setTimeout(() => {
+            this.router.navigateByUrl('/exam/' + this.examId);
+          }, 2000);
+        } else {
+          this.partialAlign = false;
+          this.displayBasic = true;
+          this.startPage = 1;
+          this.currentPageAlign = 1;
+          this.endPage = this.pdfService.numberOfPages();
+          this.numberPagesInScan = this.pdfService.numberOfPages();
+        }
+      });
   }
 
   async saveEligneImage(pageN: number, imageD: ImageData): Promise<void> {
