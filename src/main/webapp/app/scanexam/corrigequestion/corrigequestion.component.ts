@@ -105,7 +105,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   noteSteps = 0;
   maxNote = 0;
   questionStep = 0;
-  questionno = 0;
+  questionindex = 0;
+  questionNumeros: Array<number> = [];
   resp: IStudentResponse | undefined;
   titreCommentaire = '';
   descCommentaire = '';
@@ -185,12 +186,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.examId = params.get('examid')!;
           forceRefreshStudent = true;
         } else {
-          const changeStudent = params.get('studentid') !== null && this.studentid !== +params.get('studentid')!;
+          /* const changeStudent = params.get('studentid') !== null && this.studentid !== +params.get('studentid')!;
           this.db.countNonAlignImage(+this.examId!).then(page => {
             if (page > 30 && changeStudent) {
               //              this.loadAllPages();
             }
-          });
+          }); */
         }
         this.pageOffset = 0;
 
@@ -214,95 +215,92 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                   // Step 4 Query zone 4 questions
 
                   this.questionService.query({ examId: this.exam?.id }).subscribe(b => {
-                    let maxquestions = 0;
-
-                    b.body!.forEach(q => {
-                      if (q.numero! > maxquestions) {
-                        maxquestions = q.numero!;
-                      }
-                    });
-                    this.nbreQuestions = maxquestions;
+                    this.questionNumeros = Array.from(new Set(b.body!.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
+                    this.nbreQuestions = this.questionNumeros.length;
                     if (params.get('questionno') !== null) {
-                      this.questionno = +params.get('questionno')! - 1;
+                      this.questionindex = +params.get('questionno')! - 1;
+                      console.error('questionindexAndNumero', this.questionindex, this.questionNumeros[this.questionindex]);
                     }
 
-                    this.questionService.query({ examId: this.exam?.id, numero: this.questionno! + 1 }).subscribe(q1 => {
-                      this.questions = q1.body!;
+                    this.questionService
+                      .query({ examId: this.exam?.id, numero: this.questionNumeros[this.questionindex!] })
+                      .subscribe(q1 => {
+                        this.questions = q1.body!;
 
-                      if (this.questions.length > 0) {
-                        this.noteSteps = this.questions[0].point! * this.questions[0].step!;
-                        this.questionStep = this.questions[0].step!;
-                        this.maxNote = this.questions[0].point!;
-                        this.currentQuestion = this.questions[0];
-                        if (this.resp === undefined) {
-                          this.resp = new StudentResponse(undefined, this.currentNote);
-                          this.resp.note = this.currentNote;
-                          this.resp.questionId = this.questions![0].id;
-                          const sheets = (this.selectionStudents?.map(st => st.examSheets) as any)
-                            .flat()
-                            .filter(
-                              (ex: any) =>
-                                ex?.scanId === this.exam!.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie!
-                            );
-                          if (sheets !== undefined && sheets!.length > 0) {
-                            this.resp.sheetId = sheets[0]?.id;
+                        if (this.questions.length > 0) {
+                          this.noteSteps = this.questions[0].point! * this.questions[0].step!;
+                          this.questionStep = this.questions[0].step!;
+                          this.maxNote = this.questions[0].point!;
+                          this.currentQuestion = this.questions[0];
+                          if (this.resp === undefined) {
+                            this.resp = new StudentResponse(undefined, this.currentNote);
+                            this.resp.note = this.currentNote;
+                            this.resp.questionId = this.questions![0].id;
+                            const sheets = (this.selectionStudents?.map(st => st.examSheets) as any)
+                              .flat()
+                              .filter(
+                                (ex: any) =>
+                                  ex?.scanId === this.exam!.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie!
+                              );
+                            if (sheets !== undefined && sheets!.length > 0) {
+                              this.resp.sheetId = sheets[0]?.id;
+                            }
+
+                            this.studentResponseService
+                              .query({
+                                sheetId: this.resp.sheetId,
+                                questionId: this.resp.questionId,
+                              })
+                              .subscribe(sr => {
+                                if (sr.body !== null && sr.body.length > 0) {
+                                  this.resp = sr.body![0];
+                                  this.currentNote = this.resp.note!;
+                                  this.computeNote(false, this.resp!, this.currentQuestion!);
+                                  if (this.questions![0].gradeType === GradeType.DIRECT && this.questions![0].typeAlgoName !== 'QCM') {
+                                    this.textCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
+                                      this.resp?.textcomments!.forEach(com1 => {
+                                        const elt = com.body!.find(com2 => com2.id === com1.id);
+                                        if (elt !== undefined) {
+                                          (elt as any).checked = true;
+                                        }
+                                      });
+                                      this.currentTextComment4Question = com.body!;
+                                      this.blocked = false;
+                                    });
+                                  } else {
+                                    this.gradedCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
+                                      this.resp?.gradedcomments!.forEach(com1 => {
+                                        const elt = com.body!.find(com2 => com2.id === com1.id);
+                                        if (elt !== undefined) {
+                                          (elt as any).checked = true;
+                                        }
+                                      });
+                                      this.currentGradedComment4Question = com.body!;
+                                      this.blocked = false;
+                                      //                                      this.computeNote(false, this.resp!);
+                                    });
+                                  }
+                                } else {
+                                  //            this.studentResponseService.create(this.resp!).subscribe(sr1 => {
+                                  //                                      this.resp = sr1.body!;
+                                  if (this.questions![0].gradeType === GradeType.DIRECT) {
+                                    this.textCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
+                                      this.currentTextComment4Question = com.body!;
+                                      this.blocked = false;
+                                    });
+                                  } else {
+                                    this.gradedCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
+                                      this.currentGradedComment4Question = com.body!;
+                                      this.blocked = false;
+                                    });
+                                  }
+                                  //                                    });
+                                }
+                              });
                           }
-
-                          this.studentResponseService
-                            .query({
-                              sheetId: this.resp.sheetId,
-                              questionId: this.resp.questionId,
-                            })
-                            .subscribe(sr => {
-                              if (sr.body !== null && sr.body.length > 0) {
-                                this.resp = sr.body![0];
-                                this.currentNote = this.resp.note!;
-                                this.computeNote(false, this.resp!, this.currentQuestion!);
-                                if (this.questions![0].gradeType === GradeType.DIRECT && this.questions![0].typeAlgoName !== 'QCM') {
-                                  this.textCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
-                                    this.resp?.textcomments!.forEach(com1 => {
-                                      const elt = com.body!.find(com2 => com2.id === com1.id);
-                                      if (elt !== undefined) {
-                                        (elt as any).checked = true;
-                                      }
-                                    });
-                                    this.currentTextComment4Question = com.body!;
-                                    this.blocked = false;
-                                  });
-                                } else {
-                                  this.gradedCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
-                                    this.resp?.gradedcomments!.forEach(com1 => {
-                                      const elt = com.body!.find(com2 => com2.id === com1.id);
-                                      if (elt !== undefined) {
-                                        (elt as any).checked = true;
-                                      }
-                                    });
-                                    this.currentGradedComment4Question = com.body!;
-                                    this.blocked = false;
-                                    //                                      this.computeNote(false, this.resp!);
-                                  });
-                                }
-                              } else {
-                                //            this.studentResponseService.create(this.resp!).subscribe(sr1 => {
-                                //                                      this.resp = sr1.body!;
-                                if (this.questions![0].gradeType === GradeType.DIRECT) {
-                                  this.textCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
-                                    this.currentTextComment4Question = com.body!;
-                                    this.blocked = false;
-                                  });
-                                } else {
-                                  this.gradedCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
-                                    this.currentGradedComment4Question = com.body!;
-                                    this.blocked = false;
-                                  });
-                                }
-                                //                                    });
-                              }
-                            });
                         }
-                      }
-                      this.showImage = new Array<boolean>(this.questions.length);
-                    });
+                        this.showImage = new Array<boolean>(this.questions.length);
+                      });
                   });
                 });
               });
@@ -310,7 +308,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           });
         } else {
           const c = this.currentStudent + 1;
-          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno! + 1) + '/' + c);
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
         }
       }
     });
@@ -906,10 +904,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     if (!this.blocked) {
       event.preventDefault();
       const c = this.currentStudent;
-      const q1 = this.questionno!;
+      const q1 = this.questionindex!;
 
       if (c > 0) {
-        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno! + 1) + '/' + c);
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
       } else if (q1 > 0) {
         const prevSt = this.numberPagesInScan! / this.nbreFeuilleParCopie!;
         this.router.navigateByUrl('/answer/' + this.examId! + '/' + q1 + '/' + prevSt);
@@ -930,9 +928,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     if (!this.blocked) {
       event.preventDefault();
       const c = this.currentStudent + 2;
-      const q1 = this.questionno! + 2;
+      const q1 = this.questionindex! + 2;
       if (c <= this.numberPagesInScan! / this.nbreFeuilleParCopie!) {
-        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno! + 1) + '/' + c);
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
       } else if (q1 <= this.nbreQuestions) {
         this.router.navigateByUrl('/answer/' + this.examId! + '/' + q1 + '/' + 1);
       }
@@ -947,7 +945,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     if (!this.blocked) {
       event.preventDefault();
       const c = this.currentStudent + 1;
-      const q = this.questionno;
+      const q = this.questionindex;
       if (q! > 0) {
         this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
       } else if (c > 1) {
@@ -965,7 +963,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     if (!this.blocked) {
       event.preventDefault();
       const c = this.currentStudent + 1;
-      const q = this.questionno! + 2;
+      const q = this.questionindex! + 2;
       if (q <= this.nbreQuestions) {
         this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
       } else if (c < this.numberPagesInScan! / this.nbreFeuilleParCopie!) {
@@ -977,13 +975,14 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   changeStudent($event: any): void {
     this.currentStudent = $event.page;
     const c = this.currentStudent + 1;
-    this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno! + 1) + '/' + c);
+    this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
   }
   changeQuestion($event: any): void {
-    this.questionno = $event.page;
+    this.questionindex = $event.page;
+
     const c = this.currentStudent + 1;
     if ($event.pageCount !== 1) {
-      this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionno! + 1) + '/' + c);
+      this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
     }
   }
 
@@ -1074,22 +1073,22 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       if (updateanotationcanvas) {
         if (
           this.currentZoneCorrectionHandler.get(
-            '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index
+            '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index
           ) === undefined
         ) {
           const zh = new ZoneCorrectionHandler(
-            '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index,
+            '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index,
             this.eventHandler,
             this.resp?.id
           );
           zh.updateCanvas(imageRef!.nativeElement);
           this.currentZoneCorrectionHandler.set(
-            '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index,
+            '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index,
             zh
           );
         } else {
           this.currentZoneCorrectionHandler
-            .get('' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index)!
+            .get('' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index)!
             .updateCanvas(imageRef!.nativeElement);
         }
       }

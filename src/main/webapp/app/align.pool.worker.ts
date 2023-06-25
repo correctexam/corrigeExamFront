@@ -126,7 +126,11 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     });
   }
   public selectTransferables(output: IImageAlignement): Transferable[] {
-    return [output.imageAligned!, output.imagesDebugTraces!];
+    if (output.imagesDebugTraces !== undefined) {
+      return [output.imageAligned!, output.imagesDebugTraces];
+    } else {
+      return [output.imageAligned!];
+    }
   }
 
   imageDataFromMat(mat: any): any {

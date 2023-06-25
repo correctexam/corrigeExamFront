@@ -279,6 +279,8 @@
     "donneesdejaimporte": "Data currently in the database",
     "voirtoutescopies": "Show all",
     "voirtoutescopiestooltip": "Show all student answers in one page",
-    "downloadimages": "Download images"
+    "downloadimages": "Download images",
+    "cleanSheet": "Delete orphans",
+    "cleanSheetTooltip": "It is sometimes the case that certain exam sheets are orphaned, and this operation allows you to examine these unanswered sheets that are not associated with an exam."
   }
 }

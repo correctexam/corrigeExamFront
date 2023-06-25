@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MarkingExamStateDTO, ExamService } from 'app/entities/exam/service/exam.service';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
+import { HttpClient } from '@angular/common/http';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
 
 @Component({
   selector: 'jhi-marking-summary',
@@ -9,6 +11,7 @@ import { CacheServiceImpl } from '../db/CacheServiceImpl';
   styleUrls: ['./marking-summary.component.scss'],
 })
 export class MarkingSummaryComponent implements OnInit {
+  questionNumeros: Array<number> = [];
   public examId = -1;
   public dataExam: MarkingExamStateDTO = {
     nameExam: '',
@@ -22,7 +25,9 @@ export class MarkingSummaryComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private examService: ExamService,
     private router: Router,
-    private db: CacheServiceImpl
+    private db: CacheServiceImpl,
+    protected applicationConfigService: ApplicationConfigService,
+    private http: HttpClient
   ) {}
 
   public ngOnInit(): void {
@@ -38,6 +43,7 @@ export class MarkingSummaryComponent implements OnInit {
             this.dataExam = dataExam;
             // eslint-disable-next-line no-console
             console.error(this.dataExam);
+            this.questionNumeros = Array.from(new Set(this.dataExam.questions.map(q => q.numero))).sort((n1, n2) => n1 - n2);
           })
           .catch(() => {
             this.errorMsg = 'scanexam.error';
@@ -52,6 +58,13 @@ export class MarkingSummaryComponent implements OnInit {
     }
 
     return this.dataExam.questions.map(q => q.answeredSheets).reduce((q1, q2) => q1 + q2);
+  }
+
+  cleanSheet(): void {
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+    this.http.delete<any>(this.applicationConfigService.getEndpointFor('api/cleanExamSheet/' + this.examId)).subscribe(() => {
+      window.location.reload();
+    });
   }
 
   public goToExam(): void {
