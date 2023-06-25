@@ -77,7 +77,7 @@ function imageDataFromMat(mat: any): any {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function trace(message: any): void {
-  // postMessage({ msg: {log:message}, uid: '-2' })
+  postMessage({ msg: { log: message }, uid: '-2' });
 }
 
 export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }): void {
@@ -171,7 +171,7 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
 
 // Installation/Settup
 
-export function getDimensions(forme: any): any {
+function getDimensions(forme: any): any {
   const rect = cv.boundingRect(forme);
   return {
     w: rect.width + 8,
@@ -200,9 +200,14 @@ function __moy(coordonnees: any[]): any {
   }
 }
 
-export function getPosition(forme: any): any {
+function getPosition(forme: any): any {
   const rect = cv.boundingRect(forme);
   return { x: rect.x - 4, y: rect.y - 4 };
+}
+
+export function getOrigPosition(forme: any): any {
+  const rect = cv.boundingRect(forme);
+  return { x: rect.x, y: rect.y };
 }
 
 function interpretationForme(contour: any, preference: IPreference): any {

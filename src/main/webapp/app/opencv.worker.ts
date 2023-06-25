@@ -10,11 +10,12 @@ import {
   decoupe,
   diffGrayAvecCaseBlanche,
   doQCMResolution,
-  getDimensions,
-  getPosition,
+  getOrigDimensions,
+  getOrigPosition,
   IPreference,
   trouveCases,
   __comparePositionX,
+  trace,
 } from './qcm';
 
 /// <reference lib="webworker" />
@@ -142,7 +143,10 @@ function doPredictionTemplate(p: { msg: any; payload: any; uid: string }, letter
   let src = cv.matFromImageData(p.payload.image);
   let template = cv.matFromImageData(p.payload.template);
   const m = getModel(letter);
+  trace('test');
   m.isWarmedUp.then(() => {
+    trace('test');
+
     const res1 = fpredictionTemplate(template, src, p.payload.match, m, true, letter, p.payload.preference);
     postMessage({
       msg: p.msg,
@@ -205,11 +209,12 @@ function fpredictionTemplate(
   let graynomCopie = new cv.Mat();
   cv.cvtColor(nomCopie, graynomCopie, cv.COLOR_RGBA2GRAY, 0);
   const casesTemplate = trouveCases(graynomTemplate, preference);
+  console.error(casesTemplate);
   const letters = new Map();
   for (let k = 0; k < casesTemplate.cases.length; k++) {
     const forme = casesTemplate.cases.sort(__comparePositionX)[k];
-    const dim = getDimensions(forme);
-    const pos = getPosition(forme);
+    const dim = getOrigDimensions(forme);
+    const pos = getOrigPosition(forme);
 
     let dst2 = new cv.Mat();
     let dst3 = new cv.Mat();
@@ -317,6 +322,8 @@ function fprediction(
   preference: IPreference
 ): any {
   const res = extractImage(src, false, lookingForMissingLetter, preference);
+  trace(res);
+
   let candidate: any[] = [];
   cand.forEach(e => {
     candidate.push([e.padEnd(22, ' '), 0.0]);
@@ -418,7 +425,7 @@ function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingFor
   let thresh = new cv.Mat();
   cv.threshold(gray, thresh, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
   let anchor = new cv.Point(-1, -1);
-
+  trace(removeHorizonzalAndVertical);
   if (removeHorizonzalAndVertical) {
     // Step 1 remove vertical lines
     let remove_vertical = new cv.Mat();

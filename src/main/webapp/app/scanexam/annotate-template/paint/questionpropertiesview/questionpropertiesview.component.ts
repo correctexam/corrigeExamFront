@@ -216,6 +216,12 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   /**
    * When interacting with widgets that change the content of the question (but the number)
    */
+  public contentChangeCheck(): void {
+    if (/^[a-z]{1}([&|][a-z])*$/.test(this.editForm.get(['validExpression'])!.value)) {
+      this.contentChange();
+    }
+  }
+
   public contentChange(): void {
     this.save()
       .then(updatedQuestions => {
