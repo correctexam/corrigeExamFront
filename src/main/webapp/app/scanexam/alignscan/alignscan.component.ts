@@ -322,15 +322,19 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
 
     this.translateService.get('scanexam.exportcacheencours').subscribe(res => (this.message = '' + res));
     this.cacheUploadService.exportCache(+this.examId, this.translateService, this.messageService, this.numberPagesInScan, this).then(() => {
-      setTimeout(() => {
-        this.blocked = false;
-        if (!this.partialAlign) {
+      this.blocked = false;
+      if (!this.partialAlign) {
+        setTimeout(() => {
           this.router.navigateByUrl('/exam/' + this.examId);
-        } else {
-          this.partialAlign = false;
-          this.displayBasic = true;
-        }
-      }, 2000);
+        }, 2000);
+      } else {
+        this.partialAlign = false;
+        this.displayBasic = true;
+        this.startPage = 1;
+        this.currentPageAlign = 1;
+        this.endPage = this.pdfService.numberOfPages();
+        this.numberPagesInScan = this.pdfService.numberOfPages();
+      }
     });
   }
 
@@ -479,6 +483,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
             marker: this.alignement === 'marker',
             pageNumber: pagen,
             preference: pref,
+            debug: this.partialAlign,
           });
 
           resolve(pagen);
