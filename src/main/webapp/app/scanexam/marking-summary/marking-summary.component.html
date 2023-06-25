@@ -3,6 +3,16 @@
 <div *ngIf="examId !== -1 && errorMsg === undefined">
   <h1>
     {{ 'scanexam.titleSummary' | translate }} {{ dataExam.nameExam }}
+    <button
+      *jhiHasAnyAuthority="'ROLE_ADMIN'"
+      type="submit"
+      class="p-button"
+      (click)="cleanSheet()"
+      [pTooltip]="'scanexam.cleanSheetTooltip' | translate"
+    >
+      <fa-icon icon="trash-alt"></fa-icon>&nbsp;<span jhiTranslate="scanexam.cleanSheet"></span>
+    </button>
+
     <button type="submit" class="p-button p-button-primary" (click)="goToExam()">
       <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam"></span>
     </button>
@@ -19,7 +29,9 @@
           </div>
           <div class="col" *ngIf="q.answeredSheets < dataExam.sheets.length">
             <button
-              [routerLink]="'/answer/' + this.examId + '/' + q.numero + '/' + (q.firstUnmarkedSheet / pageInTemplate + 1)"
+              [routerLink]="
+                '/answer/' + this.examId + '/' + (questionNumeros.indexOf(q.numero) + 1) + '/' + (q.firstUnmarkedSheet / pageInTemplate + 1)
+              "
               class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
               pButton
               type="button"
@@ -41,7 +53,7 @@
           </div>
           <div class="col" *ngIf="q.answeredSheets === dataExam.sheets.length">
             <button
-              [routerLink]="'/answer/' + this.examId + '/' + q.numero + '/' + '1'"
+              [routerLink]="'/answer/' + this.examId + '/' + (questionNumeros.indexOf(q.numero) + 1) + '/' + '1'"
               class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
               pButton
               type="button"

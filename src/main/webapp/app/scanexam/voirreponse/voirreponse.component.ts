@@ -59,7 +59,8 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
   noteSteps = 0;
   maxNote = 0;
   questionStep = 0;
-  questionno = 0;
+  questionindex = 0;
+  questionNumeros: Array<number> = [];
   resp: IStudentResponse | undefined;
   currentQuestion: IQuestion | undefined;
   noalign = false;
@@ -106,6 +107,7 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
         const base64uuid = params.get('base64uuid')!;
         const uuiddecode = atob(base64uuid);
         const param = uuiddecode.split('/');
+
         if (param.length > 2) {
           this.uuid = param[1];
           this.sheetService.query({ name: this.uuid }).subscribe(s => {
@@ -125,11 +127,11 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
                     this.selectionStudents.length > 0 &&
                     this.selectionStudents[0].id !== undefined
                   ) {
-                    this.questionno = +param[2] - 1;
+                    //                   this.questionindex =
 
                     this.nbreFeuilleParCopie = this.sheet!.pagemax! - this.sheet!.pagemin! + 1;
                     // Step 2 Query Scan in local DB
-                    this.finalize();
+                    this.finalize(+param[2] - 1);
                   }
                 });
             });
@@ -139,43 +141,42 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
     });
   }
 
-  finalize() {
+  finalize(questionNo: number) {
     // Step 4 Query zone 4 questions
     this.blocked = false;
-    this.questionService.query({ examId: this.exam!.id }).subscribe(b =>
-      b.body!.forEach(q => {
-        if (q.numero! > this.nbreQuestions) {
-          this.nbreQuestions = q.numero!;
-        }
-      })
-    );
-    this.questionService.query({ examId: this.exam!.id, numero: this.questionno + 1 }).subscribe(q1 => {
-      this.questions = q1.body!;
-      this.showImage = new Array<boolean>(this.questions.length);
+    this.questionService.query({ examId: this.exam!.id }).subscribe(b => {
+      this.questionNumeros = Array.from(new Set(b.body!.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
+      this.nbreQuestions = this.questionNumeros.length;
+      this.questionindex = this.questionNumeros.indexOf(questionNo + 1);
 
-      if (this.questions.length > 0) {
-        this.noteSteps = this.questions[0].point! * this.questions[0].step!;
-        this.questionStep = this.questions[0].step!;
-        this.maxNote = this.questions[0].point!;
-        this.currentQuestion = this.questions[0];
+      this.questionService.query({ examId: this.exam!.id, numero: this.questionNumeros[this.questionindex] }).subscribe(q1 => {
+        this.questions = q1.body!;
+        this.showImage = new Array<boolean>(this.questions.length);
 
-        this.studentResponseService
-          .query({
-            sheetId: this.sheet!.id,
-            questionId: this.questions[0].id,
-          })
-          .subscribe(sr => {
-            if (sr.body !== null && sr.body.length > 0) {
-              this.resp = sr.body![0];
-              this.currentNote = this.resp.note!;
-              if (this.questions![0].gradeType === GradeType.DIRECT) {
-                this.currentTextComment4Question = this.resp.textcomments!;
-              } else {
-                this.currentGradedComment4Question = this.resp.gradedcomments!;
+        if (this.questions.length > 0) {
+          this.noteSteps = this.questions[0].point! * this.questions[0].step!;
+          this.questionStep = this.questions[0].step!;
+          this.maxNote = this.questions[0].point!;
+          this.currentQuestion = this.questions[0];
+
+          this.studentResponseService
+            .query({
+              sheetId: this.sheet!.id,
+              questionId: this.questions[0].id,
+            })
+            .subscribe(sr => {
+              if (sr.body !== null && sr.body.length > 0) {
+                this.resp = sr.body![0];
+                this.currentNote = this.resp.note!;
+                if (this.questions![0].gradeType === GradeType.DIRECT) {
+                  this.currentTextComment4Question = this.resp.textcomments!;
+                } else {
+                  this.currentGradedComment4Question = this.resp.gradedcomments!;
+                }
               }
-            }
-          });
-      }
+            });
+        }
+      });
     });
   }
 

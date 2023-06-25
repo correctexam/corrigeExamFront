@@ -32,11 +32,13 @@ export class StatsExamComponent implements OnInit {
   // Page related variables
   protected examid = '-1';
   protected infosQuestions: IQuestion[] = [];
+  questionNumeros: Array<number> = [];
   protected infosStudents: StudentRes[] = [];
   protected q_notees: QuestionNotee[] = [];
   protected studentsMarks: number[] = [];
   protected choixTri = true;
   protected nbStdABI = 0;
+
   // Graphical data
   protected data_radar_courant: IRadar = {
     labels: [],
@@ -115,6 +117,8 @@ export class StatsExamComponent implements OnInit {
     this.requeteInfoQuestions().subscribe(b => {
       // Getting and sorting the questions
       this.infosQuestions = (b.body ?? []).sort((i1, i2) => (i1.numero ?? 0) - (i2.numero ?? 0));
+      this.questionNumeros = Array.from(new Set(this.infosQuestions.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
+
       this.initStatVariables();
       this.initDisplayVariables();
       this.style();

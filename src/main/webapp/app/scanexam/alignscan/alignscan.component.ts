@@ -96,6 +96,29 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   submessage = '';
   progress = 0;
   scale = 2;
+
+  activeIndex = 1;
+  responsiveOptions2: any[] = [
+    {
+      breakpoint: '1500px',
+      numVisible: 5,
+    },
+    {
+      breakpoint: '1024px',
+      numVisible: 3,
+    },
+    {
+      breakpoint: '768px',
+      numVisible: 2,
+    },
+    {
+      breakpoint: '560px',
+      numVisible: 1,
+    },
+  ];
+  displayBasic = false;
+  images: any[] = [];
+
   constructor(
     public examService: ExamService,
     public scanService: ScanService,
@@ -153,14 +176,29 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     fromWorkerPool<IImageAlignementInput, IImageAlignement>(worker1, this.observable, {
       selectTransferables: input => [input.imageA, input.imageB],
     }).subscribe(
-      e => {
+      (e: IImageAlignement) => {
         const apage = {
           image: e.imageAligned,
           page: e.pageNumber,
           width: e.imageAlignedWidth!,
           height: e.imageAlignedHeight,
         };
+
         const im = new ImageData(new Uint8ClampedArray(apage.image!), apage.width, apage.height);
+        if (e.imagesDebugTracesWidth !== undefined) {
+          const debugpage = {
+            image: e.imagesDebugTraces,
+            page: e.pageNumber,
+            width: e.imagesDebugTracesWidth!,
+            height: e.imagesDebugTracesHeight,
+          };
+          const dim = new ImageData(new Uint8ClampedArray(debugpage.image!), debugpage.width, debugpage.height);
+          this.images.push({
+            src: this.fgetBase64Image(dim),
+            alt: 'Description for Image 2',
+            title: 'Exam',
+          });
+        }
 
         this.saveEligneImage(apage.page!, im).then(() => {
           if (this.currentPageAlign < this.numberPagesInScan + 1) {
@@ -271,17 +309,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
       await this.db.addExam(+this.examId);
 
       for (let e of templatePages64.keys()) {
-        /* await dbsqlite.addTemplate({
-          examId: +this.examId,
-          pageNumber: e,
-          value: JSON.stringify(
-            {
-              pages: templatePages64.get(e)!,
-            },
-            this.replacer
-          ),
-        });*/
-
         await this.db.addTemplate({
           examId: +this.examId,
           pageNumber: e,
@@ -297,77 +324,25 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
 
     this.translateService.get('scanexam.exportcacheencours').subscribe(res => (this.message = '' + res));
     this.cacheUploadService.exportCache(+this.examId, this.translateService, this.messageService, this.numberPagesInScan, this).then(() => {
-      setTimeout(() => {
-        this.blocked = false;
-        this.router.navigateByUrl('/exam/' + this.examId);
-      }, 2000);
-    });
-    /* db.export(o)
-      .then((value: Blob) => {
-        const file = new File([value], this.examId + 'indexdb.json');
-        this.progress = 0;
-        this.translateService.get('scanexam.uploadcacheencours').subscribe(res => (this.message = '' + res));
-        this.translateService.get('scanexam.uploadcacheencoursdetail').subscribe(res => (this.submessage = '' + res));
-
-        this.cacheUploadService.uploadCache(file).subscribe(
-          data => {
-            this.progress = data.progress;
-            if (data.state === 'DONE') {
-              setTimeout(() => {
-                this.blocked = false;
-                this.router.navigateByUrl('/exam/' + this.examId);
-              }, 1500);
-              this.messageService.add({
-                severity: 'success',
-                summary: this.translateService.instant('scanexam.uploadcacheok'),
-                detail: this.translateService.instant('scanexam.uploadcacheokdetail'),
-              });
-            }
-          },
-          err => {
-            if (err) {
-              setTimeout(() => {
-                this.blocked = false;
-                this.router.navigateByUrl('/exam/' + this.examId);
-              }, 2000);
-              this.messageService.add({
-                severity: 'error',
-                summary: this.translateService.instant('scanexam.uploadcacheko'),
-                detail: this.translateService.instant('scanexam.downloadcachekodetail'),
-              });
-            }
-          }
-        );
-      })
-      .catch(e => {
-        console.log(e);
-        console.log('could not export');
+      this.blocked = false;
+      if (!this.partialAlign) {
         setTimeout(() => {
-          this.blocked = false;
           this.router.navigateByUrl('/exam/' + this.examId);
         }, 2000);
-        this.messageService.add({
-          severity: 'error',
-          summary: this.translateService.instant('scanexam.downloadcacheko'),
-          detail: this.translateService.instant('scanexam.downloadcachekodetail'),
-        });
-      }); */
+      } else {
+        this.partialAlign = false;
+        this.displayBasic = true;
+        this.startPage = 1;
+        this.currentPageAlign = 1;
+        this.endPage = this.pdfService.numberOfPages();
+        this.numberPagesInScan = this.pdfService.numberOfPages();
+      }
+    });
   }
 
   async saveEligneImage(pageN: number, imageD: ImageData): Promise<void> {
-    // const imagePngBlob = await new Promise(resolve => canvasElem.toBlob( resolve, 'image/png' ) );
-
     const imageString = this.fgetBase64Image(imageD);
 
-    /* await dbsqlite.addAligneImage({
-      examId: +this.examId,
-      //    colorSpace: (imageD as any).colorSpace,
-      //    height: imageD.height,
-      value: imageString,
-      //   width: imageD.width,
-
-      pageNumber: pageN,
-    }); */
     await this.db.addAligneImage({
       examId: +this.examId,
       pageNumber: pageN,
@@ -381,16 +356,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   }
 
   async saveEligneImageBase64(pageN: number, imageD: any): Promise<void> {
-    // const imagePngBlob = await new Promise(resolve => canvasElem.toBlob( resolve, 'image/png' ) );
-    /* await dbsqlite.addAligneImage({
-      examId: +this.examId,
-      //    colorSpace: (imageD as any).colorSpace,
-      //    height: imageD.height,
-      value: imageString,
-      //   width: imageD.width,
-
-      pageNumber: pageN,
-    }); */
     await this.db.addAligneImage({
       examId: +this.examId,
       pageNumber: pageN,
@@ -404,17 +369,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   }
 
   async saveNonAligneImage(pageN: number, imageD: any): Promise<void> {
-    // const imageString = this.fgetBase64Image(imageD);
-    // const imageString = this.fgetBase64Image(imageD);
-
-    /* await dbsqlite.addNonAligneImage({
-      examId: +this.examId,
-      //    colorSpace: (imageD as any).colorSpace,
-      //    height: imageD.height,
-      value: imageString,
-      //   width: imageD.width,
-      pageNumber: pageN,
-    });*/
     await this.db.addNonAligneImage({
       examId: +this.examId,
       pageNumber: pageN,
@@ -531,6 +485,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
             marker: this.alignement === 'marker',
             pageNumber: pagen,
             preference: pref,
+            debug: this.partialAlign,
           });
 
           resolve(pagen);

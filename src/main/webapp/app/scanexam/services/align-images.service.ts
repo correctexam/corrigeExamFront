@@ -16,6 +16,9 @@ export interface IImageAlignement {
   imageAlignedWidth?: number;
   imageAlignedHeight?: number;
   pageNumber?: number;
+  imagesDebugTraces?: ArrayBuffer;
+  imagesDebugTracesWidth?: number;
+  imagesDebugTracesHeight?: number;
 }
 
 export interface IPreference {
@@ -54,6 +57,7 @@ export interface IImageAlignementInput {
   heightB?: number;
   pageNumber?: number;
   preference: IPreference;
+  debug: boolean;
 }
 export interface IImageCropInput {
   image?: ImageData;
@@ -118,6 +122,10 @@ export class AlignImagesService {
 
           this.subjects.get(data.uid)?.next(data.payload);
           this.subjects.get(data.uid)?.complete();
+        } else {
+          if (data.msg !== undefined) {
+            console.error(data.msg.log);
+          }
         }
         //   console.log(`service got message1: ${JSON.stringify(data.msg)}`);
       };

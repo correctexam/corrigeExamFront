@@ -15,6 +15,9 @@ interface IImageAlignement {
   imageAlignedWidth?: number;
   imageAlignedHeight?: number;
   pageNumber?: number;
+  imagesDebugTraces?: ArrayBuffer;
+  imagesDebugTracesWidth?: number;
+  imagesDebugTracesHeight?: number;
 }
 
 interface IImageAlignementInput {
@@ -29,6 +32,7 @@ interface IImageAlignementInput {
   heightB?: number;
   pageNumber: number;
   preference: IPreference;
+  debug: boolean;
 }
 
 export interface IPreference {
@@ -74,6 +78,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     return new Observable(observer => {
       this.opencvready
         .then(() => {
+          console.error('start worker');
           if (!input.marker) {
             try {
               const res = this.alignImage(
@@ -86,7 +91,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
                 false,
                 input.preference.numberofpointToMatch,
                 input.preference.numberofpointToMatch,
-                input.pageNumber
+                input.pageNumber,
+                input.debug
               );
               input.imageA = undefined;
               input.imageB = undefined;
@@ -106,7 +112,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
               input.widthB!,
               input.heightB!,
               input.pageNumber,
-              input.preference
+              input.preference,
+              input.debug
             );
             res.pageNumber = input.pageNumber;
             observer.next(res);
@@ -119,7 +126,11 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     });
   }
   public selectTransferables(output: IImageAlignement): Transferable[] {
-    return [output.imageAligned!];
+    if (output.imagesDebugTraces !== undefined) {
+      return [output.imageAligned!, output.imagesDebugTraces];
+    } else {
+      return [output.imageAligned!];
+    }
   }
 
   imageDataFromMat(mat: any): any {
@@ -177,14 +188,22 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     allimage: boolean,
     numberofpointToMatch: number,
     numberofgoodpointToMatch: number,
-    pageNumber: number
+    pageNumber: number,
+    debug: boolean
   ): any {
     //im2 is the original reference image we are trying to align to
     const image_A = new ImageData(new Uint8ClampedArray(image_Aba), widthA, heightA);
     const image_B = new ImageData(new Uint8ClampedArray(image_Bba), widthB, heightB);
 
     const im2 = cv.matFromImageData(image_A);
-    let im1 = cv.matFromImageData(image_B);
+    let _im1 = cv.matFromImageData(image_B);
+
+    let im1 = new cv.Mat();
+    let dsize = new cv.Size(im2.size().width, im2.size().height);
+    // You can try more different parameters
+    cv.resize(_im1, im1, dsize, 0, 0, cv.INTER_AREA);
+    //TODO delete _im1
+
     //  console.log("pass par la 1 ", "page ", pageNumber)
     let im1Gray = new cv.Mat();
     let im2Gray = new cv.Mat();
@@ -303,7 +322,41 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       let mat1 = cv.matFromArray(points1.length / 2, 1, cv.CV_32FC2, points1);
       let mat2 = cv.matFromArray(points2.length / 2, 1, cv.CV_32FC2, points2);
 
+      // let h = cv.findHomography(mat1, mat2, cv.RANSAC);
+
       let h = cv.findHomography(mat1, mat2, cv.RANSAC);
+
+      /*      if (h.empty())
+      {
+
+        alert("homography matrix empty!");
+        return;
+      }
+      else{
+        let good_inlier_matches = new cv.DMatchVector();
+        for (let i = 0; i < findHomographyMask.rows; i=i+2) {
+                 if(findHomographyMask.data[i] === 1 || findHomographyMask.data[i+1] === 1) {
+              let x = points2[i];
+              let y = points2[i + 1];
+              for (let j = 0; j < keypoints2.size(); ++j) {
+          if (x === keypoints2.get(j).pt.x && y === keypoints2.get(j).pt.y) {
+             for (let k = 0; k < good_matches.size(); ++k) {
+            if (j === good_matches.get(k).trainIdx) {
+                     good_inlier_matches.push_back(good_matches.get(k));
+            }
+             }
+          }
+             }
+                 }
+        }
+        var inlierMatches = new cv.Mat();
+        let color = new cv.Scalar(0, 255, 0, 255);
+        cv.drawMatches(im1, keypoints1, im2, keypoints2, good_inlier_matches, inlierMatches, color);
+       // cv.imshow('inlierMatches', inlierMatches);
+*/
+
+      // TODO pass the canvas
+
       //let M = cv.getPerspectiveTransform(mat1, mat2);
 
       /*  if (h.empty()) {
@@ -326,6 +379,30 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       result['imageAligned'] = this.imageDataFromMat(image_B_final_result).data.buffer;
       result['imageAlignedWidth'] = image_B_final_result.size().width;
       result['imageAlignedHeight'] = image_B_final_result.size().height;
+      if (debug) {
+        let matVec = new cv.MatVector();
+        // Push a Mat back into MatVector
+        matVec.push_back(im2);
+        matVec.push_back(im1);
+
+        let dstdebug = new cv.Mat();
+
+        cv.hconcat(matVec, dstdebug);
+        const nbrePoints = points2.length / 2;
+        for (let i = 0; i < nbrePoints; i++) {
+          let p1 = { x: points2[i * 2], y: points2[i * 2 + 1] };
+          let p2 = { x: im2.size().width + points1[i * 2], y: points1[i * 2 + 1] };
+          cv.circle(dstdebug, p1, 5, [0, 255, 0, 255], 1);
+          cv.circle(dstdebug, p2, 5, [0, 255, 0, 255], 1);
+
+          cv.line(dstdebug, p1, p2, [0, 255, 0, 255], 1);
+        }
+
+        result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
+        result['imagesDebugTracesWidth'] = dstdebug.size().width;
+        result['imagesDebugTracesHeight'] = dstdebug.size().height;
+      }
+
       mat1.delete();
       mat2.delete();
       h.delete();
@@ -335,9 +412,31 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       result['imageAligned'] = image_Bba.slice(0);
       result['imageAlignedWidth'] = widthB;
       result['imageAlignedHeight'] = heightB;
+      //      let matVec = new cv.MatVector();
+      // Push a Mat back into MatVector
+      /* matVec.push_back(im2);
+      matVec.push_back(im1);
+      let dstdebug = new cv.Mat();
+      // cv.hconcat(matVec,dstdebug);
+      result['imagesDebugTraces'] = image_Bba.slice(0);
+      result['imagesDebugTracesWidth'] = widthB;
+      result['imagesDebugTracesHeight'] = heightB; */
+
+      if (debug) {
+        let matVec = new cv.MatVector();
+        // Push a Mat back into MatVector
+        matVec.push_back(im2);
+        matVec.push_back(im1);
+        let dstdebug = new cv.Mat();
+        cv.hconcat(matVec, dstdebug);
+        result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
+        result['imagesDebugTracesWidth'] = dstdebug.size().width;
+        result['imagesDebugTracesHeight'] = dstdebug.size().height;
+      }
+
       console.log('no match for page ' + pageNumber);
     }
-
+    _im1.delete();
     im1.delete();
     im2.delete();
     im1Gray.delete();
@@ -590,18 +689,21 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     widthB: number,
     heightB: number,
     pageNumber: number,
-    preference: IPreference
+    preference: IPreference,
+    debug: boolean
   ): any {
     //im2 is the original reference image we are trying to align to
     const imageA = new ImageData(new Uint8ClampedArray(image_Aba), widthA, heightA);
     const imageB = new ImageData(new Uint8ClampedArray(image_Bba), widthB, heightB);
 
-    let srcMat = cv.matFromImageData(imageA);
+    let _srcMat = cv.matFromImageData(imageA);
+    let srcMat = new cv.Mat(); ///cv.Mat.zeros(srcMat.rows, srcMat.cols, cv.CV_8U);
+
     let dst = new cv.Mat(); ///cv.Mat.zeros(srcMat.rows, srcMat.cols, cv.CV_8U);
     // let color = new cv.Scalar(255, 0, 0);
     // let displayMat = srcMat.clone();
     let circlesMat = new cv.Mat();
-    cv.cvtColor(srcMat, srcMat, cv.COLOR_RGBA2GRAY);
+    cv.cvtColor(_srcMat, srcMat, cv.COLOR_RGBA2GRAY);
     //  cv.HoughCircles(srcMat, circlesMat, cv.HOUGH_GRADIENT, 1, 45, 75, 40, 0, 0);
     let minCircle = (srcMat.cols * preference.minCircle) / 1000;
     let maxCircle = (srcMat.cols * preference.maxCircle) / 1000;
@@ -659,7 +761,12 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       }
     }
 
-    let srcMat2 = cv.matFromImageData(imageB);
+    let _srcMat2 = cv.matFromImageData(imageB);
+    let srcMat2 = new cv.Mat();
+    let dsize1 = new cv.Size(srcMat.size().width, srcMat.size().height);
+    // You can try more different parameters
+    cv.resize(_srcMat2, srcMat2, dsize1, 0, 0, cv.INTER_AREA);
+
     let srcMat1 = new cv.Mat();
     let circlesMat1 = new cv.Mat();
     cv.cvtColor(srcMat2, srcMat1, cv.COLOR_RGBA2GRAY);
@@ -777,25 +884,75 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       result['imageAligned'] = this.imageDataFromMat(dst1).data.buffer;
       result['imageAlignedWidth'] = dst1.size().width;
       result['imageAlignedHeight'] = dst1.size().height;
+      // result['imagesDebugTraces'] = this.imageDataFromMat(dst1).data.buffer;
+      // result['imagesDebugTracesWidth'] = dst1.size().width;
+      // result['imagesDebugTracesHeight'] = dst1.size().height;
+
+      if (debug) {
+        let matVec = new cv.MatVector();
+        // Push a Mat back into MatVector
+        matVec.push_back(_srcMat);
+        matVec.push_back(srcMat2);
+
+        let dsize2 = new cv.Size(_srcMat.size().width * 2, srcMat.size().height);
+
+        let dstdebug = new cv.Mat(dsize2, _srcMat.type());
+        cv.hconcat(matVec, dstdebug);
+
+        // await new Promise(r => setTimeout(r, 5000));
+
+        let p1 = { x: x1, y: y1 };
+        let p2 = { x: srcMat.size().width + x5, y: y5 };
+        cv.circle(dstdebug, p1, 15, [0, 255, 0, 255], 1);
+        cv.circle(dstdebug, p2, 15, [0, 255, 0, 255], 1);
+        cv.line(dstdebug, p1, p2, [0, 255, 0, 255], 1);
+        p1 = { x: x2, y: y2 };
+        p2 = { x: srcMat.size().width + x6, y: y6 };
+        cv.circle(dstdebug, p1, 15, [0, 255, 0, 255], 1);
+        cv.circle(dstdebug, p2, 15, [0, 255, 0, 255], 1);
+        cv.line(dstdebug, p1, p2, [0, 255, 0, 255], 1);
+        p1 = { x: x3, y: y3 };
+        p2 = { x: srcMat.size().width + x7, y: y7 };
+        cv.circle(dstdebug, p1, 15, [0, 255, 0, 255], 1);
+        cv.circle(dstdebug, p2, 15, [0, 255, 0, 255], 1);
+        cv.line(dstdebug, p1, p2, [0, 255, 0, 255], 1);
+        p1 = { x: x4, y: y4 };
+        p2 = { x: srcMat.size().width + x8, y: y8 };
+        cv.circle(dstdebug, p1, 15, [0, 255, 0, 255], 1);
+        cv.circle(dstdebug, p2, 15, [0, 255, 0, 255], 1);
+        cv.line(dstdebug, p1, p2, [0, 255, 0, 255], 1);
+
+        result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
+        result['imagesDebugTracesWidth'] = dstdebug.size().width;
+        result['imagesDebugTracesHeight'] = dstdebug.size().height;
+      }
+      _srcMat.delete();
 
       srcMat.delete();
       dst.delete();
       circlesMat.delete();
       srcMat1.delete();
       srcMat2.delete();
+      _srcMat2.delete();
       circlesMat1.delete();
       srcTri.delete();
       dstTri.delete();
       dst1.delete();
-
+      console.error('find circle');
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return result;
     } else {
+      _srcMat.delete();
       srcMat.delete();
       dst.delete();
       circlesMat.delete();
       srcMat1.delete();
       srcMat2.delete();
+      _srcMat2.delete();
       circlesMat1.delete();
+      console.error('cannot find circle');
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return this.alignImage(
         image_Aba,
         image_Bba,
@@ -806,7 +963,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         false,
         preference.numberofpointToMatch,
         preference.numberofgoodpointToMatch,
-        pageNumber
+        pageNumber,
+        debug
       );
     }
   }

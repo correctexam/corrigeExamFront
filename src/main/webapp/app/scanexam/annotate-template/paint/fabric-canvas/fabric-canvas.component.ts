@@ -18,7 +18,7 @@ import { PreferenceService } from 'app/scanexam/preference-page/preference.servi
 // const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 //  suppressScrollX: true,
 // };
-import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer';
+// import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer';
 
 export type CustomZone = IZone & { type: DrawingTools };
 
