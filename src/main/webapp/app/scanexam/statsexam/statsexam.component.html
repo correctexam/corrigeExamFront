@@ -43,22 +43,22 @@
       <div class="statsgenerales-container">
         <div class="statgenerale">
           <span jhiTranslate="scanexam.nbrstudents"></span
-          ><span>{{ this.notes_eleves.length }} ({{ this.nbStdABI }} {{ this.nbStdABI > 1 ? 'absences' : 'absence' }})</span>
+          ><span>{{ this.studentsMarks.length }} ({{ this.nbStdABI }} {{ this.nbStdABI > 1 ? 'absences' : 'absence' }})</span>
         </div>
         <div class="statgenerale">
-          <span jhiTranslate="scanexam.average"></span><span>{{ this.getMoyenneExam().toFixed(2) }}/{{ this.getBaremeExam() }}</span>
+          <span jhiTranslate="scanexam.average"></span><span>{{ this.getMeanExam().toFixed(2) }}/{{ this.getBaremeExam() }}</span>
         </div>
         <div class="statgenerale">
-          <span jhiTranslate="scanexam.ecarttype"></span><span>{{ this.getEcartTypeExam().toFixed(2) }}</span>
+          <span jhiTranslate="scanexam.ecarttype"></span><span>{{ this.getStdDeviationExam().toFixed(2) }}</span>
         </div>
         <div class="statgenerale">
-          <span jhiTranslate="scanexam.mediane"></span> <span>{{ this.getMedianeExam() }}/{{ this.getBaremeExam() }}</span>
+          <span jhiTranslate="scanexam.mediane"></span> <span>{{ this.getMedianExam() }}/{{ this.getBaremeExam() }}</span>
         </div>
         <div class="statgenerale">
-          <span jhiTranslate="scanexam.notemax"></span><span>{{ this.getMaxNoteExam() }}/{{ this.getBaremeExam() }}</span>
+          <span jhiTranslate="scanexam.notemax"></span><span>{{ this.getMaxMarkExam() }}/{{ this.getBaremeExam() }}</span>
         </div>
         <div class="statgenerale">
-          <span jhiTranslate="scanexam.notemin"></span><span>{{ this.getMinNoteExam() }}/{{ this.getBaremeExam() }}</span>
+          <span jhiTranslate="scanexam.notemin"></span><span>{{ this.getMinMarkExam() }}/{{ this.getBaremeExam() }}</span>
         </div>
       </div>
     </p-card>

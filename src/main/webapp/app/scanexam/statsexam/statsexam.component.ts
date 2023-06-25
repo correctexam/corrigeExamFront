@@ -30,39 +30,37 @@ const TRANSPARENT = 'rgba(255,255,255,0.0)';
 })
 export class StatsExamComponent implements OnInit {
   // Page related variables
-  examid = '-1';
-  infosQuestions: IQuestion[] = [];
+  protected examid = '-1';
+  protected infosQuestions: IQuestion[] = [];
   questionNumeros: Array<number> = [];
-
-  infosStudents: StudentRes[] = [];
-  q_notees: QuestionNotee[] = [];
-  notes_eleves: number[] = [];
-  choixTri = true;
-  nbStdABI = 0;
+  protected infosStudents: StudentRes[] = [];
+  protected q_notees: QuestionNotee[] = [];
+  protected studentsMarks: number[] = [];
+  protected choixTri = true;
+  protected nbStdABI = 0;
 
   // Graphical data
-  data_radar_courant: IRadar = {
+  protected data_radar_courant: IRadar = {
     labels: [],
     datasets: [],
     vue: '',
   };
-  etudiantSelec: StudentRes | null | undefined;
-  listeMobileEtudiant: StudSelecMobile[] = [];
-  mobileSortChoices: ISortMobile[] = [
+  protected etudiantSelec: StudentRes | null | undefined;
+  protected listeMobileEtudiant: StudSelecMobile[] = [];
+  protected mobileSortChoices: ISortMobile[] = [
     { icon: 'pi pi-id-card', sort: 'ine' },
     { icon: 'pi pi-sort-alpha-up', sort: 'nom' },
     { icon: 'pi pi-sort-numeric-up', sort: 'note' },
   ];
-  mobileSortChoice: ISortMobile = this.mobileSortChoices[2];
-  knobsCourants: Map<number, string> = new Map();
-  COLOR_KNOBS = BLEU_AERO_TIEDE;
-  idQuestionSelected = 0;
-  questionSelectionnee = false;
-  texte_correction = 'Correction';
-  readonly ICONSORTUP = 'pi pi-sort-amount-up-alt'; // Permet d'éviter une étrange erreur de vscode (Unexpected keyword or identifier.javascript)
-
-  activeIndex = 1;
-  responsiveOptions2: any[] = [
+  protected mobileSortChoice: ISortMobile = this.mobileSortChoices[2];
+  protected knobsCourants: Map<number, string> = new Map();
+  protected COLOR_KNOBS = BLEU_AERO_TIEDE;
+  protected idQuestionSelected = 0;
+  protected questionSelectionnee = false;
+  protected texte_correction = 'Correction';
+  protected readonly ICONSORTUP = 'pi pi-sort-amount-up-alt'; // Permet d'éviter une étrange erreur de vscode (Unexpected keyword or identifier.javascript)
+  protected activeIndex = 1;
+  protected responsiveOptions2: any[] = [
     {
       breakpoint: '1500px',
       numVisible: 5,
@@ -80,10 +78,10 @@ export class StatsExamComponent implements OnInit {
       numVisible: 1,
     },
   ];
-  displayBasic = false;
-  images: any[] = [];
-  noalign = false;
-  nbreFeuilleParCopie: number | undefined;
+  protected displayBasic = false;
+  protected images: any[] = [];
+  private noalign = false;
+  private nbreFeuilleParCopie: number | undefined;
 
   constructor(
     private applicationConfigService: ApplicationConfigService,
@@ -160,7 +158,7 @@ export class StatsExamComponent implements OnInit {
     });
   }
 
-  private reviver(key: any, value: any): any {
+  private reviver(_key: any, value: any): any {
     if (typeof value === 'object' && value !== null) {
       if (value.dataType === 'Map') {
         return new Map(value.value);
@@ -226,7 +224,7 @@ export class StatsExamComponent implements OnInit {
             qn[parseFloat(key) - 1]?.notesAssociees?.push(note);
           }
           const note = s.note === undefined ? 0 : this.s2f(s.note);
-          this.notes_eleves.push(note);
+          this.studentsMarks.push(note);
         }
       });
     this.q_notees = qn.sort((a, b) => a.numero - b.numero);
@@ -359,7 +357,7 @@ export class StatsExamComponent implements OnInit {
   }
 
   /** @return The notation for each question */
-  public getBaremes(stats: QuestionNotee[]): number[] {
+  public getBaremes(stats: ReadonlyArray<QuestionNotee>): number[] {
     return stats.map(s => s.bareme);
   }
 
@@ -388,7 +386,7 @@ export class StatsExamComponent implements OnInit {
 
   /** @return Average mark for all the questions (ordered) */
   private getMoyennesQuestions(): number[] {
-    return this.q_notees.map(ns => this.avg(ns.notesAssociees));
+    return this.q_notees.map(ns => this.mean(ns.notesAssociees));
   }
 
   private updateKnobs(): void {
@@ -399,75 +397,55 @@ export class StatsExamComponent implements OnInit {
     });
   }
 
-  public getMoyenneExam(): number {
-    return this.sum(this.notes_eleves) / this.notes_eleves.length;
+  public getMeanExam(): number {
+    return this.sum(this.studentsMarks) / this.studentsMarks.length;
   }
 
-  public getMedianeExam(): number {
-    return this.med(this.notes_eleves);
+  public getMedianExam(): number {
+    return this.median(this.studentsMarks);
   }
 
-  public getVarianceExam(): number {
-    return this.var(this.notes_eleves);
+  public getStdDeviationExam(): number {
+    return this.stdDeviation(this.studentsMarks);
   }
 
-  public getEcartTypeExam(): number {
-    return this.ecart_type(this.notes_eleves);
+  public getMaxMarkExam(): number {
+    return this.max(this.studentsMarks);
   }
 
-  public getMaxNoteExam(): number {
-    return this.max(this.notes_eleves);
+  public getMinMarkExam(): number {
+    return this.min(this.studentsMarks);
   }
 
-  public getMinNoteExam(): number {
-    return this.min(this.notes_eleves);
+  private max(marks: ReadonlyArray<number>): number {
+    return Math.max(...marks);
   }
 
-  /** @param tab un tableau non vide @returns la valeur la plus élevée  */
-  private max(tab: number[]): number {
-    return Math.max(...tab);
+  private min(marks: ReadonlyArray<number>): number {
+    return Math.min(...marks);
   }
 
-  /** @param tab un tableau non vide @returns la valeur la moins élevée  */
-  private min(tab: number[]): number {
-    return Math.min(...tab);
+  public sum(marks: ReadonlyArray<number>): number {
+    return marks.reduce((x, y) => x + y, 0);
   }
 
-  /** @param tab un tableau non vide @returns la moyenne  */
-  public sum(tab: number[]): number {
-    return tab.reduce((x, y) => x + y, 0);
+  private mean(marks: ReadonlyArray<number>): number {
+    return marks.length > 0 ? this.sum(marks) / marks.length : 0;
   }
 
-  /** @param tab un tableau non vide @returns la moyenne correspondant à ce tableau*/
-  private avg(tab: number[]): number {
-    return tab.length > 0 ? this.sum(tab) / tab.length : 0;
+  private median(marks: ReadonlyArray<number>): number {
+    const sortedTab = [...marks].sort((a, b) => b - a);
+    return sortedTab[Math.floor(sortedTab.length / 2)];
   }
 
-  /** @param tab un tableau non vide @returns la mediane correspondant à ce tableau*/
-  private med(tab: number[]): number {
-    tab.sort();
-    const moitie: number = tab.length / 2;
-    const indiceMilieu: number = Number.isInteger(moitie) ? moitie : Math.floor(moitie);
-    return tab[indiceMilieu];
+  private stdDeviation(marks: ReadonlyArray<number>): number {
+    const mean: number = this.mean(marks);
+    // (marks.length - 1); for the corrected SD.
+    const variance = marks.map(xi => Math.pow(xi - mean, 2)).reduce((a, b) => a + b, 0) / (marks.length - 1);
+    return Math.sqrt(variance);
   }
 
-  /** @param tab un tableau non vide @returns la variance correspondant à ce tableau*/
-  private var(tab: number[]): number {
-    const moy: number = this.avg(tab);
-    let variance = 0;
-    for (const xi of tab) {
-      variance += Math.pow(xi - moy, 2);
-    }
-    variance /= tab.length;
-    return variance;
-  }
-
-  /** @param tab un tableau non vide @returns l'écart-type correspondant à ce tableau*/
-  private ecart_type(tab: number[]): number {
-    return Math.sqrt(this.var(tab));
-  }
-
-  private normaliseNotes(notes: number[], baremes: number[], norme = 100): number[] {
+  private normaliseNotes(notes: Array<number>, baremes: ReadonlyArray<number>, norme = 100): number[] {
     notes.forEach((note, indice) => {
       note /= baremes[indice];
       notes[indice] = note * norme;
@@ -507,7 +485,7 @@ export class StatsExamComponent implements OnInit {
   }
 
   /** Initialises radar data to display **/
-  private initGlobalRadarData(stats: QuestionNotee[], pourcents = false): IRadar {
+  private initGlobalRadarData(stats: ReadonlyArray<QuestionNotee>, pourcents = false): IRadar {
     const labels = stats.map(e => e.label);
     const datasets = [this.radarMoy(), this.radarMed(), this.radarMaxNote(), this.radarMinNote()];
 
@@ -541,7 +519,7 @@ export class StatsExamComponent implements OnInit {
       this.translateService.instant('scanexam.mediane'),
       BLEU_FONCE,
       TRANSPARENT,
-      this.q_notees.map(ns => this.med(ns.notesAssociees))
+      this.q_notees.map(ns => this.median(ns.notesAssociees))
     );
   }
 
