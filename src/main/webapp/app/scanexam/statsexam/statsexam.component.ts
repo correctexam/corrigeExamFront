@@ -32,6 +32,8 @@ export class StatsExamComponent implements OnInit {
   // Page related variables
   examid = '-1';
   infosQuestions: IQuestion[] = [];
+  questionNumeros: Array<number> = [];
+
   infosStudents: StudentRes[] = [];
   q_notees: QuestionNotee[] = [];
   notes_eleves: number[] = [];
@@ -117,6 +119,8 @@ export class StatsExamComponent implements OnInit {
     this.requeteInfoQuestions().subscribe(b => {
       // Getting and sorting the questions
       this.infosQuestions = (b.body ?? []).sort((i1, i2) => (i1.numero ?? 0) - (i2.numero ?? 0));
+      this.questionNumeros = Array.from(new Set(this.infosQuestions.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
+
       this.initStatVariables();
       this.initDisplayVariables();
       this.style();

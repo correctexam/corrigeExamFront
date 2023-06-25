@@ -183,20 +183,22 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
           width: e.imageAlignedWidth!,
           height: e.imageAlignedHeight,
         };
-        const debugpage = {
-          image: e.imagesDebugTraces,
-          page: e.pageNumber,
-          width: e.imagesDebugTracesWidth!,
-          height: e.imagesDebugTracesHeight,
-        };
 
         const im = new ImageData(new Uint8ClampedArray(apage.image!), apage.width, apage.height);
-        const dim = new ImageData(new Uint8ClampedArray(debugpage.image!), debugpage.width, debugpage.height);
-        this.images.push({
-          src: this.fgetBase64Image(dim),
-          alt: 'Description for Image 2',
-          title: 'Exam',
-        });
+        if (e.imagesDebugTracesWidth !== undefined) {
+          const debugpage = {
+            image: e.imagesDebugTraces,
+            page: e.pageNumber,
+            width: e.imagesDebugTracesWidth!,
+            height: e.imagesDebugTracesHeight,
+          };
+          const dim = new ImageData(new Uint8ClampedArray(debugpage.image!), debugpage.width, debugpage.height);
+          this.images.push({
+            src: this.fgetBase64Image(dim),
+            alt: 'Description for Image 2',
+            title: 'Exam',
+          });
+        }
 
         this.saveEligneImage(apage.page!, im).then(() => {
           if (this.currentPageAlign < this.numberPagesInScan + 1) {

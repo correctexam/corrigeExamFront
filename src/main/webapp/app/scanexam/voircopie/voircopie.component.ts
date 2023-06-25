@@ -63,7 +63,8 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   noteSteps = 0;
   maxNote = 0;
   questionStep = 0;
-  questionno = 0;
+  questionindex = 0;
+  questionNumeros: Array<number> = [];
   resp: IStudentResponse | undefined;
   currentQuestion: IQuestion | undefined;
   noalign = false;
@@ -139,7 +140,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
                 }
 
                 if (params.get('questionno') !== null) {
-                  this.questionno = +params.get('questionno')! - 1;
+                  this.questionindex = +params.get('questionno')! - 1;
                   this.populateBestSolutions();
 
                   // Step 1 Query templates
@@ -160,40 +161,38 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
 
     // Step 4 Query zone 4 questions
     this.blocked = false;
-    this.questionService.query({ examId: this.exam!.id }).subscribe(b =>
-      b.body!.forEach(q => {
-        if (q.numero! > this.nbreQuestions) {
-          this.nbreQuestions = q.numero!;
-        }
-      })
-    );
-    this.questionService.query({ examId: this.exam!.id, numero: this.questionno + 1 }).subscribe(q1 => {
-      this.questions = q1.body!;
-      this.showImage = new Array<boolean>(this.questions.length);
+    this.questionService.query({ examId: this.exam!.id }).subscribe(b => {
+      this.questionNumeros = Array.from(new Set(b.body!.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
+      this.nbreQuestions = this.questionNumeros.length;
 
-      if (this.questions.length > 0) {
-        this.noteSteps = this.questions[0].point! * this.questions[0].step!;
-        this.questionStep = this.questions[0].step!;
-        this.maxNote = this.questions[0].point!;
-        this.currentQuestion = this.questions[0];
+      this.questionService.query({ examId: this.exam!.id, numero: this.questionNumeros[this.questionindex] }).subscribe(q1 => {
+        this.questions = q1.body!;
+        this.showImage = new Array<boolean>(this.questions.length);
 
-        this.studentResponseService
-          .query({
-            sheetId: this.sheet!.id,
-            questionId: this.questions[0].id,
-          })
-          .subscribe(sr => {
-            if (sr.body !== null && sr.body.length > 0) {
-              this.resp = sr.body![0];
-              this.currentNote = this.resp.note!;
-              if (this.questions![0].gradeType === GradeType.DIRECT && this.questions![0].typeAlgoName !== 'QCM') {
-                this.currentTextComment4Question = this.resp.textcomments!;
-              } else {
-                this.currentGradedComment4Question = this.resp.gradedcomments!;
+        if (this.questions.length > 0) {
+          this.noteSteps = this.questions[0].point! * this.questions[0].step!;
+          this.questionStep = this.questions[0].step!;
+          this.maxNote = this.questions[0].point!;
+          this.currentQuestion = this.questions[0];
+
+          this.studentResponseService
+            .query({
+              sheetId: this.sheet!.id,
+              questionId: this.questions[0].id,
+            })
+            .subscribe(sr => {
+              if (sr.body !== null && sr.body.length > 0) {
+                this.resp = sr.body![0];
+                this.currentNote = this.resp.note!;
+                if (this.questions![0].gradeType === GradeType.DIRECT && this.questions![0].typeAlgoName !== 'QCM') {
+                  this.currentTextComment4Question = this.resp.textcomments!;
+                } else {
+                  this.currentGradedComment4Question = this.resp.gradedcomments!;
+                }
               }
-            }
-          });
-      }
+            });
+        }
+      });
     });
   }
 
@@ -242,7 +241,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   @HostListener('window:keydown.shift.ArrowLeft', ['$event'])
   previousQuestion(event: KeyboardEvent): void {
     event.preventDefault();
-    const q = this.questionno;
+    const q = this.questionindex;
     if (q > 0) {
       this.router.navigateByUrl('/copie/' + this.uuid + '/' + q);
     }
@@ -250,15 +249,15 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   @HostListener('window:keydown.shift.ArrowRight', ['$event'])
   nextQuestion(event: KeyboardEvent): void {
     event.preventDefault();
-    const q = this.questionno + 2;
+    const q = this.questionindex + 2;
     if (q <= this.nbreQuestions) {
       this.router.navigateByUrl('/copie/' + this.uuid + '/' + q);
     }
   }
 
   changeQuestion($event: any): void {
-    this.questionno = $event.page;
-    this.router.navigateByUrl('/copie/' + this.uuid + '/' + (this.questionno + 1));
+    this.questionindex = $event.page;
+    this.router.navigateByUrl('/copie/' + this.uuid + '/' + (this.questionindex + 1));
   }
 
   private reviver(key: any, value: any): any {
@@ -307,7 +306,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
 
       if (this.currentZoneVoirCopieHandler === undefined) {
         const zh = new ZoneVoirCopieHandler(
-          '' + this.exam!.id + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index,
+          '' + this.exam!.id + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index,
           this.eventHandler,
           this.resp?.id
         );
@@ -316,12 +315,12 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
       } else {
         if (
           this.currentZoneVoirCopieHandler.zoneid ===
-          '' + this.exam!.id + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index
+          '' + this.exam!.id + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index
         ) {
           this.currentZoneVoirCopieHandler.updateCanvas(imageRef!.nativeElement);
         } else {
           const zh = new ZoneVoirCopieHandler(
-            '' + this.exam!.id + '_' + this.selectionStudents![0].id + '_' + this.questionno + '_' + index,
+            '' + this.exam!.id + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index,
             this.eventHandler,
             this.resp?.id
           );
@@ -498,11 +497,13 @@ ${firsName}
 
   populateBestSolutions(): void {
     this.http
-      .get<string[]>(this.applicationConfigService.getEndpointFor('api/getBestAnswer/' + this.exam?.id + '/' + (this.questionno + 1)))
+      .get<string[]>(
+        this.applicationConfigService.getEndpointFor('api/getBestAnswer/' + this.exam?.id + '/' + this.questionNumeros[this.questionindex])
+      )
       .subscribe(s => {
         const result: string[] = [];
         s.forEach(s1 => {
-          result.push('/reponse/' + btoa('/' + s1 + '/' + (this.questionno + 1) + '/'));
+          result.push('/reponse/' + btoa('/' + s1 + '/' + this.questionNumeros[this.questionindex] + '/'));
         });
         this.bestSolutions = result;
       });

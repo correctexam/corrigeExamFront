@@ -281,6 +281,8 @@
     "donneesdejaimporte": "Données actuellement dans la base de données",
     "voirtoutescopies": "Tout voir",
     "voirtoutescopiestooltip": "Voir l'ensemble des réponses des étudiants",
-    "downloadimages": "Téléchargement des images"
+    "downloadimages": "Téléchargement des images",
+    "cleanSheet": "Supprimer orphelins",
+    "cleanSheetTooltip": "Il se peut que certaines feuilles d'examens soient orphelines, cette opération néttoie l'examen de ces feuilles sans réponse et non associées à un examen"
   }
 }
