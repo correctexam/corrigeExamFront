@@ -3,7 +3,13 @@
 <div *ngIf="examId !== -1 && errorMsg === undefined">
   <h1>
     {{ 'scanexam.titleSummary' | translate }} {{ dataExam.nameExam }}
-    <button type="submit" class="p-button" (click)="cleanSheet()" [pTooltip]="'scanexam.cleanSheetTooltip' | translate">
+    <button
+      *jhiHasAnyAuthority="'ROLE_ADMIN'"
+      type="submit"
+      class="p-button"
+      (click)="cleanSheet()"
+      [pTooltip]="'scanexam.cleanSheetTooltip' | translate"
+    >
       <fa-icon icon="trash-alt"></fa-icon>&nbsp;<span jhiTranslate="scanexam.cleanSheet"></span>
     </button>
 
