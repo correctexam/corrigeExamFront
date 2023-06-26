@@ -9,7 +9,6 @@ import { LocalStorageService } from 'ngx-webstorage';
 import { SidebarModule } from 'primeng/sidebar';
 import { PreferenceService } from 'app/scanexam/preference-page/preference.service';
 import { CreateCommentsComponent } from '../../create-comments/create-comments.component';
-import { MockComponent, MockProvider, ngMocks } from 'ng-mocks';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { EventHandlerService } from '../event-handler.service';
 import { Observable, Subject, of } from 'rxjs';
@@ -29,6 +28,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MessageModule } from 'primeng/message';
 import { InputTextModule } from 'primeng/inputtext';
 import { KeyFilterModule } from 'primeng/keyfilter';
+import { MockComponent, ngMocks, MockProvider } from 'ng-mocks';
 
 const flushPromises = (): Promise<void> => new Promise(resolve => setImmediate(resolve));
 
