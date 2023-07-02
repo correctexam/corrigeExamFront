@@ -113,12 +113,7 @@ export class FabricCanvasComponent implements OnInit {
     }
   }
 
-  updateZoomFactor($event: any): void {
-    console.error('updateZoomFactor', $event);
-  }
-
   public pageRendered(evt: PageRenderedEvent): void {
-    console.error('pageRendered', evt);
     const page = evt.pageNumber;
     if (this.eventHandler.pages[page] === undefined) {
       this.eventHandler.initPage(page, evt.source);
@@ -154,8 +149,7 @@ export class FabricCanvasComponent implements OnInit {
       // Loading the metadata after having rendered all the pages
       // to have all the canvases up to date.
       if (this.pdfViewerService.isRenderQueueEmpty()) {
-        this.loadingPdfMetadata();
-        console.error('block');
+        this.loadingPdfMetadata(evt.source.scale);
         this.blocked = false;
       }
     } else {
@@ -185,14 +179,13 @@ export class FabricCanvasComponent implements OnInit {
         });
       }
       if (this.pdfViewerService.isRenderQueueEmpty()) {
-        this.loadingPdfMetadata();
-        console.error('block');
+        this.loadingPdfMetadata(evt.source.scale);
         this.blocked = false;
       }
     }
   }
 
-  public async loadingPdfMetadata(): Promise<void> {
+  public async loadingPdfMetadata(pdfScale: number): Promise<void> {
     const rects = await this.getCustomPdfProperties();
     const qs: Record<number, Array<Rect>> = {};
     let qnum = 0;
@@ -203,7 +196,7 @@ export class FabricCanvasComponent implements OnInit {
         case DrawingTools.INEBOX:
           if (this.exam.idzoneId === undefined) {
             promises.push(
-              firstValueFrom(this.zoneService.create(this.createZone(rect))).then(z1 => {
+              firstValueFrom(this.zoneService.create(this.createZone(rect, pdfScale))).then(z1 => {
                 this.exam.idzoneId = z1.body!.id!;
                 this.renderZone(z1.body as CustomZone);
                 this.eventHandler.createRedBox('scanexam.ineuc1', z1.body!, rect.p);
@@ -215,7 +208,7 @@ export class FabricCanvasComponent implements OnInit {
         case DrawingTools.PRENOMBOX:
           if (this.exam.firstnamezoneId === undefined) {
             promises.push(
-              firstValueFrom(this.zoneService.create(this.createZone(rect))).then(z1 => {
+              firstValueFrom(this.zoneService.create(this.createZone(rect, pdfScale))).then(z1 => {
                 this.exam.firstnamezoneId = z1.body!.id!;
                 this.renderZone(z1.body as CustomZone);
                 this.eventHandler.createRedBox('scanexam.prenomuc1', z1.body!, rect.p);
@@ -227,7 +220,7 @@ export class FabricCanvasComponent implements OnInit {
         case DrawingTools.NOMBOX:
           if (this.exam.namezoneId === undefined) {
             promises.push(
-              firstValueFrom(this.zoneService.create(this.createZone(rect))).then(z1 => {
+              firstValueFrom(this.zoneService.create(this.createZone(rect, pdfScale))).then(z1 => {
                 this.exam.namezoneId = z1.body!.id!;
                 this.renderZone(z1.body as CustomZone);
                 this.eventHandler.createRedBox('scanexam.nomuc1', z1.body!, rect.p);
@@ -259,7 +252,7 @@ export class FabricCanvasComponent implements OnInit {
         value
           .filter(subq => subq !== undefined)
           .forEach(subq => {
-            this.zoneService.create(this.createZone(subq)).subscribe(resz => {
+            this.zoneService.create(this.createZone(subq, pdfScale)).subscribe(resz => {
               const zone = resz.body as CustomZone;
               zone.type = DrawingTools.QUESTIONBOX;
               const pref = this.preferenceService.getPreferenceForQuestion();
@@ -285,7 +278,7 @@ export class FabricCanvasComponent implements OnInit {
     }
   }
 
-  private createZone(rect: Rect): IZone {
+  private createZone(rect: Rect, scale: number): IZone {
     const ppc = 37.795275591;
     const canvas = this.eventHandler.getCanvasForPage(rect.p);
 
@@ -304,13 +297,14 @@ export class FabricCanvasComponent implements OnInit {
 
     return {
       pageNumber: rect.p,
-      xInit: Math.trunc(Math.floor((rect.x * ppc * this.eventHandler.coefficient) / width)),
+      xInit: Math.trunc(Math.floor((rect.x * ppc * this.eventHandler.coefficient) / width) * scale),
       yInit: Math.trunc(
-        Math.floor(rect.y * ppc * this.eventHandler.coefficient) / height -
-          Math.floor(rect.h * ppc * this.eventHandler.coefficient) / height
+        (Math.floor(rect.y * ppc * this.eventHandler.coefficient) / height -
+          Math.floor(rect.h * ppc * this.eventHandler.coefficient) / height) *
+          scale
       ),
-      width: Math.trunc(Math.floor((rect.w * ppc * this.eventHandler.coefficient) / width)),
-      height: Math.trunc(Math.floor(rect.h * ppc * this.eventHandler.coefficient) / height),
+      width: Math.trunc(Math.floor((rect.w * ppc * this.eventHandler.coefficient) / width) * scale),
+      height: Math.trunc((Math.floor(rect.h * ppc * this.eventHandler.coefficient) / height) * scale),
     };
   }
 
