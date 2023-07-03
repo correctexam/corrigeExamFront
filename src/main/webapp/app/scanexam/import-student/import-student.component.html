@@ -75,6 +75,7 @@
         <p-table [value]="students" responsiveLayout="scroll" sortMode="single" [sortField]="'ine'">
           <ng-template pTemplate="header">
             <tr>
+              <th></th>
               <th jhiTranslate="scanexam.ine">INE</th>
               <th jhiTranslate="scanexam.nom">NOM</th>
               <th jhiTranslate="scanexam.prenom">PRENOM</th>
@@ -83,6 +84,8 @@
               <th jhiTranslate="scanexam.supprimer">SUPPRIMER</th>
             </tr>
             <tr>
+              <td></td>
+
               <td>
                 <input [(ngModel)]="firstLine.ine" (paste)="data($event)" type="text" />
               </td>
@@ -106,6 +109,10 @@
             </tr>
             <tr *ngFor="let st of dataset; let index = index">
               <td>
+                {{ index + 1 }}
+              </td>
+
+              <td>
                 <input [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesaimporte' | translate" [(ngModel)]="st.ine" type="text" />
               </td>
               <td>
@@ -127,8 +134,11 @@
               </td>
             </tr>
           </ng-template>
-          <ng-template pTemplate="body" let-student>
+          <ng-template pTemplate="body" ngFor let-ii="index" let-student [ngForOf]="students">
             <tr [ngClass]="{ alreadyimported: true }">
+              <td>
+                {{ students.indexOf(student) + 1 }}
+              </td>
               <td>
                 <p-inplace [closable]="true">
                   <ng-template pTemplate="display">

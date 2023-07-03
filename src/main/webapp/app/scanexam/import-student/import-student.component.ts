@@ -31,7 +31,7 @@ export class ImportStudentComponent implements OnInit {
   dataset: Std[] = [];
   blocked = false;
   courseid: string | undefined = undefined;
-  students: IStudent[] = [];
+  students: Std[] = [];
 
   constructor(
     protected applicationConfigService: ApplicationConfigService,
