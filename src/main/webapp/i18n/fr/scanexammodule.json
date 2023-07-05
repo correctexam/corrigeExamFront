@@ -283,6 +283,17 @@
     "voirtoutescopiestooltip": "Voir l'ensemble des réponses des étudiants",
     "downloadimages": "Téléchargement des images",
     "cleanSheet": "Supprimer orphelins",
-    "cleanSheetTooltip": "Il se peut que certaines feuilles d'examens soient orphelines, cette opération néttoie l'examen de ces feuilles sans réponse et non associées à un examen"
+    "cleanSheetTooltip": "Il se peut que certaines feuilles d'examens soient orphelines, cette opération néttoie l'examen de ces feuilles sans réponse et non associées à un examen",
+    "save": "Sauver",
+    "keyboardshortcuthelp": "Entrer votre raccourci clavier de la forme: ctrl + e ou shift + e (Vous pouvez voir les raccourcis existants en cliquant sur F1)",
+    "keyboardshortcutlabel": "Raccourci clavier",
+    "keyboardshortcuttooltip": "Permet d'associer un raccourci clavier pour ce commentaire",
+    "help": "Aide",
+    "nextstudent": "Aller à l'étudiant précédent",
+    "previousstudent": "Aller à l'étudiant suivant",
+    "nextquestion": "Aller à la question suivante",
+    "previousquestion": "Aller à la question précédente",
+    "directevaluation": "Evaluation directe",
+    "directgradding": "Notation par point"
   }
 }

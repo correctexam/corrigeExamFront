@@ -281,6 +281,17 @@
     "voirtoutescopiestooltip": "Show all student answers in one page",
     "downloadimages": "Download images",
     "cleanSheet": "Delete orphans",
-    "cleanSheetTooltip": "It is sometimes the case that certain exam sheets are orphaned, and this operation allows you to examine these unanswered sheets that are not associated with an exam."
+    "cleanSheetTooltip": "It is sometimes the case that certain exam sheets are orphaned, and this operation allows you to examine these unanswered sheets that are not associated with an exam.",
+    "save": "Save",
+    "keyboardshortcuthelp": "Enter your keyboard shortcut as: ctrl + e or shift + e (You can view existing shortcuts by clicking on F1)",
+    "keyboardshortcutlabel": "Keyboard shortcut ",
+    "keyboardshortcuttooltip": "Associate a keyboard shortcut for this comment",
+    "help": "Help",
+    "nextstudent": "Go to next student",
+    "previousstudent": "Go to previous student",
+    "nextquestion": "Go to next question",
+    "previousquestion": "Go to previous question",
+    "directevaluation": "Direct evaluation",
+    "directgradding": "direct gradding"
   }
 }

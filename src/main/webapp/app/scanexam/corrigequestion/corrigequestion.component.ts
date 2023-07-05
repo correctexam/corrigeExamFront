@@ -18,7 +18,7 @@ import {
   ViewChild,
   NgZone,
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { CourseService } from 'app/entities/course/service/course.service';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 import { ExamService } from 'app/entities/exam/service/exam.service';
@@ -44,13 +44,15 @@ import { GradedCommentService } from '../../entities/graded-comment/service/grad
 import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
 import { TranslateService } from '@ngx-translate/core';
 import { IQCMSolution } from '../../qcm';
-import { Observable, Subscriber } from 'rxjs';
+import { Observable, Subscriber, firstValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 import { fromWorkerPool } from 'observable-webworker';
 import { worker1 } from '../services/workerimport';
 import { PreferenceService } from '../preference-page/preference.service';
 import { EntityResponseType } from '../../entities/exam-sheet/service/exam-sheet.service';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
+import { KeyboardShortcutsComponent, ShortcutEventOutput, ShortcutInput } from 'ng-keyboard-shortcuts';
+import { IKeyBoardShortCutPreferenceEntry, KeyboardShortcutService } from '../preference-page/keyboardshortcut.service';
 
 @Component({
   selector: 'jhi-corrigequestion',
@@ -119,7 +121,15 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   currentGradedComment4Question: IGradedComment[] | undefined;
   windowWidth = 0;
   currentZoneCorrectionHandler: Map<string, ZoneCorrectionHandler> = new Map(); // | undefined;
+  shortcuts: ShortcutInput[] = [];
+  shortCut4Comment = false;
+  currentKeyBoardShorcut: string | string[] = '';
+  commentShortcut: any;
 
+  @ViewChild(KeyboardShortcutsComponent)
+  private keyboard: KeyboardShortcutsComponent | undefined;
+  @ViewChild('input') input: ElementRef | undefined;
+  testdisableAndEnableKeyBoardShortCut = false;
   activeIndex = 1;
   responsiveOptions2: any[] = [
     {
@@ -141,7 +151,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   ];
   displayBasic = false;
   images: any[] = [];
-
+  init: Promise<void> | undefined;
   pageOffset = 0;
   constructor(
     public examService: ExamService,
@@ -163,7 +173,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     private translateService: TranslateService,
     private preferenceService: PreferenceService,
     private db: CacheServiceImpl,
-    private zone: NgZone
+    private zone: NgZone,
+    private keyboardShortcutService: KeyboardShortcutService
   ) {}
 
   ngOnInit(): void {
@@ -171,147 +182,142 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.shortcut = this.preferenceService.showKeyboardShortcuts();
     this.shortcutvalue = this.preferenceService.showKeyboardShortcuts();
     this.minimizeComment = this.preferenceService.minimizeComments();
-    this.shortcutvalue;
+    //  this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+
     this.activatedRoute.paramMap.subscribe(params => {
-      this.blocked = true;
-      let forceRefreshStudent = false;
-      this.currentNote = 0;
-      this.noteSteps = 0;
-      this.maxNote = 0;
-      this.resp = undefined;
-      //      'answer/:examid/:questionno/:studentid',
-      if (params.get('examid') !== null) {
-        this.examId = params.get('examid')!;
-        if (this.images.length === 0) {
-          this.examId = params.get('examid')!;
-          forceRefreshStudent = true;
-        } else {
-          /* const changeStudent = params.get('studentid') !== null && this.studentid !== +params.get('studentid')!;
-          this.db.countNonAlignImage(+this.examId!).then(page => {
-            if (page > 30 && changeStudent) {
-              //              this.loadAllPages();
-            }
-          }); */
-        }
-        this.pageOffset = 0;
-
-        if (params.get('studentid') !== null) {
-          this.studentid = +params.get('studentid')!;
-          this.currentStudent = this.studentid - 1;
-          // Step 1 Query templates
-          this.db.countPageTemplate(+this.examId).then(e2 => {
-            this.nbreFeuilleParCopie = e2;
-            // Step 2 Query Scan in local DB
-
-            this.db.countAlignImage(+this.examId!).then(e1 => {
-              this.numberPagesInScan = e1;
-              this.examService.find(+this.examId!).subscribe(data => {
-                this.exam = data.body!;
-                this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
-                // Step 3 Query Students for Exam
-
-                this.refreshStudentList(forceRefreshStudent).then(() => {
-                  this.getSelectedStudent();
-                  // Step 4 Query zone 4 questions
-
-                  this.questionService.query({ examId: this.exam?.id }).subscribe(b => {
-                    this.questionNumeros = Array.from(new Set(b.body!.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
-                    this.nbreQuestions = this.questionNumeros.length;
-                    if (params.get('questionno') !== null) {
-                      this.questionindex = +params.get('questionno')! - 1;
-                      console.error('questionindexAndNumero', this.questionindex, this.questionNumeros[this.questionindex]);
-                    }
-
-                    this.questionService
-                      .query({ examId: this.exam?.id, numero: this.questionNumeros[this.questionindex!] })
-                      .subscribe(q1 => {
-                        this.questions = q1.body!;
-
-                        if (this.questions.length > 0) {
-                          this.noteSteps = this.questions[0].point! * this.questions[0].step!;
-                          this.questionStep = this.questions[0].step!;
-                          this.maxNote = this.questions[0].point!;
-                          this.currentQuestion = this.questions[0];
-                          if (this.resp === undefined) {
-                            this.resp = new StudentResponse(undefined, this.currentNote);
-                            this.resp.note = this.currentNote;
-                            this.resp.questionId = this.questions![0].id;
-                            const sheets = (this.selectionStudents?.map(st => st.examSheets) as any)
-                              .flat()
-                              .filter(
-                                (ex: any) =>
-                                  ex?.scanId === this.exam!.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie!
-                              );
-                            if (sheets !== undefined && sheets!.length > 0) {
-                              this.resp.sheetId = sheets[0]?.id;
-                            }
-
-                            this.studentResponseService
-                              .query({
-                                sheetId: this.resp.sheetId,
-                                questionId: this.resp.questionId,
-                              })
-                              .subscribe(sr => {
-                                if (sr.body !== null && sr.body.length > 0) {
-                                  this.resp = sr.body![0];
-                                  this.currentNote = this.resp.note!;
-                                  this.computeNote(false, this.resp!, this.currentQuestion!);
-                                  if (this.questions![0].gradeType === GradeType.DIRECT && this.questions![0].typeAlgoName !== 'QCM') {
-                                    this.textCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
-                                      this.resp?.textcomments!.forEach(com1 => {
-                                        const elt = com.body!.find(com2 => com2.id === com1.id);
-                                        if (elt !== undefined) {
-                                          (elt as any).checked = true;
-                                        }
-                                      });
-                                      this.currentTextComment4Question = com.body!;
-                                      this.blocked = false;
-                                    });
-                                  } else {
-                                    this.gradedCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
-                                      this.resp?.gradedcomments!.forEach(com1 => {
-                                        const elt = com.body!.find(com2 => com2.id === com1.id);
-                                        if (elt !== undefined) {
-                                          (elt as any).checked = true;
-                                        }
-                                      });
-                                      this.currentGradedComment4Question = com.body!;
-                                      this.blocked = false;
-                                      //                                      this.computeNote(false, this.resp!);
-                                    });
-                                  }
-                                } else {
-                                  //            this.studentResponseService.create(this.resp!).subscribe(sr1 => {
-                                  //                                      this.resp = sr1.body!;
-                                  if (this.questions![0].gradeType === GradeType.DIRECT) {
-                                    this.textCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
-                                      this.currentTextComment4Question = com.body!;
-                                      this.blocked = false;
-                                    });
-                                  } else {
-                                    this.gradedCommentService.query({ questionId: this.questions![0].id }).subscribe(com => {
-                                      this.currentGradedComment4Question = com.body!;
-                                      this.blocked = false;
-                                    });
-                                  }
-                                  //                                    });
-                                }
-                              });
-                          }
-                        }
-                        this.showImage = new Array<boolean>(this.questions.length);
-                      });
-                  });
-                });
-              });
-            });
-          });
-        } else {
-          const c = this.currentStudent + 1;
-          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
-        }
-      }
+      this.init = this.manageParam(params);
     });
+  }
+
+  async manageParam(params: ParamMap) {
+    this.testdisableAndEnableKeyBoardShortCut = false;
+
+    this.blocked = true;
+    let forceRefreshStudent = false;
+    this.currentNote = 0;
+    this.noteSteps = 0;
+    this.maxNote = 0;
+    this.resp = undefined;
+    //      'answer/:examid/:questionno/:studentid',
+    if (params.get('examid') !== null) {
+      this.examId = params.get('examid')!;
+      if (this.images.length === 0) {
+        this.examId = params.get('examid')!;
+        forceRefreshStudent = true;
+      } else {
+        /* const changeStudent = params.get('studentid') !== null && this.studentid !== +params.get('studentid')!;
+        this.db.countNonAlignImage(+this.examId!).then(page => {
+          if (page > 30 && changeStudent) {
+            //              this.loadAllPages();
+          }
+        }); */
+      }
+      if (params.get('questionno') !== null) {
+        this.questionindex = +params.get('questionno')! - 1;
+      }
+
+      this.pageOffset = 0;
+
+      if (params.get('studentid') !== null) {
+        this.studentid = +params.get('studentid')!;
+        this.currentStudent = this.studentid - 1;
+        // Step 1 Query templates
+        this.nbreFeuilleParCopie = await this.db.countPageTemplate(+this.examId);
+        // Step 2 Query Scan in local DB
+
+        this.numberPagesInScan = await this.db.countAlignImage(+this.examId!);
+        const data = await firstValueFrom(this.examService.find(+this.examId!));
+        this.exam = data.body!;
+        const e = await firstValueFrom(this.courseService.find(this.exam.courseId!));
+        this.course = e.body!;
+        // Step 3 Query Students for Exam
+
+        await this.refreshStudentList(forceRefreshStudent);
+        this.getSelectedStudent();
+        // Step 4 Query zone 4 questions
+        const b = await firstValueFrom(this.questionService.query({ examId: this.exam.id }));
+        this.questionNumeros = Array.from(new Set(b.body!.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
+        this.nbreQuestions = this.questionNumeros.length;
+
+        // must be done here as the change of the nbreQuestions triggers the event of change question with page = 0
+        if (params.get('questionno') !== null) {
+          this.questionindex = +params.get('questionno')! - 1;
+        }
+
+        const q1 = await firstValueFrom(
+          this.questionService.query({ examId: this.exam.id, numero: this.questionNumeros[this.questionindex!] })
+        );
+
+        this.questions = q1.body!;
+
+        if (this.questions.length > 0) {
+          this.noteSteps = this.questions[0].point! * this.questions[0].step!;
+          this.questionStep = this.questions[0].step!;
+          this.maxNote = this.questions[0].point!;
+          this.currentQuestion = this.questions[0];
+          this.resp = new StudentResponse(undefined, this.currentNote);
+          this.resp.note = this.currentNote;
+          this.resp.questionId = this.questions![0].id;
+          const sheets = (this.selectionStudents?.map(st => st.examSheets) as any)
+            .flat()
+            .filter((ex: any) => ex?.scanId === this.exam!.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie!);
+          if (sheets !== undefined && sheets!.length > 0) {
+            this.resp.sheetId = sheets[0]?.id;
+          }
+
+          const sr = await firstValueFrom(
+            this.studentResponseService.query({
+              sheetId: this.resp.sheetId,
+              questionId: this.resp.questionId,
+            })
+          );
+          if (sr.body !== null && sr.body.length > 0) {
+            this.resp = sr.body![0];
+
+            this.currentNote = this.resp.note!;
+            await this.computeNote(false, this.resp!, this.currentQuestion!);
+            if (this.questions![0].gradeType === GradeType.DIRECT && this.questions![0].typeAlgoName !== 'QCM') {
+              const com = await firstValueFrom(this.textCommentService.query({ questionId: this.questions![0].id }));
+              this.resp.textcomments!.forEach(com1 => {
+                const elt = com.body!.find(com2 => com2.id === com1.id);
+                if (elt !== undefined) {
+                  (elt as any).checked = true;
+                }
+              });
+              this.currentTextComment4Question = com.body!;
+              this.blocked = false;
+            } else {
+              const com = await firstValueFrom(this.gradedCommentService.query({ questionId: this.questions![0].id }));
+              this.resp.gradedcomments!.forEach(com1 => {
+                const elt = com.body!.find(com2 => com2.id === com1.id);
+                if (elt !== undefined) {
+                  (elt as any).checked = true;
+                }
+              });
+              this.currentGradedComment4Question = com.body!;
+              this.blocked = false;
+            }
+          } else {
+            //            this.studentResponseService.create(this.resp!).subscribe(sr1 => {
+            //                                      this.resp = sr1.body!;
+            if (this.questions![0].gradeType === GradeType.DIRECT) {
+              const com = await firstValueFrom(this.textCommentService.query({ questionId: this.questions![0].id }));
+              this.currentTextComment4Question = com.body!;
+              this.blocked = false;
+            } else {
+              const com = await firstValueFrom(this.gradedCommentService.query({ questionId: this.questions![0].id }));
+              this.currentGradedComment4Question = com.body!;
+              this.blocked = false;
+            }
+          }
+        }
+        this.showImage = new Array<boolean>(this.questions.length);
+      } else {
+        const c = this.currentStudent + 1;
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+      }
+      this.testdisableAndEnableKeyBoardShortCut = true;
+    }
   }
 
   ngAfterViewInit(): void {
@@ -319,6 +325,139 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.reloadImage();
       this.changeDetector.detectChanges();
     });
+
+    this.shortcuts.push(
+      {
+        // ArrowRight
+        key: ['ctrl + right', 'meta + right'],
+        label: 'Navigation',
+        description: this.translateService.instant('scanexam.nextstudent'),
+        command: () => this.nextStudent(),
+        preventDefault: true,
+      },
+      {
+        // ArrowLeft
+        key: ['ctrl + left', 'meta + left'],
+        label: 'Navigation',
+        description: this.translateService.instant('scanexam.previousstudent'),
+        command: () => this.previousStudent(),
+        preventDefault: true,
+      },
+
+      {
+        // ArrowRight
+        key: ['ctrl + up', 'meta + up'],
+        label: 'Navigation',
+        description: this.translateService.instant('scanexam.previousquestion'),
+        command: () => this.previousQuestion(),
+        preventDefault: true,
+      },
+      {
+        // ArrowLeft
+        key: ['ctrl + down', 'meta + down'],
+        label: 'Navigation',
+        description: this.translateService.instant('scanexam.nextquestion'),
+        command: () => this.nextQuestion(),
+        preventDefault: true,
+      },
+
+      {
+        // ArrowLeft
+        key: [
+          'shift + 1',
+          '1',
+          'shift + 2',
+          '2',
+          'shift + 3',
+          '3',
+          'shift + 4',
+          '4',
+          'shift + 5',
+          '5',
+          'shift + 6',
+          '6',
+          'shift + 7',
+          '7',
+          'shift + 8',
+          '8',
+          'shift + 9',
+          '9',
+          'shift + 0',
+          '0',
+        ],
+        label: this.translateService.instant('scanexam.directevaluation'),
+        description: this.translateService.instant('scanexam.directgradding'),
+        command: (output: ShortcutEventOutput) => this.changeNote1(output),
+        preventDefault: true,
+      }
+    );
+  }
+
+  bindKeyBoardShortCut(comment: any) {
+    this.shortCut4Comment = true;
+    this.commentShortcut = comment;
+    if (this.keyboardShortcutService.getShortCutPreference().shortcuts.has(this.examId! + '_' + this.questionindex)) {
+      const res: IKeyBoardShortCutPreferenceEntry[] = this.keyboardShortcutService
+        .getShortCutPreference()
+        .shortcuts.get(this.examId! + '_' + this.questionindex)!
+        .filter(shortcut => shortcut.commentId === comment.id);
+      if (res.length > 0) {
+        this.currentKeyBoardShorcut = res[0].key;
+      }
+    }
+  }
+
+  saveShortCut() {
+    this.testdisableAndEnableKeyBoardShortCut = false;
+
+    this.shortCut4Comment = false;
+    const shorts = this.keyboardShortcutService.getShortCutPreference();
+    if (shorts.shortcuts.has(this.examId! + '_' + this.questionindex)) {
+      const res: IKeyBoardShortCutPreferenceEntry[] = shorts.shortcuts
+        .get(this.examId! + '_' + this.questionindex)!
+        .filter(shortcut => shortcut.commentId === this.commentShortcut.id);
+      if (res.length > 0) {
+        res[0].key = this.currentKeyBoardShorcut;
+        res[0].description = this.commentShortcut.text;
+      } else {
+        shorts.shortcuts.get(this.examId! + '_' + this.questionindex)!.push({
+          key: this.currentKeyBoardShorcut,
+          label: this.translateService.instant('gradeScopeIsticApp.comments.detail.title'),
+          commentId: this.commentShortcut.id,
+          questionId: this.resp!.questionId!,
+          questionIndex: this.questionindex,
+          textComment: this.currentQuestion !== undefined && this.currentQuestion.gradeType === GradeType.DIRECT,
+          examId: +this.examId!,
+          description: this.commentShortcut.text,
+        });
+      }
+    } else {
+      shorts.shortcuts.set(this.examId! + '_' + this.questionindex, [
+        {
+          key: this.currentKeyBoardShorcut,
+          label: this.translateService.instant('gradeScopeIsticApp.comments.detail.title'),
+          commentId: this.commentShortcut.id,
+          examId: +this.examId!,
+          questionId: this.resp!.questionId!,
+          questionIndex: this.questionindex,
+          textComment: this.currentQuestion !== undefined && this.currentQuestion.gradeType === GradeType.DIRECT,
+
+          description: this.commentShortcut.text,
+        },
+      ]);
+    }
+    this.keyboardShortcutService.save(shorts);
+    this.commentShortcut = null;
+    this.currentKeyBoardShorcut = '';
+    setTimeout(() => {
+      (this.testdisableAndEnableKeyBoardShortCut = true), 300;
+    });
+  }
+
+  cleanShortCut() {
+    this.commentShortcut = null;
+    this.currentKeyBoardShorcut = '';
+    this.testdisableAndEnableKeyBoardShortCut = true;
   }
 
   reloadImageGrowFactor(event: any): void {
@@ -597,35 +736,15 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     return false;
   }
 
-  @HostListener('window:keyup.shift.1', ['$event'])
-  @HostListener('window:keyup.shift.2', ['$event'])
-  @HostListener('window:keyup.shift.3', ['$event'])
-  @HostListener('window:keyup.shift.4', ['$event'])
-  @HostListener('window:keyup.shift.5', ['$event'])
-  @HostListener('window:keyup.shift.6', ['$event'])
-  @HostListener('window:keyup.shift.7', ['$event'])
-  @HostListener('window:keyup.shift.8', ['$event'])
-  @HostListener('window:keyup.shift.9', ['$event'])
-  @HostListener('window:keyup.shift.0', ['$event'])
-  @HostListener('window:keyup.1', ['$event'])
-  @HostListener('window:keyup.2', ['$event'])
-  @HostListener('window:keyup.3', ['$event'])
-  @HostListener('window:keyup.4', ['$event'])
-  @HostListener('window:keyup.5', ['$event'])
-  @HostListener('window:keyup.6', ['$event'])
-  @HostListener('window:keyup.7', ['$event'])
-  @HostListener('window:keyup.8', ['$event'])
-  @HostListener('window:keyup.9', ['$event'])
-  @HostListener('window:keyup.0', ['$event'])
-  changeNote1(event: KeyboardEvent): void {
+  changeNote1(e: ShortcutEventOutput): void {
     if (
       this.currentQuestion !== undefined &&
       !(this.currentQuestion.gradeType !== 'DIRECT' || this.currentQuestion.typeAlgoName === 'QCM') &&
-      !this.isTextInput(event.target) &&
+      !this.isTextInput(e.event.target) &&
       this.resp !== undefined &&
-      this.noteSteps >= +event.key
+      this.noteSteps >= +e.event.key
     ) {
-      this.currentNote = +event.key;
+      this.currentNote = +e.event.key;
       this.changeNote();
     }
   }
@@ -714,6 +833,19 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.blocked = false;
         (comment as any).checked = false;
       });
+    }
+  }
+
+  toggleTCommentById(commentId: any) {
+    const res = this.currentTextComment4Question?.filter(c => c.id === commentId);
+    if (res !== undefined && res.length > 0) {
+      this.toggleTComment(res[0]);
+    }
+  }
+  toggleGCommentById(commentId: any) {
+    const res = this.currentGradedComment4Question?.filter(c => c.id === commentId);
+    if (res !== undefined && res.length > 0) {
+      this.toggleGComment(res[0]);
     }
   }
 
@@ -845,6 +977,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           resolve(resp);
         }
       }
+      resolve(resp);
     });
   }
 
@@ -899,10 +1032,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  @HostListener('window:keydown.control.ArrowLeft', ['$event'])
-  previousStudent(event: KeyboardEvent) {
+  // @HostListener('window:keydown.control.ArrowLeft', ['$event'])
+  previousStudent() {
     if (!this.blocked) {
-      event.preventDefault();
       const c = this.currentStudent;
       const q1 = this.questionindex!;
 
@@ -914,19 +1046,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
     }
   }
-  @HostListener('window:keydown.meta.ArrowLeft', ['$event'])
-  macpreviousStudent(event: KeyboardEvent) {
-    this.previousStudent(event);
-  }
 
-  @HostListener('window:keydown.meta.ArrowRight', ['$event'])
-  macnextStudent(event: KeyboardEvent) {
-    this.nextStudent(event);
-  }
-  @HostListener('window:keydown.control.ArrowRight', ['$event'])
-  nextStudent(event: KeyboardEvent) {
+  // @HostListener('window:keydown.control.ArrowRight', ['$event'])
+  nextStudent() {
     if (!this.blocked) {
-      event.preventDefault();
+      //      event.preventDefault();
       const c = this.currentStudent + 2;
       const q1 = this.questionindex! + 2;
       if (c <= this.numberPagesInScan! / this.nbreFeuilleParCopie!) {
@@ -936,14 +1060,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
     }
   }
-  @HostListener('window:keydown.meta.ArrowUp', ['$event'])
-  macpreviousQuestion(event: KeyboardEvent) {
-    this.previousQuestion(event);
-  }
-  @HostListener('window:keydown.control.ArrowUp', ['$event'])
-  previousQuestion(event: KeyboardEvent): void {
+  previousQuestion(): void {
     if (!this.blocked) {
-      event.preventDefault();
       const c = this.currentStudent + 1;
       const q = this.questionindex;
       if (q! > 0) {
@@ -954,14 +1072,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  @HostListener('window:keydown.meta.ArrowDown', ['$event'])
-  macnextQuestion(event: KeyboardEvent) {
-    this.nextQuestion(event);
-  }
-  @HostListener('window:keydown.control.ArrowDown', ['$event'])
-  nextQuestion(event: KeyboardEvent): void {
+  nextQuestion(): void {
     if (!this.blocked) {
-      event.preventDefault();
       const c = this.currentStudent + 1;
       const q = this.questionindex! + 2;
       if (q <= this.nbreQuestions) {
