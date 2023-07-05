@@ -1649,6 +1649,9 @@ copy of the Program in return for a fee.
                      END OF TERMS AND CONDITIONS
 
 
+ng-keyboard-shortcuts
+MIT
+
 ngx-extended-pdf-viewer
 Apache-2.0
                                  Apache License
