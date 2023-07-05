@@ -1,5 +1,25 @@
 <div class="grid">
   <p-toast></p-toast>
+  <p-dialog
+    [header]="'scanexam.keyboardshortcutlabel' | translate"
+    (onHide)="cleanShortCut()"
+    [(visible)]="shortCut4Comment"
+    [breakpoints]="{ '960px': '75vw' }"
+    [style]="{ width: '50vw' }"
+    [draggable]="false"
+    [resizable]="false"
+  >
+    <div class="flex flex-column gap-2">
+      <label htmlFor="keyboardshortcutlabel" jhiTranslate="scanexam.keyboardshortcutlabel">Raccourci clavier</label>
+      <input pInputText id="keyboardshortcutlabel" aria-describedby="username-help" [(ngModel)]="currentKeyBoardShorcut" />
+      <small id="keyboardshortcutlabel-help" jhiTranslate="scanexam.keyboardshortcuthelp"
+        >Entrer votre raccourci clavier de la forme: ctrl + e ou shift + e (Vous pouvez voir les raccourci existant en cliquant sur
+        F1)</small
+      >
+      <p-button (click)="saveShortCut()" [label]="'scanexam.save' | translate"></p-button>
+    </div>
+  </p-dialog>
+
   <p-confirmDialog #cd icon="pi pi-exclamation-triangle">
     <ng-template pTemplate="header">
       <h3 jhiTranslate="scanexam.confirmation"></h3>
@@ -9,6 +29,16 @@
       <button type="button" pButton icon="pi pi-check" [label]="'scanexam.yes' | translate" (click)="cd.accept()"></button>
     </ng-template>
   </p-confirmDialog>
+  <ng-keyboard-shortcuts [shortcuts]="shortcuts"></ng-keyboard-shortcuts>
+  <ng-keyboard-shortcuts-help [key]="'f1'" [closeKey]="'escape'" [title]="'scanexam.help' | translate"></ng-keyboard-shortcuts-help>
+  <ng-container *ngIf="testdisableAndEnableKeyBoardShortCut">
+    <jhi-keyboardshortcut
+      (toggleTCommentById)="toggleTCommentById($event)"
+      (toggleGCommentById)="toggleGCommentById($event)"
+      [examId]="+examId!"
+      [questionindex]="questionindex"
+    ></jhi-keyboardshortcut>
+  </ng-container>
 
   <p-sidebar [(visible)]="layoutsidebarVisible">
     <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
@@ -409,6 +439,17 @@
                 >
                   <fa-icon *ngIf="!minimizeComment" icon="minus"></fa-icon>
                   <fa-icon *ngIf="minimizeComment" icon="maximize"></fa-icon>
+                </span>
+                <span class="float-end">&nbsp;&nbsp;</span>
+
+                <span
+                  class="float-end"
+                  [tooltipPosition]="'left'"
+                  [tooltipZIndex]="'3000'"
+                  [pTooltip]="'scanexam.keyboardshortcuttooltip' | translate"
+                  (click)="bindKeyBoardShortCut(comment)"
+                >
+                  <fa-icon icon="keyboard"></fa-icon>
                 </span>
                 <div *ngIf="!minimizeComment">
                   <div *ngIf="currentQuestion?.typeAlgoName === 'QCM'">

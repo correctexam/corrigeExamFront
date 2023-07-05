@@ -80,10 +80,12 @@ import { SummaryTemplateComponent } from './annotate-template/summary/summary-te
 import { ComparestudentanswerComponent } from './comparestudentanswer/comparestudentanswer.component';
 import { SplitterModule } from 'primeng/splitter';
 import { FileUploadModule } from 'primeng/fileupload';
+import { KeyboardShortcutsModule } from 'ng-keyboard-shortcuts';
 
 import { SidebarModule } from 'primeng/sidebar';
 import { CreateCommentsComponent } from './annotate-template/create-comments/create-comments.component';
 import { ClickDoubleDirective } from './clickdouble.directive';
+import { KeyboardshortcutComponent } from './corrigequestion/keyboardshortcut/keyboardshortcut.component';
 // set the location of the OpenCV files
 // registerAllModules();
 
@@ -333,6 +335,7 @@ export const CompareAnswer_ROUTE: Route = {
     ComparestudentanswerComponent,
     CreateCommentsComponent,
     ClickDoubleDirective,
+    KeyboardshortcutComponent,
   ],
   imports: [
     CommonModule,
@@ -378,6 +381,7 @@ export const CompareAnswer_ROUTE: Route = {
     OverlayPanelModule,
     SidebarModule,
     ProgressBarModule,
+    KeyboardShortcutsModule.forRoot(),
     RouterModule.forChild([
       CREERCOURS_ROUTE,
       COURSMAIN_ROUTE,
@@ -410,6 +414,7 @@ export const CompareAnswer_ROUTE: Route = {
     CoursdetailsComponent,
     ImportStudentComponent,
     CorrigequestionComponent,
+    KeyboardshortcutComponent,
     AssocierCopiesEtudiantsComponent,
     SortByDirective,
     ClickDoubleDirective,
