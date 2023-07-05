@@ -125,7 +125,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   shortCut4Comment = false;
   currentKeyBoardShorcut: string | string[] = '';
   commentShortcut: any;
-
+  questionindex4shortcut = 0;
   @ViewChild(KeyboardShortcutsComponent)
   private keyboard: KeyboardShortcutsComponent | undefined;
   @ViewChild('input') input: ElementRef | undefined;
@@ -151,7 +151,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   ];
   displayBasic = false;
   images: any[] = [];
-  init: Promise<void> | undefined;
   pageOffset = 0;
   constructor(
     public examService: ExamService,
@@ -182,10 +181,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.shortcut = this.preferenceService.showKeyboardShortcuts();
     this.shortcutvalue = this.preferenceService.showKeyboardShortcuts();
     this.minimizeComment = this.preferenceService.minimizeComments();
-    //  this.router.routeReuseStrategy.shouldReuseRoute = () => false;
 
     this.activatedRoute.paramMap.subscribe(params => {
-      this.init = this.manageParam(params);
+      this.manageParam(params);
     });
   }
 
@@ -213,7 +211,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }); */
       }
       if (params.get('questionno') !== null) {
-        this.questionindex = +params.get('questionno')! - 1;
+        this.questionindex4shortcut = +params.get('questionno')! - 1;
       }
 
       this.pageOffset = 0;
