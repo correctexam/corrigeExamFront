@@ -294,6 +294,7 @@
     "nextquestion": "Aller à la question suivante",
     "previousquestion": "Aller à la question précédente",
     "directevaluation": "Evaluation directe",
-    "directgradding": "Notation par point"
+    "directgradding": "Notation par point",
+    "resetAllShortCut": "Supprimer l'ensemble des raccourcis clavier associés aux commentaires"
   }
 }

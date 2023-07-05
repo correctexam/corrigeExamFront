@@ -407,6 +407,15 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
+  resetAllShortCut() {
+    this.testdisableAndEnableKeyBoardShortCut = false;
+    this.shortCut4Comment = false;
+    this.keyboardShortcutService.clearToDefault();
+    setTimeout(() => {
+      (this.testdisableAndEnableKeyBoardShortCut = true), 300;
+    });
+  }
+
   saveShortCut() {
     this.testdisableAndEnableKeyBoardShortCut = false;
 
@@ -426,7 +435,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           commentId: this.commentShortcut.id,
           questionId: this.resp!.questionId!,
           questionIndex: this.questionindex,
-          textComment: this.currentQuestion !== undefined && this.currentQuestion.gradeType === GradeType.DIRECT,
+          textComment:
+            this.currentQuestion !== undefined &&
+            this.currentQuestion.gradeType === GradeType.DIRECT &&
+            this.currentQuestion.typeAlgoName !== 'QCM',
           examId: +this.examId!,
           description: this.commentShortcut.text,
         });
@@ -440,7 +452,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           examId: +this.examId!,
           questionId: this.resp!.questionId!,
           questionIndex: this.questionindex,
-          textComment: this.currentQuestion !== undefined && this.currentQuestion.gradeType === GradeType.DIRECT,
+          textComment:
+            this.currentQuestion !== undefined &&
+            this.currentQuestion.gradeType === GradeType.DIRECT &&
+            this.currentQuestion.typeAlgoName !== 'QCM',
 
           description: this.commentShortcut.text,
         },
