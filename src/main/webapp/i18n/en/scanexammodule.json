@@ -292,6 +292,7 @@
     "nextquestion": "Go to next question",
     "previousquestion": "Go to previous question",
     "directevaluation": "Direct evaluation",
-    "directgradding": "direct gradding"
+    "directgradding": "direct gradding",
+    "resetAllShortCut": "Delete all keyboard shortcuts associated with comments"
   }
 }
