@@ -152,6 +152,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   displayBasic = false;
   images: any[] = [];
   pageOffset = 0;
+  init = true;
   constructor(
     public examService: ExamService,
     public zoneService: ZoneService,
@@ -189,6 +190,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   async manageParam(params: ParamMap) {
     this.testdisableAndEnableKeyBoardShortCut = false;
+    this.init = true;
 
     this.blocked = true;
     let forceRefreshStudent = false;
@@ -246,16 +248,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.questionService.query({ examId: this.exam.id, numero: this.questionNumeros[this.questionindex!] })
         );
 
-        this.questions = q1.body!;
+        const questions = q1.body!;
 
-        if (this.questions.length > 0) {
-          this.noteSteps = this.questions[0].point! * this.questions[0].step!;
-          this.questionStep = this.questions[0].step!;
-          this.maxNote = this.questions[0].point!;
-          this.currentQuestion = this.questions[0];
+        if (questions.length > 0) {
+          this.noteSteps = questions[0].point! * questions[0].step!;
+          this.questionStep = questions[0].step!;
+          this.maxNote = questions[0].point!;
+          this.currentQuestion = questions[0];
           this.resp = new StudentResponse(undefined, this.currentNote);
           this.resp.note = this.currentNote;
-          this.resp.questionId = this.questions![0].id;
+          this.resp.questionId = questions![0].id;
           const sheets = (this.selectionStudents?.map(st => st.examSheets) as any)
             .flat()
             .filter((ex: any) => ex?.scanId === this.exam!.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie!);
@@ -274,8 +276,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
             this.currentNote = this.resp.note!;
             await this.computeNote(false, this.resp!, this.currentQuestion!);
-            if (this.questions![0].gradeType === GradeType.DIRECT && this.questions![0].typeAlgoName !== 'QCM') {
-              const com = await firstValueFrom(this.textCommentService.query({ questionId: this.questions![0].id }));
+            if (questions![0].gradeType === GradeType.DIRECT && questions![0].typeAlgoName !== 'QCM') {
+              const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
               this.resp.textcomments!.forEach(com1 => {
                 const elt = com.body!.find(com2 => com2.id === com1.id);
                 if (elt !== undefined) {
@@ -283,9 +285,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 }
               });
               this.currentTextComment4Question = com.body!;
-              this.blocked = false;
             } else {
-              const com = await firstValueFrom(this.gradedCommentService.query({ questionId: this.questions![0].id }));
+              const com = await firstValueFrom(this.gradedCommentService.query({ questionId: questions![0].id }));
               this.resp.gradedcomments!.forEach(com1 => {
                 const elt = com.body!.find(com2 => com2.id === com1.id);
                 if (elt !== undefined) {
@@ -293,23 +294,23 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 }
               });
               this.currentGradedComment4Question = com.body!;
-              this.blocked = false;
             }
           } else {
             //            this.studentResponseService.create(this.resp!).subscribe(sr1 => {
             //                                      this.resp = sr1.body!;
-            if (this.questions![0].gradeType === GradeType.DIRECT) {
-              const com = await firstValueFrom(this.textCommentService.query({ questionId: this.questions![0].id }));
+            if (questions![0].gradeType === GradeType.DIRECT) {
+              const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
               this.currentTextComment4Question = com.body!;
-              this.blocked = false;
             } else {
-              const com = await firstValueFrom(this.gradedCommentService.query({ questionId: this.questions![0].id }));
+              const com = await firstValueFrom(this.gradedCommentService.query({ questionId: questions![0].id }));
               this.currentGradedComment4Question = com.body!;
-              this.blocked = false;
             }
           }
         }
-        this.showImage = new Array<boolean>(this.questions.length);
+        this.showImage = new Array<boolean>(questions.length);
+        this.questions = questions;
+        this.init = false;
+        this.blocked = false;
       } else {
         const c = this.currentStudent + 1;
         this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
@@ -1098,16 +1099,20 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   changeStudent($event: any): void {
-    this.currentStudent = $event.page;
-    const c = this.currentStudent + 1;
-    this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+    if (!this.init) {
+      this.currentStudent = $event.page;
+      const c = this.currentStudent + 1;
+      this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+    }
   }
   changeQuestion($event: any): void {
-    this.questionindex = $event.page;
+    if (!this.init) {
+      this.questionindex = $event.page;
 
-    const c = this.currentStudent + 1;
-    if ($event.pageCount !== 1) {
-      this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+      const c = this.currentStudent + 1;
+      if ($event.pageCount !== 1) {
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+      }
     }
   }
 
