@@ -324,6 +324,11 @@ export class EventCanevascorrectionHandlerService {
     this._isMouseDown = false;
     if (this._selectedTool === DrawingTools.PENCIL) {
       this._elementUnderDrawing = this.fabricShapeService.finishPath(this.canvas, this._elementUnderDrawing as CustomFabricPath);
+      this.updateComments().then(e2 =>
+        e2.subscribe(e1 => {
+          this.currentComment = e1.body;
+        })
+      );
     }
 
     if (this._selectedTool !== DrawingTools.POLYGON) {
@@ -332,11 +337,6 @@ export class EventCanevascorrectionHandlerService {
     if (this._selectedTool !== DrawingTools.SELECT) {
       this.canvas.renderAll();
     }
-    this.updateComments().then(e2 =>
-      e2.subscribe(e1 => {
-        this.currentComment = e1.body;
-      })
-    );
   }
 
   extendToObjectWithId(): void {
