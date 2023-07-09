@@ -90,7 +90,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   @ViewChildren('nomImage')
   canvass!: QueryList<ElementRef>;
   showImage: boolean[] = [];
-  examId: string | undefined;
   nbreFeuilleParCopie: number | undefined;
   numberPagesInScan: number | undefined;
   exam: IExam | undefined;
@@ -99,7 +98,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   currentStudent = 0;
   selectionStudents: IStudent[] | undefined;
   numberofzone: number | undefined = 0;
-  studentid: number | undefined;
   questions: IQuestion[] | undefined;
   blocked = true;
   nbreQuestions = 1;
@@ -125,7 +123,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   shortCut4Comment = false;
   currentKeyBoardShorcut: string | string[] = '';
   commentShortcut: any;
-  questionindex4shortcut = 0;
+  examId: string | undefined;
+  studentid: number | undefined;
+  questionindex4shortcut: number | undefined;
+  // examId_prev: string | undefined;
+  // studentid_prev: number | undefined;
+  // questionindex4shortcut_prev : number | undefined;
+
   @ViewChild(KeyboardShortcutsComponent)
   private keyboard: KeyboardShortcutsComponent | undefined;
   @ViewChild('input') input: ElementRef | undefined;
@@ -198,19 +202,15 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.noteSteps = 0;
     this.maxNote = 0;
     this.resp = undefined;
+    const examId_prev = this.examId;
+    const studentid_prev = this.studentid;
+    const questionindex4shortcut_prev = this.questionindex4shortcut;
     //      'answer/:examid/:questionno/:studentid',
     if (params.get('examid') !== null) {
       this.examId = params.get('examid')!;
       if (this.images.length === 0) {
         this.examId = params.get('examid')!;
         forceRefreshStudent = true;
-      } else {
-        /* const changeStudent = params.get('studentid') !== null && this.studentid !== +params.get('studentid')!;
-        this.db.countNonAlignImage(+this.examId!).then(page => {
-          if (page > 30 && changeStudent) {
-            //              this.loadAllPages();
-          }
-        }); */
       }
       if (params.get('questionno') !== null) {
         this.questionindex4shortcut = +params.get('questionno')! - 1;
@@ -222,95 +222,119 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.studentid = +params.get('studentid')!;
         this.currentStudent = this.studentid - 1;
         // Step 1 Query templates
-        this.nbreFeuilleParCopie = await this.db.countPageTemplate(+this.examId);
+        if (this.examId !== examId_prev) {
+          this.nbreFeuilleParCopie = await this.db.countPageTemplate(+this.examId);
+          this.numberPagesInScan = await this.db.countAlignImage(+this.examId!);
+          const data = await firstValueFrom(this.examService.find(+this.examId!));
+          this.exam = data.body!;
+          const e = await firstValueFrom(this.courseService.find(this.exam.courseId!));
+          this.course = e.body!;
+        }
         // Step 2 Query Scan in local DB
 
-        this.numberPagesInScan = await this.db.countAlignImage(+this.examId!);
-        const data = await firstValueFrom(this.examService.find(+this.examId!));
-        this.exam = data.body!;
-        const e = await firstValueFrom(this.courseService.find(this.exam.courseId!));
-        this.course = e.body!;
         // Step 3 Query Students for Exam
 
-        await this.refreshStudentList(forceRefreshStudent);
-        this.getSelectedStudent();
+        if (this.examId !== examId_prev) {
+          await this.refreshStudentList(forceRefreshStudent);
+        }
+        if (this.studentid !== studentid_prev) {
+          this.getSelectedStudent();
+        }
         // Step 4 Query zone 4 questions
-        const b = await firstValueFrom(this.questionService.query({ examId: this.exam.id }));
+        const b = await firstValueFrom(this.questionService.query({ examId: this.exam!.id }));
         this.questionNumeros = Array.from(new Set(b.body!.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
         this.nbreQuestions = this.questionNumeros.length;
 
         // must be done here as the change of the nbreQuestions triggers the event of change question with page = 0
-        if (params.get('questionno') !== null) {
-          this.questionindex = +params.get('questionno')! - 1;
+        let questions: IQuestion[] | undefined = undefined;
+        if (this.questions !== undefined) {
+          questions = [...this.questions];
         }
+        // eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
+        if (this.questionindex4shortcut !== questionindex4shortcut_prev) {
+          if (params.get('questionno') !== null) {
+            this.questionindex = +params.get('questionno')! - 1;
+          }
 
-        const q1 = await firstValueFrom(
-          this.questionService.query({ examId: this.exam.id, numero: this.questionNumeros[this.questionindex!] })
-        );
+          const q1 = await firstValueFrom(
+            this.questionService.query({ examId: this.exam!.id, numero: this.questionNumeros[this.questionindex!] })
+          );
 
-        const questions = q1.body!;
-
-        if (questions.length > 0) {
+          questions = q1.body!;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (questions !== undefined && questions.length > 0) {
           this.noteSteps = questions[0].point! * questions[0].step!;
           this.questionStep = questions[0].step!;
           this.maxNote = questions[0].point!;
           this.currentQuestion = questions[0];
-          this.resp = new StudentResponse(undefined, this.currentNote);
-          this.resp.note = this.currentNote;
-          this.resp.questionId = questions![0].id;
+
           const sheets = (this.selectionStudents?.map(st => st.examSheets) as any)
             .flat()
             .filter((ex: any) => ex?.scanId === this.exam!.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie!);
           if (sheets !== undefined && sheets!.length > 0) {
-            this.resp.sheetId = sheets[0]?.id;
+            const sr = await firstValueFrom(
+              this.studentResponseService.query({
+                sheetId: sheets[0]?.id,
+                questionId: questions![0].id,
+              })
+            );
+            if (sr.body !== null && sr.body.length > 0) {
+              this.resp = sr.body![0];
+
+              this.currentNote = this.resp.note!;
+              await this.computeNote(false, this.resp!, this.currentQuestion!);
+              if (questions![0].gradeType === GradeType.DIRECT && questions![0].typeAlgoName !== 'QCM') {
+                const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
+                this.resp.textcomments!.forEach(com1 => {
+                  const elt = com.body!.find(com2 => com2.id === com1.id);
+                  if (elt !== undefined) {
+                    (elt as any).checked = true;
+                  }
+                });
+                this.currentTextComment4Question = com.body!;
+              } else {
+                const com = await firstValueFrom(this.gradedCommentService.query({ questionId: questions![0].id }));
+                this.resp.gradedcomments!.forEach(com1 => {
+                  const elt = com.body!.find(com2 => com2.id === com1.id);
+                  if (elt !== undefined) {
+                    (elt as any).checked = true;
+                  }
+                });
+                this.currentGradedComment4Question = com.body!;
+              }
+            } else {
+              this.resp = new StudentResponse(undefined, this.currentNote);
+              this.resp.note = this.currentNote;
+              this.resp.questionId = questions![0].id;
+              this.resp.sheetId = sheets[0]?.id;
+              this.resp.questionId = questions![0].id;
+              //            this.studentResponseService.create(this.resp!).subscribe(sr1 => {
+              //                                      this.resp = sr1.body!;
+              if (questions![0].gradeType === GradeType.DIRECT) {
+                const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
+                this.currentTextComment4Question = com.body!;
+              } else {
+                const com = await firstValueFrom(this.gradedCommentService.query({ questionId: questions![0].id }));
+                this.currentGradedComment4Question = com.body!;
+              }
+            }
+          }
+          this.showImage = new Array<boolean>(questions.length);
+
+          this.questions = questions;
+          if (this.questionindex4shortcut === questionindex4shortcut_prev) {
+            setTimeout(() => {
+              this.questions = undefined;
+              setTimeout(() => {
+                this.questions = questions;
+              }, 0);
+            }, 1);
           }
 
-          const sr = await firstValueFrom(
-            this.studentResponseService.query({
-              sheetId: this.resp.sheetId,
-              questionId: this.resp.questionId,
-            })
-          );
-          if (sr.body !== null && sr.body.length > 0) {
-            this.resp = sr.body![0];
-
-            this.currentNote = this.resp.note!;
-            await this.computeNote(false, this.resp!, this.currentQuestion!);
-            if (questions![0].gradeType === GradeType.DIRECT && questions![0].typeAlgoName !== 'QCM') {
-              const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
-              this.resp.textcomments!.forEach(com1 => {
-                const elt = com.body!.find(com2 => com2.id === com1.id);
-                if (elt !== undefined) {
-                  (elt as any).checked = true;
-                }
-              });
-              this.currentTextComment4Question = com.body!;
-            } else {
-              const com = await firstValueFrom(this.gradedCommentService.query({ questionId: questions![0].id }));
-              this.resp.gradedcomments!.forEach(com1 => {
-                const elt = com.body!.find(com2 => com2.id === com1.id);
-                if (elt !== undefined) {
-                  (elt as any).checked = true;
-                }
-              });
-              this.currentGradedComment4Question = com.body!;
-            }
-          } else {
-            //            this.studentResponseService.create(this.resp!).subscribe(sr1 => {
-            //                                      this.resp = sr1.body!;
-            if (questions![0].gradeType === GradeType.DIRECT) {
-              const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
-              this.currentTextComment4Question = com.body!;
-            } else {
-              const com = await firstValueFrom(this.gradedCommentService.query({ questionId: questions![0].id }));
-              this.currentGradedComment4Question = com.body!;
-            }
-          }
+          this.init = false;
+          this.blocked = false;
         }
-        this.showImage = new Array<boolean>(questions.length);
-        this.questions = questions;
-        this.init = false;
-        this.blocked = false;
       } else {
         const c = this.currentStudent + 1;
         this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
@@ -489,7 +513,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   reloadImage() {
-    this.questions!.forEach((q, i) => {
+    this.questions?.forEach((q, i) => {
       this.showImage[i] = false;
       this.loadZone(q.zoneId).then(z => {
         const pagewithoffset = this.currentStudent! * this.nbreFeuilleParCopie! + z!.pageNumber! + this.pageOffset;
