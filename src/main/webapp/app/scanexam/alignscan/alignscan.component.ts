@@ -485,7 +485,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
           paget = this.nbreFeuilleParCopie;
         }
 
-        if (this.pageWithQCM.includes(paget)) {
+        if (this.pageWithQCM.includes(paget) && compression < 0.95) {
           compression = 0.95;
         }
 
@@ -561,7 +561,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     if (paget === 0) {
       paget = this.nbreFeuilleParCopie;
     }
-    if (this.pageWithQCM.includes(paget)) {
+    if (this.pageWithQCM.includes(paget) && compression < 0.95) {
       compression = 0.95;
     }
 
