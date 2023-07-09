@@ -131,7 +131,6 @@ export class PageHandler {
 
     this.eventHandler.canvas = canvas;
     this.eventHandler.allcanvas.set(this.page, canvas);
-    console.error(this.eventHandler.allcanvas);
 
     this.eventHandler.extendToObjectWithId();
     this.canvas = canvas;
