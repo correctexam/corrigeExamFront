@@ -20,8 +20,8 @@ import { ApplicationConfigService } from '../../core/config/application-config.s
 import { DialogService } from 'primeng/dynamicdialog';
 import { SharecourseComponent } from '../sharecourse/sharecourse.component';
 import { TranslateService } from '@ngx-translate/core';
-import { Observable, firstValueFrom, scan } from 'rxjs';
-import { HttpClient, HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse } from '@angular/common/http';
+import { firstValueFrom, scan } from 'rxjs';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 
 export interface CacheUploadNotification {
   setMessage(v: string): void;
@@ -38,39 +38,6 @@ export interface CacheDownloadNotification {
   setShowAssociation(v: boolean): void;
   setShowCorrection(v: boolean): void;
 }
-
-interface Upload {
-  progress: number;
-  state: 'PENDING' | 'IN_PROGRESS' | 'DONE';
-  body?: any;
-}
-
-function isHttpResponse<T>(event: HttpEvent<T>): event is HttpResponse<T> {
-  return event.type === HttpEventType.Response;
-}
-
-function isHttpProgressEvent(event: HttpEvent<unknown>): event is HttpProgressEvent {
-  return event.type === HttpEventType.DownloadProgress || event.type === HttpEventType.UploadProgress;
-}
-
-const initialState: Upload = { state: 'PENDING', progress: 0 };
-const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
-  if (isHttpProgressEvent(event)) {
-    return {
-      progress: event.total ? Math.round((100 * event.loaded) / event.total) : upload.progress,
-      state: 'IN_PROGRESS',
-    };
-  }
-  if (isHttpResponse(event)) {
-    // eslint-disable-next-line no-console
-    return {
-      progress: 100,
-      state: 'DONE',
-      body: event.body,
-    };
-  }
-  return upload;
-};
 
 @Component({
   selector: 'jhi-coursdetails',
@@ -175,41 +142,6 @@ export class CoursdetailsComponent implements OnInit {
         downloadLink.click();
       });
   }
-  onUpload($event: any): void {
-    if ($event.files && $event.files.length > 0) {
-      this.uploadCache($event.files[0]).subscribe(response => {
-        if (response.state === 'DONE') {
-          this.layoutsidebarVisible = false;
-          this.blocked = false;
-          this.message = '';
-          //            this.router.navigateByUrl('/course/' + response.body.id);
-          this.router.navigateByUrl('/');
-        }
-      });
-    }
-  }
-  uploadCache(file: File): Observable<Upload> {
-    this.layoutsidebarVisible = false;
-    this.message = this.translateService.instant('scanexam.importencours');
-    this.blocked = true;
-
-    const formData: FormData = new FormData();
-    formData.append('file', file);
-
-    let endpoint = 'api/importCourse';
-    if (!this.includeStudentsData) {
-      endpoint = 'api/importCourseWithoutStudentData';
-    }
-
-    return this.http
-      .post(this.applicationConfigService.getEndpointFor(endpoint), formData, {
-        reportProgress: true,
-        responseType: 'json',
-        observe: 'events',
-      })
-      .pipe(scan(calculateState, initialState));
-  }
-
   initCmpt(): void {
     this.dockItems = [
       {
@@ -249,9 +181,9 @@ export class CoursdetailsComponent implements OnInit {
         },
       },
       {
-        label: this.translateService.instant('scanexam.importexport'),
+        label: this.translateService.instant('scanexam.export'),
         icon: this.appConfig.getFrontUrl() + 'content/images/import-export-outline-icon.svg',
-        title: this.translateService.instant('scanexam.importexportcoursetooltip'),
+        title: this.translateService.instant('scanexam.exportcoursetooltip'),
         command1: () => {
           this.layoutsidebarVisible = true;
         },
