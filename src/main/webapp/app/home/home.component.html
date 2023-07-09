@@ -52,11 +52,72 @@
 </div>
 <div *jhiHasAnyAuthority="'ROLE_USER'">
   <div *ngIf="!this.account?.authorities?.includes('ROLE_ADMIN')">
+    <p-sidebar [position]="'right'" [(visible)]="layoutsidebarVisible">
+      <div class="grid">
+        <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title" jhiTranslate="scanexam.courseimport">Import</h5>
+
+              <div class="card-text">
+                <label
+                  for="switch1"
+                  jhiTranslate="scanexam.studentdata"
+                  [tooltipZIndex]="'3000'"
+                  [pTooltip]="'scanexam.studentdatatooltip' | translate"
+                  >données étudiantes:</label
+                >
+                <p-inputSwitch inputId="switch1" [(ngModel)]="includeStudentsData"></p-inputSwitch>
+
+                <div class="flex align-content-center flex-wrap card-container">
+                  <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
+                    <p-fileUpload
+                      [chooseIcon]="''"
+                      [chooseStyleClass]="'p-button p-button-primary'"
+                      moFileUploadModulede="basic"
+                      [auto]="true"
+                      [customUpload]="true"
+                      [pTooltip]="'scanexam.courseimporttooltip' | translate"
+                      [tooltipZIndex]="'3000'"
+                      [chooseLabel]="'scanexam.courseimport' | translate"
+                      name="import[]"
+                      accept="application/json"
+                      [maxFileSize]="2000000000"
+                      (uploadHandler)="onUpload($event)"
+                    ></p-fileUpload>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-sidebar>
+
     <p-dock [model]="dockItems" position="top" [styleClass]="'pdock'">
       <ng-template pTemplate="item" let-item>
-        <a [routerLink]="item.route"
-          ><img [src]="item.icon" [alt]="item.label" class="imageDock" [tooltipZIndex]="'3000'" [pTooltip]="item.title"
+        <a *ngIf="item.route" [routerLink]="item.route"
+          ><img
+            [src]="item.icon"
+            [alt]="item.label"
+            class="imageDock"
+            [tooltipZIndex]="'3000'"
+            [pTooltip]="item.title"
+            [appendTo]="'body'"
+            [tooltipPosition]="'top'"
         /></a>
+        <a *ngIf="item.command1" (click)="item.command1()"
+          ><img
+            [src]="item.icon"
+            [alt]="item.label"
+            class="imageDock"
+            [tooltipZIndex]="'3000'"
+            [pTooltip]="item.title"
+            [tooltipPosition]="'top'"
+        /></a>
+        <!--        <a [routerLink]="item.route"
+          ><img [src]="item.icon" [alt]="item.label" class="imageDock" [tooltipZIndex]="'3000'" [pTooltip]="item.title"
+        /></a>-->
       </ng-template>
     </p-dock>
     <jhi-mes-cours [showImage]="true"></jhi-mes-cours>
@@ -67,7 +128,7 @@
 
       <p class="lead" jhiTranslate="home.welcomeadminsub">Vous pouvez accéder aux données depuis le menu entité</p>
       <p jhiTranslate="home.textadmin">Vous pouvez gérer les utilsiateurs et les services depuis le menu administration.</p>
-      <jhi-mes-cours [showImage]="false"></jhi-mes-cours>
+      <jhi-mes-cours #mescours [showImage]="false"></jhi-mes-cours>
     </div>
   </div>
 </div>

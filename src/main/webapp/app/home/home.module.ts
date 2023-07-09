@@ -9,6 +9,9 @@ import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ButtonModule } from 'primeng/button';
 import { SharedModule } from 'app/shared/shared.module';
+import { SidebarModule } from 'primeng/sidebar';
+import { FileUploadModule } from 'primeng/fileupload';
+import { InputSwitchModule } from 'primeng/inputswitch';
 
 @NgModule({
   imports: [
@@ -18,6 +21,9 @@ import { SharedModule } from 'app/shared/shared.module';
     SharedModule,
     ScanexamModule,
     DockModule,
+    SidebarModule,
+    FileUploadModule,
+    InputSwitchModule,
     RouterModule.forChild([HOME_ROUTE]),
   ],
   declarations: [HomeComponent],

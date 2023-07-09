@@ -1,20 +1,54 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable no-console */
-import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone, ViewChild } from '@angular/core';
 
 import { Router } from '@angular/router';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { scan, takeUntil } from 'rxjs/operators';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import { AlignImagesService } from 'app/scanexam/services/align-images.service';
 import { ApplicationConfigService } from '../core/config/application-config.service';
 import { TranslateService } from '@ngx-translate/core';
 import { LoginService } from 'app/login/login.service';
 
 import { CONNECTION_METHOD, CAS_SERVER_URL, SERVICE_URL } from 'app/app.constants';
+import { HttpClient, HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse } from '@angular/common/http';
+import { MesCoursComponent } from 'app/scanexam/mes-cours/mes-cours.component';
+
+interface Upload {
+  progress: number;
+  state: 'PENDING' | 'IN_PROGRESS' | 'DONE';
+  body?: any;
+}
+
+function isHttpResponse<T>(event: HttpEvent<T>): event is HttpResponse<T> {
+  return event.type === HttpEventType.Response;
+}
+
+function isHttpProgressEvent(event: HttpEvent<unknown>): event is HttpProgressEvent {
+  return event.type === HttpEventType.DownloadProgress || event.type === HttpEventType.UploadProgress;
+}
+
+const initialState: Upload = { state: 'PENDING', progress: 0 };
+const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
+  if (isHttpProgressEvent(event)) {
+    return {
+      progress: event.total ? Math.round((100 * event.loaded) / event.total) : upload.progress,
+      state: 'IN_PROGRESS',
+    };
+  }
+  if (isHttpResponse(event)) {
+    // eslint-disable-next-line no-console
+    return {
+      progress: 100,
+      state: 'DONE',
+      body: event.body,
+    };
+  }
+  return upload;
+};
 
 @Component({
   selector: 'jhi-home',
@@ -27,6 +61,21 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   faPlus = faPlus;
 
+  courseId = '';
+  layoutsidebarVisible = false;
+  includeStudentsData = true;
+
+  blocked = false;
+  message = '';
+  _mescours!: MesCoursComponent;
+
+  @ViewChild(MesCoursComponent)
+  set mescours(v: MesCoursComponent) {
+    setTimeout(() => {
+      this._mescours = v;
+    }, 0);
+  }
+
   public readonly CONNECTION_METHOD_LOCAL = 'local';
   public readonly CONNECTION_METHOD_CAS = 'cas';
   public readonly CONNECTION_METHOD_SHIB = 'shib';
@@ -38,11 +87,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private accountService: AccountService,
     private router: Router,
-    private alignImagesService: AlignImagesService,
     private appConfig: ApplicationConfigService,
     private translateService: TranslateService,
     private loginService: LoginService,
-    private zone: NgZone
+    private zone: NgZone,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -85,7 +134,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.initCmpt();
     });
     this.translateService.onLangChange.subscribe(() => {
-      console.log('language change');
       this.initCmpt();
     });
   }
@@ -97,6 +145,14 @@ export class HomeComponent implements OnInit, OnDestroy {
         icon: this.appConfig.getFrontUrl() + 'content/images/plus.svg',
         title: this.translateService.instant('home.creercours'),
         route: 'creercours',
+      },
+      {
+        label: this.translateService.instant('scanexam.import'),
+        icon: this.appConfig.getFrontUrl() + 'content/images/import-export-outline-icon.svg',
+        title: this.translateService.instant('scanexam.importcoursetooltip'),
+        command1: () => {
+          this.layoutsidebarVisible = true;
+        },
       },
     ];
   }
@@ -110,5 +166,40 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  onUpload($event: any): void {
+    if ($event.files && $event.files.length > 0) {
+      this.uploadCache($event.files[0]).subscribe(response => {
+        if (response.state === 'DONE') {
+          this.layoutsidebarVisible = false;
+          this.blocked = false;
+          this.message = '';
+
+          this._mescours.ngOnInit();
+        }
+      });
+    }
+  }
+  uploadCache(file: File): Observable<Upload> {
+    this.layoutsidebarVisible = false;
+    this.message = this.translateService.instant('scanexam.importencours');
+    this.blocked = true;
+
+    const formData: FormData = new FormData();
+    formData.append('file', file);
+
+    let endpoint = 'api/importCourse';
+    if (!this.includeStudentsData) {
+      endpoint = 'api/importCourseWithoutStudentData';
+    }
+
+    return this.http
+      .post(this.appConfig.getEndpointFor(endpoint), formData, {
+        reportProgress: true,
+        responseType: 'json',
+        observe: 'events',
+      })
+      .pipe(scan(calculateState, initialState));
   }
 }
