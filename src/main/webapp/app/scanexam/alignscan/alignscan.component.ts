@@ -26,13 +26,15 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { CacheUploadService, CacheUploadNotification } from '../exam-detail/cacheUpload.service';
 import { TranslateService } from '@ngx-translate/core';
 import { fromWorkerPool } from 'observable-webworker';
-import { Observable, Subscriber } from 'rxjs';
+import { Observable, Subscriber, firstValueFrom } from 'rxjs';
 import { worker1 } from '../services/workerimport';
 import { PreferenceService } from '../preference-page/preference.service';
 import { DialogService } from 'primeng/dynamicdialog';
 import { PartialAlignModalComponent } from './partial-align-modal/partial-align-modal.component';
 // import { db as dbsqlite } from '../db/dbsqlite';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
+import { QuestionService } from '../../entities/question/service/question.service';
+import { ZoneService } from '../../entities/zone/service/zone.service';
 
 export interface IPage {
   image?: ArrayBuffer;
@@ -118,6 +120,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   ];
   displayBasic = false;
   images: any[] = [];
+  pageWithQCM: number[] = [];
 
   constructor(
     public examService: ExamService,
@@ -132,7 +135,9 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     private messageService: MessageService,
     private preferenceService: PreferenceService,
     public dialogService: DialogService,
-    public db: CacheServiceImpl
+    public db: CacheServiceImpl,
+    protected questionService: QuestionService,
+    protected zoneService: ZoneService
   ) {}
   setMessage(v: string): void {
     this.message = v;
@@ -154,7 +159,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
         if (this.preferenceService.getPreference().pdfscale !== undefined) {
           this.scale = this.preferenceService.getPreference().pdfscale;
         }
-
+        this.initQuestionQCM(+this.examId);
         this.examService.find(+this.examId).subscribe(data => {
           this.exam = data.body!;
           this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
@@ -167,6 +172,22 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
         });
       }
     });
+  }
+
+  async initQuestionQCM(examId: number): Promise<void> {
+    const q1 = await firstValueFrom(this.questionService.query({ examId }));
+    if (q1.body !== undefined && q1.body !== null) {
+      const qcmq = q1.body.filter(q2 => q2.typeAlgoName === 'QCM');
+      const pageWithQCM = [];
+      for (const q of qcmq) {
+        const _z = await firstValueFrom(this.zoneService.find(q.zoneId!));
+        const z = _z.body;
+        if (z?.pageNumber !== undefined && z?.pageNumber !== null) {
+          pageWithQCM.push(z.pageNumber);
+        }
+      }
+      this.pageWithQCM = [...new Set(pageWithQCM)];
+    }
   }
 
   initPool(): void {
@@ -194,7 +215,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
           };
           const dim = new ImageData(new Uint8ClampedArray(debugpage.image!), debugpage.width, debugpage.height);
           this.images.push({
-            src: this.fgetBase64Image(dim),
+            src: this.fgetBase64Image(dim, e.pageNumber!),
             alt: 'Description for Image 2',
             title: 'Exam',
           });
@@ -303,7 +324,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
       const templatePages64: Map<number, string> = new Map();
       this.templatePages.forEach((e, k) => {
         const pixels = new ImageData(new Uint8ClampedArray(e.image!), e.width!, e.height!);
-        templatePages64.set(k, this.fgetBase64Image(pixels));
+        templatePages64.set(k, this.fgetBase64Image(pixels, k));
       });
 
       await this.db.addExam(+this.examId);
@@ -343,7 +364,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   }
 
   async saveEligneImage(pageN: number, imageD: ImageData): Promise<void> {
-    const imageString = this.fgetBase64Image(imageD);
+    const imageString = this.fgetBase64Image(imageD, pageN);
 
     await this.db.addAligneImage({
       examId: +this.examId,
@@ -458,6 +479,16 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
         ) {
           compression = this.preferenceService.getPreference().exportImageCompression;
         }
+
+        let paget = pagen % this.nbreFeuilleParCopie;
+        if (paget === 0) {
+          paget = this.nbreFeuilleParCopie;
+        }
+
+        if (this.pageWithQCM.includes(paget)) {
+          compression = 0.95;
+        }
+
         if (
           this.preferenceService.getPreference().imageTypeExport !== undefined &&
           ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
@@ -467,11 +498,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
 
         const webPImageURL = editedImage.toDataURL(exportImageType, compression);
         await this.saveNonAligneImage(pagen, webPImageURL);
-
-        let paget = pagen % this.nbreFeuilleParCopie;
-        if (paget === 0) {
-          paget = this.nbreFeuilleParCopie;
-        }
 
         if (this.alignement !== 'off') {
           // await this.saveNonAligneImage(pagen, napage.image!);
@@ -514,7 +540,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     });
   }
 
-  private fgetBase64Image(img: ImageData): string {
+  private fgetBase64Image(img: ImageData, pageN: number): string {
     const canvas = document.createElement('canvas');
     canvas.width = img.width;
     canvas.height = img.height;
@@ -531,6 +557,14 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     ) {
       compression = this.preferenceService.getPreference().exportImageCompression;
     }
+    let paget = pageN % this.nbreFeuilleParCopie;
+    if (paget === 0) {
+      paget = this.nbreFeuilleParCopie;
+    }
+    if (this.pageWithQCM.includes(paget)) {
+      compression = 0.95;
+    }
+
     if (
       this.preferenceService.getPreference().imageTypeExport !== undefined &&
       ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
