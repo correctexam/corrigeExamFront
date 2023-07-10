@@ -13,7 +13,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { LocalStorageService, NgxWebstorageModule, SessionStorageService } from 'ngx-webstorage';
+import { NgxWebstorageModule } from 'ngx-webstorage';
 
 describe('Home Component', () => {
   let comp: HomeComponent;
@@ -21,8 +21,6 @@ describe('Home Component', () => {
   let mockAccountService: AccountService;
   let mockTranslateService: TranslateService;
   let mockRouter: Router;
-  let localStorageService: LocalStorageService;
-  let sessionStorageService: SessionStorageService;
 
   const account: Account = {
     activated: true,
