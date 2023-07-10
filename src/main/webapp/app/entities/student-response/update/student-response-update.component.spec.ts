@@ -8,10 +8,6 @@ import { of, Subject, from } from 'rxjs';
 
 import { StudentResponseService } from '../service/student-response.service';
 import { StudentResponse } from '../student-response.model';
-import { QuestionService } from 'app/entities/question/service/question.service';
-import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
-import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
-import { GradedCommentService } from 'app/entities/graded-comment/service/graded-comment.service';
 
 import { StudentResponseUpdateComponent } from './student-response-update.component';
 
@@ -20,10 +16,6 @@ describe('StudentResponse Management Update Component', () => {
   let fixture: ComponentFixture<StudentResponseUpdateComponent>;
   let activatedRoute: ActivatedRoute;
   let studentResponseService: StudentResponseService;
-  let questionService: QuestionService;
-  let examSheetService: ExamSheetService;
-  let textCommentService: TextCommentService;
-  let gradedCommentService: GradedCommentService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -45,10 +37,6 @@ describe('StudentResponse Management Update Component', () => {
     fixture = TestBed.createComponent(StudentResponseUpdateComponent);
     activatedRoute = TestBed.inject(ActivatedRoute);
     studentResponseService = TestBed.inject(StudentResponseService);
-    questionService = TestBed.inject(QuestionService);
-    examSheetService = TestBed.inject(ExamSheetService);
-    textCommentService = TestBed.inject(TextCommentService);
-    gradedCommentService = TestBed.inject(GradedCommentService);
 
     comp = fixture.componentInstance;
   });

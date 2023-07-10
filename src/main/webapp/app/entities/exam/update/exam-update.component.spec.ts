@@ -8,10 +8,6 @@ import { of, Subject, from } from 'rxjs';
 
 import { ExamService } from '../service/exam.service';
 import { Exam } from '../exam.model';
-import { TemplateService } from 'app/entities/template/service/template.service';
-import { ZoneService } from 'app/entities/zone/service/zone.service';
-import { ScanService } from 'app/entities/scan/service/scan.service';
-import { CourseService } from 'app/entities/course/service/course.service';
 
 import { ExamUpdateComponent } from './exam-update.component';
 
@@ -20,10 +16,6 @@ describe('Exam Management Update Component', () => {
   let fixture: ComponentFixture<ExamUpdateComponent>;
   let activatedRoute: ActivatedRoute;
   let examService: ExamService;
-  let templateService: TemplateService;
-  let zoneService: ZoneService;
-  let scanService: ScanService;
-  let courseService: CourseService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -45,10 +37,6 @@ describe('Exam Management Update Component', () => {
     fixture = TestBed.createComponent(ExamUpdateComponent);
     activatedRoute = TestBed.inject(ActivatedRoute);
     examService = TestBed.inject(ExamService);
-    templateService = TestBed.inject(TemplateService);
-    zoneService = TestBed.inject(ZoneService);
-    scanService = TestBed.inject(ScanService);
-    courseService = TestBed.inject(CourseService);
 
     comp = fixture.componentInstance;
   });
