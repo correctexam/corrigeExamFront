@@ -35,7 +35,7 @@ import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { IZone } from 'app/entities/zone/zone.model';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { ImageZone, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.component';
+import { ICluster, IImageCluster, ImageZone, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.component';
 import { EventCanevascorrectionHandlerService } from '../corrigequestion/event-canevascorrection-handler.service';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { PreferenceService } from '../preference-page/preference.service';
@@ -94,7 +94,12 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
 
   @ViewChildren('nomImage')
   canvass!: QueryList<ElementRef>;
+
+  @ViewChildren('nomImageVisible')
+  canvassVisibles!: QueryList<ElementRef>;
+
   showImage: boolean[] = [];
+  showImageVisible: boolean[] = [];
   examId: string | undefined;
   numberPagesInScan: number | undefined;
 
@@ -109,6 +114,14 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   foo: string | undefined;
 
   pageOffset = 0;
+
+  questionall = false;
+
+  clusters = [0];
+  imageInCluster: number[] = [];
+  layoutsidebarVisible = false;
+  nbreCluster = 5;
+
   constructor(
     public examService: ExamService,
     public zoneService: ZoneService,
@@ -151,6 +164,10 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             )
             .subscribe(res => {
               this.zones4comments = res;
+              this.imageInCluster = [];
+              this.zones4comments.answers!.forEach(() => {
+                this.imageInCluster.push(0);
+              });
             });
         } else if (params.get('commentid') !== null && this.router.url.includes('comparegradedcomment')) {
           this.http
@@ -159,6 +176,11 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             )
             .subscribe(res => {
               this.zones4comments = res;
+              this.imageInCluster = [];
+              this.zones4comments.answers!.forEach(() => {
+                this.imageInCluster.push(0);
+              });
+
               // console.error(this.zones4comments)
             });
         } else if (params.get('respid') !== null && this.router.url.includes('comparemark')) {
@@ -168,15 +190,23 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             )
             .subscribe(res => {
               this.zones4comments = res;
+              this.imageInCluster = [];
+              this.zones4comments.answers!.forEach(() => {
+                this.imageInCluster.push(0);
+              });
             });
         } else if (params.get('qid') !== null && this.router.url.includes('compareanswer')) {
+          this.questionall = true;
           this.http
             .get<Zone4SameCommentOrSameGrade>(
               this.applicationConfigService.getEndpointFor('api/getZone4Numero/' + this.examId + '/' + params.get('qid'))
             )
             .subscribe(res => {
               this.zones4comments = res;
-              // console.error(this.zones4comments)
+              this.imageInCluster = [];
+              this.zones4comments.answers!.forEach(() => {
+                this.imageInCluster.push(0);
+              });
             });
         }
       }
@@ -220,6 +250,34 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             this.showImage[i * this.zones4comments!.zones.length + j] = b;
           });
         });
+      });
+    });
+    this.reloadImageClassify();
+  }
+
+  reloadImageClassify() {
+    let k = -1;
+    this.clusters.forEach(cluster => {
+      this.zones4comments?.answers!.forEach((a, i) => {
+        if (this.imageInCluster[i] === cluster) {
+          k = k + 1;
+          const ktemp = k;
+          this.zones4comments?.zones.forEach((z, j) => {
+            const pagewithoffset = a.pagemin + this.zones4comments?.zones[j].pageNumber! + this.pageOffset;
+            const pagewithoutoffset = a.pagemin + this.zones4comments?.zones[j].pageNumber!;
+            let page = pagewithoutoffset;
+            if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
+              page = pagewithoffset;
+            }
+
+            this.showImageVisible[i * this.zones4comments!.zones.length + j] = false;
+            this.getAllImage4Zone(page, z).then(p => {
+              this.displayImage(p, this.canvassVisibles.get(ktemp * this.zones4comments!.zones.length + j), b => {
+                this.showImageVisible[i * this.zones4comments!.zones.length + j] = b;
+              });
+            });
+          });
+        }
       });
     });
   }
@@ -377,12 +435,69 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     }
   }
 
+  debugImage(imageData: any) {
+    try {
+      const c = new OffscreenCanvas(imageData.width, imageData.height);
+      const ctx = c.getContext('2d');
+      if (ctx) {
+        ctx.putImageData(imageData, 0, 0);
+        c.convertToBlob().then(blob => {
+          const reader = new FileReader();
+          reader.readAsDataURL(blob);
+          reader.onload = function () {
+            const dataUrl = reader.result;
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            const style = `font-size: 300px; background-image: url("${dataUrl}"); background-size: contain; background-repeat: no-repeat;`;
+            console.log('%c     ', style);
+          };
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  classifyAll(): void {
+    const inputImages: IImageCluster[] = [];
+
+    this.zones4comments?.answers!.forEach((_a, i) => {
+      this.zones4comments?.zones.forEach((_z, j) => {
+        const c = this.canvass.get(i * this.zones4comments!.zones.length + j)!.nativeElement;
+        const ctx = c.getContext('2d');
+        const inputimage = ctx!.getImageData(0, 0, c.width, c.height);
+        // console.error(inputimage)
+        this.debugImage(inputimage);
+        const p: IImageCluster = {
+          image: inputimage,
+          imageIndex: j,
+          studentIndex: i,
+          width: c.width,
+          height: c.height,
+        };
+        inputImages.push(p);
+      });
+    });
+    const icluster: ICluster = {
+      images: inputImages,
+      nbrCluster: this.nbreCluster,
+    };
+    this.alignImagesService.groupImagePerContoursLength(icluster).subscribe(res => {
+      const _cluster: number[] = [];
+      for (let c1 = 0; c1 < this.nbreCluster; c1++) {
+        _cluster.push(c1);
+      }
+      this.clusters = _cluster;
+      this.imageInCluster = res;
+      this.reloadImageClassify();
+    });
+  }
+
   downloadAll(): void {
     const zip = new jszip();
     const img = zip.folder('images');
 
-    this.zones4comments?.answers!.forEach((a, i) => {
-      this.zones4comments?.zones.forEach((z, j) => {
+    this.zones4comments?.answers!.forEach((_a, i) => {
+      this.zones4comments?.zones.forEach((_z, j) => {
         let exportImageType = 'image/webp';
         let compression = 0.65;
         if (

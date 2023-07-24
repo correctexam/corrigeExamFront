@@ -295,6 +295,10 @@
     "previousquestion": "Go to previous question",
     "directevaluation": "Direct evaluation",
     "directgradding": "direct gradding",
-    "resetAllShortCut": "Delete all keyboard shortcuts associated with comments"
+    "resetAllShortCut": "Delete all keyboard shortcuts associated with comments",
+    "kmeanoptions": "KMean options",
+    "nbreCluster": "How many clusters",
+    "classify": "Group similar",
+    "classifytooltip": "Groups images by similarity"
   }
 }

@@ -35,6 +35,19 @@ export interface IPage {
   height?: number;
 }
 
+export interface ICluster {
+  images: IImageCluster[];
+  nbrCluster: number;
+}
+
+export interface IImageCluster {
+  image: ImageData;
+  imageIndex: number;
+  studentIndex: number;
+  width?: number;
+  height?: number;
+}
+
 export interface ImageZone {
   t?: ImageData;
   i: ImageData;

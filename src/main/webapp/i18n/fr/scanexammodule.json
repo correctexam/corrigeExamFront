@@ -297,6 +297,10 @@
     "previousquestion": "Aller à la question précédente",
     "directevaluation": "Evaluation directe",
     "directgradding": "Notation par point",
-    "resetAllShortCut": "Supprimer l'ensemble des raccourcis clavier associés aux commentaires"
+    "resetAllShortCut": "Supprimer l'ensemble des raccourcis clavier associés aux commentaires",
+    "kmeanoptions": "Option du KMean",
+    "nbreCluster": "Nombre de clusters",
+    "classify": "Grouper",
+    "classifytooltip": "Permet de grouper les images par ressemblances"
   }
 }

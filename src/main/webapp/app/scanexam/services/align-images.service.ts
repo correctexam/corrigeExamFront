@@ -10,6 +10,7 @@ import { Injectable } from '@angular/core';
 import { v4 as uuid } from 'uuid';
 import { Subject, Observable } from 'rxjs';
 import { worker } from './workerimport';
+import { ICluster, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.component';
 
 export interface IImageAlignement {
   imageAligned?: ArrayBuffer;
@@ -187,6 +188,11 @@ export class AlignImagesService {
   public imageCrop(payload: IImageCropInput): Observable<ImageData> {
     return this._dispatch('imageCrop', payload);
   }
+
+  public groupImagePerContoursLength(payload: ICluster): Observable<number[]> {
+    return this._dispatch('groupImagePerContoursLength', payload);
+  }
+
   public prediction(payload: IImagePredictionInput, letter: boolean): Observable<IImagePredictionOutput> {
     if (letter) {
       return this._dispatch('nameprediction', payload);

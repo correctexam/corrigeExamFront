@@ -23,6 +23,19 @@ import {
 declare let cv: any;
 declare let tf: any;
 
+interface ICluster {
+  images: IImageCluster[];
+  nbrCluster: number;
+}
+
+interface IImageCluster {
+  image: ImageData;
+  imageIndex: number;
+  studentIndex: number;
+  width?: number;
+  height?: number;
+}
+
 /**
  * This exists to capture all the events that are thrown out of the worker
  * into the worker. Without this, there would be no communication possible
@@ -68,13 +81,91 @@ addEventListener('message', e => {
       return doPredictionTemplate(e.data, true);
     case 'inepredictionTemplate':
       return doPredictionTemplate(e.data, false);
-
+    case 'groupImagePerContoursLength':
+      return groupImagePerContoursLength(e.data);
     case 'qcmresolution':
       return doQCMResolution(e.data);
     default:
       break;
   }
 });
+
+function groupImagePerContoursLength(p: { msg: any; payload: ICluster; uid: string }): void {
+  if (p.payload.images.length === 0) {
+    postMessage({ msg: p.msg, payload: [], uid: p.uid });
+  }
+  const nbrImage = p.payload.images[p.payload.images.length - 1].studentIndex + 1;
+  const minLongContour = 6;
+  // Kmean parameters
+  const numClusters = p.payload.nbrCluster; // Définir le nombre de clusters souhaité
+  const attempts = 1;
+  const crite = new cv.TermCriteria(cv.TermCriteria_EPS + cv.TermCriteria_MAX_ITER, 100, 0.01);
+
+  const contourLengths = [];
+
+  // Charger l'image en utilisant OpenCV.js
+  for (let i = 0; i < nbrImage; i++) {
+    let contourLength = 0;
+    let nbreContour = 0;
+    const nbreImagePerStudent = p.payload.images.length / nbrImage;
+    for (let ij = 0; ij < nbreImagePerStudent; ij++) {
+      let src = cv.matFromImageData(p.payload.images[i + ij].image);
+      const gray = new cv.Mat();
+      cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+
+      // Appliquer Canny Edge Detection
+      const edges = new cv.Mat();
+      const threshold1 = 100;
+      const threshold2 = 200;
+      const apertureSize = 3;
+      cv.Canny(gray, edges, threshold1, threshold2, apertureSize);
+
+      // Trouver les contours dans l'image
+      const contours = new cv.MatVector();
+      const hierarchy = new cv.Mat();
+
+      cv.findContours(edges, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+      for (let ic = 0; ic < contours.size(); ic++) {
+        const contour = contours.get(ic);
+        const length = cv.arcLength(contour, true);
+        if (length > minLongContour) {
+          contourLength = contourLength + length;
+          nbreContour = nbreContour + 1;
+        }
+      }
+
+      src.delete();
+      gray.delete();
+      edges.delete();
+      contours.delete();
+      hierarchy.delete();
+    }
+    contourLengths.push(contourLength);
+    contourLengths.push(nbreContour);
+  }
+  // Appliquer l'algorithme de k-means pour regrouper les longueurs des contours
+  // const criteria = { criteria: cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, maxCount: 100, epsilon: 0.01 };
+  const labels = new cv.Mat();
+  const centers = new cv.Mat();
+  const data = cv.matFromArray(contourLengths.length / 2, 2, cv.CV_32F, contourLengths);
+  cv.kmeans(data, numClusters, labels, crite, attempts, cv.KMEANS_RANDOM_CENTERS, centers);
+  // Exemple : Afficher les résultats du regroupement k-means
+  console.error('Clusters (étiquettes) :');
+  console.error(labels.data32S);
+  console.error('Centres des clusters :');
+  console.error(centers.data32F);
+
+  let res: number[] = [];
+  for (let k = 0; k < nbrImage; k++) {
+    res.push(labels.data32S[k]);
+  }
+  postMessage({ msg: p.msg, payload: res, uid: p.uid });
+
+  // Libérer les ressources
+  labels.delete();
+  centers.delete();
+  data.delete();
+}
 
 function imageCrop(p: { msg: any; payload: any; uid: string }): void {
   // You can try more different parameters
