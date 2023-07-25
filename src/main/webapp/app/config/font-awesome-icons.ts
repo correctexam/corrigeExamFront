@@ -43,6 +43,8 @@ import {
   faMaximize,
   faDownload,
   faKeyboard,
+  faCircleNodes,
+  faObjectUngroup,
 
   // jhipster-needle-add-icon-import
 } from '@fortawesome/free-solid-svg-icons';
@@ -92,5 +94,7 @@ export const fontAwesomeIcons = [
   faMaximize,
   faDownload,
   faKeyboard,
+  faCircleNodes,
+  faObjectUngroup,
   // jhipster-needle-add-icon-import
 ];

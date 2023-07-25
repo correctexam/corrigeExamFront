@@ -42,7 +42,6 @@ export class MarkingSummaryComponent implements OnInit {
           .then(dataExam => {
             this.dataExam = dataExam;
             // eslint-disable-next-line no-console
-            console.error(this.dataExam);
             this.questionNumeros = Array.from(new Set(this.dataExam.questions.map(q => q.numero))).sort((n1, n2) => n1 - n2);
           })
           .catch(() => {

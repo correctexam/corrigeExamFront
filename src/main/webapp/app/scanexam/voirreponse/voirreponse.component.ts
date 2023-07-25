@@ -311,7 +311,9 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
       }
       this.alignImagesService
         .imageCrop({
-          image: v.image,
+          image: v.image!.data.buffer,
+          imageWidth: v.image!.width,
+          imageHeight: v.image!.height,
           x: initX,
           y: initY,
           width: finalW,
