@@ -71,6 +71,11 @@ export interface Answer {
   worststar: boolean;
 }
 
+export interface ClusterDTO {
+  templat: number;
+  copies: number[];
+}
+
 @Component({
   selector: 'jhi-comparestudentanswer',
   templateUrl: './comparestudentanswer.component.html',
@@ -226,7 +231,6 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             )
             .subscribe(res => {
               this.zones4comments = res;
-              console.error(res);
               const _cluster = this.preferenceService.getCluster4Question(this.examId + '_' + this.qId);
               if (_cluster === null) {
                 this.zones4comments.answers!.forEach((_, index) => {
@@ -631,7 +635,33 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   }
 
   applySameGradeAndComment4Cluster(k: KeyValue<number, number[]>): void {
-    console.error(k);
+    const l = [...k.value];
+    const templat = l.shift();
+    const clus = {
+      templat: templat,
+      copies: l,
+    };
+    this.http
+      .post<Zone4SameCommentOrSameGrade>(
+        this.applicationConfigService.getEndpointFor('api/updateStudentResponse4Cluster/' + this.examId + '/' + this.qId),
+        clus
+      )
+
+      .subscribe(() => {
+        this.http
+          .get<Zone4SameCommentOrSameGrade>(
+            this.applicationConfigService.getEndpointFor('api/getZone4Numero/' + this.examId + '/' + this.qId)
+          )
+          .subscribe(res => {
+            this.zones4comments!.textComments = res.textComments;
+            this.zones4comments!.gradedComments = res.gradedComments;
+            for (const v of l) {
+              this.zones4comments!.answers[v].note = res.answers[v].note;
+              this.zones4comments!.answers[v].textComments = res.answers[v].textComments;
+              this.zones4comments!.answers[v].gradedComments = res.answers[v].gradedComments;
+            }
+          });
+      });
   }
   async updateColumnEvent(event: any) {
     await this.updateColumn(event.value.value);
