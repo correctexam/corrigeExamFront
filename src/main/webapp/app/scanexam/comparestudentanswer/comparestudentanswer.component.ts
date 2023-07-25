@@ -42,7 +42,7 @@ import { PreferenceService } from '../preference-page/preference.service';
 import { AlignImagesService } from '../services/align-images.service';
 import { IComments } from '../../entities/comments/comments.model';
 import { HttpClient } from '@angular/common/http';
-import { Location } from '@angular/common';
+import { KeyValue, Location } from '@angular/common';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import jszip from 'jszip';
 import * as FileSaver from 'file-saver';
@@ -226,6 +226,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             )
             .subscribe(res => {
               this.zones4comments = res;
+              console.error(res);
               const _cluster = this.preferenceService.getCluster4Question(this.examId + '_' + this.qId);
               if (_cluster === null) {
                 this.zones4comments.answers!.forEach((_, index) => {
@@ -266,26 +267,28 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   }
 
   async reloadImage() {
-    this.blocked = true;
-    for (const [i, a] of this.zones4comments!.answers!.entries()) {
-      for (const [j, z] of this.zones4comments!.zones!.entries()) {
-        const pagewithoffset = a.pagemin + this.zones4comments?.zones[j].pageNumber! + this.pageOffset;
-        const pagewithoutoffset = a.pagemin + this.zones4comments?.zones[j].pageNumber!;
-        let page = pagewithoutoffset;
-        if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
-          page = pagewithoffset;
+    if (this.zones4comments !== undefined) {
+      this.blocked = true;
+
+      for (const [i, a] of this.zones4comments!.answers!.entries()) {
+        for (const [j, z] of this.zones4comments!.zones!.entries()) {
+          const pagewithoffset = a.pagemin + this.zones4comments.zones[j].pageNumber! + this.pageOffset;
+          const pagewithoutoffset = a.pagemin + this.zones4comments.zones[j].pageNumber!;
+          let page = pagewithoutoffset;
+          if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
+            page = pagewithoffset;
+          }
+
+          this.showImage[i * this.zones4comments!.zones.length + j] = false;
+          const p = await this.getAllImage4Zone(page, z);
+          this.displayImage(p, this.canvass.get(i * this.zones4comments!.zones.length + j), b => {
+            this.showImage[i * this.zones4comments!.zones.length + j] = b;
+          });
         }
-
-        this.showImage[i * this.zones4comments!.zones.length + j] = false;
-        const p = await this.getAllImage4Zone(page, z);
-        this.displayImage(p, this.canvass.get(i * this.zones4comments!.zones.length + j), b => {
-          this.showImage[i * this.zones4comments!.zones.length + j] = b;
-        });
       }
+      this.blocked = false;
+      this.firstImageLoadedReolve!();
     }
-    this.blocked = false;
-
-    this.firstImageLoadedReolve!();
   }
 
   reloadImageClassify() {
@@ -492,7 +495,9 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     this.blocked = true;
 
     const inputImages: IImageCluster[] = [];
-
+    if (this.zones4comments!.answers!.length <= this.nbreCluster) {
+      this.nbreCluster = this.zones4comments!.answers!.length - 1;
+    }
     this.zones4comments?.answers!.forEach((_a, i) => {
       this.zones4comments?.zones.forEach((_z, j) => {
         const c = this.canvass.get(i * this.zones4comments!.zones.length + j)!.nativeElement;
@@ -605,9 +610,18 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
         clustersource = v[0];
       } else if (!v[1].includes(currentDragAndDrop) && v[1].includes(value)) {
         clusterdest = v[0];
+      } else if (v[1].includes(currentDragAndDrop) && v[1].includes(value)) {
+        clustersource = v[0];
+        clusterdest = v[0];
       }
     }
-    if (clustersource !== -1 && clusterdest !== -1) {
+    if (clustersource !== -1 && clusterdest !== -1 && clustersource !== clusterdest) {
+      const index = this.clusters.get(clustersource)!.indexOf(currentDragAndDrop);
+      this.clusters.get(clustersource)!.splice(index, 1);
+      const index1 = this.clusters.get(clusterdest)!.indexOf(value);
+      this.clusters.get(clusterdest)!.splice(index1, 0, currentDragAndDrop);
+      this.preferenceService.saveCluster4Question(this.examId + '_' + this.qId, this.clusters);
+    } else if (clustersource !== -1 && clusterdest !== -1 && clustersource === clusterdest) {
       const index = this.clusters.get(clustersource)!.indexOf(currentDragAndDrop);
       this.clusters.get(clustersource)!.splice(index, 1);
       const index1 = this.clusters.get(clusterdest)!.indexOf(value);
@@ -616,6 +630,9 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     }
   }
 
+  applySameGradeAndComment4Cluster(k: KeyValue<number, number[]>): void {
+    console.error(k);
+  }
   async updateColumnEvent(event: any) {
     await this.updateColumn(event.value.value);
     this.preferenceService.saveImagePerLine(event.value.value);

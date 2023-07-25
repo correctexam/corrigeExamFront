@@ -83,6 +83,18 @@
     <ng-container *ngFor="let k of clusters | keyvalue">
       <div *ngIf="clusters.size > 1" class="md:col-12 col-12">
         <h1>Cluster {{ k.key }}</h1>
+        <button
+          *ngIf="questionall"
+          [disabled]="!this.examId"
+          type="submit"
+          id="classify-entity"
+          data-cy="entityCreateSaveButton"
+          class="p-button p-button-primary"
+          (click)="applySameGradeAndComment4Cluster(k)"
+          [pTooltip]="'scanexam.applysamegradetooltip' | translate"
+        >
+          <fa-icon icon="object-ungroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.applysamegrade">Appliquer la même note</span>
+        </button>
       </div>
       <ng-container *ngFor="let value of k.value">
         <div [ngClass]="colonneStyle">
