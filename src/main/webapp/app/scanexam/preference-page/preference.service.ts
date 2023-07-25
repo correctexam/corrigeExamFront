@@ -143,11 +143,26 @@ export class PreferenceService {
   saveImagePerLine(pref: number): void {
     this.localStorageService.store('saveImagePerLine', pref);
   }
+
   getImagePerLine(): number {
     let pref: number | null = this.localStorageService.retrieve('saveImagePerLine');
     if (pref === null) {
       const defaultvalue = 2;
       this.localStorageService.store('saveImagePerLine', defaultvalue);
+      pref = defaultvalue;
+    }
+    return pref;
+  }
+
+  saveNbreCluster(pref: number): void {
+    this.localStorageService.store('saveNbreCluster', pref);
+  }
+
+  getNbreCluster(): number {
+    let pref: number | null = this.localStorageService.retrieve('saveNbreCluster');
+    if (pref === null) {
+      const defaultvalue = 5;
+      this.localStorageService.store('saveNbreCluster', defaultvalue);
       pref = defaultvalue;
     }
     return pref;
