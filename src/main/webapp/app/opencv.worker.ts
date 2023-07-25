@@ -29,7 +29,7 @@ interface ICluster {
 }
 
 interface IImageCluster {
-  image: ImageData;
+  image: ArrayBuffer;
   imageIndex: number;
   studentIndex: number;
   width?: number;
@@ -95,13 +95,16 @@ function groupImagePerContoursLength(p: { msg: any; payload: ICluster; uid: stri
     postMessage({ msg: p.msg, payload: [], uid: p.uid });
   }
   const nbrImage = p.payload.images[p.payload.images.length - 1].studentIndex + 1;
-  const minLongContour = 6;
+  const minLongContour = 3;
   // Kmean parameters
   const numClusters = p.payload.nbrCluster; // Définir le nombre de clusters souhaité
-  const attempts = 1;
-  const crite = new cv.TermCriteria(cv.TermCriteria_EPS + cv.TermCriteria_MAX_ITER, 100, 0.01);
+  const attempts = 5;
+  const crite = new cv.TermCriteria(cv.TermCriteria_EPS + cv.TermCriteria_MAX_ITER, 1000, 0.001);
 
   const contourLengths = [];
+  /* for (let i = 0; i < nbrImage; i++) {
+    console.error(p.payload.images[i].studentIndex);
+  } */
 
   // Charger l'image en utilisant OpenCV.js
   for (let i = 0; i < nbrImage; i++) {
@@ -109,9 +112,21 @@ function groupImagePerContoursLength(p: { msg: any; payload: ICluster; uid: stri
     let nbreContour = 0;
     const nbreImagePerStudent = p.payload.images.length / nbrImage;
     for (let ij = 0; ij < nbreImagePerStudent; ij++) {
-      let src = cv.matFromImageData(p.payload.images[i + ij].image);
+      const imageSrc = new ImageData(
+        new Uint8ClampedArray(p.payload.images[i * nbreImagePerStudent + ij].image),
+        p.payload.images[i * nbreImagePerStudent + ij].width!,
+        p.payload.images[i * nbreImagePerStudent + ij].height
+      );
+
+      let src = cv.matFromImageData(imageSrc);
       const gray = new cv.Mat();
       cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+      //let dsize = new cv.Size(_gray.size().width *1, _gray.size().height *1);
+      // You can try more different parameters
+      //const gray = new cv.Mat();
+      //cv.resize(_gray, gray, dsize, 0, 0, cv.INTER_AREA);
+
+      // cv.threshold(gray, gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
 
       // Appliquer Canny Edge Detection
       const edges = new cv.Mat();
@@ -135,6 +150,7 @@ function groupImagePerContoursLength(p: { msg: any; payload: ICluster; uid: stri
       }
 
       src.delete();
+      //_gray.delete();
       gray.delete();
       edges.delete();
       contours.delete();
@@ -147,17 +163,31 @@ function groupImagePerContoursLength(p: { msg: any; payload: ICluster; uid: stri
   // const criteria = { criteria: cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, maxCount: 100, epsilon: 0.01 };
   const labels = new cv.Mat();
   const centers = new cv.Mat();
+
   const data = cv.matFromArray(contourLengths.length / 2, 2, cv.CV_32F, contourLengths);
-  cv.kmeans(data, numClusters, labels, crite, attempts, cv.KMEANS_RANDOM_CENTERS, centers);
+  cv.kmeans(data, numClusters, labels, crite, attempts, cv.KMEANS_PP_CENTERS, centers);
   // Exemple : Afficher les résultats du regroupement k-means
-  console.error('Clusters (étiquettes) :');
+  /* console.error('Clusters (étiquettes) :');
   console.error(labels.data32S);
   console.error('Centres des clusters :');
-  console.error(centers.data32F);
+  console.error(centers.data32F); */
+
+  let order: number[] = [];
+
+  for (let k = 0; k < numClusters; k++) {
+    order.push(centers.data32F[k * 2 + 1]);
+  }
+  order.sort(function (a, b) {
+    return a - b;
+  });
+  let mapping = new Map<number, number>();
+  for (let k = 0; k < numClusters; k++) {
+    mapping.set((centers.data32F.indexOf(order[k]) - 1) / 2, k);
+  }
 
   let res: number[] = [];
   for (let k = 0; k < nbrImage; k++) {
-    res.push(labels.data32S[k]);
+    res.push(mapping.get(labels.data32S[k])!);
   }
   postMessage({ msg: p.msg, payload: res, uid: p.uid });
 
@@ -171,7 +201,9 @@ function imageCrop(p: { msg: any; payload: any; uid: string }): void {
   // You can try more different parameters
   let rect = new cv.Rect(p.payload.x, p.payload.y, p.payload.width, p.payload.height);
   let dst = new cv.Mat();
-  let src = cv.matFromImageData(p.payload.image);
+  const imageSrc = new ImageData(new Uint8ClampedArray(p.payload.image), p.payload.imageWidth, p.payload.imageHeight);
+
+  let src = cv.matFromImageData(imageSrc);
   dst = roi(src, rect, dst);
   postMessage({ msg: p.msg, payload: imageDataFromMat(dst), uid: p.uid });
   dst.delete();

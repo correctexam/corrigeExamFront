@@ -41,7 +41,7 @@ export interface ICluster {
 }
 
 export interface IImageCluster {
-  image: ImageData;
+  image: ArrayBuffer;
   imageIndex: number;
   studentIndex: number;
   width?: number;
@@ -581,7 +581,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
             }
             this.alignImagesService
               .imageCrop({
-                image: v.image,
+                image: v.image!.data.buffer,
+                imageWidth: v.image!.width,
+                imageHeight: v.image!.height,
                 x: initX,
                 y: initY,
                 width: finalW,
@@ -614,7 +616,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
             }
             this.alignImagesService
               .imageCrop({
-                image: v.image,
+                image: v.image!.data.buffer,
+                imageWidth: v.image!.width,
+                imageHeight: v.image!.height,
                 x: initX,
                 y: initY,
                 width: finalW,
@@ -649,7 +653,10 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                       }
                       this.alignImagesService
                         .imageCrop({
-                          image: v1.image,
+                          image: v1.image!.data.buffer,
+                          imageWidth: v1.image!.width,
+                          imageHeight: v1.image!.height,
+
                           x: initX1,
                           y: initY1,
                           width: finalW1,

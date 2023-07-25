@@ -301,6 +301,7 @@
     "kmeanoptions": "Option du KMean",
     "nbreCluster": "Nombre de clusters",
     "classify": "Grouper",
-    "classifytooltip": "Permet de grouper les images par ressemblances"
+    "classifytooltip": "Permet de grouper les images par ressemblances",
+    "nbreImagePerLigne": "Nombre d'images par ligne"
   }
 }

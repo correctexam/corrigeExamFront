@@ -299,6 +299,7 @@
     "kmeanoptions": "KMean options",
     "nbreCluster": "How many clusters",
     "classify": "Group similar",
-    "classifytooltip": "Groups images by similarity"
+    "classifytooltip": "Groups images by similarity",
+    "nbreImagePerLigne": "Number of images per line"
   }
 }

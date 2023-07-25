@@ -1,4 +1,8 @@
 <div class="grid justify-center">
+  <p-blockUI [blocked]="blocked">
+    <i class="pi pi-lock" style="font-size: 3rem"></i>
+  </p-blockUI>
+
   <div class="col-8">
     <p-button
       *ngIf="questionall"
@@ -48,6 +52,12 @@
       <label><span jhiTranslate="scanexam.nbreCluster"> Nombre de cluster : </span>({{ nbreCluster }})</label>
       <p-slider [(ngModel)]="nbreCluster" [min]="2" [max]="15" [step]="1"> </p-slider>
     </div>
+    <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <label><span jhiTranslate="scanexam.nbreImagePerLigne"> Nombre de tuile affichée par ligne : </span>({{ nbreCluster }})</label>
+      <p-selectButton [options]="nbreColumnOptions" [ngModel]="nbreColumn" optionLabel="name" (onChange)="updateColumn($event)">
+      </p-selectButton>
+    </div>
   </p-sidebar>
   <ng-container>
     <ng-container *ngFor="let k of zones4comments?.answers; let i = index">
@@ -57,37 +67,43 @@
     </ng-container>
   </ng-container>
 
-  <ng-container>
-    <div class="grid" *ngFor="let cluster of clusters">
-      <div *ngIf="clusters.length > 1" class="col-12">
-        <h1>Cluster {{ cluster }}</h1>
+  <div class="grid justify-center">
+    <ng-container *ngFor="let k of clusters | keyvalue">
+      <div *ngIf="clusters.size > 1" class="md:col-12 col-12">
+        <h1>Cluster {{ k.key }}</h1>
       </div>
-      <ng-container *ngFor="let k of zones4comments?.answers; let i = index">
-        <div class="col-12 md:col-6" *ngIf="imageInCluster[i] === cluster">
-          <div class="card" [style]="'width: 100%;height: 100%;'">
+      <ng-container *ngFor="let value of k.value">
+        <div [ngClass]="colonneStyle">
+          <div
+            class="card"
+            [style]="'width: 100%;height: 100%;'"
+            pDraggable
+            pDroppable
+            (onDragStart)="dragStart(value)"
+            (onDragEnd)="dragEnd(value)"
+            (onDrop)="drop(value)"
+          >
             <div class="card-container yellow-container overflow-hidden">
               <div class="flex flex-column">
                 <div *ngFor="let z of zones4comments?.zones; let j = index">
                   <canvas
-                    [id]="'canvas' + i"
-                    [hidden]="!showImageVisible[i]"
-                    (click)="goToCopie(k.pagemin, k.pagemax)"
-                    alt="Image 1"
+                    [id]="'canvas ' + value"
+                    (click)="goToCopie((zones4comments?.answers)![value].pagemin, (zones4comments?.answers)![value].pagemax)"
                     #nomImageVisible
                   ></canvas>
                 </div>
               </div>
               <div class="card-content">
-                <p *ngIf="!pointisNan(k, zones4comments)">
+                <p *ngIf="!pointisNan((zones4comments?.answers)![value], zones4comments)">
                   Note:
                   <span *ngIf="zones4comments !== undefined && zones4comments.step > 0"
-                    ><b>{{ k.note / zones4comments.step }}/{{ zones4comments.point }}</b></span
+                    ><b>{{ zones4comments.answers![value].note / zones4comments.step }}/{{ zones4comments.point }}</b></span
                   >
                   <span *ngIf="zones4comments !== undefined && zones4comments.step <= 0"
-                    ><b *ngIf="zones4comments.point !== 0">{{ k.note }}/{{ zones4comments.point }}</b></span
+                    ><b *ngIf="zones4comments.point !== 0">{{ zones4comments.answers![value].note }}/{{ zones4comments.point }}</b></span
                   >
                 </p>
-                <p *ngFor="let item of getGradedComments(k); let index = index">
+                <p *ngFor="let item of getGradedComments((zones4comments?.answers)![value]); let index = index">
                   Commentaire {{ index + 1 }}:
                   <b
                     >{{ item.text }}
@@ -96,7 +112,7 @@
                     >
                   </b>
                 </p>
-                <p *ngFor="let item of getTextComments(k); let index = index">
+                <p *ngFor="let item of getTextComments((zones4comments?.answers)![value]); let index = index">
                   Commentaire{{ index + 1 }}: <b>{{ item.text }}</b>
                 </p>
               </div>
@@ -104,8 +120,8 @@
           </div>
         </div>
       </ng-container>
-    </div>
-  </ng-container>
+    </ng-container>
+  </div>
   <!--<ng-container   *ngIf="imageInCluster.length >0" >
   <div class="grid" *ngFor="let cluster of clusters">
     <div *ngIf="clusters.length>1" class="col-12">

@@ -86,6 +86,8 @@ import { SidebarModule } from 'primeng/sidebar';
 import { CreateCommentsComponent } from './annotate-template/create-comments/create-comments.component';
 import { ClickDoubleDirective } from './clickdouble.directive';
 import { KeyboardshortcutComponent } from './corrigequestion/keyboardshortcut/keyboardshortcut.component';
+import { DragDropModule } from 'primeng/dragdrop';
+
 // set the location of the OpenCV files
 // registerAllModules();
 
@@ -380,6 +382,7 @@ export const CompareAnswer_ROUTE: Route = {
     MessageModule,
     OverlayPanelModule,
     SidebarModule,
+    DragDropModule,
     ProgressBarModule,
     KeyboardShortcutsModule.forRoot(),
     RouterModule.forChild([

@@ -61,7 +61,10 @@ export interface IImageAlignementInput {
   debug: boolean;
 }
 export interface IImageCropInput {
-  image?: ImageData;
+  image?: ArrayBuffer;
+  imageWidth: number;
+  imageHeight: number;
+
   x?: number;
   y?: number;
   width?: number;
@@ -163,11 +166,15 @@ export class AlignImagesService {
    * return a promise with the result of the event. This way we can call
    * the worker asynchronously.
    */
-  private _dispatch<T>(msg1: any, pay: any): Observable<T> {
+  private _dispatch<T>(msg1: any, pay: any, transferable?: any): Observable<T> {
     const uuid1 = uuid(); // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
     this.ready.then(() => {
       // console.log( ' send message ' + msg1 + ' ' + uuid1)
-      this.worker.postMessage({ msg: msg1, uid: uuid1, payload: pay });
+      if (transferable) {
+        this.worker.postMessage({ msg: msg1, uid: uuid1, payload: pay }, transferable);
+      } else {
+        this.worker.postMessage({ msg: msg1, uid: uuid1, payload: pay });
+      }
     });
     const p = new Subject<T>();
     this.subjects.set(uuid1, p);
@@ -186,11 +193,12 @@ export class AlignImagesService {
   }
 
   public imageCrop(payload: IImageCropInput): Observable<ImageData> {
-    return this._dispatch('imageCrop', payload);
+    return this._dispatch('imageCrop', payload, [payload.image]);
   }
 
   public groupImagePerContoursLength(payload: ICluster): Observable<number[]> {
-    return this._dispatch('groupImagePerContoursLength', payload);
+    const transferable = payload.images.map(image => image.image);
+    return this._dispatch('groupImagePerContoursLength', payload, transferable);
   }
 
   public prediction(payload: IImagePredictionInput, letter: boolean): Observable<IImagePredictionOutput> {

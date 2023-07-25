@@ -103,7 +103,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   examId: string | undefined;
   numberPagesInScan: number | undefined;
 
-  blocked = true;
+  blocked = false;
 
   zones4comments?: Zone4SameCommentOrSameGrade;
   noalign = false;
@@ -115,12 +115,32 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
 
   pageOffset = 0;
 
+  colonneStyle = 'col-12 md:col-6';
+
   questionall = false;
 
-  clusters = [0];
-  imageInCluster: number[] = [];
+  clusters: Map<number, number[]> = new Map([[0, []]]);
+  //  imageInCluster: number[] = [];
   layoutsidebarVisible = false;
   nbreCluster = 5;
+
+  currentDragAndDrop = -1;
+
+  firstImageLoadedReolve: ((value: void | PromiseLike<void>) => void) | undefined;
+  firstImageLoaded: Promise<void>;
+
+  nbreColumn = 2;
+
+  factorScale = 0.5;
+
+  nbreColumnOptions: any[] = [
+    { name: '1', value: 1 },
+    { name: '2', value: 2 },
+    { name: '3', value: 3 },
+    { name: '4', value: 4 },
+    { name: '6', value: 6 },
+    { name: '12', value: 12 },
+  ];
 
   constructor(
     public examService: ExamService,
@@ -146,7 +166,11 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     private applicationConfigService: ApplicationConfigService,
     private location: Location,
     private zone: NgZone
-  ) {}
+  ) {
+    this.firstImageLoaded = new Promise(resolve => {
+      this.firstImageLoadedReolve = resolve;
+    });
+  }
 
   ngOnInit(): void {
     this.windowWidth = window.innerWidth;
@@ -164,9 +188,8 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             )
             .subscribe(res => {
               this.zones4comments = res;
-              this.imageInCluster = [];
-              this.zones4comments.answers!.forEach(() => {
-                this.imageInCluster.push(0);
+              this.zones4comments.answers!.forEach((_, index) => {
+                this.clusters.get(0)?.push(index);
               });
             });
         } else if (params.get('commentid') !== null && this.router.url.includes('comparegradedcomment')) {
@@ -176,9 +199,8 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             )
             .subscribe(res => {
               this.zones4comments = res;
-              this.imageInCluster = [];
-              this.zones4comments.answers!.forEach(() => {
-                this.imageInCluster.push(0);
+              this.zones4comments.answers!.forEach((_, index) => {
+                this.clusters.get(0)?.push(index);
               });
 
               // console.error(this.zones4comments)
@@ -190,9 +212,8 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             )
             .subscribe(res => {
               this.zones4comments = res;
-              this.imageInCluster = [];
-              this.zones4comments.answers!.forEach(() => {
-                this.imageInCluster.push(0);
+              this.zones4comments.answers!.forEach((_, index) => {
+                this.clusters.get(0)?.push(index);
               });
             });
         } else if (params.get('qid') !== null && this.router.url.includes('compareanswer')) {
@@ -203,9 +224,8 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             )
             .subscribe(res => {
               this.zones4comments = res;
-              this.imageInCluster = [];
-              this.zones4comments.answers!.forEach(() => {
-                this.imageInCluster.push(0);
+              this.zones4comments.answers!.forEach((_, index) => {
+                this.clusters.get(0)?.push(index);
               });
             });
         }
@@ -216,6 +236,10 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.canvass.changes.subscribe(() => {
       this.reloadImage();
+      this.changeDetector.detectChanges();
+    });
+    this.canvassVisibles.changes.subscribe(() => {
+      this.reloadImageClassify();
       this.changeDetector.detectChanges();
     });
   }
@@ -234,9 +258,10 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     }
   }
 
-  reloadImage() {
-    this.zones4comments?.answers!.forEach((a, i) => {
-      this.zones4comments?.zones.forEach((z, j) => {
+  async reloadImage() {
+    this.blocked = true;
+    for (const [i, a] of this.zones4comments!.answers!.entries()) {
+      for (const [j, z] of this.zones4comments!.zones!.entries()) {
         const pagewithoffset = a.pagemin + this.zones4comments?.zones[j].pageNumber! + this.pageOffset;
         const pagewithoutoffset = a.pagemin + this.zones4comments?.zones[j].pageNumber!;
         let page = pagewithoutoffset;
@@ -245,40 +270,35 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
         }
 
         this.showImage[i * this.zones4comments!.zones.length + j] = false;
-        this.getAllImage4Zone(page, z).then(p => {
-          this.displayImage(p, this.canvass.get(i * this.zones4comments!.zones.length + j), b => {
-            this.showImage[i * this.zones4comments!.zones.length + j] = b;
-          });
+        const p = await this.getAllImage4Zone(page, z);
+        this.displayImage(p, this.canvass.get(i * this.zones4comments!.zones.length + j), b => {
+          this.showImage[i * this.zones4comments!.zones.length + j] = b;
         });
-      });
-    });
-    this.reloadImageClassify();
+      }
+    }
+    this.blocked = false;
+
+    this.firstImageLoadedReolve!();
   }
 
   reloadImageClassify() {
-    let k = -1;
-    this.clusters.forEach(cluster => {
-      this.zones4comments?.answers!.forEach((a, i) => {
-        if (this.imageInCluster[i] === cluster) {
-          k = k + 1;
-          const ktemp = k;
-          this.zones4comments?.zones.forEach((z, j) => {
-            const pagewithoffset = a.pagemin + this.zones4comments?.zones[j].pageNumber! + this.pageOffset;
-            const pagewithoutoffset = a.pagemin + this.zones4comments?.zones[j].pageNumber!;
-            let page = pagewithoutoffset;
-            if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
-              page = pagewithoffset;
-            }
-
-            this.showImageVisible[i * this.zones4comments!.zones.length + j] = false;
-            this.getAllImage4Zone(page, z).then(p => {
-              this.displayImage(p, this.canvassVisibles.get(ktemp * this.zones4comments!.zones.length + j), b => {
-                this.showImageVisible[i * this.zones4comments!.zones.length + j] = b;
-              });
-            });
-          });
-        }
+    this.firstImageLoaded.then(() => {
+      const nbreZones = this.zones4comments!.zones!.length;
+      let k = 0;
+      this.clusters.forEach(value => {
+        value.forEach(v => {
+          for (let j = 0; j < nbreZones; j++) {
+            const newCanvas = this.canvassVisibles.get(k)!.nativeElement;
+            const oldCanvas = this.canvass.get(v * nbreZones + j)!.nativeElement;
+            newCanvas.width = oldCanvas.width;
+            newCanvas.height = oldCanvas.height;
+            const context = newCanvas.getContext('2d');
+            context.drawImage(oldCanvas, 0, 0);
+            k = k + 1;
+          }
+        });
       });
+      this.blocked = false;
     });
   }
 
@@ -330,7 +350,9 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             }
             this.alignImagesService
               .imageCrop({
-                image: v.image,
+                image: v.image!.data.buffer,
+                imageWidth: v.image!.width,
+                imageHeight: v.image!.height,
                 x: initX,
                 y: initY,
                 width: finalW,
@@ -363,7 +385,10 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             }
             this.alignImagesService
               .imageCrop({
-                image: v.image,
+                image: v.image!.data.buffer,
+                imageWidth: v.image!.width,
+                imageHeight: v.image!.height,
+
                 x: initX,
                 y: initY,
                 width: finalW,
@@ -382,11 +407,10 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
       i.onload = () => {
         const editedImage: HTMLCanvasElement = <HTMLCanvasElement>document.createElement('canvas');
         editedImage.width = i.width;
-        let factorScale = 0.5;
         if (this.windowWidth < 991) {
-          factorScale = 0.95;
+          this.factorScale = 0.95;
         }
-        this.scale = (window.innerWidth * factorScale) / i.width;
+        this.scale = (window.innerWidth * this.factorScale) / i.width;
         this.eventHandler.scale = this.scale;
         editedImage.height = i.height;
         const ctx = editedImage.getContext('2d');
@@ -458,6 +482,8 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   }
 
   classifyAll(): void {
+    this.blocked = true;
+
     const inputImages: IImageCluster[] = [];
 
     this.zones4comments?.answers!.forEach((_a, i) => {
@@ -466,9 +492,9 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
         const ctx = c.getContext('2d');
         const inputimage = ctx!.getImageData(0, 0, c.width, c.height);
         // console.error(inputimage)
-        this.debugImage(inputimage);
+        // this.debugImage(inputimage);
         const p: IImageCluster = {
-          image: inputimage,
+          image: inputimage.data.buffer,
           imageIndex: j,
           studentIndex: i,
           width: c.width,
@@ -482,12 +508,16 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
       nbrCluster: this.nbreCluster,
     };
     this.alignImagesService.groupImagePerContoursLength(icluster).subscribe(res => {
-      const _cluster: number[] = [];
+      const _cluster = new Map<number, number[]>();
       for (let c1 = 0; c1 < this.nbreCluster; c1++) {
-        _cluster.push(c1);
+        _cluster.set(c1, []);
       }
       this.clusters = _cluster;
-      this.imageInCluster = res;
+      res.forEach((t, index) => {
+        this.clusters.get(t)?.push(index);
+      });
+      //      this.imageInCluster = res;
+
       this.reloadImageClassify();
     });
   }
@@ -532,5 +562,62 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     zip.generateAsync({ type: 'blob' }).then(content => {
       FileSaver.saveAs(content, 'Exam' + this.examId + '.zip');
     });
+  }
+
+  dragStart(value: any): void {
+    console.error('dragStart', value);
+    this.currentDragAndDrop = value;
+  }
+
+  dragEnd(value: any): void {
+    console.error('dragEnd', value);
+    this.currentDragAndDrop = -1;
+  }
+
+  drop(value: any) {
+    const currentDragAndDrop = this.currentDragAndDrop;
+    let clustersource = -1;
+    let clusterdest = -1;
+
+    for (const v of this.clusters) {
+      if (v[1].includes(currentDragAndDrop) && !v[1].includes(value)) {
+        clustersource = v[0];
+      } else if (!v[1].includes(currentDragAndDrop) && v[1].includes(value)) {
+        clusterdest = v[0];
+      }
+    }
+    if (clustersource !== -1 && clusterdest !== -1) {
+      const index = this.clusters.get(clustersource)!.indexOf(currentDragAndDrop);
+      this.clusters.get(clustersource)!.splice(index, 1);
+      const index1 = this.clusters.get(clusterdest)!.indexOf(value);
+      this.clusters.get(clusterdest)!.splice(index1, 0, currentDragAndDrop);
+    }
+    console.error('drop', value);
+  }
+
+  async updateColumn(event: any) {
+    this.nbreColumn = event.value.value;
+    if (this.nbreColumn === 1) {
+      this.colonneStyle = 'col-12 md:col-12';
+      this.factorScale = 1;
+    } else if (this.nbreColumn === 2) {
+      this.colonneStyle = 'col-12 md:col-6';
+      this.factorScale = 1 / 2;
+    } else if (this.nbreColumn === 3) {
+      this.colonneStyle = 'col-12 md:col-4';
+      this.factorScale = 0.95 / 3;
+    } else if (this.nbreColumn === 4) {
+      this.colonneStyle = 'col-12 md:col-3';
+      this.factorScale = 0.95 / 4;
+    } else if (this.nbreColumn === 6) {
+      this.colonneStyle = 'col-12 md:col-2';
+      this.factorScale = 0.95 / 6;
+    } else if (this.nbreColumn === 12) {
+      this.colonneStyle = 'col-12 md:col-1';
+      this.factorScale = 0.95 / 12;
+    }
+    await this.reloadImage();
+    this.reloadImageClassify();
+    this.layoutsidebarVisible = false;
   }
 }
