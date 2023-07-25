@@ -62,11 +62,11 @@
     <h3 jhiTranslate="scanexam.kmeanoptions">Kmean options</h3>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <label><span jhiTranslate="scanexam.nbreCluster"> Nombre de cluster : </span>({{ nbreCluster }})</label>
-      <p-slider [(ngModel)]="nbreCluster" [min]="2" [max]="15" [step]="1"> </p-slider>
+      <p-slider [ngModel]="nbreCluster" [min]="2" [max]="15" [step]="1" (onChange)="updateNbrCluster($event)"> </p-slider>
     </div>
     <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <label><span jhiTranslate="scanexam.nbreImagePerLigne"> Nombre de tuile affichée par ligne : </span>({{ nbreCluster }})</label>
+      <label><span jhiTranslate="scanexam.nbreImagePerLigne"> Nombre de tuile affichée par ligne : </span>({{ nbreColumn }})</label>
       <p-selectButton [options]="nbreColumnOptions" [ngModel]="nbreColumn" optionLabel="name" (onChange)="updateColumnEvent($event)">
       </p-selectButton>
     </div>

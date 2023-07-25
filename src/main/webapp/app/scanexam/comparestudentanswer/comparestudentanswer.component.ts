@@ -179,6 +179,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     const factorscale = this.preferenceService.getImagePerLine();
     this.updateColumn(factorscale);
+    this.nbreCluster = this.preferenceService.getNbreCluster();
     this.windowWidth = window.innerWidth;
     this.activatedRoute.paramMap.subscribe(params => {
       this.blocked = true;
@@ -501,6 +502,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     const inputImages: IImageCluster[] = [];
     if (this.zones4comments!.answers!.length <= this.nbreCluster) {
       this.nbreCluster = this.zones4comments!.answers!.length - 1;
+      this.preferenceService.saveNbreCluster(this.nbreCluster);
     }
     this.zones4comments?.answers!.forEach((_a, i) => {
       this.zones4comments?.zones.forEach((_z, j) => {
@@ -662,6 +664,11 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             }
           });
       });
+  }
+
+  updateNbrCluster(event: any) {
+    this.nbreCluster = event.value;
+    this.preferenceService.saveNbreCluster(event.value);
   }
   async updateColumnEvent(event: any) {
     await this.updateColumn(event.value.value);
