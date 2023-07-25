@@ -300,8 +300,10 @@
     "resetAllShortCut": "Supprimer l'ensemble des raccourcis clavier associés aux commentaires",
     "kmeanoptions": "Option du KMean",
     "nbreCluster": "Nombre de clusters",
-    "classify": "Grouper",
-    "classifytooltip": "Permet de grouper les images par ressemblances",
+    "classify": "(Re)calculer groupes",
+    "unclassify": "Supprimer groupes calculés",
+    "classifytooltip": "Permet de calculer des groupes d'images par ressemblances",
+    "unclassifytooltip": "Permet de supprimer le calcul des groupes d'images",
     "nbreImagePerLigne": "Nombre d'images par ligne"
   }
 }

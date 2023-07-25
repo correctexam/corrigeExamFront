@@ -101,6 +101,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   showImage: boolean[] = [];
   showImageVisible: boolean[] = [];
   examId: string | undefined;
+  qId: string | undefined;
   numberPagesInScan: number | undefined;
 
   blocked = false;
@@ -110,8 +111,6 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   factor = 1;
   scale = 1;
   windowWidth = 0;
-
-  foo: string | undefined;
 
   pageOffset = 0;
 
@@ -173,6 +172,8 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    const factorscale = this.preferenceService.getImagePerLine();
+    this.updateColumn(factorscale);
     this.windowWidth = window.innerWidth;
     this.activatedRoute.paramMap.subscribe(params => {
       this.blocked = true;
@@ -217,6 +218,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
               });
             });
         } else if (params.get('qid') !== null && this.router.url.includes('compareanswer')) {
+          this.qId = params.get('qid')!;
           this.questionall = true;
           this.http
             .get<Zone4SameCommentOrSameGrade>(
@@ -224,9 +226,14 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             )
             .subscribe(res => {
               this.zones4comments = res;
-              this.zones4comments.answers!.forEach((_, index) => {
-                this.clusters.get(0)?.push(index);
-              });
+              const _cluster = this.preferenceService.getCluster4Question(this.examId + '_' + this.qId);
+              if (_cluster === null) {
+                this.zones4comments.answers!.forEach((_, index) => {
+                  this.clusters.get(0)?.push(index);
+                });
+              } else {
+                this.clusters = _cluster;
+              }
             });
         }
       }
@@ -516,10 +523,26 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
       res.forEach((t, index) => {
         this.clusters.get(t)?.push(index);
       });
+
+      this.preferenceService.saveCluster4Question(this.examId + '_' + this.qId, this.clusters);
       //      this.imageInCluster = res;
 
       this.reloadImageClassify();
     });
+  }
+
+  unclassifyAll(): void {
+    this.blocked = true;
+
+    const _cluster: Map<number, number[]> = new Map([[0, []]]);
+    this.zones4comments!.answers!.forEach((_, index) => {
+      _cluster.get(0)?.push(index);
+    });
+    this.preferenceService.saveCluster4Question(this.examId + '_' + this.qId, _cluster);
+    this.clusters = _cluster;
+    //      this.imageInCluster = res;
+
+    this.reloadImageClassify();
   }
 
   downloadAll(): void {
@@ -565,12 +588,10 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   }
 
   dragStart(value: any): void {
-    console.error('dragStart', value);
     this.currentDragAndDrop = value;
   }
 
-  dragEnd(value: any): void {
-    console.error('dragEnd', value);
+  dragEnd(): void {
     this.currentDragAndDrop = -1;
   }
 
@@ -591,12 +612,16 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
       this.clusters.get(clustersource)!.splice(index, 1);
       const index1 = this.clusters.get(clusterdest)!.indexOf(value);
       this.clusters.get(clusterdest)!.splice(index1, 0, currentDragAndDrop);
+      this.preferenceService.saveCluster4Question(this.examId + '_' + this.qId, this.clusters);
     }
-    console.error('drop', value);
   }
 
-  async updateColumn(event: any) {
-    this.nbreColumn = event.value.value;
+  async updateColumnEvent(event: any) {
+    await this.updateColumn(event.value.value);
+    this.preferenceService.saveImagePerLine(event.value.value);
+  }
+  async updateColumn(nbreColumn: number) {
+    this.nbreColumn = nbreColumn;
     if (this.nbreColumn === 1) {
       this.colonneStyle = 'col-12 md:col-12';
       this.factorScale = 1;

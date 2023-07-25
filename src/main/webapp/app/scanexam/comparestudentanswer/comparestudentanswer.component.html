@@ -45,6 +45,18 @@
     >
       <fa-icon icon="circle-nodes"></fa-icon>&nbsp;<span jhiTranslate="scanexam.classify">Classify</span>
     </button>
+    <button
+      *ngIf="questionall"
+      [disabled]="!this.examId"
+      type="submit"
+      id="classify-entity"
+      data-cy="entityCreateSaveButton"
+      class="p-button p-button-primary"
+      (click)="unclassifyAll()"
+      [pTooltip]="'scanexam.unclassifytooltip' | translate"
+    >
+      <fa-icon icon="object-ungroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.unclassify">Unclassify</span>
+    </button>
   </div>
   <p-sidebar [(visible)]="layoutsidebarVisible">
     <h3 jhiTranslate="scanexam.kmeanoptions">Kmean options</h3>
@@ -55,7 +67,7 @@
     <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <label><span jhiTranslate="scanexam.nbreImagePerLigne"> Nombre de tuile affichée par ligne : </span>({{ nbreCluster }})</label>
-      <p-selectButton [options]="nbreColumnOptions" [ngModel]="nbreColumn" optionLabel="name" (onChange)="updateColumn($event)">
+      <p-selectButton [options]="nbreColumnOptions" [ngModel]="nbreColumn" optionLabel="name" (onChange)="updateColumnEvent($event)">
       </p-selectButton>
     </div>
   </p-sidebar>
@@ -80,7 +92,7 @@
             pDraggable
             pDroppable
             (onDragStart)="dragStart(value)"
-            (onDragEnd)="dragEnd(value)"
+            (onDragEnd)="dragEnd()"
             (onDrop)="drop(value)"
           >
             <div class="card-container yellow-container overflow-hidden">
@@ -122,51 +134,4 @@
       </ng-container>
     </ng-container>
   </div>
-  <!--<ng-container   *ngIf="imageInCluster.length >0" >
-  <div class="grid" *ngFor="let cluster of clusters">
-    <div *ngIf="clusters.length>1" class="col-12">
-      <h1 > Cluster {{cluster}} </h1>
-    </div>
-    <ng-container   *ngFor="let k of zones4comments?.answers; let i = index">
-
-    <div class="col-12 md:col-6"  *ngIf="imageInCluster.length ===0 || imageInCluster[i]===cluster">
-
-
-    <div class="card" [style]="'width: 100%;height: 100%;'">
-      <div class="card-container yellow-container overflow-hidden">
-        <div class="flex flex-column">
-          <div *ngFor="let z of zones4comments?.zones; let j = index">
-            <canvas (click)="goToCopie(k.pagemin, k.pagemax)" alt="Image 1" #nomImageClassify></canvas>
-          </div>
-        </div>
-        <div class="card-content">
-          <p *ngIf="!pointisNan(k, zones4comments)">
-            Note:
-            <span *ngIf="zones4comments !== undefined && zones4comments.step > 0"
-              ><b>{{ k.note / zones4comments.step }}/{{ zones4comments.point }}</b></span
-            >
-            <span *ngIf="zones4comments !== undefined && zones4comments.step <= 0"
-              ><b *ngIf="zones4comments.point !== 0">{{ k.note }}/{{ zones4comments.point }}</b></span
-            >
-          </p>
-          <p *ngFor="let item of getGradedComments(k); let index = index">
-            Commentaire {{ index + 1 }}:
-            <b
-              >{{ item.text }}
-              <span *ngIf="item.grade && zones4comments !== undefined && zones4comments?.algoName !== 'QCM'"
-                >( <span *ngIf="zones4comments?.gradeType === 'NEGATIVE'">-</span> {{ item.grade! / zones4comments.step! }}pt)</span
-              >
-            </b>
-          </p>
-          <p *ngFor="let item of getTextComments(k); let index = index">
-            Commentaire{{ index + 1 }}: <b>{{ item.text }}</b>
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</ng-container>
-
-</div>
-</ng-container>-->
 </div>

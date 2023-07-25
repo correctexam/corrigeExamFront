@@ -139,4 +139,49 @@ export class PreferenceService {
     }
     return pref;
   }
+
+  saveImagePerLine(pref: number): void {
+    this.localStorageService.store('saveImagePerLine', pref);
+  }
+  getImagePerLine(): number {
+    let pref: number | null = this.localStorageService.retrieve('saveImagePerLine');
+    if (pref === null) {
+      const defaultvalue = 2;
+      this.localStorageService.store('saveImagePerLine', defaultvalue);
+      pref = defaultvalue;
+    }
+    return pref;
+  }
+
+  saveCluster4Question(key: string, pref: Map<number, number[]>): void {
+    this.localStorageService.store('cluster_' + key, JSON.stringify(pref, this.replacer));
+  }
+  getCluster4Question(key: string): Map<number, number[]> | null {
+    const spref: string | null = this.localStorageService.retrieve('cluster_' + key);
+    if (spref === null) {
+      return null;
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return JSON.parse(spref, this.reviver);
+    }
+  }
+
+  replacer(key: any, value: any): any {
+    if (value instanceof Map) {
+      return {
+        dataType: 'Map',
+        value: Array.from(value.entries()), // or with spread: value: [...value]
+      };
+    } else {
+      return value;
+    }
+  }
+  reviver(key: any, value: any): any {
+    if (typeof value === 'object' && value !== null) {
+      if (value.dataType === 'Map') {
+        return new Map(value.value);
+      }
+    }
+    return value;
+  }
 }

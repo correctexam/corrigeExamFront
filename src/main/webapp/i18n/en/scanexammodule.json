@@ -299,7 +299,9 @@
     "kmeanoptions": "KMean options",
     "nbreCluster": "How many clusters",
     "classify": "Group similar",
-    "classifytooltip": "Groups images by similarity",
+    "classifytooltip": "Compute groups images by similarity",
+    "unclassify": "Remove computed groups",
+    "unclassifytooltip": "Remove the computed image groups",
     "nbreImagePerLigne": "Number of images per line"
   }
 }
