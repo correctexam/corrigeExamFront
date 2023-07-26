@@ -11,8 +11,9 @@ import { AccountService } from 'app/core/auth/account.service';
   templateUrl: './main.component.html',
 })
 export class MainComponent implements OnInit {
-  private renderer: Renderer2;
+  helptitle: string | undefined;
 
+  private renderer: Renderer2;
   constructor(
     private accountService: AccountService,
     private titleService: Title,
@@ -21,6 +22,13 @@ export class MainComponent implements OnInit {
     rootRenderer: RendererFactory2
   ) {
     this.renderer = rootRenderer.createRenderer(document.querySelector('html'), null);
+
+    // Could not use default translate services due to a bug in https://github.com/omridevk/ng-keyboard-shortcuts
+    if ('fr' === this.translateService.currentLang) {
+      this.helptitle = 'Raccourcis clavier';
+    } else {
+      this.helptitle = 'Keyboard shortcuts';
+    }
   }
 
   ngOnInit(): void {
@@ -32,6 +40,10 @@ export class MainComponent implements OnInit {
         this.updateTitle();
       }
     });
+
+    /*    this.translateService.get('scanexam.help').subscribe(e=> {
+      this.helptitle = e
+    });*/
 
     this.translateService.onLangChange.subscribe((langChangeEvent: LangChangeEvent) => {
       this.updateTitle();
