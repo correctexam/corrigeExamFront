@@ -304,6 +304,8 @@
     "unclassifytooltip": "Remove the computed image groups",
     "nbreImagePerLigne": "Number of images per line",
     "applysamegrade": "Apply the same grade",
-    "applysamegradetooltip": "Apply the same grade and comments as the first answer in this answer group."
+    "applysamegradetooltip": "Apply the same grade and comments as the first answer in this answer group.",
+    "documentation": "Documentation",
+    "accessdocumentation": "Open the online documentation"
   }
 }
