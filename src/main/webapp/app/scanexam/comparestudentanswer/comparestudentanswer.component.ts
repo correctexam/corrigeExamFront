@@ -83,18 +83,6 @@ export interface ClusterDTO {
   providers: [ConfirmationService, MessageService],
 })
 export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
-  goBack() {
-    this.location.back();
-  }
-  goToCopie(pageMin: number, pageMax: number) {
-    if (this.zones4comments !== undefined && this.zones4comments.numero > 0 && Number.isInteger(pageMin / (pageMax + 1 - pageMin) + 1)) {
-      this.zone.run(() => {
-        this.router.navigate([
-          '/answer/' + this.examId + '/' + this.zones4comments!.numero + '/' + (pageMin / (pageMax + 1 - pageMin) + 1),
-        ]);
-      });
-    }
-  }
   debug = false;
 
   @ViewChildren('nomImage')
@@ -228,7 +216,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
           this.questionall = true;
           this.http
             .get<Zone4SameCommentOrSameGrade>(
-              this.applicationConfigService.getEndpointFor('api/getZone4Numero/' + this.examId + '/' + params.get('qid'))
+              this.applicationConfigService.getEndpointFor('api/getZone4Numero/' + this.examId + '/' + this.qId)
             )
             .subscribe(res => {
               this.zones4comments = res;
@@ -255,6 +243,32 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
       this.reloadImageClassify();
       this.changeDetector.detectChanges();
     });
+  }
+
+  goBack() {
+    this.location.back();
+  }
+  goToCopie(event: any, pageMin: number, pageMax: number) {
+    if (event.ctrlKey || event.metaKey) {
+      if (this.zones4comments !== undefined && this.zones4comments.numero > 0 && Number.isInteger(pageMin / (pageMax + 1 - pageMin) + 1)) {
+        this.zone.run(() => {
+          const url = this.router.serializeUrl(
+            this.router.createUrlTree([
+              '/answer/' + this.examId + '/' + this.zones4comments!.numero + '/' + (pageMin / (pageMax + 1 - pageMin) + 1),
+            ])
+          );
+          window.open(url, '_blank');
+        });
+      }
+    } else {
+      if (this.zones4comments !== undefined && this.zones4comments.numero > 0 && Number.isInteger(pageMin / (pageMax + 1 - pageMin) + 1)) {
+        this.zone.run(() => {
+          this.router.navigate([
+            '/answer/' + this.examId + '/' + this.zones4comments!.numero + '/' + (pageMin / (pageMax + 1 - pageMin) + 1),
+          ]);
+        });
+      }
+    }
   }
 
   reloadImageGrowFactor(event: any): void {
@@ -671,8 +685,8 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     this.preferenceService.saveNbreCluster(event.value);
   }
   async updateColumnEvent(event: any) {
-    await this.updateColumn(event.value.value);
-    this.preferenceService.saveImagePerLine(event.value.value);
+    await this.updateColumn(event.value);
+    this.preferenceService.saveImagePerLine(event.value);
   }
   async updateColumn(nbreColumn: number) {
     this.nbreColumn = nbreColumn;

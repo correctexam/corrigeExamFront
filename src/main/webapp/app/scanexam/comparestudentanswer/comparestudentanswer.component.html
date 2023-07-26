@@ -5,7 +5,6 @@
 
   <div class="col-8">
     <p-button
-      *ngIf="questionall"
       class="sm:text-xs md:text-xs lg:text-base"
       styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
       (click)="layoutsidebarVisible = true"
@@ -59,15 +58,21 @@
     </button>
   </div>
   <p-sidebar [(visible)]="layoutsidebarVisible">
-    <h3 jhiTranslate="scanexam.kmeanoptions">Kmean options</h3>
-    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+    <h3 *ngIf="questionall" jhiTranslate="scanexam.kmeanoptions">Kmean options</h3>
+    <div *ngIf="questionall" style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <label><span jhiTranslate="scanexam.nbreCluster"> Nombre de cluster : </span>({{ nbreCluster }})</label>
       <p-slider [ngModel]="nbreCluster" [min]="2" [max]="15" [step]="1" (onChange)="updateNbrCluster($event)"> </p-slider>
     </div>
     <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <label><span jhiTranslate="scanexam.nbreImagePerLigne"> Nombre de tuile affichée par ligne : </span>({{ nbreColumn }})</label>
-      <p-selectButton [options]="nbreColumnOptions" [ngModel]="nbreColumn" optionLabel="name" (onChange)="updateColumnEvent($event)">
+      <p-selectButton
+        [options]="nbreColumnOptions"
+        [ngModel]="nbreColumn"
+        optionLabel="name"
+        optionValue="value"
+        (onChange)="updateColumnEvent($event)"
+      >
       </p-selectButton>
     </div>
   </p-sidebar>
@@ -112,7 +117,7 @@
                 <div *ngFor="let z of zones4comments?.zones; let j = index">
                   <canvas
                     [id]="'canvas ' + value"
-                    (click)="goToCopie((zones4comments?.answers)![value].pagemin, (zones4comments?.answers)![value].pagemax)"
+                    (click)="goToCopie($event, (zones4comments?.answers)![value].pagemin, (zones4comments?.answers)![value].pagemax)"
                     #nomImageVisible
                   ></canvas>
                 </div>
