@@ -186,6 +186,9 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
               this.zones4comments.answers!.forEach((_, index) => {
                 this.clusters.get(0)?.push(index);
               });
+              if (this.clusters.get(0) === undefined || this.clusters.get(0)!.length === 0) {
+                this.blocked = false;
+              }
             });
         } else if (params.get('commentid') !== null && this.router.url.includes('comparegradedcomment')) {
           this.http
@@ -197,6 +200,9 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
               this.zones4comments.answers!.forEach((_, index) => {
                 this.clusters.get(0)?.push(index);
               });
+              if (this.clusters.get(0) === undefined || this.clusters.get(0)!.length === 0) {
+                this.blocked = false;
+              }
 
               // console.error(this.zones4comments)
             });
@@ -210,6 +216,9 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
               this.zones4comments.answers!.forEach((_, index) => {
                 this.clusters.get(0)?.push(index);
               });
+              if (this.clusters.get(0) === undefined || this.clusters.get(0)!.length === 0) {
+                this.blocked = false;
+              }
             });
         } else if (params.get('qid') !== null && this.router.url.includes('compareanswer')) {
           this.qId = params.get('qid')!;
