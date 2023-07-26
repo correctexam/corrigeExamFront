@@ -685,8 +685,8 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     this.preferenceService.saveNbreCluster(event.value);
   }
   async updateColumnEvent(event: any) {
-    await this.updateColumn(event.value.value);
-    this.preferenceService.saveImagePerLine(event.value.value);
+    await this.updateColumn(event.value);
+    this.preferenceService.saveImagePerLine(event.value);
   }
   async updateColumn(nbreColumn: number) {
     this.nbreColumn = nbreColumn;

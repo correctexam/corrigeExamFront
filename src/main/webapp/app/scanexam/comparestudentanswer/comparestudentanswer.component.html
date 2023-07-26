@@ -66,7 +66,13 @@
     <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <label><span jhiTranslate="scanexam.nbreImagePerLigne"> Nombre de tuile affichée par ligne : </span>({{ nbreColumn }})</label>
-      <p-selectButton [options]="nbreColumnOptions" [ngModel]="nbreColumn" optionLabel="name" (onChange)="updateColumnEvent($event)">
+      <p-selectButton
+        [options]="nbreColumnOptions"
+        [ngModel]="nbreColumn"
+        optionLabel="name"
+        optionValue="value"
+        (onChange)="updateColumnEvent($event)"
+      >
       </p-selectButton>
     </div>
   </p-sidebar>
