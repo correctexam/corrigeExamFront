@@ -266,7 +266,15 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
               '/answer/' + this.examId + '/' + this.zones4comments!.numero + '/' + (pageMin / (pageMax + 1 - pageMin) + 1),
             ])
           );
-          window.open(url, '_blank');
+          if ('/' !== this.applicationConfigService.getFrontUrl()) {
+            if (this.applicationConfigService.getFrontUrl().endsWith('/') && url.startsWith('/')) {
+              window.open(this.applicationConfigService.getFrontUrl().slice(0, -1) + url, '_blank');
+            } else {
+              window.open(this.applicationConfigService.getFrontUrl() + url, '_blank');
+            }
+          } else {
+            window.open(url, '_blank');
+          }
         });
       }
     } else {
