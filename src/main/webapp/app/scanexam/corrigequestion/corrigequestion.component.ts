@@ -53,6 +53,7 @@ import { EntityResponseType } from '../../entities/exam-sheet/service/exam-sheet
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { KeyboardShortcutsComponent, ShortcutEventOutput, ShortcutInput } from 'ng-keyboard-shortcuts';
 import { IKeyBoardShortCutPreferenceEntry, KeyboardShortcutService } from '../preference-page/keyboardshortcut.service';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
 
 @Component({
   selector: 'jhi-corrigequestion',
@@ -61,21 +62,6 @@ import { IKeyBoardShortCutPreferenceEntry, KeyboardShortcutService } from '../pr
   providers: [ConfirmationService, MessageService],
 })
 export class CorrigequestionComponent implements OnInit, AfterViewInit {
-  compareGradedComment(comment: IGradedComment) {
-    this.zone.run(() => {
-      this.router.navigate(['/comparegradedcomment/' + this.examId + '/' + comment.id]);
-    });
-  }
-  compareTextComment(comment: ITextComment) {
-    this.zone.run(() => {
-      this.router.navigate(['/comparetextcomment/' + this.examId + '/' + comment.id]);
-    });
-  }
-  compareMark(response: IStudentResponse) {
-    this.zone.run(() => {
-      this.router.navigate(['/comparemark/' + this.examId + '/' + response.id]);
-    });
-  }
   minimizeComment = false;
   layoutsidebarVisible = false;
   debug = false;
@@ -178,7 +164,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     private preferenceService: PreferenceService,
     private db: CacheServiceImpl,
     private zone: NgZone,
-    private keyboardShortcutService: KeyboardShortcutService
+    private keyboardShortcutService: KeyboardShortcutService,
+    private applicationConfigService: ApplicationConfigService
   ) {}
 
   ngOnInit(): void {
@@ -1754,5 +1741,66 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   toggleCommentLayout() {
     this.minimizeComment = !this.minimizeComment;
     this.preferenceService.setMinimizeComments(this.minimizeComment);
+  }
+
+  compareGradedComment(event: any, comment: IGradedComment) {
+    if (event.ctrlKey || event.metaKey) {
+      this.zone.run(() => {
+        const url = this.router.serializeUrl(this.router.createUrlTree(['/comparegradedcomment/' + this.examId + '/' + comment.id]));
+        if ('/' !== this.applicationConfigService.getFrontUrl()) {
+          if (this.applicationConfigService.getFrontUrl().endsWith('/') && url.startsWith('/')) {
+            window.open(this.applicationConfigService.getFrontUrl().slice(0, -1) + url, '_blank');
+          } else {
+            window.open(this.applicationConfigService.getFrontUrl() + url, '_blank');
+          }
+        } else {
+          window.open(url, '_blank');
+        }
+      });
+    } else {
+      this.zone.run(() => {
+        this.router.navigate(['/comparegradedcomment/' + this.examId + '/' + comment.id]);
+      });
+    }
+  }
+  compareTextComment(event: any, comment: ITextComment) {
+    if (event.ctrlKey || event.metaKey) {
+      this.zone.run(() => {
+        const url = this.router.serializeUrl(this.router.createUrlTree(['/comparetextcomment/' + this.examId + '/' + comment.id]));
+        if ('/' !== this.applicationConfigService.getFrontUrl()) {
+          if (this.applicationConfigService.getFrontUrl().endsWith('/') && url.startsWith('/')) {
+            window.open(this.applicationConfigService.getFrontUrl().slice(0, -1) + url, '_blank');
+          } else {
+            window.open(this.applicationConfigService.getFrontUrl() + url, '_blank');
+          }
+        } else {
+          window.open(url, '_blank');
+        }
+      });
+    } else {
+      this.zone.run(() => {
+        this.router.navigate(['/comparetextcomment/' + this.examId + '/' + comment.id]);
+      });
+    }
+  }
+  compareMark(event: any, response: IStudentResponse) {
+    if (event.ctrlKey || event.metaKey) {
+      this.zone.run(() => {
+        const url = this.router.serializeUrl(this.router.createUrlTree(['/comparemark/' + this.examId + '/' + response.id]));
+        if ('/' !== this.applicationConfigService.getFrontUrl()) {
+          if (this.applicationConfigService.getFrontUrl().endsWith('/') && url.startsWith('/')) {
+            window.open(this.applicationConfigService.getFrontUrl().slice(0, -1) + url, '_blank');
+          } else {
+            window.open(this.applicationConfigService.getFrontUrl() + url, '_blank');
+          }
+        } else {
+          window.open(url, '_blank');
+        }
+      });
+    } else {
+      this.zone.run(() => {
+        this.router.navigate(['/comparemark/' + this.examId + '/' + response.id]);
+      });
+    }
   }
 }

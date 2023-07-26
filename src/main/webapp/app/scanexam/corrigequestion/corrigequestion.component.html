@@ -314,7 +314,7 @@
               [tooltipPosition]="'left'"
               [tooltipZIndex]="'3000'"
               [pTooltip]="'scanexam.tooltipCompareMark' | translate"
-              (click)="compareMark(resp!)"
+              (click)="compareMark($event, resp!)"
             >
               <fa-icon icon="code-compare"></fa-icon>
             </span>
@@ -345,7 +345,7 @@
                   [tooltipPosition]="'left'"
                   [tooltipZIndex]="'3000'"
                   [pTooltip]="'scanexam.tooltipCompareComment' | translate"
-                  (click)="compareTextComment(comment)"
+                  (click)="compareTextComment($event, comment)"
                 >
                   <fa-icon icon="code-compare"></fa-icon>
                 </span>
@@ -438,7 +438,7 @@
                   [tooltipPosition]="'left'"
                   [tooltipZIndex]="'3000'"
                   [pTooltip]="'scanexam.tooltipCompareComment' | translate"
-                  (click)="compareGradedComment(comment)"
+                  (click)="compareGradedComment($event, comment)"
                 >
                   <fa-icon icon="code-compare"></fa-icon>
                 </span>

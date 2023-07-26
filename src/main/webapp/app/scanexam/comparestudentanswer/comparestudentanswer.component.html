@@ -13,44 +13,48 @@
   </div>
   <div class="col-4 flex flex-row-reverse">
     <button
-      [disabled]="!this.examId"
+      pButton
+      [disabled]="!this.examId || getCurrentNavigationId() === 1"
       type="submit"
       id="save-entity"
       data-cy="entityCreateSaveButton"
-      class="p-button p-button-primary"
+      class="p-button-primary"
       (click)="goBack()"
     >
       <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackcorrection">Retourner à la correction</span>
     </button>
     <button
+      pButton
       [disabled]="!this.examId"
       type="submit"
       id="save-entity"
       data-cy="entityCreateSaveButton"
-      class="p-button p-button-primary"
+      class="p-button-primary"
       (click)="downloadAll()"
     >
       <fa-icon icon="download"></fa-icon>&nbsp;<span jhiTranslate="scanexam.downloadimages">Download</span>
     </button>
     <button
       *ngIf="questionall"
+      pButton
       [disabled]="!this.examId"
       type="submit"
       id="classify-entity"
       data-cy="entityCreateSaveButton"
-      class="p-button p-button-primary"
+      class="p-button-primary"
       (click)="classifyAll()"
       [pTooltip]="'scanexam.classifytooltip' | translate"
     >
       <fa-icon icon="circle-nodes"></fa-icon>&nbsp;<span jhiTranslate="scanexam.classify">Classify</span>
     </button>
     <button
+      pButton
       *ngIf="questionall"
       [disabled]="!this.examId"
       type="submit"
       id="classify-entity"
       data-cy="entityCreateSaveButton"
-      class="p-button p-button-primary"
+      class="p-button-primary"
       (click)="unclassifyAll()"
       [pTooltip]="'scanexam.unclassifytooltip' | translate"
     >
@@ -90,11 +94,12 @@
       <h1>Cluster {{ k.key }}</h1>
       <button
         *ngIf="questionall"
+        pButton
         [disabled]="!this.examId"
         type="submit"
         id="classify-entity"
         data-cy="entityCreateSaveButton"
-        class="p-button p-button-primary"
+        class="p-button-primary"
         (click)="applySameGradeAndComment4Cluster(k)"
         [pTooltip]="'scanexam.applysamegradetooltip' | translate"
       >
@@ -112,14 +117,13 @@
           (onDragEnd)="dragEnd()"
           (onDrop)="drop(value)"
         >
-          <div class="card-container yellow-container overflow-hidden">
+          <div
+            class="card-container yellow-container overflow-hidden"
+            (click)="goToCopie($event, (zones4comments?.answers)![value].pagemin, (zones4comments?.answers)![value].pagemax)"
+          >
             <div class="flex flex-column">
               <div *ngFor="let z of zones4comments?.zones; let j = index">
-                <canvas
-                  [id]="'canvas ' + value"
-                  (click)="goToCopie($event, (zones4comments?.answers)![value].pagemin, (zones4comments?.answers)![value].pagemax)"
-                  #nomImageVisible
-                ></canvas>
+                <canvas [id]="'canvas ' + value" #nomImageVisible></canvas>
               </div>
             </div>
             <div class="card-content">

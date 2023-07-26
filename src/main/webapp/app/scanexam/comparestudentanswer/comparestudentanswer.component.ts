@@ -156,7 +156,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     private db: CacheServiceImpl,
     private http: HttpClient,
     private applicationConfigService: ApplicationConfigService,
-    private location: Location,
+    protected location: Location,
     private zone: NgZone
   ) {
     this.firstImageLoaded = new Promise(resolve => {
@@ -254,7 +254,18 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     });
   }
 
+  getCurrentNavigationId(): number {
+    const s = this.location.getState() as any;
+    if (s?.navigationId !== undefined) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return s.navigationId;
+    } else {
+      return -1;
+    }
+  }
+
   goBack() {
+    console.error(this.location.getState());
     this.location.back();
   }
   goToCopie(event: any, pageMin: number, pageMax: number) {

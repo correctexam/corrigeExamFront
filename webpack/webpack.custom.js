@@ -20,8 +20,6 @@ module.exports = async (config, options, targetOptions) => {
     encoding: 'hex',
     files: { include: ['*.json'] },
   });
-  // console.error(environment.FRONT_URL)
-  // console.error(environment.SERVER_API_URL)
 
   // PLUGINS
   if (config.mode === 'development') {
