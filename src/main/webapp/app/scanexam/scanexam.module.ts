@@ -98,6 +98,10 @@ export const COURSMAIN_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.coursmain',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-1-create-your-course-and-exam-this-includes-creating-your-exam-using-a-word-processor-word-google-doc-libreoffice-or-latex',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-1-creer-son-cours-et-son-examen-cela-comprend-fabriquer-l-enonce-de-son-examen-a-l-aide-d-un-traitement-de-texte-word-google-doc-libreoffice-ou-de-latex',
+    },
   },
 };
 
@@ -107,6 +111,10 @@ export const CREERCOURS_ROUTE: Route = {
   component: CreercoursComponent,
   data: {
     pageTitle: 'home.creercours',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-1-create-your-course-and-exam-this-includes-creating-your-exam-using-a-word-processor-word-google-doc-libreoffice-or-latex',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-1-creer-son-cours-et-son-examen-cela-comprend-fabriquer-l-enonce-de-son-examen-a-l-aide-d-un-traitement-de-texte-word-google-doc-libreoffice-ou-de-latex',
+    },
   },
 };
 
@@ -117,6 +125,10 @@ export const REGISTERSTUDENT_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.registerstudents',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-1-create-your-course-and-exam-this-includes-creating-your-exam-using-a-word-processor-word-google-doc-libreoffice-or-latex',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-1-creer-son-cours-et-son-examen-cela-comprend-fabriquer-l-enonce-de-son-examen-a-l-aide-d-un-traitement-de-texte-word-google-doc-libreoffice-ou-de-latex',
+    },
   },
 };
 
@@ -127,6 +139,10 @@ export const STATS_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.stats',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-7-view-the-statistics-associated-with-passing-the-exam-to-potentially-adjust-the-grading-slightly',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-7-regarder-les-statistiques-associees-a-la-reussite-a-l-examen-pour-potentiellement-ajuster-un-peu-le-bareme',
+    },
   },
 };
 
@@ -137,6 +153,10 @@ export const CREEREXAM_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.creerexam',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-1-create-your-course-and-exam-this-includes-creating-your-exam-using-a-word-processor-word-google-doc-libreoffice-or-latex',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-1-creer-son-cours-et-son-examen-cela-comprend-fabriquer-l-enonce-de-son-examen-a-l-aide-d-un-traitement-de-texte-word-google-doc-libreoffice-ou-de-latex',
+    },
   },
 };
 
@@ -147,6 +167,10 @@ export const CHARGERSCAN_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.loadscan',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-3-load-scans-of-correctly-ordered-exam-papers',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-3-charger-les-scans-des-copies-des-examens-correctement-ordonnes',
+    },
   },
 };
 
@@ -157,6 +181,10 @@ export const EXAMDETAIL_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.exam',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-1-create-your-course-and-exam-this-includes-creating-your-exam-using-a-word-processor-word-google-doc-libreoffice-or-latex',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-1-creer-son-cours-et-son-examen-cela-comprend-fabriquer-l-enonce-de-son-examen-a-l-aide-d-un-traitement-de-texte-word-google-doc-libreoffice-ou-de-latex',
+    },
   },
 };
 
@@ -167,6 +195,10 @@ export const ANNOTATETEMPLATE_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.annotate',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-2-create-your-grading-scale-how-each-question-will-be-graded-typical-comments-per-question-etc',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-2-creer-son-bareme-de-correction-la-facon-dont-chaque-question-sera-evaluee-ses-commentaires-types-par-question',
+    },
   },
 };
 
@@ -177,6 +209,10 @@ export const AlignerCopiesEtudiants_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.imagealign',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-4-straighten-your-scans',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-4-redresser-ses-scans',
+    },
   },
 };
 
@@ -187,6 +223,10 @@ export const AssocierCopiesEtudiants_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.studentbindings',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-5-associate-each-copy-with-a-student-ai-assisted',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-5-associer-chaque-copie-avec-un-etudiant-assistee-a-l-aide-de-l-ia',
+    },
   },
 };
 
@@ -197,6 +237,10 @@ export const MarkingSummary_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.answer',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-6-correct-copies-question-by-question-or-student-by-student-or-any-other-combination',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-6-corriger-ses-copies-question-par-question-ou-etudiant-par-etudiant-ou-tout-autre-combinaison',
+    },
   },
 };
 
@@ -207,6 +251,10 @@ export const AssocierCopiesEtudiantsToStudent_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.studentbindings',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-5-associate-each-copy-with-a-student-ai-assisted',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-5-associer-chaque-copie-avec-un-etudiant-assistee-a-l-aide-de-l-ia',
+    },
   },
 };
 
@@ -217,6 +265,10 @@ export const CorrigerCopiesEtudiantsToQuestion_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.answer',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-6-correct-copies-question-by-question-or-student-by-student-or-any-other-combination',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-6-corriger-ses-copies-question-par-question-ou-etudiant-par-etudiant-ou-tout-autre-combinaison',
+    },
   },
 };
 
@@ -227,6 +279,10 @@ export const CorrigerCopiesEtudiants_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.answer',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-6-correct-copies-question-by-question-or-student-by-student-or-any-other-combination',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-6-corriger-ses-copies-question-par-question-ou-etudiant-par-etudiant-ou-tout-autre-combinaison',
+    },
   },
 };
 
@@ -235,6 +291,10 @@ export const VoirCopieEtudiants_ROUTE: Route = {
   component: VoirCopieComponent,
   data: {
     pageTitle: 'home.voircopie',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html',
+    },
   },
 };
 
@@ -243,6 +303,10 @@ export const VoirReponseEtudiants_ROUTE: Route = {
   component: VoirReponseComponent,
   data: {
     pageTitle: 'home.voirreponse',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html',
+    },
   },
 };
 
@@ -251,6 +315,10 @@ export const VoirReponsesstarunstar_ROUTE: Route = {
   component: VoirReponsesStarUnstarComponent,
   data: {
     pageTitle: 'home.voirreponsesstarunstar',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-7-view-the-statistics-associated-with-passing-the-exam-to-potentially-adjust-the-grading-slightly',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-7-regarder-les-statistiques-associees-a-la-reussite-a-l-examen-pour-potentiellement-ajuster-un-peu-le-bareme',
+    },
   },
 };
 
@@ -261,6 +329,10 @@ export const ShowResults_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.voircopie',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-8-sending-feedback-to-students',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-8-envoyer-le-retour-aux-etudiants',
+    },
   },
 };
 
@@ -271,6 +343,10 @@ export const CompareTextCommentAnswer_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'scanexam.comparecopie',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-6-correct-copies-question-by-question-or-student-by-student-or-any-other-combination',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-6-corriger-ses-copies-question-par-question-ou-etudiant-par-etudiant-ou-tout-autre-combinaison',
+    },
   },
 };
 export const CompareGradedCommentAnswer_ROUTE: Route = {
@@ -280,6 +356,10 @@ export const CompareGradedCommentAnswer_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'scanexam.comparecopie',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-6-correct-copies-question-by-question-or-student-by-student-or-any-other-combination',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-6-corriger-ses-copies-question-par-question-ou-etudiant-par-etudiant-ou-tout-autre-combinaison',
+    },
   },
 };
 
@@ -290,6 +370,10 @@ export const CompareMarkAnswer_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'scanexam.comparecopie',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-6-correct-copies-question-by-question-or-student-by-student-or-any-other-combination',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-6-corriger-ses-copies-question-par-question-ou-etudiant-par-etudiant-ou-tout-autre-combinaison',
+    },
   },
 };
 
@@ -300,6 +384,10 @@ export const CompareAnswer_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'scanexam.comparecopie',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-6-correct-copies-question-by-question-or-student-by-student-or-any-other-combination',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-6-corriger-ses-copies-question-par-question-ou-etudiant-par-etudiant-ou-tout-autre-combinaison',
+    },
   },
 };
 
@@ -385,6 +473,7 @@ export const CompareAnswer_ROUTE: Route = {
     DragDropModule,
     ProgressBarModule,
     KeyboardShortcutsModule.forRoot(),
+
     RouterModule.forChild([
       CREERCOURS_ROUTE,
       COURSMAIN_ROUTE,

@@ -1,5 +1,5 @@
-import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { AfterViewInit, Component, NgZone, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, Scroll } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { SessionStorageService } from 'ngx-webstorage';
 
@@ -12,6 +12,7 @@ import { ProfileService } from 'app/layouts/profiles/profile.service';
 import { EntityNavbarItems } from 'app/entities/entity-navbar-items';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { PreferencePageComponent } from '../../scanexam/preference-page/preference-page.component';
+import { ShortcutInput } from 'ng-keyboard-shortcuts';
 
 @Component({
   selector: 'jhi-navbar',
@@ -19,7 +20,7 @@ import { PreferencePageComponent } from '../../scanexam/preference-page/preferen
   styleUrls: ['./navbar.component.scss'],
   providers: [DialogService],
 })
-export class NavbarComponent implements OnInit, OnDestroy {
+export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   inProduction?: boolean;
   isNavbarCollapsed = true;
   languages = LANGUAGES;
@@ -28,6 +29,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
   account: Account | null = null;
   entitiesNavbarItems: any[] = [];
   ref: DynamicDialogRef | undefined;
+  documentationHref = 'https://correctexam.readthedocs.io/en/latest/';
+  data: any;
+  shortcuts: ShortcutInput[] = [];
 
   // duplicate in home.component.ts
   public readonly CONNECTION_METHOD_LOCAL = 'local';
@@ -44,6 +48,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private accountService: AccountService,
     private profileService: ProfileService,
     private router: Router,
+    protected activatedRoute: ActivatedRoute,
     public dialogService: DialogService,
     private zone: NgZone
   ) {
@@ -53,6 +58,18 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.router.events.subscribe(val => {
+      if (val instanceof Scroll) {
+        const primaryRouter = this.router.routerState.root.children.filter(e => e.outlet === 'primary');
+        if (primaryRouter.length > 0) {
+          primaryRouter[0].data.subscribe(data => {
+            this.data = data;
+            this.updateDocumentation(data);
+          });
+        }
+      }
+    });
+
     this.entitiesNavbarItems = EntityNavbarItems;
     this.profileService.getProfileInfo().subscribe(profileInfo => {
       this.inProduction = profileInfo.inProduction;
@@ -64,9 +81,59 @@ export class NavbarComponent implements OnInit, OnDestroy {
     });
   }
 
+  ngAfterViewInit(): void {
+    this.translateService.get('scanexam.accessdocumentation').subscribe(e => {
+      this.shortcuts.push({
+        // ArrowRight
+        key: ['ctrl + F1', 'meta + F1'],
+        label: 'Documentation',
+        description: e,
+        command: () => window.open(this.documentationHref, '_blank'),
+        preventDefault: true,
+      });
+    });
+  }
+
+  updateDocumentation(data: any): void {
+    if (this.account === null && data?.documentation?.anonymous !== undefined) {
+      const doc = data?.documentation?.anonymous;
+      if (doc[this.translateService.currentLang] !== undefined) {
+        this.documentationHref = doc[this.translateService.currentLang];
+      } else if (doc.en !== undefined) {
+        this.documentationHref = doc.en;
+      } else {
+        if ('fr' === this.translateService.currentLang) {
+          this.documentationHref = 'https://correctexam.readthedocs.io/fr/latest/';
+        } else {
+          this.documentationHref = 'https://correctexam.readthedocs.io/en/latest/';
+        }
+      }
+    } else if (this.account !== null && data?.documentation !== undefined) {
+      const doc = data?.documentation;
+      if (doc[this.translateService.currentLang] !== undefined) {
+        this.documentationHref = doc[this.translateService.currentLang];
+      } else if (doc.en !== undefined) {
+        this.documentationHref = doc.en;
+      } else {
+        if ('fr' === this.translateService.currentLang) {
+          this.documentationHref = 'https://correctexam.readthedocs.io/fr/latest/';
+        } else {
+          this.documentationHref = 'https://correctexam.readthedocs.io/en/latest/';
+        }
+      }
+    } else {
+      if ('fr' === this.translateService.currentLang) {
+        this.documentationHref = 'https://correctexam.readthedocs.io/fr/latest/';
+      } else {
+        this.documentationHref = 'https://correctexam.readthedocs.io/en/latest/';
+      }
+    }
+  }
+
   changeLanguage(languageKey: string): void {
     this.sessionStorageService.store('locale', languageKey);
     this.translateService.use(languageKey);
+    this.updateDocumentation(this.data);
   }
 
   collapseNavbar(): void {

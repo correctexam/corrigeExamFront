@@ -306,6 +306,8 @@
     "unclassifytooltip": "Permet de supprimer le calcul des groupes d'images",
     "nbreImagePerLigne": "Nombre d'images par ligne",
     "applysamegrade": "Appliquer la même note",
-    "applysamegradetooltip": "Appliquer la même note et les mêmes commentaires que la première réponse de ce groupe de réponse"
+    "applysamegradetooltip": "Appliquer la même note et les mêmes commentaires que la première réponse de ce groupe de réponse",
+    "documentation": "Documentation",
+    "accessdocumentation": "Ouverture de la documentation"
   }
 }
