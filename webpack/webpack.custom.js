@@ -8,7 +8,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const WebpackNotifierPlugin = require('webpack-notifier');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
-const { ESBuildMinifyPlugin } = require('esbuild-loader');
+const { EsbuildPlugin } = require('esbuild-loader');
 
 const environment = require('./environment');
 const proxyConfig = require('./proxy.conf');
@@ -28,9 +28,9 @@ module.exports = async (config, options, targetOptions) => {
     config.optimization.minimizer.shift();
 
     config.optimization.minimizer.unshift(
-      new ESBuildMinifyPlugin({
+      new EsbuildPlugin({
         target: 'es2015', // Syntax to compile to (see options below for possible values)
-      })
+      }),
     );
 
     config.plugins.push(
@@ -55,7 +55,7 @@ module.exports = async (config, options, targetOptions) => {
         __CONNECTION_METHOD__: JSON.stringify(environment.__CONNECTION_METHOD__),
         __CAS_SERVER_URL__: JSON.stringify(environment.__CAS_SERVER_URL__),
         __SERVICE_URL__: JSON.stringify(environment.__SERVICE_URL__),
-      })
+      }),
     );
   }
 
@@ -71,9 +71,9 @@ module.exports = async (config, options, targetOptions) => {
     config.optimization.minimizer.shift();
 
     config.optimization.minimizer.unshift(
-      new ESBuildMinifyPlugin({
+      new EsbuildPlugin({
         target: 'es2015', // Syntax to compile to (see options below for possible values)
-      })
+      }),
     );
 
     config.plugins.push(
@@ -105,8 +105,8 @@ module.exports = async (config, options, targetOptions) => {
         },
         {
           reload: targetOptions.target === 'build', // enabled for build --watch
-        }
-      )
+        },
+      ),
     );
   }
 
@@ -132,7 +132,7 @@ module.exports = async (config, options, targetOptions) => {
         __CONNECTION_METHOD__: JSON.stringify(environment.__CONNECTION_METHOD__),
         __CAS_SERVER_URL__: JSON.stringify(environment.__CAS_SERVER_URL__),
         __SERVICE_URL__: JSON.stringify(environment.__SERVICE_URL__),
-      })
+      }),
     );
   }
 
@@ -164,11 +164,11 @@ module.exports = async (config, options, targetOptions) => {
           // jhipster-needle-i18n-language-webpack - JHipster will add/remove languages in this array
         ],
       },
-    })
+    }),
   );
 
   config = merge(
-    config
+    config,
     // jhipster-needle-add-webpack-config - JHipster will add custom config
   );
 

@@ -90,7 +90,7 @@ export class StatsExamComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
     private router: Router,
-    private db: CacheServiceImpl
+    private db: CacheServiceImpl,
   ) {}
 
   public ngOnInit(): void {
@@ -467,6 +467,7 @@ export class StatsExamComponent implements OnInit {
       }
     }
     for (const etudiant of this.infosStudents) {
+      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
       const note = this.s2f(etudiant.note === undefined ? '0' : etudiant.note)
         .toFixed(2)
         .toString();
@@ -519,7 +520,7 @@ export class StatsExamComponent implements OnInit {
       this.translateService.instant('scanexam.mediane'),
       BLEU_FONCE,
       TRANSPARENT,
-      this.q_notees.map(ns => this.median(ns.notesAssociees))
+      this.q_notees.map(ns => this.median(ns.notesAssociees)),
     );
   }
 
@@ -528,7 +529,7 @@ export class StatsExamComponent implements OnInit {
       this.translateService.instant('scanexam.notemax1'),
       VERT,
       TRANSPARENT,
-      this.q_notees.map(ns => this.max(ns.notesAssociees))
+      this.q_notees.map(ns => this.max(ns.notesAssociees)),
     );
   }
   private radarMinNote(): IRadarDataset {
@@ -536,7 +537,7 @@ export class StatsExamComponent implements OnInit {
       this.translateService.instant('scanexam.notemin1'),
       ROUGE,
       TRANSPARENT,
-      this.q_notees.map(ns => this.min(ns.notesAssociees))
+      this.q_notees.map(ns => this.min(ns.notesAssociees)),
     );
   }
 
@@ -545,7 +546,7 @@ export class StatsExamComponent implements OnInit {
       this.translateService.instant('scanexam.notes'),
       VIOLET,
       VIOLET_LEGER,
-      Array.from(this.getNotes(etudiant).values())
+      Array.from(this.getNotes(etudiant).values()),
     );
   }
 
@@ -581,7 +582,7 @@ export class StatsExamComponent implements OnInit {
     if (this.etudiantSelec !== null && this.etudiantSelec !== undefined) {
       this.data_radar_courant = this.initStudentRadarData(
         this.etudiantSelec,
-        this.data_radar_courant.vue === this.translateService.instant('scanexam.pourcents')
+        this.data_radar_courant.vue === this.translateService.instant('scanexam.pourcents'),
       );
       this.updateCarteRadar();
       this.updateKnobs();
@@ -620,7 +621,7 @@ export class StatsExamComponent implements OnInit {
     pointBorderColor: string,
     pointHoverBackgroundColor: string,
     pointHoverBorderColor: string,
-    data: number[]
+    data: number[],
   ): IRadarDataset {
     return {
       label,

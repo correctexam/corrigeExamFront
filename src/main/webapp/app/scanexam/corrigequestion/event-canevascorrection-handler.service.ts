@@ -106,7 +106,7 @@ export class EventCanevascorrectionHandlerService {
             if (c === this.canvas) {
               this.currentComment = e1.body!;
             }
-          })
+          }),
         );
       });
       this.modelViewpping.clear();
@@ -132,14 +132,16 @@ export class EventCanevascorrectionHandlerService {
     | CustomFabricGroup
     | CustomFabricPath
     | CustomFabricLine
-    | CustomFabricGroup
     | CustomFabricPolygon
     | undefined;
   private _initPositionOfElement!: Pointer;
 
   drawingToolObserver!: (d: DrawingTools) => void;
 
-  constructor(private fabricShapeService: FabricShapeService, public commentsService: CommentsService) {}
+  constructor(
+    private fabricShapeService: FabricShapeService,
+    public commentsService: CommentsService,
+  ) {}
 
   registerSelectedToolObserver(f: (d: DrawingTools) => void): any {
     this.drawingToolObserver = f;
@@ -177,7 +179,7 @@ export class EventCanevascorrectionHandlerService {
           this.canvas,
           this.selectedThickness,
           this._selectedColour,
-          pointer
+          pointer,
         );
         break;
       case DrawingTools.RECTANGLE:
@@ -186,7 +188,7 @@ export class EventCanevascorrectionHandlerService {
           this.selectedThickness,
           this._selectedColour,
           DrawingColours.RED,
-          pointer
+          pointer,
         );
         break;
       case DrawingTools.PENCIL:
@@ -198,7 +200,7 @@ export class EventCanevascorrectionHandlerService {
           this.selectedThickness,
           this._selectedColour,
           [5, 0],
-          pointer
+          pointer,
         );
         break;
       case DrawingTools.DASHED_LINE:
@@ -207,7 +209,7 @@ export class EventCanevascorrectionHandlerService {
           this.selectedThickness,
           this._selectedColour,
           [5, 5],
-          pointer
+          pointer,
         );
         break;
       case DrawingTools.POLYGON:
@@ -216,7 +218,7 @@ export class EventCanevascorrectionHandlerService {
             this.canvas,
             this.selectedThickness,
             this._selectedColour,
-            pointer
+            pointer,
           );
         } else {
           if (
@@ -224,7 +226,7 @@ export class EventCanevascorrectionHandlerService {
           ) {
             this._elementUnderDrawing = this.fabricShapeService.finishPolygon(
               this.canvas,
-              this._elementUnderDrawing as CustomFabricPolygon
+              this._elementUnderDrawing as CustomFabricPolygon,
             );
             this._elementUnderDrawing = undefined;
           } else {
@@ -313,7 +315,7 @@ export class EventCanevascorrectionHandlerService {
         this.fabricShapeService.formFirstLineOfPolygon(
           this._elementUnderDrawing as CustomFabricPolygon,
           this._initPositionOfElement,
-          pointer
+          pointer,
         );
         break;
     }
@@ -327,7 +329,7 @@ export class EventCanevascorrectionHandlerService {
       this.updateComments().then(e2 =>
         e2.subscribe(e1 => {
           this.currentComment = e1.body;
-        })
+        }),
       );
     }
 
@@ -370,7 +372,7 @@ export class EventCanevascorrectionHandlerService {
         this.updateComments().then(e2 =>
           e2.subscribe(e1 => {
             this.currentComment = e1.body!;
-          })
+          }),
         );
 
         break;
@@ -380,7 +382,7 @@ export class EventCanevascorrectionHandlerService {
         this.updateComments().then(e2 =>
           e2.subscribe(e1 => {
             this.currentComment = e1.body!;
-          })
+          }),
         );
 
         break;
@@ -394,7 +396,7 @@ export class EventCanevascorrectionHandlerService {
     this.updateComments().then(e2 =>
       e2.subscribe(e1 => {
         this.currentComment = e1.body!;
-      })
+      }),
     );
 
     if (type !== FabricObjectType.ELLIPSE) {
@@ -421,7 +423,7 @@ export class EventCanevascorrectionHandlerService {
     this.updateComments().then(e2 =>
       e2.subscribe(e1 => {
         this.currentComment = e1.body!;
-      })
+      }),
     );
 
     if (type !== FabricObjectType.ELLIPSE) {

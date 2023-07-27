@@ -50,7 +50,7 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     private router: Router,
     protected activatedRoute: ActivatedRoute,
     public dialogService: DialogService,
-    private zone: NgZone
+    private zone: NgZone,
   ) {
     if (VERSION) {
       this.version = VERSION.toLowerCase().startsWith('v') ? VERSION : `v${VERSION}`;

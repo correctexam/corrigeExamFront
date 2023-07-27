@@ -165,7 +165,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     private db: CacheServiceImpl,
     private zone: NgZone,
     private keyboardShortcutService: KeyboardShortcutService,
-    private applicationConfigService: ApplicationConfigService
+    private applicationConfigService: ApplicationConfigService,
   ) {}
 
   ngOnInit(): void {
@@ -244,7 +244,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           }
 
           const q1 = await firstValueFrom(
-            this.questionService.query({ examId: this.exam!.id, numero: this.questionNumeros[this.questionindex!] })
+            this.questionService.query({ examId: this.exam!.id, numero: this.questionNumeros[this.questionindex!] }),
           );
 
           questions = q1.body!;
@@ -264,7 +264,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               this.studentResponseService.query({
                 sheetId: sheets[0]?.id,
                 questionId: questions![0].id,
-              })
+              }),
             );
             if (sr.body !== null && sr.body.length > 0) {
               this.resp = sr.body![0];
@@ -399,7 +399,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         description: this.translateService.instant('scanexam.directgradding'),
         command: (output: ShortcutEventOutput) => this.changeNote1(output),
         preventDefault: true,
-      }
+      },
     );
   }
 
@@ -525,7 +525,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               this.showImage[i] = b;
             },
             i,
-            true
+            true,
           );
         });
       });
@@ -585,7 +585,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                         .flat()
                         .filter(
                           (ex: any) =>
-                            ex?.scanId === this.exam!.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie!
+                            ex?.scanId === this.exam!.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie!,
                         );
                       if (sheets !== undefined && sheets!.length > 0) {
                         sid = sheets[0]?.id;
@@ -613,7 +613,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                       summary: this.translateService.instant('scanexam.couldnotcorrectQCM'),
                       detail: this.translateService.instant('scanexam.couldnotcorrectQCMdetails') + ' ' + err.message,
                     });
-                  }
+                  },
                 );
               });
             });
@@ -642,7 +642,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
     validToCreate = validExp!.filter(c => !this.currentGradedComment4Question?.map(v => v.text).includes(c));
     invalidToCreate = invalidExp!.filter(
-      c => !this.currentGradedComment4Question?.map(v => v.text).includes(c) && !validExp!.includes(c!) && c !== ''
+      c => !this.currentGradedComment4Question?.map(v => v.text).includes(c) && !validExp!.includes(c!) && c !== '',
     );
     invalidToCreate = [...new Set(invalidToCreate)];
 
@@ -764,7 +764,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   changeNote1(e: ShortcutEventOutput): void {
     if (
       this.currentQuestion !== undefined &&
-      !(this.currentQuestion.gradeType !== 'DIRECT' || this.currentQuestion.typeAlgoName === 'QCM') &&
+      !(this.currentQuestion.gradeType !== GradeType.DIRECT || this.currentQuestion.typeAlgoName === 'QCM') &&
       !this.isTextInput(e.event.target) &&
       this.resp !== undefined &&
       this.noteSteps >= +e.event.key
@@ -1154,8 +1154,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   getSelectedStudent() {
-    const filterStudent = this.students!.filter(s =>
-      s.examSheets?.some(ex => ex.scanId === this.exam!.scanfileId && ex.pagemin === this.currentStudent * this.nbreFeuilleParCopie!)
+    const filterStudent = this.students!.filter(
+      s => s.examSheets?.some(ex => ex.scanId === this.exam!.scanfileId && ex.pagemin === this.currentStudent * this.nbreFeuilleParCopie!),
     );
     this.selectionStudents = filterStudent;
     if (this.selectionStudents.length === 0) {
@@ -1170,7 +1170,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async loadZone(
-    zoneId: number | undefined
+    zoneId: number | undefined,
     // showImageRef: (s: boolean) => void,
     // imageRef: ElementRef<any> | undefined,
     // currentStudent: number,
@@ -1197,7 +1197,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     imageRef: ElementRef<any> | undefined,
     show: (s: boolean) => void,
     index: number,
-    updateanotationcanvas: boolean
+    updateanotationcanvas: boolean,
   ): void {
     if (imageRef !== undefined) {
       imageRef!.nativeElement.width = v.w * this.scale;
@@ -1214,18 +1214,18 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       if (updateanotationcanvas) {
         if (
           this.currentZoneCorrectionHandler.get(
-            '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index
+            '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index,
           ) === undefined
         ) {
           const zh = new ZoneCorrectionHandler(
             '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index,
             this.eventHandler,
-            this.resp?.id
+            this.resp?.id,
           );
           zh.updateCanvas(imageRef!.nativeElement);
           this.currentZoneCorrectionHandler.set(
             '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index,
-            zh
+            zh,
           );
         } else {
           this.currentZoneCorrectionHandler
@@ -1542,7 +1542,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                       this.showImageQCM = b;
                     },
                     index,
-                    false
+                    false,
                   );
                 });
               });
@@ -1663,18 +1663,18 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               () => {
                 this.observer?.complete();
                 this.blocked = false;
-              }
+              },
             );
           },
           () => {
             this.observer?.complete();
             this.blocked = false;
-          }
+          },
         );
       },
       err => {
         console.log(err);
-      }
+      },
     );
   }
 
@@ -1689,7 +1689,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         {
           pages: imageString!,
         },
-        this.replacer
+        this.replacer,
       ),
     });
     this.images = [];
