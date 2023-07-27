@@ -52,7 +52,6 @@ export class EventHandlerService {
     | CustomFabricGroup
     | CustomFabricPath
     | CustomFabricLine
-    | CustomFabricGroup
     | CustomFabricPolygon
     | undefined;
   private _initPositionOfElement!: Pointer;
@@ -77,7 +76,7 @@ export class EventHandlerService {
     private examService: ExamService,
     private questionService: QuestionService,
     private translateService: TranslateService,
-    private preferenceService: PreferenceService
+    private preferenceService: PreferenceService,
   ) {}
 
   public set exam(c: IExam) {
@@ -108,7 +107,7 @@ export class EventHandlerService {
     this.drawingToolObserver(t);
     this._selectedTool = t;
     this.objectsSelectable(
-      this._selectedTool === DrawingTools.SELECT || this._selectedTool === DrawingTools.ERASER || this._selectedTool === DrawingTools.FILL
+      this._selectedTool === DrawingTools.SELECT || this._selectedTool === DrawingTools.ERASER || this._selectedTool === DrawingTools.FILL,
     );
 
     if (this.selectedTool === DrawingTools.GARBAGE) {
@@ -197,7 +196,7 @@ export class EventHandlerService {
           this.canvas,
           this.selectedThickness,
           this._selectedColour,
-          pointer
+          pointer,
         );
         break;
       case DrawingTools.NOMBOX:
@@ -209,7 +208,7 @@ export class EventHandlerService {
           this.selectedThickness,
           this._selectedColour,
           DrawingColours.RED,
-          pointer
+          pointer,
         );
         break;
       case DrawingTools.QUESTIONBOX:
@@ -218,7 +217,7 @@ export class EventHandlerService {
           this.selectedThickness,
           this._selectedColour,
           DrawingColours.GREEN,
-          pointer
+          pointer,
         );
         break;
       case DrawingTools.PENCIL:
@@ -230,7 +229,7 @@ export class EventHandlerService {
           this.selectedThickness,
           this._selectedColour,
           [5, 0],
-          pointer
+          pointer,
         );
         break;
       case DrawingTools.DASHED_LINE:
@@ -239,7 +238,7 @@ export class EventHandlerService {
           this.selectedThickness,
           this._selectedColour,
           [5, 5],
-          pointer
+          pointer,
         );
         break;
       case DrawingTools.POLYGON:
@@ -248,13 +247,13 @@ export class EventHandlerService {
             this.canvas,
             this.selectedThickness,
             this._selectedColour,
-            pointer
+            pointer,
           );
         } else {
           if (this.fabricShapeService.isClickNearPolygonCenter(this._elementUnderDrawing as CustomFabricPolygon, pointer, 20)) {
             this._elementUnderDrawing = this.fabricShapeService.finishPolygon(
               this.canvas,
-              this._elementUnderDrawing as CustomFabricPolygon
+              this._elementUnderDrawing as CustomFabricPolygon,
             );
             this._elementUnderDrawing = undefined;
           } else {
@@ -299,7 +298,7 @@ export class EventHandlerService {
         this.fabricShapeService.formFirstLineOfPolygon(
           this._elementUnderDrawing as CustomFabricPolygon,
           this._initPositionOfElement,
-          pointer
+          pointer,
         );
         break;
     }
@@ -370,13 +369,13 @@ export class EventHandlerService {
   private createBlueBox(
     type: DrawingTools.NOMBOX | DrawingTools.PRENOMBOX | DrawingTools.INEBOX | DrawingTools.QUESTIONBOX,
     boxName: string,
-    qnum: number
+    qnum: number,
   ): void {
     this._elementUnderDrawing = this.fabricShapeService.createBox(
       this.canvas,
       this._elementUnderDrawing as CustomFabricRect,
       boxName,
-      DrawingColours.BLUE
+      DrawingColours.BLUE,
     );
 
     const customObject = this._elementUnderDrawing;
@@ -456,7 +455,7 @@ export class EventHandlerService {
           (zone.height! * this.pages[page].pageViewer.canvas.clientHeight) / this.coefficient,
 
           e,
-          DrawingColours.RED
+          DrawingColours.RED,
         );
         this.modelViewpping.set(r.id, zone.id!);
       });
@@ -478,7 +477,7 @@ export class EventHandlerService {
             (zone.width! * this.pages[page].pageViewer.canvas.clientWidth) / this.coefficient,
             (zone.height! * this.pages[page].pageViewer.canvas.clientHeight) / this.coefficient,
             name + String(e.body[0].numero),
-            DrawingColours.GREEN
+            DrawingColours.GREEN,
           );
           this.modelViewpping.set(r.id, zone.id!);
         }
@@ -667,7 +666,7 @@ export class EventHandlerService {
     id: string,
     type: FabricObjectType,
     newScales: { x: number; y: number },
-    newCoords: { left: number; top: number }
+    newCoords: { left: number; top: number },
   ): void {
     const o1 = this.canvas.getObjects().filter(o => (o as any).id === id)[0];
     const l = o1.aCoords?.tl.x;

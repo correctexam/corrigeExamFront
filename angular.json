@@ -56,7 +56,7 @@
               "src/main/webapp/content/scss/vendor.scss",
               "src/main/webapp/content/scss/global.scss"
             ],
-            "scripts": ["node_modules/chart.js/dist/chart.js"],
+            "scripts": ["node_modules/chart.js/dist/chart.umd.js"],
             "webWorkerTsConfig": "tsconfig.worker.json"
           },
           "configurations": {
