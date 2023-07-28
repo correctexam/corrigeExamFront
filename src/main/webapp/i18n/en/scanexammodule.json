@@ -299,7 +299,7 @@
     "kmeanoptions": "KMean options",
     "nbreCluster": "How many clusters",
     "classify": "Group similar",
-    "classifytooltip": "Compute groups images by similarity",
+    "classifytooltip": "Compute groups images by similarity (you can choose the number of target groups in the left-hand menu: KMean options)",
     "unclassify": "Remove computed groups",
     "unclassifytooltip": "Remove the computed image groups",
     "nbreImagePerLigne": "Number of images per line",
