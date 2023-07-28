@@ -157,7 +157,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     private http: HttpClient,
     private applicationConfigService: ApplicationConfigService,
     protected location: Location,
-    private zone: NgZone
+    private zone: NgZone,
   ) {
     this.firstImageLoaded = new Promise(resolve => {
       this.firstImageLoadedReolve = resolve;
@@ -179,7 +179,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
         if (params.get('commentid') !== null && this.router.url.includes('comparetextcomment')) {
           this.http
             .get<Zone4SameCommentOrSameGrade>(
-              this.applicationConfigService.getEndpointFor('api/getZone4TextComment/' + this.examId + '/' + params.get('commentid'))
+              this.applicationConfigService.getEndpointFor('api/getZone4TextComment/' + this.examId + '/' + params.get('commentid')),
             )
             .subscribe(res => {
               this.zones4comments = res;
@@ -193,7 +193,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
         } else if (params.get('commentid') !== null && this.router.url.includes('comparegradedcomment')) {
           this.http
             .get<Zone4SameCommentOrSameGrade>(
-              this.applicationConfigService.getEndpointFor('api/getZone4GradedComment/' + this.examId + '/' + params.get('commentid'))
+              this.applicationConfigService.getEndpointFor('api/getZone4GradedComment/' + this.examId + '/' + params.get('commentid')),
             )
             .subscribe(res => {
               this.zones4comments = res;
@@ -209,7 +209,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
         } else if (params.get('respid') !== null && this.router.url.includes('comparemark')) {
           this.http
             .get<Zone4SameCommentOrSameGrade>(
-              this.applicationConfigService.getEndpointFor('api/getZone4Mark/' + this.examId + '/' + params.get('respid'))
+              this.applicationConfigService.getEndpointFor('api/getZone4Mark/' + this.examId + '/' + params.get('respid')),
             )
             .subscribe(res => {
               this.zones4comments = res;
@@ -225,7 +225,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
           this.questionall = true;
           this.http
             .get<Zone4SameCommentOrSameGrade>(
-              this.applicationConfigService.getEndpointFor('api/getZone4Numero/' + this.examId + '/' + this.qId)
+              this.applicationConfigService.getEndpointFor('api/getZone4Numero/' + this.examId + '/' + this.qId),
             )
             .subscribe(res => {
               this.zones4comments = res;
@@ -275,7 +275,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
           const url = this.router.serializeUrl(
             this.router.createUrlTree([
               '/answer/' + this.examId + '/' + this.zones4comments!.numero + '/' + (pageMin / (pageMax + 1 - pageMin) + 1),
-            ])
+            ]),
           );
           if ('/' !== this.applicationConfigService.getFrontUrl()) {
             if (this.applicationConfigService.getFrontUrl().endsWith('/') && url.startsWith('/')) {
@@ -648,6 +648,24 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     this.currentDragAndDrop = -1;
   }
 
+  dropVoid(value: any) {
+    const currentDragAndDrop = this.currentDragAndDrop;
+    let clustersource = -1;
+    const clusterdest = value;
+
+    for (const v of this.clusters) {
+      if (v[1].includes(currentDragAndDrop)) {
+        clustersource = v[0];
+      }
+    }
+    if (clustersource !== -1 && clusterdest !== -1 && clustersource !== clusterdest) {
+      const index = this.clusters.get(clustersource)!.indexOf(currentDragAndDrop);
+      this.clusters.get(clustersource)!.splice(index, 1);
+      this.clusters.get(clusterdest)!.splice(0, 0, currentDragAndDrop);
+      this.preferenceService.saveCluster4Question(this.examId + '_' + this.qId, this.clusters);
+    }
+  }
+
   drop(value: any) {
     const currentDragAndDrop = this.currentDragAndDrop;
     let clustersource = -1;
@@ -673,7 +691,12 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
       const index = this.clusters.get(clustersource)!.indexOf(currentDragAndDrop);
       this.clusters.get(clustersource)!.splice(index, 1);
       const index1 = this.clusters.get(clusterdest)!.indexOf(value);
-      this.clusters.get(clusterdest)!.splice(index1, 0, currentDragAndDrop);
+      if (index > index1) {
+        this.clusters.get(clusterdest)!.splice(index1, 0, currentDragAndDrop);
+      } else {
+        this.clusters.get(clusterdest)!.splice(index1 + 1, 0, currentDragAndDrop);
+      }
+
       this.preferenceService.saveCluster4Question(this.examId + '_' + this.qId, this.clusters);
     }
   }
@@ -688,13 +711,13 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     this.http
       .post<Zone4SameCommentOrSameGrade>(
         this.applicationConfigService.getEndpointFor('api/updateStudentResponse4Cluster/' + this.examId + '/' + this.qId),
-        clus
+        clus,
       )
 
       .subscribe(() => {
         this.http
           .get<Zone4SameCommentOrSameGrade>(
-            this.applicationConfigService.getEndpointFor('api/getZone4Numero/' + this.examId + '/' + this.qId)
+            this.applicationConfigService.getEndpointFor('api/getZone4Numero/' + this.examId + '/' + this.qId),
           )
           .subscribe(res => {
             this.zones4comments!.textComments = res.textComments;

@@ -2,7 +2,6 @@
   <p-blockUI [blocked]="blocked">
     <i class="pi pi-lock" style="font-size: 3rem"></i>
   </p-blockUI>
-
   <div class="col-8">
     <p-button
       class="sm:text-xs md:text-xs lg:text-base"
@@ -88,7 +87,7 @@
     </ng-container>
   </ng-container>
 </div>
-<div class="grid justify-center">
+<div #pnl class="grid justify-center">
   <ng-container *ngFor="let k of clusters | keyvalue">
     <div *ngIf="clusters.size > 1" class="md:col-12 col-12">
       <h1>Cluster {{ k.key }}</h1>
@@ -106,11 +105,23 @@
         <fa-icon icon="object-ungroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.applysamegrade">Appliquer la même note</span>
       </button>
     </div>
+    <ng-container *ngIf="k.value.length === 0">
+      <div [ngClass]="colonneStyle">
+        <div class="card" [style]="'width: 100%;height: 100%;position: static;'" pDroppable (onDrop)="dropVoid(k.key)">
+          <div class="card-container yellow-container overflow-hidden">
+            <div class="flex flex-column">
+              <canvas></canvas>
+            </div>
+            <div class="card-content"></div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
     <ng-container *ngFor="let value of k.value">
       <div [ngClass]="colonneStyle">
         <div
           class="card"
-          [style]="'width: 100%;height: 100%;'"
+          [style]="'width: 100%;height: 100%;position: static;'"
           pDraggable
           pDroppable
           (onDragStart)="dragStart(value)"
