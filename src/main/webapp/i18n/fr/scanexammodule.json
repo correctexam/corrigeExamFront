@@ -308,6 +308,8 @@
     "applysamegrade": "Appliquer la même note",
     "applysamegradetooltip": "Appliquer la même note et les mêmes commentaires que la première réponse de ce groupe de réponse",
     "documentation": "Documentation",
-    "accessdocumentation": "Ouverture de la documentation"
+    "accessdocumentation": "Ouverture de la documentation",
+    "exportpdfok": "Export réussi",
+    "exportpdfokdetails": "Tous les examens ont été exportés en pdf (accepté les popups si vous ne les avez pas reçus)"
   }
 }

@@ -685,7 +685,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
       const index = this.clusters.get(clustersource)!.indexOf(currentDragAndDrop);
       this.clusters.get(clustersource)!.splice(index, 1);
       const index1 = this.clusters.get(clusterdest)!.indexOf(value);
-      this.clusters.get(clusterdest)!.splice(index1, 0, currentDragAndDrop);
+      this.clusters.get(clusterdest)!.splice(index1 + 1, 0, currentDragAndDrop);
       this.preferenceService.saveCluster4Question(this.examId + '_' + this.qId, this.clusters);
     } else if (clustersource !== -1 && clusterdest !== -1 && clustersource === clusterdest) {
       const index = this.clusters.get(clustersource)!.indexOf(currentDragAndDrop);

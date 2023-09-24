@@ -306,6 +306,8 @@
     "applysamegrade": "Apply the same grade",
     "applysamegradetooltip": "Apply the same grade and comments as the first answer in this answer group.",
     "documentation": "Documentation",
-    "accessdocumentation": "Open the online documentation"
+    "accessdocumentation": "Open the online documentation",
+    "exportpdfok": "Successful export",
+    "exportpdfokdetails": "All exams have been exported as pdf files (accept popupswithin your browser if you did not received them)"
   }
 }
