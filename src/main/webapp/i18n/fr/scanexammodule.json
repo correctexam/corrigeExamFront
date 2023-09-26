@@ -98,6 +98,15 @@
     "uploadcacheokdetail": "Export de la base de données locales réussi",
     "uploadcacheko": "Impossible d'envoyer le fichier vers le serveur",
     "uploadcachekodetail": "Export de la base de données locales impossible (sans doute due à la taille, ce n'est pas très grave)",
+    "uploadcacheencours": "Upload du cache des images vers le serveur en cours",
+    "uploadcacheencoursdetail": "(Cela peut prendre un peu de temps)",
+    "uploadstudentsheetok": "Envoyer un fichier vers le serveur",
+    "uploadstudentsheetokdetail": "Export du pdf de la copie d'un étudiant annotée réussi",
+    "uploadstudentsheetko": "Impossible d'envoyer le fichier vers le serveur",
+    "uploadstudentsheetkodetail": "Export pdf de la copie d'un étudiant annotée impossible",
+    "uploadstudentsheetencours": "Upload du pdf de la copie d'un étudiant vers le serveur en cours",
+    "uploadstudentsheetencoursdetail": "(Cela peut prendre un peu de temps)",
+
     "confirmdownloadcache": "Êtes-vous sûr de vouloir télécharger le cache du serveur vers le navigateur ? Cela supprimera votre base d'images locale à cet équipement préalablement alignées.",
     "downloadcacheok": "Télécharger un fichier depuis le serveur",
     "downloadcacheokc": "Téléchargement du cache depuis le serveur",
@@ -124,6 +133,8 @@
     "mailsubject": "Sujet du mail :",
     "mailbody": "Corps du mail :",
     "mailtooltip": "les variables ${firstname}, ${url}, ${lastname}, ${note} peuvent être utilisé au sein du corps du mail",
+    "mailabibody": "Corps du mail pour les ABI:",
+
     "envoiemail": "Envoi mail étudiants",
     "resultatstudents": "Résultat étudiants",
     "envoimailstudent": "Envoi mail étudiants",
@@ -140,6 +151,7 @@
     "mailnotsent": "Mails non envoyés",
     "mailnotsentdetails": "Une erreur s'est produite pendant l'envoi des emails aux étudiants",
     "mailtemplate": "Bonjour ${firstname},\n\nVoici le lien vers votre copie ${url}.\n\nSincèrement,\n\nL'équipe pédagogique",
+    "mailabitemplate": "Bonjour ${firstname},\n\nVous n'avez pas rendu de copie pour cet examen.\n\nSincèrement,\n\nL'équipe pédagogique",
     "mailsubjecttemplate": "Votre résultat à l'examen ",
     "profdispo": "Professeurs disponibles",
     "profshared": "Partage en cours",
@@ -188,8 +200,6 @@
     "nosupportQMCmultiplepage": "Pas de support de la correction automatique sur des QCM sur plusieurs pages",
     "nosupportQMCmultiplepagedetails": "Pas de support de la correction automatique sur des QCM sur plusieurs pages.",
     "alignementencours": "Alignement en cours",
-    "uploadcacheencours": "Upload du cache des images vers le serveur en cours",
-    "uploadcacheencoursdetail": "(Cela peut prendre un peu de temps)",
     "downloadcacheencours": "Download du cache des images depuis le serveur en cours",
     "downloadcacheencoursdetail": "(Cela peut prendre un peu de temps)",
     "importToDexie": "Import dans la base de données locale en cours",
@@ -308,6 +318,12 @@
     "applysamegrade": "Appliquer la même note",
     "applysamegradetooltip": "Appliquer la même note et les mêmes commentaires que la première réponse de ce groupe de réponse",
     "documentation": "Documentation",
-    "accessdocumentation": "Ouverture de la documentation"
+    "accessdocumentation": "Ouverture de la documentation",
+    "exportpdfok": "Export réussi",
+    "exportpdfokdetails": "Tous les examens ont été exportés en pdf (accepté les popups si vous ne les avez pas reçus)",
+    "envoiabi": "Envoi d'un mail aux absents:",
+    "envoipdf": "Envoi de la copie annotée en pdf:",
+    "lienelevepdf": "Lien copie annotée",
+    "pdf": "pdf"
   }
 }

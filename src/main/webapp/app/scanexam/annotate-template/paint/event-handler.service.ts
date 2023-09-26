@@ -439,6 +439,16 @@ export class EventHandlerService {
 
     if (c !== undefined) {
       this.translateService.get(translationToken).subscribe(e => {
+        console.error(zone);
+        console.error(
+          {
+            x: (zone.xInit! * this.pages[page].pageViewer.canvas.clientWidth) / this.coefficient,
+            y: (zone.yInit! * this.pages[page].pageViewer.canvas.clientHeight) / this.coefficient,
+          },
+          (zone.width! * this.pages[page].pageViewer.canvas.clientWidth) / this.coefficient,
+          (zone.height! * this.pages[page].pageViewer.canvas.clientHeight) / this.coefficient,
+        );
+
         const r = this.fabricShapeService.createBoxFromScratch(
           c,
           /*          {

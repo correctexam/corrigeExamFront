@@ -87,6 +87,8 @@ import { CreateCommentsComponent } from './annotate-template/create-comments/cre
 import { ClickDoubleDirective } from './clickdouble.directive';
 import { KeyboardshortcutComponent } from './corrigequestion/keyboardshortcut/keyboardshortcut.component';
 import { DragDropModule } from 'primeng/dragdrop';
+import { ExportanonymoupdfComponent } from './exportanonymoupdf/exportanonymoupdf.component';
+import { CheckboxModule } from 'primeng/checkbox';
 
 // set the location of the OpenCV files
 // registerAllModules();
@@ -139,6 +141,32 @@ export const STATS_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.stats',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-7-view-the-statistics-associated-with-passing-the-exam-to-potentially-adjust-the-grading-slightly',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-7-regarder-les-statistiques-associees-a-la-reussite-a-l-examen-pour-potentiellement-ajuster-un-peu-le-bareme',
+    },
+  },
+};
+
+export const EXPORTPDF_ROUTE: Route = {
+  path: 'exportpdf/:examid',
+  canActivate: [UserRouteAccessService],
+  component: ExportanonymoupdfComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-7-view-the-statistics-associated-with-passing-the-exam-to-potentially-adjust-the-grading-slightly',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-7-regarder-les-statistiques-associees-a-la-reussite-a-l-examen-pour-potentiellement-ajuster-un-peu-le-bareme',
+    },
+  },
+};
+
+export const EXPORTPDFBYSHEET_ROUTE: Route = {
+  path: 'exportpdf/:examid/:sheetuid',
+  canActivate: [UserRouteAccessService],
+  component: ExportanonymoupdfComponent,
+  data: {
+    authorities: ['ROLE_USER'],
     documentation: {
       en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-7-view-the-statistics-associated-with-passing-the-exam-to-potentially-adjust-the-grading-slightly',
       fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-7-regarder-les-statistiques-associees-a-la-reussite-a-l-examen-pour-potentiellement-ajuster-un-peu-le-bareme',
@@ -426,6 +454,7 @@ export const CompareAnswer_ROUTE: Route = {
     CreateCommentsComponent,
     ClickDoubleDirective,
     KeyboardshortcutComponent,
+    ExportanonymoupdfComponent,
   ],
   imports: [
     CommonModule,
@@ -472,6 +501,7 @@ export const CompareAnswer_ROUTE: Route = {
     SidebarModule,
     DragDropModule,
     ProgressBarModule,
+    CheckboxModule,
     KeyboardShortcutsModule.forRoot(),
 
     RouterModule.forChild([
@@ -497,6 +527,8 @@ export const CompareAnswer_ROUTE: Route = {
       CompareGradedCommentAnswer_ROUTE,
       CompareMarkAnswer_ROUTE,
       CompareAnswer_ROUTE,
+      EXPORTPDF_ROUTE,
+      EXPORTPDFBYSHEET_ROUTE,
     ]),
     TabViewModule,
   ],
