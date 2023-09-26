@@ -31,6 +31,18 @@
 
         <textarea [style]="{ width: '100%', height: '12rem' }" type="text" [(ngModel)]="mailBody" pInputTextarea></textarea>
       </div>
+      <div class="col-12">
+        <label jhiTranslate="scanexam.envoipdf">Envoi de la copie en pdf:</label>
+        <p-checkbox [binary]="true" [(ngModel)]="mailpdf" [style]="{ width: '100%' }" />
+      </div>
+      <div class="col-12">
+        <label jhiTranslate="scanexam.envoiabi">Envoi du mail aux absents:</label>
+        <p-checkbox [binary]="true" [(ngModel)]="mailabi" [style]="{ width: '100%' }" />
+      </div>
+      <div class="col-12" *ngIf="mailabi">
+        <label jhiTranslate="scanexam.mailabibody">Corps du mail:</label>
+        <textarea [style]="{ width: '100%', height: '6rem' }" type="text" [(ngModel)]="mailabiBody" pInputTextarea></textarea>
+      </div>
     </div>
 
     <ng-template pTemplate="footer">
@@ -120,6 +132,7 @@
             <th jhiTranslate="scanexam.note">NOTE</th>
             <th jhiTranslate="scanexam.lienprof">LIEN PROF</th>
             <th jhiTranslate="scanexam.lieneleve">LIEN</th>
+            <th jhiTranslate="scanexam.lienelevepdf">LIEN</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-student>
@@ -136,6 +149,10 @@
             <td *ngIf="!student.studentNumber">ABI</td>
             <td *ngIf="!student.abi">
               <a target="_blank" href="{{ 'copie/' + student.uuid + '/1' }}" jhiTranslate="scanexam.lien">link</a>
+            </td>
+            <td *ngIf="student.abi">ABI</td>
+            <td *ngIf="!student.abi">
+              <a target="_blank" href="{{ 'exportpdf/' + examid! + '/' + student.uuid }}" jhiTranslate="scanexam.pdf">pdf</a>
             </td>
             <td *ngIf="student.abi">ABI</td>
           </tr>

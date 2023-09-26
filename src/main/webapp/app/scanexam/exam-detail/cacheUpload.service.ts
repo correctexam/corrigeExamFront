@@ -69,7 +69,7 @@ export class CacheUploadService {
     private http: HttpClient,
     public applicationConfigService: ApplicationConfigService,
     private db: CacheServiceImpl,
-    private preferenceService: PreferenceService
+    private preferenceService: PreferenceService,
   ) {}
 
   async exportCache(
@@ -77,7 +77,7 @@ export class CacheUploadService {
     translateService: TranslateService,
     messageService: MessageService,
     numberPageInScan: number,
-    cacheUploadNotification: CacheUploadNotification
+    cacheUploadNotification: CacheUploadNotification,
   ): Promise<void> {
     if (this.preferenceService.getPreference().cacheDb !== 'sqlite') {
       const o: ExportOptions = {
@@ -129,7 +129,7 @@ export class CacheUploadService {
           nbrPart,
           o,
           cacheUploadNotification,
-          filename1
+          filename1,
         );
         if (!success) {
           cacheUploadNotification.setBlocked(false);
@@ -181,7 +181,7 @@ export class CacheUploadService {
             cacheUploadNotification.setMessage('');
             cacheUploadNotification.setSubMessage('');
             resolve(false);
-          }
+          },
         );
       });
       const success = await p;
@@ -213,7 +213,7 @@ export class CacheUploadService {
     nbrPart: number,
     o: ExportOptions,
     cacheUploadNotification: CacheUploadNotification,
-    filename: string
+    filename: string,
   ): Promise<boolean> {
     translateService
       .get('scanexam.exportcacheencours')
@@ -255,7 +255,7 @@ export class CacheUploadService {
             cacheUploadNotification.setMessage('');
             cacheUploadNotification.setSubMessage('');
             resolve(false);
-          }
+          },
         );
       });
       return await p;
@@ -277,7 +277,7 @@ export class CacheUploadService {
     translateService: TranslateService,
     messageService: MessageService,
     cacheDownloadNotification: CacheDownloadNotification,
-    showFailMessage: boolean
+    showFailMessage: boolean,
   ): Promise<void> {
     translateService.get('scanexam.downloadcacheencours').subscribe(res => cacheDownloadNotification.setMessage('' + res + ''));
     translateService.get('scanexam.downloadcacheencoursdetail').subscribe(res => cacheDownloadNotification.setSubMessage('' + res));
@@ -423,6 +423,76 @@ export class CacheUploadService {
       })
       .pipe(scan(calculateState, initialState));
   }
+
+  public async uploadStudentPdf(
+    blob: Blob,
+    examId: number,
+    translateService: TranslateService,
+    messageService: MessageService,
+    filename: string,
+    cacheUploadNotification: CacheUploadNotification,
+  ): Promise<boolean> {
+    const file = new File([blob], filename);
+    cacheUploadNotification.setProgress(0);
+    translateService.get('scanexam.uploadstudentsheetencours').subscribe(res => cacheUploadNotification.setMessage('' + res));
+    translateService.get('scanexam.uploadstudentsheetencoursdetail').subscribe(res => cacheUploadNotification.setSubMessage('' + res));
+    const p = new Promise<boolean>(resolve => {
+      this.uploadPdfStudentSheet(file, examId).subscribe(
+        e => {
+          cacheUploadNotification.setProgress(e.progress);
+          if (e.state === 'DONE') {
+            cacheUploadNotification.setMessage('');
+            cacheUploadNotification.setSubMessage('');
+            resolve(true);
+          }
+        },
+        () => {
+          messageService.add({
+            severity: 'error',
+            summary: translateService.instant('scanexam.uploadstudentsheetko'),
+            detail: translateService.instant('scanexam.uploadstudentsheetdetail'),
+          });
+
+          cacheUploadNotification.setBlocked(false);
+          cacheUploadNotification.setMessage('');
+          cacheUploadNotification.setSubMessage('');
+          resolve(false);
+        },
+      );
+    });
+    const success = await p;
+    cacheUploadNotification.setBlocked(false);
+
+    if (!success) {
+      messageService.add({
+        severity: 'error',
+        summary: translateService.instant('scanexam.uploadstudentsheetko'),
+        detail: translateService.instant('scanexam.uploadstudentsheetkodetail'),
+      });
+    } else {
+      messageService.add({
+        severity: 'success',
+        summary: translateService.instant('scanexam.uploadstudentsheetok'),
+        detail: translateService.instant('scanexam.uploadstudentsheetokdetail'),
+      });
+    }
+
+    return success;
+  }
+
+  private uploadPdfStudentSheet(file: File, examId: number): Observable<Upload> {
+    const formData: FormData = new FormData();
+    formData.append('file', file);
+
+    return this.http
+      .post(this.applicationConfigService.getEndpointFor('api/uploadExportFinalStudent/' + examId), formData, {
+        reportProgress: true,
+        responseType: 'json',
+        observe: 'events',
+      })
+      .pipe(scan(calculateState, initialState));
+  }
+
   private getCache(filename: string): Observable<any> {
     // eslint-disable-next-line no-console
     // console.log(this.applicationConfigService.getEndpointFor('api/getCache/' + filename));

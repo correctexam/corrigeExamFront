@@ -13,6 +13,8 @@ import * as FileSaver from 'file-saver';
 import { IExam } from '../../entities/exam/exam.model';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { faEnvelope, faTemperatureThreeQuarters } from '@fortawesome/free-solid-svg-icons';
+import { ExportPdfService } from '../exportanonymoupdf/exportanonymoupdf.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'jhi-resultatstudentcourse',
@@ -27,6 +29,10 @@ export class ResultatStudentcourseComponent implements OnInit {
   showEmail = false;
   mailSubject = '';
   mailBody = '';
+  mailabiBody = '';
+
+  mailabi = false;
+  mailpdf = false;
   exam: IExam | undefined;
 
   faEnvelope = faEnvelope;
@@ -40,7 +46,8 @@ export class ResultatStudentcourseComponent implements OnInit {
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
     public confirmationService: ConfirmationService,
-    public examService: ExamService
+    public examService: ExamService,
+    public exportPdfService: ExportPdfService,
   ) {}
 
   ngOnInit(): void {
@@ -53,6 +60,7 @@ export class ResultatStudentcourseComponent implements OnInit {
             this.exam = e.body!;
             this.mailSubject = this.translate.instant('scanexam.mailsubjecttemplate') + this.exam.name;
             this.mailBody = data;
+            this.mailabiBody = this.translate.instant('scanexam.mailabitemplate');
           });
           this.loadEtudiants();
         });
@@ -61,6 +69,7 @@ export class ResultatStudentcourseComponent implements OnInit {
             if (this.exam !== undefined) {
               this.mailSubject = this.translate.instant('scanexam.mailsubjecttemplate') + this.exam.name;
               this.mailBody = data;
+              this.mailabiBody = this.translate.instant('scanexam.mailabitemplate');
             }
           });
         });
@@ -72,34 +81,54 @@ export class ResultatStudentcourseComponent implements OnInit {
     this.showEmail = true;
   }
 
-  envoiEmailEtudiant(): void {
+  async envoiEmailEtudiant(): Promise<void> {
     const mail = {
       subject: this.mailSubject,
       body: this.mailBody,
+      mailabi: this.mailabi,
+      mailpdf: this.mailpdf,
+      bodyabi: this.mailabiBody,
     };
     this.blocked = true;
-    this.http.post(this.applicationConfigService.getEndpointFor('api/sendResult/' + this.examid), mail).subscribe(() => {
-      this.showEmail = false;
-
-      this.translate.get('scanexam.mailsent').subscribe(
-        data => {
+    let res = true;
+    if (this.mailpdf) {
+      res = await this.exportPdfService.generatePdf(this.examid!, this.messageService, false);
+    }
+    try {
+      if (res) {
+        await firstValueFrom(this.http.post(this.applicationConfigService.getEndpointFor('api/sendResult/' + this.examid), mail));
+        this.showEmail = false;
+        this.translate.get('scanexam.mailsent').subscribe(data => {
           this.blocked = false;
           this.messageService.add({
             severity: 'success',
             summary: data,
             detail: this.translate.instant('scanexam.mailsentdetails'),
           });
-        },
-        () => {
+        });
+      } else {
+        this.showEmail = false;
+        this.translate.get('scanexam.mailnotsent').subscribe(data => {
           this.blocked = false;
           this.messageService.add({
             severity: 'error',
-            summary: this.translate.instant('scanexam.mailnotsent'),
-            detail: this.translate.instant('scanexam.mailnotsentdetails'),
+            summary: data,
+            detail: this.translate.instant('scanexam.mailsemailnotsentdetailstdetails'),
           });
-        }
-      );
-    });
+        });
+      }
+    } catch (e: any) {
+      this.showEmail = false;
+
+      this.translate.get('scanexam.mailnotsent').subscribe(data => {
+        this.blocked = false;
+        this.messageService.add({
+          severity: 'error',
+          summary: data,
+          detail: this.translate.instant('scanexam.mailsemailnotsentdetailstdetails'),
+        });
+      });
+    }
   }
   gotoUE(): void {
     this.router.navigateByUrl('/exam/' + this.examid);

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 
-import { Component, Inject, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ExamService } from 'app/entities/exam/service/exam.service';
@@ -11,8 +11,8 @@ import { ScanService } from 'app/entities/scan/service/scan.service';
 import { MessageService } from 'primeng/api';
 import { CacheUploadService } from '../exam-detail/cacheUpload.service';
 import { PreferenceService } from '../preference-page/preference.service';
-import { DialogService } from 'primeng/dynamicdialog';
 
+import jsPDF from 'jspdf';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { QuestionService } from 'app/entities/question/service/question.service';
@@ -22,7 +22,9 @@ import { ApplicationConfigService } from '../../core/config/application-config.s
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 import { ExportPDFDto, Questionspdf, Sheetspdf, StudentResponsepdf } from './exportpdf.model';
 import { IComments } from 'app/entities/comments/comments.model';
-import { ExportPdfService } from './exportanonymoupdf.service';
+import { SVG } from '@svgdotjs/svg.js';
+import { GradeType } from 'app/entities/enumerations/grade-type.model';
+import { firstValueFrom } from 'rxjs';
 
 const coefficient = 100000;
 
@@ -31,16 +33,10 @@ interface ImageSize {
   height: number;
 }
 
-@Component({
-  selector: 'jhi-exportanonymoupdf',
-  templateUrl: './exportanonymoupdf.component.html',
-  styleUrls: ['./exportanonymoupdf.component.scss'],
-  providers: [MessageService, DialogService],
-})
-export class ExportanonymoupdfComponent implements OnInit {
+@Injectable({ providedIn: 'root' })
+export class ExportPdfService {
   examId = '';
   scan!: IScan;
-  pdfcontent!: string;
   scale = 2;
   sheetuid: string | undefined;
   nbrPageInTemplate = 0;
@@ -48,11 +44,10 @@ export class ExportanonymoupdfComponent implements OnInit {
   examExport: ExportPDFDto | undefined;
   comments!: IComments[];
   questionMap: Map<number, Questionspdf> = new Map();
-  blocked = true;
   canvass: Map<number, HTMLCanvasElement> = new Map();
-  message: string | undefined;
-  subMessage: string | undefined;
   progress = 0;
+  messageService!: MessageService;
+  anonymous = true;
 
   constructor(
     public examService: ExamService,
@@ -61,67 +56,52 @@ export class ExportanonymoupdfComponent implements OnInit {
     public questionService: QuestionService,
     public zoneService: ZoneService,
     public sheetService: ExamSheetService,
-
     protected activatedRoute: ActivatedRoute,
     public router: Router,
     public applicationConfigService: ApplicationConfigService,
     private cacheUploadService: CacheUploadService,
     private translateService: TranslateService,
-    private messageService: MessageService,
     private preferenceService: PreferenceService,
     private db: CacheServiceImpl,
-    private exportPdfService: ExportPdfService,
   ) {}
 
-  ngOnInit(): void {
-    this.activatedRoute.paramMap.subscribe(params => {
-      if (params.get('examid') !== null) {
-        this.examId = params.get('examid')!;
-        if (params.get('sheetuid') !== null) {
-          this.sheetuid = params.get('sheetuid')!;
-          this.exportPdfService.generatePdf(this.examId, this.messageService, true, this.sheetuid);
-        } else {
-          this.exportPdfService.generatePdf(this.examId, this.messageService, true);
-        }
+  async generatePdf(examId: string, messageService: MessageService, anonymous: boolean, sheetuuid?: string): Promise<boolean> {
+    this.messageService = messageService;
+    this.anonymous = anonymous;
+    this.examId = examId;
+    let uri = 'api/exportpdf/' + this.examId;
+    if (sheetuuid !== undefined) {
+      this.sheetuid = sheetuuid;
+      uri = 'api/exportpdf4sheet/' + this.examId + '/' + sheetuuid;
+    }
 
-        /*
-        this.http.get<ExportPDFDto>(this.applicationConfigService.getEndpointFor(uri)).subscribe(res => {
-          this.examExport = res;
-          this.examExport.questionspdf!.forEach(q => this.questionMap.set(q.ID!, q));
+    this.examExport = await firstValueFrom(this.http.get<ExportPDFDto>(this.applicationConfigService.getEndpointFor(uri)));
+    this.examExport.questionspdf!.forEach(q => this.questionMap.set(q.ID!, q));
 
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          if (this.preferenceService.getPreference().pdfscale !== undefined) {
-            this.scale = this.preferenceService.getPreference().pdfscale;
-          }
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (this.preferenceService.getPreference().pdfscale !== undefined) {
+      this.scale = this.preferenceService.getPreference().pdfscale;
+    }
 
-          this.db.countPageTemplate(+this.examId).then(paget => {
-            this.nbrPageInTemplate = paget;
+    this.nbrPageInTemplate = await this.db.countPageTemplate(+this.examId);
+    this.comments = await firstValueFrom(
+      this.http.get<IComments[]>(this.applicationConfigService.getEndpointFor('api/getComments/' + this.examId)),
+    );
 
-            this.http
-              .get<IComments[]>(this.applicationConfigService.getEndpointFor('api/getComments/' + this.examId))
-              .subscribe(comments => {
-                this.comments = comments;
+    const exportPromises: Promise<void>[] = [];
 
-                const exportPromises: Promise<void>[] = [];
-
-                this.examExport?.sheetspdf?.forEach((sheet, index1) => {
-                  exportPromises.push(this.processPage(sheet, index1));
-                });
-                Promise.all(exportPromises).then(() => {
-                  this.blocked = false;
-                  this.messageService.add({
-                    severity: 'success',
-                    summary: this.translateService.instant('scanexam.exportpdfok'),
-                    detail: this.translateService.instant('scanexam.exportpdfokdetails'),
-                  });
-                });
-              });
-          });
-        });*/
-      }
+    this.examExport?.sheetspdf?.forEach((sheet, index1) => {
+      exportPromises.push(this.processPage(sheet, index1));
     });
+    await Promise.all(exportPromises);
+    this.messageService.add({
+      severity: 'success',
+      summary: this.translateService.instant('scanexam.exportpdfok'),
+      detail: this.translateService.instant('scanexam.exportpdfokdetails'),
+    });
+    return true;
   }
-  /*
+
   processPage(sheet: Sheetspdf, index1: number): Promise<void> {
     return new Promise((resolve, reject) => {
       if (index1 > -1) {
@@ -148,13 +128,15 @@ export class ExportanonymoupdfComponent implements OnInit {
 
   async startProcessingPage(sheet: Sheetspdf): Promise<void> {
     for (let page = sheet.pagemin! + 1; page <= sheet.pagemax! + 1; page++) {
-      if (this.nbrPageInTemplate > 1) {
-        const paget1 = (page % this.nbrPageInTemplate) % 2;
-        if (1 === paget1) {
+      if (this.anonymous) {
+        if (this.nbrPageInTemplate > 1) {
+          const paget1 = (page % this.nbrPageInTemplate) % 2;
+          if (1 === paget1) {
+            this.maskNameFirstName(this.canvass.get(page)!);
+          }
+        } else {
           this.maskNameFirstName(this.canvass.get(page)!);
         }
-      } else {
-        this.maskNameFirstName(this.canvass.get(page)!);
       }
 
       await this.drawComments(sheet, page);
@@ -267,7 +249,6 @@ export class ExportanonymoupdfComponent implements OnInit {
         compression = this.preferenceService.getPreference().exportImageCompression;
       }
 
-
       const imgData = canvas.toDataURL('image/jpeg', compression);
       const dimensions = await this.getImageDimensions(imgData);
       pdf.addImage(imgData, 'JPEG', 0, 0, dimensions.width / (dimensions.width / 210), dimensions.height / (dimensions.height / 297));
@@ -277,30 +258,26 @@ export class ExportanonymoupdfComponent implements OnInit {
       }
       this.canvass.delete(page)!;
     }
-    if (!this.sheetuid){
-     const blob =  new Blob([pdf.output('blob')], {type: 'application/pdf'});
-    await this.cacheUploadService.uploadStudentPdf(blob, +this.examId, this.translateService, this.messageService, sheet.name! + '.pdf', {
-      setMessage: (v: string): void => {
-        this.message = v;
-      },
-      setSubMessage: (v: string): void => {
-        this.subMessage = v;
-
-      },
-      setBlocked(v: boolean): void{
-       // this.blocked  =v;
-      },
-      setProgress: (v: number): void => {
-
-        this.progress = v;
-      }
-    });
-  }else {
-    await pdf.save(sheet.studentpdf![0].name + '_' + sheet.studentpdf![0].firstname + '.pdf', { returnPromise: true });
-
+    if (!this.sheetuid) {
+      const blob = new Blob([pdf.output('blob')], { type: 'application/pdf' });
+      await this.cacheUploadService.uploadStudentPdf(blob, +this.examId, this.translateService, this.messageService, sheet.name! + '.pdf', {
+        setMessage(v: string): void {
+          //        this.message = v;
+        },
+        setSubMessage(v: string): void {
+          //   this.subMessage = v;
+        },
+        setBlocked(v: boolean): void {
+          // this.blocked  =v;
+        },
+        setProgress: (v: number): void => {
+          this.progress = v;
+        },
+      });
+    } else {
+      await pdf.save(sheet.studentpdf![0].name + '_' + sheet.studentpdf![0].firstname + '.pdf', { returnPromise: true });
+    }
   }
-  }
-
 
   private computeNote(resp: StudentResponsepdf, currentQ: Questionspdf): number {
     const noteSteps = currentQ.point! * currentQ.step!;
@@ -442,5 +419,5 @@ export class ExportanonymoupdfComponent implements OnInit {
       }
     }
     return value;
-  }*/
+  }
 }

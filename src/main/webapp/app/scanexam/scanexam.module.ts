@@ -88,6 +88,7 @@ import { ClickDoubleDirective } from './clickdouble.directive';
 import { KeyboardshortcutComponent } from './corrigequestion/keyboardshortcut/keyboardshortcut.component';
 import { DragDropModule } from 'primeng/dragdrop';
 import { ExportanonymoupdfComponent } from './exportanonymoupdf/exportanonymoupdf.component';
+import { CheckboxModule } from 'primeng/checkbox';
 
 // set the location of the OpenCV files
 // registerAllModules();
@@ -500,6 +501,7 @@ export const CompareAnswer_ROUTE: Route = {
     SidebarModule,
     DragDropModule,
     ProgressBarModule,
+    CheckboxModule,
     KeyboardShortcutsModule.forRoot(),
 
     RouterModule.forChild([
