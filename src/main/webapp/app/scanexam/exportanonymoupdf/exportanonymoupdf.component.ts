@@ -79,9 +79,9 @@ export class ExportanonymoupdfComponent implements OnInit {
         this.examId = params.get('examid')!;
         if (params.get('sheetuid') !== null) {
           this.sheetuid = params.get('sheetuid')!;
-          this.exportPdfService.generatePdf(this.examId, this.messageService, true, this.sheetuid);
+          this.exportPdfService.generatePdf(this.examId, this.messageService, true, this.sheetuid).then(() => (this.blocked = false));
         } else {
-          this.exportPdfService.generatePdf(this.examId, this.messageService, true);
+          this.exportPdfService.generatePdf(this.examId, this.messageService, true).then(() => (this.blocked = false));
         }
 
         /*
