@@ -33,6 +33,8 @@
           id="save-entity"
           data-cy="entityCreateSaveButton"
           class="p-button p-button-primary"
+          [pTooltip]="'scanexam.gotoexamtooltip' | translate"
+          [tooltipPosition]="'bottom'"
           (click)="gotoUE()"
         >
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackue">Retourner au module</span>
@@ -43,6 +45,8 @@
           id="save-entity"
           data-cy="entityCreateSaveButton"
           class="p-button p-button-primary"
+          [pTooltip]="'scanexam.reloadScan' | translate"
+          [tooltipPosition]="'bottom'"
           (click)="reloadScan = true"
         >
           <fa-icon icon="refresh"></fa-icon>&nbsp;<span jhiTranslate="scanexam.reloadscan">Recharger un nouveau scan</span>
@@ -54,6 +58,8 @@
           data-cy="entityCreateSaveButton"
           class="p-button p-button-primary"
           (click)="initCacheProcessing()"
+          [pTooltip]="'scanexam.initCacheProcessing' | translate"
+          [tooltipPosition]="'bottom'"
         >
           <fa-icon icon="retweet"></fa-icon>&nbsp;<span jhiTranslate="scanexam.rescan">Réanalyser à partie du pdf</span>
         </button>

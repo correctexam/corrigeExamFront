@@ -408,7 +408,7 @@ export class ChargerscanComponent implements OnInit {
       this.currentPageAlign = 1;
 
       while (
-        this.currentPageAlign < this.startPage + (navigator.hardwareConcurrency - 1) * 2 &&
+        this.currentPageAlign < this.startPage + ((navigator.hardwareConcurrency - 1) * 3) / 2 &&
         this.currentPageAlign < this.numberPagesInScan + 1
       ) {
         this.observerPage!.next(this.currentPageAlign);

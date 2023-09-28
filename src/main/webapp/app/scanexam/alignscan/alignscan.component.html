@@ -46,6 +46,8 @@
           data-cy="entityCreateSaveButton"
           class="p-button p-button-primary"
           (click)="gotoUE()"
+          [pTooltip]="'scanexam.gotoexamtooltip' | translate"
+          [tooltipPosition]="'bottom'"
         >
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam">Retourner à l'exam</span>
         </button>
@@ -56,6 +58,7 @@
           [disabled]="!loaded"
           [pTooltip]="'scanexam.alignscantooltip' | translate"
           [tooltipZIndex]="'3000'"
+          [tooltipPosition]="'bottom'"
         >
           <fa-icon [icon]="faObjectGroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.alignscan"> Alignement des scans</span>
         </button>
@@ -65,6 +68,7 @@
           [disabled]="!loaded || !allowPartialAlign"
           [pTooltip]="'scanexam.partialalignscantooltip' | translate"
           [tooltipZIndex]="'3000'"
+          [tooltipPosition]="'bottom'"
         >
           <fa-icon [icon]="faObjectUngroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.partialalignscan"> Alignement des scans</span>
         </button>
@@ -74,6 +78,7 @@
           [disabled]="!loaded || !allowPartialAlign"
           [pTooltip]="'scanexam.voirvignettealigntooltip' | translate"
           [tooltipZIndex]="'3000'"
+          [tooltipPosition]="'bottom'"
         >
           <fa-icon icon="image"></fa-icon>&nbsp;<span jhiTranslate="scanexam.voirvignettealign"> Vignettes des pages</span>
         </button>

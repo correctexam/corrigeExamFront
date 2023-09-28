@@ -46,11 +46,13 @@
             </div>
             <div class="flex card-content">
               <div class="flex-none flex align-items-center justify-content-center">
-                <span (click)="rotateImage(value)"><fa-icon icon="rotate-right" /></span>
+                <span (click)="rotateImage(value)" [pTooltip]="'scanexam.rotateImageTooltip' | translate"
+                  ><fa-icon icon="rotate-right"
+                /></span>
               </div>
               <div class="flex-grow-1 flex align-items-center"></div>
               <div class="flex-none flex align-items-center justify-content-center">
-                <span (click)="deleteImage(value)"><fa-icon icon="trash" /></span>
+                <span (click)="deleteImage(value)" [pTooltip]="'scanexam.deleteImageTooltip' | translate"><fa-icon icon="trash" /></span>
               </div>
             </div>
           </div>
