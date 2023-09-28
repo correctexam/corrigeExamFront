@@ -87,7 +87,7 @@
             pButton
             pRipple
             type="button"
-            [disabled]="blocked || !exam?.scanfileId"
+            [disabled]="blocked || !exam?.scanfileId || !showAlignement"
           >
             <fa-stack>
               <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>

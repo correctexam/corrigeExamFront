@@ -52,7 +52,6 @@ export class EventCanevascorrectionHandlerService {
       this.commentsService.query({ zonegeneratedid: (c as any).zoneid }).subscribe(e1 => {
         if (!(e1!.body === undefined || e1!.body?.length === 0)) {
           const svg = e1!.body![0].jsonData!;
-          console.error(e1!.body![0].jsonData!);
           let draw = SVG(svg);
           if (svg.startsWith('<?xml')) {
             draw = SVG(svg.split('\n').splice(2).join('\n'));

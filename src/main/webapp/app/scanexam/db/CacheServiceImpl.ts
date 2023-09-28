@@ -35,8 +35,18 @@ export class CacheServiceImpl implements CacheService {
     return this.service.removeElementForExam(examId);
   }
 
+  removePageAlignForExam(examId: number): Promise<void> {
+    return this.service.removePageAlignForExam(examId);
+  }
+
   removeElementForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<void> {
     return this.service.removeElementForExamForPages(examId, pageStart, pageEnd);
+  }
+  removePageAlignForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<void> {
+    return this.service.removePageAlignForExamForPages(examId, pageStart, pageEnd);
+  }
+  removePageNonAlignForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<void> {
+    return this.service.removePageNonAlignForExamForPages(examId, pageStart, pageEnd);
   }
 
   addAligneImage(elt: AlignImage): Promise<any> {
@@ -92,5 +102,12 @@ export class CacheServiceImpl implements CacheService {
   }
   countAlignWithPageNumber(examId: number, pageInscan: number): Promise<number> {
     return this.service.countAlignWithPageNumber(examId, pageInscan);
+  }
+
+  moveNonAlignPages(examId: number, from: number, to: number): Promise<void> {
+    return this.service.moveNonAlignPages(examId, from, to);
+  }
+  moveAlignPages(examId: number, from: number, to: number): Promise<void> {
+    return this.service.moveAlignPages(examId, from, to);
   }
 }

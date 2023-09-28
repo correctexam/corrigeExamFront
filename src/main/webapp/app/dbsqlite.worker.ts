@@ -94,6 +94,16 @@ addEventListener('message', e => {
       db1.removeElementForExam(_sqlite3, e.data);
       break;
     }
+    case 'removePageAlignForExam': {
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.payload.examId);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
+      }
+      db1.removePageAlignForExam(_sqlite3, e.data);
+      break;
+    }
     case 'removeElementForExamForPages': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
@@ -102,6 +112,26 @@ addEventListener('message', e => {
         dbs.set(e.data.exam, db1);
       }
       db1.removeElementForExamForPages(_sqlite3, e.data);
+      break;
+    }
+    case 'removePageAlignForExamForPages': {
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.payload.examId);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
+      }
+      db1.removePageAlignForExamForPages(_sqlite3, e.data);
+      break;
+    }
+    case 'removePageNonAlignForExamForPages': {
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.payload.examId);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
+      }
+      db1.removePageNonAlignForExamForPages(_sqlite3, e.data);
       break;
     }
     case 'export': {
@@ -288,6 +318,26 @@ addEventListener('message', e => {
         dbs.set(e.data.exam, db1);
       }
       db1.countAlignWithPageNumber(_sqlite3, e.data);
+      break;
+    }
+    case 'moveNonAlignPage': {
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.payload.examId);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
+      }
+      db1.moveNonAlignPages(_sqlite3, e.data);
+      break;
+    }
+    case 'moveAlignPages': {
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.payload.examId);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.exam, db1);
+      }
+      db1.moveAlignPages(_sqlite3, e.data);
       break;
     }
   }
@@ -492,6 +542,21 @@ class DB {
     }
   }
 
+  // removeElementForExam(examId: number) :Promise<void>;
+  removePageAlignForExam(sqlite3: any, data: any) {
+    this.initDb(sqlite3);
+    try {
+      this.db.exec('delete from align');
+      postMessage({
+        msg: data.msg,
+        uid: data.uid,
+        payload: {},
+      });
+    } finally {
+      this.db.close();
+    }
+  }
+
   removeElementForExamForPages(sqlite3: any, data: any) {
     const payload = data.payload;
 
@@ -529,6 +594,38 @@ class DB {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 
     });*/
+  }
+
+  removePageAlignForExamForPages(sqlite3: any, data: any) {
+    const payload = data.payload;
+
+    this.initDb(sqlite3);
+    try {
+      this.db.exec('delete from align where page>=' + payload.pageStart + ' and page <= ' + payload.pageEnd + '');
+      postMessage({
+        msg: data.msg,
+        uid: data.uid,
+        payload: {},
+      });
+    } finally {
+      this.db.close();
+    }
+  }
+
+  removePageNonAlignForExamForPages(sqlite3: any, data: any) {
+    const payload = data.payload;
+
+    this.initDb(sqlite3);
+    try {
+      this.db.exec('delete from nonalign where page>=' + payload.pageStart + ' and page <= ' + payload.pageEnd + '');
+      postMessage({
+        msg: data.msg,
+        uid: data.uid,
+        payload: {},
+      });
+    } finally {
+      this.db.close();
+    }
   }
 
   // export(examId: number,options?: ExportOptions) :Promise<Blob>;
@@ -723,7 +820,7 @@ class DB {
       this.initDb(sqlite3);
       try {
         const value = this.db.selectArrays(
-          'select page,imageData from nonalign where page in (' + payload.pages.join(',') + ') order by page asc'
+          'select page,imageData from nonalign where page in (' + payload.pages.join(',') + ') order by page asc',
         );
         const res: any[] = [];
         value.forEach((e: any) => {
@@ -752,7 +849,7 @@ class DB {
       this.initDb(sqlite3);
       try {
         const value = this.db.selectArrays(
-          'select page,imageData from align where page in (' + payload.pages.join(',') + ') order by page asc'
+          'select page,imageData from align where page in (' + payload.pages.join(',') + ') order by page asc',
         );
         const res: any[] = [];
         value.forEach((e: any) => {
@@ -785,7 +882,7 @@ class DB {
     this.initDb(sqlite3);
     try {
       const value = this.db.selectArrays(
-        'select page,imageData from nonalign where page>=' + payload.p1 + ' and page <= ' + payload.p2 + ' order by page asc'
+        'select page,imageData from nonalign where page>=' + payload.p1 + ' and page <= ' + payload.p2 + ' order by page asc',
       );
       const res: any[] = [];
       value.forEach((e: any) => {
@@ -812,7 +909,7 @@ class DB {
     this.initDb(sqlite3);
     try {
       const value = this.db.selectArrays(
-        'select page,imageData from align where page>=' + payload.p1 + ' and page <= ' + payload.p2 + ' order by page asc'
+        'select page,imageData from align where page>=' + payload.p1 + ' and page <= ' + payload.p2 + ' order by page asc',
       );
       const res: any[] = [];
       value.forEach((e: any) => {
@@ -914,6 +1011,37 @@ class DB {
   // countAlignWithPageNumber(examId:number, pageInscan:number): Promise<number>;
 
   countAlignWithPageNumber(sqlite3: any, data: any) {
+    const payload = data.payload;
+    this.initDb(sqlite3);
+    try {
+      const count = this.db.selectValue('select count(*) from align where page=' + payload.pageInscan);
+      postMessage({
+        msg: data.msg,
+        uid: data.uid,
+        payload: count,
+      });
+    } finally {
+      this.db.close();
+    }
+  }
+
+  //TODO
+  moveNonAlignPages(sqlite3: any, data: any) {
+    const payload = data.payload;
+    this.initDb(sqlite3);
+    try {
+      const count = this.db.selectValue('select count(*) from align where page=' + payload.pageInscan);
+      postMessage({
+        msg: data.msg,
+        uid: data.uid,
+        payload: count,
+      });
+    } finally {
+      this.db.close();
+    }
+  }
+  // TODO
+  moveAlignPages(sqlite3: any, data: any) {
     const payload = data.payload;
     this.initDb(sqlite3);
     try {

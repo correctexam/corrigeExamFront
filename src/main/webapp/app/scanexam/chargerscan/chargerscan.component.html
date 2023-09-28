@@ -12,12 +12,14 @@
         </div>
 
         <span ng-if="message !== undefined && message.length > 0">{{ message }}</span>
+        <BR />
+        <span ng-if="submessage !== undefined && submessage.length > 0">{{ submessage }}</span>
       </div>
       <div class="col-4"></div>
     </div>
   </p-blockUI>
 
-  <div class="sm:col-12 md:col-12 lg:col-8">
+  <div class="sm:col-12 md:col-12 lg:col-12">
     <div class="grid grid-nogutter">
       <div class="col-8">
         <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">
@@ -35,71 +37,122 @@
         >
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackue">Retourner au module</span>
         </button>
-      </div>
-    </div>
-    <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <div class="col-12 md:col-12">
-        <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.scan.content" for="field_content">Content</label>
-          <div>
-            <div *ngIf="editForm.get('content')!.value" class="form-text text-danger clearfix">
-              <a
-                class="pull-start"
-                (click)="openFile(editForm.get('content')!.value, editForm.get('contentContentType')!.value)"
-                jhiTranslate="entity.action.open"
-                >open</a
-              ><br />
-              <span class="pull-start"
-                >{{ editForm.get('contentContentType')!.value }}, {{ byteSize(editForm.get('content')!.value) }}</span
-              >
-              <button
-                type="button"
-                (click)="editForm.patchValue({ content: null }); editForm.patchValue({ contentContentType: null })"
-                class="btn btn-secondary btn-xs pull-end"
-              >
-                <fa-icon icon="times"></fa-icon>
-              </button>
-            </div>
-            <input
-              type="file"
-              id="file_content"
-              data-cy="content"
-              (change)="setFileData($event, 'content', false)"
-              jhiTranslate="entity.action.addblob"
-            />
-          </div>
-          <input type="hidden" class="form-control" name="content" id="field_content" data-cy="content" formControlName="content" />
-          <input
-            type="hidden"
-            class="form-control"
-            name="contentContentType"
-            id="field_contentContentType"
-            formControlName="contentContentType"
-          />
-        </div>
-
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="gotoUE()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-        </button>
-
         <button
+          [disabled]="!this.examid"
           type="submit"
           id="save-entity"
           data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving"
           class="p-button p-button-primary"
+          (click)="reloadScan = true"
         >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+          <fa-icon icon="refresh"></fa-icon>&nbsp;<span jhiTranslate="scanexam.reloadscan">Recharger un nouveau scan</span>
+        </button>
+        <button
+          [disabled]="!this.examid"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="p-button p-button-primary"
+          (click)="initCacheProcessing()"
+        >
+          <fa-icon icon="retweet"></fa-icon>&nbsp;<span jhiTranslate="scanexam.rescan">Réanalyser à partie du pdf</span>
         </button>
       </div>
-    </form>
+    </div>
+    <div *ngIf="reloadScan || pageInTemplate === 0 || pageInScan === 0">
+      <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+        <div class="col-12 md:col-12">
+          <div class="row mb-3">
+            <label class="form-label" jhiTranslate="gradeScopeIsticApp.scan.content" for="field_content">Content</label>
+            <div>
+              <div *ngIf="editForm.get('content')!.value" class="form-text text-danger clearfix">
+                <a
+                  class="pull-start"
+                  (click)="openFile(editForm.get('content')!.value, editForm.get('contentContentType')!.value)"
+                  jhiTranslate="entity.action.open"
+                  >open</a
+                ><br />
+                <span class="pull-start"
+                  >{{ editForm.get('contentContentType')!.value }}, {{ byteSize(editForm.get('content')!.value) }}</span
+                >
+                <button
+                  type="button"
+                  (click)="editForm.patchValue({ content: null }); editForm.patchValue({ contentContentType: null })"
+                  class="btn btn-secondary btn-xs pull-end"
+                >
+                  <fa-icon icon="times"></fa-icon>
+                </button>
+              </div>
+              <input
+                type="file"
+                id="file_content"
+                data-cy="content"
+                (change)="setFileData($event, 'content', false)"
+                jhiTranslate="entity.action.addblob"
+              />
+            </div>
+            <input type="hidden" class="form-control" name="content" id="field_content" data-cy="content" formControlName="content" />
+            <input
+              type="hidden"
+              class="form-control"
+              name="contentContentType"
+              id="field_contentContentType"
+              formControlName="contentContentType"
+            />
+          </div>
+
+          <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="gotoUE()">
+            <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+          </button>
+
+          <button
+            type="submit"
+            id="save-entity"
+            data-cy="entityCreateSaveButton"
+            [disabled]="editForm.invalid || isSaving"
+            class="p-button p-button-primary"
+          >
+            <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+          </button>
+        </div>
+      </form>
+    </div>
+    <jhi-viewandreorderpages
+      #viewpage
+      *ngIf="showVignette && !reloadScan && examid && pageInTemplate > 0 && pageInScan > 0"
+      [examId]="+examid!"
+    ></jhi-viewandreorderpages>
   </div>
-  <div class="lg:col-4 xl:col-4 overflow-hidden sm:hidden md:hidden lg:flex xl:flex">
+  <!--  <div class="lg:col-4 xl:col-4 overflow-hidden sm:hidden md:hidden lg:flex xl:flex">
     <img
       src="content/images/bannerright.jpg"
       alt="Image"
       class="md:ml-auto block md:h-full"
       style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
     />
+  </div>-->
+  <div class="canvas-wrapper foo">
+    <ngx-extended-pdf-viewer
+      [hidden]="'true'"
+      [base64Src]="pdfcontent"
+      [useBrowserLocale]="true"
+      style="flex: 1 1 100%"
+      #viewer
+      [height]="'90vh'"
+      [page]="1"
+      [handTool]="false"
+      [showHandToolButton]="false"
+      [textLayer]="false"
+      [(scrollMode)]="scrollMode"
+      [handTool]="false"
+      [showToolbar]="false"
+      [pageViewMode]="'infinite-scroll'"
+      [showSecondaryToolbarButton]="false"
+      backgroundColor="#ffffff"
+      [zoom]="'100%'"
+      [minZoom]="1"
+      [maxZoom]="1"
+      (pdfLoaded)="pdfloaded()"
+    ></ngx-extended-pdf-viewer>
   </div>
 </div>

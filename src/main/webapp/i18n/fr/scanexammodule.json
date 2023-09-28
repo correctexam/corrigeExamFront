@@ -324,6 +324,15 @@
     "envoiabi": "Envoi d'un mail aux absents:",
     "envoipdf": "Envoi de la copie annotée en pdf:",
     "lienelevepdf": "Lien copie annotée",
-    "pdf": "pdf"
+    "pdf": "pdf",
+    "reloadscan": "Recharger un nouveau scan",
+    "rescan": "Réanalyser à partir du pdf",
+    "processingencours": "Processing des images en cours",
+    "voirvignettealign": "Vignettes des pages",
+    "voirvignettealigntooltip": "Permet de voir (ou cacher) un aperçu des vignettes des pages alignées",
+    "npagealign": "Pas de page à aligner",
+    "npagealigndetails": "Il n'y a pas de page à aligner pour le numéro de page = ",
+    "showmapping": "Voir les correspondances entre les pages alignées/non alignées (debug)",
+    "loadingscan": "Chargement du scan en cours"
   }
 }

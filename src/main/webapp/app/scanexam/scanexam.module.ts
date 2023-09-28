@@ -89,6 +89,8 @@ import { KeyboardshortcutComponent } from './corrigequestion/keyboardshortcut/ke
 import { DragDropModule } from 'primeng/dragdrop';
 import { ExportanonymoupdfComponent } from './exportanonymoupdf/exportanonymoupdf.component';
 import { CheckboxModule } from 'primeng/checkbox';
+import { ViewandreorderpagesComponent } from './viewandreorderpages/viewandreorderpages.component';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 // set the location of the OpenCV files
 // registerAllModules();
@@ -455,6 +457,7 @@ export const CompareAnswer_ROUTE: Route = {
     ClickDoubleDirective,
     KeyboardshortcutComponent,
     ExportanonymoupdfComponent,
+    ViewandreorderpagesComponent,
   ],
   imports: [
     CommonModule,
@@ -488,6 +491,7 @@ export const CompareAnswer_ROUTE: Route = {
     InputTextareaModule,
     SplitterModule,
     DialogModule,
+    ProgressSpinnerModule,
     InplaceModule,
     InputTextModule,
     GalleriaModule,

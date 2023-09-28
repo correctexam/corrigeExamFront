@@ -49,6 +49,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
   exam: IExam | undefined;
   course: ICourse | undefined;
   dockItems!: any[];
+  showAlignement = false;
   showAssociation = false;
   showCorrection = false;
   nbreFeuilleParCopie = 0;
@@ -72,11 +73,15 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     private messageService: MessageService,
     public cacheUploadService: CacheUploadService,
     private translateService: TranslateService,
-    private db: CacheServiceImpl
+    private db: CacheServiceImpl,
   ) {}
+  setShowAlignement(v: boolean): void {
+    this.showAlignement = v;
+  }
   setShowAssociation(v: boolean): void {
     this.showAssociation = v;
   }
+
   setShowCorrection(v: boolean): void {
     this.showCorrection = v;
   }
@@ -93,14 +98,28 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
             e => (this.course = e.body!),
             () => {
               this.router.navigateByUrl('/');
-            }
+            },
           );
 
           this.db.countPageTemplate(+this.examId).then(c => {
             if (c !== 0) {
               this.blocked = true;
-              this.showAssociation = true;
-              this.initTemplate();
+              this.db.countNonAlignImage(+this.examId).then(c1 => {
+                if (c1 !== 0) {
+                  this.showAlignement = true;
+
+                  this.checkIfAlreadyAlign().then(res => {
+                    if (res) {
+                      this.showAssociation = true;
+                      this.initTemplate();
+                    } else {
+                      this.blocked = false;
+                    }
+                  });
+                } else {
+                  this.blocked = false;
+                }
+              });
             } else {
               this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, false);
             }
@@ -115,6 +134,12 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
         });
       }
     });
+  }
+
+  async checkIfAlreadyAlign(): Promise<boolean> {
+    const p = await this.db.countNonAlignImage(+this.examId);
+    const p1 = await this.db.countAlignImage(+this.examId);
+    return p > 0 && p1 > 0 && p === p1;
   }
 
   initCmpt(): void {
@@ -178,11 +203,11 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
             const ex2 = (this.students.map(s => s.examSheets) as any)
               .flat()
               .filter((ex1: any) => ex1.scanId === this.exam!.scanfileId && ex1.pagemin !== -1).length;
-            this.showCorrection = ex2 === this.numberPagesInScan / this.nbreFeuilleParCopie;
+            this.showCorrection = ex2 === this.numberPagesInScan / this.nbreFeuilleParCopie && this.showAssociation && this.showAlignement;
           },
           () => {
             this.blocked = false;
-          }
+          },
         );
       });
     });
@@ -219,6 +244,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
         message: data,
         accept: () => {
           this.db.removeElementForExam(+this.examId).then(() => {
+            this.showAlignement = false;
             this.showAssociation = false;
             this.showCorrection = false;
           });

@@ -321,6 +321,15 @@
     "envoiabi": "Sent an email to missing student(s):",
     "envoipdf": "Send the pdf of the annotated copy as an attachment:",
     "lienelevepdf": "Link to annotated student sheet",
-    "pdf": "pdf"
+    "pdf": "pdf",
+    "reloadscan": "Reload a new scan",
+    "rescan": "Analyse from pdf",
+    "processingencours": "Images processing ongoing",
+    "voirvignettealign": "Page thumbnails",
+    "voirvignettealigntooltip": "Shows (or hides) a preview of the thumbnails of aligned pages",
+    "npagealign": "No page to align",
+    "npagealigndetails": "There is no page to align for the page number =",
+    "showmapping": "View mappings between aligned and non-aligned pages (debug)",
+    "loadingscan": "Loading scans in progess"
   }
 }

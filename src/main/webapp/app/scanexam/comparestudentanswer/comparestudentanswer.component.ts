@@ -36,7 +36,7 @@ import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { IZone } from 'app/entities/zone/zone.model';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ICluster, IImageCluster, ImageZone, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.component';
-import { EventCanevascorrectionHandlerService } from '../corrigequestion/event-canevascorrection-handler.service';
+// import { EventCanevascorrectionHandlerService } from '../corrigequestion/event-canevascorrection-handler.service';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { PreferenceService } from '../preference-page/preference.service';
 import { AlignImagesService } from '../services/align-images.service';
@@ -150,7 +150,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     public textCommentService: TextCommentService,
     public studentResponseService: StudentResponseService,
     private changeDetector: ChangeDetectorRef,
-    private eventHandler: EventCanevascorrectionHandlerService,
+    //   private eventHandler: EventCanevascorrectionHandlerService,
     private translateService: TranslateService,
     private preferenceService: PreferenceService,
     private db: CacheServiceImpl,
@@ -299,7 +299,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     }
   }
 
-  reloadImageGrowFactor(event: any): void {
+  /*  reloadImageGrowFactor(event: any): void {
     if (event.value !== this.factor) {
       this.factor = event.value;
       this.reloadImage();
@@ -311,7 +311,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
       this.pageOffset = event.value;
       this.reloadImage();
     }
-  }
+  }*/
 
   async reloadImage() {
     if (this.zones4comments !== undefined) {
@@ -468,7 +468,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
           this.factorScale = 0.95;
         }
         this.scale = (window.innerWidth * this.factorScale) / i.width;
-        this.eventHandler.scale = this.scale;
+        //        this.eventHandler.scale = this.scale;
         editedImage.height = i.height;
         const ctx = editedImage.getContext('2d');
         ctx!.drawImage(i, 0, 0);
