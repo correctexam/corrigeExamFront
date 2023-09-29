@@ -344,6 +344,8 @@
     "withmarker": "Avec marqueur d'alignement",
     "withmarkertooltip": "Présence dans les copies de ronds noir dans les coins afin d'aligner les pages",
     "withoutmarker": "Sans marqueur d'alignement",
-    "withoutmarkertooltip": "Sans marqueur significatif afin d'aligner les pages (l'algorithme cherchera par lui même des points d'intérêt)"
+    "withoutmarkertooltip": "Sans marqueur significatif afin d'aligner les pages (l'algorithme cherchera par lui même des points d'intérêt)",
+    "pdfupload": "Permet de charger le fichier pdf contenant l'ensemble des copies scannées",
+    "pdfchoisirfichier": "Choisir pdf de scan"
   }
 }

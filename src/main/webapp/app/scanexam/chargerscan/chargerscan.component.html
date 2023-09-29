@@ -11,9 +11,9 @@
           </div>
         </div>
 
-        <span ng-if="message !== undefined && message.length > 0">{{ message }}</span>
+        <span *ngIf="message !== undefined && message.length > 0">{{ message }}</span>
         <BR />
-        <span ng-if="submessage !== undefined && submessage.length > 0">{{ submessage }}</span>
+        <span *ngIf="submessage !== undefined && submessage.length > 0">{{ submessage }}</span>
       </div>
       <div class="col-4"></div>
     </div>
@@ -68,7 +68,7 @@
     <div *ngIf="reloadScan || pageInTemplate === 0 || pageInScan === 0">
       <div class="col-12 md:col-12">
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.scan.content" for="field_content">Content</label>
+          <!--          <label class="form-label" jhiTranslate="gradeScopeIsticApp.scan.content" for="field_content">Content</label>-->
           <div>
             <!-- <div *ngIf="editForm.get('content')!.value" class="form-text text-danger clearfix">
                 <a
@@ -98,12 +98,13 @@
             <p-fileUpload
               [chooseIcon]="''"
               [chooseStyleClass]="'p-button p-button-primary'"
-              moFileUploadModulede="basic"
+              mode="basic"
               [auto]="true"
               [customUpload]="true"
               [pTooltip]="'scanexam.pdfupload' | translate"
+              tooltipPosition="bottom"
               [tooltipZIndex]="'3000'"
-              [chooseLabel]="'entity.action.addblob' | translate"
+              [chooseLabel]="'scanexam.pdfchoisirfichier' | translate"
               name="import[]"
               accept="application/pdf"
               [maxFileSize]="2000000000"

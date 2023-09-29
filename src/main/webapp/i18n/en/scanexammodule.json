@@ -338,6 +338,8 @@
     "withmarker": "With alignment marker",
     "withmarkertooltip": "Black circles in the corners of sheets to align pages",
     "withoutmarker": "No alignment marker",
-    "withoutmarkertooltip": "No significant marker to align the pages (the algorithm will search for points of interest)"
+    "withoutmarkertooltip": "No significant marker to align the pages (the algorithm will search for points of interest)",
+    "pdfupload": "Loads the pdf file containing all the scanned copies",
+    "pdfchoisirfichier": "Choose pdf"
   }
 }
