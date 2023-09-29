@@ -5,7 +5,6 @@ import { IExam } from 'app/entities/exam/exam.model';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { ConfirmationService } from 'primeng/api';
 import { TemplateService } from '../../entities/template/service/template.service';
-import { ITemplate } from '../../entities/template/template.model';
 
 @Component({
   selector: 'jhi-annotate-template',
@@ -17,10 +16,14 @@ export class AnnotateTemplateComponent implements OnInit {
   examId = '';
   exam!: IExam;
   course!: ICourse;
-  template!: ITemplate;
+  pdf: any;
   dockItems!: any[];
 
-  constructor(private examService: ExamService, private templateService: TemplateService, private activatedRoute: ActivatedRoute) {}
+  constructor(
+    private examService: ExamService,
+    private templateService: TemplateService,
+    private activatedRoute: ActivatedRoute,
+  ) {}
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
@@ -28,8 +31,8 @@ export class AnnotateTemplateComponent implements OnInit {
         this.examId = params.get('examid')!;
         this.examService.find(+this.examId).subscribe(data => {
           this.exam = data.body!;
-          this.templateService.find(this.exam.templateId!).subscribe(t => {
-            this.template = t.body!;
+          this.templateService.getPdf(this.exam.templateId!).subscribe(t => {
+            this.pdf = t;
           });
         });
       }
