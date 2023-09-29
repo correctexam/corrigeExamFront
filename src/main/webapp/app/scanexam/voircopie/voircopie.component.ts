@@ -101,7 +101,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     private eventHandler: EventCanevasVoirCopieHandlerService,
     public finalResultService: FinalResultService,
     public cacheUploadService: CacheUploadService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -178,7 +178,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
           this.studentResponseService
             .query({
               sheetId: this.sheet!.id,
-              questionId: this.questions[0].id,
+              questionsId: this.questions.map(q => q.id),
             })
             .subscribe(sr => {
               if (sr.body !== null && sr.body.length > 0) {
@@ -213,7 +213,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
         },
         this.canvass.get(i),
         this.currentStudent,
-        i
+        i,
       );
     });
   }
@@ -274,7 +274,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     showImageRef: (s: boolean) => void,
     imageRef: ElementRef<any> | undefined,
     currentStudent: number,
-    index: number
+    index: number,
   ): Promise<IZone | undefined> {
     return new Promise<IZone | undefined>(resolve => {
       if (zoneId) {
@@ -308,7 +308,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
         const zh = new ZoneVoirCopieHandler(
           '' + this.exam!.id + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index,
           this.eventHandler,
-          this.resp?.id
+          this.resp?.id,
         );
         zh.updateCanvas(imageRef!.nativeElement);
         this.currentZoneVoirCopieHandler = zh;
@@ -322,7 +322,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
           const zh = new ZoneVoirCopieHandler(
             '' + this.exam!.id + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index,
             this.eventHandler,
-            this.resp?.id
+            this.resp?.id,
           );
           zh.updateCanvas(imageRef!.nativeElement);
           this.currentZoneVoirCopieHandler = zh;
@@ -500,7 +500,7 @@ ${firsName}
   populateBestSolutions(): void {
     this.http
       .get<string[]>(
-        this.applicationConfigService.getEndpointFor('api/getBestAnswer/' + this.exam?.id + '/' + this.questionNumeros[this.questionindex])
+        this.applicationConfigService.getEndpointFor('api/getBestAnswer/' + this.exam?.id + '/' + this.questionNumeros[this.questionindex]),
       )
       .subscribe(s => {
         const result: string[] = [];

@@ -143,6 +143,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   images: any[] = [];
   pageOffset = 0;
   init = true;
+  showSpinner = false;
   constructor(
     public examService: ExamService,
     public zoneService: ZoneService,
@@ -183,7 +184,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.testdisableAndEnableKeyBoardShortCut = false;
     this.init = true;
 
-    this.blocked = true;
     let forceRefreshStudent = false;
     this.currentNote = 0;
     this.noteSteps = 0;
@@ -263,7 +263,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             const sr = await firstValueFrom(
               this.studentResponseService.query({
                 sheetId: sheets[0]?.id,
-                questionId: questions![0].id,
+                questionsId: questions!.map(q => q.id),
               }),
             );
             if (sr.body !== null && sr.body.length > 0) {
@@ -579,7 +579,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 this.alignImagesService.correctQCM(t).subscribe(
                   res => {
                     this.processSolutions(res.solutions).then(() => {
-                      const qid = this.questions![0].id;
+                      const qid = this.questions!.map(qq => qq.id);
                       let sid = '';
                       const sheets = (this.selectionStudents?.map(st => st.examSheets) as any)
                         .flat()
@@ -593,7 +593,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                       this.studentResponseService
                         .query({
                           sheetId: sid,
-                          questionId: qid,
+                          questionsId: qid,
                         })
                         .subscribe(sr => {
                           if (sr.body !== null && sr.body.length > 0) {
@@ -679,7 +679,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   async processAnswer(e: IQCMSolution) {
     if (e.solution !== undefined /* && e.solution !== '' */) {
-      const resp = await this.getStudentResponse(this.questions![0].id!, e.numero!);
+      const resp = await this.getStudentResponse(
+        this.questions!.map(q => q.id!),
+        e.numero!,
+      );
 
       resp.gradedcomments?.forEach(gc => {
         (gc as any).checked = false;
@@ -862,30 +865,38 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   toggleTCommentById(commentId: any) {
-    const res = this.currentTextComment4Question?.filter(c => c.id === commentId);
-    if (res !== undefined && res.length > 0) {
-      this.toggleTComment(res[0]);
+    if (!this.blocked) {
+      const res = this.currentTextComment4Question?.filter(c => c.id === commentId);
+      if (res !== undefined && res.length > 0) {
+        this.toggleTComment(res[0]);
+      }
     }
   }
   toggleGCommentById(commentId: any) {
-    const res = this.currentGradedComment4Question?.filter(c => c.id === commentId);
-    if (res !== undefined && res.length > 0) {
-      this.toggleGComment(res[0]);
+    if (!this.blocked) {
+      const res = this.currentGradedComment4Question?.filter(c => c.id === commentId);
+      if (res !== undefined && res.length > 0) {
+        this.toggleGComment(res[0]);
+      }
     }
   }
 
   toggleGComment(comment: IGradedComment) {
-    if (!this.checked(comment)) {
-      this.ajouterGComment(comment);
-    } else {
-      this.retirerGComment(comment);
+    if (!this.blocked) {
+      if (!this.checked(comment)) {
+        this.ajouterGComment(comment);
+      } else {
+        this.retirerGComment(comment);
+      }
     }
   }
   toggleTComment(comment: ITextComment) {
-    if (!this.checked(comment)) {
-      this.ajouterTComment(comment);
-    } else {
-      this.retirerTComment(comment);
+    if (!this.blocked) {
+      if (!this.checked(comment)) {
+        this.ajouterTComment(comment);
+      } else {
+        this.retirerTComment(comment);
+      }
     }
   }
 
@@ -1007,54 +1018,56 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   addComment() {
-    this.blocked = true;
-    this.updateResponseRequest(this.resp!).subscribe(resp => {
-      this.resp = resp.body!;
-      if (this.currentQuestion !== undefined && this.currentQuestion.gradeType === GradeType.DIRECT) {
-        const t: ITextComment = {
-          questionId: this.currentQuestion.id,
-          text: this.titreCommentaire,
-          description: this.descCommentaire,
-          // studentResponses : [{id: this.resp?.id}]
-        };
-        this.textCommentService.create(t).subscribe(e => {
-          this.resp?.textcomments?.push(e.body!);
-          const currentComment = e.body!;
-          this.updateResponseRequest(this.resp!).subscribe(resp1 => {
-            this.resp = resp1.body!;
-            (currentComment as any).checked = true;
-            this.currentTextComment4Question?.push(currentComment);
-            this.titreCommentaire = '';
-            this.descCommentaire = '';
-            this.blocked = false;
+    if (!this.blocked) {
+      this.blocked = true;
+      this.updateResponseRequest(this.resp!).subscribe(resp => {
+        this.resp = resp.body!;
+        if (this.currentQuestion !== undefined && this.currentQuestion.gradeType === GradeType.DIRECT) {
+          const t: ITextComment = {
+            questionId: this.currentQuestion.id,
+            text: this.titreCommentaire,
+            description: this.descCommentaire,
+            // studentResponses : [{id: this.resp?.id}]
+          };
+          this.textCommentService.create(t).subscribe(e => {
+            this.resp?.textcomments?.push(e.body!);
+            const currentComment = e.body!;
+            this.updateResponseRequest(this.resp!).subscribe(resp1 => {
+              this.resp = resp1.body!;
+              (currentComment as any).checked = true;
+              this.currentTextComment4Question?.push(currentComment);
+              this.titreCommentaire = '';
+              this.descCommentaire = '';
+              this.blocked = false;
+            });
           });
-        });
-      } else if (this.currentQuestion !== undefined && this.currentQuestion.gradeType !== GradeType.DIRECT) {
-        const t: IGradedComment = {
-          questionId: this.currentQuestion.id,
-          text: this.titreCommentaire,
-          description: this.descCommentaire,
-          grade: !this.noteCommentaire ? 0 : this.noteCommentaire,
-          // studentResponses: [{ id: this.resp?.id }],
-        };
-        this.blocked = true;
-        this.gradedCommentService.create(t).subscribe(e => {
-          this.resp?.gradedcomments?.push(e.body!);
-          const currentComment = e.body!;
-          this.updateResponseRequest(this.resp!).subscribe(resp1 => {
-            this.resp = resp1.body!;
+        } else if (this.currentQuestion !== undefined && this.currentQuestion.gradeType !== GradeType.DIRECT) {
+          const t: IGradedComment = {
+            questionId: this.currentQuestion.id,
+            text: this.titreCommentaire,
+            description: this.descCommentaire,
+            grade: !this.noteCommentaire ? 0 : this.noteCommentaire,
+            // studentResponses: [{ id: this.resp?.id }],
+          };
+          this.blocked = true;
+          this.gradedCommentService.create(t).subscribe(e => {
+            this.resp?.gradedcomments?.push(e.body!);
+            const currentComment = e.body!;
+            this.updateResponseRequest(this.resp!).subscribe(resp1 => {
+              this.resp = resp1.body!;
 
-            (currentComment as any).checked = true;
-            this.currentGradedComment4Question?.push(currentComment);
-            this.computeNote(false, this.resp!, this.currentQuestion!);
-            this.titreCommentaire = '';
-            this.descCommentaire = '';
-            this.noteCommentaire = 0;
-            this.blocked = false;
+              (currentComment as any).checked = true;
+              this.currentGradedComment4Question?.push(currentComment);
+              this.computeNote(false, this.resp!, this.currentQuestion!);
+              this.titreCommentaire = '';
+              this.descCommentaire = '';
+              this.noteCommentaire = 0;
+              this.blocked = false;
+            });
           });
-        });
-      }
-    });
+        }
+      });
+    }
   }
 
   // @HostListener('window:keydown.control.ArrowLeft', ['$event'])
@@ -1378,7 +1391,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async getStudentResponse(questionId: number, currentStudent: number): Promise<StudentResponse> {
+  async getStudentResponse(questionsId: number[], currentStudent: number): Promise<StudentResponse> {
     return new Promise(resolve => {
       const sheets = (this.students?.map(st => st.examSheets) as any)
         .flat()
@@ -1390,7 +1403,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.studentResponseService
         .query({
           sheetId: sheetId,
-          questionId: questionId,
+          questionsId: questionsId,
         })
         .subscribe(sr => {
           if (sr.body !== null && sr.body.length > 0) {
@@ -1569,17 +1582,19 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   removeGradedComment(comment: IGradedComment): void {
-    this.confirmationService.confirm({
-      message: this.translateService.instant('scanexam.removegradedcommentconfirmation'),
-      accept: () => {
-        this.retirerGComment(comment).then(() => {
-          this.currentGradedComment4Question = this.currentGradedComment4Question!.filter(e => e.id !== comment.id);
-          this.gradedCommentService.delete(comment!.id!).subscribe(() => {
-            console.log('delete');
+    if (!this.blocked) {
+      this.confirmationService.confirm({
+        message: this.translateService.instant('scanexam.removegradedcommentconfirmation'),
+        accept: () => {
+          this.retirerGComment(comment).then(() => {
+            this.currentGradedComment4Question = this.currentGradedComment4Question!.filter(e => e.id !== comment.id);
+            this.gradedCommentService.delete(comment!.id!).subscribe(() => {
+              console.log('delete');
+            });
           });
-        });
-      },
-    });
+        },
+      });
+    }
   }
 
   // ----------------- code for realign -----------------------
@@ -1597,42 +1612,44 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   realignInternal(mark: boolean) {
-    this.blocked = true;
-    this.initPool();
-    this.questions!.forEach(q => {
-      this.loadZone(q.zoneId).then(z => {
-        const pagewithoffset = this.currentStudent! * this.nbreFeuilleParCopie! + z!.pageNumber! + this.pageOffset;
-        const pagewithoutoffset = this.currentStudent! * this.nbreFeuilleParCopie! + z!.pageNumber!;
-        let page = pagewithoutoffset;
-        if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
-          page = pagewithoffset;
-        }
-        this.db.getFirstTemplate(+this.examId!, z!.pageNumber!).then(e2 => {
-          const image = JSON.parse(e2!.value, this.reviver);
-          this.loadImage(image.pages, z!.pageNumber!).then(v => {
-            this.db.getFirstNonAlignImage(+this.examId!, page).then(e3 => {
-              const image1 = JSON.parse(e3!.value, this.reviver);
-              this.loadImage(image1.pages, page).then(v1 => {
-                const inp: IImageAlignementInput = {
-                  imageA: v.image!.data.buffer,
-                  imageB: v1.image!.data.buffer,
-                  heightA: v.height,
-                  widthA: v.width,
-                  heightB: v1.height,
-                  widthB: v1.width,
-                  pageNumber: page,
-                  marker: mark,
-                  preference: this.preferenceService.getPreference(),
-                  debug: false,
-                };
+    if (!this.blocked) {
+      this.blocked = true;
+      this.initPool();
+      this.questions!.forEach(q => {
+        this.loadZone(q.zoneId).then(z => {
+          const pagewithoffset = this.currentStudent! * this.nbreFeuilleParCopie! + z!.pageNumber! + this.pageOffset;
+          const pagewithoutoffset = this.currentStudent! * this.nbreFeuilleParCopie! + z!.pageNumber!;
+          let page = pagewithoutoffset;
+          if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
+            page = pagewithoffset;
+          }
+          this.db.getFirstTemplate(+this.examId!, z!.pageNumber!).then(e2 => {
+            const image = JSON.parse(e2!.value, this.reviver);
+            this.loadImage(image.pages, z!.pageNumber!).then(v => {
+              this.db.getFirstNonAlignImage(+this.examId!, page).then(e3 => {
+                const image1 = JSON.parse(e3!.value, this.reviver);
+                this.loadImage(image1.pages, page).then(v1 => {
+                  const inp: IImageAlignementInput = {
+                    imageA: v.image!.data.buffer,
+                    imageB: v1.image!.data.buffer,
+                    heightA: v.height,
+                    widthA: v.width,
+                    heightB: v1.height,
+                    widthB: v1.width,
+                    pageNumber: page,
+                    marker: mark,
+                    preference: this.preferenceService.getPreference(),
+                    debug: false,
+                  };
 
-                this.observer!.next(inp);
+                  this.observer!.next(inp);
+                });
               });
             });
           });
         });
       });
-    });
+    }
   }
 
   observable: Observable<IImageAlignementInput> | undefined;
@@ -1726,7 +1743,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   removeAnswer(): void {
-    this.examService.deleteAnswer(this.resp!.id!).subscribe(() => this.ngOnInit());
+    if (!this.blocked) {
+      this.examService.deleteAnswer(this.resp!.id!).subscribe(() => this.ngOnInit());
+    }
   }
 
   @HostListener('window:resize', ['$event'])
@@ -1744,63 +1763,69 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   compareGradedComment(event: any, comment: IGradedComment) {
-    if (event.ctrlKey || event.metaKey) {
-      this.zone.run(() => {
-        const url = this.router.serializeUrl(this.router.createUrlTree(['/comparegradedcomment/' + this.examId + '/' + comment.id]));
-        if ('/' !== this.applicationConfigService.getFrontUrl()) {
-          if (this.applicationConfigService.getFrontUrl().endsWith('/') && url.startsWith('/')) {
-            window.open(this.applicationConfigService.getFrontUrl().slice(0, -1) + url, '_blank');
+    if (!this.blocked) {
+      if (event.ctrlKey || event.metaKey) {
+        this.zone.run(() => {
+          const url = this.router.serializeUrl(this.router.createUrlTree(['/comparegradedcomment/' + this.examId + '/' + comment.id]));
+          if ('/' !== this.applicationConfigService.getFrontUrl()) {
+            if (this.applicationConfigService.getFrontUrl().endsWith('/') && url.startsWith('/')) {
+              window.open(this.applicationConfigService.getFrontUrl().slice(0, -1) + url, '_blank');
+            } else {
+              window.open(this.applicationConfigService.getFrontUrl() + url, '_blank');
+            }
           } else {
-            window.open(this.applicationConfigService.getFrontUrl() + url, '_blank');
+            window.open(url, '_blank');
           }
-        } else {
-          window.open(url, '_blank');
-        }
-      });
-    } else {
-      this.zone.run(() => {
-        this.router.navigate(['/comparegradedcomment/' + this.examId + '/' + comment.id]);
-      });
+        });
+      } else {
+        this.zone.run(() => {
+          this.router.navigate(['/comparegradedcomment/' + this.examId + '/' + comment.id]);
+        });
+      }
     }
   }
   compareTextComment(event: any, comment: ITextComment) {
-    if (event.ctrlKey || event.metaKey) {
-      this.zone.run(() => {
-        const url = this.router.serializeUrl(this.router.createUrlTree(['/comparetextcomment/' + this.examId + '/' + comment.id]));
-        if ('/' !== this.applicationConfigService.getFrontUrl()) {
-          if (this.applicationConfigService.getFrontUrl().endsWith('/') && url.startsWith('/')) {
-            window.open(this.applicationConfigService.getFrontUrl().slice(0, -1) + url, '_blank');
+    if (!this.blocked) {
+      if (event.ctrlKey || event.metaKey) {
+        this.zone.run(() => {
+          const url = this.router.serializeUrl(this.router.createUrlTree(['/comparetextcomment/' + this.examId + '/' + comment.id]));
+          if ('/' !== this.applicationConfigService.getFrontUrl()) {
+            if (this.applicationConfigService.getFrontUrl().endsWith('/') && url.startsWith('/')) {
+              window.open(this.applicationConfigService.getFrontUrl().slice(0, -1) + url, '_blank');
+            } else {
+              window.open(this.applicationConfigService.getFrontUrl() + url, '_blank');
+            }
           } else {
-            window.open(this.applicationConfigService.getFrontUrl() + url, '_blank');
+            window.open(url, '_blank');
           }
-        } else {
-          window.open(url, '_blank');
-        }
-      });
-    } else {
-      this.zone.run(() => {
-        this.router.navigate(['/comparetextcomment/' + this.examId + '/' + comment.id]);
-      });
+        });
+      } else {
+        this.zone.run(() => {
+          this.router.navigate(['/comparetextcomment/' + this.examId + '/' + comment.id]);
+        });
+      }
     }
   }
   compareMark(event: any, response: IStudentResponse) {
-    if (event.ctrlKey || event.metaKey) {
-      this.zone.run(() => {
-        const url = this.router.serializeUrl(this.router.createUrlTree(['/comparemark/' + this.examId + '/' + response.id]));
-        if ('/' !== this.applicationConfigService.getFrontUrl()) {
-          if (this.applicationConfigService.getFrontUrl().endsWith('/') && url.startsWith('/')) {
-            window.open(this.applicationConfigService.getFrontUrl().slice(0, -1) + url, '_blank');
+    if (!this.blocked) {
+      if (event.ctrlKey || event.metaKey) {
+        this.zone.run(() => {
+          const url = this.router.serializeUrl(this.router.createUrlTree(['/comparemark/' + this.examId + '/' + response.id]));
+          if ('/' !== this.applicationConfigService.getFrontUrl()) {
+            if (this.applicationConfigService.getFrontUrl().endsWith('/') && url.startsWith('/')) {
+              window.open(this.applicationConfigService.getFrontUrl().slice(0, -1) + url, '_blank');
+            } else {
+              window.open(this.applicationConfigService.getFrontUrl() + url, '_blank');
+            }
           } else {
-            window.open(this.applicationConfigService.getFrontUrl() + url, '_blank');
+            window.open(url, '_blank');
           }
-        } else {
-          window.open(url, '_blank');
-        }
-      });
-    } else {
-      this.zone.run(() => {
-        this.router.navigate(['/comparemark/' + this.examId + '/' + response.id]);
-      });
+        });
+      } else {
+        this.zone.run(() => {
+          this.router.navigate(['/comparemark/' + this.examId + '/' + response.id]);
+        });
+      }
     }
   }
 }

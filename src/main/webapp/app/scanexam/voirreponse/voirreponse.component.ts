@@ -90,7 +90,7 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
     public studentResponseService: StudentResponseService,
     private changeDetector: ChangeDetectorRef,
     public cacheUploadService: CacheUploadService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -162,7 +162,7 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
           this.studentResponseService
             .query({
               sheetId: this.sheet!.id,
-              questionId: this.questions[0].id,
+              questionsId: this.questions.map(q => q.id),
             })
             .subscribe(sr => {
               if (sr.body !== null && sr.body.length > 0) {
@@ -196,7 +196,7 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
           this.showImage[i] = b;
         },
         this.canvass.get(i),
-        this.currentStudent
+        this.currentStudent,
       );
     });
   }
@@ -205,7 +205,7 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
     zoneId: number | undefined,
     showImageRef: (s: boolean) => void,
     imageRef: ElementRef<any> | undefined,
-    currentStudent: number
+    currentStudent: number,
   ): Promise<IZone | undefined> {
     return new Promise<IZone | undefined>(resolve => {
       if (zoneId) {

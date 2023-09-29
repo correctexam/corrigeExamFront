@@ -66,12 +66,11 @@
       </div>
     </div>
     <div *ngIf="reloadScan || pageInTemplate === 0 || pageInScan === 0">
-      <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-        <div class="col-12 md:col-12">
-          <div class="row mb-3">
-            <label class="form-label" jhiTranslate="gradeScopeIsticApp.scan.content" for="field_content">Content</label>
-            <div>
-              <div *ngIf="editForm.get('content')!.value" class="form-text text-danger clearfix">
+      <div class="col-12 md:col-12">
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.scan.content" for="field_content">Content</label>
+          <div>
+            <!-- <div *ngIf="editForm.get('content')!.value" class="form-text text-danger clearfix">
                 <a
                   class="pull-start"
                   (click)="openFile(editForm.get('content')!.value, editForm.get('contentContentType')!.value)"
@@ -88,26 +87,32 @@
                 >
                   <fa-icon icon="times"></fa-icon>
                 </button>
-              </div>
-              <input
+              </div> -->
+            <!--<input
                 type="file"
                 id="file_content"
                 data-cy="content"
                 (change)="setFileData($event, 'content', false)"
                 jhiTranslate="entity.action.addblob"
-              />
-            </div>
-            <input type="hidden" class="form-control" name="content" id="field_content" data-cy="content" formControlName="content" />
-            <input
-              type="hidden"
-              class="form-control"
-              name="contentContentType"
-              id="field_contentContentType"
-              formControlName="contentContentType"
-            />
+              />-->
+            <p-fileUpload
+              [chooseIcon]="''"
+              [chooseStyleClass]="'p-button p-button-primary'"
+              moFileUploadModulede="basic"
+              [auto]="true"
+              [customUpload]="true"
+              [pTooltip]="'scanexam.pdfupload' | translate"
+              [tooltipZIndex]="'3000'"
+              [chooseLabel]="'entity.action.addblob' | translate"
+              name="import[]"
+              accept="application/pdf"
+              [maxFileSize]="2000000000"
+              (uploadHandler)="onUpload($event)"
+            ></p-fileUpload>
           </div>
+        </div>
 
-          <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="gotoUE()">
+        <!--  <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="gotoUE()">
             <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
           </button>
 
@@ -119,9 +124,8 @@
             class="p-button p-button-primary"
           >
             <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-          </button>
-        </div>
-      </form>
+          </button>-->
+      </div>
     </div>
     <jhi-viewandreorderpages
       #viewpage
@@ -140,7 +144,7 @@
   <div class="canvas-wrapper foo">
     <ngx-extended-pdf-viewer
       [hidden]="'true'"
-      [base64Src]="pdfcontent"
+      [src]="blob1"
       [useBrowserLocale]="true"
       style="flex: 1 1 100%"
       #viewer

@@ -14,7 +14,10 @@ export type EntityArrayResponseType = HttpResponse<IScan[]>;
 export class ScanService {
   protected resourceUrl: string;
 
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+  constructor(
+    protected http: HttpClient,
+    protected applicationConfigService: ApplicationConfigService,
+  ) {
     this.resourceUrl = this.applicationConfigService.getEndpointFor('api/scans');
   }
 
@@ -30,14 +33,21 @@ export class ScanService {
     return this.http.put<IScan>(`${this.resourceUrl}`, scan, { observe: 'response' });
   }
 
+  getPdf(id: number): Observable<any> {
+    return this.http.get(this.applicationConfigService.getEndpointFor('api/getScanPdf/' + id), {
+      //  reportProgress: true,
+      // observe: 'events',
+      responseType: 'blob',
+    });
+  }
+
   updateWithProgress(scan: IScan): Observable<HttpEvent<IScan>> {
     // eslint-disable-next-line no-console
     return this.http.put<IScan>(`${this.resourceUrl}`, scan, { reportProgress: true, observe: 'events' } /* { observe: 'response' }*/);
   }
 
-  uploadScan(file: File, scanId: number): Observable<HttpEvent<any>> {
-    const formData: FormData = new FormData();
-    formData.append('file', file);
+  uploadScan(formData: FormData, scanId: number): Observable<HttpEvent<any>> {
+    console.error('updload scan');
 
     return this.http.post(`${this.applicationConfigService.getEndpointFor('api/uploadScan')}/${scanId} `, formData, {
       reportProgress: true,
