@@ -238,67 +238,67 @@ class ExamIndexDB extends Dexie {
   }
 
   async moveNonAlignPages(from: number, to: number) {
-    console.error('ask to move from ', from, to);
-
-    await this.nonAlignImages
-      .where({ examId: this.examId })
-      .filter(e2 => e2.pageNumber === from)
-      .modify(i => {
-        i.pageNumber = -1000; // (very approximate formula...., but anyway...)
-      });
-    if (from < to) {
+    if (from !== to) {
       await this.nonAlignImages
         .where({ examId: this.examId })
-        .filter(e2 => e2.pageNumber > from && e2.pageNumber <= to)
+        .filter(e2 => e2.pageNumber === from)
         .modify(i => {
-          i.pageNumber = i.pageNumber - 1;
+          i.pageNumber = -1000; // (very approximate formula...., but anyway...)
         });
-    } else {
+      if (from < to) {
+        await this.nonAlignImages
+          .where({ examId: this.examId })
+          .filter(e2 => e2.pageNumber > from && e2.pageNumber <= to)
+          .modify(i => {
+            i.pageNumber = i.pageNumber - 1;
+          });
+      } else {
+        await this.nonAlignImages
+          .where({ examId: this.examId })
+          .filter(e2 => e2.pageNumber < from && e2.pageNumber >= to)
+          .modify(i => {
+            i.pageNumber = i.pageNumber + 1;
+          });
+      }
       await this.nonAlignImages
         .where({ examId: this.examId })
-        .filter(e2 => e2.pageNumber < from && e2.pageNumber >= to)
+        .filter(e2 => e2.pageNumber === -1000)
         .modify(i => {
-          i.pageNumber = i.pageNumber + 1;
+          i.pageNumber = to;
         });
     }
-    await this.nonAlignImages
-      .where({ examId: this.examId })
-      .filter(e2 => e2.pageNumber === -1000)
-      .modify(i => {
-        i.pageNumber = to;
-      });
   }
 
   async moveAlignPages(from: number, to: number) {
-    console.error('ask to move from ', from, to);
-
-    await this.alignImages
-      .where({ examId: this.examId })
-      .filter(e2 => e2.pageNumber === from)
-      .modify(i => {
-        i.pageNumber = -1000; // (very approximate formula...., but anyway...)
-      });
-    if (from < to) {
+    if (from !== to) {
       await this.alignImages
         .where({ examId: this.examId })
-        .filter(e2 => e2.pageNumber > from && e2.pageNumber <= to)
+        .filter(e2 => e2.pageNumber === from)
         .modify(i => {
-          i.pageNumber = i.pageNumber - 1;
+          i.pageNumber = -1000; // (very approximate formula...., but anyway...)
         });
-    } else {
+      if (from < to) {
+        await this.alignImages
+          .where({ examId: this.examId })
+          .filter(e2 => e2.pageNumber > from && e2.pageNumber <= to)
+          .modify(i => {
+            i.pageNumber = i.pageNumber - 1;
+          });
+      } else {
+        await this.alignImages
+          .where({ examId: this.examId })
+          .filter(e2 => e2.pageNumber < from && e2.pageNumber >= to)
+          .modify(i => {
+            i.pageNumber = i.pageNumber + 1;
+          });
+      }
       await this.alignImages
         .where({ examId: this.examId })
-        .filter(e2 => e2.pageNumber < from && e2.pageNumber >= to)
+        .filter(e2 => e2.pageNumber === -1000)
         .modify(i => {
-          i.pageNumber = i.pageNumber + 1;
+          i.pageNumber = to;
         });
     }
-    await this.alignImages
-      .where({ examId: this.examId })
-      .filter(e2 => e2.pageNumber === -1000)
-      .modify(i => {
-        i.pageNumber = to;
-      });
   }
 
   async getAlignSortByPageNumber() {

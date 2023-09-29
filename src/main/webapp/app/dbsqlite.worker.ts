@@ -320,7 +320,7 @@ addEventListener('message', e => {
       db1.countAlignWithPageNumber(_sqlite3, e.data);
       break;
     }
-    case 'moveNonAlignPage': {
+    case 'moveNonAlignPages': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
         db1 = new DB(e.data.payload.examId);
@@ -873,12 +873,6 @@ class DB {
 
   getNonAlignImageBetweenAndSortByPageNumber(sqlite3: any, data: any) {
     const payload = data.payload;
-    /*
-    this.alignImages
-      .where({ examId: this.examId })
-      .filter(e2 => e2.pageNumber <= p1 && e2.pageNumber < p2)
-      .sortBy('pageNumber');
-    */
     this.initDb(sqlite3);
     try {
       const value = this.db.selectArrays(
@@ -1028,31 +1022,55 @@ class DB {
   //TODO
   moveNonAlignPages(sqlite3: any, data: any) {
     const payload = data.payload;
+
     this.initDb(sqlite3);
-    try {
-      const count = this.db.selectValue('select count(*) from align where page=' + payload.pageInscan);
-      postMessage({
-        msg: data.msg,
-        uid: data.uid,
-        payload: count,
-      });
-    } finally {
-      this.db.close();
+    if (payload.from !== payload.to) {
+      try {
+        const count = this.db.selectValue('update nonalign  set page=-1000 where page=' + payload.from);
+        if (payload.from < payload.to) {
+          const count1 = this.db.selectValue('update nonalign  set page=page-1 where page>' + payload.from + ' and page<=' + payload.to);
+          console.error(count1);
+        } else {
+          const count2 = this.db.selectValue('update nonalign  set page=page+1 where page<' + payload.from + ' and page>=' + payload.to);
+          console.error(count2);
+        }
+        const count3 = this.db.selectValue('update nonalign set page=' + payload.to + ' where page=-1000');
+        console.error(count3);
+        postMessage({
+          msg: data.msg,
+          uid: data.uid,
+          payload: count,
+        });
+      } finally {
+        this.db.close();
+      }
     }
   }
   // TODO
   moveAlignPages(sqlite3: any, data: any) {
     const payload = data.payload;
+
     this.initDb(sqlite3);
-    try {
-      const count = this.db.selectValue('select count(*) from align where page=' + payload.pageInscan);
-      postMessage({
-        msg: data.msg,
-        uid: data.uid,
-        payload: count,
-      });
-    } finally {
-      this.db.close();
+    if (payload.from !== payload.to) {
+      try {
+        const count = this.db.selectValue('update align  set page=-1000 where page=' + payload.from);
+        if (payload.from < payload.to) {
+          const count1 = this.db.selectValue('update align  set page=page-1 where page>' + payload.from + ' and page<=' + payload.to);
+          console.error(count1);
+        } else {
+          const count2 = this.db.selectValue('update align  set page=page+1 where page<' + payload.from + ' and page>=' + payload.to);
+          console.error(count2);
+        }
+        const count3 = this.db.selectValue('update align set page=' + payload.to + ' where page=-1000');
+        console.error(count3);
+        postMessage({
+          msg: data.msg,
+          uid: data.uid,
+          payload: count,
+        });
+      } finally {
+        this.db.close();
+      }
     }
   }
 }

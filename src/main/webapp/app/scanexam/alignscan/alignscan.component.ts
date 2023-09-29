@@ -66,10 +66,10 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   templatePages: Map<number, IPage> = new Map();
   loaded = false;
   alignement = 'marker';
-  alignementOptions = [
-    { label: 'Off', value: 'off' },
-    { label: 'with Marker', value: 'marker' },
-    { label: 'without Marker', value: 'nomarker' },
+  alignementOptions: any = [
+    { label: 'scanexam.off', value: 'off', tooltip: 'scanexam.offtooltip' },
+    { label: 'scanexam.withmarker', value: 'marker', tooltip: 'scanexam.withmarkertooltip' },
+    { label: 'scanexam.withoutmarker', value: 'nomarker', tooltip: 'scanexam.withoutmarkertooltip' },
   ];
   debugOptions = [
     { label: 'Off', value: false },
@@ -137,6 +137,14 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   }
 
   ngOnInit(): void {
+    /*    this.translateService.get('scanexam.off').subscribe(off=> {
+      this.alignementOptions = [
+        { label: off, value: 'off' ,tooltip:this.translateService.instant('scanexam.offtooltip')},
+        { label: this.translateService.instant('scanexam.withmarker'), value: 'marker' },
+        { label: this.translateService.instant('scanexam.withoutmarker'), value: 'nomarker' },
+      ];
+    })*/
+
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('examid') !== null) {
         this.examId = params.get('examid')!;

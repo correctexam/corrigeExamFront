@@ -332,6 +332,12 @@
     "showmapping": "View mappings between aligned and non-aligned pages (debug)",
     "loadingscan": "Loading scans in progess",
     "rotateImageTooltip": "Rotate images 180° (If you are in the alignment view, don't forget to force the cache synchronisation if you want that your changes to be visible to other users)",
-    "deleteImageTooltip": "Delete images (If you are on the alignment view, don't forget to force the cache synchronization if you want that your changes to be visible to other users)"
+    "deleteImageTooltip": "Delete images (If you are on the alignment view, don't forget to force the cache synchronization if you want that your changes to be visible to other users)",
+    "off": "No alignment",
+    "offtooltip": "Keep scans identical",
+    "withmarker": "With alignment marker",
+    "withmarkertooltip": "Black circles in the corners of sheets to align pages",
+    "withoutmarker": "No alignment marker",
+    "withoutmarkertooltip": "No significant marker to align the pages (the algorithm will search for points of interest)"
   }
 }

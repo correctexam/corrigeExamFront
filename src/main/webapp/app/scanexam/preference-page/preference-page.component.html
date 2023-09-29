@@ -8,7 +8,8 @@
         </div>
         <div class="form-group">
           <label class="form-label col-4" for="cacheDb">cacheDb: </label>
-          <input type="string" name="cacheDb" formControlName="cacheDb" class="form-control" value="indexdb" />
+          <!--          <input type="string" name="cacheDb" formControlName="cacheDb" class="form-control" value="indexdb" />-->
+          <p-selectButton [options]="dbOptions" formControlName="cacheDb" optionLabel="label" optionValue="value"></p-selectButton>
         </div>
         <div class="form-group">
           <label class="form-label col-4" for="imageTypeExport">Image compression: </label>

@@ -12,6 +12,14 @@ import { PreferenceService } from './preference.service';
 })
 export class PreferencePageComponent implements OnInit {
   editForm: UntypedFormGroup;
+
+  dbOptions: any[] = [
+    { label: 'indexdb', value: 'indexdb' },
+    { label: 'sqlite', value: 'sqlite' },
+  ];
+
+  value: string = 'indexdb';
+
   /*
 http://angular-form-builder.surge.sh/
 
@@ -38,7 +46,7 @@ http://angular-form-builder.surge.sh/
     public ref: DynamicDialogRef,
     public config: DynamicDialogConfig,
     public preferenceService: PreferenceService,
-    private fb: UntypedFormBuilder
+    private fb: UntypedFormBuilder,
   ) {
     this.editForm = this.fb.group({
       pdfscale: [],

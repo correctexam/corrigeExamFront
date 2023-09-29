@@ -78,7 +78,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     return new Observable(observer => {
       this.opencvready
         .then(() => {
-          console.error('start worker');
+          //    console.error('start worker');
           if (!input.marker) {
             try {
               const res = this.alignImage(
@@ -92,7 +92,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
                 input.preference.numberofpointToMatch,
                 input.preference.numberofpointToMatch,
                 input.pageNumber,
-                input.debug
+                input.debug,
               );
               input.imageA = undefined;
               input.imageB = undefined;
@@ -113,7 +113,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
               input.heightB!,
               input.pageNumber,
               input.preference,
-              input.debug
+              input.debug,
             );
             res.pageNumber = input.pageNumber;
             observer.next(res);
@@ -189,7 +189,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     numberofpointToMatch: number,
     numberofgoodpointToMatch: number,
     pageNumber: number,
-    debug: boolean
+    debug: boolean,
   ): any {
     //im2 is the original reference image we are trying to align to
     const image_A = new ImageData(new Uint8ClampedArray(image_Aba), widthA, heightA);
@@ -236,7 +236,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
           1,
           numberofpointToMatch,
           numberofgoodpointToMatch,
-          pageNumber
+          pageNumber,
         );
         if (!res1) {
           squareSize = squareSize + Math.trunc(minPageWidth / 10);
@@ -255,7 +255,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
           2,
           numberofpointToMatch,
           numberofgoodpointToMatch,
-          pageNumber
+          pageNumber,
         );
         if (!res2) {
           squareSize = squareSize + Math.trunc(minPageWidth / 10);
@@ -274,7 +274,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
           3,
           numberofpointToMatch,
           numberofgoodpointToMatch,
-          pageNumber
+          pageNumber,
         );
 
         if (!res3) {
@@ -294,7 +294,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
           4,
           numberofpointToMatch,
           numberofgoodpointToMatch,
-          pageNumber
+          pageNumber,
         );
         if (!res4) {
           squareSize = squareSize + Math.trunc(minPageWidth / 10);
@@ -407,7 +407,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       mat2.delete();
       h.delete();
       image_B_final_result.delete();
-      console.log('Good match for page ' + pageNumber);
+      //  console.log('Good match for page ' + pageNumber);
     } else {
       result['imageAligned'] = image_Bba.slice(0);
       result['imageAlignedWidth'] = widthB;
@@ -434,7 +434,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         result['imagesDebugTracesHeight'] = dstdebug.size().height;
       }
 
-      console.log('no match for page ' + pageNumber);
+      //  console.log('no match for page ' + pageNumber);
     }
     _im1.delete();
     im1.delete();
@@ -454,7 +454,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     numberofpointToMatch: number,
     numberofgoodpointToMatch: number,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _pageNumber: number
+    _pageNumber: number,
   ): boolean {
     // console.log("pass par la 4 ", "page ", pageNumber + "zone " + ii)
 
@@ -578,7 +578,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     }
 
     // console.log(realgoodmatchtokeep)
-    console.error('first realgoodmatchtokeep', realgoodmatchtokeep, numberofgoodpointToMatch);
+    //  console.error('first realgoodmatchtokeep', realgoodmatchtokeep, numberofgoodpointToMatch);
 
     if (realgoodmatchtokeep <= numberofgoodpointToMatch) {
       orb.delete();
@@ -611,13 +611,13 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
           Math.abs(
             (points1tmp[2 * a] - points2tmp[2 * a]) * (points1tmp[2 * a] - points2tmp[2 * a]) +
               (points1tmp[2 * a + 1] - points2tmp[2 * a + 1]) * (points1tmp[2 * a + 1] - points2tmp[2 * a + 1]) -
-              distanceaverage
+              distanceaverage,
           ) -
           Math.abs(
             (points1tmp[2 * b] - points2tmp[2 * b]) * (points1tmp[2 * b] - points2tmp[2 * b]) +
               (points1tmp[2 * b + 1] - points2tmp[2 * b + 1] * (points1tmp[2 * b + 1] - points2tmp[2 * b + 1])) -
-              distanceaverage
-          )
+              distanceaverage,
+          ),
       );
 
       good_matchesToKeep.push(intergood_matchesToKeep[0]);
@@ -626,7 +626,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       good_matchesToKeep.push(intergood_matchesToKeep[3]);
       good_matchesToKeep.push(intergood_matchesToKeep[4]);
 
-      console.error('last realgoodmatchtokeep', good_matchesToKeep.length, numberofgoodpointToMatch);
+      // console.error('last realgoodmatchtokeep', good_matchesToKeep.length, numberofgoodpointToMatch);
 
       good_matchesToKeep.forEach(i => {
         points1.push(keypoints1.get(good_matches.get(+i).queryIdx).pt.x + zone1.x);
@@ -658,7 +658,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       arr.reduce(
         (acc: number, curr: number) => acc + curr,
 
-        0
+        0,
       ) / arr.length
     );
   }
@@ -690,7 +690,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     heightB: number,
     pageNumber: number,
     preference: IPreference,
-    debug: boolean
+    debug: boolean,
   ): any {
     //im2 is the original reference image we are trying to align to
     const imageA = new ImageData(new Uint8ClampedArray(image_Aba), widthA, heightA);
@@ -938,7 +938,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       srcTri.delete();
       dstTri.delete();
       dst1.delete();
-      console.error('find circle');
+      //      console.error('find circle');
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return result;
     } else {
@@ -950,7 +950,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       srcMat2.delete();
       _srcMat2.delete();
       circlesMat1.delete();
-      console.error('cannot find circle');
+      //  console.error('cannot find circle');
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return this.alignImage(
@@ -964,7 +964,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         preference.numberofpointToMatch,
         preference.numberofgoodpointToMatch,
         pageNumber,
-        debug
+        debug,
       );
     }
   }

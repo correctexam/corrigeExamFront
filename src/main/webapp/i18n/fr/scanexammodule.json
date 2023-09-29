@@ -338,6 +338,12 @@
     "deleteImageTooltip": "Destruction des images  (Si vous êtes sur la vue alignement, n'oubliez pas de forcer la synchronisation du cache si vous voulez que vos modifications soient visibles pour les autres utilisateurs)",
     "gotoexamtooltip": "Retour à la vue de l'examen",
     "reloadScan": "Rechargement d'un nouveau pdf",
-    "initCacheProcessing": "Réanalyse du pdf chargé"
+    "initCacheProcessing": "Réanalyse du pdf chargé",
+    "off": "Aucun alignement",
+    "offtooltip": "Conserver les scans à l'identique",
+    "withmarker": "Avec marqueur d'alignement",
+    "withmarkertooltip": "Présence dans les copies de ronds noir dans les coins afin d'aligner les pages",
+    "withoutmarker": "Sans marqueur d'alignement",
+    "withoutmarkertooltip": "Sans marqueur significatif afin d'aligner les pages (l'algorithme cherchera par lui même des points d'intérêt)"
   }
 }
