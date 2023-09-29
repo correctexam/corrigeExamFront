@@ -324,6 +324,26 @@
     "envoiabi": "Envoi d'un mail aux absents:",
     "envoipdf": "Envoi de la copie annotée en pdf:",
     "lienelevepdf": "Lien copie annotée",
-    "pdf": "pdf"
+    "pdf": "pdf",
+    "reloadscan": "Recharger un nouveau scan",
+    "rescan": "Réanalyser à partir du pdf",
+    "processingencours": "Processing des images en cours",
+    "voirvignettealign": "Vignettes des pages",
+    "voirvignettealigntooltip": "Permet de voir (ou cacher) un aperçu des vignettes des pages alignées",
+    "npagealign": "Pas de page à aligner",
+    "npagealigndetails": "Il n'y a pas de page à aligner pour le numéro de page = ",
+    "showmapping": "Voir les correspondances entre les pages alignées/non alignées (debug)",
+    "loadingscan": "Chargement du scan en cours",
+    "rotateImageTooltip": "Rotation des images à 180° (Si vous êtes sur la vue alignement, n'oubliez pas de forcer la synchronisation du cache si vous voulez que vos modifications soient visibles pour les autres utilisateurs)",
+    "deleteImageTooltip": "Destruction des images  (Si vous êtes sur la vue alignement, n'oubliez pas de forcer la synchronisation du cache si vous voulez que vos modifications soient visibles pour les autres utilisateurs)",
+    "gotoexamtooltip": "Retour à la vue de l'examen",
+    "reloadScan": "Rechargement d'un nouveau pdf",
+    "initCacheProcessing": "Réanalyse du pdf chargé",
+    "off": "Aucun alignement",
+    "offtooltip": "Conserver les scans à l'identique",
+    "withmarker": "Avec marqueur d'alignement",
+    "withmarkertooltip": "Présence dans les copies de ronds noir dans les coins afin d'aligner les pages",
+    "withoutmarker": "Sans marqueur d'alignement",
+    "withoutmarkertooltip": "Sans marqueur significatif afin d'aligner les pages (l'algorithme cherchera par lui même des points d'intérêt)"
   }
 }

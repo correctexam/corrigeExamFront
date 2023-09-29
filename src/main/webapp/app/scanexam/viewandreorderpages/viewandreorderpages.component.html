@@ -1,0 +1,63 @@
+<div #pnl class="grid justify-center">
+  <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+    <label><span jhiTranslate="scanexam.nbreImagePerLigne"> Nombre de tuile affichée par ligne : </span>({{ nbreColumn }})</label>
+    <p-selectButton
+      [options]="nbreColumnOptions"
+      [ngModel]="nbreColumn"
+      optionLabel="name"
+      optionValue="value"
+      [disabled]="showProgressBar"
+      (onChange)="updateColumnEvent($event)"
+    >
+    </p-selectButton>
+  </div>
+  <p-progressSpinner *ngIf="showProgressBar"></p-progressSpinner>
+  <ng-container *ngFor="let k of clusters | keyvalue">
+    <div *ngIf="clusters.size > 1" class="md:col-12 col-12">
+      <h1>Copie {{ k.key }}</h1>
+    </div>
+
+    <ng-container *ngIf="k.value.length === 0">
+      <div [ngClass]="colonneStyle">
+        <div class="card" [style]="'width: 100%;height: 100%;position: static;'" pDroppable (onDrop)="dropVoid(k.key)">
+          <div class="card-container yellow-container overflow-hidden">
+            <div class="flex flex-column">
+              <canvas></canvas>
+            </div>
+            <div class="card-content"></div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngFor="let value of k.value">
+      <div [ngClass]="colonneStyle">
+        <div
+          class="card"
+          [style]="'width: 100%;height: 100%;position: static;'"
+          pDraggable
+          pDroppable
+          (onDragStart)="dragStart(value)"
+          (onDragEnd)="dragEnd()"
+          (onDrop)="drop(value)"
+        >
+          <div class="card-container yellow-container overflow-hidden">
+            <div class="flex flex-column">
+              <canvas [id]="'' + value" #nomImageVisible></canvas>
+            </div>
+            <div class="flex card-content">
+              <div class="flex-none flex align-items-center justify-content-center">
+                <span (click)="rotateImage(value)" [pTooltip]="'scanexam.rotateImageTooltip' | translate"
+                  ><fa-icon icon="rotate-right"
+                /></span>
+              </div>
+              <div class="flex-grow-1 flex align-items-center"></div>
+              <div class="flex-none flex align-items-center justify-content-center">
+                <span (click)="deleteImage(value)" [pTooltip]="'scanexam.deleteImageTooltip' | translate"><fa-icon icon="trash" /></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+</div>

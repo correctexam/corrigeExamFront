@@ -96,6 +96,22 @@ class ExamIndexDB extends Dexie {
     });
   }
 
+  async removePageAlignForExam() {
+    await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
+      this.exams.delete(this.examId);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      this.alignImages
+        .where('examId')
+        .equals(this.examId)
+        .toArray()
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        .then(a => this.alignImages.bulkDelete(a.map(t => t.id!)));
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    });
+  }
+
   async removeElementForExamForPages(pageStart: number, pageEnd: number) {
     await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
       //      this.exams.delete(this.examId);
@@ -116,6 +132,34 @@ class ExamIndexDB extends Dexie {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         .then(a => this.nonAlignImages.bulkDelete(a.map(t => t.id!)));
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    });
+  }
+
+  async removePageAlignForExamForPages(pageStart: number, pageEnd: number) {
+    await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
+      //      this.exams.delete(this.examId);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      this.alignImages
+        .where({ examId: this.examId })
+        .filter(e2 => e2.pageNumber >= pageStart && e2.pageNumber <= pageEnd)
+        .toArray()
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        .then(a => this.alignImages.bulkDelete(a.map(t => t.id!)));
+    });
+  }
+
+  async removePageNonAlignForExamForPages(pageStart: number, pageEnd: number) {
+    await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
+      //      this.exams.delete(this.examId);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      this.nonAlignImages
+        .where({ examId: this.examId })
+        .filter(e2 => e2.pageNumber >= pageStart && e2.pageNumber <= pageEnd)
+        .toArray()
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        .then(a => this.nonAlignImages.bulkDelete(a.map(t => t.id!)));
     });
   }
 
@@ -193,6 +237,70 @@ class ExamIndexDB extends Dexie {
     return await this.nonAlignImages.where({ examId: this.examId }).sortBy('pageNumber');
   }
 
+  async moveNonAlignPages(from: number, to: number) {
+    if (from !== to) {
+      await this.nonAlignImages
+        .where({ examId: this.examId })
+        .filter(e2 => e2.pageNumber === from)
+        .modify(i => {
+          i.pageNumber = -1000; // (very approximate formula...., but anyway...)
+        });
+      if (from < to) {
+        await this.nonAlignImages
+          .where({ examId: this.examId })
+          .filter(e2 => e2.pageNumber > from && e2.pageNumber <= to)
+          .modify(i => {
+            i.pageNumber = i.pageNumber - 1;
+          });
+      } else {
+        await this.nonAlignImages
+          .where({ examId: this.examId })
+          .filter(e2 => e2.pageNumber < from && e2.pageNumber >= to)
+          .modify(i => {
+            i.pageNumber = i.pageNumber + 1;
+          });
+      }
+      await this.nonAlignImages
+        .where({ examId: this.examId })
+        .filter(e2 => e2.pageNumber === -1000)
+        .modify(i => {
+          i.pageNumber = to;
+        });
+    }
+  }
+
+  async moveAlignPages(from: number, to: number) {
+    if (from !== to) {
+      await this.alignImages
+        .where({ examId: this.examId })
+        .filter(e2 => e2.pageNumber === from)
+        .modify(i => {
+          i.pageNumber = -1000; // (very approximate formula...., but anyway...)
+        });
+      if (from < to) {
+        await this.alignImages
+          .where({ examId: this.examId })
+          .filter(e2 => e2.pageNumber > from && e2.pageNumber <= to)
+          .modify(i => {
+            i.pageNumber = i.pageNumber - 1;
+          });
+      } else {
+        await this.alignImages
+          .where({ examId: this.examId })
+          .filter(e2 => e2.pageNumber < from && e2.pageNumber >= to)
+          .modify(i => {
+            i.pageNumber = i.pageNumber + 1;
+          });
+      }
+      await this.alignImages
+        .where({ examId: this.examId })
+        .filter(e2 => e2.pageNumber === -1000)
+        .modify(i => {
+          i.pageNumber = to;
+        });
+    }
+  }
+
   async getAlignSortByPageNumber() {
     return await this.alignImages.where({ examId: this.examId }).sortBy('pageNumber');
   }
@@ -262,6 +370,35 @@ export class AppDB implements CacheService {
       this.dbs.set(examId, db1);
     }
     return db1.removeElementForExamForPages(pageStart, pageEnd);
+  }
+
+  async removePageAlignForExam(examId: number): Promise<void> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.removePageAlignForExam();
+  }
+
+  async removePageAlignForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<void> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return db1.removePageAlignForExamForPages(pageStart, pageEnd);
+  }
+
+  async removePageNonAlignForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<void> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return db1.removePageNonAlignForExamForPages(pageStart, pageEnd);
   }
 
   async addAligneImage(elt: AlignImage): Promise<void> {
@@ -438,13 +575,33 @@ export class AppDB implements CacheService {
     }
     return db1.countAlignWithPageNumber(pageInscan);
   }
+
+  async moveNonAlignPages(examId: number, from: number, to: number): Promise<void> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.moveNonAlignPages(from, to);
+  }
+  async moveAlignPages(examId: number, from: number, to: number): Promise<void> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.moveAlignPages(from, to);
+  }
 }
 
 export interface CacheService {
   resetDatabase(examId: number): Promise<void>;
   removeExam(examId: number): Promise<void>;
   removeElementForExam(examId: number): Promise<void>;
+  removePageAlignForExam(examId: number): Promise<void>;
   removeElementForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<void>;
+  removePageAlignForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<void>;
+  removePageNonAlignForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<void>;
   addAligneImage(elt: AlignImage): Promise<any>;
   addNonAligneImage(elt: AlignImage): Promise<any>;
   export(examId: number, options?: ExportOptions): Promise<Blob>;
@@ -466,6 +623,8 @@ export interface CacheService {
   addTemplate(elt: AlignImage): Promise<number>;
   countNonAlignWithPageNumber(examId: number, pageInscan: number): Promise<number>;
   countAlignWithPageNumber(examId: number, pageInscan: number): Promise<number>;
+  moveAlignPages(examId: number, from: number, to: number): Promise<void>;
+  moveNonAlignPages(examId: number, from: number, to: number): Promise<void>;
 }
 
 export const db = new AppDB();

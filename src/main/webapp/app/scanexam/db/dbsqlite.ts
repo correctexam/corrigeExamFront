@@ -47,7 +47,7 @@ export class SqliteCacheService implements CacheService {
             () => {
               res();
             },
-            () => rej()
+            () => rej(),
           );
       });
     } else {
@@ -76,7 +76,7 @@ export class SqliteCacheService implements CacheService {
           () => {
             res();
           },
-          () => rej()
+          () => rej(),
         );
     });
     return p.asObservable();
@@ -216,11 +216,49 @@ export class SqliteCacheService implements CacheService {
       examId: examId,
     }).toPromise();
   }
+
+  removePageAlignForExam(examId: number): Promise<any> {
+    return this._dispatch('removePageAlignForExam', {
+      examId: examId,
+    }).toPromise();
+  }
+
   removeElementForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<any> {
     return this._dispatch('removeElementForExamForPages', {
       examId: examId,
       pageStart: pageStart,
       pageEnd: pageEnd,
+    }).toPromise();
+  }
+  removePageAlignForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<any> {
+    return this._dispatch('removePageAlignForExamForPages', {
+      examId: examId,
+      pageStart: pageStart,
+      pageEnd: pageEnd,
+    }).toPromise();
+  }
+
+  removePageNonAlignForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<any> {
+    return this._dispatch('removePageNonAlignForExamForPages', {
+      examId: examId,
+      pageStart: pageStart,
+      pageEnd: pageEnd,
+    }).toPromise();
+  }
+
+  moveNonAlignPages(examId: number, from: number, to: number): Promise<any> {
+    return this._dispatch('moveNonAlignPages', {
+      examId: examId,
+      from: from,
+      to: to,
+    }).toPromise();
+  }
+
+  moveAlignPages(examId: number, from: number, to: number): Promise<any> {
+    return this._dispatch('moveAlignPages', {
+      examId: examId,
+      from: from,
+      to: to,
     }).toPromise();
   }
 }

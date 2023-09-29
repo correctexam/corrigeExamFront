@@ -25,6 +25,7 @@ export interface CacheDownloadNotification {
   setBlocked(v: boolean): void;
   setProgress(v: number): void;
   setShowAssociation(v: boolean): void;
+  setShowAlignement(v: boolean): void;
   setShowCorrection(v: boolean): void;
 }
 

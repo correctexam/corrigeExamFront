@@ -11,8 +11,12 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 export class PartialAlignModalComponent implements OnInit {
   startPage = 1;
   endPage = 1;
+  showmapping = false;
 
-  constructor(public ref: DynamicDialogRef, public config: DynamicDialogConfig) {}
+  constructor(
+    public ref: DynamicDialogRef,
+    public config: DynamicDialogConfig,
+  ) {}
 
   ngOnInit(): void {}
 
@@ -20,6 +24,7 @@ export class PartialAlignModalComponent implements OnInit {
     this.ref.close({
       startPage: this.startPage,
       endPage: this.endPage,
+      showmapping: this.showmapping,
     });
   }
 }

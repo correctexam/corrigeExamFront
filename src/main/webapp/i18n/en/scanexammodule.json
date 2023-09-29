@@ -321,6 +321,23 @@
     "envoiabi": "Sent an email to missing student(s):",
     "envoipdf": "Send the pdf of the annotated copy as an attachment:",
     "lienelevepdf": "Link to annotated student sheet",
-    "pdf": "pdf"
+    "pdf": "pdf",
+    "reloadscan": "Reload a new scan",
+    "rescan": "Analyse from pdf",
+    "processingencours": "Images processing ongoing",
+    "voirvignettealign": "Page thumbnails",
+    "voirvignettealigntooltip": "Shows (or hides) a preview of the thumbnails of aligned pages",
+    "npagealign": "No page to align",
+    "npagealigndetails": "There is no page to align for the page number =",
+    "showmapping": "View mappings between aligned and non-aligned pages (debug)",
+    "loadingscan": "Loading scans in progess",
+    "rotateImageTooltip": "Rotate images 180° (If you are in the alignment view, don't forget to force the cache synchronisation if you want that your changes to be visible to other users)",
+    "deleteImageTooltip": "Delete images (If you are on the alignment view, don't forget to force the cache synchronization if you want that your changes to be visible to other users)",
+    "off": "No alignment",
+    "offtooltip": "Keep scans identical",
+    "withmarker": "With alignment marker",
+    "withmarkertooltip": "Black circles in the corners of sheets to align pages",
+    "withoutmarker": "No alignment marker",
+    "withoutmarkertooltip": "No significant marker to align the pages (the algorithm will search for points of interest)"
   }
 }

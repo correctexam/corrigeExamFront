@@ -45,6 +45,10 @@ import {
   faKeyboard,
   faCircleNodes,
   faObjectUngroup,
+  faRetweet,
+  faImage,
+  faRotateRight,
+  faTrash,
 
   // jhipster-needle-add-icon-import
 } from '@fortawesome/free-solid-svg-icons';
@@ -96,5 +100,10 @@ export const fontAwesomeIcons = [
   faKeyboard,
   faCircleNodes,
   faObjectUngroup,
+  faRetweet,
+  faImage,
+  faRotateRight,
+  faTrash,
+
   // jhipster-needle-add-icon-import
 ];
