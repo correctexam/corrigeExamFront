@@ -81,7 +81,7 @@
     </ng-template>
   </p-dialog>
 
-  <p-blockUI [blocked]="blocked">
+  <p-blockUI [blocked]="showSpinner">
     <i class="pi pi-lock" style="font-size: 3rem"></i>
   </p-blockUI>
   <p-overlayPanel #qcmcorrect (onShow)="computeQCMdebug()">
@@ -176,6 +176,7 @@
               styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
               (click)="layoutsidebarVisible = true"
               icon="pi pi-arrow-right"
+              [disabled]="blocked"
             ></p-button>
 
             <button
@@ -187,6 +188,7 @@
               [pTooltip]="'scanexam.qcmcorrect' | translate"
               [tooltipZIndex]="'3000'"
               [label]="'scanexam.qcmcorrectlabel' | translate"
+              [disabled]="blocked"
             ></button>
             <button
               class="sm:text-xs md:text-xs lg:text-base"
@@ -198,6 +200,7 @@
               [tooltipZIndex]="'3000'"
               [label]="'scanexam.showqcmcorrectlabel' | translate"
               (click)="showQCMCorrect($event)"
+              [disabled]="blocked"
             ></button>
 
             <button [hidden]="!debug" type="text" pButton [label]="'reset'" (click)="removeAllAnswer()"></button>
@@ -207,14 +210,16 @@
             <button
               class="sm:text-xs md:text-xs lg:text-base"
               pButton
-              [disabled]="!examId"
+              [disabled]="!examId && blocked"
               (click)="showGalleria()"
               jhiTranslate="scanexam.showgalleria"
             >
               Show full page
             </button>
+            <p-progressSpinner *ngIf="blocked" styleClass="w-2rem h-2rem"></p-progressSpinner>
             <!--            <h2>Question {{ questionno! + 1 }}</h2>-->
           </div>
+
           <div class="col-1">
             <fa-icon [size]="'2x'" [tooltipZIndex]="'3000'" [pTooltip]="getStudentName()!" tooltipPosition="left" icon="eye"></fa-icon>
           </div>
@@ -227,6 +232,7 @@
               data-cy="entityCreateSaveButton"
               class="p-button p-button-primary mr-5"
               (click)="gotoUE()"
+              [disabled]="blocked"
             >
               <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span class="sm:text-xs md:text-xs lg:text-base" jhiTranslate="scanexam.gobackexam"
                 >Retourner à l'exam</span
@@ -281,17 +287,23 @@
                 noteSteps > 0 &&
                 currentQuestion.typeAlgoName !== 'QCM'
               "
+              [disabled]="blocked"
               [stars]="noteSteps"
               [(ngModel)]="currentNote"
               (onRate)="changeNote()"
               (onCancel)="changeNote()"
-            ></p-rating>
-            <span jhiTranslate="scanexam.noteattribuee">Note attribuée : </span
-            ><span *ngIf="questionStep > 0 && resp?.id && currentNote !== undefined"
+            ></p-rating
+            ><BR />
+
+            <span jhiTranslate="scanexam.noteattribuee">Note attribuée : </span>
+
+            <span *ngIf="questionStep > 0 && resp?.id && currentNote !== undefined"
               ><b>{{ currentNote! / questionStep }}</b></span
             >
             <span *ngIf="questionStep <= 0 && resp?.id"
               ><b>{{ currentNote }}</b></span
+            ><span *ngIf="resp?.id && questions !== undefined && questions!.length > 0"
+              ><b> / {{ questions![0].point! }}</b></span
             >
             <span *ngIf="!resp?.id" jhiTranslate="scanexam.noneval">non évalué</span>
             <span
@@ -302,11 +314,9 @@
               [pTooltip]="'scanexam.tooltipResetAnswer' | translate"
               (click)="removeAnswer()"
             >
-              <fa-icon icon="times"></fa-icon>
+              <fa-icon icon="trash"></fa-icon>
             </span>
-            <span *ngIf="resp?.id" class="float-end" [tooltipPosition]="'left'" [tooltipZIndex]="'3000'" [pTooltip]="''">
-              &nbsp; &nbsp;
-            </span>
+            <span *ngIf="resp?.id" class="float-end"> &nbsp; &nbsp; </span>
 
             <span
               *ngIf="resp?.id"
@@ -321,11 +331,16 @@
           </div>
           <div *ngIf="resp" style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <label jhiTranslate="scanexam.excellente">Excellente réponse: </label>
-            <p-inputSwitch class="float-end" [(ngModel)]="resp!.star" (onChange)="updateResponse()"></p-inputSwitch>
+            <p-inputSwitch [disabled]="blocked" class="float-end" [(ngModel)]="resp!.star" (onChange)="updateResponse()"></p-inputSwitch>
           </div>
           <div *ngIf="resp" style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <label jhiTranslate="scanexam.badanswer">Mauvaise réponse remarquable: </label>
-            <p-inputSwitch class="float-end" [(ngModel)]="resp!.worststar" (onChange)="updateResponse()"></p-inputSwitch>
+            <p-inputSwitch
+              [disabled]="blocked"
+              class="float-end"
+              [(ngModel)]="resp!.worststar"
+              (onChange)="updateResponse()"
+            ></p-inputSwitch>
           </div>
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <jhi-graphical-toolbarcorrection></jhi-graphical-toolbarcorrection>
@@ -337,7 +352,7 @@
             <div class="card" [style]="getStyle(comment)">
               <div class="card-body">
                 <span class="float-end" (click)="removeTextComment(comment)">
-                  <fa-icon icon="times"></fa-icon>
+                  <fa-icon icon="trash"></fa-icon>
                 </span>
                 <span class="float-end">&nbsp;&nbsp;</span>
                 <span
@@ -430,7 +445,7 @@
             <div class="card" [style]="getStyle(comment)">
               <div class="card-body">
                 <span *ngIf="currentQuestion?.typeAlgoName !== 'QCM'" class="float-end clickable" (click)="removeGradedComment(comment)"
-                  ><fa-icon icon="times"></fa-icon
+                  ><fa-icon icon="trash"></fa-icon
                 ></span>
                 <span class="float-end">&nbsp;&nbsp;</span>
                 <span

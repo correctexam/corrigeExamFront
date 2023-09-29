@@ -9,11 +9,11 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Validators, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
-import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
+import { DataUtils } from 'app/core/util/data-util.service';
+import { EventManager } from 'app/core/util/event-manager.service';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { IScan, Scan } from 'app/entities/scan/scan.model';
-import { AlertError } from 'app/shared/alert/alert-error.model';
+// import { AlertError } from 'app/shared/alert/alert-error.model';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { finalize, firstValueFrom, Observable, scan, Subscriber } from 'rxjs';
 import { ScanService } from '../../entities/scan/service/scan.service';
@@ -24,7 +24,6 @@ import { IPage } from '../alignscan/alignscan.component';
 import { TemplateService } from 'app/entities/template/service/template.service';
 import { QuestionService } from 'app/entities/question/service/question.service';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
-import { ITemplate } from 'app/entities/template/template.model';
 import { PreferenceService } from '../preference-page/preference.service';
 import { ViewandreorderpagesComponent } from '../viewandreorderpages/viewandreorderpages.component';
 
@@ -86,9 +85,9 @@ export class ChargerscanComponent implements OnInit {
   viewcomponent!: ViewandreorderpagesComponent;
 
   //  course!: ICourse;
-  scan!: IScan;
-  template!: ITemplate;
-  pdfcontent!: string;
+  //   scan!: IScan;
+  //  template!: ITemplate;
+  // pdfcontent!: string;
   public scrollMode: ScrollModeType = ScrollModeType.vertical;
   cvState!: string;
   currentStudent = 0;
@@ -153,7 +152,6 @@ export class ChargerscanComponent implements OnInit {
     protected router: Router,
     public confirmationService: ConfirmationService,
     private fb: UntypedFormBuilder,
-    protected dataUtils: DataUtils,
     protected eventManager: EventManager,
     protected examService: ExamService,
     protected scanService: ScanService,
@@ -164,6 +162,7 @@ export class ChargerscanComponent implements OnInit {
     protected questionService: QuestionService,
     protected zoneService: ZoneService,
     protected preferenceService: PreferenceService,
+    protected dataUtils: DataUtils,
   ) {
     this.editForm = this.fb.group({
       content: [],
@@ -189,7 +188,7 @@ export class ChargerscanComponent implements OnInit {
     this.pageInTemplate = templatePage;
   }
 
-  byteSize(base64String: string): string {
+  /* byteSize(base64String: string): string {
     return this.dataUtils.byteSize(base64String);
   }
 
@@ -202,16 +201,31 @@ export class ChargerscanComponent implements OnInit {
       error: (err: FileLoadError) =>
         this.eventManager.broadcast(new EventWithContent<AlertError>('gradeScopeIsticApp.error', { ...err, key: 'error.file.' + err.key })),
     });
+  } */
+
+  onUpload($event: any): void {
+    if ($event.files && $event.files.length > 0) {
+      this.uploadCache($event.files[0]);
+    }
+  }
+  uploadCache(file: File): void {
+    this.message = this.translateService.instant('scanexam.importencours');
+    this.blocked = true;
+
+    const formData: FormData = new FormData();
+    formData.append('file', file);
+    this.blob = file;
+    this.save(formData);
   }
 
-  save(): void {
+  save(formData: FormData): void {
     this.isSaving = true;
     this.blocked = true;
     const scan1 = this.createFromForm();
     this.progress = 0;
-    const blob = new File([scan1.content!], scan1.id + '.pdf', {
+    /* const blob = new File([scan1.content!], scan1.id + '.pdf', {
       type: 'text/plain',
-    });
+    });*/
 
     if (scan1.id !== undefined) {
       this.scanService
@@ -224,7 +238,7 @@ export class ChargerscanComponent implements OnInit {
           this.exam.scanfileId = e.body?.id;
 
           this.examService.update(this.exam).subscribe(() => {
-            this.pipeToSaveResponse(this.scanService.uploadScan(blob, e.body?.id!));
+            this.pipeToSaveResponse(this.scanService.uploadScan(formData, e.body?.id!));
           });
         });
     } else {
@@ -235,7 +249,7 @@ export class ChargerscanComponent implements OnInit {
         })
         .subscribe(e => {
           this.exam.scanfileId = e.body?.id;
-          this.examService.update(this.exam).subscribe(() => this.pipeToSaveResponse(this.scanService.uploadScan(blob, e.body?.id!)));
+          this.examService.update(this.exam).subscribe(() => this.pipeToSaveResponse(this.scanService.uploadScan(formData, e.body?.id!)));
         });
     }
   }
@@ -288,8 +302,8 @@ export class ChargerscanComponent implements OnInit {
       ...new Scan(),
       id: this.exam.scanfileId,
       name: this.exam.name + 'StudentSheets.pdf',
-      contentContentType: this.editForm.get(['contentContentType'])!.value,
-      content: this.editForm.get(['content'])!.value,
+      contentContentType: 'application/pdf',
+      //  content: this.editForm.get(['content'])!.value,
     };
   }
 
@@ -331,10 +345,11 @@ export class ChargerscanComponent implements OnInit {
     this.exam = data.body!;
 
     if (this.exam.templateId) {
-      const e1 = await firstValueFrom(this.templateService.find(this.exam.templateId));
-      this.template = e1.body!;
+      //      const e1 = await firstValueFrom(this.templateService.find(this.exam.templateId));
+      // this.template = e1.body!;
       await this.removeElement(+this.examid!);
-      this.pdfcontent = this.template.content!;
+      const e1 = await firstValueFrom(this.templateService.getPdf(this.exam.templateId));
+      this.blob1 = e1;
     }
   }
 
@@ -353,21 +368,38 @@ export class ChargerscanComponent implements OnInit {
     await this.process();
   }
 
+  blob: any;
+  blob1: any;
+
   async process(): Promise<void> {
     this.translateService.get('scanexam.processingencours').subscribe(res => (this.message = '' + res));
 
     this.blocked = true;
     this.currentPageAlignOver = 1;
     this.avancement = 0;
-
     if (!this.phase1) {
       for (let i = 1; i <= this.nbreFeuilleParCopie; i++) {
         await this.processPage(i, true);
         if (i === this.nbreFeuilleParCopie) {
           this.phase1 = true;
           if (this.exam.scanfileId) {
-            this.scan = (await firstValueFrom(this.scanService.find(this.exam.scanfileId))).body!;
-            this.pdfcontent = this.scan.content!;
+            if (this.blob !== undefined) {
+              this.blob1 = this.blob;
+
+              /*              const reader = new FileReader();
+              console.error(this.blob);
+              reader.readAsDataURL(this.blob);
+              reader.onloadend = ()=> {
+                console.error(reader.result)
+                this.pdfcontent = (reader.result as string).split(',')[1];;
+                this.blob = undefined
+              }*/
+            } else {
+              // const loadedscan = (await firstValueFrom(this.scanService.find(this.exam.scanfileId))).body!;
+              // this.pdfcontent = loadedscan.content!;
+              const e1 = await firstValueFrom(this.scanService.getPdf(this.exam.scanfileId));
+              this.blob1 = e1;
+            }
           }
         }
       }
@@ -384,6 +416,8 @@ export class ChargerscanComponent implements OnInit {
         err => console.log(err),
         () => {
           this.phase1 = false;
+          this.blob = undefined;
+          this.blob1 = undefined;
           this.blocked = false;
           if (this.viewcomponent !== undefined) {
             this.viewcomponent.update();

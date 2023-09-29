@@ -14,7 +14,10 @@ export type EntityArrayResponseType = HttpResponse<ITemplate[]>;
 export class TemplateService {
   protected resourceUrl: string;
 
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+  constructor(
+    protected http: HttpClient,
+    protected applicationConfigService: ApplicationConfigService,
+  ) {
     this.resourceUrl = this.applicationConfigService.getEndpointFor('api/templates');
   }
 
@@ -34,6 +37,14 @@ export class TemplateService {
 
   find(id: number): Observable<EntityResponseType> {
     return this.http.get<ITemplate>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  }
+
+  getPdf(id: number): Observable<any> {
+    return this.http.get(this.applicationConfigService.getEndpointFor('api/getTemplatePdf/' + id), {
+      //  reportProgress: true,
+      // observe: 'events',
+      responseType: 'blob',
+    });
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {
