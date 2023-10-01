@@ -338,7 +338,7 @@
     "deleteImageTooltip": "Destruction des images  (Si vous êtes sur la vue alignement, n'oubliez pas de forcer la synchronisation du cache si vous voulez que vos modifications soient visibles pour les autres utilisateurs)",
     "gotoexamtooltip": "Retour à la vue de l'examen",
     "reloadScan": "Rechargement d'un nouveau pdf",
-    "initCacheProcessing": "Réanalyse du pdf chargé",
+    "initCacheProcessing": "Nouvelle analyse à partir du pdf précédemment chargé",
     "off": "Aucun alignement",
     "offtooltip": "Conserver les scans à l'identique",
     "withmarker": "Avec marqueur d'alignement",

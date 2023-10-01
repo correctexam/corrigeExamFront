@@ -177,6 +177,7 @@ export class ChargerscanComponent implements OnInit {
         this.init().then(() => {});
         this.examService.find(+this.examid).subscribe(c => {
           this.exam = c.body!;
+          this.exam.scanfileId;
         });
       }
     });

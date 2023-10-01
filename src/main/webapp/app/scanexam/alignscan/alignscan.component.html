@@ -72,16 +72,18 @@
         >
           <fa-icon [icon]="faObjectUngroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.partialalignscan"> Alignement des scans</span>
         </button>
-        <button
-          (click)="showVignette()"
-          class="p-button p-button-primary"
-          [disabled]="!loaded || !allowPartialAlign"
-          [pTooltip]="'scanexam.voirvignettealigntooltip' | translate"
-          [tooltipZIndex]="'3000'"
-          [tooltipPosition]="'bottom'"
-        >
-          <fa-icon icon="image"></fa-icon>&nbsp;<span jhiTranslate="scanexam.voirvignettealign"> Vignettes des pages</span>
-        </button>
+        <ng-container *ngIf="nbPageAlignInCache > 0">
+          <button
+            (click)="showVignette()"
+            class="p-button p-button-primary"
+            [disabled]="!loaded || !allowPartialAlign"
+            [pTooltip]="'scanexam.voirvignettealigntooltip' | translate"
+            [tooltipZIndex]="'3000'"
+            [tooltipPosition]="'bottom'"
+          >
+            <fa-icon icon="image"></fa-icon>&nbsp;<span jhiTranslate="scanexam.voirvignettealign"> Vignettes des pages</span>
+          </button>
+        </ng-container>
       </div>
     </div>
     <div class="col-12 md:col-12">

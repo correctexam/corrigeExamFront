@@ -80,12 +80,13 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   observer: Subscriber<IImageAlignementInput> | undefined;
   observablePage: Observable<number> | undefined;
   observerPage: Subscriber<number> | undefined;
+
   allowPartialAlign = false;
   message = '';
   submessage = '';
   progress = 0;
   scale = 2;
-
+  nbPageAlignInCache = 0;
   activeIndex = 1;
   responsiveOptions2: any[] = [
     {
@@ -166,6 +167,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   async checkIfAlreadyAlign(): Promise<void> {
     const p = await this.db.countNonAlignImage(+this.examId);
     // const p1 = await this.db.countAlignImage(+this.examId);
+    this.nbPageAlignInCache = await this.db.countAlignImage(+this.examId);
     this.allowPartialAlign = p > 0; // && p1 > 0 && p === p1;
   }
 
@@ -229,7 +231,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     await this.db.removePageAlignForExamForPages(examId, pageStart, pageEnd);
   }
 
-  public async pdfloaded(): Promise<void> {
+  public async load(): Promise<void> {
     const numberPagesInScan = await this.db.countNonAlignImage(+this.examId);
 
     if (numberPagesInScan !== 0) {
@@ -251,7 +253,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     this.showMapping = debug;
     this._showVignette = false;
     this.initPool();
-    this.pdfloaded();
+    this.load();
     this.translateService.get('scanexam.alignementencours').subscribe(res => (this.message = '' + res));
 
     this.blocked = true;
@@ -308,6 +310,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     this.db.countNonAlignImage(+this.examId).then(value => {
       this.cacheUploadService.exportCache(+this.examId, this.translateService, this.messageService, value, this).then(() => {
         this.blocked = false;
+
         /* if (!this.partialAlign) {
           setTimeout(() => {
             this._showVignette =true;
@@ -325,6 +328,8 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
         this.currentPageAlign = 1;
         this.endPage = value;
         this.numberPagesInScan = value;
+        this.db.countAlignImage(+this.examId).then(e => (this.nbPageAlignInCache = e));
+
         // }
       });
     });
