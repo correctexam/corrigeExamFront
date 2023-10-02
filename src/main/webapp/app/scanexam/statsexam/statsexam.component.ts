@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable guard-for-in */
 import { HttpClient, HttpResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
@@ -703,6 +703,12 @@ export class StatsExamComponent implements OnInit {
       }
       this.displayBasic = true;
     });
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onKeydownHandler(event: KeyboardEvent): void {
+    this.displayBasic = false;
   }
 
   public gotoResultat(): void {

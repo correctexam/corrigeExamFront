@@ -26,7 +26,11 @@ export class ZoneCorrectionHandler {
   private canvasInitialCanvas!: HTMLCanvasElement;
   noteImg!: HTMLImageElement;
 
-  constructor(public zoneid: string, public eventHandler: EventCanevascorrectionHandlerService, public respid: number | undefined) {}
+  constructor(
+    public zoneid: string,
+    public eventHandler: EventCanevascorrectionHandlerService,
+    public respid: number | undefined,
+  ) {}
 
   updateCanvas(canvas1: any): fabric.Canvas {
     if (this.annotationCanvas && this.annotationCanvas.parentNode) {
@@ -115,7 +119,7 @@ export class ZoneCorrectionHandler {
       e.target.id,
       e.target.type,
       { x: e.target.scaleX, y: e.target.scaleY },
-      { left: e.target.left, top: e.target.top }
+      { left: e.target.left, top: e.target.top },
     );
   }
 
@@ -146,6 +150,20 @@ export class ZoneCorrectionHandler {
       this.annotationCanvas.style.cursor = 'default';
       this.annotationCanvas.onmousedown = null;
       this.annotationCanvas.onpointerup = null;
+    }
+  }
+  changeAllCursor(erase: boolean): void {
+    if (this.annotationCanvas) {
+      this.annotationCanvas.style.cursor = 'default';
+    }
+    if (this.canvas !== undefined) {
+      if (erase) {
+        this.canvas.moveCursor = 'url("content/images/trash.svg"), auto';
+        this.canvas.hoverCursor = 'url("content/images/trash.svg"), auto';
+      } else {
+        this.canvas.moveCursor = 'move';
+        this.canvas.hoverCursor = 'move';
+      }
     }
   }
 }

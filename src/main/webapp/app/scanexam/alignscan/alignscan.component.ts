@@ -508,7 +508,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     const ctx = canvas.getContext('2d');
     ctx?.putImageData(img, 0, 0);
     let compression = 1;
-    let exportImageType = 'image/webp';
     let paget = pageN % this.nbreFeuilleParCopie;
     if (paget === 0) {
       paget = this.nbreFeuilleParCopie;
@@ -528,13 +527,14 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     if (this.pageWithQCM.includes(paget) && compression < 0.95) {
       compression = 0.95;
     }
-
+*/
+    let exportImageType = 'image/webp';
     if (
       this.preferenceService.getPreference().imageTypeExport !== undefined &&
       ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
     ) {
       exportImageType = this.preferenceService.getPreference().imageTypeExport;
-    }*/
+    }
     const dataURL = canvas.toDataURL(exportImageType, compression);
     return dataURL;
     // return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");

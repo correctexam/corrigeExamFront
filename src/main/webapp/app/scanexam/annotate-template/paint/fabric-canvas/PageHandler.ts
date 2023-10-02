@@ -25,7 +25,11 @@ export class PageHandler {
   private canvas!: PagedCanvas;
   private pdfCanvas!: HTMLCanvasElement;
 
-  public constructor(public pageViewer: any, private page: number, private eventHandler: EventHandlerService) {
+  public constructor(
+    public pageViewer: any,
+    private page: number,
+    private eventHandler: EventHandlerService,
+  ) {
     // this.updateCanvas(pageViewer);
     //    window.addEventListener('mouseup', this.mouseUpHandler.bind(this));
     //    window.addEventListener('touchend', this.mouseUpHandler.bind(this));
@@ -204,7 +208,7 @@ export class PageHandler {
         e.target.id,
         e.target.type,
         { x: e.target.scaleX, y: e.target.scaleY },
-        { left: e.target.left, top: e.target.top }
+        { left: e.target.left, top: e.target.top },
       );
     }
   }
@@ -240,6 +244,19 @@ export class PageHandler {
       this.annotationCanvas.style.cursor = 'default';
       this.annotationCanvas.onmousedown = null;
       this.annotationCanvas.onpointerup = null;
+    }
+  }
+
+  changeAllCursor(erase: boolean): void {
+    if (this.annotationCanvas) {
+      this.annotationCanvas.style.cursor = 'default';
+    }
+    if (erase) {
+      this.canvas.moveCursor = 'url("content/images/trash.svg"), auto';
+      this.canvas.hoverCursor = 'url("content/images/trash.svg"), auto';
+    } else {
+      this.canvas.moveCursor = 'move';
+      this.canvas.hoverCursor = 'move';
     }
   }
 }

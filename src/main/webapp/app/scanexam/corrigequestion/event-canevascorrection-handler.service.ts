@@ -28,7 +28,6 @@ import {
 } from '../annotate-template/paint/models';
 import { Injectable } from '@angular/core';
 import { CustomFabricGroup } from '../annotate-template/paint/models';
-import { ZoneCorrectionHandler } from './ZoneCorrectionHandler';
 import { IComments } from '../../entities/comments/comments.model';
 import { CommentsService } from '../../entities/comments/service/comments.service';
 import { SVG, extend as SVGextend, Element as SVGElement, G } from '@svgdotjs/svg.js';
@@ -71,13 +70,13 @@ export class EventCanevascorrectionHandlerService {
   }
   currentComment: IComments | null = null;
   public allcanvas: fabric.Canvas[] = [];
-  private _selectedTool: DrawingTools = DrawingTools.SELECT;
+  private _selectedTool: DrawingTools = DrawingTools.PENCIL;
   private previousTop!: number;
   private previousLeft!: number;
   private previousScaleX!: number;
   private previousScaleY!: number;
   public modelViewpping = new Map<string, number>();
-  zones: { [zoneNumber: number]: ZoneCorrectionHandler } = {};
+  //  zones: { [zoneNumber: number]: ZoneCorrectionHandler } = {};
   public scale = 1;
   set selectedTool(t: DrawingTools) {
     this.canvas.discardActiveObject();
@@ -110,6 +109,21 @@ export class EventCanevascorrectionHandlerService {
         );
       });
       this.modelViewpping.clear();
+    } else if (this.selectedTool === DrawingTools.ERASER) {
+      const ps = [...this.allcanvas.keys()];
+      this.allcanvas.forEach(c => {
+        if (c !== undefined) {
+          c.moveCursor = 'url("content/images/trash.svg"), auto';
+          c.hoverCursor = 'url("content/images/trash.svg"), auto';
+        }
+      });
+    } else {
+      this.allcanvas.forEach(c => {
+        if (c !== undefined) {
+          c.moveCursor = 'move';
+          c.hoverCursor = 'move';
+        }
+      });
     }
   }
   get selectedTool(): DrawingTools {

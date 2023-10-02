@@ -54,6 +54,7 @@ import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { KeyboardShortcutsComponent, ShortcutEventOutput, ShortcutInput } from 'ng-keyboard-shortcuts';
 import { IKeyBoardShortCutPreferenceEntry, KeyboardShortcutService } from '../preference-page/keyboardshortcut.service';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { DrawingTools } from '../annotate-template/paint/models';
 
 @Component({
   selector: 'jhi-corrigequestion',
@@ -1070,9 +1071,17 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // @HostListener('window:keydown.control.ArrowLeft', ['$event'])
+  cleanCanvassCache() {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (this.eventHandler?.allcanvas !== undefined) {
+      this.eventHandler.allcanvas.splice(0);
+      this.eventHandler.selectedTool = DrawingTools.PENCIL;
+    }
+  }
+
   previousStudent() {
     if (!this.blocked) {
+      this.cleanCanvassCache();
       const c = this.currentStudent;
       const q1 = this.questionindex!;
 
@@ -1085,9 +1094,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // @HostListener('window:keydown.control.ArrowRight', ['$event'])
   nextStudent() {
     if (!this.blocked) {
+      this.cleanCanvassCache();
+
       //      event.preventDefault();
       const c = this.currentStudent + 2;
       const q1 = this.questionindex! + 2;
@@ -1100,6 +1110,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
   previousQuestion(): void {
     if (!this.blocked) {
+      this.cleanCanvassCache();
+
       const c = this.currentStudent + 1;
       const q = this.questionindex;
       if (q! > 0) {
@@ -1112,6 +1124,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   nextQuestion(): void {
     if (!this.blocked) {
+      this.cleanCanvassCache();
       const c = this.currentStudent + 1;
       const q = this.questionindex! + 2;
       if (q <= this.nbreQuestions) {
@@ -1124,6 +1137,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   changeStudent($event: any): void {
     if (!this.init) {
+      this.cleanCanvassCache();
       this.currentStudent = $event.page;
       const c = this.currentStudent + 1;
       this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
@@ -1131,6 +1145,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
   changeQuestion($event: any): void {
     if (!this.init) {
+      this.cleanCanvassCache();
+
       this.questionindex = $event.page;
 
       const c = this.currentStudent + 1;
@@ -1150,6 +1166,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   gotoUE(): void {
+    this.cleanCanvassCache();
     this.router.navigateByUrl('/exam/' + this.examId!);
   }
 
@@ -1468,6 +1485,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
 
+  @HostListener('document:keydown.escape', ['$event'])
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onKeydownHandler(event: KeyboardEvent) {
+    this.displayBasic = false;
+  }
+
   async loadImage(file: any, page1: number): Promise<IPage> {
     return new Promise(resolve => {
       const i = new Image();
@@ -1730,7 +1753,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
     const ctx = canvas.getContext('2d');
     ctx?.putImageData(img, 0, 0);
-    const dataURL = canvas.toDataURL('image/png');
+    let exportImageType = 'image/webp';
+    if (
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      this.preferenceService.getPreference().imageTypeExport !== undefined &&
+      ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
+    ) {
+      exportImageType = this.preferenceService.getPreference().imageTypeExport;
+    }
+
+    const dataURL = canvas.toDataURL(exportImageType);
     return dataURL;
   }
 
