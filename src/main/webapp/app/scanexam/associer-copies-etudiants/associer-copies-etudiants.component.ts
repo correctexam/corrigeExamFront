@@ -205,7 +205,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     public messageService: MessageService,
     public sheetService: ExamSheetService,
     private preferenceService: PreferenceService,
-    private db: CacheServiceImpl
+    private db: CacheServiceImpl,
   ) {}
 
   ngOnInit(): void {
@@ -289,7 +289,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
       true,
       this.setShowPrenomImage,
       this.prenomImage,
-      this.currentStudent
+      this.currentStudent,
       /* true,
         this.students.map(student => student.firstname!),
         this.prenomImageReco*/
@@ -301,7 +301,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
       true,
       this.setShowINEImage,
       this.ineImage,
-      this.currentStudent
+      this.currentStudent,
       /* false,
         this.students.map(student => student.ine!),
         this.ineImageReco*/
@@ -318,26 +318,26 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         this.predictText(
           value[0]!,
           true,
-          this.students.map(student => student.name!)
+          this.students.map(student => student.name!),
           //  this.nomImageReco!
-        )
+        ),
       );
       ppredics.push(
         this.predictText(
           value[1]!,
           true,
-          this.students.map(student => student.firstname!)
+          this.students.map(student => student.firstname!),
           // this.prenomImageReco!
-        )
+        ),
       );
 
       ppredics.push(
         this.predictText(
           value[2]!,
           false,
-          this.students.map(student => student.ine!)
+          this.students.map(student => student.ine!),
           //   this.ineImageReco!
-        )
+        ),
       );
       Promise.all(ppredics).then(predicts => {
         /* endTime = performance.now();
@@ -362,7 +362,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
             student =>
               (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
               (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase() &&
-              (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
+              (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase(),
           );
           if (sts.length > 0) {
             this.recognizedStudent = sts[0];
@@ -379,7 +379,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
               let sts1 = this.students.filter(
                 student =>
                   (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-                  (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase()
+                  (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase(),
               );
               if (sts1.length > 0) {
                 this.recognizedStudent = sts1[0];
@@ -390,7 +390,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
               let sts1 = this.students.filter(
                 student =>
                   (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase() &&
-                  (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
+                  (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase(),
               );
               if (sts1.length > 0) {
                 this.recognizedStudent = sts1[0];
@@ -404,7 +404,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
               sts = this.students.filter(
                 student =>
                   (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-                  (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
+                  (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase(),
               );
               if (sts.length > 0) {
                 this.recognizedStudent = sts[0];
@@ -435,7 +435,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
           let sts = this.students.filter(
             student =>
               (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-              (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase()
+              (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase(),
           );
           if (sts.length > 0) {
             this.recognizedStudent = sts[0];
@@ -445,7 +445,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
           let sts = this.students.filter(
             student =>
               (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-              (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase()
+              (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase(),
           );
           if (sts.length > 0) {
             this.recognizedStudent = sts[0];
@@ -482,7 +482,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
       true,
       this.setShowPrenomImage,
       this.prenomImage,
-      this.currentStudent
+      this.currentStudent,
     );
     promiseload.push(p1);
     const p2 = this.loadZone(this.exam.idzoneId, this.setZoneINE, true, this.setShowINEImage, this.ineImage, this.currentStudent);
@@ -495,7 +495,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   async predictText(
     p: ImageZone,
     zoneletter: boolean,
-    candidatematch: string[] /* , debugimageRef: ElementRef */
+    candidatematch: string[] /* , debugimageRef: ElementRef */,
   ): Promise<(string | number)[]> {
     return new Promise<(string | number)[]>(resolve => {
       if (p !== null && p !== undefined && this.assisted) {
@@ -537,7 +537,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     showImage: boolean,
     showImageRef: (s: boolean) => void,
     imageRef: ElementRef<any> | undefined,
-    currentStudent: number
+    currentStudent: number,
   ): Promise<ImageZone | null> {
     return new Promise<ImageZone | null>(resolve => {
       if (zoneId) {
@@ -693,12 +693,13 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         s.value.examSheets === null ||
         s.value.examSheets!.length === 0 ||
         !s.value.examSheets?.some((ex: any) => ex?.scanId === this.exam.scanfileId) ||
-        s.value.examSheets?.some((ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === -1 && ex?.pagemax === -1)
+        s.value.examSheets?.some((ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === -1 && ex?.pagemax === -1),
     );
-    const list1 = this.list._options!.filter(s =>
-      s.value.examSheets?.some(
-        (ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie
-      )
+    const list1 = this.list._options!.filter(
+      s =>
+        s.value.examSheets?.some(
+          (ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie,
+        ),
     );
 
     if (list.filter(e => e.label === item.label).length >= 1) {
@@ -721,17 +722,17 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
 
   reShow(): void {
     this.getAllImage4Zone(this.currentStudent! * this.nbreFeuilleParCopie! + this.zonenom.pageNumber!, this.zonenom).then(p =>
-      this.displayImage(p, this.nomImage, this.setShowNomImage)
+      this.displayImage(p, this.nomImage, this.setShowNomImage),
     );
     this.getAllImage4Zone(this.currentStudent! * this.nbreFeuilleParCopie! + this.zoneprenom.pageNumber!, this.zoneprenom).then(p =>
-      this.displayImage(p, this.prenomImage, this.setShowPrenomImage)
+      this.displayImage(p, this.prenomImage, this.setShowPrenomImage),
     );
     this.getAllImage4Zone(this.currentStudent! * this.nbreFeuilleParCopie! + this.zoneine.pageNumber!, this.zoneine).then(p =>
-      this.displayImage(p, this.ineImage, this.setShowINEImage)
+      this.displayImage(p, this.ineImage, this.setShowINEImage),
     );
 
-    const filterStudent = this.students.filter(s =>
-      s.examSheets?.some(ex => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie)
+    const filterStudent = this.students.filter(
+      s => s.examSheets?.some(ex => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie),
     );
     this.selectionStudents = filterStudent;
   }
@@ -786,7 +787,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         this.students = studentsbody.body!;
         this.refreshLocalStudentList();
         res();
-      })
+      }),
     );
   }
 
@@ -799,8 +800,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
           !s.value.examSheets?.some((ex: any) => ex?.scanId === this.exam.scanfileId) ||
           s.value.examSheets?.some((ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === -1 && ex?.pagemax === -1) ||
           s.value.examSheets?.some(
-            (ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie
-          )
+            (ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie,
+          ),
       );
     } else {
       // this.list._filterValue = '';
@@ -819,8 +820,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   }
 
   getFilterStudent(): void {
-    const filterStudent = this.students.filter(s =>
-      s.examSheets?.some(ex => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie)
+    const filterStudent = this.students.filter(
+      s => s.examSheets?.some(ex => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie),
     );
     this.selectionStudents = filterStudent;
   }
@@ -854,8 +855,11 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         .filter((ex: any) => ex?.scanId === this.exam.scanfileId);
       const examSheet4CurrentPage: IExamSheet[] = (
         this.students
-          .filter(s =>
-            s.examSheets?.some(ex => ex?.scanId === this.exam.scanfileId && ex.pagemin === this.currentStudent * this.nbreFeuilleParCopie)
+          .filter(
+            s =>
+              s.examSheets?.some(
+                ex => ex?.scanId === this.exam.scanfileId && ex.pagemin === this.currentStudent * this.nbreFeuilleParCopie,
+              ),
           )
           .map(s => s.examSheets) as any
       ).flat();
@@ -928,6 +932,11 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
       this.displayBasic = true;
     });
   }
+  @HostListener('document:keydown.escape', ['$event'])
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onKeydownHandler(event: KeyboardEvent): void {
+    this.displayBasic = false;
+  }
 
   loadAllPages(): Promise<void> {
     this.images = [];
@@ -941,7 +950,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                 .getNonAlignImageBetweenAndSortByPageNumber(
                   +this.examId!,
                   this.currentStudent * page1 + 1,
-                  (this.currentStudent + 1) * page1
+                  (this.currentStudent + 1) * page1,
                 )
                 .then(e1 => {
                   e1.forEach(e => {
