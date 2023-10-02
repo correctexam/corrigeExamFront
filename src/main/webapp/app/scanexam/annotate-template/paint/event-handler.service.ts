@@ -115,12 +115,16 @@ export class EventHandlerService {
     } else if (this.selectedTool === DrawingTools.ERASER) {
       const ps = [...this.allcanvas.keys()];
       ps.forEach(p => {
-        this.pages[p].changeAllCursor(true);
+        if (this.pages[p] !== undefined) {
+          this.pages[p].changeAllCursor(true);
+        }
       });
     } else {
       const ps = [...this.allcanvas.keys()];
       ps.forEach(p => {
-        this.pages[p].changeAllCursor(false);
+        if (this.pages[p] !== undefined) {
+          this.pages[p].changeAllCursor(false);
+        }
       });
     }
   }
