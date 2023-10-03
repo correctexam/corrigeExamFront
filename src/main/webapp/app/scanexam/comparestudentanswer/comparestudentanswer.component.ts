@@ -265,7 +265,6 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   }
 
   goBack() {
-    console.error(this.location.getState());
     this.location.back();
   }
   goToCopie(event: any, pageMin: number, pageMax: number) {

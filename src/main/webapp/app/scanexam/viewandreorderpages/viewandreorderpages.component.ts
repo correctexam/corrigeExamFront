@@ -121,16 +121,41 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
     this.clusters.clear();
     if (this.templatePage > 0 && this.pageInScan > 0) {
       let images: ImageDB[] = [];
-      if (this.alignPage) {
-        images = await this.db.getAlignImageBetweenAndSortByPageNumber(this.examId, 1, this.pageInScan);
-      } else {
-        images = await this.db.getNonAlignImageBetweenAndSortByPageNumber(this.examId, 1, this.pageInScan);
+
+      const step = 150;
+      const quotien = Math.floor(this.pageInScan / step);
+      const reste = this.pageInScan % step;
+      let promises: Promise<number>[] = [];
+
+      for (let i = 0; i < quotien; i++) {
+        if (this.alignPage) {
+          images = await this.db.getAlignImageBetweenAndSortByPageNumber(this.examId, i * step + 1, (i + 1) * step);
+        } else {
+          images = await this.db.getNonAlignImageBetweenAndSortByPageNumber(this.examId, i * step + 1, (i + 1) * step);
+        }
+        images.forEach((e, index) => {
+          const image = JSON.parse(e.value, this.reviver);
+          promises.push(this.loadImage(image.pages, e.pageNumber));
+        });
+        await Promise.all(promises);
+        promises = [];
       }
-      const promises: Promise<number>[] = [];
+      if (this.alignPage) {
+        images = await this.db.getAlignImageBetweenAndSortByPageNumber(this.examId, quotien * step + 1, quotien * step + reste);
+      } else {
+        images = await this.db.getNonAlignImageBetweenAndSortByPageNumber(this.examId, quotien * step + 1, quotien * step + reste);
+      }
       images.forEach((e, index) => {
         const image = JSON.parse(e.value, this.reviver);
         promises.push(this.loadImage(image.pages, e.pageNumber));
       });
+
+      /* if (this.alignPage) {
+        images = await this.db.getAlignImageBetweenAndSortByPageNumber(this.examId, 1, this.pageInScan);
+      } else {
+        images = await this.db.getNonAlignImageBetweenAndSortByPageNumber(this.examId, 1, this.pageInScan);
+      }*/
+
       Promise.all(promises).then(e => {
         this.canvass.forEach((e1, k1) => {
           const div = Math.floor((k1 - 1) / this.templatePage) + 1;

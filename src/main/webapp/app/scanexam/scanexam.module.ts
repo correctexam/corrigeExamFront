@@ -81,6 +81,7 @@ import { ComparestudentanswerComponent } from './comparestudentanswer/comparestu
 import { SplitterModule } from 'primeng/splitter';
 import { FileUploadModule } from 'primeng/fileupload';
 import { KeyboardShortcutsModule } from 'ng-keyboard-shortcuts';
+import { PlatformModule } from '@angular/cdk/platform';
 
 import { SidebarModule } from 'primeng/sidebar';
 import { CreateCommentsComponent } from './annotate-template/create-comments/create-comments.component';
@@ -499,6 +500,7 @@ export const CompareAnswer_ROUTE: Route = {
     FileUploadModule,
     PickListModule,
     KeyFilterModule,
+    PlatformModule,
     MessagesModule,
     MessageModule,
     OverlayPanelModule,

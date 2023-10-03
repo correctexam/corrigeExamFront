@@ -31,6 +31,7 @@ import { CustomFabricGroup } from '../annotate-template/paint/models';
 import { IComments } from '../../entities/comments/comments.model';
 import { CommentsService } from '../../entities/comments/service/comments.service';
 import { SVG, extend as SVGextend, Element as SVGElement, G } from '@svgdotjs/svg.js';
+import { Platform } from '@angular/cdk/platform';
 
 const RANGE_AROUND_CENTER = 20;
 
@@ -79,8 +80,10 @@ export class EventCanevascorrectionHandlerService {
   //  zones: { [zoneNumber: number]: ZoneCorrectionHandler } = {};
   public scale = 1;
   set selectedTool(t: DrawingTools) {
-    this.canvas.discardActiveObject();
-    this.canvas.renderAll();
+    if (this.canvas !== undefined && this.canvas !== null) {
+      this.canvas.discardActiveObject();
+      this.canvas.renderAll();
+    }
     if (this.drawingToolObserver) {
       this.drawingToolObserver(t);
     }
@@ -113,8 +116,13 @@ export class EventCanevascorrectionHandlerService {
       const ps = [...this.allcanvas.keys()];
       this.allcanvas.forEach(c => {
         if (c !== undefined) {
-          c.moveCursor = 'url("content/images/trash.svg"), auto';
-          c.hoverCursor = 'url("content/images/trash.svg"), auto';
+          if (this.platform.FIREFOX) {
+            c.moveCursor = 'url("content/images/trash1.png"), auto';
+            c.hoverCursor = 'url("content/images/trash1.png"), auto';
+          } else {
+            c.moveCursor = 'url("content/images/trash.svg"), auto';
+            c.hoverCursor = 'url("content/images/trash.svg"), auto';
+          }
         }
       });
     } else {
@@ -155,6 +163,7 @@ export class EventCanevascorrectionHandlerService {
   constructor(
     private fabricShapeService: FabricShapeService,
     public commentsService: CommentsService,
+    private platform: Platform,
   ) {}
 
   registerSelectedToolObserver(f: (d: DrawingTools) => void): any {
@@ -457,9 +466,11 @@ export class EventCanevascorrectionHandlerService {
   }
 
   private objectsSelectable(isSelectable: boolean) {
-    this.canvas.forEachObject(obj => {
-      obj.selectable = isSelectable;
-    });
+    if (this.canvas !== undefined && this.canvas !== null) {
+      this.canvas.forEachObject(obj => {
+        obj.selectable = isSelectable;
+      });
+    }
   }
 
   private getOtherEllipses(notIncludedId: string): CustomFabricEllipse[] {
