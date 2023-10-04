@@ -305,7 +305,7 @@ export class CacheUploadService {
         if (data.size === 0) {
           if (showFailMessage) {
             messageService.add({
-              severity: 'error',
+              severity: 'warn',
               summary: translateService.instant('scanexam.downloadcacheko'),
               detail: translateService.instant('scanexam.downloadcachekodetail'),
             });
@@ -353,9 +353,8 @@ export class CacheUploadService {
             acceptChangedPrimaryKey: true,
           });
         } catch (err: any) {
-          console.error(err);
           messageService.add({
-            severity: 'error',
+            severity: 'warn',
             summary: translateService.instant('scanexam.downloadcacheko'),
             detail: translateService.instant('scanexam.downloadcachekodetail'),
           });
@@ -386,7 +385,7 @@ export class CacheUploadService {
 
       if (data.size === 0) {
         messageService.add({
-          severity: 'error',
+          severity: 'warn',
           summary: translateService.instant('scanexam.downloadcacheko'),
           detail: translateService.instant('scanexam.downloadcachekodetail'),
         });
