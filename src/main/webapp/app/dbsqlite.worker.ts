@@ -11,13 +11,13 @@
 const dbs = new Map<number, DB>();
 let _sqlite3: any;
 addEventListener('message', e => {
-  if (e.data?.payload?.examId) {
+  /* if (e.data?.payload?.examId) {
     [...dbs.keys()]
       .filter(k => k !== e.data.payload.examId)
       .forEach(k => {
         dbs.get(k)!.closeOther();
       });
-  }
+  } */
 
   switch (e.data.msg) {
     case 'hello': {
@@ -44,7 +44,6 @@ addEventListener('message', e => {
           })
           .then(function (sqlite3var: any) {
             _sqlite3 = sqlite3var;
-            console.log('Done initializing. Running demo...');
             postMessage({ msg: 'databaseReady', uid: '0' });
           });
       } finally {
@@ -360,7 +359,9 @@ addEventListener('message', e => {
 class DB {
   db: any;
 
-  constructor(public examName: number) {}
+  constructor(public examName: number) {
+    console.error(examName);
+  }
 
   error(...args: string[]) {
     console.error(...args);
@@ -380,10 +381,10 @@ class DB {
   }
 
   close() {
-    //   this.db.close();
+    this.db.close();
   }
   closeOther() {
-    this.db.close();
+    //  this.db.close();
   }
   initemptyDb(sqlite3: any) {
     this.initDb(sqlite3);
@@ -465,16 +466,16 @@ class DB {
     const payload = data.payload;
     this.initDb(sqlite3);
     try {
-      if (this.db.selectValue('select count(*) from template where page=' + payload.elt.pageNumber) > 0) {
+      if (this.db.selectValue('select count(*) from template where page=' + payload.pageNumber) > 0) {
         this.db.exec({
-          sql: 'delete from template where page=' + payload.elt.pageNumber,
+          sql: 'delete from template where page=' + payload.pageNumber,
         });
       }
       const enc = new TextDecoder('utf-8');
-      const arr = new Uint8Array(payload.elt.value);
+      const arr = new Uint8Array(payload.value);
       this.db.exec({
         sql: 'INSERT INTO template(page,imageData ) VALUES (?,?)',
-        bind: [payload.elt.pageNumber, enc.decode(arr)],
+        bind: [payload.pageNumber, enc.decode(arr)],
       });
     } finally {
       this.close();

@@ -311,9 +311,8 @@ export class SqliteCacheService implements CacheService {
     };
     return this._dispatch(
       'addTemplate',
-      {
-        elt: el1,
-      },
+      el1,
+
       [el1.value],
     ).toPromise();
   }
