@@ -128,7 +128,6 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
       let promises: Promise<number>[] = [];
 
       for (let i = 0; i < quotien; i++) {
-        console.error('ask load');
         if (this.alignPage) {
           images = await this.db.getAlignImageBetweenAndSortByPageNumber(this.examId, i * step + 1, (i + 1) * step);
         } else {

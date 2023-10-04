@@ -359,9 +359,7 @@ addEventListener('message', e => {
 class DB {
   db: any;
 
-  constructor(public examName: number) {
-    console.error(examName);
-  }
+  constructor(public examName: number) {}
 
   error(...args: string[]) {
     console.error(...args);
@@ -371,9 +369,9 @@ class DB {
     if (this.db === undefined || !this.db.isOpen()) {
       const oo = sqlite3.oo1; /*high-level OO API*/
       if (sqlite3.opfs) {
-        console.time('open');
+        //        console.time('open');
         this.db = new oo.OpfsDb('/' + this.examName + '.sqlite3');
-        console.timeEnd('open');
+        //        console.timeEnd('open');
       } else {
         this.db = new oo.DB('/' + this.examName + '.sqlite3', 'ct');
       }
