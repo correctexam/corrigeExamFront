@@ -337,7 +337,8 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
 
   async saveEligneImage(pageN: number, imageD: ImageData): Promise<void> {
     const imageString = this.fgetBase64Image(imageD, pageN);
-
+    console.error('ask saving page', pageN);
+    console.time('' + pageN);
     await this.db.addAligneImage({
       examId: +this.examId,
       pageNumber: pageN,
@@ -348,9 +349,12 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
         this.replacer,
       ),
     });
+    console.timeEnd('' + pageN);
+    console.error('end saving page', pageN);
   }
 
-  async saveEligneImageBase64(pageN: number, imageD: any): Promise<void> {
+  /* async saveEligneImageBase64(pageN: number, imageD: any): Promise<void> {
+    console.error('ask saving page', pageN)
     await this.db.addAligneImage({
       examId: +this.examId,
       pageNumber: pageN,
@@ -361,7 +365,9 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
         this.replacer,
       ),
     });
-  }
+    console.error('end saving page', pageN)
+
+  }*/
 
   gotoUE(): any {
     this.router.navigateByUrl('/exam/' + this.examId);

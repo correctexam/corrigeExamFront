@@ -115,7 +115,7 @@ function groupImagePerContoursLength(p: { msg: any; payload: ICluster; uid: stri
       const imageSrc = new ImageData(
         new Uint8ClampedArray(p.payload.images[i * nbreImagePerStudent + ij].image),
         p.payload.images[i * nbreImagePerStudent + ij].width!,
-        p.payload.images[i * nbreImagePerStudent + ij].height
+        p.payload.images[i * nbreImagePerStudent + ij].height,
       );
 
       let src = cv.matFromImageData(imageSrc);
@@ -205,7 +205,8 @@ function imageCrop(p: { msg: any; payload: any; uid: string }): void {
 
   let src = cv.matFromImageData(imageSrc);
   dst = roi(src, rect, dst);
-  postMessage({ msg: p.msg, payload: imageDataFromMat(dst), uid: p.uid });
+  const res = imageDataFromMat(dst).data.buffer;
+  postMessage({ msg: p.msg, payload: res, uid: p.uid }, [res]);
   dst.delete();
   src.delete();
 }
@@ -318,7 +319,7 @@ function fpredictionTemplate(
   m: MLModel,
   lookingForMissingLetter: boolean,
   onlyletter: boolean,
-  preference: IPreference
+  preference: IPreference,
 ): any {
   let candidate: any[] = [];
   cand.forEach(e => {
@@ -440,7 +441,7 @@ function fprediction(
   m: MLModel,
   lookingForMissingLetter: boolean,
   onlyletter: boolean,
-  preference: IPreference
+  preference: IPreference,
 ): any {
   const res = extractImage(src, false, lookingForMissingLetter, preference);
 
@@ -559,7 +560,7 @@ function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingFor
       anchor,
       2,
       cv.BORDER_CONSTANT,
-      cv.morphologyDefaultBorderValue()
+      cv.morphologyDefaultBorderValue(),
     );
     let contours2 = new cv.MatVector();
     let hierarchy2 = new cv.Mat();
@@ -582,7 +583,7 @@ function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingFor
       anchor1,
       2,
       cv.BORDER_CONSTANT,
-      cv.morphologyDefaultBorderValue()
+      cv.morphologyDefaultBorderValue(),
     );
     let contours3 = new cv.MatVector();
     let hierarchy3 = new cv.Mat();
@@ -632,7 +633,7 @@ function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingFor
     anchor,
     morphsize,
     cv.BORDER_CONSTANT,
-    cv.morphologyDefaultBorderValue()
+    cv.morphologyDefaultBorderValue(),
   );
   let final = new cv.Mat();
 

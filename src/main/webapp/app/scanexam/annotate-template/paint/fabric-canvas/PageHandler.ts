@@ -3,6 +3,7 @@
 import { fabric } from 'fabric';
 import { EventHandlerService } from '../event-handler.service';
 import { IEvent, Transform } from 'fabric/fabric-impl';
+import { Platform } from '@angular/cdk/platform';
 
 type AnnotationPageRect = {
   page: number;
@@ -29,6 +30,7 @@ export class PageHandler {
     public pageViewer: any,
     private page: number,
     private eventHandler: EventHandlerService,
+    private platform: Platform,
   ) {
     // this.updateCanvas(pageViewer);
     //    window.addEventListener('mouseup', this.mouseUpHandler.bind(this));
@@ -252,8 +254,13 @@ export class PageHandler {
       this.annotationCanvas.style.cursor = 'default';
     }
     if (erase) {
-      this.canvas.moveCursor = 'url("content/images/trash.svg"), auto';
-      this.canvas.hoverCursor = 'url("content/images/trash.svg"), auto';
+      if (this.platform.FIREFOX) {
+        this.canvas.moveCursor = 'url("content/images/trash1.png"), auto';
+        this.canvas.hoverCursor = 'url("content/images/trash1.png"), auto';
+      } else {
+        this.canvas.moveCursor = 'url("content/images/trash.svg"), auto';
+        this.canvas.hoverCursor = 'url("content/images/trash.svg"), auto';
+      }
     } else {
       this.canvas.moveCursor = 'move';
       this.canvas.hoverCursor = 'move';

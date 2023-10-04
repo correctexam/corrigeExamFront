@@ -32,6 +32,7 @@ import { CustomZone } from './fabric-canvas/fabric-canvas.component';
 import { ConfirmationService } from 'primeng/api';
 import { IText } from 'fabric/fabric-impl';
 import { Observable, Subject, firstValueFrom } from 'rxjs';
+import { Platform } from '@angular/cdk/platform';
 
 @Injectable({
   providedIn: 'root',
@@ -77,6 +78,7 @@ export class EventHandlerService {
     private questionService: QuestionService,
     private translateService: TranslateService,
     private preferenceService: PreferenceService,
+    private platform: Platform,
   ) {}
 
   public set exam(c: IExam) {
@@ -501,7 +503,7 @@ export class EventHandlerService {
 
   public initPage(page: number, pageViewer: any): void {
     if (this.pages[page] === undefined) {
-      this.pages[page] = new PageHandler(pageViewer, page, this);
+      this.pages[page] = new PageHandler(pageViewer, page, this, this.platform);
     }
   }
 

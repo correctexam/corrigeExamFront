@@ -47,8 +47,6 @@ export class ScanService {
   }
 
   uploadScan(formData: FormData, scanId: number): Observable<HttpEvent<any>> {
-    console.error('updload scan');
-
     return this.http.post(`${this.applicationConfigService.getEndpointFor('api/uploadScan')}/${scanId} `, formData, {
       reportProgress: true,
       responseType: 'json',

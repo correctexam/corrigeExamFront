@@ -24,9 +24,107 @@ export class SqliteCacheService implements CacheService {
         //        console.error(' receive message ', data);
         if (this.subjects.has(data.uid)) {
           //   console.error( ' receive message '  + data.uid)
+          switch (data.msg) {
+            case 'getFirstNonAlignImage': {
+              const enc = new TextDecoder('utf-8');
+              const arr = new Uint8Array(data.payload.value);
+              data.payload.value = enc.decode(arr);
+              this.subjects.get(data.uid)?.next(data.payload);
+              this.subjects.get(data.uid)?.complete();
 
-          this.subjects.get(data.uid)?.next(data.payload);
-          this.subjects.get(data.uid)?.complete();
+              break;
+            }
+            case 'getFirstAlignImage': {
+              const enc = new TextDecoder('utf-8');
+              const arr = new Uint8Array(data.payload.value);
+              data.payload.value = enc.decode(arr);
+              this.subjects.get(data.uid)?.next(data.payload);
+              this.subjects.get(data.uid)?.complete();
+
+              break;
+            }
+            case 'getFirstTemplate': {
+              const enc = new TextDecoder('utf-8');
+              const arr = new Uint8Array(data.payload.value);
+              data.payload.value = enc.decode(arr);
+              this.subjects.get(data.uid)?.next(data.payload);
+              this.subjects.get(data.uid)?.complete();
+
+              break;
+            }
+            case 'getNonAlignImageBetweenAndSortByPageNumber': {
+              const enc = new TextDecoder('utf-8');
+              data.payload.forEach((res: any) => {
+                const arr = new Uint8Array(res.value);
+                res.value = enc.decode(arr);
+                // console.error(res.value)
+              });
+
+              this.subjects.get(data.uid)?.next(data.payload);
+              this.subjects.get(data.uid)?.complete();
+
+              break;
+            }
+            case 'getAlignImageBetweenAndSortByPageNumber': {
+              const enc = new TextDecoder('utf-8');
+              data.payload.forEach((res: any) => {
+                const arr = new Uint8Array(res.value);
+                res.value = enc.decode(arr);
+              });
+              this.subjects.get(data.uid)?.next(data.payload);
+              this.subjects.get(data.uid)?.complete();
+
+              break;
+            }
+            case 'getNonAlignImagesForPageNumbers': {
+              const enc = new TextDecoder('utf-8');
+              data.payload.forEach((res: any) => {
+                const arr = new Uint8Array(res.value);
+                res.value = enc.decode(arr);
+              });
+              this.subjects.get(data.uid)?.next(data.payload);
+              this.subjects.get(data.uid)?.complete();
+
+              break;
+            }
+            case 'getAlignImagesForPageNumbers': {
+              const enc = new TextDecoder('utf-8');
+              data.payload.forEach((res: any) => {
+                const arr = new Uint8Array(res.value);
+                res.value = enc.decode(arr);
+              });
+              this.subjects.get(data.uid)?.next(data.payload);
+              this.subjects.get(data.uid)?.complete();
+
+              break;
+            }
+            case 'getNonAlignSortByPageNumber': {
+              const enc = new TextDecoder('utf-8');
+              data.payload.forEach((res: any) => {
+                const arr = new Uint8Array(res.value);
+                res.value = enc.decode(arr);
+              });
+              this.subjects.get(data.uid)?.next(data.payload);
+              this.subjects.get(data.uid)?.complete();
+
+              break;
+            }
+            case 'getAlignSortByPageNumber': {
+              const enc = new TextDecoder('utf-8');
+              data.payload.forEach((res: any) => {
+                const arr = new Uint8Array(res.value);
+                res.value = enc.decode(arr);
+              });
+              this.subjects.get(data.uid)?.next(data.payload);
+              this.subjects.get(data.uid)?.complete();
+
+              break;
+            }
+            default: {
+              this.subjects.get(data.uid)?.next(data.payload);
+              this.subjects.get(data.uid)?.complete();
+            }
+          }
         }
       };
       this.worker.onerror = e => {
@@ -60,11 +158,15 @@ export class SqliteCacheService implements CacheService {
    * return a promise with the result of the event. This way we can call
    * the worker asynchronously.
    */
-  private _dispatch<T>(msg1: any, pay: any): Observable<T> {
+  private _dispatch<T>(msg1: any, pay: any, transferable?: any): Observable<T> {
     const uuid1 = uuid(); // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
     this.ready.then(() => {
       //  console.error( ' send message ' + msg1 + ' ' + uuid1)
-      this.worker.postMessage({ msg: msg1, uid: uuid1, payload: pay });
+      if (transferable) {
+        this.worker.postMessage({ msg: msg1, uid: uuid1, payload: pay }, transferable);
+      } else {
+        this.worker.postMessage({ msg: msg1, uid: uuid1, payload: pay });
+      }
     });
     const p = new Subject<T>();
     this.subjects.set(uuid1, p);
@@ -87,11 +189,24 @@ export class SqliteCacheService implements CacheService {
   }
 
   async addAligneImage(elt: ImageDB) {
-    return this._dispatch('addAligneImage', elt).toPromise();
+    const enc = new TextEncoder(); // always utf-8
+    const el1 = {
+      examId: elt.examId,
+      pageNumber: elt.pageNumber,
+      value: enc.encode(elt.value).buffer,
+    };
+
+    return this._dispatch('addAligneImage', el1, [el1.value]).toPromise();
   }
 
   async addNonAligneImage(elt: ImageDB) {
-    return this._dispatch('addNonAligneImage', elt).toPromise();
+    const enc = new TextEncoder(); // always utf-8
+    const el1 = {
+      examId: elt.examId,
+      pageNumber: elt.pageNumber,
+      value: enc.encode(elt.value).buffer,
+    };
+    return this._dispatch('addNonAligneImage', el1, [el1.value]).toPromise();
   }
 
   export(examId: number, options?: ExportOptions | undefined): Promise<any> {
@@ -187,9 +302,20 @@ export class SqliteCacheService implements CacheService {
     }).toPromise();
   }
   addTemplate(elt: AlignImage): Promise<any> {
-    return this._dispatch('addTemplate', {
-      elt: elt,
-    }).toPromise();
+    const enc = new TextEncoder(); // always utf-8
+
+    const el1 = {
+      examId: elt.examId,
+      pageNumber: elt.pageNumber,
+      value: enc.encode(elt.value).buffer,
+    };
+    return this._dispatch(
+      'addTemplate',
+      {
+        elt: el1,
+      },
+      [el1.value],
+    ).toPromise();
   }
   countNonAlignWithPageNumber(examId: number, pageInscan: number): Promise<any> {
     return this._dispatch('countNonAlignWithPageNumber', {

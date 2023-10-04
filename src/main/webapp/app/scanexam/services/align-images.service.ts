@@ -152,7 +152,7 @@ export class AlignImagesService {
             () => {
               res();
             },
-            () => rej()
+            () => rej(),
           );
       });
     } else {
@@ -186,13 +186,13 @@ export class AlignImagesService {
           () => {
             res();
           },
-          () => rej()
+          () => rej(),
         );
     });
     return p.asObservable();
   }
 
-  public imageCrop(payload: IImageCropInput): Observable<ImageData> {
+  public imageCrop(payload: IImageCropInput): Observable<ArrayBuffer> {
     return this._dispatch('imageCrop', payload, [payload.image]);
   }
 

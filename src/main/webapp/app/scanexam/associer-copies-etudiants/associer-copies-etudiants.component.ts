@@ -589,7 +589,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                 width: finalW,
                 height: finalH,
               })
-              .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
+              .subscribe(res => resolve({ i: new ImageData(new Uint8ClampedArray(res), finalW, finalH), w: finalW, h: finalH }));
           });
         });
       });
@@ -631,7 +631,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                 }
                 this.db.getFirstTemplate(+this.examId, page1).then(e3 => {
                   if (!this.baseTemplate) {
-                    resolve({ i: res, w: finalW, h: finalH });
+                    resolve({ i: new ImageData(new Uint8ClampedArray(res), finalW, finalH), w: finalW, h: finalH });
                   } else {
                     const image1 = JSON.parse(e3!.value, this.reviver);
                     this.loadImage(image1.pages, pageInscan % this.nbreFeuilleParCopie).then(v1 => {
@@ -663,7 +663,12 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
                           height: finalH1,
                         })
                         .subscribe(res1 => {
-                          resolve({ t: res1, i: res, w: finalW, h: finalH });
+                          resolve({
+                            t: new ImageData(new Uint8ClampedArray(res1), finalW1, finalH1),
+                            i: new ImageData(new Uint8ClampedArray(res), finalW, finalH),
+                            w: finalW,
+                            h: finalH,
+                          });
                         });
                     });
                   }

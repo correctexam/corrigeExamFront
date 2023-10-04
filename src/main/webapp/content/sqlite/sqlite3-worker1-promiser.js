@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/prefer-optional-chain */
+/* eslint-disable curly */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /*
   2022-08-24
 
@@ -114,7 +118,7 @@
    by all client code except that which tests this API. The `row`
    property contains the row result in the form implied by the
    `rowMode` option (defaulting to `'array'`). The `rowNumber` is a
-   1-based integer value incremented by 1 on each call into th 
+   1-based integer value incremented by 1 on each call into th
    callback.
 
    At the end of the result set, the same event is fired with
@@ -155,7 +159,7 @@ self.sqlite3Worker1Promiser = function callee(config = callee.defaultConfig) {
     let msgHandler = handlerMap[ev.messageId];
     if (!msgHandler) {
       if (ev && 'sqlite3-api' === ev.type && 'worker1-ready' === ev.result) {
-        /*fired one time when the Worker1 API initializes*/
+        /* fired one time when the Worker1 API initializes*/
         if (config.onready) config.onready();
         return;
       }
