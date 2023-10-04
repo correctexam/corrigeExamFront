@@ -11,6 +11,14 @@
 const dbs = new Map<number, DB>();
 let _sqlite3: any;
 addEventListener('message', e => {
+  if (e.data?.payload?.examId) {
+    [...dbs.keys()]
+      .filter(k => k !== e.data.payload.examId)
+      .forEach(k => {
+        dbs.get(k)!.closeOther();
+      });
+  }
+
   switch (e.data.msg) {
     case 'hello': {
       const response = `worker response to ${e.data.msg}`;
@@ -362,7 +370,9 @@ class DB {
     if (this.db === undefined || !this.db.isOpen()) {
       const oo = sqlite3.oo1; /*high-level OO API*/
       if (sqlite3.opfs) {
+        console.time('open');
         this.db = new oo.OpfsDb('/' + this.examName + '.sqlite3');
+        console.timeEnd('open');
       } else {
         this.db = new oo.DB('/' + this.examName + '.sqlite3', 'ct');
       }
@@ -372,7 +382,9 @@ class DB {
   close() {
     //   this.db.close();
   }
-
+  closeOther() {
+    this.db.close();
+  }
   initemptyDb(sqlite3: any) {
     this.initDb(sqlite3);
     try {
