@@ -128,6 +128,7 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
       let promises: Promise<number>[] = [];
 
       for (let i = 0; i < quotien; i++) {
+        console.error('ask load');
         if (this.alignPage) {
           images = await this.db.getAlignImageBetweenAndSortByPageNumber(this.examId, i * step + 1, (i + 1) * step);
         } else {
@@ -140,11 +141,13 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
         await Promise.all(promises);
         promises = [];
       }
+
       if (this.alignPage) {
         images = await this.db.getAlignImageBetweenAndSortByPageNumber(this.examId, quotien * step + 1, quotien * step + reste);
       } else {
         images = await this.db.getNonAlignImageBetweenAndSortByPageNumber(this.examId, quotien * step + 1, quotien * step + reste);
       }
+
       images.forEach((e, index) => {
         const image = JSON.parse(e.value, this.reviver);
         promises.push(this.loadImage(image.pages, e.pageNumber));

@@ -414,7 +414,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
                 width: finalW,
                 height: finalH,
               })
-              .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
+              .subscribe(res => resolve({ i: new ImageData(new Uint8ClampedArray(res), finalW, finalH), w: finalW, h: finalH }));
           });
         });
       });
@@ -450,7 +450,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
                 width: finalW,
                 height: finalH,
               })
-              .subscribe(res => resolve({ i: res, w: finalW, h: finalH }));
+              .subscribe(res => resolve({ i: new ImageData(new Uint8ClampedArray(res), finalW, finalH), w: finalW, h: finalH }));
           });
         });
       });
