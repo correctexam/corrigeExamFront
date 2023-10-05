@@ -176,7 +176,6 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       q.libelle = this.editForm.get(['libelle'])!.value;
       q.gradeType = this.editForm.get(['gradeType'])!.value;
       q.typeId = this.editForm.get(['typeId'])!.value;
-      console.error(q);
     });
 
     // Saving the current preferences
