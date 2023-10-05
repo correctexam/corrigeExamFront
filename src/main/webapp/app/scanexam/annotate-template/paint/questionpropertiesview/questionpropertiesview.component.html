@@ -31,6 +31,24 @@
           </div>
         </div>
         <div class="row">
+          <label for="libelle" jhiTranslate="scanexam.libelle" style="display: block; margin-bottom: 4px">libelle</label>
+          <input
+            class="form-control"
+            id="libelle"
+            type="text"
+            name="libelle"
+            formControlName="libelle"
+            pInputText
+            placeholder="Question n° XXX"
+            style="margin-right: 0.5em"
+            [pTooltip]="'scanexam.libelletooltip' | translate"
+            (keyup)="contentChange()"
+            (change)="contentChange()"
+            [tooltipZIndex]="'3000'"
+          />
+        </div>
+
+        <div class="row">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.point" for="field_point">Point</label>
           <input
             type="number"

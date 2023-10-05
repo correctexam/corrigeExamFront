@@ -8,6 +8,7 @@ export interface IQuestion {
   point?: number;
   step?: number | null;
   validExpression?: string | null;
+  libelle?: string | null;
   gradeType?: GradeType | null;
   textcomments?: ITextComment[] | null;
   gradedcomments?: IGradedComment[] | null;
@@ -32,7 +33,7 @@ export class Question implements IQuestion {
     public typeAlgoName?: string,
     public typeId?: number,
     public examName?: string,
-    public examId?: number
+    public examId?: number,
   ) {}
 }
 export function getQuestionIdentifier(question: IQuestion): number | undefined {

@@ -17,12 +17,14 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   loginForm: any;
 
+  canclean = true;
+
   constructor(
     private accountService: AccountService,
     private loginService: LoginService,
     private router: Router,
     private fb: UntypedFormBuilder,
-    private zone: NgZone
+    private zone: NgZone,
   ) {
     this.loginForm = this.fb.group({
       username: [null, [Validators.required]],
@@ -44,6 +46,27 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.username.nativeElement.focus();
+  }
+
+  async cleanCache(): Promise<void> {
+    sessionStorage.clear();
+    localStorage.clear();
+
+    const keys = await caches.keys();
+    keys.forEach(key => {
+      caches.delete(key);
+    });
+
+    document.cookie = document.cookie.split(';').reduce((newCookie1, keyVal) => {
+      const pair = keyVal.trim().split('=');
+      if (pair[0]) {
+        if (pair[0] !== 'path' && pair[0] !== 'expires') {
+          newCookie1 += pair[0] + '=;';
+        }
+      }
+      return newCookie1;
+    }, 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path:/;');
+    this.canclean = false;
   }
 
   login(): void {

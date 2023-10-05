@@ -51,6 +51,11 @@
         </div>
 
         <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.libelle" for="field_libelle">Libelle</label>
+          <input type="text" class="form-control" name="libelle" id="field_libelle" data-cy="libelle" formControlName="libelle" />
+        </div>
+
+        <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.gradeType" for="field_gradeType">Grade Type</label>
           <select class="form-control" name="gradeType" formControlName="gradeType" id="field_gradeType" data-cy="gradeType">
             <option [ngValue]="null">{{ 'gradeScopeIsticApp.GradeType.null' | translate }}</option>
