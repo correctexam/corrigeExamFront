@@ -163,13 +163,34 @@ export class PageHandler {
   }
 
   private addEventListeners(canvas: PagedCanvas): void {
-    canvas.on('mouse:down', e => this.onCanvasMouseDown(e));
-    canvas.on('mouse:move', e => this.onCanvasMouseMove(e));
-    canvas.on('mouse:up', () => this.onCanvasMouseUp());
-    canvas.on('selection:created', e => this.onSelectionCreated(e));
-    canvas.on('selection:updated', e => this.onSelectionUpdated(e));
-    canvas.on('selection:cleared', () => this.eventHandler.unselectObject());
-    canvas.on('object:modified', e => this.onObjectModified(e as CanvasModifiedEvent));
+    canvas.on('mouse:down', e => {
+      console.error('down');
+      this.onCanvasMouseDown(e);
+    });
+    canvas.on('mouse:move', e => {
+      console.error('move');
+      this.onCanvasMouseMove(e);
+    });
+    canvas.on('mouse:up', () => {
+      console.error('up');
+      this.onCanvasMouseUp();
+    });
+    canvas.on('selection:created', e => {
+      console.error('created');
+      this.onSelectionCreated(e);
+    });
+    canvas.on('selection:updated', e => {
+      console.error('updated');
+      this.onSelectionUpdated(e);
+    });
+    canvas.on('selection:cleared', () => {
+      console.error('cleared');
+      this.eventHandler.unselectObject();
+    });
+    canvas.on('object:modified', e => {
+      console.error('modified');
+      this.onObjectModified(e as CanvasModifiedEvent);
+    });
   }
 
   private onCanvasMouseDown(event: IEvent<MouseEvent>): void {
@@ -189,12 +210,27 @@ export class PageHandler {
   }
 
   private onSelectionCreated(e: any): void {
-    this.eventHandler.canvas = this.canvas;
+    console.error('onSelectionCreated');
+    console.error(this.eventHandler.canvas, this.canvas);
 
+    Array.from(this.eventHandler.allcanvas.values())
+      .filter(c => c !== this.canvas)
+      .forEach(c => {
+        c.discardActiveObject();
+        c.renderAll();
+      });
+    /*    if (this.eventHandler.canvas !== this.canvas){
+              this.eventHandler.canvas.discardActiveObject();
+              this.eventHandler.canvas.renderAll();
+    } */
+
+    this.eventHandler.canvas = this.canvas;
     this.eventHandler.objectSelected(e.selected[0]);
   }
 
   private onSelectionUpdated(e: any): void {
+    console.error('onSelectionUpdated');
+
     this.eventHandler.canvas = this.canvas;
 
     this.eventHandler.objectSelected(e.selected[0]);

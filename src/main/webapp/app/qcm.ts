@@ -104,8 +104,13 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
     // eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
     if (true) {
       const casesvideseleves = trouveCases(grayE, p.payload.preference);
-      const decalage = /* { x: 0, y: 0 }; // */ computeDecallage(casesvideseleves, res);
-      const dstE = applyTranslation(srcE, decalage);
+      let dstE;
+      if (casesvideseleves !== undefined && casesvideseleves.cases !== undefined && casesvideseleves.cases.length > 0) {
+        const decalage = /* { x: 0, y: 0 }; // */ computeDecallage(casesvideseleves, res);
+        dstE = applyTranslation(srcE, decalage);
+      } else {
+        dstE = srcE;
+      }
       let results = analyseStudentSheet(res, src, dstE, p.payload.preference);
       let e = imageDataFromMat(dstE);
 
@@ -177,6 +182,7 @@ export function getOrigDimensions(forme: any): any {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function __moy(coordonnees: any[]): any {
   if (coordonnees.length > 0) {
     let x_sum = 0;
@@ -186,6 +192,31 @@ function __moy(coordonnees: any[]): any {
       y_sum += e.y;
     });
     return { x: x_sum / coordonnees.length, y: y_sum / coordonnees.length };
+  } else {
+    return { x: 0, y: 0 };
+  }
+}
+
+function __closest(coordonnees: any[]): any {
+  if (coordonnees.length > 0) {
+    const min = Math.min(
+      ...coordonnees.map(
+        item =>
+          Math.abs(item.deltaw) * Math.abs(item.deltaw) +
+          Math.abs(item.deltah) * Math.abs(item.deltah) +
+          Math.abs(item.x) +
+          Math.abs(item.y),
+      ),
+    );
+    const p = coordonnees.filter(
+      item =>
+        Math.abs(item.deltaw) * Math.abs(item.deltaw) +
+          Math.abs(item.deltah) * Math.abs(item.deltah) +
+          Math.abs(item.x) +
+          Math.abs(item.y) ===
+        min,
+    )[0];
+    return { x: p.x, y: p.y };
   } else {
     return { x: 0, y: 0 };
   }
@@ -478,19 +509,21 @@ function computeDecallage(casesvideseleves: any, casesvidesexamtemplate: any): a
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (currentBox !== undefined) {
       // m.set(casevideeleve, currentBox)
-      let poseleve = getOrigPosition(casevideeleve);
-      let posref = getOrigPosition(currentBox);
-      let decalage = { x: poseleve.x - posref.x, y: poseleve.y - posref.y };
+      const poseleve = getOrigPosition(casevideeleve);
+      const posref = getOrigPosition(currentBox);
+      const dimeleve = getOrigDimensions(casevideeleve);
+      const dimref = getOrigDimensions(currentBox);
+      const decalage = { x: poseleve.x - posref.x, y: poseleve.y - posref.y, deltaw: dimeleve.w - dimref.w, deltah: dimeleve.h - dimref.h };
       decalages.push(decalage);
     }
   });
-  return __moy(decalages);
+  return __closest(decalages);
 }
 
 function applyTranslation(src1: any, decalage: any): any {
   let dst = new cv.Mat();
   if (decalage.x !== 0 || decalage.y !== 0) {
-    let M = cv.matFromArray(2, 3, cv.CV_64FC1, [1, 0, +decalage.x, 0, 1, +decalage.y]);
+    let M = cv.matFromArray(2, 3, cv.CV_64FC1, [1, 0, -decalage.x, 0, 1, -decalage.y]);
     let dsize = new cv.Size(src1.cols, src1.rows);
     // You can try more different parameters
     cv.warpAffine(src1, dst, M, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());

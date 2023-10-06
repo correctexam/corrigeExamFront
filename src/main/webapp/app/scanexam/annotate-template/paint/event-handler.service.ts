@@ -207,6 +207,14 @@ export class EventHandlerService {
     this._initPositionOfElement = { x: pointer.x, y: pointer.y };
 
     switch (this._selectedTool) {
+      case DrawingTools.SELECT:
+        Array.from(this.allcanvas.values())
+          .filter(c => c !== this.canvas)
+          .forEach(c => {
+            c.discardActiveObject();
+            c.renderAll();
+          });
+        break;
       case DrawingTools.ELLIPSE:
         this._elementUnderDrawing = this.fabricShapeService.createEllipse(
           this.canvas,
@@ -360,16 +368,16 @@ export class EventHandlerService {
       this._elementUnderDrawing = undefined;
     }
 
-    if (this._selectedTool === DrawingTools.SELECT) {
+    /* if (this._selectedTool === DrawingTools.SELECT) {
       Array.from(this.allcanvas.values())
         .filter(c => c !== this.canvas)
         .forEach(c => {
           c.discardActiveObject();
           c.renderAll();
         });
-    } else {
-      this.canvas.renderAll();
-    }
+    } else {*/
+    this.canvas.renderAll();
+    //}
   }
 
   private createZone(obj: CustomFabricObject): IZone {
@@ -521,6 +529,8 @@ export class EventHandlerService {
    * Triggers unselection of objects
    */
   public unselectObject(): void {
+    //  this.allcanvas.forEach((v,k)=> console.error(k,v?.selection))
+
     // No more question selected
     this._selectedQuestion.next(undefined);
   }
@@ -540,9 +550,9 @@ export class EventHandlerService {
       // // Need to put the truely selected question at first position in the array
       // questions = [question, ...questions.filter(q => q.id !== question.id)];
       // Notifying that this bunch of questions is selected
-      this._selectedQuestion.next(question);
 
       this.currentSelected = (object as CustomFabricGroup).getObjects()[1];
+      this._selectedQuestion.next(question);
     }
   }
 
