@@ -116,8 +116,6 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
     });
 
     this.selectionSubscription = this.eventHandler.getSelectedQuestion().subscribe(selectedQ => {
-      console.error(selectedQ);
-
       if (selectedQ === undefined) {
         this.questions = [];
       } else {

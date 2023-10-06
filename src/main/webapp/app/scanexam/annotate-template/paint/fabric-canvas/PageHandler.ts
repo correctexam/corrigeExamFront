@@ -164,31 +164,24 @@ export class PageHandler {
 
   private addEventListeners(canvas: PagedCanvas): void {
     canvas.on('mouse:down', e => {
-      console.error('down');
       this.onCanvasMouseDown(e);
     });
     canvas.on('mouse:move', e => {
-      console.error('move');
       this.onCanvasMouseMove(e);
     });
     canvas.on('mouse:up', () => {
-      console.error('up');
       this.onCanvasMouseUp();
     });
     canvas.on('selection:created', e => {
-      console.error('created');
       this.onSelectionCreated(e);
     });
     canvas.on('selection:updated', e => {
-      console.error('updated');
       this.onSelectionUpdated(e);
     });
     canvas.on('selection:cleared', () => {
-      console.error('cleared');
       this.eventHandler.unselectObject();
     });
     canvas.on('object:modified', e => {
-      console.error('modified');
       this.onObjectModified(e as CanvasModifiedEvent);
     });
   }
@@ -210,9 +203,6 @@ export class PageHandler {
   }
 
   private onSelectionCreated(e: any): void {
-    console.error('onSelectionCreated');
-    console.error(this.eventHandler.canvas, this.canvas);
-
     Array.from(this.eventHandler.allcanvas.values())
       .filter(c => c !== this.canvas)
       .forEach(c => {
@@ -229,8 +219,6 @@ export class PageHandler {
   }
 
   private onSelectionUpdated(e: any): void {
-    console.error('onSelectionUpdated');
-
     this.eventHandler.canvas = this.canvas;
 
     this.eventHandler.objectSelected(e.selected[0]);
