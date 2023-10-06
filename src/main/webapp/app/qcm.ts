@@ -104,8 +104,7 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
     // eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
     if (true) {
       const casesvideseleves = trouveCases(grayE, p.payload.preference);
-      const decalage = { x: 0, y: 0 }; // computeDecallage(casesvideseleves, res);
-
+      const decalage = /* { x: 0, y: 0 }; // */ computeDecallage(casesvideseleves, res);
       const dstE = applyTranslation(srcE, decalage);
       let results = analyseStudentSheet(res, src, dstE, p.payload.preference);
       let e = imageDataFromMat(dstE);
@@ -398,16 +397,28 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
   const cases_vides: any[] = [];
   let infos_cases: Map<number, any> = new Map<number, any>();
   const imgs_templatediffblank: Map<number, number> = new Map();
+  const gray = new cv.Mat();
+  cv.cvtColor(templateimage, gray, cv.COLOR_RGBA2GRAY, 0);
+  let thresh = new cv.Mat();
+  cv.threshold(gray, thresh, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
+  const gray_st = new cv.Mat();
+  cv.cvtColor(studentScanImage, gray_st, cv.COLOR_RGBA2GRAY, 0);
+  let thresh_st = new cv.Mat();
+  cv.threshold(gray_st, thresh_st, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
+
   casesExamTemplate.cases.forEach((case1: any, k: number) => {
-    const diff = diffCouleurAvecCaseBlanche(decoupe(templateimage, getPosition(case1), getDimensions(case1)));
+    const diff = diffCouleurAvecCaseBlanche(decoupe(thresh, getPosition(case1), getDimensions(case1)));
     imgs_templatediffblank.set(k, diff);
   });
+  gray.delete();
+  thresh.delete();
   casesExamTemplate.cases.forEach((case1: any, k: number) => {
     // Pour chaque (x,y) associé à une case du template, on récupère la zone située au même endroit sur la copie
     // et on la compare avec celle du template
 
-    const img_case_eleve = decoupe(studentScanImage, getPosition(case1), getDimensions(case1));
+    const img_case_eleve = decoupe(thresh_st, getPosition(case1), getDimensions(case1));
     const diff1 = diffCouleurAvecCaseBlanche(img_case_eleve);
+    //    img_case_eleve.delete();
     const diff = diff1 - imgs_templatediffblank.get(k)!;
     // console.error('diff',k,diff1-imgs_templatediffblank.get(k)!,diff1, imgs_templatediffblank.get(k));
     if (diff > preference.qcm_differences_avec_case_blanche) {
@@ -421,7 +432,7 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
       cv.putText(
         studentScanImage,
         '' + diff.toFixed(2),
-        { x: getPosition(case1).x, y: getPosition(case1).y - 10 },
+        { x: getPosition(case1).x, y: getPosition(case1).y + 10 },
         cv.FONT_HERSHEY_COMPLEX,
         0.5,
         new cv.Scalar(255, 0, 0, 128),
@@ -431,7 +442,7 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
       cv.putText(
         studentScanImage,
         '' + diff.toFixed(2),
-        { x: getPosition(case1).x, y: getPosition(case1).y - 10 },
+        { x: getPosition(case1).x, y: getPosition(case1).y + 10 },
         cv.FONT_HERSHEY_COMPLEX,
         0.33,
         new cv.Scalar(255, 0, 0, 128),
@@ -440,6 +451,8 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
     }
     img_case_eleve.delete();
   });
+  gray_st.delete();
+  thresh_st.delete();
 
   drawRectangle(studentScanImage, cases_remplies, new cv.Scalar(0, 255, 0, 128), 2);
   drawRectangle(studentScanImage, cases_vides, new cv.Scalar(0, 0, 255, 128), 2);
@@ -465,8 +478,8 @@ function computeDecallage(casesvideseleves: any, casesvidesexamtemplate: any): a
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (currentBox !== undefined) {
       // m.set(casevideeleve, currentBox)
-      let poseleve = getPosition(casevideeleve);
-      let posref = getPosition(currentBox);
+      let poseleve = getOrigPosition(casevideeleve);
+      let posref = getOrigPosition(currentBox);
       let decalage = { x: poseleve.x - posref.x, y: poseleve.y - posref.y };
       decalages.push(decalage);
     }
@@ -477,7 +490,7 @@ function computeDecallage(casesvideseleves: any, casesvidesexamtemplate: any): a
 function applyTranslation(src1: any, decalage: any): any {
   let dst = new cv.Mat();
   if (decalage.x !== 0 || decalage.y !== 0) {
-    let M = cv.matFromArray(2, 3, cv.CV_64FC1, [1, 0, -decalage.x, 0, 1, -decalage.y]);
+    let M = cv.matFromArray(2, 3, cv.CV_64FC1, [1, 0, +decalage.x, 0, 1, +decalage.y]);
     let dsize = new cv.Size(src1.cols, src1.rows);
     // You can try more different parameters
     cv.warpAffine(src1, dst, M, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
@@ -501,13 +514,11 @@ function __dist(case1: any, case2: any): number {
 
 // Renvoie un pourcentage de différences entre une image de case et une considérée comme vide
 function diffCouleurAvecCaseBlanche(img_case: any): number {
-  let gray = new cv.Mat();
-  cv.cvtColor(img_case, gray, cv.COLOR_RGBA2GRAY, 0);
-  let thresh = new cv.Mat();
-  cv.threshold(gray, thresh, 200, 255, cv.THRESH_BINARY);
-  const nonzerorationforeleve = 1.0 - cv.countNonZero(thresh) / (img_case.rows * img_case.cols);
-  gray.delete();
-  thresh.delete();
+  //  let gray = new cv.Mat();
+  //  cv.cvtColor(img_case, gray, cv.COLOR_RGBA2GRAY, 0);
+  //  let thresh = new cv.Mat();
+  //  cv.threshold(gray, thresh, 200, 255, cv.THRESH_BINARY);
+  const nonzerorationforeleve = 1.0 - cv.countNonZero(img_case) / (img_case.rows * img_case.cols);
   return nonzerorationforeleve;
 }
 
