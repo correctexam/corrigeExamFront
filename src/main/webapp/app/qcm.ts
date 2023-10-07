@@ -104,9 +104,13 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
     // eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
     if (true) {
       const casesvideseleves = trouveCases(grayE, p.payload.preference);
-      const decalage = computeDecallage(casesvideseleves, res);
-
-      const dstE = applyTranslation(srcE, decalage);
+      let dstE;
+      if (casesvideseleves !== undefined && casesvideseleves.cases !== undefined && casesvideseleves.cases.length > 0) {
+        const decalage = /* { x: 0, y: 0 }; // */ computeDecallage(casesvideseleves, res);
+        dstE = applyTranslation(srcE, decalage);
+      } else {
+        dstE = srcE;
+      }
       let results = analyseStudentSheet(res, src, dstE, p.payload.preference);
       let e = imageDataFromMat(dstE);
 
@@ -166,8 +170,8 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
 function getDimensions(forme: any): any {
   const rect = cv.boundingRect(forme);
   return {
-    w: rect.width + 8,
-    h: rect.height + 8,
+    w: rect.width,
+    h: rect.height,
   };
 }
 export function getOrigDimensions(forme: any): any {
@@ -178,6 +182,7 @@ export function getOrigDimensions(forme: any): any {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function __moy(coordonnees: any[]): any {
   if (coordonnees.length > 0) {
     let x_sum = 0;
@@ -192,9 +197,34 @@ function __moy(coordonnees: any[]): any {
   }
 }
 
+function __closest(coordonnees: any[]): any {
+  if (coordonnees.length > 0) {
+    const min = Math.min(
+      ...coordonnees.map(
+        item =>
+          Math.abs(item.deltaw) * Math.abs(item.deltaw) +
+          Math.abs(item.deltah) * Math.abs(item.deltah) +
+          Math.abs(item.x) +
+          Math.abs(item.y),
+      ),
+    );
+    const p = coordonnees.filter(
+      item =>
+        Math.abs(item.deltaw) * Math.abs(item.deltaw) +
+          Math.abs(item.deltah) * Math.abs(item.deltah) +
+          Math.abs(item.x) +
+          Math.abs(item.y) ===
+        min,
+    )[0];
+    return { x: p.x, y: p.y };
+  } else {
+    return { x: 0, y: 0 };
+  }
+}
+
 function getPosition(forme: any): any {
   const rect = cv.boundingRect(forme);
-  return { x: rect.x - 4, y: rect.y - 4 };
+  return { x: rect.x, y: rect.y };
 }
 
 export function getOrigPosition(forme: any): any {
@@ -256,8 +286,22 @@ function detectFormes(img: any, nomsFormes: string[] = [], preference: IPreferen
   // Filtrage des 'doublons' : opencv a souvent tendance à repérer 2 carrés (très proches) au lieu d'un
   const res: any[] = [];
   const todelete: any[] = [];
-  formes.forEach((x, i) => {
-    if (!faitDoublon(i, formes)) {
+  const tokeep: any[] = [];
+
+  formes.forEach(x => {
+    if (getOrigPosition(x).x === 0 && getOrigPosition(x).y === 0) {
+      todelete.push(x);
+    } else if (
+      ((getOrigDimensions(x).w * 100) / getOrigDimensions(img).w + (getOrigDimensions(x).h * 100) / getOrigDimensions(img).h) / 2 >
+      80
+    ) {
+      todelete.push(x);
+    } else {
+      tokeep.push(x);
+    }
+  });
+  tokeep.forEach((x, i) => {
+    if (!faitDoublon(i, tokeep)) {
       res.push(x);
     } else {
       todelete.push(x);
@@ -266,13 +310,14 @@ function detectFormes(img: any, nomsFormes: string[] = [], preference: IPreferen
   todelete.forEach(x => {
     x.delete();
   });
+
   return res;
 }
 
 // Comparaison personnalisée de positions (lecture haut-bas,gauche-droite)
 function __comparePosition(f1: any, f2: any): number {
-  let p1 = getPosition(f1);
-  let p2 = getPosition(f2);
+  let p1 = getOrigPosition(f1);
+  let p2 = getOrigPosition(f2);
   if (p1.y < p2.y) {
     return -1;
   } else if (p1.y > p2.y) {
@@ -284,8 +329,8 @@ function __comparePosition(f1: any, f2: any): number {
 
 // Comparaison personnalisée de positions (lecture haut-bas,gauche-droite)
 export function __comparePositionX(f1: any, f2: any): number {
-  let p1 = getPosition(f1);
-  let p2 = getPosition(f2);
+  let p1 = getOrigPosition(f1);
+  let p2 = getOrigPosition(f2);
   return p1.x - p2.x;
 }
 
@@ -295,10 +340,10 @@ function intersection(f1: any, f2: any): boolean {
 }
 
 function __f2Inf1(f1: any, f2: any): boolean {
-  let pos1 = getPosition(f1);
-  let pos2 = getPosition(f2);
-  let dim1 = getDimensions(f1);
-  let dim2 = getDimensions(f2);
+  let pos1 = getOrigPosition(f1);
+  let pos2 = getOrigPosition(f2);
+  let dim1 = getOrigDimensions(f1);
+  let dim2 = getOrigDimensions(f2);
   const inter_x = (pos2.x >= pos1.x && pos2.x <= pos1.x + dim1.w) || (pos2.x + dim2.w >= pos1.x && pos2.x + dim2.w <= pos1.x + dim1.w);
   const inter_y = (pos2.y >= pos1.y && pos2.y <= pos1.y + dim1.h) || (pos2.y + dim2.h >= pos1.y && pos2.y + dim2.h <= pos1.y + dim1.h);
   return inter_x && inter_y;
@@ -367,8 +412,8 @@ export function decoupe(img: any, pos: any, dims: any): any {
 function drawRectangle(img: any, formes: any, couleur: any = new cv.Scalar(255, 0, 0, 128), epaisseur = 2): any {
   // Attention on est ici en bgr et non en rgb
   formes.forEach((forme: any) => {
-    const pos = getPosition(forme);
-    const dim = getDimensions(forme);
+    const pos = getOrigPosition(forme);
+    const dim = getOrigDimensions(forme);
     //    dim.h = dim.h;
     //    dim.w = dim.w - 4;
     let pointMin = new cv.Point(pos.x, pos.y);
@@ -383,16 +428,28 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
   const cases_vides: any[] = [];
   let infos_cases: Map<number, any> = new Map<number, any>();
   const imgs_templatediffblank: Map<number, number> = new Map();
+  const gray = new cv.Mat();
+  cv.cvtColor(templateimage, gray, cv.COLOR_RGBA2GRAY, 0);
+  let thresh = new cv.Mat();
+  cv.threshold(gray, thresh, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
+  const gray_st = new cv.Mat();
+  cv.cvtColor(studentScanImage, gray_st, cv.COLOR_RGBA2GRAY, 0);
+  let thresh_st = new cv.Mat();
+  cv.threshold(gray_st, thresh_st, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
+
   casesExamTemplate.cases.forEach((case1: any, k: number) => {
-    const diff = diffCouleurAvecCaseBlanche(decoupe(templateimage, getPosition(case1), getDimensions(case1)));
+    const diff = diffCouleurAvecCaseBlanche(decoupe(thresh, getPosition(case1), getDimensions(case1)));
     imgs_templatediffblank.set(k, diff);
   });
+  gray.delete();
+  thresh.delete();
   casesExamTemplate.cases.forEach((case1: any, k: number) => {
     // Pour chaque (x,y) associé à une case du template, on récupère la zone située au même endroit sur la copie
     // et on la compare avec celle du template
 
-    const img_case_eleve = decoupe(studentScanImage, getPosition(case1), getDimensions(case1));
+    const img_case_eleve = decoupe(thresh_st, getPosition(case1), getDimensions(case1));
     const diff1 = diffCouleurAvecCaseBlanche(img_case_eleve);
+    //    img_case_eleve.delete();
     const diff = diff1 - imgs_templatediffblank.get(k)!;
     // console.error('diff',k,diff1-imgs_templatediffblank.get(k)!,diff1, imgs_templatediffblank.get(k));
     if (diff > preference.qcm_differences_avec_case_blanche) {
@@ -406,25 +463,27 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
       cv.putText(
         studentScanImage,
         '' + diff.toFixed(2),
-        { x: getPosition(case1).x, y: getPosition(case1).y - 5 },
+        { x: getPosition(case1).x, y: getPosition(case1).y + 10 },
         cv.FONT_HERSHEY_COMPLEX,
         0.5,
         new cv.Scalar(255, 0, 0, 128),
-        1
+        1,
       );
     } else {
       cv.putText(
         studentScanImage,
         '' + diff.toFixed(2),
-        { x: getPosition(case1).x, y: getPosition(case1).y - 5 },
+        { x: getPosition(case1).x, y: getPosition(case1).y + 10 },
         cv.FONT_HERSHEY_COMPLEX,
         0.33,
         new cv.Scalar(255, 0, 0, 128),
-        1
+        1,
       );
     }
     img_case_eleve.delete();
   });
+  gray_st.delete();
+  thresh_st.delete();
 
   drawRectangle(studentScanImage, cases_remplies, new cv.Scalar(0, 255, 0, 128), 2);
   drawRectangle(studentScanImage, cases_vides, new cv.Scalar(0, 0, 255, 128), 2);
@@ -434,6 +493,7 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
   return infos_cases;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function computeDecallage(casesvideseleves: any, casesvidesexamtemplate: any): any {
   const decalages: any[] = [];
   casesvideseleves.cases.forEach((casevideeleve: any) => {
@@ -449,13 +509,15 @@ function computeDecallage(casesvideseleves: any, casesvidesexamtemplate: any): a
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (currentBox !== undefined) {
       // m.set(casevideeleve, currentBox)
-      let poseleve = getPosition(casevideeleve);
-      let posref = getPosition(currentBox);
-      let decalage = { x: poseleve.x - posref.x, y: poseleve.y - posref.y };
+      const poseleve = getOrigPosition(casevideeleve);
+      const posref = getOrigPosition(currentBox);
+      const dimeleve = getOrigDimensions(casevideeleve);
+      const dimref = getOrigDimensions(currentBox);
+      const decalage = { x: poseleve.x - posref.x, y: poseleve.y - posref.y, deltaw: dimeleve.w - dimref.w, deltah: dimeleve.h - dimref.h };
       decalages.push(decalage);
     }
   });
-  return __moy(decalages);
+  return __closest(decalages);
 }
 
 function applyTranslation(src1: any, decalage: any): any {
@@ -485,12 +547,11 @@ function __dist(case1: any, case2: any): number {
 
 // Renvoie un pourcentage de différences entre une image de case et une considérée comme vide
 function diffCouleurAvecCaseBlanche(img_case: any): number {
-  let gray = new cv.Mat();
-  cv.cvtColor(img_case, gray, cv.COLOR_RGBA2GRAY, 0);
-  let thresh = new cv.Mat();
-  cv.threshold(gray, thresh, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
-  let nonzerorationforeleve = cv.countNonZero(thresh) / (img_case.rows * img_case.cols);
-
+  //  let gray = new cv.Mat();
+  //  cv.cvtColor(img_case, gray, cv.COLOR_RGBA2GRAY, 0);
+  //  let thresh = new cv.Mat();
+  //  cv.threshold(gray, thresh, 200, 255, cv.THRESH_BINARY);
+  const nonzerorationforeleve = 1.0 - cv.countNonZero(img_case) / (img_case.rows * img_case.cols);
   return nonzerorationforeleve;
 }
 

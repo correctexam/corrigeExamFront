@@ -340,6 +340,10 @@
     "withoutmarker": "No alignment marker",
     "withoutmarkertooltip": "No significant marker to align the pages (the algorithm will search for points of interest)",
     "pdfupload": "Loads the pdf file containing all the scanned copies",
-    "pdfchoisirfichier": "Choose pdf"
+    "pdfchoisirfichier": "Choose pdf",
+    "cleancachesession": "Problems logging in, click here to clear your browser's cache for this application",
+    "cleancachesessiondone": "The browser's cache has been cleared, you can try to reconnect.",
+    "libelle": "Question label",
+    "libelletooltip": "This allows you to give a label to a question (if required)"
   }
 }

@@ -163,13 +163,27 @@ export class PageHandler {
   }
 
   private addEventListeners(canvas: PagedCanvas): void {
-    canvas.on('mouse:down', e => this.onCanvasMouseDown(e));
-    canvas.on('mouse:move', e => this.onCanvasMouseMove(e));
-    canvas.on('mouse:up', () => this.onCanvasMouseUp());
-    canvas.on('selection:created', e => this.onSelectionCreated(e));
-    canvas.on('selection:updated', e => this.onSelectionUpdated(e));
-    canvas.on('selection:cleared', () => this.eventHandler.unselectObject());
-    canvas.on('object:modified', e => this.onObjectModified(e as CanvasModifiedEvent));
+    canvas.on('mouse:down', e => {
+      this.onCanvasMouseDown(e);
+    });
+    canvas.on('mouse:move', e => {
+      this.onCanvasMouseMove(e);
+    });
+    canvas.on('mouse:up', () => {
+      this.onCanvasMouseUp();
+    });
+    canvas.on('selection:created', e => {
+      this.onSelectionCreated(e);
+    });
+    canvas.on('selection:updated', e => {
+      this.onSelectionUpdated(e);
+    });
+    canvas.on('selection:cleared', () => {
+      this.eventHandler.unselectObject();
+    });
+    canvas.on('object:modified', e => {
+      this.onObjectModified(e as CanvasModifiedEvent);
+    });
   }
 
   private onCanvasMouseDown(event: IEvent<MouseEvent>): void {
@@ -189,8 +203,18 @@ export class PageHandler {
   }
 
   private onSelectionCreated(e: any): void {
-    this.eventHandler.canvas = this.canvas;
+    Array.from(this.eventHandler.allcanvas.values())
+      .filter(c => c !== this.canvas)
+      .forEach(c => {
+        c.discardActiveObject();
+        c.renderAll();
+      });
+    /*    if (this.eventHandler.canvas !== this.canvas){
+              this.eventHandler.canvas.discardActiveObject();
+              this.eventHandler.canvas.renderAll();
+    } */
 
+    this.eventHandler.canvas = this.canvas;
     this.eventHandler.objectSelected(e.selected[0]);
   }
 

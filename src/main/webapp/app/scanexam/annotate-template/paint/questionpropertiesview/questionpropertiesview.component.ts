@@ -27,13 +27,13 @@ export type EntityResponseType = HttpResponse<IQuestion>;
         'hidden',
         style({
           opacity: 0,
-        })
+        }),
       ),
       state(
         'visible',
         style({
           opacity: 1,
-        })
+        }),
       ),
       transition('visible => hidden', animate('400ms ease-in')),
       transition('hidden => visible', animate('400ms ease-out')),
@@ -86,7 +86,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
     private questionTypeService: QuestionTypeService,
     private fb: UntypedFormBuilder,
     private eventHandler: EventHandlerService,
-    private preferenceService: PreferenceService
+    private preferenceService: PreferenceService,
   ) {}
 
   public ngOnInit(): void {
@@ -97,6 +97,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       point: [pref.point],
       step: [pref.step],
       validExpression: [''],
+      libelle: [''],
       gradeType: [pref.gradeType],
       zoneId: [],
       typeId: [pref.typeId],
@@ -151,12 +152,13 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
         point: question.point,
         step: question.step,
         validExpression: question.validExpression,
+        libelle: question.libelle,
         gradeType: question.gradeType,
         typeId: question.typeId,
       },
       {
         emitEvent: false,
-      }
+      },
     );
 
     // Need to update the UI of the step list
@@ -171,6 +173,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       q.point = this.editForm.get(['point'])!.value;
       q.step = this.editForm.get(['step'])!.value;
       q.validExpression = this.editForm.get(['validExpression'])!.value;
+      q.libelle = this.editForm.get(['libelle'])!.value;
       q.gradeType = this.editForm.get(['gradeType'])!.value;
       q.typeId = this.editForm.get(['typeId'])!.value;
     });

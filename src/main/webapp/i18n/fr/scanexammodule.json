@@ -346,6 +346,10 @@
     "withoutmarker": "Sans marqueur d'alignement",
     "withoutmarkertooltip": "Sans marqueur significatif afin d'aligner les pages (l'algorithme cherchera par lui même des points d'intérêt)",
     "pdfupload": "Permet de charger le fichier pdf contenant l'ensemble des copies scannées",
-    "pdfchoisirfichier": "Choisir pdf de scan"
+    "pdfchoisirfichier": "Choisir pdf de scan",
+    "cleancachesession": "Des difficultés pour vous connecter, cliquer ici pour nettoyer le cache de votre navigateur lié à cette application",
+    "cleancachesessiondone": "Le nettoyage du cache est effectuée, vous pouvez essayer de vous reconnecter",
+    "libelle": "Intitulé de la question",
+    "libelletooltip": "Cela permet de mettre un intitulé pour une question"
   }
 }

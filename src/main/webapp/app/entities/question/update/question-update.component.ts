@@ -39,7 +39,7 @@ export class QuestionUpdateComponent implements OnInit {
     protected questionTypeService: QuestionTypeService,
     protected examService: ExamService,
     protected activatedRoute: ActivatedRoute,
-    private fb: UntypedFormBuilder
+    private fb: UntypedFormBuilder,
   ) {
     this.editForm = this.fb.group({
       id: [],
@@ -47,6 +47,7 @@ export class QuestionUpdateComponent implements OnInit {
       point: [],
       step: [],
       validExpression: [],
+      libelle: [],
       gradeType: [],
       zoneId: [],
       typeId: [],
@@ -63,7 +64,7 @@ export class QuestionUpdateComponent implements OnInit {
         .pipe(
           map((res: HttpResponse<IZone[]>) => {
             return res.body || [];
-          })
+          }),
         )
         .subscribe((resBody: IZone[]) => {
           if (!question.zoneId) {
@@ -74,7 +75,7 @@ export class QuestionUpdateComponent implements OnInit {
               .pipe(
                 map((subRes: HttpResponse<IZone>) => {
                   return subRes.body ? [subRes.body].concat(resBody) : resBody;
-                })
+                }),
               )
               .subscribe((concatRes: IZone[]) => (this.zones = concatRes));
           }
@@ -93,6 +94,7 @@ export class QuestionUpdateComponent implements OnInit {
       point: question.point,
       step: question.step,
       validExpression: question.validExpression,
+      libelle: question.libelle,
       gradeType: question.gradeType,
       zoneId: question.zoneId,
       typeId: question.typeId,
@@ -122,6 +124,7 @@ export class QuestionUpdateComponent implements OnInit {
       point: this.editForm.get(['point'])!.value,
       step: this.editForm.get(['step'])!.value,
       validExpression: this.editForm.get(['validExpression'])!.value,
+      libelle: this.editForm.get(['libelle'])!.value,
       gradeType: this.editForm.get(['gradeType'])!.value,
       zoneId: this.editForm.get(['zoneId'])!.value,
       typeId: this.editForm.get(['typeId'])!.value,
@@ -132,7 +135,7 @@ export class QuestionUpdateComponent implements OnInit {
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IQuestion>>): void {
     result.subscribe(
       () => this.onSaveSuccess(),
-      () => this.onSaveError()
+      () => this.onSaveError(),
     );
   }
 

@@ -277,23 +277,30 @@
       <div class="col-12 sm:col-12 md:col-12 lg:col-3 xl:col-2">
         <div class="grid grid-nogutter">
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
-            <p-rating
-              [disabled]="
-                currentQuestion !== undefined && (currentQuestion.gradeType !== 'DIRECT' || currentQuestion.typeAlgoName === 'QCM')
-              "
+            <div *ngIf="currentQuestion?.libelle !== undefined && currentQuestion?.libelle !== ''">
+              <span [tooltipPosition]="'top'" [pTooltip]="'scanexam.libelle' | translate">{{ currentQuestion?.libelle }}</span>
+              <BR />
+            </div>
+            <div
               *ngIf="
                 currentQuestion !== undefined &&
                 currentQuestion.gradeType === 'DIRECT' &&
                 noteSteps > 0 &&
                 currentQuestion.typeAlgoName !== 'QCM'
               "
-              [disabled]="blocked"
-              [stars]="noteSteps"
-              [(ngModel)]="currentNote"
-              (onRate)="changeNote()"
-              (onCancel)="changeNote()"
-            ></p-rating
-            ><BR />
+            >
+              <p-rating
+                [disabled]="
+                  currentQuestion !== undefined && (currentQuestion.gradeType !== 'DIRECT' || currentQuestion.typeAlgoName === 'QCM')
+                "
+                [disabled]="blocked"
+                [stars]="noteSteps"
+                [(ngModel)]="currentNote"
+                (onRate)="changeNote()"
+                (onCancel)="changeNote()"
+              ></p-rating
+              ><BR />
+            </div>
 
             <span jhiTranslate="scanexam.noteattribuee">Note attribuée : </span>
 

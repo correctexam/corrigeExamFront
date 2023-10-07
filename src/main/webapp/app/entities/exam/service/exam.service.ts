@@ -15,7 +15,10 @@ export class ExamService {
   protected resourceUrl: string;
   protected resourceUrlCustom: string;
 
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+  constructor(
+    protected http: HttpClient,
+    protected applicationConfigService: ApplicationConfigService,
+  ) {
     this.resourceUrl = this.applicationConfigService.getEndpointFor('api/exams');
     this.resourceUrlCustom = this.applicationConfigService.getEndpointFor('api/getExamStatus');
   }
@@ -101,6 +104,7 @@ export class ExamService {
 export interface QuestionStateDTO {
   id: number;
   numero: number;
+  libelle?: string;
   answeredSheets: number;
   firstUnmarkedSheet: number;
 }
