@@ -7,7 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { IQuestion } from 'app/entities/question/question.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
-import { Observable } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 
 // Couleurs à utiliser
@@ -82,7 +82,7 @@ export class StatsExamComponent implements OnInit {
   protected images: any[] = [];
   private noalign = false;
   private nbreFeuilleParCopie: number | undefined;
-
+  protected libelles: any;
   constructor(
     private applicationConfigService: ApplicationConfigService,
     private http: HttpClient,
@@ -182,6 +182,9 @@ export class StatsExamComponent implements OnInit {
 
   private async initStudents(): Promise<void> {
     this.infosStudents = await this.loadStudents();
+    this.libelles = await firstValueFrom(
+      this.http.get(this.applicationConfigService.getEndpointFor('api/getLibelleQuestions/' + this.examid)),
+    );
   }
 
   private requeteInfoQuestions(): Observable<HttpResponse<IQuestion[]>> {
@@ -203,7 +206,10 @@ export class StatsExamComponent implements OnInit {
       const numero = q.numero ?? 0;
       const bareme = q.point ?? 0;
       const labelBegin: string = this.translateService.instant('scanexam.questionLow');
-      const label = `${labelBegin} ${numero}`;
+      let label = `${labelBegin} ${numero}`;
+      if (this.libelles[numero] !== undefined && this.libelles[numero] !== '') {
+        label = label + '(' + this.libelles[numero] + ')';
+      }
       const notesAssociees: number[] = [];
       const quest_divisee = qn.find(quest => quest.label === label);
       if (quest_divisee === undefined) {

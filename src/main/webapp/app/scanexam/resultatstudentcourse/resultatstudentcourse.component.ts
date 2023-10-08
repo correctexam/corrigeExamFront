@@ -26,6 +26,7 @@ export class ResultatStudentcourseComponent implements OnInit {
   blocked = false;
   examid: string | undefined = undefined;
   studentsresult: any[] = [];
+  libelles: any;
   showEmail = false;
   mailSubject = '';
   mailBody = '';
@@ -63,6 +64,7 @@ export class ResultatStudentcourseComponent implements OnInit {
             this.mailabiBody = this.translate.instant('scanexam.mailabitemplate');
           });
           this.loadEtudiants();
+          this.loadLibelle();
         });
         this.translate.onLangChange.subscribe(() => {
           this.translate.get('scanexam.mailtemplate').subscribe(data => {
@@ -142,6 +144,15 @@ export class ResultatStudentcourseComponent implements OnInit {
     });
   }
 
+  loadLibelle(): void {
+    this.blocked = true;
+    this.http.get(this.applicationConfigService.getEndpointFor('api/getLibelleQuestions/' + this.examid)).subscribe(s => {
+      // eslint-disable-next-line no-console
+      this.libelles = s as any;
+      this.blocked = false;
+    });
+  }
+
   exportExcel(): void {
     import('xlsx').then(xlsx => {
       let maxQuestion = 0;
@@ -158,7 +169,11 @@ export class ResultatStudentcourseComponent implements OnInit {
       });
       this.studentsresult.forEach(res => {
         for (let i = 1; i <= maxQuestion; i++) {
-          res['Q' + i] = undefined;
+          if (this.libelles[i] !== undefined && this.libelles[i] !== '') {
+            res['Q' + i + ' (' + this.libelles[i] + ')'] = undefined;
+          } else {
+            res['Q' + i] = undefined;
+          }
         }
       });
 
@@ -172,7 +187,11 @@ export class ResultatStudentcourseComponent implements OnInit {
         for (const key in res.notequestions) {
           // eslint-disable-next-line no-prototype-builtins
           if (res.notequestions.hasOwnProperty(key)) {
-            res['Q' + key] = parseFloat(res.notequestions[key].replaceAll(',', '.'));
+            if (this.libelles[key] !== undefined && this.libelles[key] !== '') {
+              res['Q' + key + ' (' + this.libelles[key] + ')'] = parseFloat(res.notequestions[key].replaceAll(',', '.'));
+            } else {
+              res['Q' + key] = parseFloat(res.notequestions[key].replaceAll(',', '.'));
+            }
           }
         }
       });
