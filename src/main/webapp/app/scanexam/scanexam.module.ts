@@ -166,7 +166,7 @@ export const EXPORTPDF_ROUTE: Route = {
 
 export const EXPORTPDFBYSHEET_ROUTE: Route = {
   path: 'exportpdf/:examid/:sheetuid',
-  canActivate: [UserRouteAccessService],
+  //  canActivate: [UserRouteAccessService],
   component: ExportanonymoupdfComponent,
   data: {
     authorities: ['ROLE_USER'],

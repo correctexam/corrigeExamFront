@@ -377,7 +377,7 @@ export class EventHandlerService {
         });
     } else {*/
     this.canvas.renderAll();
-    //}
+    // }
   }
 
   private createZone(obj: CustomFabricObject): IZone {

@@ -84,6 +84,9 @@ export class ExportPdfService {
     }
 
     this.nbrPageInTemplate = await this.db.countPageTemplate(+this.examId);
+    if (this.nbrPageInTemplate === 0) {
+      this.nbrPageInTemplate = +(await firstValueFrom(this.cacheUploadService.getNbrePageInTemplate(+this.examId)));
+    }
     this.comments = await firstValueFrom(
       this.http.get<IComments[]>(this.applicationConfigService.getEndpointFor('api/getComments/' + this.examId)),
     );
@@ -102,21 +105,39 @@ export class ExportPdfService {
     return true;
   }
 
+  async putAlignImageInCache(examId: number, page: number): Promise<void> {
+    const pageInCache = await this.db.countAlignWithPageNumber(examId, page);
+    if (pageInCache === 0) {
+      const value = await firstValueFrom(this.cacheUploadService.getAlignImage(examId, page));
+      await this.db.addAligneImage({
+        // eslint-disable-next-line object-shorthand
+        examId: examId,
+        pageNumber: page,
+        value,
+      });
+    }
+  }
+
   processPage(sheet: Sheetspdf, index1: number): Promise<void> {
     return new Promise((resolve, reject) => {
       if (index1 > -1) {
         const begin = sheet.pagemin! + 1;
         const end = sheet.pagemax! + 1;
         const promises: Promise<number>[] = [];
-
-        this.db.getAlignImageBetweenAndSortByPageNumber(+this.examId, begin, end).then(e2 => {
-          e2.forEach((e, index) => {
-            const image = JSON.parse(e.value, this.reviver);
-            promises.push(this.loadImage(image.pages, e.pageNumber));
-          });
-          Promise.all(promises).then(e => {
-            this.startProcessingPage(sheet).then(() => {
-              this.exportPdf(sheet).then(() => resolve());
+        const checkPagePromises: Promise<void>[] = [];
+        for (let k = begin; k <= end; k++) {
+          checkPagePromises.push(this.putAlignImageInCache(+this.examId, k));
+        }
+        Promise.all(checkPagePromises).then(k => {
+          this.db.getAlignImageBetweenAndSortByPageNumber(+this.examId, begin, end).then(e2 => {
+            e2.forEach((e, index) => {
+              const image = JSON.parse(e.value, this.reviver);
+              promises.push(this.loadImage(image.pages, e.pageNumber));
+            });
+            Promise.all(promises).then(e => {
+              this.startProcessingPage(sheet).then(() => {
+                this.exportPdf(sheet).then(() => resolve());
+              });
             });
           });
         });
