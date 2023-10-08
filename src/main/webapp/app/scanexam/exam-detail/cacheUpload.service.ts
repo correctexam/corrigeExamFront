@@ -516,4 +516,10 @@ export class CacheUploadService {
       responseType: 'text',
     });
   }
+  getNbrePageInTemplate(examId: number): Observable<any> {
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+    return this.http.get(this.applicationConfigService.getEndpointFor('api/getCachePageInTemplate/' + examId), {
+      responseType: 'text',
+    });
+  }
 }
