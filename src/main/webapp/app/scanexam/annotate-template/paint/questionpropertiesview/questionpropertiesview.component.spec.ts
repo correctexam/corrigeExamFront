@@ -102,7 +102,7 @@ describe('QuestionpropertiesviewComponent', () => {
     mockQuestionTypeService = TestBed.inject(QuestionTypeService);
 
     mockQuestionTypeService.query = jest.fn(
-      (): Observable<HttpResponse<IQuestionType[]>> => of(new HttpResponse({ body: [{ algoName: 'foo' }, { algoName: 'bar' }] }))
+      (): Observable<HttpResponse<IQuestionType[]>> => of(new HttpResponse({ body: [{ algoName: 'foo' }, { algoName: 'bar' }] })),
     );
 
     await waitForAll();
@@ -170,7 +170,7 @@ describe('QuestionpropertiesviewComponent', () => {
           gradeType: selectedQ.gradeType,
           typeId: selectedQ.typeId,
         },
-        { emitEvent: false }
+        { emitEvent: false },
       );
       expect(component.isSaving).toBeFalsy();
       expect(mockEvtHandler.setCurrentQuestionNumber).not.toHaveBeenCalled();
@@ -194,7 +194,7 @@ describe('QuestionpropertiesviewComponent', () => {
       const input = fixture.debugElement.query(By.css('#field_numero')).nativeElement;
       const q1b = { ...selectedQ };
       q1b.numero = 3;
-      const q1c = { ...otherQ, id: 1, zoneId: 100 };
+      const q1c = { ...otherQ, id: 1, zoneId: 100, libelle: undefined };
       mockQuestionService.query = jest.fn((): Observable<HttpResponse<Array<IQuestion>>> => of(new HttpResponse({ body: [q1b, otherQ] })));
       mockQuestionService.update = jest
         .fn()
@@ -272,7 +272,7 @@ describe('QuestionpropertiesviewComponent', () => {
           gradeType: qs[0].gradeType,
           typeId: qs[0].typeId,
         },
-        { emitEvent: false }
+        { emitEvent: false },
       );
       expect(component.isSaving).toBeFalsy();
       expect(mockEvtHandler.setCurrentQuestionNumber).not.toHaveBeenCalled();
@@ -505,7 +505,7 @@ describe('QuestionpropertiesviewComponent', () => {
       component.manualid = 0;
       component.qcmid = 0;
       mockQuestionTypeService.query = jest.fn(
-        (): Observable<HttpResponse<IQuestionType[]>> => of(new HttpResponse({ body: [{ algoName: 'manual', id: 11 }] }))
+        (): Observable<HttpResponse<IQuestionType[]>> => of(new HttpResponse({ body: [{ algoName: 'manual', id: 11 }] })),
       );
 
       component.ngOnInit();
@@ -518,7 +518,7 @@ describe('QuestionpropertiesviewComponent', () => {
       component.manualid = 0;
       component.qcmid = 0;
       mockQuestionTypeService.query = jest.fn(
-        (): Observable<HttpResponse<IQuestionType[]>> => of(new HttpResponse({ body: [{ algoName: 'QCM', id: 12 }] }))
+        (): Observable<HttpResponse<IQuestionType[]>> => of(new HttpResponse({ body: [{ algoName: 'QCM', id: 12 }] })),
       );
 
       component.ngOnInit();
