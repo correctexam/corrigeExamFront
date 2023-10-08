@@ -63,6 +63,18 @@ import { DrawingTools } from '../annotate-template/paint/models';
   providers: [ConfirmationService, MessageService],
 })
 export class CorrigequestionComponent implements OnInit, AfterViewInit {
+  getQuestionTooltip(): string | undefined {
+    if (
+      this.questions &&
+      this.questions!.length > this.questionindex &&
+      this.questions![this.questionindex]?.libelle &&
+      this.questions![this.questionindex].libelle !== ''
+    ) {
+      return this.questions![this.questionindex].libelle!;
+    } else {
+      return 'Question ' + this.questionNumeros[this.questionindex];
+    }
+  }
   minimizeComment = false;
   layoutsidebarVisible = false;
   debug = false;
@@ -1693,6 +1705,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           height: e.imageAlignedHeight,
         };
         const im = new ImageData(new Uint8ClampedArray(apage.image!), apage.width, apage.height);
+        // TODO remove just align
         this.removeElementForPages(+this.examId!, e.pageNumber!, e.pageNumber!).then(
           () => {
             this.saveEligneImage(apage.page!, this.fgetBase64Image(im)).then(
@@ -1719,7 +1732,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async removeElementForPages(examId: number, pageStart: number, pageEnd: number): Promise<any> {
-    await this.db.removeElementForExamForPages(examId, pageStart, pageEnd);
+    await this.db.removePageAlignForExamForPages(examId, pageStart, pageEnd);
   }
   async saveEligneImage(pageN: number, imageString: string): Promise<void> {
     await this.db.addAligneImage({

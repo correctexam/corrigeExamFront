@@ -249,7 +249,8 @@
             (onPageChange)="changeQuestion($event)"
             [showJumpToPageDropdown]="true"
             [showPageLinks]="false"
-            [pTooltip]="'Question ' + questionNumeros[questionindex]"
+            [pTooltip]="getQuestionTooltip()"
+            [tooltipPosition]="'bottom'"
           ></p-paginator>
           <div></div>
         </div>
