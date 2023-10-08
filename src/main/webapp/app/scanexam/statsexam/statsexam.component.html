@@ -79,6 +79,8 @@
             [class]="questionSelectionnee && note.key == idQuestionSelected ? 'knobQuestion knobSelected' : 'knobQuestion'"
             tabindex="0"
             (click)="selectQuestion(note.key)"
+            [pTooltip]="libelles[note.key + 1]"
+            [tooltipPosition]="'top'"
             id="knobquest{{ note.key }}"
           >
             <h6>Question {{ note.key + 1 }}</h6>
