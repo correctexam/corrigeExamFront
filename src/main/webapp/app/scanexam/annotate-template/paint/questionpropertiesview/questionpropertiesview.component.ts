@@ -253,6 +253,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
           this.questions[0].point = this.questions[1].point;
           this.questions[0].step = this.questions[1].step;
           this.questions[0].typeId = this.questions[1].typeId;
+          this.questions[0].libelle = this.questions[1].libelle;
 
           return firstValueFrom(this.questionService.update(this.questions[0]));
         }
