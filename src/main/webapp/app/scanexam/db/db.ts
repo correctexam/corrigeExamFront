@@ -270,12 +270,13 @@ class ExamIndexDB extends Dexie {
   }
 
   async moveAlignPages(from: number, to: number) {
+    console.error('move', from, to);
     if (from !== to) {
       await this.alignImages
-        .where({ examId: this.examId })
-        .filter(e2 => e2.pageNumber === from)
+        .where({ examId: this.examId, pageNumber: from })
+        //        .filter(e2 => e2.pageNumber === from)
         .modify(i => {
-          i.pageNumber = -1000; // (very approximate formula...., but anyway...)
+          i.pageNumber = -1000;
         });
       if (from < to) {
         await this.alignImages
@@ -293,8 +294,8 @@ class ExamIndexDB extends Dexie {
           });
       }
       await this.alignImages
-        .where({ examId: this.examId })
-        .filter(e2 => e2.pageNumber === -1000)
+        .where({ examId: this.examId, pageNumber: -1000 })
+        //        .filter(e2 => e2.pageNumber === -1000)
         .modify(i => {
           i.pageNumber = to;
         });

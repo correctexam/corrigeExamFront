@@ -46,7 +46,7 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
   canvass: Map<number, HTMLCanvasElement> = new Map();
   colonneStyle = 'col-2 md:col-2';
   nbreColumn = 2;
-
+  candropordelete = true;
   @ViewChildren('nomImageVisible')
   canvassVisibles: QueryList<ElementRef> | undefined;
 
@@ -305,9 +305,13 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
 
     this.reloadImageClassify();
     if (this.alignPage) {
+      console.error('move from ', currentDragAndDrop, value);
+      this.candropordelete = false;
       await this.db.moveAlignPages(this.examId, currentDragAndDrop, value);
     } else {
+      this.candropordelete = false;
       await this.db.moveNonAlignPages(this.examId, currentDragAndDrop, value);
+      this.candropordelete = true;
     }
   }
 
@@ -324,6 +328,7 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
     }
 
     this.reloadImageClassify();
+    this.candropordelete = false;
     if (this.alignPage) {
       await this.db.moveAlignPages(this.examId, pageNumber, lastPage);
       await this.db.removePageAlignForExamForPages(this.examId, lastPage, lastPage);
@@ -331,6 +336,7 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
       await this.db.moveNonAlignPages(this.examId, pageNumber, lastPage);
       await this.db.removePageNonAlignForExamForPages(this.examId, lastPage, lastPage);
     }
+    this.candropordelete = true;
   }
 
   async _rotateImage(file: any, page1: number): Promise<number> {
@@ -409,6 +415,7 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
 
     // updateCache
     let images: ImageDB[] = [];
+    this.candropordelete = false;
     if (this.alignPage) {
       images = await this.db.getAlignImageBetweenAndSortByPageNumber(this.examId, pageNumber, pageNumber);
     } else {
@@ -420,6 +427,8 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
       const image = JSON.parse(e.value, this.reviver);
       promises.push(this._rotateImage(image.pages, e.pageNumber));
     });
+    this.candropordelete = true;
+
     await Promise.all(promises);
     this.reloadImageClassify();
   }
