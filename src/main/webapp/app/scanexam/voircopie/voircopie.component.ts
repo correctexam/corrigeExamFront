@@ -39,6 +39,7 @@ import { ApplicationConfigService } from 'app/core/config/application-config.ser
 import { HttpClient } from '@angular/common/http';
 import { CacheUploadService } from '../exam-detail/cacheUpload.service';
 import { TranslateService } from '@ngx-translate/core';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'jhi-voircopie',
@@ -71,10 +72,10 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   factor = 1;
   uuid = '';
   sheet: IExamSheet | undefined;
+  resolve: any;
   note = new Promise<number>(resolve => {
     this.resolve = resolve;
   });
-  resolve: any;
   currentTextComment4Question: ITextComment[] | undefined;
   currentGradedComment4Question: IGradedComment[] | undefined;
   currentZoneVoirCopieHandler: ZoneVoirCopieHandler | undefined;
@@ -141,13 +142,14 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
 
                 if (params.get('questionno') !== null) {
                   this.questionindex = +params.get('questionno')! - 1;
-                  this.populateBestSolutions();
 
                   // Step 1 Query templates
 
                   this.nbreFeuilleParCopie = this.sheet!.pagemax! - this.sheet!.pagemin! + 1;
                   // Step 2 Query Scan in local DB
-                  this.finalize();
+                  this.finalize().then(() => {
+                    this.populateBestSolutions();
+                  });
                 }
               });
           });
@@ -156,44 +158,41 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     });
   }
 
-  finalize() {
+  async finalize() {
     // this.courseService.find(this.exam!.courseId!).subscribe(e => (this.course = e.body!));
 
     // Step 4 Query zone 4 questions
     this.blocked = false;
-    this.questionService.query({ examId: this.exam!.id }).subscribe(b => {
-      this.questionNumeros = Array.from(new Set(b.body!.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
-      this.nbreQuestions = this.questionNumeros.length;
+    const b = await firstValueFrom(this.questionService.query({ examId: this.exam!.id }));
+    this.questionNumeros = Array.from(new Set(b.body!.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
+    this.nbreQuestions = this.questionNumeros.length;
 
-      this.questionService.query({ examId: this.exam!.id, numero: this.questionNumeros[this.questionindex] }).subscribe(q1 => {
-        this.questions = q1.body!;
-        this.showImage = new Array<boolean>(this.questions.length);
-
-        if (this.questions.length > 0) {
-          this.noteSteps = this.questions[0].point! * this.questions[0].step!;
-          this.questionStep = this.questions[0].step!;
-          this.maxNote = this.questions[0].point!;
-          this.currentQuestion = this.questions[0];
-
-          this.studentResponseService
-            .query({
-              sheetId: this.sheet!.id,
-              questionsId: this.questions.map(q => q.id),
-            })
-            .subscribe(sr => {
-              if (sr.body !== null && sr.body.length > 0) {
-                this.resp = sr.body![0];
-                this.currentNote = this.resp.note!;
-                if (this.questions![0].gradeType === GradeType.DIRECT && this.questions![0].typeAlgoName !== 'QCM') {
-                  this.currentTextComment4Question = this.resp.textcomments!;
-                } else {
-                  this.currentGradedComment4Question = this.resp.gradedcomments!;
-                }
-              }
-            });
+    const q1 = await firstValueFrom(
+      this.questionService.query({ examId: this.exam!.id, numero: this.questionNumeros[this.questionindex] }),
+    );
+    this.questions = q1.body!;
+    this.showImage = new Array<boolean>(this.questions.length);
+    if (this.questions.length > 0) {
+      this.noteSteps = this.questions[0].point! * this.questions[0].step!;
+      this.questionStep = this.questions[0].step!;
+      this.maxNote = this.questions[0].point!;
+      this.currentQuestion = this.questions[0];
+      const sr = await firstValueFrom(
+        this.studentResponseService.query({
+          sheetId: this.sheet!.id,
+          questionsId: this.questions.map(q => q.id),
+        }),
+      );
+      if (sr.body !== null && sr.body.length > 0) {
+        this.resp = sr.body![0];
+        this.currentNote = this.resp.note!;
+        if (this.questions![0].gradeType === GradeType.DIRECT && this.questions![0].typeAlgoName !== 'QCM') {
+          this.currentTextComment4Question = this.resp.textcomments!;
+        } else {
+          this.currentGradedComment4Question = this.resp.gradedcomments!;
         }
-      });
-    });
+      }
+    }
   }
 
   ngAfterViewInit(): void {

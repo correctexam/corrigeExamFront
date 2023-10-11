@@ -159,7 +159,6 @@ export class ExportPdfService {
           this.maskNameFirstName(this.canvass.get(page)!);
         }
       }
-
       await this.drawComments(sheet, page);
     }
   }
@@ -274,6 +273,15 @@ export class ExportPdfService {
       const dimensions = await this.getImageDimensions(imgData);
       pdf.addImage(imgData, 'JPEG', 0, 0, dimensions.width / (dimensions.width / 210), dimensions.height / (dimensions.height / 297));
       this.addTextOrGradedComments(pdf, page, sheet);
+      const page1 = page % this.nbrPageInTemplate;
+      if (page1 === 1) {
+        pdf.setTextColor('green');
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(16);
+
+        pdf.text('' + sheet.finalresult! / 100, 190, 10);
+      }
+
       if (page < sheet.pagemax! + 1) {
         pdf.addPage('a4', 'portrait');
       }

@@ -319,11 +319,11 @@ class ExamIndexDB extends Dexie {
   }
 
   async countNonAlignWithPageNumber(pageInscan: number) {
-    return await this.nonAlignImages.where({ examId: this.examId, pageInscan }).count();
+    return await this.nonAlignImages.where({ examId: this.examId, pageNumber: pageInscan }).count();
   }
 
   async countAlignWithPageNumber(pageInscan: number) {
-    return await this.alignImages.where({ examId: this.examId, pageInscan }).count();
+    return await this.alignImages.where({ examId: this.examId, pageNumber: pageInscan }).count();
   }
 }
 
