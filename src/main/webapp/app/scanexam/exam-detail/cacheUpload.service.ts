@@ -361,7 +361,6 @@ export class CacheUploadService {
           cacheDownloadNotification.setBlocked(false);
           cacheDownloadNotification.setMessage('');
           cacheDownloadNotification.setSubMessage('');
-
           return;
         }
       }
@@ -373,6 +372,7 @@ export class CacheUploadService {
       });
       cacheDownloadNotification.setBlocked(false);
       cacheDownloadNotification.setShowAssociation(true);
+      cacheDownloadNotification.setShowAlignement(true);
       cacheDownloadNotification.setShowCorrection(true);
     } else {
       cacheDownloadNotification.setBlocked(true);
@@ -406,6 +406,7 @@ export class CacheUploadService {
         });
         cacheDownloadNotification.setBlocked(false);
         cacheDownloadNotification.setShowAssociation(true);
+        cacheDownloadNotification.setShowAlignement(true);
         cacheDownloadNotification.setShowCorrection(true);
       }
     }

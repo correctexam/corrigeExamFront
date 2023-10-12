@@ -75,7 +75,7 @@ export class ExportPdfService {
     this.messageService = messageService;
     this.anonymous = anonymous;
     this.examId = examId;
-    this.upload = true;
+    this.upload = upload;
     let uri = 'api/exportpdf/' + this.examId;
     if (sheetuuid !== undefined) {
       uri = 'api/exportpdf4sheet/' + this.examId + '/' + sheetuuid;
@@ -98,7 +98,7 @@ export class ExportPdfService {
     );
 
     const exportPromises: Promise<void>[] = [];
-
+    console.error(this.examExport);
     this.examExport?.sheetspdf?.forEach((sheet, index1) => {
       exportPromises.push(this.processPage(sheet, index1));
     });
@@ -279,12 +279,12 @@ export class ExportPdfService {
       const dimensions = await this.getImageDimensions(imgData);
       pdf.addImage(imgData, 'JPEG', 0, 0, dimensions.width / (dimensions.width / 210), dimensions.height / (dimensions.height / 297));
       this.addTextOrGradedComments(pdf, page, sheet);
-      const page1 = page % this.nbrPageInTemplate;
+      //      const page1 = page % this.nbrPageInTemplate;
+      const page1 = this.nbrPageInTemplate === 1 ? 1 : page % this.nbrPageInTemplate;
       if (page1 === 1) {
         pdf.setTextColor('green');
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(16);
-
         pdf.text('' + sheet.finalresult! / 100, 190, 10);
       }
 
@@ -383,14 +383,14 @@ export class ExportPdfService {
           } else if (currentQ.gradeType === GradeType.POSITIVE) {
             content =
               '+' +
-              (gc.grade! * this.questionMap.get(resp1.questionID!)!.point!) / this.questionMap.get(resp1.questionID!)!.step! +
-              'pt' +
+              gc.grade! /* * this.questionMap.get(resp1.questionID!)!.point! */ / this.questionMap.get(resp1.questionID!)!.step! +
+              'pt\n' +
               (gc.description ? gc.description : '');
           } else {
             content =
               '-' +
-              (gc.grade! * this.questionMap.get(resp1.questionID!)!.point!) / this.questionMap.get(resp1.questionID!)!.step! +
-              'pt' +
+              gc.grade! /**this.questionMap.get(resp1.questionID!)!.point! */ / this.questionMap.get(resp1.questionID!)!.step! +
+              'pt\n' +
               (gc.description ? gc.description : '');
           }
 
