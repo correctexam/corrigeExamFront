@@ -238,6 +238,20 @@
                 >Retourner à l'exam</span
               >
             </button>
+
+            <button
+              [disabled]="!this.examId"
+              type="submit"
+              id="save-entity"
+              data-cy="entityCreateSaveButton"
+              class="p-button p-button-primary mr-5"
+              (click)="gotoMarkingSummary()"
+              [disabled]="blocked"
+              [pTooltip]="'scanexam.gotolistquestion' | translate"
+              [tooltipPosition]="'bottom'"
+            >
+              <fa-icon icon="list"></fa-icon>
+            </button>
           </div>
         </div>
         <div class="d-flex justify-content-center" ng-if="questionnofirst !== -1">

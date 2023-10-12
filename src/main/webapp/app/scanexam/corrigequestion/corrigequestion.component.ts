@@ -1182,6 +1182,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.router.navigateByUrl('/exam/' + this.examId!);
   }
 
+  gotoMarkingSummary(): void {
+    this.cleanCanvassCache();
+    this.router.navigateByUrl('/marking-summary/' + this.examId!);
+  }
+
   async refreshStudentList(force: boolean): Promise<void> {
     await new Promise<void>(res => {
       if (force || this.students === undefined || this.students.length === 0) {
