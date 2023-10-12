@@ -400,8 +400,8 @@ export class ExportPdfService {
             bounds: {
               x: 0,
               y: (this.questionMap.get(resp1.questionID!)!.zonepdf!.YInit! * 297) / coefficient + decallage,
-              w: 200,
-              h: 80,
+              w: 100,
+              h: 5,
             },
             contents: content,
             open: false,
@@ -415,8 +415,8 @@ export class ExportPdfService {
             bounds: {
               x: 0,
               y: (this.questionMap.get(resp1.questionID!)!.zonepdf!.YInit! * 297) / coefficient + decallage,
-              w: 200,
-              h: 80,
+              w: 100,
+              h: 5,
             },
             contents: '' + tc.description,
             open: false,
