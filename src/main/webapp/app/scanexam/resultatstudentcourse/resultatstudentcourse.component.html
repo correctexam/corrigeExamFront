@@ -35,7 +35,7 @@
         <label jhiTranslate="scanexam.envoipdf">Envoi de la copie en pdf:</label>
         <p-checkbox [binary]="true" [(ngModel)]="mailpdf" [style]="{ width: '100%' }" />
       </div>
-      <div class="col-12">
+      <div *ngIf="!currentStudentMail" class="col-12">
         <label jhiTranslate="scanexam.envoiabi">Envoi du mail aux absents:</label>
         <p-checkbox [binary]="true" [(ngModel)]="mailabi" [style]="{ width: '100%' }" />
       </div>
@@ -133,6 +133,7 @@
             <th jhiTranslate="scanexam.lienprof">LIEN PROF</th>
             <th jhiTranslate="scanexam.lieneleve">LIEN</th>
             <th jhiTranslate="scanexam.lienelevepdf">LIEN</th>
+            <th jhiTranslate="scanexam.envoimailpersonal">Envoi Mail</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-student>
@@ -155,6 +156,20 @@
               <a target="_blank" href="{{ 'exportpdf/' + examid! + '/' + student.uuid }}" jhiTranslate="scanexam.pdf">pdf</a>
             </td>
             <td *ngIf="student.abi">ABI</td>
+            <td *ngIf="!student.abi">
+              <button
+                type="submit"
+                id="save-entity"
+                data-cy="entityCreateSaveButton"
+                class="p-button p-button-primary mr-5"
+                [pTooltip]="'scanexam.sendirectemail' | translate"
+                [tooltipPosition]="'left'"
+                (click)="showEmailSt(student)"
+              >
+                <fa-icon icon="envelope"></fa-icon>
+              </button>
+            </td>
+            <td *ngIf="student.abi"></td>
           </tr>
         </ng-template>
       </p-table>

@@ -351,6 +351,8 @@
     "cleancachesessiondone": "Le nettoyage du cache est effectuée, vous pouvez essayer de vous reconnecter",
     "libelle": "Intitulé de la question",
     "libelletooltip": "Cela permet de mettre un intitulé pour une question",
-    "gotolistquestion": "Retourner à la liste des questions (résumé de l'état de la correction)"
+    "gotolistquestion": "Retourner à la liste des questions (résumé de l'état de la correction)",
+    "sendirectemail": "Envoi d'un email avec les résultats pour cet étudiant",
+    "envoimailpersonal": "Envoi Email"
   }
 }

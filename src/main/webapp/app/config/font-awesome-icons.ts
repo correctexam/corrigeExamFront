@@ -49,6 +49,7 @@ import {
   faImage,
   faRotateRight,
   faTrash,
+  faEnvelope,
 
   // jhipster-needle-add-icon-import
 } from '@fortawesome/free-solid-svg-icons';
@@ -104,6 +105,7 @@ export const fontAwesomeIcons = [
   faImage,
   faRotateRight,
   faTrash,
+  faEnvelope,
 
   // jhipster-needle-add-icon-import
 ];

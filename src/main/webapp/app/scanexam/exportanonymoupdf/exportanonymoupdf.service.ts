@@ -38,7 +38,7 @@ export class ExportPdfService {
   examId = '';
   scan!: IScan;
   scale = 2;
-  sheetuid: string | undefined;
+  upload = true;
   nbrPageInTemplate = 0;
   nbrPageInExam = 0;
   examExport: ExportPDFDto | undefined;
@@ -65,13 +65,19 @@ export class ExportPdfService {
     private db: CacheServiceImpl,
   ) {}
 
-  async generatePdf(examId: string, messageService: MessageService, anonymous: boolean, sheetuuid?: string): Promise<boolean> {
+  async generatePdf(
+    examId: string,
+    messageService: MessageService,
+    anonymous: boolean,
+    upload: boolean,
+    sheetuuid?: string,
+  ): Promise<boolean> {
     this.messageService = messageService;
     this.anonymous = anonymous;
     this.examId = examId;
+    this.upload = true;
     let uri = 'api/exportpdf/' + this.examId;
     if (sheetuuid !== undefined) {
-      this.sheetuid = sheetuuid;
       uri = 'api/exportpdf4sheet/' + this.examId + '/' + sheetuuid;
     }
 
@@ -287,7 +293,7 @@ export class ExportPdfService {
       }
       this.canvass.delete(page)!;
     }
-    if (!this.sheetuid) {
+    if (this.upload) {
       const blob = new Blob([pdf.output('blob')], { type: 'application/pdf' });
       await this.cacheUploadService.uploadStudentPdf(blob, +this.examId, this.translateService, this.messageService, sheet.name! + '.pdf', {
         setMessage(v: string): void {

@@ -31,7 +31,7 @@ export class ResultatStudentcourseComponent implements OnInit {
   mailSubject = '';
   mailBody = '';
   mailabiBody = '';
-
+  currentStudentMail: any;
   mailabi = false;
   mailpdf = false;
   exam: IExam | undefined;
@@ -80,6 +80,12 @@ export class ResultatStudentcourseComponent implements OnInit {
   }
 
   showEmailStudent(): void {
+    this.currentStudentMail = undefined;
+    this.showEmail = true;
+  }
+
+  showEmailSt(st: any): void {
+    this.currentStudentMail = st;
     this.showEmail = true;
   }
 
@@ -90,16 +96,18 @@ export class ResultatStudentcourseComponent implements OnInit {
       mailabi: this.mailabi,
       mailpdf: this.mailpdf,
       bodyabi: this.mailabiBody,
+      sheetuuid: this.currentStudentMail?.uuid,
     };
     this.blocked = true;
     let res = true;
     if (this.mailpdf) {
-      res = await this.exportPdfService.generatePdf(this.examid!, this.messageService, false);
+      res = await this.exportPdfService.generatePdf(this.examid!, this.messageService, false, true, this.currentStudentMail?.uuid);
     }
     try {
       if (res) {
         await firstValueFrom(this.http.post(this.applicationConfigService.getEndpointFor('api/sendResult/' + this.examid), mail));
         this.showEmail = false;
+        this.currentStudentMail = undefined;
         this.translate.get('scanexam.mailsent').subscribe(data => {
           this.blocked = false;
           this.messageService.add({
@@ -110,6 +118,8 @@ export class ResultatStudentcourseComponent implements OnInit {
         });
       } else {
         this.showEmail = false;
+        this.currentStudentMail = undefined;
+
         this.translate.get('scanexam.mailnotsent').subscribe(data => {
           this.blocked = false;
           this.messageService.add({
@@ -121,7 +131,7 @@ export class ResultatStudentcourseComponent implements OnInit {
       }
     } catch (e: any) {
       this.showEmail = false;
-
+      this.currentStudentMail = undefined;
       this.translate.get('scanexam.mailnotsent').subscribe(data => {
         this.blocked = false;
         this.messageService.add({
