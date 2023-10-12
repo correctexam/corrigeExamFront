@@ -344,6 +344,7 @@
     "cleancachesession": "Problems logging in, click here to clear your browser's cache for this application",
     "cleancachesessiondone": "The browser's cache has been cleared, you can try to reconnect.",
     "libelle": "Question label",
-    "libelletooltip": "This allows you to give a label to a question (if required)"
+    "libelletooltip": "This allows you to give a label to a question (if required)",
+    "gotolistquestion": "Go back to question list"
   }
 }

@@ -350,6 +350,7 @@
     "cleancachesession": "Des difficultés pour vous connecter, cliquer ici pour nettoyer le cache de votre navigateur lié à cette application",
     "cleancachesessiondone": "Le nettoyage du cache est effectuée, vous pouvez essayer de vous reconnecter",
     "libelle": "Intitulé de la question",
-    "libelletooltip": "Cela permet de mettre un intitulé pour une question"
+    "libelletooltip": "Cela permet de mettre un intitulé pour une question",
+    "gotolistquestion": "Retourner à la liste des questions (résumé de l'état de la correction)"
   }
 }
