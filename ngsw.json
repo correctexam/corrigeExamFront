@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1697092551564,
+  "timestamp": 1697096003789,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -263,7 +263,7 @@
     "/content/images/trash.svg": "a475dcbb1f7e1845f4ff36506ae76ef56e6946e7",
     "/content/images/trash1.png": "8b29087d9012b6b9942c958cdf7eef69283471ba",
     "/content/images/upload-solid.svg": "f6bfe3a97fa3e71a4441b64b1936586f24a5ea88",
-    "/content/latex-template.zip": "51785eb18c83fb1dad4310e93f6dbf744891c67f",
+    "/content/latex-template.zip": "5a670dda5abc76bba2e87aadb57b55ece0ce0a5a",
     "/content/opencv/4/loader.js": "1e7e3d0af6e4693c33a5431f1f44e2825dab8eac",
     "/content/opencv/4/opencv.js": "c6546391826a75d8c58f6ea27f1a1abbcbbb11ce",
     "/content/opencv/4/opencv_js.js": "f3b7b3bfae9cc0cea77ce0722ff7ffac2058b336",
