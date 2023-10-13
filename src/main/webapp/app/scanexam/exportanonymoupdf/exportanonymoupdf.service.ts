@@ -389,7 +389,7 @@ export class ExportPdfService {
           } else {
             content =
               '-' +
-              gc.grade! /**this.questionMap.get(resp1.questionID!)!.point! */ / this.questionMap.get(resp1.questionID!)!.step! +
+              gc.grade! /* *this.questionMap.get(resp1.questionID!)!.point! */ / this.questionMap.get(resp1.questionID!)!.step! +
               'pt\n' +
               (gc.description ? gc.description : '');
           }
@@ -401,7 +401,7 @@ export class ExportPdfService {
               x: 0,
               y: (this.questionMap.get(resp1.questionID!)!.zonepdf!.YInit! * 297) / coefficient + decallage,
               w: 100,
-              h: 5,
+              h: 10, // to fix a bug in chromium
             },
             contents: content,
             open: false,
@@ -416,7 +416,7 @@ export class ExportPdfService {
               x: 0,
               y: (this.questionMap.get(resp1.questionID!)!.zonepdf!.YInit! * 297) / coefficient + decallage,
               w: 100,
-              h: 5,
+              h: 10, // to fix a bug in chromium
             },
             contents: '' + tc.description,
             open: false,
