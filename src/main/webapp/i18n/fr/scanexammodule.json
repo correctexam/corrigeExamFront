@@ -353,6 +353,8 @@
     "libelletooltip": "Cela permet de mettre un intitulé pour une question",
     "gotolistquestion": "Retourner à la liste des questions (résumé de l'état de la correction)",
     "sendirectemail": "Envoi d'un email avec les résultats pour cet étudiant",
-    "envoimailpersonal": "Envoi Email"
+    "envoimailpersonal": "Envoi Email",
+    "concatenation": "Fusion (concaténation) au pdf du scan prélablement chargé:",
+    "concatenationTooltip": "Permet de décider si on fait un pdf résultant de la concatenation du pdf existant et du nouveau pdf ou si l'on remplace le pdf de scan précédent (coché veut dire concaténation)"
   }
 }

@@ -77,7 +77,8 @@ export class ChargerscanComponent implements OnInit {
   pageInScan = 0;
   message = '';
   reloadScan = false;
-
+  merge = true;
+  saveTemplate = true;
   observablePage: Observable<number> | undefined;
   observerPage: Subscriber<number> | undefined;
 
@@ -93,6 +94,7 @@ export class ChargerscanComponent implements OnInit {
   currentStudent = 0;
   nbreFeuilleParCopie = 2;
   numberPagesInScan = 0;
+  firstPageToLoad = 0;
   // Change if partial update
   currentPageAlign = 1;
   // Change if partial update
@@ -206,10 +208,10 @@ export class ChargerscanComponent implements OnInit {
 
   onUpload($event: any): void {
     if ($event.files && $event.files.length > 0) {
-      this.uploadCache($event.files[0]);
+      this.uploadScan($event.files[0]);
     }
   }
-  uploadCache(file: File): void {
+  uploadScan(file: File): void {
     this.message = this.translateService.instant('scanexam.importencours');
     this.blocked = true;
 
@@ -239,7 +241,7 @@ export class ChargerscanComponent implements OnInit {
           this.exam.scanfileId = e.body?.id;
 
           this.examService.update(this.exam).subscribe(() => {
-            this.pipeToSaveResponse(this.scanService.uploadScan(formData, e.body?.id!));
+            this.pipeToSaveResponse(this.scanService.uploadScan(formData, e.body?.id!, this.merge));
           });
         });
     } else {
@@ -250,7 +252,9 @@ export class ChargerscanComponent implements OnInit {
         })
         .subscribe(e => {
           this.exam.scanfileId = e.body?.id;
-          this.examService.update(this.exam).subscribe(() => this.pipeToSaveResponse(this.scanService.uploadScan(formData, e.body?.id!)));
+          this.examService
+            .update(this.exam)
+            .subscribe(() => this.pipeToSaveResponse(this.scanService.uploadScan(formData, e.body?.id!, this.merge)));
         });
     }
   }
@@ -277,7 +281,7 @@ export class ChargerscanComponent implements OnInit {
   }
 
   protected onSaveSuccess(): void {
-    this.initCacheProcessing();
+    this.initCacheProcessing(false);
     this.reloadScan = false;
     //    this.gotoUE();
   }
@@ -327,11 +331,14 @@ export class ChargerscanComponent implements OnInit {
   async removeElement(examId: number): Promise<any> {
     await this.db.removeElementForExam(examId);
   }
-  async removeElementForPages(examId: number, pageStart: number, pageEnd: number): Promise<any> {
-    await this.db.removeElementForExamForPages(examId, pageStart, pageEnd);
-  }
 
-  public async initCacheProcessing(): Promise<void> {
+  public async initCacheProcessing(removeCache: boolean): Promise<void> {
+    this.saveTemplate = removeCache;
+
+    const pageCacheInTemplate = await this.db.countPageTemplate(+this.examid!);
+    if (pageCacheInTemplate === 0) {
+      this.saveTemplate = true;
+    }
     this.translateService.get('scanexam.loadingscan').subscribe(res => (this.message = '' + res));
     this.blocked = true;
 
@@ -348,7 +355,11 @@ export class ChargerscanComponent implements OnInit {
     if (this.exam.templateId) {
       //      const e1 = await firstValueFrom(this.templateService.find(this.exam.templateId));
       // this.template = e1.body!;
-      await this.removeElement(+this.examid!);
+      if (removeCache || !this.merge) {
+        await this.removeElement(+this.examid!);
+      } else {
+        this.firstPageToLoad = await this.db.countNonAlignImage(+this.examid!);
+      }
       const e1 = await firstValueFrom(this.templateService.getPdf(this.exam.templateId));
       this.blob1 = e1;
     }
@@ -386,18 +397,7 @@ export class ChargerscanComponent implements OnInit {
           if (this.exam.scanfileId) {
             if (this.blob !== undefined) {
               this.blob1 = this.blob;
-
-              /*              const reader = new FileReader();
-              console.error(this.blob);
-              reader.readAsDataURL(this.blob);
-              reader.onloadend = ()=> {
-                console.error(reader.result)
-                this.pdfcontent = (reader.result as string).split(',')[1];;
-                this.blob = undefined
-              }*/
             } else {
-              // const loadedscan = (await firstValueFrom(this.scanService.find(this.exam.scanfileId))).body!;
-              // this.pdfcontent = loadedscan.content!;
               const e1 = await firstValueFrom(this.scanService.getPdf(this.exam.scanfileId));
               this.blob1 = e1;
             }
@@ -420,6 +420,7 @@ export class ChargerscanComponent implements OnInit {
           this.blob = undefined;
           this.blob1 = undefined;
           this.blocked = false;
+          this.firstPageToLoad = 0;
           if (this.viewcomponent !== undefined) {
             this.viewcomponent.update();
           } else {
@@ -453,22 +454,24 @@ export class ChargerscanComponent implements OnInit {
   }
 
   async saveTemplateImage(pageN: number, imageD: any): Promise<void> {
-    await this.db.addTemplate({
-      examId: +this.examid!,
-      pageNumber: pageN,
-      value: JSON.stringify(
-        {
-          pages: imageD,
-        },
-        this.replacer,
-      ),
-    });
+    if (this.saveTemplate) {
+      await this.db.addTemplate({
+        examId: +this.examid!,
+        pageNumber: pageN,
+        value: JSON.stringify(
+          {
+            pages: imageD,
+          },
+          this.replacer,
+        ),
+      });
+    }
   }
 
   async saveNonAligneImage(pageN: number, imageD: any): Promise<void> {
     await this.db.addNonAligneImage({
       examId: +this.examid!,
-      pageNumber: pageN,
+      pageNumber: pageN + this.firstPageToLoad,
       value: JSON.stringify(
         {
           pages: imageD,

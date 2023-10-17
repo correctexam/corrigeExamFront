@@ -58,7 +58,7 @@
             id="save-entity"
             data-cy="entityCreateSaveButton"
             class="p-button p-button-primary"
-            (click)="initCacheProcessing()"
+            (click)="initCacheProcessing(true)"
             [pTooltip]="'scanexam.initCacheProcessing' | translate"
             [tooltipPosition]="'bottom'"
           >
@@ -69,34 +69,22 @@
     </div>
     <div *ngIf="reloadScan || pageInTemplate === 0 || pageInScan === 0">
       <div class="col-12 md:col-12">
-        <div class="row mb-3">
-          <!--          <label class="form-label" jhiTranslate="gradeScopeIsticApp.scan.content" for="field_content">Content</label>-->
-          <div>
-            <!-- <div *ngIf="editForm.get('content')!.value" class="form-text text-danger clearfix">
-                <a
-                  class="pull-start"
-                  (click)="openFile(editForm.get('content')!.value, editForm.get('contentContentType')!.value)"
-                  jhiTranslate="entity.action.open"
-                  >open</a
-                ><br />
-                <span class="pull-start"
-                  >{{ editForm.get('contentContentType')!.value }}, {{ byteSize(editForm.get('content')!.value) }}</span
-                >
-                <button
-                  type="button"
-                  (click)="editForm.patchValue({ content: null }); editForm.patchValue({ contentContentType: null })"
-                  class="btn btn-secondary btn-xs pull-end"
-                >
-                  <fa-icon icon="times"></fa-icon>
-                </button>
-              </div> -->
-            <!--<input
-                type="file"
-                id="file_content"
-                data-cy="content"
-                (change)="setFileData($event, 'content', false)"
-                jhiTranslate="entity.action.addblob"
-              />-->
+        <!--            <p-toggleButton [(ngModel)]="merge" onLabel="Concatenation" offLabel="Remplacement"></p-toggleButton>-->
+        <div class="flex flex-row flex-wrap card-container blue-container">
+          <div class="flex align-items-center justify-content-center font-bold border-round m-2">
+            <label
+              for="switch1"
+              jhiTranslate="scanexam.concatenation"
+              [pTooltip]="'scanexam.concatenationTooltip' | translate"
+              [tooltipPosition]="'bottom'"
+              >Concaténation au scan déjà chargé:</label
+            >
+          </div>
+
+          <div class="flex align-items-center justify-content-center font-bold text-white border-round m-2">
+            <p-inputSwitch inputId="switch1" [(ngModel)]="merge"></p-inputSwitch>
+          </div>
+          <div class="flex align-items-center justify-content-center border-round m-2">
             <p-fileUpload
               [chooseIcon]="''"
               [chooseStyleClass]="'p-button p-button-primary'"
@@ -114,20 +102,6 @@
             ></p-fileUpload>
           </div>
         </div>
-
-        <!--  <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="gotoUE()">
-            <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-          </button>
-
-          <button
-            type="submit"
-            id="save-entity"
-            data-cy="entityCreateSaveButton"
-            [disabled]="editForm.invalid || isSaving"
-            class="p-button p-button-primary"
-          >
-            <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-          </button>-->
       </div>
     </div>
     <jhi-viewandreorderpages
@@ -136,14 +110,7 @@
       [examId]="+examid!"
     ></jhi-viewandreorderpages>
   </div>
-  <!--  <div class="lg:col-4 xl:col-4 overflow-hidden sm:hidden md:hidden lg:flex xl:flex">
-    <img
-      src="content/images/bannerright.jpg"
-      alt="Image"
-      class="md:ml-auto block md:h-full"
-      style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
-    />
-  </div>-->
+
   <div class="canvas-wrapper foo">
     <ngx-extended-pdf-viewer
       [hidden]="'true'"
