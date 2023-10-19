@@ -347,6 +347,8 @@
     "libelletooltip": "This allows you to give a label to a question (if required)",
     "gotolistquestion": "Go back to question list",
     "sendirectemail": "Send an email with the results for this student",
-    "envoimailpersonal": "Send email"
+    "envoimailpersonal": "Send email",
+    "concatenation": "Merge to already loaded scan:",
+    "concatenationTooltip": "Configure whether to create a pdf by merging (concatenating) the existing pdf and the new pdf or to replace the previous scan pdf with the new one (ticked means concatenation)."
   }
 }

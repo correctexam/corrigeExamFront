@@ -46,12 +46,20 @@ export class ScanService {
     return this.http.put<IScan>(`${this.resourceUrl}`, scan, { reportProgress: true, observe: 'events' } /* { observe: 'response' }*/);
   }
 
-  uploadScan(formData: FormData, scanId: number): Observable<HttpEvent<any>> {
-    return this.http.post(`${this.applicationConfigService.getEndpointFor('api/uploadScan')}/${scanId} `, formData, {
-      reportProgress: true,
-      responseType: 'json',
-      observe: 'events',
-    });
+  uploadScan(formData: FormData, scanId: number, merge: boolean): Observable<HttpEvent<any>> {
+    if (merge) {
+      return this.http.post(`${this.applicationConfigService.getEndpointFor('api/uploadAndMergeScan')}/${scanId} `, formData, {
+        reportProgress: true,
+        responseType: 'json',
+        observe: 'events',
+      });
+    } else {
+      return this.http.post(`${this.applicationConfigService.getEndpointFor('api/uploadScan')}/${scanId} `, formData, {
+        reportProgress: true,
+        responseType: 'json',
+        observe: 'events',
+      });
+    }
   }
 
   partialUpdate(scan: IScan): Observable<EntityResponseType> {
