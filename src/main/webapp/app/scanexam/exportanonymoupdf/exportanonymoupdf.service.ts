@@ -389,7 +389,7 @@ export class ExportPdfService {
           } else {
             content =
               '-' +
-              gc.grade! /**this.questionMap.get(resp1.questionID!)!.point! */ / this.questionMap.get(resp1.questionID!)!.step! +
+              gc.grade! /* *this.questionMap.get(resp1.questionID!)!.point! */ / this.questionMap.get(resp1.questionID!)!.step! +
               'pt\n' +
               (gc.description ? gc.description : '');
           }

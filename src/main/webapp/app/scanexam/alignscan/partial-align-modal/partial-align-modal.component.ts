@@ -18,7 +18,14 @@ export class PartialAlignModalComponent implements OnInit {
     public config: DynamicDialogConfig,
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (this.config.data?.startPage) {
+      this.startPage = this.config.data.startPage;
+    }
+    if (this.config.data?.endPage) {
+      this.endPage = this.config.data.endPage;
+    }
+  }
 
   process(): void {
     this.ref.close({

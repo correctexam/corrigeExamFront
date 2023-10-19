@@ -168,6 +168,10 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     const p = await this.db.countNonAlignImage(+this.examId);
     // const p1 = await this.db.countAlignImage(+this.examId);
     this.nbPageAlignInCache = await this.db.countAlignImage(+this.examId);
+    if (p > this.nbPageAlignInCache) {
+      this.startPage = this.nbPageAlignInCache + 1;
+      this.endPage = p;
+    }
     this.allowPartialAlign = p > 0; // && p1 > 0 && p === p1;
   }
 
@@ -561,6 +565,10 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     const ref = this.dialogService.open(PartialAlignModalComponent, {
       header: '',
       width: '70%',
+      data: {
+        startPage: this.startPage,
+        endPage: this.endPage,
+      },
     });
 
     ref.onClose.subscribe((res: any) => {

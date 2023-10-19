@@ -70,8 +70,8 @@
     <div *ngIf="reloadScan || pageInTemplate === 0 || pageInScan === 0">
       <div class="col-12 md:col-12">
         <!--            <p-toggleButton [(ngModel)]="merge" onLabel="Concatenation" offLabel="Remplacement"></p-toggleButton>-->
-        <div class="flex flex-row flex-wrap card-container blue-container">
-          <div class="flex align-items-center justify-content-center font-bold border-round m-2">
+        <div class="flex flex-row flex-wrap card-container">
+          <div *ngIf="exam?.scanfileId" class="flex align-items-center justify-content-center font-bold border-round m-2">
             <label
               for="switch1"
               jhiTranslate="scanexam.concatenation"
@@ -81,7 +81,7 @@
             >
           </div>
 
-          <div class="flex align-items-center justify-content-center font-bold text-white border-round m-2">
+          <div *ngIf="exam?.scanfileId" class="flex align-items-center justify-content-center font-bold text-white border-round m-2">
             <p-inputSwitch inputId="switch1" [(ngModel)]="merge"></p-inputSwitch>
           </div>
           <div class="flex align-items-center justify-content-center border-round m-2">
