@@ -6,7 +6,7 @@
 /* eslint-disable no-console */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ZoneService } from '../../entities/zone/service/zone.service';
 import { CourseService } from 'app/entities/course/service/course.service';
@@ -27,6 +27,8 @@ import { faHouseSignal } from '@fortawesome/free-solid-svg-icons';
 import { Listbox } from 'primeng/listbox';
 import { PreferenceService } from '../preference-page/preference.service';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
+import { ShortcutInput } from 'ng-keyboard-shortcuts';
+import { TranslateService } from '@ngx-translate/core';
 
 export interface IPage {
   image?: ImageData;
@@ -61,7 +63,7 @@ export interface ImageZone {
   styleUrls: ['./associer-copies-etudiants.component.scss'],
   providers: [ConfirmationService, MessageService],
 })
-export class AssocierCopiesEtudiantsComponent implements OnInit {
+export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   @ViewChild('list')
   list!: Listbox;
   faHouseSignal = faHouseSignal;
@@ -193,6 +195,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
   displayBasic = false;
   images: any[] = [];
 
+  shortcuts: ShortcutInput[] = [];
+
   constructor(
     public examService: ExamService,
     public zoneService: ZoneService,
@@ -206,6 +210,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     public sheetService: ExamSheetService,
     private preferenceService: PreferenceService,
     private db: CacheServiceImpl,
+    private translateService: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -268,6 +273,26 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
         }
       }
     });
+  }
+  ngAfterViewInit(): void {
+    this.shortcuts.push(
+      {
+        // ArrowRight
+        key: ['ctrl + right', 'meta + right'],
+        label: 'Navigation',
+        description: this.translateService.instant('scanexam.nextstudent'),
+        command: () => this.nextStudent(),
+        preventDefault: true,
+      },
+      {
+        // ArrowLeft
+        key: ['ctrl + left', 'meta + left'],
+        label: 'Navigation',
+        description: this.translateService.instant('scanexam.previousstudent'),
+        command: () => this.previousStudent(),
+        preventDefault: true,
+      },
+    );
   }
 
   loadImageAndPredict(): void {
@@ -758,9 +783,21 @@ export class AssocierCopiesEtudiantsComponent implements OnInit {
     });
   }
 
+  nextStudent(): void {
+    if (this.currentStudent + 1 < this.numberPagesInScan / this.nbreFeuilleParCopie) {
+      this.selectionStudents = [];
+      this.goToStudent(this.currentStudent + 1);
+    }
+  }
+  previousStudent(): void {
+    if (this.currentStudent - 1 >= 0) {
+      this.selectionStudents = [];
+      this.goToStudent(this.currentStudent - 1);
+    }
+  }
+
   onPageChange($event: any): void {
     this.selectionStudents = [];
-    //  this.refreshLocalStudentList();
     this.goToStudent($event.page);
   }
 

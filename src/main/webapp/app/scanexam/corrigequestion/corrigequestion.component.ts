@@ -368,7 +368,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       },
 
       {
-        // ArrowRight
         key: ['ctrl + up', 'meta + up'],
         label: 'Navigation',
         description: this.translateService.instant('scanexam.previousquestion'),
@@ -376,7 +375,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         preventDefault: true,
       },
       {
-        // ArrowLeft
         key: ['ctrl + down', 'meta + down'],
         label: 'Navigation',
         description: this.translateService.instant('scanexam.nextquestion'),
