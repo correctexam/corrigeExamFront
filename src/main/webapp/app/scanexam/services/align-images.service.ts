@@ -11,6 +11,8 @@ import { v4 as uuid } from 'uuid';
 import { Subject, Observable } from 'rxjs';
 import { worker } from './workerimport';
 import { ICluster, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.component';
+import { DoPredictionsInputDifferentPage, DoPredictionsInputSamePage, DoPredictionsOutput } from 'app/opencv.worker';
+import { IZone } from 'app/entities/zone/zone.model';
 
 export interface IImageAlignement {
   imageAligned?: ArrayBuffer;
@@ -38,6 +40,7 @@ export interface IPreference {
   numberofpointToMatch: number;
   numberofgoodpointToMatch: number;
   defaultAlignAlgowithMarker: boolean;
+  removeHorizontalName: boolean;
   pdfscale: number;
   cacheDb: string;
   imageTypeExport: string;
@@ -69,6 +72,21 @@ export interface IImageCropInput {
   y?: number;
   width?: number;
   height?: number;
+}
+export interface IImageCropFromZoneInput {
+  z: IZone;
+  page: number;
+  align: boolean;
+  template: boolean;
+  examId: number;
+  indexDb: boolean;
+  factor: number;
+}
+export interface IImageCropFromZoneOutput {
+  image: ArrayBuffer;
+  page: number;
+  width: number;
+  height: number;
 }
 
 export interface IQCMInput {
@@ -196,6 +214,10 @@ export class AlignImagesService {
     return this._dispatch('imageCrop', payload, [payload.image]);
   }
 
+  public imageCropFromZone(payload: IImageCropFromZoneInput): Observable<IImageCropFromZoneOutput> {
+    return this._dispatch('imageCropFromZone', payload);
+  }
+
   public groupImagePerContoursLength(payload: ICluster): Observable<number[]> {
     const transferable = payload.images.map(image => image.image);
     return this._dispatch('groupImagePerContoursLength', payload, transferable);
@@ -207,6 +229,10 @@ export class AlignImagesService {
     } else {
       return this._dispatch('ineprediction', payload);
     }
+  }
+
+  public doPredictions(payload: DoPredictionsInputDifferentPage | DoPredictionsInputSamePage): Observable<DoPredictionsOutput[]> {
+    return this._dispatch('doPredictions', payload);
   }
 
   public predictionTemplate(payload: IImagePredictionTemplateInput, letter: boolean): Observable<IImagePredictionOutput> {

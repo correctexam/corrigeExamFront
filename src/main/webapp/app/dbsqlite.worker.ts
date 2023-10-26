@@ -23,6 +23,17 @@ addEventListener('message', e => {
     case 'hello': {
       const response = `worker response to ${e.data.msg}`;
       postMessage({ msg: response });
+
+      break;
+    }
+    case 'shareWorker': {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const port = e.data.port; // (C)
+      port.onmessage = (e1: any) => {
+        // (A)
+        console.error(e1.data);
+        port.postMessage(['hello', 'world']);
+      };
       break;
     }
     case 'load': {

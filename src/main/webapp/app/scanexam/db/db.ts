@@ -37,7 +37,7 @@ export interface NonAlignImage {
   value: string;
 }
 
-class ExamIndexDB extends Dexie {
+export class ExamIndexDB extends Dexie {
   private exams!: Table<Exam, number>;
   private templates!: Table<Template, number>;
   private alignImages!: Table<AlignImage, number>;
