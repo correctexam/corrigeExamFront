@@ -334,7 +334,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       candidateIne,
       examId: +this.examId,
-      indexDb: true,
+      indexDb: this.preferenceService.getPreference().cacheDb === 'indexdb',
       factor: this.factor,
       pagesToAnalyze: [this.currentStudent! * this.nbreFeuilleParCopie! + z1!.pageNumber!],
       pageTemplate: z1!.pageNumber!,

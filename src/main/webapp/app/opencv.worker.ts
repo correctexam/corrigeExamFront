@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable object-shorthand */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable no-console */
@@ -19,6 +20,9 @@ import {
 } from './qcm';
 import { IZone } from './entities/zone/zone.model';
 import { AlignImage, AppDB, NonAlignImage, Template } from './scanexam/db/db';
+import { Observable, Subject, firstValueFrom } from 'rxjs';
+import { v4 as uuid } from 'uuid';
+
 // import { IImageCropFromZoneInput, IImageCropFromZoneOutput } from './scanexam/services/align-images.service';
 
 /// <reference lib="webworker" />
@@ -89,6 +93,125 @@ export interface DoPredictionsInputDifferentPage extends DoPredictionsInput {
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let source: any;
+let sqliteService: any;
+
+export class SqliteCacheService {
+  ready!: Promise<void>;
+  subjects = new Map<string, Subject<any>>();
+
+  constructor(public sqliteWorkerport: any) {
+    const p = new Subject();
+    this.subjects.set('0', p);
+
+    this.ready = new Promise((res, rej) => {
+      this.subjects
+        .get('0')
+        ?.asObservable()
+        .subscribe(
+          () => {
+            res();
+          },
+          () => rej(),
+        );
+    });
+  }
+
+  onmessage: (e1: any) => void = (e1: any) => {
+    // (A)
+    const data = e1.data;
+    switch (data.msg) {
+      case 'getFirstNonAlignImage': {
+        const enc = new TextDecoder('utf-8');
+        const arr = new Uint8Array(data.payload.value);
+        data.payload.value = enc.decode(arr);
+        this.subjects.get(data.uid)?.next(data.payload);
+        this.subjects.get(data.uid)?.complete();
+
+        break;
+      }
+      case 'getFirstAlignImage': {
+        const enc = new TextDecoder('utf-8');
+        const arr = new Uint8Array(data.payload.value);
+        data.payload.value = enc.decode(arr);
+        this.subjects.get(data.uid)?.next(data.payload);
+        this.subjects.get(data.uid)?.complete();
+
+        break;
+      }
+      case 'getFirstTemplate': {
+        const enc = new TextDecoder('utf-8');
+        const arr = new Uint8Array(data.payload.value);
+        data.payload.value = enc.decode(arr);
+        this.subjects.get(data.uid)?.next(data.payload);
+        this.subjects.get(data.uid)?.complete();
+
+        break;
+      }
+      default: {
+        this.subjects.get(data.uid)?.next(data.payload);
+        this.subjects.get(data.uid)?.complete();
+      }
+    }
+  };
+
+  onerror: (e1: any) => void = (e1: any) => {
+    if (this.subjects.has(e1.uid)) {
+      console.log('get error uid');
+      this.subjects.get(e1.uid)?.error(e1);
+    }
+    console.log(`error on service work: ${JSON.stringify(e1)}`);
+  };
+
+  private _dispatch<T>(msg1: any, pay: any, transferable?: any): Observable<T> {
+    const uuid1 = uuid(); // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
+    this.ready.then(() => {
+      if (transferable) {
+        this.sqliteWorkerport.postMessage({ msg: msg1, uid: uuid1, payload: pay }, transferable);
+      } else {
+        this.sqliteWorkerport.postMessage({ msg: msg1, uid: uuid1, payload: pay });
+      }
+    });
+    const p = new Subject<T>();
+    this.subjects.set(uuid1, p);
+    this.ready = new Promise((res, rej) => {
+      this.subjects
+        .get(uuid1)
+        ?.asObservable()
+        .subscribe(
+          () => {
+            res();
+          },
+          () => rej(),
+        );
+    });
+    return p.asObservable();
+  }
+  public getFirstNonAlignImage(examId: number, pageInscan: number): Promise<any> {
+    return firstValueFrom(
+      this._dispatch('getFirstNonAlignImage', {
+        examId: examId,
+        pageInscan: pageInscan,
+      }),
+    );
+  }
+  getFirstAlignImage(examId: number, pageInscan: number): Promise<any> {
+    return firstValueFrom(
+      this._dispatch('getFirstAlignImage', {
+        examId: examId,
+        pageInscan: pageInscan,
+      }),
+    );
+  }
+
+  getFirstTemplate(examId: number, pageInscan: number): Promise<any> {
+    return firstValueFrom(
+      this._dispatch('getFirstTemplate', {
+        examId: examId,
+        pageInscan: pageInscan,
+      }),
+    );
+  }
+}
 
 addEventListener('message', e => {
   switch (e.data.msg) {
@@ -100,11 +223,11 @@ addEventListener('message', e => {
     case 'shareWorker': {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const port = e.data.port; // (B)
+      sqliteService = new SqliteCacheService(port);
       //      port.postMessage(['hello', 'world']);
-      port.onmessage = (e1: any) => {
-        // (A)
-        console.error('reply', e1.data);
-      };
+      port.onmessage = sqliteService.onmessage;
+      port.onerror = sqliteService.onerror;
+
       break;
     }
     case 'load': {
@@ -162,8 +285,10 @@ async function getTemplateImage(page: number, examId: number, indexDb: boolean):
       db = new AppDB();
     }
     return await db.getFirstTemplate(examId, page);
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return await sqliteService.getFirstTemplate(examId, page);
   }
-  return undefined;
   /*else {
     if (align){
       return await db.getFirstAlignImage(examId,page);
@@ -189,8 +314,15 @@ async function getScanImage(
     } else {
       return await db.getFirstNonAlignImage(examId, page);
     }
+  } else {
+    if (align) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return await sqliteService.getFirstAlignImage(examId, page);
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return await sqliteService.getFirstNonAlignImage(examId, page);
+    }
   }
-  return undefined;
   /*else {
     if (align){
       return await db.getFirstAlignImage(examId,page);
@@ -251,6 +383,7 @@ function imageCropFromZone(p: { msg: any; payload: any; uid: string }): void {
 async function imageCropFromZoneAsync(p: { msg: any; payload: any; uid: string }): Promise<void> {
   const p1 = p.payload;
   let i;
+
   if (p1.template) {
     i = await getTemplateImage(p1.page, p1.examId, p1.indexDb);
   } else {
@@ -269,6 +402,7 @@ async function imageCropFromZoneAsync(p: { msg: any; payload: any; uid: string }
       height: z1.size().height,
     };
     source.currentTarget.postMessage({ msg: p.msg, payload: output, uid: p.uid }, [output.image]);
+    z1.delete();
   }
 }
 
@@ -367,6 +501,7 @@ async function doPredictionsAsync(p: {
           output.name = res1.solution[0] as string;
           output.namePrecision = +res1.solution[1];
           z1t.delete();
+          res1.debug.delete();
         }
 
         if (z2 !== undefined && z2t !== undefined) {
@@ -382,6 +517,7 @@ async function doPredictionsAsync(p: {
           output.firstname = res2.solution[0] as string;
           output.firstnamePrecision = +res2.solution[1];
           z2t.delete();
+          res2.debug.delete();
         }
 
         if (z3 !== undefined && z3t !== undefined) {
@@ -389,6 +525,7 @@ async function doPredictionsAsync(p: {
           output.ine = res3.solution[0] as string;
           output.inePrecision = +res3.solution[1];
           z3t.delete();
+          res3.debug.delete();
         }
       }
       source.currentTarget.postMessage({ msg: p.msg, payload: [output], uid: p.uid }, opts);
@@ -418,12 +555,18 @@ function doPredidction4zone(
   const casesTemplateSorted = casesTemplate.cases.sort(__comparePositionX);
   const casePosition = [];
   const caseDimension = [];
-  for (let k = 0; k < casesTemplate.cases.length; k++) {
+  for (let k = 0; k < casesTemplateSorted.length; k++) {
     const forme = casesTemplateSorted[k];
     const dim = getOrigDimensions(forme);
     caseDimension.push(dim);
     const pos = getOrigPosition(forme);
     casePosition.push(pos);
+  }
+  for (let k = 0; k < casesTemplate.cases.length; k++) {
+    casesTemplate.cases[k].delete();
+  }
+  for (let k = 0; k < casesTemplate.img_cases.length; k++) {
+    casesTemplate.img_cases[k].delete();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-shadow
@@ -863,6 +1006,9 @@ async function fprediction(
     }
     predict.push(res1);
   }
+  for (let i = 0; i < res.letter.length; i++) {
+    res.letter[i][1].delete();
+  }
   for (let k = 0; k < candidate.length; k++) {
     for (let j = 0; j < 20; j++) {
       if (j < predict.length) {
@@ -1265,7 +1411,6 @@ function extractImageNew(
   dst.delete();
   pre_result.delete();
   result.delete();
-
   final.delete();
   //invert_final.delete();
   contours.delete();

@@ -1366,6 +1366,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       z: zone,
     };
     const crop = await firstValueFrom(this.alignImagesService.imageCropFromZone(imageToCrop));
+    this.computeScale(crop.width);
+
     return {
       i: new ImageData(new Uint8ClampedArray(crop.image), crop.width, crop.height),
       h: crop.height,
@@ -1384,6 +1386,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       z: zone,
     };
     const crop = await firstValueFrom(this.alignImagesService.imageCropFromZone(imageToCrop));
+    this.computeScale(crop.width);
+
     return {
       i: new ImageData(new Uint8ClampedArray(crop.image), crop.width, crop.height),
       h: crop.height,
@@ -1547,18 +1551,26 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.displayBasic = false;
   }
 
+  computeScale(imageWidth: number): void {
+    let factorScale = 0.75;
+    if (this.windowWidth < 991) {
+      factorScale = 0.95;
+    }
+    let scale = (window.innerWidth * factorScale) / imageWidth;
+    if (scale > 2) {
+      scale = 2;
+    }
+    this.scale = scale;
+    this.eventHandler.scale = this.scale;
+  }
+
   async loadImage(file: any, page1: number): Promise<IPage> {
     return new Promise(resolve => {
       const i = new Image();
       i.onload = () => {
         const editedImage: HTMLCanvasElement = <HTMLCanvasElement>document.createElement('canvas');
         editedImage.width = i.width;
-        let factorScale = 0.75;
-        if (this.windowWidth < 991) {
-          factorScale = 0.95;
-        }
-        this.scale = (window.innerWidth * factorScale) / i.width;
-        this.eventHandler.scale = this.scale;
+        this.computeScale(i.width);
         editedImage.height = i.height;
         const ctx = editedImage.getContext('2d');
         ctx!.drawImage(i, 0, 0);
