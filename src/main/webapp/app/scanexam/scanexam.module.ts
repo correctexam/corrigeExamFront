@@ -92,6 +92,7 @@ import { ExportanonymoupdfComponent } from './exportanonymoupdf/exportanonymoupd
 import { CheckboxModule } from 'primeng/checkbox';
 import { ViewandreorderpagesComponent } from './viewandreorderpages/viewandreorderpages.component';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { AllbindingsComponent } from './associer-copies-etudiants/allbindings/allbindings.component';
 
 // set the location of the OpenCV files
 // registerAllModules();
@@ -459,6 +460,7 @@ export const CompareAnswer_ROUTE: Route = {
     KeyboardshortcutComponent,
     ExportanonymoupdfComponent,
     ViewandreorderpagesComponent,
+    AllbindingsComponent,
   ],
   imports: [
     CommonModule,

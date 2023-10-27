@@ -49,6 +49,16 @@
         </button>
         <p-inputSwitch [(ngModel)]="assisted"></p-inputSwitch>
         <label jhiTranslate="scanexam.assistance">Assistance</label>
+        <button
+          [disabled]="!this.examId"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="p-button p-button-primary"
+          (click)="openAllBinding()"
+        >
+          <fa-icon icon="magnifying-glass-arrow-right"></fa-icon>&nbsp;<span>Show all binding</span>
+        </button>
       </div>
     </div>
     <div class="col-12 md:col-12">

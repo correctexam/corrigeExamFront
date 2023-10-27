@@ -428,112 +428,117 @@ async function doPredictionsAsync(p: {
   const p1 = p.payload;
 
   if (isDoPredictionsInputSamePage(p1)) {
-    const i = await getScanImage(p1.align, p1.pagesToAnalyze[0], p1.examId, p1.indexDb);
-    if (i !== undefined) {
-      const l = await loadImage(i);
+    const opts: Transferable[] = [];
+    const outputs: DoPredictionsOutput[] = [];
+    for (let pageToAnalyze of p1.pagesToAnalyze) {
+      const i = await getScanImage(p1.align, pageToAnalyze, p1.examId, p1.indexDb);
+      if (i !== undefined) {
+        const l = await loadImage(i);
 
-      let z1: any;
-      let z2: any;
-      let z3: any;
-      if (p1.nameZone) {
-        z1 = cropZone(l, p1.nameZone, p1.factor);
-      }
-      if (p1.firstnameZone) {
-        z2 = cropZone(l, p1.firstnameZone, p1.factor);
-      }
-      if (p1.ineZone) {
-        z3 = cropZone(l, p1.ineZone, p1.factor);
-      }
-      const output: DoPredictionsOutput = {};
-      let z1Buffer: ArrayBuffer | undefined;
-      let z2Buffer: ArrayBuffer | undefined;
-      let z3Buffer: ArrayBuffer | undefined;
-      const opts: Transferable[] = [];
-
-      if (z1) {
-        z1Buffer = imageDataFromMat(z1).data.buffer;
-        output.nameZoneW = z1.size().width;
-        output.nameZoneH = z1.size().height;
-        if (z1Buffer) {
-          opts.push(z1Buffer);
-        }
-      }
-      if (z2) {
-        z2Buffer = imageDataFromMat(z2).data.buffer;
-        output.firstnameZoneW = z2.size().width;
-        output.firstnameZoneH = z2.size().height;
-        if (z2Buffer) {
-          opts.push(z2Buffer);
-        }
-      }
-      if (z3) {
-        z3Buffer = imageDataFromMat(z3).data.buffer;
-        output.ineZoneW = z3.size().width;
-        output.ineZoneH = z3.size().height;
-
-        if (z3Buffer) {
-          opts.push(z3Buffer);
-        }
-      }
-
-      output.nameZone = z1Buffer;
-      output.firstnameZone = z2Buffer;
-      output.ineZone = z3Buffer;
-
-      // Load Template
-      const t = await getTemplateImage(p1.pageTemplate, p1.examId, p1.indexDb);
-      if (t !== undefined) {
-        const ti = await loadImage(t);
-        let z1t: any;
-        let z2t: any;
-        let z3t: any;
+        let z1: any;
+        let z2: any;
+        let z3: any;
         if (p1.nameZone) {
-          z1t = cropZone(ti, p1.nameZone, p1.factor);
+          z1 = cropZone(l, p1.nameZone, p1.factor);
         }
         if (p1.firstnameZone) {
-          z2t = cropZone(ti, p1.firstnameZone, p1.factor);
+          z2 = cropZone(l, p1.firstnameZone, p1.factor);
         }
         if (p1.ineZone) {
-          z3t = cropZone(ti, p1.ineZone, p1.factor);
+          z3 = cropZone(l, p1.ineZone, p1.factor);
         }
-        if (z1 !== undefined && z1t !== undefined) {
-          const res1 = await doPredidction4zone(true, z1, z1t, p1.candidateName, p1.preferences, p1.looking4missing, p1.removeHorizontal);
-          output.name = res1.solution[0] as string;
-          output.namePrecision = +res1.solution[1];
-          z1t.delete();
-          res1.debug.delete();
+        const output: DoPredictionsOutput = {};
+        let z1Buffer: ArrayBuffer | undefined;
+        let z2Buffer: ArrayBuffer | undefined;
+        let z3Buffer: ArrayBuffer | undefined;
+
+        if (z1) {
+          z1Buffer = imageDataFromMat(z1).data.buffer;
+          output.nameZoneW = z1.size().width;
+          output.nameZoneH = z1.size().height;
+          if (z1Buffer) {
+            opts.push(z1Buffer);
+          }
+        }
+        if (z2) {
+          z2Buffer = imageDataFromMat(z2).data.buffer;
+          output.firstnameZoneW = z2.size().width;
+          output.firstnameZoneH = z2.size().height;
+          if (z2Buffer) {
+            opts.push(z2Buffer);
+          }
+        }
+        if (z3) {
+          z3Buffer = imageDataFromMat(z3).data.buffer;
+          output.ineZoneW = z3.size().width;
+          output.ineZoneH = z3.size().height;
+
+          if (z3Buffer) {
+            opts.push(z3Buffer);
+          }
         }
 
-        if (z2 !== undefined && z2t !== undefined) {
-          const res2 = await doPredidction4zone(
-            true,
-            z2,
-            z2t,
-            p1.candidateFirstName,
-            p1.preferences,
-            p1.looking4missing,
-            p1.removeHorizontal,
-          );
-          output.firstname = res2.solution[0] as string;
-          output.firstnamePrecision = +res2.solution[1];
-          z2t.delete();
-          res2.debug.delete();
-        }
+        output.nameZone = z1Buffer;
+        output.firstnameZone = z2Buffer;
+        output.ineZone = z3Buffer;
 
-        if (z3 !== undefined && z3t !== undefined) {
-          const res3 = await doPredidction4zone(false, z3, z3t, p1.candidateIne, p1.preferences, p1.looking4missing, p1.removeHorizontal);
-          output.ine = res3.solution[0] as string;
-          output.inePrecision = +res3.solution[1];
-          z3t.delete();
-          res3.debug.delete();
+        // Load Template
+        const t = await getTemplateImage(p1.pageTemplate, p1.examId, p1.indexDb);
+        if (t !== undefined) {
+          const ti = await loadImage(t);
+          let z1t: any;
+          let z2t: any;
+          let z3t: any;
+          if (p1.nameZone) {
+            z1t = cropZone(ti, p1.nameZone, p1.factor);
+          }
+          if (p1.firstnameZone) {
+            z2t = cropZone(ti, p1.firstnameZone, p1.factor);
+          }
+          if (p1.ineZone) {
+            z3t = cropZone(ti, p1.ineZone, p1.factor);
+          }
+          if (z1 !== undefined && z1t !== undefined) {
+            const res1 = await doPredidction4zone(true, z1, z1t, p1.candidateName, p1.preferences, p1.looking4missing, p1.removeHorizontal);
+            output.name = res1.solution[0] as string;
+            output.namePrecision = +res1.solution[1];
+            z1t.delete();
+            res1.debug.delete();
+          }
+
+          if (z2 !== undefined && z2t !== undefined) {
+            const res2 = await doPredidction4zone(
+              true,
+              z2,
+              z2t,
+              p1.candidateFirstName,
+              p1.preferences,
+              p1.looking4missing,
+              p1.removeHorizontal,
+            );
+            output.firstname = res2.solution[0] as string;
+            output.firstnamePrecision = +res2.solution[1];
+            z2t.delete();
+            res2.debug.delete();
+          }
+
+          if (z3 !== undefined && z3t !== undefined) {
+            const res3 = await doPredidction4zone(false, z3, z3t, p1.candidateIne, p1.preferences, p1.looking4missing, p1.removeHorizontal);
+            output.ine = res3.solution[0] as string;
+            output.inePrecision = +res3.solution[1];
+            z3t.delete();
+            res3.debug.delete();
+          }
         }
+        outputs.push(output);
+        z1?.delete();
+        z2?.delete();
+        z3?.delete();
       }
-      source.currentTarget.postMessage({ msg: p.msg, payload: [output], uid: p.uid }, opts);
-      z1?.delete();
-      z2?.delete();
-      z3?.delete();
     }
+    source.currentTarget.postMessage({ msg: p.msg, payload: outputs, uid: p.uid }, opts);
   } else {
+    // TODO
     p1.firstnamePagesToAnalyze;
   }
 }
