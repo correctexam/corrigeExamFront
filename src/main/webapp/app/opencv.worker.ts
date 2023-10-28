@@ -65,7 +65,7 @@ export interface DoPredictionsOutput {
   firstnameZone?: ArrayBuffer;
   firstnameZoneW?: number;
   firstnameZoneH?: number;
-
+  page: number;
   ineZone?: ArrayBuffer;
   ineZoneW?: number;
   ineZoneH?: number;
@@ -438,16 +438,23 @@ async function doPredictionsAsync(p: {
         let z1: any;
         let z2: any;
         let z3: any;
+        let pageZone = 0;
         if (p1.nameZone) {
           z1 = cropZone(l, p1.nameZone, p1.factor);
+          pageZone = p1.nameZone.pageNumber!;
         }
         if (p1.firstnameZone) {
           z2 = cropZone(l, p1.firstnameZone, p1.factor);
+          pageZone = p1.firstnameZone.pageNumber!;
         }
         if (p1.ineZone) {
           z3 = cropZone(l, p1.ineZone, p1.factor);
+          pageZone = p1.ineZone.pageNumber!;
         }
-        const output: DoPredictionsOutput = {};
+        const output: DoPredictionsOutput = {
+          page: pageToAnalyze - pageZone,
+        };
+        console.error(output);
         let z1Buffer: ArrayBuffer | undefined;
         let z2Buffer: ArrayBuffer | undefined;
         let z3Buffer: ArrayBuffer | undefined;

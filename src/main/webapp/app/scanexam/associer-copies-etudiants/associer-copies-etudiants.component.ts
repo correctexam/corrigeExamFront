@@ -67,6 +67,7 @@ interface PredictResult {
   nameImage?: ImageData;
   firstnameImage?: ImageData;
   ineImage?: ImageData;
+  page: number;
 }
 
 @Component({
@@ -402,8 +403,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     const output: PredictResult[] = [];
     const r5 = await firstValueFrom(this.alignImagesService.doPredictions(r));
     for (const r1 of r5) {
-      console.error(r1);
-      let result: PredictResult = { predictionprecision: 0 };
+      let result: PredictResult = { predictionprecision: 0, page: r1.page };
+
       let recognizedStudent: IStudent | undefined;
       let predictionprecision = 0;
       if (r1.nameZone) {
@@ -546,218 +547,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     return output;
   }
 
-  /*  loadImageAndPredict(): void {
-
-    this.testLoadImage();
-
-
-    const promiseload: Promise<ImageZone | null>[] = [];
-    // Step 4 Query zone
-    const p0 = this.loadZone(this.exam.namezoneId, this.setZoneNom, true, this.setShowNomImage, this.nomImage, this.currentStudent);
-
-    promiseload.push(p0);
-
-    const p1 = this.loadZone(
-      this.exam.firstnamezoneId,
-      this.setZonePrenom,
-      true,
-      this.setShowPrenomImage,
-      this.prenomImage,
-      this.currentStudent,
-    );
-    promiseload.push(p1);
-    const p2 = this.loadZone(
-      this.exam.idzoneId,
-      this.setZoneINE,
-      true,
-      this.setShowINEImage,
-      this.ineImage,
-      this.currentStudent,
-    );
-    promiseload.push(p2);
-
-
-
-
-
-
-    Promise.all(promiseload).then(value => {
-
-
-
-      this.blocked = false;
-      const ppredics: Promise<(string | number)[]>[] = [];
-      ppredics.push(
-        this.predictText(
-          value[0]!,
-          true,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-          this.freeStudent.map(student => student.name!),
-          //  this.nomImageReco!
-        ),
-      );
-      ppredics.push(
-        this.predictText(
-          value[1]!,
-          true,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-          this.freeStudent.map(student => student.firstname!),
-          // this.prenomImageReco!
-        ),
-      );
-
-      ppredics.push(
-        this.predictText(
-          value[2]!,
-          false,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-          this.freeStudent.map(student => student.ine!),
-          //   this.ineImageReco!
-        ),
-      );
-      Promise.all(ppredics).then((predicts) => {
-        const solutionName = predicts[0];
-        const solutionFirstname = predicts[1];
-        const solutionINE = predicts[2];
-        console.log(solutionName);
-        console.log(solutionFirstname);
-        console.log(solutionINE);
-        if (
-          solutionName !== undefined &&
-          solutionFirstname !== undefined &&
-          solutionINE !== undefined &&
-          solutionName.length > 0 &&
-          solutionFirstname.length > 0 &&
-          solutionINE.length > 0
-        ) {
-          let sts = this.students.filter(
-            student =>
-              (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-              (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase() &&
-              (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase(),
-          );
-          if (sts.length > 0) {
-            // Full match
-            this.recognizedStudent = sts[0];
-            this.predictionprecision = ((+solutionName[1] as number) +
-              (+solutionFirstname[1] as number) +
-             (+solutionINE[1] as number)) / 3;
-          }
-          if (this.recognizedStudent === undefined)
-          {
-            // INE Good Match
-            if (+solutionINE[1] > 0.28) {
-              sts = this.students.filter(student => (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase());
-              if (sts.length > 0) {
-                this.recognizedStudent = sts[0];
-                this.predictionprecision = solutionINE[1] as number;
-              }
-            }
-            // Only Name and FirstName (No INE)
-            if (this.recognizedStudent === undefined &&
-              +solutionINE[1] < +solutionFirstname[1] &&
-              +solutionINE[1] < +solutionName[1]) {
-              let sts1 = this.students.filter(
-                student =>
-                  (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-                  (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase(),
-              );
-              if (sts1.length > 0) {
-                this.recognizedStudent = sts1[0];
-                this.predictionprecision = ((solutionName[1] as number) + (solutionFirstname[1] as number)) / 2;
-              }
-            }
-            // Only INE and FirstName (No Name)
-            if (this.recognizedStudent === undefined &&
-              +solutionName[1] < +solutionFirstname[1] &&
-              +solutionName[1] < +solutionINE[1]) {
-              let sts1 = this.students.filter(
-                student =>
-                  (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase() &&
-                  (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase(),
-              );
-              if (sts1.length > 0) {
-                this.recognizedStudent = sts1[0];
-                this.predictionprecision = ((solutionFirstname[1] as number) + (solutionINE[1] as number)) / 2;
-              }
-            }
-            // Only INE and Name (No FirstName)
-            if (
-              this.recognizedStudent === undefined &&
-              +solutionFirstname[1] < +solutionName[1] &&
-              +solutionFirstname[1] < +solutionINE[1]
-            ) {
-              sts = this.students.filter(
-                student =>
-                  (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-                  (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase(),
-              );
-              if (sts.length > 0) {
-                this.recognizedStudent = sts[0];
-                this.predictionprecision = ((solutionName[1] as number) + (solutionINE[1] as number)) / 2;
-              }
-            }
-            if (this.recognizedStudent === undefined && +solutionName[1] >= 0.44 && solutionFirstname[1] < solutionName[1]) {
-              sts = this.students.filter(student => (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase());
-              if (sts.length > 0) {
-                this.recognizedStudent = sts[0];
-                this.predictionprecision = (solutionName[1] as number) / 3;
-              }
-            }
-            if (this.recognizedStudent === undefined && +solutionFirstname[1] >= 0.44 && solutionName[1] < solutionFirstname[1]) {
-              sts = this.students.filter(student => (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase());
-              if (sts.length > 0) {
-                this.recognizedStudent = sts[0];
-                this.predictionprecision = (solutionFirstname[1] as number) / 3;
-              }
-            }
-          }
-        } else if (
-          solutionName !== undefined &&
-          solutionFirstname !== undefined &&
-          solutionName.length > 0 &&
-          solutionFirstname.length > 0
-        ) {
-          let sts = this.students.filter(
-            student =>
-              (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-              (solutionFirstname[0] as string).toLowerCase() === student.firstname?.toLowerCase(),
-          );
-          if (sts.length > 0) {
-            this.recognizedStudent = sts[0];
-            this.predictionprecision = ((solutionName[1] as number) + (solutionFirstname[1] as number)) / 2;
-          }
-        }
-        else if ( solutionName !== undefined && solutionINE !== undefined && solutionName.length > 0 && solutionINE.length > 0) {
-          let sts = this.students.filter(
-            student =>
-              (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase() &&
-              (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase(),
-          );
-          if (sts.length > 0) {
-            this.recognizedStudent = sts[0];
-            this.predictionprecision = ((solutionName[1] as number) + (solutionINE[1] as number)) / 2;
-          }
-        } else if (solutionINE !== undefined && solutionINE.length > 0 && +solutionINE[1] > 0.25) {
-          let sts = this.students.filter(student => (solutionINE[0] as string).toLowerCase() === student.ine?.toLowerCase());
-          if (sts.length > 0) {
-            this.recognizedStudent = sts[0];
-            this.predictionprecision = solutionINE[1] as number;
-          }
-        }
-          else if (solutionName !== undefined && solutionName.length > 0 && +solutionName[1] > 0.25) {
-            let sts = this.students.filter(student => (solutionName[0] as string).toLowerCase() === student.name?.toLowerCase());
-            if (sts.length > 0) {
-              this.recognizedStudent = sts[0];
-              this.predictionprecision = solutionName[1] as number;
-            }
-          }
-
-
-
-      });
-    });
-  }*/
   reloadImageGrowFactor(event: any): void {
     if (event.value !== this.factor) {
       this.factor = event.value;
@@ -765,60 +554,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // reloadImage1(): void {
-  /*   this.blocked = true;
-
-    const promiseload: Promise<ImageZone | null>[] = [];
-    const p0 = this.loadZone(this.exam.namezoneId, this.setZoneNom, true, this.setShowNomImage, this.nomImage, this.currentStudent);
-
-    promiseload.push(p0);
-
-    const p1 = this.loadZone(
-      this.exam.firstnamezoneId,
-      this.setZonePrenom,
-      true,
-      this.setShowPrenomImage,
-      this.prenomImage,
-      this.currentStudent,
-    );
-    promiseload.push(p1);
-    const p2 = this.loadZone(this.exam.idzoneId, this.setZoneINE, true, this.setShowINEImage, this.ineImage, this.currentStudent);
-    promiseload.push(p2);
-
-    Promise.all(promiseload).then(() => (this.blocked = false));
-    // this.loadAllPages();*/
-  // }
-  /*
-  async predictText(
-    p: ImageZone,
-    zoneletter: boolean,
-    candidatematch: string[] ,
-  ): Promise<(string | number)[]> {
-    return new Promise<(string | number)[]>(resolve => {
-      if (p !== null && p !== undefined && this.assisted) {
-        if (p.t !== undefined) {
-          const c = { template: p.t!, image: p.i, match: candidatematch, preference: this.preferenceService.getPreference() };
-          //        this.alignImagesService.prediction(c, zoneletter).subscribe(result => {
-          this.alignImagesService.prediction(c, zoneletter).subscribe(result => {
-            //          const ctx2 = debugimageRef?.nativeElement.getContext('2d');
-            //          ctx2.putImageData(result.debug, 0, 0);
-            resolve(result.solution!);
-          });
-        } else {
-          const c = { image: p.i, match: candidatematch, preference: this.preferenceService.getPreference() };
-          //        this.alignImagesService.prediction(c, zoneletter).subscribe(result => {
-          this.alignImagesService.prediction(c, zoneletter).subscribe(result => {
-            //          const ctx2 = debugimageRef?.nativeElement.getContext('2d');
-            //          ctx2.putImageData(result.debug, 0, 0);
-            resolve(result.solution!);
-          });
-        }
-      } else {
-        resolve([]);
-      }
-    });
-  }
-  */
   @HostListener('window:keydown.control.Enter', ['$event'])
   async selectRecogniezStudent(): Promise<void> {
     this.selectionStudents = [this.recognizedStudent];
@@ -828,155 +563,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       this.goToStudent(this.currentStudent);
     }
   }
-  /*
-  async loadZone(
-    zoneId: number | undefined,
-    z: (zone: IZone) => void,
-    showImage: boolean,
-    showImageRef: (s: boolean) => void,
-    imageRef: ElementRef<any> | undefined,
-    currentStudent: number,
-  ): Promise<ImageZone | null> {
-    return new Promise<ImageZone | null>(resolve => {
-      if (zoneId) {
-        this.zoneService.find(zoneId).subscribe(e => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          z(e.body!);
-          this.getAllImage4Zone(currentStudent! * this.nbreFeuilleParCopie! + e.body!.pageNumber!, e.body!).then(p => {
-            if (showImage) {
-              this.displayImage(p, imageRef, showImageRef);
-            }
-            resolve(p);
-          });
-        });
-      } else {
-        resolve(null);
-      }
-    });
-  }*/
-  /*
-  async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
-    if (this.noalign) {
-      return new Promise(resolve => {
-        // const startTime = performance.now();
-        this.db.getFirstNonAlignImage(+this.examId, pageInscan).then(e2 => {
-          const image = JSON.parse(e2!.value, this.reviver);
-          this.loadImage(image.pages, pageInscan).then(v => {
-            let finalW = (zone.width! * v.width! * this.factor) / 100000;
-            let finalH = (zone.height! * v.height! * this.factor) / 100000;
-            let initX =
-              (zone.xInit! * v.width!) / 100000 - ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
-            if (initX < 0) {
-              finalW = finalW + initX;
-              initX = 0;
-            }
-            let initY =
-              (zone.yInit! * v.height!) / 100000 -
-              ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
-            if (initY < 0) {
-              finalH = finalH + initY;
-              initY = 0;
-            }
-            this.alignImagesService
-              .imageCrop({
-                image: v.image!.data.buffer,
-                imageWidth: v.image!.width,
-                imageHeight: v.image!.height,
-                x: initX,
-                y: initY,
-                width: finalW,
-                height: finalH,
-              })
-              .subscribe(res => resolve({ i: new ImageData(new Uint8ClampedArray(res), finalW, finalH), w: finalW, h: finalH }));
-          });
-        });
-      });
-    } else {
-      return new Promise(resolve => {
-        // const startTime = performance.now();
-        this.db.getFirstAlignImage(+this.examId, pageInscan).then(e2 => {
-          const image = JSON.parse(e2!.value, this.reviver);
-          this.loadImage(image.pages, pageInscan).then(v => {
-            let finalW = (zone.width! * v.width! * this.factor) / 100000;
-            let finalH = (zone.height! * v.height! * this.factor) / 100000;
-            let initX =
-              (zone.xInit! * v.width!) / 100000 - ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
-            if (initX < 0) {
-              finalW = finalW + initX;
-              initX = 0;
-            }
-            let initY =
-              (zone.yInit! * v.height!) / 100000 -
-              ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
-            if (initY < 0) {
-              finalH = finalH + initY;
-              initY = 0;
-            }
-            this.alignImagesService
-              .imageCrop({
-                image: v.image!.data.buffer,
-                imageWidth: v.image!.width,
-                imageHeight: v.image!.height,
-                x: initX,
-                y: initY,
-                width: finalW,
-                height: finalH,
-              })
-              .subscribe(res => {
-                let page1 = pageInscan % this.nbreFeuilleParCopie;
-                if (page1 === 0) {
-                  page1 = this.nbreFeuilleParCopie;
-                }
-                this.db.getFirstTemplate(+this.examId, page1).then(e3 => {
-                  if (!this.baseTemplate) {
-                    resolve({ i: new ImageData(new Uint8ClampedArray(res), finalW, finalH), w: finalW, h: finalH });
-                  } else {
-                    const image1 = JSON.parse(e3!.value, this.reviver);
-                    this.loadImage(image1.pages, pageInscan % this.nbreFeuilleParCopie).then(v1 => {
-                      let finalW1 = (zone.width! * v1.width! * this.factor) / 100000;
-                      let finalH1 = (zone.height! * v1.height! * this.factor) / 100000;
-                      let initX1 =
-                        (zone.xInit! * v1.width!) / 100000 -
-                        ((zone.width! * v1.width! * this.factor) / 100000 - (zone.width! * v1.width!) / 100000) / 2;
-                      if (initX1 < 0) {
-                        finalW1 = finalW1 + initX1;
-                        initX1 = 0;
-                      }
-                      let initY1 =
-                        (zone.yInit! * v1.height!) / 100000 -
-                        ((zone.height! * v1.height! * this.factor) / 100000 - (zone.height! * v1.height!) / 100000) / 2;
-                      if (initY1 < 0) {
-                        finalH1 = finalH1 + initY1;
-                        initY1 = 0;
-                      }
-                      this.alignImagesService
-                        .imageCrop({
-                          image: v1.image!.data.buffer,
-                          imageWidth: v1.image!.width,
-                          imageHeight: v1.image!.height,
-
-                          x: initX1,
-                          y: initY1,
-                          width: finalW1,
-                          height: finalH1,
-                        })
-                        .subscribe(res1 => {
-                          resolve({
-                            t: new ImageData(new Uint8ClampedArray(res1), finalW1, finalH1),
-                            i: new ImageData(new Uint8ClampedArray(res), finalW, finalH),
-                            w: finalW,
-                            h: finalH,
-                          });
-                        });
-                    });
-                  }
-                });
-              });
-          });
-        });
-      });
-    }
-  }*/
 
   displayImage(v: ImageZone, imageRef: ElementRef<any> | undefined, show: (s: boolean) => void): void {
     if (imageRef !== undefined) {
@@ -1185,22 +771,13 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
         )
         .map(s => s.examSheets) as any
     ).flat();
-    let promises: Promise<any>[] = [];
+
     // Passe cette sheet à -1 -1. sémantique plus associé
 
-    examSheet4CurrentPage
-      .filter(ex => !examSheet4CurrentStudent.map(ex1 => ex1.id).includes(ex!.id))
-      .forEach(ex => {
-        ex!.pagemin = -1;
-        ex!.pagemax = -1;
-        const p = firstValueFrom(this.sheetService.update(ex!));
-        /*          new Promise<void>(res => {
-            this.sheetService.update(ex!).subscribe(() => {
-              res();
-            });
-          });*/
-        promises.push(p);
-      });
+    for (const ex2 of examSheet4CurrentPage.filter(ex => !examSheet4CurrentStudent.map(ex1 => ex1.id).includes(ex!.id))) {
+      ex2!.pagemin = -1;
+      ex2!.pagemax = -1;
+    }
 
     // Pour l'étudiant sélectionné. récupère la sheet. Si elle exite, on met à jour les bonnes pages sinon on crée la page.
 
@@ -1208,12 +785,11 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     for (const student of selectedStudent) {
       const examS4Student = student.examSheets?.filter((ex: IExamSheet) => ex?.scanId === this.exam.scanfileId);
       if (examS4Student !== undefined && examS4Student.length > 0) {
-        examS4Student.forEach((ex: IExamSheet) => {
+        for (const ex of examS4Student) {
           ex.pagemin = this.currentStudent * this.nbreFeuilleParCopie;
           ex.pagemax = (this.currentStudent + 1) * this.nbreFeuilleParCopie - 1;
-          const p1 = firstValueFrom(this.sheetService.update(ex));
-          promises.push(p1);
-        });
+          await firstValueFrom(this.sheetService.update(ex));
+        }
       } else {
         const sheet: IExamSheet = {
           name: uuid(),
@@ -1223,17 +799,13 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
           students: this.selectionStudents,
         };
         const e = await firstValueFrom(this.sheetService.create(sheet));
-        const p1s: Promise<any>[] = [];
-        this.selectionStudents.forEach(s1 => {
+        for (const s1 of this.selectionStudents) {
           s1.examSheets?.push(e.body!);
-          const p1 = firstValueFrom(this.studentService.update(s1));
-          p1s.push(p1);
-        });
-        promises.push(Promise.all(p1s));
+          await firstValueFrom(this.studentService.update(s1));
+        }
       }
     }
 
-    await Promise.all(promises);
     await this.refreshStudentList();
   }
 
@@ -1336,13 +908,17 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   }
 
   async openAllBinding(): Promise<void> {
-    const res1 = await this.testLoadImage4pages([1, 2, 3]);
+    this.blocked = true;
+    const res1 = await this.testLoadImage4pages([0, 1, 2]);
+    this.blocked = false;
 
     const ref = this.dialogService.open(AllbindingsComponent, {
       header: '',
       width: '100%',
       data: {
         students: res1,
+        nbreFeuilleParCopie: this.nbreFeuilleParCopie,
+        exa: this.exam,
       },
     });
 
