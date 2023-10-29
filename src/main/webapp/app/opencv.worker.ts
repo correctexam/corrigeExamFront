@@ -454,7 +454,6 @@ async function doPredictionsAsync(p: {
         const output: DoPredictionsOutput = {
           page: pageToAnalyze - pageZone,
         };
-        console.error(output);
         let z1Buffer: ArrayBuffer | undefined;
         let z2Buffer: ArrayBuffer | undefined;
         let z3Buffer: ArrayBuffer | undefined;

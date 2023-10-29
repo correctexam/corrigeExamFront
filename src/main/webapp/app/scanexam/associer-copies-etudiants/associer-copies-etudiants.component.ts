@@ -6,7 +6,7 @@
 /* eslint-disable no-console */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ZoneService } from '../../entities/zone/service/zone.service';
 import { CourseService } from 'app/entities/course/service/course.service';
@@ -134,47 +134,14 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     }));
   }
   filterbindstudent = true;
+  columnstyle = {
+    width: '100%',
+  };
 
-  private editedImage: HTMLCanvasElement | undefined;
-  _showNomImage = false;
-  public get showNomImage(): boolean {
-    return this._showNomImage;
-  }
-  public set showNomImage(s: boolean) {
-    this._showNomImage = s;
-  }
-  public setShowNomImage: (s: boolean) => void = s => (this._showNomImage = s);
+  nameImageImg?: string;
+  firstnameImageImg?: string;
+  ineImageImg?: string;
 
-  @ViewChild('nomImage')
-  nomImage: ElementRef | undefined;
-  @ViewChild('nomImageReco')
-  nomImageReco: ElementRef | undefined;
-  _showPrenomImage = false;
-  public get showPrenomImage(): boolean {
-    return this._showPrenomImage;
-  }
-  public set showPrenomImage(s: boolean) {
-    this._showPrenomImage = s;
-  }
-  public setShowPrenomImage: (s: boolean) => void = s => (this._showPrenomImage = s);
-
-  @ViewChild('prenomImage')
-  prenomImage: ElementRef | undefined;
-  @ViewChild('prenomImageReco')
-  prenomImageReco: ElementRef | undefined;
-  _showINEImage = false;
-  public get showINEImage(): boolean {
-    return this._showINEImage;
-  }
-  public set showINEImage(s: boolean) {
-    this._showINEImage = s;
-  }
-  public setShowINEImage: (s: boolean) => void = s => (this._showINEImage = s);
-
-  @ViewChild('ineImage')
-  ineImage: ElementRef | undefined;
-  @ViewChild('ineImageReco')
-  ineImageReco: ElementRef | undefined;
   debug = false;
   noalign = false;
   factor = 1;
@@ -237,7 +204,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
         if (this.examId !== params.get('examid')!) {
           this.examId = params.get('examid')!;
           this.images = [];
-          // this.loadAllPages();
 
           if (params.get('currentStudent') !== null) {
             this.currentStudent = +params.get('currentStudent')! - 1;
@@ -251,24 +217,11 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
                 this.nbreFeuilleParCopie = e2;
 
                 this.activeIndex = this.currentStudent! * this.nbreFeuilleParCopie!;
-                // Step 2 Query Scan in local DB
-                /* let endTime = performance.now();
-              let totalTime = endTime - startTime; // ti
-              console.log(' step 1 ' + totalTime);*/
                 this.factor = 1;
                 this.noalign = false;
                 this.db.countAlignImage(+this.examId).then(e1 => {
-                  /* endTime = performance.now();
-                  totalTime = endTime - startTime; // ti
-                  //   console.log(' step 2 ' + totalTime);*/
-
                   this.numberPagesInScan = e1;
                   this.examService.find(+this.examId).subscribe(data => {
-                    // Step 3 Query Exam
-                    /* endTime = performance.now();
-                    totalTime = endTime - startTime; // ti
-                    //  console.log(' step 3 ' + totalTime);*/
-
                     this.exam = data.body!;
                     this.courseService.find(this.exam.courseId!).subscribe(e => (this.course = e.body!));
                     // Step 4 Query Students for Exam
@@ -312,44 +265,33 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     );
   }
 
+  imagedata_to_image(imagedata: ImageData): string {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = imagedata.width;
+    canvas.height = imagedata.height;
+    ctx?.putImageData(imagedata, 0, 0);
+    return canvas.toDataURL();
+  }
+
   async testLoadImage(): Promise<void> {
     const res = await this.testLoadImage4pages([this.currentStudent! * this.nbreFeuilleParCopie!]);
-    console.error(res);
     if (res.length === 1) {
       this.predictionprecision = res[0].predictionprecision;
       this.recognizedStudent = res[0].recognizedStudent;
       if (res[0].nameImage) {
-        this.displayImage(
-          {
-            i: res[0].nameImage,
-            h: res[0].nameImage.height,
-            w: res[0].nameImage.width,
-          },
-          this.nomImage,
-          this.setShowNomImage,
-        );
+        this.nameImageImg = this.imagedata_to_image(res[0].nameImage);
       }
       if (res[0].firstnameImage) {
-        this.displayImage(
-          {
-            i: res[0].firstnameImage,
-            h: res[0].firstnameImage.height,
-            w: res[0].firstnameImage.width,
-          },
-          this.prenomImage,
-          this.setShowPrenomImage,
-        );
+        this.firstnameImageImg = this.imagedata_to_image(res[0].firstnameImage);
       }
       if (res[0].ineImage) {
-        this.displayImage(
-          {
-            i: res[0].ineImage,
-            h: res[0].ineImage.height,
-            w: res[0].ineImage.width,
-          },
-          this.ineImage,
-          this.setShowINEImage,
-        );
+        this.ineImageImg = this.imagedata_to_image(res[0].ineImage);
+      }
+      const imgs = [res[0].nameImage, res[0].firstnameImage, res[0].ineImage];
+      const length = imgs.filter(e => e !== undefined).length;
+      if (length > 1) {
+        this.columnstyle.width = Math.floor(100 / length) + '%';
       }
     }
   }
@@ -564,18 +506,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     }
   }
 
-  displayImage(v: ImageZone, imageRef: ElementRef<any> | undefined, show: (s: boolean) => void): void {
-    if (imageRef !== undefined) {
-      imageRef!.nativeElement.width = v.w;
-      imageRef!.nativeElement.height = v.h;
-      const ctx1 = imageRef!.nativeElement.getContext('2d');
-
-      ctx1.putImageData(v.i, 0, 0);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      show(true);
-    }
-  }
-
   selectedColor(item: any): string {
     const list = this.list._options!.filter(
       s =>
@@ -609,39 +539,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     }
   }
 
-  /* reShow1(): void {
-     this.getAllImage4Zone(this.currentStudent! * this.nbreFeuilleParCopie! + this.zonenom.pageNumber!, this.zonenom).then(p =>
-      this.displayImage(p, this.nomImage, this.setShowNomImage),
-    );
-    this.getAllImage4Zone(this.currentStudent! * this.nbreFeuilleParCopie! + this.zoneprenom.pageNumber!, this.zoneprenom).then(p =>
-      this.displayImage(p, this.prenomImage, this.setShowPrenomImage),
-    );
-    this.getAllImage4Zone(this.currentStudent! * this.nbreFeuilleParCopie! + this.zoneine.pageNumber!, this.zoneine).then(p =>
-      this.displayImage(p, this.ineImage, this.setShowINEImage),
-    );
-
-    const filterStudent = this.students.filter(
-      s => s.examSheets?.some(ex => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie),
-    );
-    this.selectionStudents = filterStudent;
-  }*/
-
-  /* async loadImage(file: any, page1: number): Promise<IPage> {
-    return new Promise(resolve => {
-      const i = new Image();
-      i.onload = () => {
-        this.editedImage = <HTMLCanvasElement>document.createElement('canvas');
-        this.editedImage.width = i.width;
-        this.editedImage.height = i.height;
-        const ctx = this.editedImage.getContext('2d');
-        ctx!.drawImage(i, 0, 0);
-        const inputimage = ctx!.getImageData(0, 0, i.width, i.height);
-        resolve({ image: inputimage, page: page1, width: i.width, height: i.height });
-      };
-      i.src = file;
-    });
-  }*/
-
   nextStudent(): void {
     if (this.currentStudent + 1 < this.numberPagesInScan / this.nbreFeuilleParCopie) {
       this.selectionStudents = [];
@@ -662,11 +559,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
 
   selectStudent4Copie($event: any): void {
     this.selectionStudents = $event.value;
-  }
-
-  public alignementChange(): any {
-    // this.loadAllPages();
-    // this.exportAsImage();
   }
 
   private reviver(key: any, value: any): any {
@@ -918,14 +810,15 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       data: {
         students: res1,
         nbreFeuilleParCopie: this.nbreFeuilleParCopie,
-        exa: this.exam,
+        exam: this.exam,
       },
     });
 
-    ref.onClose.subscribe((res: any) => {
-      if (res) {
-        console.error(res);
-      }
+    ref.onClose.subscribe(() => {
+      this.getFilterStudent();
+      this.testLoadImage().then(() => {
+        this.blocked = false;
+      });
     });
   }
 }

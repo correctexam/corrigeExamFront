@@ -103,12 +103,23 @@
       </div>
 
       <div class="canvas-wrapper foo">
-        <canvas [hidden]="!showNomImage" #nomImage></canvas>
+        <table [style]="{ 'min-width': '60rem' }">
+          <tr>
+            <td style="width: 33%" *ngIf="nameImageImg"><img style="max-width: 100%" [src]="nameImageImg" /></td>
+            <td style="width: 33%" *ngIf="nameImageImg === undefined"></td>
+            <td style="width: 33%" *ngIf="firstnameImageImg"><img style="max-width: 100%" [src]="firstnameImageImg" /></td>
+            <td style="width: 33%" *ngIf="firstnameImageImg === undefined"></td>
+            <td style="width: 33%" *ngIf="ineImageImg"><img style="max-width: 100%" [src]="ineImageImg" /></td>
+            <td style="width: 33%" *ngIf="ineImageImg === undefined"></td>
+          </tr>
+        </table>
+
+        <!--        <canvas [hidden]="!showNomImage" #nomImage></canvas>
         <canvas [hidden]="!showPrenomImage" #prenomImage></canvas>
         <canvas [hidden]="!showINEImage" #ineImage></canvas>
         <canvas [hidden]="!debug" #nomImageReco></canvas>
         <canvas [hidden]="!debug" #prenomImageReco></canvas>
-        <canvas [hidden]="!debug" #ineImageReco></canvas>
+        <canvas [hidden]="!debug" #ineImageReco></canvas>-->
       </div>
       <div class="grid align-items-center">
         <div class="col-3">

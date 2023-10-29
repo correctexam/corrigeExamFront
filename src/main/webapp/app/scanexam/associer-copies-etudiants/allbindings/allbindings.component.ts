@@ -42,7 +42,6 @@ export class AllbindingsComponent implements OnInit {
         s.currentStudent = s.page / this.nbreFeuilleParCopie;
       });
       this.students = students;
-      console.error(this.students);
     }
   }
 
@@ -55,11 +54,12 @@ export class AllbindingsComponent implements OnInit {
     return canvas.toDataURL();
   }
 
-  async bindStudent(student: IStudent, currentStudent: number): Promise<void> {
+  async bindStudent(student: IStudent, currentStudent: number, element: any): Promise<void> {
     let examSheet4CurrentStudentId: (number | undefined)[] = [];
     if (student.examSheets) {
       examSheet4CurrentStudentId = student.examSheets.filter((ex: any) => ex?.scanId === this.exam.scanfileId).map(ex1 => ex1.id);
     }
+    console.error(examSheet4CurrentStudentId);
     // Récupère la sheet courante.
     const examSheet4CurrentPage: IExamSheet[] = (
       this.students
@@ -73,6 +73,7 @@ export class AllbindingsComponent implements OnInit {
         .map(s => s.examSheets) as any
     ).flat();
     // Passe cette sheet à -1 -1. sémantique plus associé
+    console.error(examSheet4CurrentPage);
 
     for (const ex of examSheet4CurrentPage.filter(ex2 => !examSheet4CurrentStudentId.includes(ex2.id))) {
       ex.pagemin = -1;
@@ -101,5 +102,15 @@ export class AllbindingsComponent implements OnInit {
       student.examSheets?.push(e.body!);
       await firstValueFrom(this.studentService.update(student));
     }
+    element.bound = true;
+  }
+  selectedColor(item: any): string {
+    if (item.bound) {
+      return 'text-green-400';
+    } else {
+      return '';
+    } /* else {
+      return 'text-red-400';
+    }*/
   }
 }

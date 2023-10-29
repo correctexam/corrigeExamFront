@@ -4,8 +4,8 @@
       <th style="width: 25%">Name</th>
       <th style="width: 25%">FirsName</th>
       <th style="width: 25%">INE</th>
-      <th pSortableColumn="predictionprecision" style="width: 18%">Recognized Student <p-sortIcon field="student"></p-sortIcon></th>
-      <th pSortableColumn="recognizedStudent" style="width: 4%">Probability <p-sortIcon field="probability"></p-sortIcon></th>
+      <th pSortableColumn="recognizedStudentShow" style="width: 18%">Recognized Student <p-sortIcon field="student"></p-sortIcon></th>
+      <th pSortableColumn="predictionprecision" style="width: 4%">Probability <p-sortIcon field="probability"></p-sortIcon></th>
       <th style="width: 3%"></th>
     </tr>
   </ng-template>
@@ -17,9 +17,13 @@
       <td *ngIf="sheet.firstnameImageImg === undefined"></td>
       <td *ngIf="sheet?.ineImageImg"><img style="max-width: 100%" [src]="sheet?.ineImageImg" /></td>
       <td *ngIf="sheet.ineImageImg === undefined"></td>
-      <td>{{ sheet.recognizedStudentShow }}</td>
+      <td>
+        <span style="float: left" [ngClass]="selectedColor(sheet)">{{ sheet.recognizedStudentShow }}</span>
+      </td>
       <td>{{ sheet.predictionprecision | percent: '1.1-1' }}</td>
-      <td><button class="p-button p-button-primary" (click)="bindStudent(sheet.recognizedStudent, sheet.currentStudent)">bind</button></td>
+      <td>
+        <button class="p-button p-button-primary" (click)="bindStudent(sheet.recognizedStudent, sheet.currentStudent, sheet)">bind</button>
+      </td>
     </tr>
   </ng-template>
 </p-table>
