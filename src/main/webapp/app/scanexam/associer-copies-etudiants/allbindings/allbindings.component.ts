@@ -35,12 +35,19 @@ export class AllbindingsComponent implements OnInit {
     if (this.config.data?.students) {
       const students = this.config.data.students;
       students.forEach((s: any) => {
-        s.nameImageImg = this.imagedata_to_image(s.nameImage);
-        s.firstnameImageImg = this.imagedata_to_image(s.firstnameImage);
-        s.ineImageImg = this.imagedata_to_image(s.ineImage);
+        if (s.nameImage) {
+          s.nameImageImg = this.imagedata_to_image(s.nameImage);
+        }
+        if (s.firstnameImage) {
+          s.firstnameImageImg = this.imagedata_to_image(s.firstnameImage);
+        }
+        if (s.ineImage) {
+          s.ineImageImg = this.imagedata_to_image(s.ineImage);
+        }
         s.recognizedStudentShow = s.recognizedStudent?.name + ' ' + s.recognizedStudent?.firstname + ' (' + s.recognizedStudent?.ine + ')';
         s.currentStudent = s.page / this.nbreFeuilleParCopie;
       });
+      students.sort((a: any, b: any) => b.predictionprecision - a.predictionprecision);
       this.students = students;
     }
   }
@@ -59,7 +66,6 @@ export class AllbindingsComponent implements OnInit {
     if (student.examSheets) {
       examSheet4CurrentStudentId = student.examSheets.filter((ex: any) => ex?.scanId === this.exam.scanfileId).map(ex1 => ex1.id);
     }
-    console.error(examSheet4CurrentStudentId);
     // Récupère la sheet courante.
     const examSheet4CurrentPage: IExamSheet[] = (
       this.students
@@ -73,7 +79,6 @@ export class AllbindingsComponent implements OnInit {
         .map(s => s.examSheets) as any
     ).flat();
     // Passe cette sheet à -1 -1. sémantique plus associé
-    console.error(examSheet4CurrentPage);
 
     for (const ex of examSheet4CurrentPage.filter(ex2 => !examSheet4CurrentStudentId.includes(ex2.id))) {
       ex.pagemin = -1;

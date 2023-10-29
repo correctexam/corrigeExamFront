@@ -56,19 +56,23 @@ export interface DoPredictionsInput {
   preferences: IPreference;
   removeHorizontal: boolean;
   looking4missing: boolean;
+  debug?: boolean;
 }
 
 export interface DoPredictionsOutput {
   nameZone?: ArrayBuffer;
+  nameZoneDebug?: ArrayBuffer;
   nameZoneW?: number;
   nameZoneH?: number;
   firstnameZone?: ArrayBuffer;
+  firstnameZoneDebug?: ArrayBuffer;
   firstnameZoneW?: number;
   firstnameZoneH?: number;
-  page: number;
   ineZone?: ArrayBuffer;
+  ineZoneDebug?: ArrayBuffer;
   ineZoneW?: number;
   ineZoneH?: number;
+  page: number;
   name?: string;
   namePrecision?: number;
   firstname?: string;
@@ -505,11 +509,27 @@ async function doPredictionsAsync(p: {
             z3t = cropZone(ti, p1.ineZone, p1.factor);
           }
           if (z1 !== undefined && z1t !== undefined) {
-            const res1 = await doPredidction4zone(true, z1, z1t, p1.candidateName, p1.preferences, p1.looking4missing, p1.removeHorizontal);
+            const res1 = await doPredidction4zone(
+              true,
+              z1,
+              z1t,
+              p1.candidateName,
+              p1.preferences,
+              p1.looking4missing,
+              p1.removeHorizontal,
+              p1.debug!,
+            );
             output.name = res1.solution[0] as string;
             output.namePrecision = +res1.solution[1];
             z1t.delete();
-            res1.debug.delete();
+            if (res1.debug) {
+              const z1BufferDebug = imageDataFromMat(res1.debug).data.buffer;
+              if (z1BufferDebug) {
+                opts.push(z1BufferDebug);
+                output.nameZoneDebug = z1BufferDebug;
+              }
+              res1.debug.delete();
+            }
           }
 
           if (z2 !== undefined && z2t !== undefined) {
@@ -521,19 +541,43 @@ async function doPredictionsAsync(p: {
               p1.preferences,
               p1.looking4missing,
               p1.removeHorizontal,
+              p1.debug!,
             );
             output.firstname = res2.solution[0] as string;
             output.firstnamePrecision = +res2.solution[1];
             z2t.delete();
-            res2.debug.delete();
+            if (res2.debug) {
+              const z2BufferDebug = imageDataFromMat(res2.debug).data.buffer;
+              if (z2BufferDebug) {
+                opts.push(z2BufferDebug);
+                output.firstnameZoneDebug = z2BufferDebug;
+              }
+              res2.debug.delete();
+            }
           }
 
           if (z3 !== undefined && z3t !== undefined) {
-            const res3 = await doPredidction4zone(false, z3, z3t, p1.candidateIne, p1.preferences, p1.looking4missing, p1.removeHorizontal);
+            const res3 = await doPredidction4zone(
+              false,
+              z3,
+              z3t,
+              p1.candidateIne,
+              p1.preferences,
+              p1.looking4missing,
+              p1.removeHorizontal,
+              p1.debug!,
+            );
             output.ine = res3.solution[0] as string;
             output.inePrecision = +res3.solution[1];
             z3t.delete();
-            res3.debug.delete();
+            if (res3.debug) {
+              const z3BufferDebug = imageDataFromMat(res3.debug).data.buffer;
+              if (z3BufferDebug) {
+                opts.push(z3BufferDebug);
+                output.ineZoneDebug = z3BufferDebug;
+              }
+              res3.debug.delete();
+            }
           }
         }
         outputs.push(output);
@@ -557,6 +601,7 @@ function doPredidction4zone(
   preference: IPreference,
   looking4missing: boolean,
   removeHorizontal: boolean,
+  debug: boolean,
 ): Promise<any> {
   let graynomTemplate = new cv.Mat();
   cv.cvtColor(srcTemplate, graynomTemplate, cv.COLOR_RGBA2GRAY, 0);
@@ -599,7 +644,7 @@ function doPredidction4zone(
   graynomTemplate.delete();
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return fprediction(src, candidates, looking4missing, removeHorizontal, letter, preference, dimAverage, posXAverage);
+  return fprediction(src, candidates, looking4missing, removeHorizontal, letter, preference, dimAverage, posXAverage, debug);
 }
 
 function groupImagePerContoursLength(p: { msg: any; payload: ICluster; uid: string }): void {
@@ -735,94 +780,6 @@ function getModel(letter: boolean): MLModel {
   }
 }
 
-/*function doPrediction(p: { msg: any; payload: any; uid: string }, letter: boolean): void {
-  // You can try more different parameters
-  const m = getModel(letter);
-  m.isWarmedUp.then(() => {
-    let src = cv.matFromImageData(p.payload.image);
-    let srcTemplate = cv.matFromImageData(p.payload.template);
-
-    let graynomTemplate = new cv.Mat();
-    cv.cvtColor(srcTemplate, graynomTemplate, cv.COLOR_RGBA2GRAY, 0);
-
-    const casesTemplate = trouveCases(graynomTemplate, p.payload.preference);
-    const casesTemplateSorted = casesTemplate.cases.sort(__comparePositionX);
-    const casePosition = [];
-    const caseDimension = [];
-    for (let k = 0; k < casesTemplate.cases.length; k++) {
-      const forme = casesTemplateSorted[k];
-      const dim = getOrigDimensions(forme);
-      caseDimension.push(dim);
-      const pos = getOrigPosition(forme);
-      casePosition.push(pos);
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-shadow
-    const posX = casePosition.map(p => p.x);
-    const distAverageX = [];
-
-    for (let k = 0; k < casePosition.length - 1; k++) {
-      distAverageX.push(posX[k + 1] - posX[k]);
-    }
-    const posXAverage = distAverageX.reduce((a, b) => a + b, 0) / distAverageX.length;
-
-    const dimAverage = {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    w: caseDimension.map(d => d.w).reduce((a, b) => a + b, 0) / caseDimension.length,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      h: caseDimension.map(d => d.h).reduce((a, b) => a + b, 0) / caseDimension.length,
-    };
-
-    const res1 = fprediction(src, p.payload.match, m, true, letter, p.payload.preference, dimAverage, posXAverage);
-    //    const res2 = fprediction(src, p.payload.match, m, false, letter);
-    //    if (res1.solution[1] > res2.solution[1]) {
-    postMessage({
-      msg: p.msg,
-      payload: {
-        debug: imageDataFromMat(res1.debug),
-        solution: res1.solution,
-      },
-      uid: p.uid,
-    });
-    res1.debug.delete();
-    //      res2.debug.delete();
-    src.delete();
-    /* } else {
-      postMessage({
-        msg: p.msg,
-        payload: {
-          debug: imageDataFromMat(res2.debug),
-          solution: res2.solution,
-        },
-        uid: p.uid,
-      });
-      res1.debug.delete();
-      res2.debug.delete();
-      src.delete();
-    }*/
-/* });
-}*/
-
-/*function doPredictionTemplate(p: { msg: any; payload: any; uid: string }, letter: boolean): void {
-  // You can try more different parameters
-  let src = cv.matFromImageData(p.payload.image);
-  let template = cv.matFromImageData(p.payload.template);
-  const m = getModel(letter);
-  m.isWarmedUp.then(() => {
-    const res1 = fpredictionTemplate(template, src, p.payload.match, m, true, letter, p.payload.preference);
-    postMessage({
-      msg: p.msg,
-      payload: {
-        solution: res1.solution,
-      },
-      uid: p.uid,
-    });
-    //    res1.debug.delete();
-    src.delete();
-    template.delete();
-  });
-}*/
-
 /**
  * This function is to convert again from cv.Mat to ImageData
  */
@@ -852,128 +809,6 @@ function imageDataFromMat(mat: any): any {
   return clampedArray;
 }
 
-/*function fpredictionTemplate(
-  nomTemplate: any,
-  nomCopie: any,
-  cand: string[],
-  m: MLModel,
-  lookingForMissingLetter: boolean,
-  onlyletter: boolean,
-  preference: IPreference,
-): any {
-  let candidate: any[] = [];
-  cand.forEach(e => {
-    candidate.push([e.padEnd(22, ' '), 0.0]);
-  });
-
-  let graynomTemplate = new cv.Mat();
-  cv.cvtColor(nomTemplate, graynomTemplate, cv.COLOR_RGBA2GRAY, 0);
-  let graynomCopie = new cv.Mat();
-  cv.cvtColor(nomCopie, graynomCopie, cv.COLOR_RGBA2GRAY, 0);
-  const casesTemplate = trouveCases(graynomTemplate, preference);
-  const letters = new Map();
-  for (let k = 0; k < casesTemplate.cases.length; k++) {
-    const forme = casesTemplate.cases.sort(__comparePositionX)[k];
-    const dim = getOrigDimensions(forme);
-    const pos = getOrigPosition(forme);
-
-    let dst2 = new cv.Mat();
-    let dst3 = new cv.Mat();
-    let dsize = new cv.Size(26, 26);
-    const m1 = decoupe(graynomCopie, pos, dim);
-    cv.resize(m1, dst2, dsize, 0, 0, cv.INTER_AREA);
-    // let dsizeb = new cv.Size(28, 28);
-    // cv.resize(img, dst3, dsizeb, 0, 0, cv.INTER_AREA);
-    let s = new cv.Scalar(255, 0, 0, 255);
-    cv.copyMakeBorder(dst2, dst3, 1, 1, 1, 1, cv.BORDER_CONSTANT, s);
-    letters.set(pos, dst3);
-    dst2.delete();
-    m1.delete();
-  }
-  const prepredict: any[] = [];
-  for (let i = 0; i < [...letters].length; i++) {
-    const s = diffGrayAvecCaseBlanche([...letters][i][1]);
-    if (s > 0.15) {
-      let res1 = m.predict(imageDataFromMat([...letters][i][1]));
-      if (onlyletter) {
-        if (res1[0] === '1') {
-          res1[0] = 'i';
-        }
-        if (res1[0] === '0') {
-          res1[0] = 'o';
-        }
-        if (res1[0] === '5') {
-          res1[0] = 's';
-        }
-        if (res1[0] === '3') {
-          res1[0] = 'b';
-        }
-        if (res1[0] === '9') {
-          res1[0] = 'g';
-        }
-      }
-      prepredict.push(res1);
-    } else {
-      prepredict.push(['', 1]);
-    }
-  }
-
-  let lastcharacter = 0;
-  prepredict.forEach((v, index) => {
-    if (v[0] !== '') {
-      lastcharacter = index;
-    }
-  });
-  let predict = prepredict.slice(0, lastcharacter + 1);
-
-  for (let k = 0; k < candidate.length; k++) {
-    for (let j = 0; j < 13; j++) {
-      if (j < predict.length) {
-        let letter = candidate[k][0].substring(j, j + 1).toLowerCase();
-        if (letter === predict[j][0].toLowerCase()) {
-          candidate[k][1] = candidate[k][1] + predict[j][1];
-        } else {
-          if (onlyletter) {
-            candidate[k][1] = candidate[k][1] + (1 - predict[j][1]) / 35;
-            // console.log(predict[j][1])
-          } else {
-            candidate[k][1] = candidate[k][1] + (1 - predict[j][1]) / 9;
-          }
-        }
-      }
-    }
-    candidate[k][1] = candidate[k][1] / predict.length;
-  }
-
-  for (let k = 0; k < candidate.length; k++) {
-    candidate[k][0] = candidate[k][0].trim();
-    candidate[k][1] = candidate[k][1] - Math.abs(candidate[k][0].length - predict.length) / candidate[k][0].length;
-  }
-
-  candidate.sort((a, b) => {
-    if (a[1] < b[1]) {
-      return 1;
-    } else {
-      return -1;
-    }
-  });
-  graynomTemplate.delete();
-  graynomCopie.delete();
-  for (let i = 0; i < [...letters].length; i++) {
-    [...letters][i][1].delete();
-  }
-  for (let i = 0; i < casesTemplate.cases.length; i++) {
-    casesTemplate.cases[i].delete();
-  }
-  for (let i = 0; i < casesTemplate.img_cases.length; i++) {
-    casesTemplate.img_cases[i].delete();
-  }
-
-  return {
-    solution: candidate[0],
-  };
-}*/
-
 async function fprediction(
   src: any,
   cand: string[],
@@ -983,6 +818,7 @@ async function fprediction(
   preference: IPreference,
   dimAverage: any,
   posXAverage: number,
+  debug: boolean,
 ): Promise<any> {
   const m = getModel(onlyletter);
   await m.isWarmedUp;
@@ -993,11 +829,12 @@ async function fprediction(
   cand.forEach(e => {
     candidate.push([e.padEnd(22, ' '), 0.0]);
   });
+  console.error(res.length, res);
 
   const predict = [];
   for (let i = 0; i < res.letter.length; i++) {
     let res1 = m.predict(imageDataFromMat(res.letter[i][1]));
-
+    console.error(res1);
     if (onlyletter) {
       if (res1[0] === '1') {
         res1[0] = 'i';
@@ -1052,11 +889,17 @@ async function fprediction(
       return -1;
     }
   });
-
-  return {
-    debug: res.invert_final,
-    solution: candidate[0],
-  };
+  if (debug) {
+    return {
+      debug: res.invert_final,
+      solution: candidate[0],
+    };
+  } else {
+    res.invert_final.delete();
+    return {
+      solution: candidate[0],
+    };
+  }
 }
 function levenshteinDistance(a: string, b: string): number {
   // Create a 2D array to store the distances

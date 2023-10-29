@@ -105,12 +105,14 @@
       <div class="canvas-wrapper foo">
         <table [style]="{ 'min-width': '60rem' }">
           <tr>
-            <td style="width: 33%" *ngIf="nameImageImg"><img style="max-width: 100%" [src]="nameImageImg" /></td>
-            <td style="width: 33%" *ngIf="nameImageImg === undefined"></td>
-            <td style="width: 33%" *ngIf="firstnameImageImg"><img style="max-width: 100%" [src]="firstnameImageImg" /></td>
-            <td style="width: 33%" *ngIf="firstnameImageImg === undefined"></td>
-            <td style="width: 33%" *ngIf="ineImageImg"><img style="max-width: 100%" [src]="ineImageImg" /></td>
-            <td style="width: 33%" *ngIf="ineImageImg === undefined"></td>
+            <td [style]="columnstyle" *ngIf="nameImageImg"><img style="max-width: 100%" [src]="nameImageImg" /></td>
+            <td [style]="columnstyle" *ngIf="firstnameImageImg"><img style="max-width: 100%" [src]="firstnameImageImg" /></td>
+            <td [style]="columnstyle" *ngIf="ineImageImg"><img style="max-width: 100%" [src]="ineImageImg" /></td>
+          </tr>
+          <tr *ngIf="debug">
+            <td [style]="columnstyle" *ngIf="nameImageImgDebug"><img style="max-width: 100%" [src]="nameImageImgDebug" /></td>
+            <td [style]="columnstyle" *ngIf="firstnameImageImgDebug"><img style="max-width: 100%" [src]="firstnameImageImgDebug" /></td>
+            <td [style]="columnstyle" *ngIf="ineImageImgDebug"><img style="max-width: 100%" [src]="ineImageImgDebug" /></td>
           </tr>
         </table>
 
