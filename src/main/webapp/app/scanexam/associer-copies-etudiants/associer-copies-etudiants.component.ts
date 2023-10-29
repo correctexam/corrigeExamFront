@@ -335,6 +335,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       candidateIne = this.students.map(student => student.ine!);
     }
+    console.error(candidateName.map((e: any) => (this.latinise(e)! as string).toLowerCase()));
+    console.error(candidateFirstName.map((e: any) => (this.latinise(e)! as string)?.toLowerCase()));
+    console.error(candidateIne.map((e: any) => (this.latinise(e)! as string)?.toLowerCase()));
     const r: DoPredictionsInputSamePage = {
       align: !this.noalign,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -403,9 +406,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       ) {
         let sts = this.students.filter(
           student =>
-            (solutionName as string).toLowerCase() === this.latinise(student.name?.toLowerCase()) &&
-            (solutionFirstname as string).toLowerCase() === this.latinise(student.firstname?.toLowerCase()) &&
-            (solutionINE as string).toLowerCase() === this.latinise(student.ine?.toLowerCase()),
+            (solutionName as string).toLowerCase() === this.latinise(student.name)?.toLowerCase() &&
+            (solutionFirstname as string).toLowerCase() === this.latinise(student.firstname)?.toLowerCase() &&
+            (solutionINE as string).toLowerCase() === this.latinise(student.ine)?.toLowerCase(),
         );
         if (sts.length > 0) {
           // Full match
@@ -415,7 +418,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
         if (recognizedStudent === undefined) {
           // INE Good Match
           if (solutionINEProb > 0.28) {
-            sts = this.students.filter(student => (solutionINE as string).toLowerCase() === this.latinise(student.ine?.toLowerCase()));
+            sts = this.students.filter(student => (solutionINE as string).toLowerCase() === this.latinise(student.ine)?.toLowerCase());
             if (sts.length > 0) {
               recognizedStudent = sts[0];
               predictionprecision = solutionINEProb as number;
@@ -425,8 +428,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
           if (recognizedStudent === undefined && +solutionINEProb < +solutionFirstnameProb && +solutionINEProb < +solutionNameProb) {
             let sts1 = this.students.filter(
               student =>
-                (solutionName as string).toLowerCase() === this.latinise(student.name?.toLowerCase()) &&
-                (solutionFirstname as string).toLowerCase() === this.latinise(student.firstname?.toLowerCase()),
+                (solutionName as string).toLowerCase() === this.latinise(student.name)?.toLowerCase() &&
+                (solutionFirstname as string).toLowerCase() === this.latinise(student.firstname)?.toLowerCase(),
             );
             if (sts1.length > 0) {
               recognizedStudent = sts1[0];
@@ -437,8 +440,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
           if (recognizedStudent === undefined && +solutionNameProb < +solutionFirstnameProb && +solutionNameProb < +solutionINEProb) {
             let sts1 = this.students.filter(
               student =>
-                (solutionFirstname as string).toLowerCase() === this.latinise(student.firstname?.toLowerCase()) &&
-                (solutionINE as string).toLowerCase() === this.latinise(student.ine?.toLowerCase()),
+                (solutionFirstname as string).toLowerCase() === this.latinise(student.firstname)?.toLowerCase() &&
+                (solutionINE as string).toLowerCase() === this.latinise(student.ine)?.toLowerCase(),
             );
             if (sts1.length > 0) {
               recognizedStudent = sts1[0];
@@ -449,8 +452,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
           if (recognizedStudent === undefined && +solutionFirstnameProb < +solutionNameProb && +solutionFirstnameProb < +solutionINEProb) {
             sts = this.students.filter(
               student =>
-                (solutionName as string).toLowerCase() === this.latinise(student.name?.toLowerCase()) &&
-                (solutionINE as string).toLowerCase() === this.latinise(student.ine?.toLowerCase()),
+                (solutionName as string).toLowerCase() === this.latinise(student.name)?.toLowerCase() &&
+                (solutionINE as string).toLowerCase() === this.latinise(student.ine)?.toLowerCase(),
             );
             if (sts.length > 0) {
               recognizedStudent = sts[0];
@@ -458,7 +461,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
             }
           }
           if (recognizedStudent === undefined && +solutionNameProb >= 0.44 && solutionFirstnameProb < solutionNameProb) {
-            sts = this.students.filter(student => (solutionName as string).toLowerCase() === this.latinise(student.name?.toLowerCase()));
+            sts = this.students.filter(student => (solutionName as string).toLowerCase() === this.latinise(student.name)?.toLowerCase());
             if (sts.length > 0) {
               recognizedStudent = sts[0];
               predictionprecision = (solutionNameProb as number) / 3;
@@ -478,7 +481,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
         let sts = this.students.filter(
           student =>
             (solutionName as string).toLowerCase() === this.latinise(student.name?.toLowerCase()) &&
-            (solutionFirstname as string).toLowerCase() === this.latinise(student.firstname?.toLowerCase()),
+            (solutionFirstname as string).toLowerCase() === this.latinise(student.firstname)?.toLowerCase(),
         );
         if (sts.length > 0) {
           recognizedStudent = sts[0];
@@ -487,21 +490,21 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       } else if (solutionName !== undefined && solutionINE !== undefined && solutionName.length > 0 && solutionINE.length > 0) {
         let sts = this.students.filter(
           student =>
-            (solutionName as string).toLowerCase() === this.latinise(student.name?.toLowerCase()) &&
-            (solutionINE as string).toLowerCase() === this.latinise(student.ine?.toLowerCase()),
+            (solutionName as string).toLowerCase() === this.latinise(student.name)?.toLowerCase() &&
+            (solutionINE as string).toLowerCase() === this.latinise(student.ine)?.toLowerCase(),
         );
         if (sts.length > 0) {
           recognizedStudent = sts[0];
           predictionprecision = ((solutionNameProb as number) + (solutionINEProb as number)) / 2;
         }
       } else if (solutionINE !== undefined && solutionINE.length > 0 && +solutionINEProb > 0.25) {
-        let sts = this.students.filter(student => (solutionINE as string).toLowerCase() === this.latinise(student.ine?.toLowerCase()));
+        let sts = this.students.filter(student => (solutionINE as string).toLowerCase() === this.latinise(student.ine)?.toLowerCase());
         if (sts.length > 0) {
           recognizedStudent = sts[0];
           predictionprecision = solutionINEProb as number;
         }
       } else if (solutionName !== undefined && solutionName.length > 0 && +solutionNameProb > 0.25) {
-        let sts = this.students.filter(student => (solutionName as string).toLowerCase() === this.latinise(student.name?.toLowerCase()));
+        let sts = this.students.filter(student => (solutionName as string).toLowerCase() === this.latinise(student.name)?.toLowerCase());
         if (sts.length > 0) {
           recognizedStudent = sts[0];
           predictionprecision = solutionNameProb as number;

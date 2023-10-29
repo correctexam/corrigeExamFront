@@ -605,7 +605,6 @@ function doPredidction4zone(
 ): Promise<any> {
   let graynomTemplate = new cv.Mat();
   cv.cvtColor(srcTemplate, graynomTemplate, cv.COLOR_RGBA2GRAY, 0);
-
   const casesTemplate = trouveCases(graynomTemplate, preference);
 
   const casesTemplateSorted = casesTemplate.cases.sort(__comparePositionX);
@@ -627,12 +626,16 @@ function doPredidction4zone(
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-shadow
   const posX = casePosition.map(p => p.x);
-  const distAverageX = [];
+  let distAverageX = [];
 
   for (let k = 0; k < casePosition.length - 1; k++) {
     distAverageX.push(posX[k + 1] - posX[k]);
   }
-  const posXAverage = distAverageX.reduce((a, b) => a + b, 0) / distAverageX.length;
+
+  let posXAverage = distAverageX.reduce((a, b) => a + b, 0) / distAverageX.length;
+
+  distAverageX = distAverageX.filter(e => e < posXAverage * 1.1);
+  posXAverage = distAverageX.reduce((a, b) => a + b, 0) / distAverageX.length;
 
   const dimAverage = {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -1120,11 +1123,14 @@ function extractImageNew(
   });
 
   let merge = mergeRect(rects);
+  console.error(merge);
   let kk = 0;
   while (merge !== null && kk < 200) {
     rects = rects.filter(rect => rect !== merge.toRemove1 && rect !== merge.toRemove2);
     rects.push(merge.u);
     merge = mergeRect(rects);
+    console.error(merge, kk);
+
     kk = kk + 1;
   }
 
@@ -1169,7 +1175,7 @@ function extractImageNew(
   const newrects: any[] = [];
   if (lookingForMissingLetter && rects.length > 3) {
     //TODO Improve based on averageDistance on template
-    const maxDistance = posXAverage + dimAverage.w;
+    const maxDistance = dimAverage.w;
     //    const dstavg = (lettersf[lettersf.length - 1][0].x - lettersf[0][0].x) / lettersf.length;
     let maxHauteur = 0;
     let maxLargeur = 0;
@@ -1177,7 +1183,7 @@ function extractImageNew(
     const nbrMissing = [];
     for (let i = 0; i < rects.length - 1; i++) {
       let diffXt = rects[i + 1].x - rects[i].x;
-      if (diffXt > maxDistance) {
+      if (diffXt > 2 * maxDistance) {
         nbrMissing.push(i);
       }
       if (rects[i].y < minY) {
@@ -1190,10 +1196,9 @@ function extractImageNew(
         maxLargeur = rects[i].width;
       }
     }
-
+    console.error('nbrMissing', nbrMissing);
     nbrMissing.forEach(n => {
       let x = rects[n].x + posXAverage;
-
       let rect = new cv.Rect(x, minY, maxLargeur, maxHauteur);
       newrects.push(rect);
     });
@@ -1207,6 +1212,8 @@ function extractImageNew(
       return 1;
     }
   });
+
+  console.error('rects', rects.length);
 
   // TODO interect on rect
   rects.forEach(rect => {
@@ -1284,6 +1291,13 @@ function extractImageNew(
   };
 }
 
+function union(rect1: any, rect2: any): any {
+  const x = Math.min(rect1.x, rect2.x);
+  const y = Math.min(rect1.y, rect2.y);
+  const x2 = Math.max(rect1.x + rect1.width, rect2.x + rect2.width);
+  const y2 = Math.max(rect1.y + rect1.height, rect2.y + rect2.height);
+  return new cv.Rect(x, y, x2 - x, y2 - y);
+}
 function intersect(rect1: any, rect2: any): any {
   let rightRect = rect2;
   let leftRect = rect1;
@@ -1333,9 +1347,9 @@ function mergeRect(rects: any[]): any {
     const rect1 = rects[i];
     for (let j = i + 1; j < rects.length; j++) {
       const rect2 = rects[j];
-      const union = intersect(rect1, rect2);
-      if (union !== null) {
-        return { u: union, toRemove1: rect1, toRemove2: rect2 };
+      const union1 = intersect(rect1, rect2);
+      if (union1 !== null) {
+        return { u: union(rect1, rect2), toRemove1: rect1, toRemove2: rect2 };
       }
     }
   }

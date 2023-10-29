@@ -4,7 +4,7 @@ import { ICourseGroup } from 'app/entities/course-group/course-group.model';
 export interface IStudent {
   id?: number;
   name?: string;
-  firstname?: string | null;
+  firstname?: string;
   ine?: string;
   caslogin?: string | null;
   mail?: string | null;
@@ -16,12 +16,12 @@ export class Student implements IStudent {
   constructor(
     public id?: number,
     public name?: string,
-    public firstname?: string | null,
+    public firstname?: string,
     public ine?: string,
     public caslogin?: string | null,
     public mail?: string | null,
     public examSheets?: IExamSheet[] | null,
-    public groups?: ICourseGroup[] | null
+    public groups?: ICourseGroup[] | null,
   ) {}
 }
 

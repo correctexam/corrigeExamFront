@@ -48,6 +48,7 @@ export class AllbindingsComponent implements OnInit {
         s.currentStudent = s.page / this.nbreFeuilleParCopie;
       });
       students.sort((a: any, b: any) => b.predictionprecision - a.predictionprecision);
+
       this.students = students;
     }
   }
