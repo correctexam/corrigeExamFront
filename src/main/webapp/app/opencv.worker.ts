@@ -1173,7 +1173,7 @@ function extractImageNew(
   rects = rects.filter((rect, index) => !rectToRemove.includes(index));
 
   const newrects: any[] = [];
-  if (lookingForMissingLetter && rects.length > 3) {
+  if (lookingForMissingLetter && rects.length > 1) {
     //TODO Improve based on averageDistance on template
     const maxDistance = dimAverage.w;
     //    const dstavg = (lettersf[lettersf.length - 1][0].x - lettersf[0][0].x) / lettersf.length;
