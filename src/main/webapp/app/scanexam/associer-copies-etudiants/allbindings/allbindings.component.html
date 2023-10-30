@@ -27,6 +27,7 @@
       <td>{{ sheet.predictionprecision | number: '1.0-0' }}</td>
       <td>
         <button
+          *ngIf="sheet.predictionprecision >= 1"
           [pTooltip]="'scanexam.bindTooltip' | translate"
           class="p-button p-button-primary"
           (click)="bindStudent(sheet.recognizedStudent, sheet.currentStudent, sheet)"
