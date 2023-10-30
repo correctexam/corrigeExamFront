@@ -1,11 +1,15 @@
 <p-table [value]="students" [tableStyle]="{ 'min-width': '60rem' }">
   <ng-template pTemplate="header">
     <tr>
-      <th *ngIf="showName" [style]="columnstyle">Name</th>
-      <th *ngIf="showFirstname" [style]="columnstyle">FirsName</th>
+      <th *ngIf="showName" [style]="columnstyle"><span jhiTranslate="scanexam.nom">Name</span></th>
+      <th *ngIf="showFirstname" [style]="columnstyle"><span jhiTranslate="scanexam.prenom">FirsName</span></th>
       <th *ngIf="showIne" [style]="columnstyle">INE</th>
-      <th pSortableColumn="recognizedStudentShow" style="width: 18%">Recognized Student <p-sortIcon field="student"></p-sortIcon></th>
-      <th pSortableColumn="predictionprecision" style="width: 4%">Probability <p-sortIcon field="probability"></p-sortIcon></th>
+      <th pSortableColumn="recognizedStudentShow" style="width: 18%">
+        <span jhiTranslate="scanexam.recognizedstudent">Recognized Student</span> <p-sortIcon field="student"></p-sortIcon>
+      </th>
+      <th pSortableColumn="predictionprecision" style="width: 4%">
+        <span jhiTranslate="scanexam.score">Probability</span> <p-sortIcon field="probability"></p-sortIcon>
+      </th>
       <th style="width: 3%"></th>
     </tr>
   </ng-template>
@@ -22,7 +26,13 @@
       </td>
       <td>{{ sheet.predictionprecision | number: '1.0-0' }}</td>
       <td>
-        <button class="p-button p-button-primary" (click)="bindStudent(sheet.recognizedStudent, sheet.currentStudent, sheet)">bind</button>
+        <button
+          [pTooltip]="'scanexam.bindTooltip' | translate"
+          class="p-button p-button-primary"
+          (click)="bindStudent(sheet.recognizedStudent, sheet.currentStudent, sheet)"
+        >
+          <span jhiTranslate="scanexam.bind">bind</span>
+        </button>
       </td>
     </tr>
   </ng-template>

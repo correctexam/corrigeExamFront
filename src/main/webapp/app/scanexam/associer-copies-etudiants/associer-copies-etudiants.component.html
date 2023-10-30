@@ -47,8 +47,14 @@
         >
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam">Retourner à l'exam</span>
         </button>
-        <p-inputSwitch [(ngModel)]="assisted"></p-inputSwitch>
+        <p-inputSwitch
+          [(ngModel)]="assisted"
+          (onChange)="loadImage()"
+          [pTooltip]="'scanexam.assistanceTooltip' | translate"
+        ></p-inputSwitch>
         <label jhiTranslate="scanexam.assistance">Assistance</label>
+        <p-inputSwitch [(ngModel)]="debug" (onChange)="loadImage()" [pTooltip]="'scanexam.debugTooltip' | translate"></p-inputSwitch>
+        <label jhiTranslate="scanexam.debug">Debug</label>
         <button
           [disabled]="!this.examId"
           type="submit"
@@ -56,8 +62,9 @@
           data-cy="entityCreateSaveButton"
           class="p-button p-button-primary"
           (click)="openAllBinding()"
+          [pTooltip]="'scanexam.allbindingsTooltip' | translate"
         >
-          <fa-icon icon="magnifying-glass-arrow-right"></fa-icon>&nbsp;<span>Show all binding</span>
+          <fa-icon icon="magnifying-glass-arrow-right"></fa-icon>&nbsp;<span jhiTranslate="scanexam.allbindings">Show all binding</span>
         </button>
       </div>
     </div>
@@ -70,6 +77,7 @@
             ><span jhiTranslate="scanexam.aistudent">Etudiant(es) Reconnu(es):</span> {{ showRecognizedStudent() }}</span
           >
           <p-button
+            [pTooltip]="'scanexam.validaterecognizedTooltip' | translate"
             (onClick)="selectRecogniezStudent()"
             [style.padding]="'0.1rem'"
             *ngIf="assisted && recognizedStudent !== undefined && predictionprecision > 0.07"
@@ -81,7 +89,11 @@
       <div class="grid align-items-center">
         <div class="col-3">
           <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
-          <p-inputSwitch [(ngModel)]="noalign" (onChange)="loadImage()"></p-inputSwitch>
+          <p-inputSwitch
+            [(ngModel)]="noalign"
+            (onChange)="loadImage()"
+            [pTooltip]="'scanexam.removealignementTooltip' | translate"
+          ></p-inputSwitch>
         </div>
         <div class="col-6">
           <div class="d-flex justify-content-center">
@@ -119,7 +131,11 @@
       <div class="grid align-items-center">
         <div class="col-3">
           <label jhiTranslate="scanexam.filterboundstudent">Filtrer les étudiants déjà affectées: </label>
-          <p-inputSwitch [(ngModel)]="filterbindstudent" (onChange)="refreshLocalStudentList()"></p-inputSwitch>
+          <p-inputSwitch
+            [(ngModel)]="filterbindstudent"
+            (onChange)="refreshLocalStudentList()"
+            [pTooltip]="'scanexam.filterboundstudentTooltip' | translate"
+          ></p-inputSwitch>
         </div>
         <div class="col-6"></div>
         <div class="col-3">

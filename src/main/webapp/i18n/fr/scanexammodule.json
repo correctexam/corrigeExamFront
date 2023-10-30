@@ -31,10 +31,12 @@
     "clearcanvas": "Effacer le canvas, supprimer toutes les formes/textes",
     "bindcopies": "Associer étudiants/copies",
     "assistance": "Assistance",
+    "assistanceTooltip": "Permet d'activer l'IA pour la détection automatique des noms",
     "alignement": "Alignement",
     "selectedstudent": "Etudiant(es) Séléctionné(es) :",
     "aistudent": "Etudiant(es) Reconnu(es) :",
     "removealignement": "Supprimer l'alignement :",
+    "removealignementTooltip": "Permet de travailler sur les copies non alignées",
     "showgalleria": "Voir la page complète",
     "zoomfactor": "Facteur d'agrandissement :",
     "next": "Suivant",
@@ -236,6 +238,7 @@
     "shortcutdetail": "Il est possible de passer d'une question à une autre en utilisant les raccourcis clavier suivants: Ctrl + down (Cmd + down pour les mac) ou Ctrl + up (Cmd + up pour les mac). Il est possible de passer d'un étudiant à un autre en utilisant les raccourcis clavier suivants: Ctrl + right (Cmd + right pour les mac) ou Ctrl + left (Cmd + left pour les mac).",
     "shortcutopenatstart": "Afficher cette fenètre au chargement du module de correction sur cet ordinateur/tablette",
     "filterboundstudent": "Filtrer les étudiant(e)s déjà affectée(s):",
+    "filterboundstudentTooltip": "Permet de filtrer les étudiant(e)s déjà affectée(s)",
     "removeallbinding": "Supprimer toutes les associations",
     "removeallbindingtooltip": "⚠️ à faire uniquement si la correction n'a pas commencé",
     "noneval": "non évalué",
@@ -355,6 +358,15 @@
     "sendirectemail": "Envoi d'un email avec les résultats pour cet étudiant",
     "envoimailpersonal": "Envoi Email",
     "concatenation": "Fusion (concaténation) au pdf du scan prélablement chargé:",
-    "concatenationTooltip": "Permet de décider si on fait un pdf résultant de la concatenation du pdf existant et du nouveau pdf ou si l'on remplace le pdf de scan précédent (coché veut dire concaténation)"
+    "concatenationTooltip": "Permet de décider si on fait un pdf résultant de la concatenation du pdf existant et du nouveau pdf ou si l'on remplace le pdf de scan précédent (coché veut dire concaténation)",
+    "debug": "debug",
+    "debugTooltip": "Permet de voir le résultat de la détection de caractères",
+    "allbindings": "Toutes copies",
+    "allbindingsTooltip": "Permet de lancer l'analyse sur toutes les copies non encore associées",
+    "bind": "lier",
+    "bindTooltip": "Permet d'associer cette copie à cet étudiant",
+    "recognizedstudent": "Etudiant reconnu",
+    "score": "Score",
+    "validaterecognizedTooltip": "Permet d'associer l'étudiant reconnu avec cette copie. Cette action est aussi appelable avec le raccourci clavier ctrl + enter"
   }
 }

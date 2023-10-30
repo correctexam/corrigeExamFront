@@ -746,7 +746,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
 
   async openAllBinding(): Promise<void> {
     const freeSheets = this.computeFreeSheets();
-    console.error(freeSheets);
     if (freeSheets.length > 0) {
       this.blocked = true;
       const res1 = await this.testLoadImage4pages(freeSheets.map(e => e * this.nbreFeuilleParCopie!));
