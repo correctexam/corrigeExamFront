@@ -18,7 +18,7 @@ import { IZone } from 'app/entities/zone/zone.model';
 import { AlignImagesService } from '../services/align-images.service';
 import { ITemplate } from 'app/entities/template/template.model';
 import { StudentService } from 'app/entities/student/service/student.service';
-import { IStudent } from '../../entities/student/student.model';
+import { IStudent, Student } from '../../entities/student/student.model';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 import { IExamSheet } from '../../entities/exam-sheet/exam-sheet.model';
 import { v4 as uuid } from 'uuid';
@@ -116,8 +116,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     this.recognizedStudent?.firstname +
     ' (' +
     this.recognizedStudent?.ine +
-    ') [precision=' +
-    this.predictionprecision +
+    ') [score=' +
+    Math.floor(this.predictionprecision) +
     ']';
 
   students: IStudent[] = [];
@@ -146,7 +146,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   firstnameImageImgDebug?: string;
   ineImageImgDebug?: string;
 
-  debug = true;
+  debug = false;
   noalign = false;
   factor = 1;
 
@@ -285,7 +285,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       if (res[0].nameImage) {
         this.nameImageImg = this.imagedata_to_image(res[0].nameImage);
       }
-      console.error(res[0]);
+      //      console.error(res[0]);
       if (this.debug && res[0].nameImageDebug) {
         this.nameImageImgDebug = this.imagedata_to_image(res[0].nameImageDebug);
       }
@@ -303,9 +303,11 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       }
       const imgs = [res[0].nameImage, res[0].firstnameImage, res[0].ineImage];
       const length = imgs.filter(e => e !== undefined).length;
-      console.error(length);
+      //      console.error(length);
       if (length > 1) {
         this.columnstyle = { width: Math.floor(100 / length) + '%' };
+      } else {
+        this.columnstyle = { width: '100%' };
       }
     }
   }
@@ -323,29 +325,24 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    let candidateFirstName = this.freeStudent.map(student => student.firstname!);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    let candidateName = this.freeStudent.map(student => student.name!);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    let candidateIne = this.freeStudent.map(student => student.ine!);
+    let candidates = this.freeStudent.map(
+      student => new Student(student.id, this.latinise(student.name), this.latinise(student.firstname), this.latinise(student.ine)),
+    );
+
     if (!this.filterbindstudent) {
-      candidateFirstName = this.students.map(student => student.firstname!);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      candidateName = this.students.map(student => student.name!);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      candidateIne = this.students.map(student => student.ine!);
+      candidates = this.students.map(
+        student => new Student(student.id, this.latinise(student.name), this.latinise(student.firstname), this.latinise(student.ine)),
+      );
     }
-    console.error(candidateName.map((e: any) => (this.latinise(e)! as string).toLowerCase()));
+    /*    console.error(candidateName.map((e: any) => (this.latinise(e)! as string).toLowerCase()));
     console.error(candidateFirstName.map((e: any) => (this.latinise(e)! as string)?.toLowerCase()));
-    console.error(candidateIne.map((e: any) => (this.latinise(e)! as string)?.toLowerCase()));
+    console.error(candidateIne.map((e: any) => (this.latinise(e)! as string)?.toLowerCase())); */
     const r: DoPredictionsInputSamePage = {
       align: !this.noalign,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      candidateFirstName: candidateFirstName.map((e: any) => this.latinise(e)!),
+      candidates: candidates as IStudent[],
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      candidateName: candidateName.map((e: any) => this.latinise(e)!),
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      candidateIne: candidateIne.map((e: any) => this.latinise(e)!),
       examId: +this.examId,
       indexDb: this.preferenceService.getPreference().cacheDb === 'indexdb',
       factor: this.factor,
@@ -358,15 +355,13 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       removeHorizontal: this.preferenceService.getPreference().removeHorizontalName,
       looking4missing: true,
       preferences: this.preferenceService.getPreference(),
+      assist: this.assisted,
       debug: this.debug,
     };
     const output: PredictResult[] = [];
     const r5 = await firstValueFrom(this.alignImagesService.doPredictions(r));
     for (const r1 of r5) {
       let result: PredictResult = { predictionprecision: 0, page: r1.page };
-
-      let recognizedStudent: IStudent | undefined;
-      let predictionprecision = 0;
       if (r1.nameZone) {
         result.nameImage = new ImageData(new Uint8ClampedArray(r1.nameZone), r1.nameZoneW!, r1.nameZoneH!);
         if (this.debug && r1.nameZoneDebug) {
@@ -386,17 +381,16 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
           result.ineImageDebug = new ImageData(new Uint8ClampedArray(r1.ineZoneDebug), r1.ineZoneW!, r1.ineZoneH!);
         }
       }
-      const solutionName = r1.name;
-      const solutionFirstname = r1.firstname;
+      /*      const solutionFirstname = r1.firstname;
       const solutionINE = r1.ine;
       const solutionNameProb = r1.namePrecision!;
       const solutionFirstnameProb = r1.firstnamePrecision!;
       const solutionINEProb = r1.inePrecision!;
       console.log(solutionName, solutionNameProb);
       console.log(solutionFirstname, solutionFirstnameProb);
-      console.log(solutionINE, solutionINEProb);
+      console.log(solutionINE, solutionINEProb);*/
 
-      if (
+      /*      if (
         solutionName !== undefined &&
         solutionFirstname !== undefined &&
         solutionINE !== undefined &&
@@ -509,10 +503,13 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
           recognizedStudent = sts[0];
           predictionprecision = solutionNameProb as number;
         }
+      }*/
+      if (r1.resultPrediction.length > 0) {
+        result.predictionprecision = r1.resultPrediction[0].proba! * r1.resultPrediction[0].score!;
+        result.recognizedStudent = this.students.find(st => st.id === r1.resultPrediction[0].id);
+        output.push(result);
       }
-      result.predictionprecision = predictionprecision;
-      result.recognizedStudent = recognizedStudent;
-      output.push(result);
+      //      const solutionName = r1.resultPrediction[0].;
     }
 
     return output;
@@ -844,7 +841,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
 
   async openAllBinding(): Promise<void> {
     const freeSheets = this.computeFreeSheets();
-    console.error(freeSheets);
+    //    console.error(freeSheets);
     if (freeSheets.length > 0) {
       this.blocked = true;
       const res1 = await this.testLoadImage4pages(freeSheets.map(e => e * this.nbreFeuilleParCopie!));

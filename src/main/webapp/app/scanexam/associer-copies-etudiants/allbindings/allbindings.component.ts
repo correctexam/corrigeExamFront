@@ -17,6 +17,11 @@ export class AllbindingsComponent implements OnInit {
   students: any[] = [];
   exam!: IExam;
   nbreFeuilleParCopie!: number;
+  columnstyle = { width: '75%' };
+  showName = true;
+  showFirstname = true;
+  showIne = true;
+
   constructor(
     public ref: DynamicDialogRef,
     public config: DynamicDialogConfig,
@@ -47,6 +52,20 @@ export class AllbindingsComponent implements OnInit {
         s.recognizedStudentShow = s.recognizedStudent?.name + ' ' + s.recognizedStudent?.firstname + ' (' + s.recognizedStudent?.ine + ')';
         s.currentStudent = s.page / this.nbreFeuilleParCopie;
       });
+      if (students.length > 0) {
+        const imgs = [students[0].nameImage, students[0].firstnameImage, students[0].ineImage];
+        this.showName = students[0].nameImage !== undefined;
+        this.showFirstname = students[0].firstnameImage !== undefined;
+        this.showIne = students[0].ineImage !== undefined;
+        const length = imgs.filter(e => e !== undefined).length;
+        //      console.error(length);
+        if (length > 1) {
+          this.columnstyle = { width: Math.floor(75 / length) + '%' };
+        } else {
+          this.columnstyle = { width: '75%' };
+        }
+      }
+
       students.sort((a: any, b: any) => b.predictionprecision - a.predictionprecision);
 
       this.students = students;

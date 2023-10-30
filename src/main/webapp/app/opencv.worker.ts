@@ -42,6 +42,15 @@ interface IImageCluster {
   height?: number;
 }
 
+interface IStudent {
+  id?: number;
+  name?: string;
+  firstname?: string;
+  ine?: string;
+  score?: number;
+  proba?: number;
+}
+
 export interface DoPredictionsInput {
   nameZone?: IZone;
   firstnameZone?: IZone;
@@ -49,13 +58,12 @@ export interface DoPredictionsInput {
   indexDb: boolean;
   align: boolean;
   examId: number;
-  candidateName: string[];
-  candidateFirstName: string[];
-  candidateIne: string[];
+  candidates: IStudent[];
   factor: number;
   preferences: IPreference;
   removeHorizontal: boolean;
   looking4missing: boolean;
+  assist: boolean;
   debug?: boolean;
 }
 
@@ -73,12 +81,7 @@ export interface DoPredictionsOutput {
   ineZoneW?: number;
   ineZoneH?: number;
   page: number;
-  name?: string;
-  namePrecision?: number;
-  firstname?: string;
-  firstnamePrecision?: number;
-  ine?: string;
-  inePrecision?: number;
+  resultPrediction: IStudent[];
 }
 
 export interface DoPredictionsInputSamePage extends DoPredictionsInput {
@@ -434,6 +437,8 @@ async function doPredictionsAsync(p: {
   if (isDoPredictionsInputSamePage(p1)) {
     const opts: Transferable[] = [];
     const outputs: DoPredictionsOutput[] = [];
+    const statCAndPerPage: Map<number, Map<number, IStudent>> = new Map();
+
     for (let pageToAnalyze of p1.pagesToAnalyze) {
       const i = await getScanImage(p1.align, pageToAnalyze, p1.examId, p1.indexDb);
       if (i !== undefined) {
@@ -442,6 +447,7 @@ async function doPredictionsAsync(p: {
         let z1: any;
         let z2: any;
         let z3: any;
+
         let pageZone = 0;
         if (p1.nameZone) {
           z1 = cropZone(l, p1.nameZone, p1.factor);
@@ -457,6 +463,7 @@ async function doPredictionsAsync(p: {
         }
         const output: DoPredictionsOutput = {
           page: pageToAnalyze - pageZone,
+          resultPrediction: [],
         };
         let z1Buffer: ArrayBuffer | undefined;
         let z2Buffer: ArrayBuffer | undefined;
@@ -491,99 +498,108 @@ async function doPredictionsAsync(p: {
         output.nameZone = z1Buffer;
         output.firstnameZone = z2Buffer;
         output.ineZone = z3Buffer;
-
-        // Load Template
-        const t = await getTemplateImage(p1.pageTemplate, p1.examId, p1.indexDb);
-        if (t !== undefined) {
-          const ti = await loadImage(t);
-          let z1t: any;
-          let z2t: any;
-          let z3t: any;
-          if (p1.nameZone) {
-            z1t = cropZone(ti, p1.nameZone, p1.factor);
-          }
-          if (p1.firstnameZone) {
-            z2t = cropZone(ti, p1.firstnameZone, p1.factor);
-          }
-          if (p1.ineZone) {
-            z3t = cropZone(ti, p1.ineZone, p1.factor);
-          }
-          if (z1 !== undefined && z1t !== undefined) {
-            const res1 = await doPredidction4zone(
-              true,
-              z1,
-              z1t,
-              p1.candidateName,
-              p1.preferences,
-              p1.looking4missing,
-              p1.removeHorizontal,
-              p1.debug!,
-            );
-            output.name = res1.solution[0] as string;
-            output.namePrecision = +res1.solution[1];
-            z1t.delete();
-            if (res1.debug) {
-              const z1BufferDebug = imageDataFromMat(res1.debug).data.buffer;
-              if (z1BufferDebug) {
-                opts.push(z1BufferDebug);
-                output.nameZoneDebug = z1BufferDebug;
+        if (p1.assist) {
+          // Load Template
+          const t = await getTemplateImage(p1.pageTemplate, p1.examId, p1.indexDb);
+          if (t !== undefined) {
+            const ti = await loadImage(t);
+            let z1t: any;
+            let z2t: any;
+            let z3t: any;
+            let predictname: any;
+            let predictfirstname: any;
+            let predictine: any;
+            if (p1.nameZone) {
+              z1t = cropZone(ti, p1.nameZone, p1.factor);
+            }
+            if (p1.firstnameZone) {
+              z2t = cropZone(ti, p1.firstnameZone, p1.factor);
+            }
+            if (p1.ineZone) {
+              z3t = cropZone(ti, p1.ineZone, p1.factor);
+            }
+            if (z1 !== undefined && z1t !== undefined) {
+              predictname = await doPredidction4zone(true, z1, z1t, p1.preferences, p1.looking4missing, p1.removeHorizontal, p1.debug!);
+              //            output.name = res1.solution[0] as string;
+              //            output.namePrecision = +res1.solution[1];
+              z1t.delete();
+              if (predictname.debug) {
+                const z1BufferDebug = imageDataFromMat(predictname.debug).data.buffer;
+                if (z1BufferDebug) {
+                  opts.push(z1BufferDebug);
+                  output.nameZoneDebug = z1BufferDebug;
+                }
+                predictname.debug.delete();
               }
-              res1.debug.delete();
+            }
+
+            if (z2 !== undefined && z2t !== undefined) {
+              predictfirstname = await doPredidction4zone(
+                true,
+                z2,
+                z2t,
+                p1.preferences,
+                p1.looking4missing,
+                p1.removeHorizontal,
+                p1.debug!,
+              );
+              //            output.firstname = res2.solution[0] as string;
+              //            output.firstnamePrecision = +res2.solution[1];
+              z2t.delete();
+              if (predictfirstname.debug) {
+                const z2BufferDebug = imageDataFromMat(predictfirstname.debug).data.buffer;
+                if (z2BufferDebug) {
+                  opts.push(z2BufferDebug);
+                  output.firstnameZoneDebug = z2BufferDebug;
+                }
+                predictfirstname.debug.delete();
+              }
+            }
+
+            if (z3 !== undefined && z3t !== undefined) {
+              predictine = await doPredidction4zone(false, z3, z3t, p1.preferences, p1.looking4missing, p1.removeHorizontal, p1.debug!);
+              //            output.ine = res3.solution[0] as string;
+              //            output.inePrecision = +res3.solution[1];
+              z3t.delete();
+              if (predictine.debug) {
+                const z3BufferDebug = imageDataFromMat(predictine.debug).data.buffer;
+                if (z3BufferDebug) {
+                  opts.push(z3BufferDebug);
+                  output.ineZoneDebug = z3BufferDebug;
+                }
+                predictine.debug.delete();
+              }
+            }
+
+            if (predictname?.solution?.length > 0 && predictfirstname?.solution?.length > 0) {
+              const predictnamelength: number = predictname.solution.length;
+              const predictfirstnamelength: number = predictfirstname.solution.length;
+              const cand = p1.candidates.filter(
+                c => Math.abs(predictnamelength - c.name!.length) <= 2 && Math.abs(predictfirstnamelength - c.firstname!.length) <= 2,
+              );
+              statCAndPerPage.set(output.page, new Map());
+              cand.forEach(c => {
+                const c1 = { ...c };
+                const sizedistance = Math.abs(predictnamelength - c.name!.length) + Math.abs(predictfirstnamelength - c.firstname!.length);
+                c1.score = 1000 / Math.pow(2, sizedistance);
+                c1.proba = computeStatPredict(c1, predictname, predictfirstname, predictine);
+                statCAndPerPage.get(output.page)?.set(c1.id!, c1);
+              });
+              const res = Array.from(statCAndPerPage.get(output.page)!.values()).sort((a, b) => b.proba! * b.score! - a.proba! * a.score!);
+              let finalres = [];
+              if (res.length > 2) {
+                finalres = [res[0], res[1], res[2]];
+              } else {
+                finalres = res;
+              }
+              output.resultPrediction = finalres;
             }
           }
-
-          if (z2 !== undefined && z2t !== undefined) {
-            const res2 = await doPredidction4zone(
-              true,
-              z2,
-              z2t,
-              p1.candidateFirstName,
-              p1.preferences,
-              p1.looking4missing,
-              p1.removeHorizontal,
-              p1.debug!,
-            );
-            output.firstname = res2.solution[0] as string;
-            output.firstnamePrecision = +res2.solution[1];
-            z2t.delete();
-            if (res2.debug) {
-              const z2BufferDebug = imageDataFromMat(res2.debug).data.buffer;
-              if (z2BufferDebug) {
-                opts.push(z2BufferDebug);
-                output.firstnameZoneDebug = z2BufferDebug;
-              }
-              res2.debug.delete();
-            }
-          }
-
-          if (z3 !== undefined && z3t !== undefined) {
-            const res3 = await doPredidction4zone(
-              false,
-              z3,
-              z3t,
-              p1.candidateIne,
-              p1.preferences,
-              p1.looking4missing,
-              p1.removeHorizontal,
-              p1.debug!,
-            );
-            output.ine = res3.solution[0] as string;
-            output.inePrecision = +res3.solution[1];
-            z3t.delete();
-            if (res3.debug) {
-              const z3BufferDebug = imageDataFromMat(res3.debug).data.buffer;
-              if (z3BufferDebug) {
-                opts.push(z3BufferDebug);
-                output.ineZoneDebug = z3BufferDebug;
-              }
-              res3.debug.delete();
-            }
-          }
+          outputs.push(output);
+          z1?.delete();
+          z2?.delete();
+          z3?.delete();
         }
-        outputs.push(output);
-        z1?.delete();
-        z2?.delete();
-        z3?.delete();
       }
     }
     source.currentTarget.postMessage({ msg: p.msg, payload: outputs, uid: p.uid }, opts);
@@ -593,11 +609,64 @@ async function doPredictionsAsync(p: {
   }
 }
 
+function predictProba(name: string, predictname: any, letter: boolean): number {
+  let probaname = 0;
+  for (let j = 0; j < predictname.length; j++) {
+    const cletter = name.substring(j, j + 1).toLowerCase();
+    if (cletter === predictname[j][0].toLowerCase()) {
+      probaname = probaname + predictname[j][1];
+    } else {
+      if (letter) {
+        probaname = probaname + (1 - predictname[j][1]) / 35;
+      } else {
+        probaname = probaname + (1 - predictname[j][1]) / 9;
+      }
+    }
+  }
+  if (predictname > 0) {
+    probaname = probaname / predictname.length;
+  }
+  const studdentname = name.trim();
+  const levenshtein = levenshteinDistance(studdentname, predictname.map((cl: any) => cl[0] as string).join(''));
+  const levenshteinMax = Math.max(predictname.map((e: any) => e[0] as string).join('').length, studdentname.length);
+  probaname = probaname - (probaname * levenshtein) / levenshteinMax; // (Math.abs(candidate[k][0].length - predict.length) / candidate[k][0].length);
+
+  return probaname;
+}
+
+function computeStatPredict(st: IStudent, predictname: any, predictfirstname: any, predictine: any): number {
+  let probaname = 0;
+  let probafirstname = 0;
+  let probaeine = 0;
+  let i = 0;
+  let sum = 0;
+  if (predictname?.solution?.length > 0) {
+    probaname = predictProba(st.name!, predictname.solution, true);
+    i = i + 1;
+    sum = sum + probaname;
+  }
+  if (predictfirstname?.solution?.length > 0) {
+    probafirstname = predictProba(st.firstname!, predictfirstname.solution, true);
+    i = i + 1;
+    sum = sum + probafirstname;
+  }
+  if (predictine?.solution?.length > 0) {
+    probaeine = predictProba(st.ine!, predictine.solution, false);
+    i = i + 1;
+    sum = sum + probaeine;
+  }
+
+  if (i > 0) {
+    return sum / i;
+  } else {
+    return 0;
+  }
+}
+
 function doPredidction4zone(
   letter: boolean,
   src: any,
   srcTemplate: any,
-  candidates: string[],
   preference: IPreference,
   looking4missing: boolean,
   removeHorizontal: boolean,
@@ -647,7 +716,9 @@ function doPredidction4zone(
   graynomTemplate.delete();
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return fprediction(src, candidates, looking4missing, removeHorizontal, letter, preference, dimAverage, posXAverage, debug);
+  return fprediction(src, looking4missing, removeHorizontal, letter, preference, dimAverage, posXAverage, debug);
+
+  //  return fprediction(src, candidates, looking4missing, removeHorizontal, letter, preference, dimAverage, posXAverage, debug);
 }
 
 function groupImagePerContoursLength(p: { msg: any; payload: ICluster; uid: string }): void {
@@ -814,7 +885,7 @@ function imageDataFromMat(mat: any): any {
 
 async function fprediction(
   src: any,
-  cand: string[],
+  //  cand: string[],
   lookingForMissingLetter: boolean,
   removeHorizontal: boolean,
   onlyletter: boolean,
@@ -828,16 +899,14 @@ async function fprediction(
 
   const res = extractImageNew(src, removeHorizontal, lookingForMissingLetter, preference, dimAverage, posXAverage);
 
-  let candidate: any[] = [];
+  /* let candidate: any[] = [];
   cand.forEach(e => {
     candidate.push([e.padEnd(22, ' '), 0.0]);
-  });
-  console.error(res.length, res);
+  });*/
 
   const predict = [];
   for (let i = 0; i < res.letter.length; i++) {
     let res1 = m.predict(imageDataFromMat(res.letter[i][1]));
-    console.error(res1);
     if (onlyletter) {
       if (res1[0] === '1') {
         res1[0] = 'i';
@@ -860,7 +929,20 @@ async function fprediction(
   for (let i = 0; i < res.letter.length; i++) {
     res.letter[i][1].delete();
   }
-  for (let k = 0; k < candidate.length; k++) {
+
+  if (debug) {
+    return {
+      debug: res.invert_final,
+      solution: predict,
+    };
+  } else {
+    res.invert_final.delete();
+    return {
+      solution: predict,
+    };
+  }
+
+  /* for (let k = 0; k < candidate.length; k++) {
     for (let j = 0; j < 20; j++) {
       if (j < predict.length) {
         let letter = candidate[k][0].substring(j, j + 1).toLowerCase();
@@ -891,19 +973,9 @@ async function fprediction(
     } else {
       return -1;
     }
-  });
-  if (debug) {
-    return {
-      debug: res.invert_final,
-      solution: candidate[0],
-    };
-  } else {
-    res.invert_final.delete();
-    return {
-      solution: candidate[0],
-    };
-  }
+  });*/
 }
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function levenshteinDistance(a: string, b: string): number {
   // Create a 2D array to store the distances
   let distances = new Array(a.length + 1);
@@ -1122,15 +1194,25 @@ function extractImageNew(
     }
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let merge = mergeRect(rects);
-  console.error(merge);
   let kk = 0;
   while (merge !== null && kk < 200) {
     rects = rects.filter(rect => rect !== merge.toRemove1 && rect !== merge.toRemove2);
-    rects.push(merge.u);
-    merge = mergeRect(rects);
-    console.error(merge, kk);
+    const e = merge.u;
+    const diffw = e.width - dimAverage.w;
+    if (diffw > 0) {
+      e.x = e.x + diffw / 2;
+      e.width = dimAverage.w;
+    }
+    const diffh = e.height - dimAverage.h;
+    if (diffh > 0) {
+      e.y = e.y + diffh / 2;
+      e.height = dimAverage.h;
+    }
 
+    rects.push(e);
+    merge = mergeRect(rects);
     kk = kk + 1;
   }
 
@@ -1196,7 +1278,6 @@ function extractImageNew(
         maxLargeur = rects[i].width;
       }
     }
-    console.error('nbrMissing', nbrMissing);
     nbrMissing.forEach(n => {
       let x = rects[n].x + posXAverage;
       let rect = new cv.Rect(x, minY, maxLargeur, maxHauteur);
@@ -1212,8 +1293,6 @@ function extractImageNew(
       return 1;
     }
   });
-
-  console.error('rects', rects.length);
 
   // TODO interect on rect
   rects.forEach(rect => {
