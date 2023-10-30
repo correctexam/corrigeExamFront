@@ -595,11 +595,11 @@ async function doPredictionsAsync(p: {
               output.resultPrediction = finalres;
             }
           }
-          outputs.push(output);
-          z1?.delete();
-          z2?.delete();
-          z3?.delete();
         }
+        outputs.push(output);
+        z1?.delete();
+        z2?.delete();
+        z3?.delete();
       }
     }
     source.currentTarget.postMessage({ msg: p.msg, payload: outputs, uid: p.uid }, opts);

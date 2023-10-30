@@ -228,7 +228,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
                   this.examService.find(+this.examId).subscribe(data => {
                     this.exam = data.body!;
                     // Step 4 Query Students for Exam
-                    this.refreshStudentList().then(() => this.testLoadImage());
+                    this.refreshStudentList().then(() => this.loadImage());
                   });
                 });
               });
@@ -240,7 +240,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
           this.currentStudent = +params.get('currentStudent')! - 1;
           this.activeIndex = this.currentStudent! * this.nbreFeuilleParCopie!;
           this.getFilterStudent();
-          this.testLoadImage().then(() => {
+          this.loadImage().then(() => {
             this.blocked = false;
           });
         }
@@ -277,7 +277,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     return canvas.toDataURL();
   }
 
-  async testLoadImage(): Promise<void> {
+  async loadImage(): Promise<void> {
     const res = await this.testLoadImage4pages([this.currentStudent! * this.nbreFeuilleParCopie!]);
     if (res.length === 1) {
       this.predictionprecision = res[0].predictionprecision;
@@ -303,7 +303,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       }
       const imgs = [res[0].nameImage, res[0].firstnameImage, res[0].ineImage];
       const length = imgs.filter(e => e !== undefined).length;
-      //      console.error(length);
       if (length > 1) {
         this.columnstyle = { width: Math.floor(100 / length) + '%' };
       } else {
@@ -360,6 +359,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     };
     const output: PredictResult[] = [];
     const r5 = await firstValueFrom(this.alignImagesService.doPredictions(r));
+    console.error(r5);
     for (const r1 of r5) {
       let result: PredictResult = { predictionprecision: 0, page: r1.page };
       if (r1.nameZone) {
@@ -381,135 +381,12 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
           result.ineImageDebug = new ImageData(new Uint8ClampedArray(r1.ineZoneDebug), r1.ineZoneW!, r1.ineZoneH!);
         }
       }
-      /*      const solutionFirstname = r1.firstname;
-      const solutionINE = r1.ine;
-      const solutionNameProb = r1.namePrecision!;
-      const solutionFirstnameProb = r1.firstnamePrecision!;
-      const solutionINEProb = r1.inePrecision!;
-      console.log(solutionName, solutionNameProb);
-      console.log(solutionFirstname, solutionFirstnameProb);
-      console.log(solutionINE, solutionINEProb);*/
 
-      /*      if (
-        solutionName !== undefined &&
-        solutionFirstname !== undefined &&
-        solutionINE !== undefined &&
-        solutionName.length > 0 &&
-        solutionFirstname.length > 0 &&
-        solutionINE.length > 0
-      ) {
-        let sts = this.students.filter(
-          student =>
-            (solutionName as string).toLowerCase() === this.latinise(student.name)?.toLowerCase() &&
-            (solutionFirstname as string).toLowerCase() === this.latinise(student.firstname)?.toLowerCase() &&
-            (solutionINE as string).toLowerCase() === this.latinise(student.ine)?.toLowerCase(),
-        );
-        if (sts.length > 0) {
-          // Full match
-          recognizedStudent = sts[0];
-          predictionprecision = ((+solutionNameProb! as number) + (+solutionFirstnameProb! as number) + (+solutionINEProb! as number)) / 3;
-        }
-        if (recognizedStudent === undefined) {
-          // INE Good Match
-          if (solutionINEProb > 0.28) {
-            sts = this.students.filter(student => (solutionINE as string).toLowerCase() === this.latinise(student.ine)?.toLowerCase());
-            if (sts.length > 0) {
-              recognizedStudent = sts[0];
-              predictionprecision = solutionINEProb as number;
-            }
-          }
-          // Only Name and FirstName (No INE)
-          if (recognizedStudent === undefined && +solutionINEProb < +solutionFirstnameProb && +solutionINEProb < +solutionNameProb) {
-            let sts1 = this.students.filter(
-              student =>
-                (solutionName as string).toLowerCase() === this.latinise(student.name)?.toLowerCase() &&
-                (solutionFirstname as string).toLowerCase() === this.latinise(student.firstname)?.toLowerCase(),
-            );
-            if (sts1.length > 0) {
-              recognizedStudent = sts1[0];
-              predictionprecision = ((solutionNameProb as number) + (solutionFirstnameProb as number)) / 2;
-            }
-          }
-          // Only INE and FirstName (No Name)
-          if (recognizedStudent === undefined && +solutionNameProb < +solutionFirstnameProb && +solutionNameProb < +solutionINEProb) {
-            let sts1 = this.students.filter(
-              student =>
-                (solutionFirstname as string).toLowerCase() === this.latinise(student.firstname)?.toLowerCase() &&
-                (solutionINE as string).toLowerCase() === this.latinise(student.ine)?.toLowerCase(),
-            );
-            if (sts1.length > 0) {
-              recognizedStudent = sts1[0];
-              predictionprecision = ((solutionFirstnameProb as number) + (solutionINEProb as number)) / 2;
-            }
-          }
-          // Only INE and Name (No FirstName)
-          if (recognizedStudent === undefined && +solutionFirstnameProb < +solutionNameProb && +solutionFirstnameProb < +solutionINEProb) {
-            sts = this.students.filter(
-              student =>
-                (solutionName as string).toLowerCase() === this.latinise(student.name)?.toLowerCase() &&
-                (solutionINE as string).toLowerCase() === this.latinise(student.ine)?.toLowerCase(),
-            );
-            if (sts.length > 0) {
-              recognizedStudent = sts[0];
-              predictionprecision = ((solutionNameProb as number) + (solutionINEProb as number)) / 2;
-            }
-          }
-          if (recognizedStudent === undefined && +solutionNameProb >= 0.44 && solutionFirstnameProb < solutionNameProb) {
-            sts = this.students.filter(student => (solutionName as string).toLowerCase() === this.latinise(student.name)?.toLowerCase());
-            if (sts.length > 0) {
-              recognizedStudent = sts[0];
-              predictionprecision = (solutionNameProb as number) / 3;
-            }
-          }
-          if (recognizedStudent === undefined && +solutionFirstnameProb >= 0.44 && solutionNameProb < solutionFirstnameProb) {
-            sts = this.students.filter(
-              student => (solutionFirstname as string).toLowerCase() === this.latinise(student.firstname?.toLowerCase()),
-            );
-            if (sts.length > 0) {
-              recognizedStudent = sts[0];
-              predictionprecision = (solutionFirstnameProb as number) / 3;
-            }
-          }
-        }
-      } else if (solutionName !== undefined && solutionFirstname !== undefined && solutionName.length > 0 && solutionFirstname.length > 0) {
-        let sts = this.students.filter(
-          student =>
-            (solutionName as string).toLowerCase() === this.latinise(student.name?.toLowerCase()) &&
-            (solutionFirstname as string).toLowerCase() === this.latinise(student.firstname)?.toLowerCase(),
-        );
-        if (sts.length > 0) {
-          recognizedStudent = sts[0];
-          predictionprecision = ((solutionNameProb as number) + (solutionFirstnameProb as number)) / 2;
-        }
-      } else if (solutionName !== undefined && solutionINE !== undefined && solutionName.length > 0 && solutionINE.length > 0) {
-        let sts = this.students.filter(
-          student =>
-            (solutionName as string).toLowerCase() === this.latinise(student.name)?.toLowerCase() &&
-            (solutionINE as string).toLowerCase() === this.latinise(student.ine)?.toLowerCase(),
-        );
-        if (sts.length > 0) {
-          recognizedStudent = sts[0];
-          predictionprecision = ((solutionNameProb as number) + (solutionINEProb as number)) / 2;
-        }
-      } else if (solutionINE !== undefined && solutionINE.length > 0 && +solutionINEProb > 0.25) {
-        let sts = this.students.filter(student => (solutionINE as string).toLowerCase() === this.latinise(student.ine)?.toLowerCase());
-        if (sts.length > 0) {
-          recognizedStudent = sts[0];
-          predictionprecision = solutionINEProb as number;
-        }
-      } else if (solutionName !== undefined && solutionName.length > 0 && +solutionNameProb > 0.25) {
-        let sts = this.students.filter(student => (solutionName as string).toLowerCase() === this.latinise(student.name)?.toLowerCase());
-        if (sts.length > 0) {
-          recognizedStudent = sts[0];
-          predictionprecision = solutionNameProb as number;
-        }
-      }*/
       if (r1.resultPrediction.length > 0) {
         result.predictionprecision = r1.resultPrediction[0].proba! * r1.resultPrediction[0].score!;
         result.recognizedStudent = this.students.find(st => st.id === r1.resultPrediction[0].id);
-        output.push(result);
       }
-      //      const solutionName = r1.resultPrediction[0].;
+      output.push(result);
     }
 
     return output;
@@ -518,7 +395,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   reloadImageGrowFactor(event: any): void {
     if (event.value !== this.factor) {
       this.factor = event.value;
-      this.testLoadImage();
+      this.loadImage();
     }
   }
 
@@ -821,7 +698,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       .filter((ex: any) => ex?.scanId === this.exam.scanfileId);
     let listAllFreeSheet: number[] = [];
     for (let i = 0; i < Math.floor(this.numberPagesInScan / this.nbreFeuilleParCopie); i++) {
-      if (!examSheet4Exam.map(sheet => sheet.pagemin).includes(i)) {
+      if (!examSheet4Exam.map(sheet => sheet.pagemin! / this.nbreFeuilleParCopie).includes(i)) {
         listAllFreeSheet.push(i);
       }
     }
@@ -841,7 +718,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
 
   async openAllBinding(): Promise<void> {
     const freeSheets = this.computeFreeSheets();
-    //    console.error(freeSheets);
+    console.error(freeSheets);
     if (freeSheets.length > 0) {
       this.blocked = true;
       const res1 = await this.testLoadImage4pages(freeSheets.map(e => e * this.nbreFeuilleParCopie!));
@@ -859,7 +736,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
 
       ref.onClose.subscribe(() => {
         this.refreshStudentList().then(() => {
-          this.testLoadImage().then(() => {
+          this.loadImage().then(() => {
             this.blocked = false;
           });
         });
