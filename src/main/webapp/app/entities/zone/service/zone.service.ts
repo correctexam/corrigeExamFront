@@ -20,7 +20,10 @@ export interface ResizeBoxDTO {
 export class ZoneService {
   protected resourceUrl: string;
 
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+  constructor(
+    protected http: HttpClient,
+    protected applicationConfigService: ApplicationConfigService,
+  ) {
     this.resourceUrl = this.applicationConfigService.getEndpointFor('api/zones');
   }
 
@@ -43,6 +46,10 @@ export class ZoneService {
 
   find(id: number): Observable<EntityResponseType> {
     return this.http.get<IZone>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  }
+
+  find4ExamId(examid: number): Observable<EntityArrayResponseType> {
+    return this.http.get<IZone[]>(`${this.resourceUrl}/byExam/${examid}`, { observe: 'response' });
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {

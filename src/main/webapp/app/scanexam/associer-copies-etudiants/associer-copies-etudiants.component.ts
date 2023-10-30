@@ -206,6 +206,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       this.blocked = true;
       if (params.get('examid') !== null) {
         if (this.examId !== params.get('examid')!) {
+          console.time('loadpage');
           this.examId = params.get('examid')!;
           this.images = [];
 
@@ -214,34 +215,42 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
 
             // const startTime = performance.now();
             // Step 1 Query templates
-            this.db
-              .countPageTemplate(+this.examId)
+            console.timeLog('loadpage', 'before countTemplate');
+            const promises: Promise<any>[] = [];
+            promises.push(this.db.countPageTemplate(+this.examId));
+            promises.push(this.db.countAlignImage(+this.examId));
+            promises.push(firstValueFrom(this.examService.find(+this.examId)));
 
-              .then(e2 => {
-                this.nbreFeuilleParCopie = e2;
+            Promise.all(promises).then(value => {
+              this.nbreFeuilleParCopie = value[0];
+              this.numberPagesInScan = value[1];
+              this.exam = value[2].body!;
+              console.timeLog('loadpage', 'after countTemplate');
+              this.activeIndex = this.currentStudent! * this.nbreFeuilleParCopie!;
+              this.factor = 1;
+              this.noalign = false;
+              console.timeLog('loadpage', 'after countAlign');
+              console.timeLog('loadpage', 'after load exam');
 
-                this.activeIndex = this.currentStudent! * this.nbreFeuilleParCopie!;
-                this.factor = 1;
-                this.noalign = false;
-                this.db.countAlignImage(+this.examId).then(e1 => {
-                  this.numberPagesInScan = e1;
-                  this.examService.find(+this.examId).subscribe(data => {
-                    this.exam = data.body!;
-                    // Step 4 Query Students for Exam
-                    this.refreshStudentList().then(() => this.loadImage());
-                  });
+              this.refreshStudentList().then(() => {
+                console.timeLog('loadpage', 'after loadstudentList');
+                this.loadImage().then(() => {
+                  console.timeEnd('loadpage');
                 });
               });
+            });
           } else {
             const c = this.currentStudent + 1;
             this.router.navigateByUrl('/studentbindings/' + this.examId! + '/' + c);
           }
         } else {
+          console.time('loadpagesameexam');
           this.currentStudent = +params.get('currentStudent')! - 1;
           this.activeIndex = this.currentStudent! * this.nbreFeuilleParCopie!;
           this.getFilterStudent();
           this.loadImage().then(() => {
             this.blocked = false;
+            console.timeEnd('loadpagesameexam');
           });
         }
       }
@@ -278,7 +287,11 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   }
 
   async loadImage(): Promise<void> {
+    console.timeLog('loadpagesameexam', 'before testLoadImage4pages');
     const res = await this.testLoadImage4pages([this.currentStudent! * this.nbreFeuilleParCopie!]);
+    console.timeLog('loadpage', 'after testLoadImage4pages');
+    console.timeLog('loadpagesameexam', 'after testLoadImage4pages');
+
     if (res.length === 1) {
       this.predictionprecision = res[0].predictionprecision;
       this.recognizedStudent = res[0].recognizedStudent;
@@ -313,26 +326,37 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
 
   async testLoadImage4pages(pagesToAnalyze: number[]): Promise<PredictResult[]> {
     let z1, z2, z3;
-    if (this.exam.namezoneId) {
-      z1 = (await firstValueFrom(this.zoneService.find(this.exam.namezoneId))).body;
-    }
-    if (this.exam.firstnamezoneId) {
-      z2 = (await firstValueFrom(this.zoneService.find(this.exam.firstnamezoneId))).body;
-    }
-    if (this.exam.idzoneId) {
-      z3 = (await firstValueFrom(this.zoneService.find(this.exam.idzoneId))).body;
-    }
+
+    console.timeLog('loadpage', 'before loadZone');
+    console.timeLog('loadpagesameexam', 'before loadZone');
+    const zones = (await firstValueFrom(this.zoneService.find4ExamId(this.exam.id!)))?.body;
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    let candidates = this.freeStudent.map(
-      student => new Student(student.id, this.latinise(student.name), this.latinise(student.firstname), this.latinise(student.ine)),
-    );
+    if (zones) {
+      if (zones[0].id) {
+        z1 = zones[0];
+      }
+      if (zones[1].id) {
+        z2 = zones[1];
+      }
+      if (zones[2].id) {
+        z3 = zones[2];
+      }
+    }
+    console.timeLog('loadpage', 'after loadZone');
+    console.timeLog('loadpagesameexam', 'after loadZone');
 
+    let candidates = [];
     if (!this.filterbindstudent) {
       candidates = this.students.map(
         student => new Student(student.id, this.latinise(student.name), this.latinise(student.firstname), this.latinise(student.ine)),
       );
+    } else {
+      candidates = this.freeStudent.map(
+        student => new Student(student.id, this.latinise(student.name), this.latinise(student.firstname), this.latinise(student.ine)),
+      );
     }
+
     /*    console.error(candidateName.map((e: any) => (this.latinise(e)! as string).toLowerCase()));
     console.error(candidateFirstName.map((e: any) => (this.latinise(e)! as string)?.toLowerCase()));
     console.error(candidateIne.map((e: any) => (this.latinise(e)! as string)?.toLowerCase())); */
@@ -358,8 +382,12 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       debug: this.debug,
     };
     const output: PredictResult[] = [];
+    console.timeLog('loadpage', 'before doPredictions');
+    console.timeLog('loadpagesameexam', 'before doPredictions');
     const r5 = await firstValueFrom(this.alignImagesService.doPredictions(r));
-    console.error(r5);
+    console.timeLog('loadpage', 'after doPredictions');
+    console.timeLog('loadpagesameexam', 'after doPredictions');
+
     for (const r1 of r5) {
       let result: PredictResult = { predictionprecision: 0, page: r1.page };
       if (r1.nameZone) {

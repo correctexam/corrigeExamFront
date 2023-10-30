@@ -440,15 +440,21 @@ async function doPredictionsAsync(p: {
     const statCAndPerPage: Map<number, Map<number, IStudent>> = new Map();
 
     for (let pageToAnalyze of p1.pagesToAnalyze) {
+      console.time('analysePage');
+      console.timeLog('analysePage', 'before getScan');
       const i = await getScanImage(p1.align, pageToAnalyze, p1.examId, p1.indexDb);
+      console.timeLog('analysePage', 'after getScan');
       if (i !== undefined) {
+        console.timeLog('analysePage', 'before loadImage');
         const l = await loadImage(i);
+        console.timeLog('analysePage', 'after loadImage');
 
         let z1: any;
         let z2: any;
         let z3: any;
 
         let pageZone = 0;
+        console.timeLog('analysePage', 'before cropZone');
         if (p1.nameZone) {
           z1 = cropZone(l, p1.nameZone, p1.factor);
           pageZone = p1.nameZone.pageNumber!;
@@ -461,6 +467,8 @@ async function doPredictionsAsync(p: {
           z3 = cropZone(l, p1.ineZone, p1.factor);
           pageZone = p1.ineZone.pageNumber!;
         }
+        console.timeLog('analysePage', 'after cropZone');
+
         const output: DoPredictionsOutput = {
           page: pageToAnalyze - pageZone,
           resultPrediction: [],
@@ -500,15 +508,21 @@ async function doPredictionsAsync(p: {
         output.ineZone = z3Buffer;
         if (p1.assist) {
           // Load Template
+          console.timeLog('analysePage', 'before template load');
           const t = await getTemplateImage(p1.pageTemplate, p1.examId, p1.indexDb);
+          console.timeLog('analysePage', 'after template load');
           if (t !== undefined) {
+            console.timeLog('analysePage', 'before template image load');
             const ti = await loadImage(t);
+            console.timeLog('analysePage', 'after template image load');
             let z1t: any;
             let z2t: any;
             let z3t: any;
             let predictname: any;
             let predictfirstname: any;
             let predictine: any;
+            console.timeLog('analysePage', 'before cropZone template');
+
             if (p1.nameZone) {
               z1t = cropZone(ti, p1.nameZone, p1.factor);
             }
@@ -518,6 +532,10 @@ async function doPredictionsAsync(p: {
             if (p1.ineZone) {
               z3t = cropZone(ti, p1.ineZone, p1.factor);
             }
+            console.timeLog('analysePage', 'after cropZone template');
+
+            console.timeLog('analysePage', 'before doPredidction4zone name');
+
             if (z1 !== undefined && z1t !== undefined) {
               predictname = await doPredidction4zone(true, z1, z1t, p1.preferences, p1.looking4missing, p1.removeHorizontal, p1.debug!);
               //            output.name = res1.solution[0] as string;
@@ -532,7 +550,8 @@ async function doPredictionsAsync(p: {
                 predictname.debug.delete();
               }
             }
-
+            console.timeLog('analysePage', 'after doPredidction4zone name');
+            console.timeLog('analysePage', 'before doPredidction4zone firstname');
             if (z2 !== undefined && z2t !== undefined) {
               predictfirstname = await doPredidction4zone(
                 true,
@@ -555,6 +574,8 @@ async function doPredictionsAsync(p: {
                 predictfirstname.debug.delete();
               }
             }
+            console.timeLog('analysePage', 'after doPredidction4zone firstname');
+            console.timeLog('analysePage', 'before doPredidction4zone ine');
 
             if (z3 !== undefined && z3t !== undefined) {
               predictine = await doPredidction4zone(false, z3, z3t, p1.preferences, p1.looking4missing, p1.removeHorizontal, p1.debug!);
@@ -570,6 +591,8 @@ async function doPredictionsAsync(p: {
                 predictine.debug.delete();
               }
             }
+            console.timeLog('analysePage', 'after doPredidction4zone ine');
+            console.timeLog('analysePage', 'before computescore');
 
             if (predictname?.solution?.length > 0 && predictfirstname?.solution?.length > 0) {
               const predictnamelength: number = predictname.solution.length;
@@ -594,6 +617,7 @@ async function doPredictionsAsync(p: {
               }
               output.resultPrediction = finalres;
             }
+            console.timeLog('analysePage', 'after computescore');
           }
         }
         outputs.push(output);
@@ -601,6 +625,7 @@ async function doPredictionsAsync(p: {
         z2?.delete();
         z3?.delete();
       }
+      console.timeEnd('analysePage');
     }
     source.currentTarget.postMessage({ msg: p.msg, payload: outputs, uid: p.uid }, opts);
   } else {
