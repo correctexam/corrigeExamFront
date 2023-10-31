@@ -772,6 +772,34 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     }
   }
 
+  gotopreviousnonboundsheet(): void {
+    const free = this.computeFreeSheets();
+    const s = free.find(v => v < this.currentStudent);
+    if (s !== undefined) {
+      this.goToStudent(s);
+    } else {
+      this.messageService.add({
+        severity: 'info',
+        summary: this.translateService.instant('scanexam.npagealign'),
+        detail: this.translateService.instant('scanexam.npagealigndetails'),
+      });
+    }
+  }
+  gotonextnonboundsheet(): void {
+    const free = this.computeFreeSheets();
+
+    const s = free.find(v => v > this.currentStudent);
+    if (s !== undefined) {
+      this.goToStudent(s);
+    } else {
+      this.messageService.add({
+        severity: 'info',
+        summary: this.translateService.instant('scanexam.npagealign'),
+        detail: this.translateService.instant('scanexam.npagealigndetails'),
+      });
+    }
+  }
+
   latinMap(): Map<string, string> {
     return new Map<string, string>([
       ['Á', 'A'],

@@ -95,25 +95,8 @@
       </div>
     </div>
     <div class="col-12 md:col-12">
-      <div class="d-flex justify-content-center">
-        <div>
-          <span jhiTranslate="scanexam.selectedstudent">Etudiant(es) Séléctionné(es):</span> {{ selectionStudentsString() }}
-          <BR />
-          <span *ngIf="assisted && recognizedStudent !== undefined && predictionprecision > 0.07"
-            ><span jhiTranslate="scanexam.aistudent">Etudiant(es) Reconnu(es):</span> {{ showRecognizedStudent() }}</span
-          >
-          <p-button
-            [pTooltip]="'scanexam.validaterecognizedTooltip' | translate"
-            (onClick)="selectRecogniezStudent()"
-            [style.padding]="'0.1rem'"
-            *ngIf="assisted && recognizedStudent !== undefined && predictionprecision > 0.07"
-            >✔️</p-button
-          >
-        </div>
-      </div>
-
-      <div class="grid align-items-center">
-        <div class="col-3">
+      <div class="grid">
+        <div class="col-1">
           <p-button
             class="sm:text-xs md:text-xs lg:text-base"
             styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
@@ -122,8 +105,39 @@
             [disabled]="blocked"
           ></p-button>
         </div>
+        <div class="col-10 d-flex justify-content-center">
+          <div>
+            <span jhiTranslate="scanexam.selectedstudent">Etudiant(es) Séléctionné(es):</span> {{ selectionStudentsString() }}
+            <BR />
+            <span *ngIf="assisted && recognizedStudent !== undefined && predictionprecision > 0.07"
+              ><span jhiTranslate="scanexam.aistudent">Etudiant(es) Reconnu(es):</span> {{ showRecognizedStudent() }}</span
+            >
+            <p-button
+              [pTooltip]="'scanexam.validaterecognizedTooltip' | translate"
+              (onClick)="selectRecogniezStudent()"
+              [style.padding]="'0.1rem'"
+              *ngIf="assisted && recognizedStudent !== undefined && predictionprecision > 0.07"
+              >✔️</p-button
+            >
+          </div>
+        </div>
+        <div class="col-1"></div>
+      </div>
+      <div class="grid">
+        <div class="col-3"></div>
         <div class="col-6">
           <div class="d-flex justify-content-center">
+            <button
+              pButton
+              [pTooltip]="'scanexam.gotopreviousnonboundsheet' | translate"
+              [tooltipZIndex]="'3000'"
+              (click)="gotopreviousnonboundsheet()"
+              class="p-button"
+              [disabled]="blocked"
+            >
+              <fa-icon icon="arrow-left"></fa-icon>
+            </button>
+
             <p-paginator
               [rows]="1"
               [first]="currentStudent"
@@ -132,10 +146,23 @@
               [showJumpToPageDropdown]="true"
               [showPageLinks]="false"
             ></p-paginator>
+            <button
+              pButton
+              [pTooltip]="'scanexam.gotonextnonboundsheet' | translate"
+              [tooltipZIndex]="'3000'"
+              (click)="gotonextnonboundsheet()"
+              class="p-button"
+              [disabled]="blocked"
+            >
+              <fa-icon icon="arrow-right"></fa-icon>
+            </button>
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="d-flex justify-content-end">
             <button pButton (click)="showGalleria()" jhiTranslate="scanexam.showgalleria">Show full page</button>
           </div>
         </div>
-        <div class="col-3 justify-content-end"></div>
       </div>
 
       <div class="canvas-wrapper foo">

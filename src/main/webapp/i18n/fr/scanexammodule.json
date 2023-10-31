@@ -367,6 +367,8 @@
     "bindTooltip": "Permet d'associer cette copie à cet étudiant",
     "recognizedstudent": "Etudiant reconnu",
     "score": "Score",
-    "validaterecognizedTooltip": "Permet d'associer l'étudiant reconnu avec cette copie. Cette action est aussi appelable avec le raccourci clavier ctrl + enter"
+    "validaterecognizedTooltip": "Permet d'associer l'étudiant reconnu avec cette copie. Cette action est aussi appelable avec le raccourci clavier ctrl + enter",
+    "gotonextnonboundsheet": "Aller à la prochaine copie non associée à un étudiant",
+    "gotopreviousnonboundsheet": "Aller à la précédente copie non associée à un étudiant"
   }
 }

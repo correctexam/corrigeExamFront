@@ -361,6 +361,8 @@
     "recognizedstudent": "Recognized student",
     "score": "Score",
     "filterboundstudentTooltip": "Allows you to filter students already assigned",
-    "validaterecognizedTooltip": "Allows you to associate the recognised student with this copy. This action can also be called using the keyboard shortcut ctrl + enter."
+    "validaterecognizedTooltip": "Allows you to associate the recognised student with this copy. This action can also be called using the keyboard shortcut ctrl + enter.",
+    "gotonextnonboundsheet": "Go to the next sheet not associated with a student",
+    "gotopreviousnonboundsheet": "Go to the previous sheet not associated with a student"
   }
 }
