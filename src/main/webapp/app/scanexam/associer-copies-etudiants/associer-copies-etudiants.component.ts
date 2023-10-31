@@ -109,6 +109,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   numberPagesInScan = 0;
   selectionStudents: any[] = [];
   freeStudent: any[] = [];
+  layoutsidebarVisible = false;
   selectionStudentsString: () => string = () => this.selectionStudents.map(s => s.name + ' ' + s.firstname).join(' - ');
   showRecognizedStudent: () => string = () =>
     this.recognizedStudent?.name +

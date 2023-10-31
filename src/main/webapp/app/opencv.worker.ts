@@ -616,6 +616,25 @@ async function doPredictionsAsync(p: {
                 finalres = res;
               }
               output.resultPrediction = finalres;
+            } else if (predictname?.solution?.length > 0) {
+              const predictnamelength: number = predictname.solution.length;
+              const cand = p1.candidates.filter(c => Math.abs(predictnamelength - c.name!.length) <= 2);
+              statCAndPerPage.set(output.page, new Map());
+              cand.forEach(c => {
+                const c1 = { ...c };
+                const sizedistance = Math.abs(predictnamelength - c.name!.length);
+                c1.score = 1000 / Math.pow(2, sizedistance);
+                c1.proba = computeStatPredict(c1, predictname, predictfirstname, predictine);
+                statCAndPerPage.get(output.page)?.set(c1.id!, c1);
+              });
+              const res = Array.from(statCAndPerPage.get(output.page)!.values()).sort((a, b) => b.proba! * b.score! - a.proba! * a.score!);
+              let finalres = [];
+              if (res.length > 2) {
+                finalres = [res[0], res[1], res[2]];
+              } else {
+                finalres = res;
+              }
+              output.resultPrediction = finalres;
             }
             console.timeLog('analysePage', 'after computescore');
           }

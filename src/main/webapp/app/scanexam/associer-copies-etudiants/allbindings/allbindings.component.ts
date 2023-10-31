@@ -21,6 +21,7 @@ export class AllbindingsComponent implements OnInit {
   showName = true;
   showFirstname = true;
   showIne = true;
+  nobutton = false;
 
   constructor(
     public ref: DynamicDialogRef,
@@ -82,6 +83,7 @@ export class AllbindingsComponent implements OnInit {
   }
 
   async bindStudent(student: IStudent, currentStudent: number, element: any): Promise<void> {
+    this.nobutton = true;
     let examSheet4CurrentStudentId: (number | undefined)[] = [];
     if (student.examSheets) {
       examSheet4CurrentStudentId = student.examSheets.filter((ex: any) => ex?.scanId === this.exam.scanfileId).map(ex1 => ex1.id);
@@ -128,6 +130,7 @@ export class AllbindingsComponent implements OnInit {
       await firstValueFrom(this.studentService.update(student));
     }
     element.bound = true;
+    this.nobutton = false;
   }
   selectedColor(item: any): string {
     if (item.bound) {
