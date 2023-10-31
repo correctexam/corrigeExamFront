@@ -31,10 +31,12 @@
     "clearcanvas": "Clear canvas, remove all shapes/texts",
     "bindcopies": "Bind student/examsheet",
     "assistance": "Support",
+    "assistanceTooltip": "Enables AI for automatic student name detection",
     "alignement": "Alignment",
     "selectedstudent": "Selected Students:",
     "aistudent": "Recognized Students:",
     "removealignement": "Delete alignment:",
+    "removealignementTooltip": "Enables you to work on non-aligned sheets",
     "showgalleria": "Show full page",
     "zoomfactor": "Zoom factor:",
     "next": "Next",
@@ -349,6 +351,18 @@
     "sendirectemail": "Send an email with the results for this student",
     "envoimailpersonal": "Send email",
     "concatenation": "Merge to already loaded scan:",
-    "concatenationTooltip": "Configure whether to create a pdf by merging (concatenating) the existing pdf and the new pdf or to replace the previous scan pdf with the new one (ticked means concatenation)."
+    "concatenationTooltip": "Configure whether to create a pdf by merging (concatenating) the existing pdf and the new pdf or to replace the previous scan pdf with the new one (ticked means concatenation).",
+    "debug": "debug",
+    "debugTooltip": "Displays the result of character detection",
+    "allbindings": "All bindings",
+    "allbindingsTooltip": "Enables analysis to be run on all copies not yet bound",
+    "bind": "bind",
+    "bindTooltip": "Allows you to associate this sheet with this student",
+    "recognizedstudent": "Recognized student",
+    "score": "Score",
+    "filterboundstudentTooltip": "Allows you to filter students already assigned",
+    "validaterecognizedTooltip": "Allows you to associate the recognised student with this copy. This action can also be called using the keyboard shortcut ctrl + enter.",
+    "gotonextnonboundsheet": "Go to the next sheet not associated with a student",
+    "gotopreviousnonboundsheet": "Go to the previous sheet not associated with a student"
   }
 }

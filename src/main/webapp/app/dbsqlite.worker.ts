@@ -10,6 +10,7 @@
 
 const dbs = new Map<number, DB>();
 let _sqlite3: any;
+let portopenCvWorker: any;
 addEventListener('message', e => {
   /* if (e.data?.payload?.examId) {
     [...dbs.keys()]
@@ -23,6 +24,50 @@ addEventListener('message', e => {
     case 'hello': {
       const response = `worker response to ${e.data.msg}`;
       postMessage({ msg: response });
+
+      break;
+    }
+    case 'shareWorker': {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const port = e.data.port; // (C)
+      portopenCvWorker = port;
+      port.onmessage = (e1: any) => {
+        switch (e1.data.msg) {
+          case 'getFirstNonAlignImage': {
+            let db1 = dbs.get(e1.data.payload.examId);
+            if (db1 === undefined) {
+              db1 = new DB(e1.data.payload.examId);
+              db1.initemptyDb(_sqlite3);
+              dbs.set(e1.data.payload.examId, db1);
+            }
+            db1.getFirstNonAlignImage(_sqlite3, e1.data, port);
+            break;
+          }
+          case 'getFirstAlignImage': {
+            let db1 = dbs.get(e1.data.payload.examId);
+            if (db1 === undefined) {
+              db1 = new DB(e1.data.payload.examId);
+              db1.initemptyDb(_sqlite3);
+              dbs.set(e1.data.payload.examId, db1);
+            }
+            db1.getFirstAlignImage(_sqlite3, e1.data, port);
+            break;
+          }
+          case 'getFirstTemplate': {
+            let db1 = dbs.get(e1.data.payload.examId);
+            if (db1 === undefined) {
+              db1 = new DB(e1.data.payload.examId);
+              db1.initemptyDb(_sqlite3);
+              dbs.set(e1.data.payload.examId, db1);
+            }
+            db1.getFirstTemplate(_sqlite3, e1.data, port);
+            break;
+          }
+        }
+        // (A)
+        //        console.error(e1.data);
+        //        port.postMessage(['hello', 'world']);
+      };
       break;
     }
     case 'load': {
@@ -45,6 +90,7 @@ addEventListener('message', e => {
           .then(function (sqlite3var: any) {
             _sqlite3 = sqlite3var;
             postMessage({ msg: 'databaseReady', uid: '0' });
+            portopenCvWorker.postMessage({ msg: 'databaseReady', uid: '0' });
           });
       } finally {
         //       postMessage({ msg: 'databaseNotReady', uid: '0'});
@@ -777,7 +823,7 @@ class DB {
   }
 
   // getFirstNonAlignImage(examId:number,pageInscan:number ):Promise<ImageDB|undefined>;
-  getFirstNonAlignImage(sqlite3: any, data: any) {
+  getFirstNonAlignImage(sqlite3: any, data: any, port?: any) {
     //    console.error("getFirstNonAlignImage",data.payload.pageInscan, t)
 
     const payload = data.payload;
@@ -786,44 +832,73 @@ class DB {
       const value = this.db.selectValue('select imageData from nonalign where page=' + payload.pageInscan);
       const enc = new TextEncoder(); // always utf-8
       const v = enc.encode(value).buffer;
-      postMessage(
-        {
-          msg: data.msg,
-          uid: data.uid,
-          payload: {
-            value: v,
-            examId: payload.examId,
-            pageNumber: payload.pageNumber,
+      if (port) {
+        port.postMessage(
+          {
+            msg: data.msg,
+            uid: data.uid,
+            payload: {
+              value: v,
+              examId: payload.examId,
+              pageNumber: payload.pageNumber,
+            },
           },
-        },
-        [v],
-      );
+          [v],
+        );
+      } else {
+        postMessage(
+          {
+            msg: data.msg,
+            uid: data.uid,
+            payload: {
+              value: v,
+              examId: payload.examId,
+              pageNumber: payload.pageNumber,
+            },
+          },
+          [v],
+        );
+      }
     } finally {
       this.close();
     }
   }
 
   // getFirstAlignImage(examId:number,pageInscan:number ):Promise<ImageDB|undefined>;
-  getFirstAlignImage(sqlite3: any, data: any) {
+  getFirstAlignImage(sqlite3: any, data: any, port?: any) {
     const payload = data.payload;
     this.initDb(sqlite3);
     try {
       const value = this.db.selectValue('select imageData from align where page=' + payload.pageInscan);
       const enc = new TextEncoder(); // always utf-8
       const v = enc.encode(value).buffer;
-
-      postMessage(
-        {
-          msg: data.msg,
-          uid: data.uid,
-          payload: {
-            value: v,
-            examId: payload.examId,
-            pageNumber: payload.pageNumber,
+      if (port) {
+        port.postMessage(
+          {
+            msg: data.msg,
+            uid: data.uid,
+            payload: {
+              value: v,
+              examId: payload.examId,
+              pageNumber: payload.pageNumber,
+            },
           },
-        },
-        [v],
-      );
+          [v],
+        );
+      } else {
+        postMessage(
+          {
+            msg: data.msg,
+            uid: data.uid,
+            payload: {
+              value: v,
+              examId: payload.examId,
+              pageNumber: payload.pageNumber,
+            },
+          },
+          [v],
+        );
+      }
     } finally {
       this.close();
     }
@@ -831,26 +906,40 @@ class DB {
 
   // getFirstTemplate(examId:number,pageInscan:number ):Promise<Template|undefined>;
 
-  getFirstTemplate(sqlite3: any, data: any) {
+  getFirstTemplate(sqlite3: any, data: any, port?: any) {
     const payload = data.payload;
     this.initDb(sqlite3);
     try {
       const value = this.db.selectValue('select imageData from template where page=' + payload.pageInscan);
       const enc = new TextEncoder(); // always utf-8
       const v = enc.encode(value).buffer;
-
-      postMessage(
-        {
-          msg: data.msg,
-          uid: data.uid,
-          payload: {
-            value: v,
-            examId: payload.examId,
-            pageNumber: payload.pageNumber,
+      if (port) {
+        port.postMessage(
+          {
+            msg: data.msg,
+            uid: data.uid,
+            payload: {
+              value: v,
+              examId: payload.examId,
+              pageNumber: payload.pageNumber,
+            },
           },
-        },
-        [v],
-      );
+          [v],
+        );
+      } else {
+        postMessage(
+          {
+            msg: data.msg,
+            uid: data.uid,
+            payload: {
+              value: v,
+              examId: payload.examId,
+              pageNumber: payload.pageNumber,
+            },
+          },
+          [v],
+        );
+      }
     } finally {
       this.close();
     }

@@ -68,6 +68,7 @@ http://angular-form-builder.surge.sh/
       numberofpointToMatch: [],
       numberofgoodpointToMatch: [],
       defaultAlignAlgowithMarker: [true],
+      removeHorizontalName: [true],
     });
   }
 

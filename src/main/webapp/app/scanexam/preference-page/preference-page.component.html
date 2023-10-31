@@ -192,6 +192,21 @@
           />
         </div>
       </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="removeHorizontalName" [pTooltip]="'Used mainly when recognizing letter on sheet'"
+            >Remove Horizontal and Vertical lines:</label
+          >
+          <input
+            type="checkbox"
+            class="form-check col-1"
+            name="removeHorizontalName"
+            id="removeHorizontalName"
+            data-cy="removeHorizontalName"
+            formControlName="removeHorizontalName"
+          />
+        </div>
+      </div>
     </div>
     <button class="p-button p-button-primary" type="submit">Submit</button>
     <button class="p-button p-button-secondary" (click)="clearToDefault()">Reset to default value</button>

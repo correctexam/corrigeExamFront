@@ -5,4 +5,8 @@ export const worker1: () => Worker = function () {
 };
 
 export const workersqllite = new Worker(new URL('../../dbsqlite.worker', import.meta.url));
-// new Worker(new URL('../../align.pool.worker', import.meta.url));
+
+const channel = new MessageChannel();
+
+workersqllite.postMessage({ msg: 'shareWorker', uid: '-1', port: channel.port1 }, [channel.port1]);
+worker.postMessage({ msg: 'shareWorker', uid: '-1', port: channel.port2 }, [channel.port2]);

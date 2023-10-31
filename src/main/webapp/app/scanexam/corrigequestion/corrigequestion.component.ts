@@ -25,7 +25,13 @@ import { ExamService } from 'app/entities/exam/service/exam.service';
 import { StudentService } from 'app/entities/student/service/student.service';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { AlignImagesService, IImageAlignement, IImageAlignementInput, IQCMInput } from '../services/align-images.service';
+import {
+  AlignImagesService,
+  IImageAlignement,
+  IImageAlignementInput,
+  IImageCropFromZoneInput,
+  IQCMInput,
+} from '../services/align-images.service';
 import { IExam } from '../../entities/exam/exam.model';
 import { ICourse } from 'app/entities/course/course.model';
 import { IStudent } from '../../entities/student/student.model';
@@ -510,10 +516,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  reloadImage() {
-    this.questions?.forEach((q, i) => {
-      this.showImage[i] = false;
-      this.loadZone(q.zoneId).then(z => {
+  async reloadImage() {
+    if (this.questions) {
+      for (const { i, q } of this.questions.map((value, index) => ({ i: index, q: value }))) {
+        this.showImage[i] = false;
+        const z = await this.loadZone(q.zoneId);
         const pagewithoffset = this.currentStudent! * this.nbreFeuilleParCopie! + z!.pageNumber! + this.pageOffset;
         const pagewithoutoffset = this.currentStudent! * this.nbreFeuilleParCopie! + z!.pageNumber!;
         let page = pagewithoutoffset;
@@ -527,20 +534,19 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             this.activeIndex = page - 1;
           }
         }
+        const imagezone = await this.getAllImage4Zone(page, z!);
 
-        this.getAllImage4Zone(page, z!).then(p => {
-          this.displayImage(
-            p,
-            this.canvass.get(i),
-            b => {
-              this.showImage[i] = b;
-            },
-            i,
-            true,
-          );
-        });
-      });
-    });
+        this.displayImage(
+          imagezone,
+          this.canvass.get(i),
+          b => {
+            this.showImage[i] = b;
+          },
+          i,
+          true,
+        );
+      }
+    }
   }
   cleanAllCorrection(q: IQuestion): Observable<HttpResponse<IQuestion>> {
     return this.questionService.cleanAllCorrectionAndComment(q);
@@ -1349,8 +1355,47 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       });
     });
   }
-
   async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
+    const imageToCrop: IImageCropFromZoneInput = {
+      examId: +this.examId!,
+      factor: +this.factor,
+      align: !this.noalign,
+      template: false,
+      indexDb: this.preferenceService.getPreference().cacheDb === 'indexdb',
+      page: pageInscan,
+      z: zone,
+    };
+    const crop = await firstValueFrom(this.alignImagesService.imageCropFromZone(imageToCrop));
+    this.computeScale(crop.width);
+
+    return {
+      i: new ImageData(new Uint8ClampedArray(crop.image), crop.width, crop.height),
+      h: crop.height,
+      w: crop.width,
+    };
+  }
+
+  async getTemplateImage4Zone(zone: IZone): Promise<ImageZone> {
+    const imageToCrop: IImageCropFromZoneInput = {
+      examId: +this.examId!,
+      factor: +this.factor,
+      align: !this.noalign,
+      template: true,
+      indexDb: this.preferenceService.getPreference().cacheDb === 'indexdb',
+      page: zone.pageNumber!,
+      z: zone,
+    };
+    const crop = await firstValueFrom(this.alignImagesService.imageCropFromZone(imageToCrop));
+    this.computeScale(crop.width);
+
+    return {
+      i: new ImageData(new Uint8ClampedArray(crop.image), crop.width, crop.height),
+      h: crop.height,
+      w: crop.width,
+    };
+  }
+
+  /* async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
     if (this.noalign) {
       return new Promise(resolve => {
         this.db.getFirstNonAlignImage(+this.examId!, pageInscan).then(e2 => {
@@ -1421,7 +1466,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       });
     }
-  }
+  } */
 
   async getStudentResponse(questionsId: number[], currentStudent: number): Promise<StudentResponse> {
     return new Promise(resolve => {
@@ -1455,7 +1500,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  async getTemplateImage4Zone(zone: IZone): Promise<ImageZone> {
+  /*  async getTemplateImage4Zone(zone: IZone): Promise<ImageZone> {
     return new Promise(resolve => {
       this.db.getFirstTemplate(+this.examId!, zone.pageNumber!).then(e2 => {
         const image = JSON.parse(e2!.value, this.reviver);
@@ -1489,7 +1534,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       });
     });
-  }
+  }*/
 
   showGalleria(): void {
     this.blocked = true;
@@ -1506,18 +1551,26 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.displayBasic = false;
   }
 
+  computeScale(imageWidth: number): void {
+    let factorScale = 0.75;
+    if (this.windowWidth < 991) {
+      factorScale = 0.95;
+    }
+    let scale = (window.innerWidth * factorScale) / imageWidth;
+    if (scale > 2) {
+      scale = 2;
+    }
+    this.scale = scale;
+    this.eventHandler.scale = this.scale;
+  }
+
   async loadImage(file: any, page1: number): Promise<IPage> {
     return new Promise(resolve => {
       const i = new Image();
       i.onload = () => {
         const editedImage: HTMLCanvasElement = <HTMLCanvasElement>document.createElement('canvas');
         editedImage.width = i.width;
-        let factorScale = 0.75;
-        if (this.windowWidth < 991) {
-          factorScale = 0.95;
-        }
-        this.scale = (window.innerWidth * factorScale) / i.width;
-        this.eventHandler.scale = this.scale;
+        this.computeScale(i.width);
         editedImage.height = i.height;
         const ctx = editedImage.getContext('2d');
         ctx!.drawImage(i, 0, 0);

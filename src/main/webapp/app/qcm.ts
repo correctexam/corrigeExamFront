@@ -183,7 +183,7 @@ export function getOrigDimensions(forme: any): any {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function __moy(coordonnees: any[]): any {
+/* function __moy(coordonnees: any[]): any {
   if (coordonnees.length > 0) {
     let x_sum = 0;
     let y_sum = 0;
@@ -195,7 +195,7 @@ function __moy(coordonnees: any[]): any {
   } else {
     return { x: 0, y: 0 };
   }
-}
+}*/
 
 function __closest(coordonnees: any[]): any {
   if (coordonnees.length > 0) {
@@ -264,11 +264,14 @@ function interpretationForme(contour: any, preference: IPreference): any {
 
 function detectFormes(img: any, nomsFormes: string[] = [], preference: IPreference): any[] {
   const thrash = new cv.Mat();
-  cv.threshold(img, thrash, 245, 255, cv.THRESH_BINARY);
+  cv.threshold(img, thrash, 248, 255, cv.THRESH_BINARY);
+  //  cv.adaptiveThreshold(img, thrash, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 3, 2);
+
   let contours = new cv.MatVector();
   let hierarchy = new cv.Mat();
   cv.findContours(thrash, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_NONE);
   const formes: any[] = [];
+
   // approximates each contour to polygon
   for (let i = 0; i < contours.size(); ++i) {
     let contour = contours.get(i);

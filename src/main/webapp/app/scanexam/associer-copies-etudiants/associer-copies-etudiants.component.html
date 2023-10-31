@@ -31,6 +31,40 @@
   </p-galleria>
   <ng-keyboard-shortcuts [shortcuts]="shortcuts"></ng-keyboard-shortcuts>
 
+  <p-sidebar [(visible)]="layoutsidebarVisible">
+    <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
+      <p-inputSwitch
+        [(ngModel)]="noalign"
+        (onChange)="loadImage()"
+        [pTooltip]="'scanexam.removealignementTooltip' | translate"
+      ></p-inputSwitch>
+    </div>
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <label jhiTranslate="scanexam.assistance">Assistance</label>
+      <p-inputSwitch [(ngModel)]="assisted" (onChange)="loadImage()" [pTooltip]="'scanexam.assistanceTooltip' | translate"></p-inputSwitch>
+    </div>
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <label jhiTranslate="scanexam.debug">Debug</label>
+      <p-inputSwitch [(ngModel)]="debug" (onChange)="loadImage()" [pTooltip]="'scanexam.debugTooltip' | translate"></p-inputSwitch>
+    </div>
+
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <label><span jhiTranslate="scanexam.zoomfactor"> Facteur d'agrandissement: </span>{{ factor }} </label>
+      <p-slider [ngModel]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImageGrowFactor($event)"> </p-slider>
+    </div>
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <button
+        pButton
+        [pTooltip]="'scanexam.removeallbindingtooltip' | translate"
+        [tooltipZIndex]="'3000'"
+        (click)="cleanBinding()"
+        jhiTranslate="scanexam.removeallbinding"
+      ></button>
+    </div>
+  </p-sidebar>
+
   <div class="col-12">
     <div class="grid grid-nogutter">
       <div class="col-8">
@@ -47,34 +81,63 @@
         >
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam">Retourner à l'exam</span>
         </button>
-        <p-inputSwitch [(ngModel)]="assisted"></p-inputSwitch>
-        <label jhiTranslate="scanexam.assistance">Assistance</label>
+        <button
+          [disabled]="!this.examId"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="p-button p-button-primary"
+          (click)="openAllBinding()"
+          [pTooltip]="'scanexam.allbindingsTooltip' | translate"
+        >
+          <fa-icon icon="magnifying-glass-arrow-right"></fa-icon>&nbsp;<span jhiTranslate="scanexam.allbindings">Show all binding</span>
+        </button>
       </div>
     </div>
     <div class="col-12 md:col-12">
-      <div class="d-flex justify-content-center">
-        <div>
-          <span jhiTranslate="scanexam.selectedstudent">Etudiant(es) Séléctionné(es):</span> {{ selectionStudentsString() }}
-          <BR />
-          <span *ngIf="assisted && recognizedStudent !== undefined && predictionprecision > 0.07"
-            ><span jhiTranslate="scanexam.aistudent">Etudiant(es) Reconnu(es):</span> {{ showRecognizedStudent() }}</span
-          >
+      <div class="grid">
+        <div class="col-1">
           <p-button
-            (onClick)="selectRecogniezStudent()"
-            [style.padding]="'0.1rem'"
-            *ngIf="assisted && recognizedStudent !== undefined && predictionprecision > 0.07"
-            >✔️</p-button
-          >
+            class="sm:text-xs md:text-xs lg:text-base"
+            styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
+            (click)="layoutsidebarVisible = true"
+            icon="pi pi-arrow-right"
+            [disabled]="blocked"
+          ></p-button>
         </div>
+        <div class="col-10 d-flex justify-content-center">
+          <div>
+            <span jhiTranslate="scanexam.selectedstudent">Etudiant(es) Séléctionné(es):</span> {{ selectionStudentsString() }}
+            <BR />
+            <span *ngIf="assisted && recognizedStudent !== undefined && predictionprecision > 0.07"
+              ><span jhiTranslate="scanexam.aistudent">Etudiant(es) Reconnu(es):</span> {{ showRecognizedStudent() }}</span
+            >
+            <p-button
+              [pTooltip]="'scanexam.validaterecognizedTooltip' | translate"
+              (onClick)="selectRecogniezStudent()"
+              [style.padding]="'0.1rem'"
+              *ngIf="assisted && recognizedStudent !== undefined && predictionprecision > 0.07"
+              >✔️</p-button
+            >
+          </div>
+        </div>
+        <div class="col-1"></div>
       </div>
-
-      <div class="grid align-items-center">
-        <div class="col-3">
-          <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
-          <p-inputSwitch [(ngModel)]="noalign" (onChange)="reloadImage()"></p-inputSwitch>
-        </div>
+      <div class="grid">
+        <div class="col-3"></div>
         <div class="col-6">
           <div class="d-flex justify-content-center">
+            <button
+              pButton
+              [pTooltip]="'scanexam.gotopreviousnonboundsheet' | translate"
+              [tooltipZIndex]="'3000'"
+              (click)="gotopreviousnonboundsheet()"
+              class="p-button"
+              [disabled]="blocked"
+            >
+              <fa-icon icon="arrow-left"></fa-icon>
+            </button>
+
             <p-paginator
               [rows]="1"
               [first]="currentStudent"
@@ -83,38 +146,50 @@
               [showJumpToPageDropdown]="true"
               [showPageLinks]="false"
             ></p-paginator>
-            <button pButton (click)="showGalleria()" jhiTranslate="scanexam.showgalleria">Show full page</button>
+            <button
+              pButton
+              [pTooltip]="'scanexam.gotonextnonboundsheet' | translate"
+              [tooltipZIndex]="'3000'"
+              (click)="gotonextnonboundsheet()"
+              class="p-button"
+              [disabled]="blocked"
+            >
+              <fa-icon icon="arrow-right"></fa-icon>
+            </button>
           </div>
         </div>
-        <div class="col-3 justify-content-end">
-          <label><span jhiTranslate="scanexam.zoomfactor"> Facteur d'agrandissement: </span>{{ factor }} </label>
-          <p-slider [ngModel]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImageGrowFactor($event)"> </p-slider>
+        <div class="col-3">
+          <div class="d-flex justify-content-end">
+            <button pButton (click)="showGalleria()" jhiTranslate="scanexam.showgalleria">Show full page</button>
+          </div>
         </div>
       </div>
 
       <div class="canvas-wrapper foo">
-        <canvas [hidden]="!showNomImage" #nomImage></canvas>
-        <canvas [hidden]="!showPrenomImage" #prenomImage></canvas>
-        <canvas [hidden]="!showINEImage" #ineImage></canvas>
-        <canvas [hidden]="!debug" #nomImageReco></canvas>
-        <canvas [hidden]="!debug" #prenomImageReco></canvas>
-        <canvas [hidden]="!debug" #ineImageReco></canvas>
+        <table [style]="{ 'min-width': '60rem' }">
+          <tr>
+            <td [style]="columnstyle" *ngIf="nameImageImg"><img style="max-width: 100%" [src]="nameImageImg" /></td>
+            <td [style]="columnstyle" *ngIf="firstnameImageImg"><img style="max-width: 100%" [src]="firstnameImageImg" /></td>
+            <td [style]="columnstyle" *ngIf="ineImageImg"><img style="max-width: 100%" [src]="ineImageImg" /></td>
+          </tr>
+          <tr *ngIf="debug">
+            <td [style]="columnstyle" *ngIf="nameImageImgDebug"><img style="max-width: 100%" [src]="nameImageImgDebug" /></td>
+            <td [style]="columnstyle" *ngIf="firstnameImageImgDebug"><img style="max-width: 100%" [src]="firstnameImageImgDebug" /></td>
+            <td [style]="columnstyle" *ngIf="ineImageImgDebug"><img style="max-width: 100%" [src]="ineImageImgDebug" /></td>
+          </tr>
+        </table>
       </div>
       <div class="grid align-items-center">
         <div class="col-3">
           <label jhiTranslate="scanexam.filterboundstudent">Filtrer les étudiants déjà affectées: </label>
-          <p-inputSwitch [(ngModel)]="filterbindstudent" (onChange)="refreshLocalStudentList()"></p-inputSwitch>
+          <p-inputSwitch
+            [(ngModel)]="filterbindstudent"
+            (onChange)="refreshLocalStudentList()"
+            [pTooltip]="'scanexam.filterboundstudentTooltip' | translate"
+          ></p-inputSwitch>
         </div>
         <div class="col-6"></div>
-        <div class="col-3">
-          <button
-            pButton
-            [pTooltip]="'scanexam.removeallbindingtooltip' | translate"
-            [tooltipZIndex]="'3000'"
-            (click)="cleanBinding()"
-            jhiTranslate="scanexam.removeallbinding"
-          ></button>
-        </div>
+        <div class="col-3"></div>
       </div>
       <!-- (onClick)="bindStudent()"-->
       <p-listbox
@@ -129,34 +204,10 @@
         (onClick)="bindStudentOnClick()"
       >
         <ng-template let-table pTemplate="item">
-          <!--         <div class="flex  overflow-hidden" style="width: '100%'">
-              <div class="flex align-items-center justify-content-center flex-grow-1 ">
-                <span style="float: left">{{ table.label }}</span>
-                <span style="float: left; width: '1rem'">&nbsp;</span>
-                  <button
-                  icon="pi pi-check"
-                 grid style="width: '1.5rem'; height: '1.5rem'"
-                  class="p-button-sm p-button-raised p-button-text p-button-rounded"
-                  pButton
-                  (click)="selectStudents(table.value)"
-                ></button>
-              </div>
-              <div class="flex-none flex align-items-right justify-content-right">
-                <button style="padding: '0.1rem'" pButton (click)="selectStudents(table.value)" jhiTranslate="scanexam.next">Next</button>
-              </div>-->
           <div class="col-12" style="width: '100%'">
             <div class="flex flex-row m-0 p-0">
               <div class="flex-grow-1 flex-shrink-1 flex align-items-center justify-content-left border-round m-0 p-0">
                 <span style="float: left" [ngClass]="selectedColor(table)">{{ table.label }}</span>
-                <!-- <span style="float: left; width: '1rem'">&nbsp;</span>-->
-                <!--<button
-                  icon="pi pi-check"
-                  grid
-                  style="width: '1.5rem'; height: '1.5rem'"
-                  class="p-button-sm p-button-raised p-button-text p-button-rounded"
-                  pButton
-                  (click.single)="single($event)"
-                ></button>-->
               </div>
               <div class="flex-shrink-0 flex align-items-center justify-content-right border-round m-0 p-0"></div>
               <div class="flex-grow-1 flex-shrink-1 flex align-items-end justify-content-end border-round m-0 p-0">
