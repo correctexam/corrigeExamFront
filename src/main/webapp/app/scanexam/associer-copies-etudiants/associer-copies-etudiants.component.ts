@@ -361,64 +361,79 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     /*    console.error(candidateName.map((e: any) => (this.latinise(e)! as string).toLowerCase()));
     console.error(candidateFirstName.map((e: any) => (this.latinise(e)! as string)?.toLowerCase()));
     console.error(candidateIne.map((e: any) => (this.latinise(e)! as string)?.toLowerCase())); */
-    const r: DoPredictionsInputSamePage = {
-      align: !this.noalign,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      candidates: candidates as IStudent[],
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      examId: +this.examId,
-      indexDb: this.preferenceService.getPreference().cacheDb === 'indexdb',
-      factor: this.factor,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      pagesToAnalyze: pagesToAnalyze.map(p => p + z1!.pageNumber!),
-      pageTemplate: z1!.pageNumber!,
-      nameZone: z1!,
-      firstnameZone: z2!,
-      ineZone: z3!,
-      removeHorizontal: this.preferenceService.getPreference().removeHorizontalName,
-      looking4missing: true,
-      preferences: this.preferenceService.getPreference(),
-      assist: this.assisted,
-      debug: this.debug,
-    };
-    const output: PredictResult[] = [];
-    console.timeLog('loadpage', 'before doPredictions');
-    console.timeLog('loadpagesameexam', 'before doPredictions');
-    const r5 = await firstValueFrom(this.alignImagesService.doPredictions(r));
-    console.timeLog('loadpage', 'after doPredictions');
-    console.timeLog('loadpagesameexam', 'after doPredictions');
-
-    for (const r1 of r5) {
-      let result: PredictResult = { predictionprecision: 0, page: r1.page };
-      if (r1.nameZone) {
-        result.nameImage = new ImageData(new Uint8ClampedArray(r1.nameZone), r1.nameZoneW!, r1.nameZoneH!);
-        if (this.debug && r1.nameZoneDebug) {
-          result.nameImageDebug = new ImageData(new Uint8ClampedArray(r1.nameZoneDebug), r1.nameZoneW!, r1.nameZoneH!);
-        }
-      }
-
-      if (r1.firstnameZone) {
-        result.firstnameImage = new ImageData(new Uint8ClampedArray(r1.firstnameZone), r1.firstnameZoneW!, r1.firstnameZoneH!);
-        if (this.debug && r1.firstnameZoneDebug) {
-          result.firstnameImageDebug = new ImageData(new Uint8ClampedArray(r1.firstnameZoneDebug), r1.firstnameZoneW!, r1.firstnameZoneH!);
-        }
-      }
-      if (r1.ineZone) {
-        result.ineImage = new ImageData(new Uint8ClampedArray(r1.ineZone), r1.ineZoneW!, r1.ineZoneH!);
-        if (this.debug && r1.ineZoneDebug) {
-          result.ineImageDebug = new ImageData(new Uint8ClampedArray(r1.ineZoneDebug), r1.ineZoneW!, r1.ineZoneH!);
-        }
-      }
-
-      if (r1.resultPrediction.length > 0) {
-        result.predictionprecision = r1.resultPrediction[0].proba! * r1.resultPrediction[0].score!;
-        result.recognizedStudent = this.students.find(st => st.id === r1.resultPrediction[0].id);
-      }
-      output.push(result);
+    let pageNumber = z1?.pageNumber;
+    if (pageNumber === undefined) {
+      pageNumber = z2?.pageNumber;
     }
+    if (pageNumber === undefined) {
+      pageNumber = z3?.pageNumber;
+    }
+    if (pageNumber !== undefined && pageNumber !== null && (z1 !== undefined || z2 !== undefined || z3 !== undefined)) {
+      const r: DoPredictionsInputSamePage = {
+        align: !this.noalign,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        candidates: candidates as IStudent[],
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        examId: +this.examId,
+        indexDb: this.preferenceService.getPreference().cacheDb === 'indexdb',
+        factor: this.factor,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        pagesToAnalyze: pagesToAnalyze.map(p => p + pageNumber!),
+        pageTemplate: pageNumber!,
+        nameZone: z1!,
+        firstnameZone: z2!,
+        ineZone: z3!,
+        removeHorizontal: this.preferenceService.getPreference().removeHorizontalName,
+        looking4missing: true,
+        preferences: this.preferenceService.getPreference(),
+        assist: this.assisted,
+        debug: this.debug,
+      };
+      const output: PredictResult[] = [];
+      console.timeLog('loadpage', 'before doPredictions');
+      console.timeLog('loadpagesameexam', 'before doPredictions');
+      const r5 = await firstValueFrom(this.alignImagesService.doPredictions(r));
+      console.timeLog('loadpage', 'after doPredictions');
+      console.timeLog('loadpagesameexam', 'after doPredictions');
 
-    return output;
+      for (const r1 of r5) {
+        let result: PredictResult = { predictionprecision: 0, page: r1.page };
+        if (r1.nameZone) {
+          result.nameImage = new ImageData(new Uint8ClampedArray(r1.nameZone), r1.nameZoneW!, r1.nameZoneH!);
+          if (this.debug && r1.nameZoneDebug) {
+            result.nameImageDebug = new ImageData(new Uint8ClampedArray(r1.nameZoneDebug), r1.nameZoneW!, r1.nameZoneH!);
+          }
+        }
+
+        if (r1.firstnameZone) {
+          result.firstnameImage = new ImageData(new Uint8ClampedArray(r1.firstnameZone), r1.firstnameZoneW!, r1.firstnameZoneH!);
+          if (this.debug && r1.firstnameZoneDebug) {
+            result.firstnameImageDebug = new ImageData(
+              new Uint8ClampedArray(r1.firstnameZoneDebug),
+              r1.firstnameZoneW!,
+              r1.firstnameZoneH!,
+            );
+          }
+        }
+        if (r1.ineZone) {
+          result.ineImage = new ImageData(new Uint8ClampedArray(r1.ineZone), r1.ineZoneW!, r1.ineZoneH!);
+          if (this.debug && r1.ineZoneDebug) {
+            result.ineImageDebug = new ImageData(new Uint8ClampedArray(r1.ineZoneDebug), r1.ineZoneW!, r1.ineZoneH!);
+          }
+        }
+
+        if (r1.resultPrediction.length > 0) {
+          result.predictionprecision = r1.resultPrediction[0].proba! * r1.resultPrediction[0].score!;
+          result.recognizedStudent = this.students.find(st => st.id === r1.resultPrediction[0].id);
+        }
+        output.push(result);
+      }
+
+      return output;
+    } else {
+      return [];
+    }
   }
 
   reloadImageGrowFactor(event: any): void {
