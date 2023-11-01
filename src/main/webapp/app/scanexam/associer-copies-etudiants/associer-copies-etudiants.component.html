@@ -39,26 +39,51 @@
         [(ngModel)]="noalign"
         (onChange)="loadImage()"
         [pTooltip]="'scanexam.removealignementTooltip' | translate"
+        [tooltipZIndex]="'3000'"
+        [tooltipPosition]="'right'"
       ></p-inputSwitch>
     </div>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <label jhiTranslate="scanexam.assistance">Assistance</label>
-      <p-inputSwitch [(ngModel)]="assisted" (onChange)="loadImage()" [pTooltip]="'scanexam.assistanceTooltip' | translate"></p-inputSwitch>
+      <p-inputSwitch
+        [(ngModel)]="assisted"
+        (onChange)="loadImage()"
+        [pTooltip]="'scanexam.assistanceTooltip' | translate"
+        [tooltipZIndex]="'3000'"
+        [tooltipPosition]="'right'"
+      ></p-inputSwitch>
     </div>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <label jhiTranslate="scanexam.debug">Debug</label>
-      <p-inputSwitch [(ngModel)]="debug" (onChange)="loadImage()" [pTooltip]="'scanexam.debugTooltip' | translate"></p-inputSwitch>
+      <p-inputSwitch
+        [(ngModel)]="debug"
+        (onChange)="loadImage()"
+        [pTooltip]="'scanexam.debugTooltip' | translate"
+        [tooltipZIndex]="'3000'"
+        [tooltipPosition]="'right'"
+      ></p-inputSwitch>
     </div>
 
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <label><span jhiTranslate="scanexam.zoomfactor"> Facteur d'agrandissement: </span>{{ factor }} </label>
-      <p-slider [ngModel]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImageGrowFactor($event)"> </p-slider>
+      <p-slider
+        [ngModel]="factor"
+        [min]="1"
+        [max]="2"
+        [step]="0.1"
+        (onChange)="reloadImageGrowFactor($event)"
+        [pTooltip]="'scanexam.factorTooltip' | translate"
+        [tooltipZIndex]="'3000'"
+        [tooltipPosition]="'right'"
+      >
+      </p-slider>
     </div>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <button
         pButton
         [pTooltip]="'scanexam.removeallbindingtooltip' | translate"
         [tooltipZIndex]="'3000'"
+        [tooltipPosition]="'right'"
         (click)="cleanBinding()"
         jhiTranslate="scanexam.removeallbinding"
       ></button>
@@ -89,6 +114,8 @@
           class="p-button p-button-primary"
           (click)="openAllBinding()"
           [pTooltip]="'scanexam.allbindingsTooltip' | translate"
+          [tooltipZIndex]="'3000'"
+          [tooltipPosition]="'bottom'"
         >
           <fa-icon icon="magnifying-glass-arrow-right"></fa-icon>&nbsp;<span jhiTranslate="scanexam.allbindings">Show all binding</span>
         </button>
@@ -102,6 +129,8 @@
             styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
             (click)="layoutsidebarVisible = true"
             icon="pi pi-arrow-right"
+            [pTooltip]="'scanexam.showLayoutOptionsTooltip' | translate"
+            [tooltipPosition]="'right'"
             [disabled]="blocked"
           ></p-button>
         </div>
@@ -131,6 +160,7 @@
               pButton
               [pTooltip]="'scanexam.gotopreviousnonboundsheet' | translate"
               [tooltipZIndex]="'3000'"
+              [tooltipPosition]="'bottom'"
               (click)="gotopreviousnonboundsheet()"
               class="p-button"
               [disabled]="blocked"
@@ -145,11 +175,14 @@
               (onPageChange)="onPageChange($event)"
               [showJumpToPageDropdown]="true"
               [showPageLinks]="false"
+              [pTooltip]="'scanexam.showPaginatorTooltip' | translate"
+              [tooltipPosition]="'bottom'"
             ></p-paginator>
             <button
               pButton
               [pTooltip]="'scanexam.gotonextnonboundsheet' | translate"
               [tooltipZIndex]="'3000'"
+              [tooltipPosition]="'bottom'"
               (click)="gotonextnonboundsheet()"
               class="p-button"
               [disabled]="blocked"
@@ -160,7 +193,15 @@
         </div>
         <div class="col-3">
           <div class="d-flex justify-content-end">
-            <button pButton (click)="showGalleria()" jhiTranslate="scanexam.showgalleria">Show full page</button>
+            <button
+              pButton
+              (click)="showGalleria()"
+              jhiTranslate="scanexam.showgalleria"
+              [pTooltip]="'scanexam.showFullPageTooltip' | translate"
+              [tooltipPosition]="'bottom'"
+            >
+              Show full page
+            </button>
           </div>
         </div>
       </div>
@@ -211,7 +252,17 @@
               </div>
               <div class="flex-shrink-0 flex align-items-center justify-content-right border-round m-0 p-0"></div>
               <div class="flex-grow-1 flex-shrink-1 flex align-items-end justify-content-end border-round m-0 p-0">
-                <button style="padding: '0.0rem'" pButton (click)="selectStudents(table.value)" jhiTranslate="scanexam.next">Next</button>
+                <button
+                  style="padding: '0.0rem'"
+                  pButton
+                  (click)="selectStudents(table.value)"
+                  jhiTranslate="scanexam.next"
+                  [pTooltip]="'scanexam.gotonextnonboundsheetTooltip' | translate"
+                  [tooltipZIndex]="'3000'"
+                  [tooltipPosition]="'left'"
+                >
+                  Next
+                </button>
               </div>
             </div>
           </div>

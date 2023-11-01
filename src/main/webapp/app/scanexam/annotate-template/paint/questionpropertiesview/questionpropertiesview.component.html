@@ -16,6 +16,8 @@
             class="form-control"
             name="numero"
             id="field_numero"
+            [pTooltip]="'scanexam.numeroTooltip' | translate"
+            [tooltipPosition]="'left'"
             data-cy="numero"
             formControlName="numero"
             min="1"
@@ -42,6 +44,7 @@
             placeholder="Question n° XXX"
             style="margin-right: 0.5em"
             [pTooltip]="'scanexam.libelletooltip' | translate"
+            [tooltipPosition]="'left'"
             (keyup)="contentChange()"
             (change)="contentChange()"
             [tooltipZIndex]="'3000'"
@@ -61,12 +64,22 @@
             [min]="0.25"
             [max]="50"
             (change)="pointChange($event)"
+            [pTooltip]="'scanexam.questionpointtooltip' | translate"
+            [tooltipPosition]="'left'"
           />
         </div>
 
         <div class="row">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.type" for="field_type">Type</label>
-          <select class="form-control" id="field_type" name="type" formControlName="typeId" (change)="changeQCM()">
+          <select
+            class="form-control"
+            id="field_type"
+            name="type"
+            formControlName="typeId"
+            (change)="changeQCM()"
+            [pTooltip]="'scanexam.typequestionTooltip' | translate"
+            [tooltipPosition]="'left'"
+          >
             <option [ngValue]="null"></option>
             <option [ngValue]="questionTypeOption.id" *ngFor="let questionTypeOption of questiontypes; trackBy: trackById">
               {{ questionTypeOption.algoName }}
@@ -86,6 +99,7 @@
             optionLabel="name"
             optionValue="value"
             [pTooltip]="'scanexam.steptooltip' | translate"
+            [tooltipPosition]="'left'"
             (onChange)="contentChange()"
             [tooltipZIndex]="'3000'"
           ></p-listbox>
@@ -95,12 +109,13 @@
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.gradeType" for="field_gradeType">Grade Type</label>
           <select
             class="form-control"
-            gradeT
             name="gradeType"
             formControlName="gradeType"
             id="field_gradeType"
             data-cy="gradeType"
             (change)="contentChange()"
+            [pTooltip]="'scanexam.manualgradetypequestionTooltip' | translate"
+            [tooltipPosition]="'left'"
           >
             <option [ngValue]="null">{{ 'gradeScopeIsticApp.GradeType.null' | translate }}</option>
             <option *ngFor="let gradeType of gradeTypeValues" [value]="gradeType">
@@ -125,6 +140,7 @@
             placeholder="a&b|a&c"
             style="margin-right: 0.5em"
             [pTooltip]="'scanexam.expressiontooltip' | translate"
+            [tooltipPosition]="'left'"
             (change)="contentChangeCheck()"
             [tooltipZIndex]="'3000'"
           />
@@ -150,9 +166,10 @@
             optionLabel="name"
             optionValue="value"
             [pTooltip]="'scanexam.penaltytooltip' | translate"
-            (onChange)="contentChange()"
-            [tooltipZIndex]="'3000'"
-          ></p-listbox>
+            [tooltipPosition]="'left'"
+          >
+            > (onChange)="contentChange()" [tooltipZIndex]="'3000'" ></p-listbox
+          >
         </div>
       </div>
     </form>
@@ -165,6 +182,7 @@
       icon="pi pi-arrow-left"
       [label]="'scanexam.commentsmanagement' | translate"
       [pTooltip]="'scanexam.commentsmanagementtooltip' | translate"
+      [tooltipPosition]="'left'"
       id="sidebar-show-button"
       [tooltipZIndex]="'3000'"
     ></p-button>
