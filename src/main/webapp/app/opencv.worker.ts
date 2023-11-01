@@ -11,8 +11,8 @@ import {
   //  decoupe,
   //  diffGrayAvecCaseBlanche,
   doQCMResolution,
-  getOrigDimensions,
-  getOrigPosition,
+  getDimensions,
+  getPosition,
   IPreference,
   __comparePositionX,
   detectFormes,
@@ -289,13 +289,6 @@ async function getTemplateImage(page: number, examId: number, indexDb: boolean):
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return await sqliteService.getFirstTemplate(examId, page);
   }
-  /*else {
-    if (align){
-      return await db.getFirstAlignImage(examId,page);
-    }else {
-      return await db.getFirstNonAlignImage(examId,page);
-    }
-  }*/
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -323,13 +316,6 @@ async function getScanImage(
       return await sqliteService.getFirstNonAlignImage(examId, page);
     }
   }
-  /*else {
-    if (align){
-      return await db.getFirstAlignImage(examId,page);
-    }else {
-      return await db.getFirstNonAlignImage(examId,page);
-    }
-  }*/
 }
 
 function reviver(key: any, value: any): any {
@@ -707,8 +693,8 @@ function trouveCases(img: any, preference: IPreference): any {
   const img_cases: any[] = [];
   // Enregistrement des cases de l'image (tous les carrés détectés)
   formes_cases.forEach(forme => {
-    const dim = getOrigDimensions(forme);
-    const pos = getOrigPosition(forme);
+    const dim = getDimensions(forme);
+    const pos = getPosition(forme);
     cases.push(forme);
     img_cases.push(decoupe(img, pos, dim));
   });
@@ -734,9 +720,9 @@ function doPredidction4zone(
   const caseDimension = [];
   for (let k = 0; k < casesTemplateSorted.length; k++) {
     const forme = casesTemplateSorted[k];
-    const dim = getOrigDimensions(forme);
+    const dim = getDimensions(forme);
     caseDimension.push(dim);
-    const pos = getOrigPosition(forme);
+    const pos = getPosition(forme);
     casePosition.push(pos);
   }
   for (let k = 0; k < casesTemplate.cases.length; k++) {
@@ -1322,7 +1308,6 @@ function extractImageNew(
       dsize = new cv.Size(width + 1, 26);
     }
 
-    //  dsize = new cv.Size(24, 24);;
     const bordertopBottom = (28 - dsize.height) / 2;
     const borderleftRight = (28 - dsize.width) / 2;
     cv.resize(dst4, dst2, dsize, 0, 0, cv.INTER_AREA);
@@ -1335,7 +1320,6 @@ function extractImageNew(
     cv.rectangle(invert_final, point1, point2, rectangleColor, 2, cv.LINE_AA, 0);
   });
 
-  // src.delete();
   gray.delete();
   thresh.delete();
   test.delete();
@@ -1349,7 +1333,6 @@ function extractImageNew(
   pre_result.delete();
   result.delete();
   final.delete();
-  //invert_final.delete();
   contours.delete();
   hierarchy.delete();
   let lettersf = [...letters];

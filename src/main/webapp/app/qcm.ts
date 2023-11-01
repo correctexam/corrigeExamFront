@@ -43,12 +43,6 @@ export interface IPreference {
   defaultAlignAlgowithMarker: boolean;
 }
 
-/* const MIN_WIDTH_SHAPE = 10;
-const MIN_HEIGHT_SHAPE = 10;
-const EPSILON = 0.0145; // 0.03
-// Interprétation
-const DIFFERENCES_AVEC_CASE_BLANCHE = 0.22;*/
-
 function imageDataFromMat(mat: any): any {
   // convert the mat type to cv.CV_8U
   const img = new cv.Mat();
@@ -102,60 +96,39 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
     cv.cvtColor(srcE, grayE, cv.COLOR_RGBA2GRAY, 0);
 
     // eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
-    if (true) {
-      const casesvideseleves = trouveCases(grayE, p.payload.preference);
-      let dstE;
-      if (casesvideseleves !== undefined && casesvideseleves.cases !== undefined && casesvideseleves.cases.length > 0) {
-        const decalage = /* { x: 0, y: 0 }; // */ computeDecallage(casesvideseleves, res);
-        dstE = applyTranslation(srcE, decalage);
-      } else {
-        dstE = srcE;
-      }
-      let results = analyseStudentSheet(res, src, dstE, p.payload.preference);
-      let e = imageDataFromMat(dstE);
-
-      let solution: string[] = [];
-
-      results.forEach((v, k) => {
-        if (v.verdict) {
-          solution.push(String.fromCharCode(97 + k));
-        }
-      });
-      p1.solutions?.push({
-        imageSolution: e,
-        numero: i,
-        solution: solution.join('&'),
-      });
-      grayE.delete();
-      srcE.delete();
-      _srcE.delete();
-
-      if (dstE !== srcE) {
-        dstE.delete();
-      }
-
-      casesvideseleves.cases.forEach((ca: any) => ca.delete());
-      casesvideseleves.img_cases.forEach((ca: any) => ca.delete());
+    const casesvideseleves = trouveCases(grayE, p.payload.preference);
+    let dstE;
+    if (casesvideseleves !== undefined && casesvideseleves.cases !== undefined && casesvideseleves.cases.length > 0) {
+      const decalage = /* { x: 0, y: 0 }; // */ computeDecallage(casesvideseleves, res);
+      dstE = applyTranslation(srcE, decalage);
     } else {
-      let results = analyseStudentSheet(res, src, srcE, p.payload.preference);
-      let e = imageDataFromMat(srcE);
-
-      let solution: string[] = [];
-
-      results.forEach((v, k) => {
-        if (v.verdict) {
-          solution.push(String.fromCharCode(97 + k));
-        }
-      });
-      p1.solutions?.push({
-        imageSolution: e,
-        numero: i,
-        solution: solution.join('&'),
-      });
-      grayE.delete();
-      _srcE.delete();
-      srcE.delete();
+      dstE = srcE;
     }
+    let results = analyseStudentSheet(res, src, dstE, p.payload.preference);
+    let e = imageDataFromMat(dstE);
+
+    let solution: string[] = [];
+
+    results.forEach((v, k) => {
+      if (v.verdict) {
+        solution.push(String.fromCharCode(97 + k));
+      }
+    });
+    p1.solutions?.push({
+      imageSolution: e,
+      numero: i,
+      solution: solution.join('&'),
+    });
+    grayE.delete();
+    srcE.delete();
+    _srcE.delete();
+
+    if (dstE !== srcE) {
+      dstE.delete();
+    }
+
+    casesvideseleves.cases.forEach((ca: any) => ca.delete());
+    casesvideseleves.img_cases.forEach((ca: any) => ca.delete());
   });
 
   src.delete();
@@ -167,35 +140,13 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
 
 // Installation/Settup
 
-function getDimensions(forme: any): any {
+export function getDimensions(forme: any): any {
   const rect = cv.boundingRect(forme);
   return {
     w: rect.width,
     h: rect.height,
   };
 }
-export function getOrigDimensions(forme: any): any {
-  const rect = cv.boundingRect(forme);
-  return {
-    w: rect.width,
-    h: rect.height,
-  };
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-/* function __moy(coordonnees: any[]): any {
-  if (coordonnees.length > 0) {
-    let x_sum = 0;
-    let y_sum = 0;
-    coordonnees.forEach(e => {
-      x_sum += e.x;
-      y_sum += e.y;
-    });
-    return { x: x_sum / coordonnees.length, y: y_sum / coordonnees.length };
-  } else {
-    return { x: 0, y: 0 };
-  }
-}*/
 
 function __closest(coordonnees: any[]): any {
   if (coordonnees.length > 0) {
@@ -222,12 +173,7 @@ function __closest(coordonnees: any[]): any {
   }
 }
 
-function getPosition(forme: any): any {
-  const rect = cv.boundingRect(forme);
-  return { x: rect.x, y: rect.y };
-}
-
-export function getOrigPosition(forme: any): any {
+export function getPosition(forme: any): any {
   const rect = cv.boundingRect(forme);
   return { x: rect.x, y: rect.y };
 }
@@ -237,7 +183,7 @@ function interpretationForme(contour: any, preference: IPreference): any {
   const forme = new cv.Mat();
   cv.approxPolyDP(contour, forme, eps, true);
   let nom = undefined;
-  const dims = getOrigDimensions(forme);
+  const dims = getDimensions(forme);
 
   if (dims.w >= preference.qcm_min_width_shape && dims.h >= preference.qcm_min_height_shape) {
     //        console.log(forme)
@@ -292,12 +238,9 @@ export function detectFormes(img: any, nomsFormes: string[] = [], preference: IP
   const tokeep: any[] = [];
 
   formes.forEach(x => {
-    if (getOrigPosition(x).x === 0 && getOrigPosition(x).y === 0) {
+    if (getPosition(x).x === 0 && getPosition(x).y === 0) {
       todelete.push(x);
-    } else if (
-      ((getOrigDimensions(x).w * 100) / getOrigDimensions(img).w + (getOrigDimensions(x).h * 100) / getOrigDimensions(img).h) / 2 >
-      80
-    ) {
+    } else if (((getDimensions(x).w * 100) / getDimensions(img).w + (getDimensions(x).h * 100) / getDimensions(img).h) / 2 > 80) {
       todelete.push(x);
     } else {
       tokeep.push(x);
@@ -347,12 +290,9 @@ function detectFormesQCM(img: any, nomsFormes: string[] = [], preference: IPrefe
   const tokeep: any[] = [];
 
   formes.forEach(x => {
-    if (getOrigPosition(x).x === 0 && getOrigPosition(x).y === 0) {
+    if (getPosition(x).x === 0 && getPosition(x).y === 0) {
       todelete.push(x);
-    } else if (
-      ((getOrigDimensions(x).w * 100) / getOrigDimensions(img).w + (getOrigDimensions(x).h * 100) / getOrigDimensions(img).h) / 2 >
-      80
-    ) {
+    } else if (((getDimensions(x).w * 100) / getDimensions(img).w + (getDimensions(x).h * 100) / getDimensions(img).h) / 2 > 80) {
       todelete.push(x);
     } else {
       tokeep.push(x);
@@ -374,8 +314,8 @@ function detectFormesQCM(img: any, nomsFormes: string[] = [], preference: IPrefe
 
 // Comparaison personnalisée de positions (lecture haut-bas,gauche-droite)
 function __comparePosition(f1: any, f2: any): number {
-  let p1 = getOrigPosition(f1);
-  let p2 = getOrigPosition(f2);
+  let p1 = getPosition(f1);
+  let p2 = getPosition(f2);
   if (p1.y < p2.y) {
     return -1;
   } else if (p1.y > p2.y) {
@@ -387,8 +327,8 @@ function __comparePosition(f1: any, f2: any): number {
 
 // Comparaison personnalisée de positions (lecture haut-bas,gauche-droite)
 export function __comparePositionX(f1: any, f2: any): number {
-  let p1 = getOrigPosition(f1);
-  let p2 = getOrigPosition(f2);
+  let p1 = getPosition(f1);
+  let p2 = getPosition(f2);
   return p1.x - p2.x;
 }
 
@@ -398,10 +338,10 @@ function intersection(f1: any, f2: any): boolean {
 }
 
 function __f2Inf1(f1: any, f2: any): boolean {
-  let pos1 = getOrigPosition(f1);
-  let pos2 = getOrigPosition(f2);
-  let dim1 = getOrigDimensions(f1);
-  let dim2 = getOrigDimensions(f2);
+  let pos1 = getPosition(f1);
+  let pos2 = getPosition(f2);
+  let dim1 = getDimensions(f1);
+  let dim2 = getDimensions(f2);
   const inter_x = (pos2.x >= pos1.x && pos2.x <= pos1.x + dim1.w) || (pos2.x + dim2.w >= pos1.x && pos2.x + dim2.w <= pos1.x + dim1.w);
   const inter_y = (pos2.y >= pos1.y && pos2.y <= pos1.y + dim1.h) || (pos2.y + dim2.h >= pos1.y && pos2.y + dim2.h <= pos1.y + dim1.h);
   return inter_x && inter_y;
@@ -470,8 +410,8 @@ export function decoupe(img: any, pos: any, dims: any): any {
 function drawRectangle(img: any, formes: any, couleur: any = new cv.Scalar(255, 0, 0, 128), epaisseur = 2): any {
   // Attention on est ici en bgr et non en rgb
   formes.forEach((forme: any) => {
-    const pos = getOrigPosition(forme);
-    const dim = getOrigDimensions(forme);
+    const pos = getPosition(forme);
+    const dim = getDimensions(forme);
     //    dim.h = dim.h;
     //    dim.w = dim.w - 4;
     let pointMin = new cv.Point(pos.x, pos.y);
@@ -567,10 +507,10 @@ function computeDecallage(casesvideseleves: any, casesvidesexamtemplate: any): a
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (currentBox !== undefined) {
       // m.set(casevideeleve, currentBox)
-      const poseleve = getOrigPosition(casevideeleve);
-      const posref = getOrigPosition(currentBox);
-      const dimeleve = getOrigDimensions(casevideeleve);
-      const dimref = getOrigDimensions(currentBox);
+      const poseleve = getPosition(casevideeleve);
+      const posref = getPosition(currentBox);
+      const dimeleve = getDimensions(casevideeleve);
+      const dimref = getDimensions(currentBox);
       const decalage = { x: poseleve.x - posref.x, y: poseleve.y - posref.y, deltaw: dimeleve.w - dimref.w, deltah: dimeleve.h - dimref.h };
       decalages.push(decalage);
     }
