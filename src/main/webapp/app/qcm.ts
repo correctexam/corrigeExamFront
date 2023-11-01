@@ -262,9 +262,64 @@ function interpretationForme(contour: any, preference: IPreference): any {
   return { nom: nom, forme: forme };
 }
 
-function detectFormes(img: any, nomsFormes: string[] = [], preference: IPreference): any[] {
+export function detectFormes(img: any, nomsFormes: string[] = [], preference: IPreference): any[] {
   const thrash = new cv.Mat();
   cv.threshold(img, thrash, 248, 255, cv.THRESH_BINARY);
+  //  cv.adaptiveThreshold(img, thrash, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 3, 2);
+
+  let contours = new cv.MatVector();
+  let hierarchy = new cv.Mat();
+  cv.findContours(thrash, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_NONE);
+  const formes: any[] = [];
+
+  // approximates each contour to polygon
+  for (let i = 0; i < contours.size(); ++i) {
+    let contour = contours.get(i);
+    // contours.forEach(contour=> {
+    const res = interpretationForme(contour, preference);
+    if (nomsFormes.includes(res.nom)) {
+      // affiche(img,forme=forme)
+      formes.push(res.forme);
+    }
+  }
+
+  // Tri des formes pour que l'ordre des cases détecté soit intuitif
+  formes.sort(__comparePosition);
+  //    formes.sort(key=functools.cmp_to_key(__comparePosition))
+  // Filtrage des 'doublons' : opencv a souvent tendance à repérer 2 carrés (très proches) au lieu d'un
+  const res: any[] = [];
+  const todelete: any[] = [];
+  const tokeep: any[] = [];
+
+  formes.forEach(x => {
+    if (getOrigPosition(x).x === 0 && getOrigPosition(x).y === 0) {
+      todelete.push(x);
+    } else if (
+      ((getOrigDimensions(x).w * 100) / getOrigDimensions(img).w + (getOrigDimensions(x).h * 100) / getOrigDimensions(img).h) / 2 >
+      80
+    ) {
+      todelete.push(x);
+    } else {
+      tokeep.push(x);
+    }
+  });
+  tokeep.forEach((x, i) => {
+    if (!faitDoublon(i, tokeep)) {
+      res.push(x);
+    } else {
+      todelete.push(x);
+    }
+  });
+  todelete.forEach(x => {
+    x.delete();
+  });
+
+  return res;
+}
+
+function detectFormesQCM(img: any, nomsFormes: string[] = [], preference: IPreference): any[] {
+  const thrash = new cv.Mat();
+  cv.threshold(img, thrash, 245, 255, cv.THRESH_BINARY);
   //  cv.adaptiveThreshold(img, thrash, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 3, 2);
 
   let contours = new cv.MatVector();
@@ -365,8 +420,8 @@ function faitDoublon(indice: any, formes: any): boolean {
 }
 
 // Trouve les cases qui composent l'image désignée par le chemin
-export function trouveCases(img: any, preference: IPreference): any {
-  const formes_cases = detectFormes(img, ['CARRE', 'RECTANGLE'], preference);
+function trouveCases(img: any, preference: IPreference): any {
+  const formes_cases = detectFormesQCM(img, ['CARRE', 'RECTANGLE'], preference);
   const cases: any[] = [];
   const img_cases: any[] = [];
   // Enregistrement des cases de l'image (tous les carrés détectés)

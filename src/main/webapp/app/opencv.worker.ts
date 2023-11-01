@@ -14,8 +14,9 @@ import {
   getOrigDimensions,
   getOrigPosition,
   IPreference,
-  trouveCases,
   __comparePositionX,
+  detectFormes,
+  decoupe,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 } from './qcm';
 import { IZone } from './entities/zone/zone.model';
@@ -267,14 +268,6 @@ addEventListener('message', e => {
     case 'imageCropFromZone':
       return imageCropFromZone(e.data);
 
-    /*    case 'nameprediction':
-      return doPrediction(e.data, true);
-    case 'ineprediction':
-      return doPrediction(e.data, false);*/
-    /*    case 'namepredictionTemplate':
-      return doPredictionTemplate(e.data, true);
-    case 'inepredictionTemplate':
-      return doPredictionTemplate(e.data, false);*/
     case 'groupImagePerContoursLength':
       return groupImagePerContoursLength(e.data);
     case 'qcmresolution':
@@ -707,6 +700,22 @@ function computeStatPredict(st: IStudent, predictname: any, predictfirstname: an
   }
 }
 
+// Trouve les cases qui composent l'image désignée par le chemin
+function trouveCases(img: any, preference: IPreference): any {
+  const formes_cases = detectFormes(img, ['CARRE', 'RECTANGLE'], preference);
+  const cases: any[] = [];
+  const img_cases: any[] = [];
+  // Enregistrement des cases de l'image (tous les carrés détectés)
+  formes_cases.forEach(forme => {
+    const dim = getOrigDimensions(forme);
+    const pos = getOrigPosition(forme);
+    cases.push(forme);
+    img_cases.push(decoupe(img, pos, dim));
+  });
+  // eslint-disable-next-line object-shorthand
+  return { cases: cases, img_cases: img_cases };
+}
+
 function doPredidction4zone(
   letter: boolean,
   src: any,
@@ -943,14 +952,10 @@ async function fprediction(
 
   const res = extractImageNew(src, removeHorizontal, lookingForMissingLetter, preference, dimAverage, posXAverage);
 
-  /* let candidate: any[] = [];
-  cand.forEach(e => {
-    candidate.push([e.padEnd(22, ' '), 0.0]);
-  });*/
-
   const predict = [];
   for (let i = 0; i < res.letter.length; i++) {
     let res1 = m.predict(imageDataFromMat(res.letter[i][1]));
+    console.error(res1);
     if (onlyletter) {
       if (res1[0] === '1') {
         res1[0] = 'i';
@@ -985,39 +990,6 @@ async function fprediction(
       solution: predict,
     };
   }
-
-  /* for (let k = 0; k < candidate.length; k++) {
-    for (let j = 0; j < 20; j++) {
-      if (j < predict.length) {
-        let letter = candidate[k][0].substring(j, j + 1).toLowerCase();
-        if (letter === predict[j][0].toLowerCase()) {
-          candidate[k][1] = candidate[k][1] + predict[j][1];
-        } else {
-          if (onlyletter) {
-            candidate[k][1] = candidate[k][1] + (1 - predict[j][1]) / 35;
-          } else {
-            candidate[k][1] = candidate[k][1] + (1 - predict[j][1]) / 9;
-          }
-        }
-      }
-    }
-    candidate[k][1] = candidate[k][1] / predict.length;
-  }
-
-  for (let k = 0; k < candidate.length; k++) {
-    candidate[k][0] = candidate[k][0].trim();
-    const levenshtein = levenshteinDistance(candidate[k][0], predict.map(e => e[0] as string).join(''));
-    const levenshteinMax = Math.max(predict.map(e => e[0] as string).join('').length, candidate[k][0].length);
-    candidate[k][1] = candidate[k][1] - (candidate[k][1] * levenshtein) / levenshteinMax; // (Math.abs(candidate[k][0].length - predict.length) / candidate[k][0].length);
-  }
-
-  candidate.sort((a, b) => {
-    if (a[1] < b[1]) {
-      return 1;
-    } else {
-      return -1;
-    }
-  });*/
 }
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function levenshteinDistance(a: string, b: string): number {
@@ -1209,18 +1181,6 @@ function extractImageNew(
     }
   }
 
-  //  cv.drawContours(invert_final, contours, -1, fillColor1, 1, cv.LINE_AA);
-
-  // fusion entre rect qui intersect
-  /*4  let merge = mergeRect(rects);
-  let kk = 0;
-  while (merge !== null && kk < 200) {
-    rects = rects.filter(rect => rect !== merge.toRemove1 && rect !== merge.toRemove2);
-    rects.push(merge.u);
-    merge = mergeRect(rects);
-    kk = kk + 1;
-  }*/
-  //  rects.filter(r=>  Math.abs(r.width - dimAverage.w)/  dimAverage.w >0.8 || Math.abs(r.height - dimAverage.h)/  dimAverage.h >0.8).forEach(e=> console.error(e))
   rects = rects.filter(
     r => Math.abs(r.width - dimAverage.w) / dimAverage.w < 0.8 && Math.abs(r.height - dimAverage.h) / dimAverage.h < 0.7,
   );
@@ -1354,13 +1314,6 @@ function extractImageNew(
     const ratioRect = dst4.size().width / dst4.size().height;
     let dsize = new cv.Size(28, 28);
 
-    /*    if (< 1 && ratioOrig> ratioRect)
-    h=26
-    w=26 / ratioOrig * ratioRect
-    else
-    h=26 * ratioOrig / ratioRect
-    w=26*/
-
     if (ratioOrig < ratioRect) {
       let height = Math.floor((26.0 * ratioOrig) / ratioRect);
       dsize = new cv.Size(26, height + 1);
@@ -1478,262 +1431,3 @@ function mergeRect(rects: any[]): any {
   }
   return null;
 }
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-/* function extractImage(src: any, removeHorizonzalAndVertical: boolean, lookingForMissingLetter: boolean, preference: IPreference): any {
-  const linelength = preference.linelength;
-  const repairsize = preference.repairsize;
-  const dilatesize = preference.dilatesize;
-  const morphsize = preference.morphsize;
-  const drawcontoursizeh = preference.drawcontoursizeh;
-  const drawcontoursizev = preference.drawcontoursizev;
-
-  //  let src = cv.imread(inputid);
-  let dst = src.clone();
-  let gray = new cv.Mat();
-  false;
-  cv.cvtColor(src, gray, cv.COLOR_BGR2GRAY, 0);
-  let thresh = new cv.Mat();
-  cv.threshold(gray, thresh, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
-  let anchor = new cv.Point(-1, -1);
-  if (removeHorizonzalAndVertical) {
-    // Step 1 remove vertical lines
-    let remove_vertical = new cv.Mat();
-    let ksize2 = new cv.Size(1, linelength);
-    // You can try more different parameters
-    let vertical_kernel = cv.getStructuringElement(cv.MORPH_RECT, ksize2);
-    cv.morphologyEx(
-      thresh,
-      remove_vertical,
-      cv.MORPH_OPEN,
-      vertical_kernel,
-      anchor,
-      2,
-      cv.BORDER_CONSTANT,
-      cv.morphologyDefaultBorderValue(),
-    );
-    let contours2 = new cv.MatVector();
-    let hierarchy2 = new cv.Mat();
-    cv.findContours(remove_vertical, contours2, hierarchy2, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-    let fillColor = new cv.Scalar(255, 255, 255);
-    cv.drawContours(dst, contours2, -1, fillColor, drawcontoursizev);
-
-    // Step 1 remove horizontal lines
-
-    let remove_horizontal = new cv.Mat();
-    let ksize3 = new cv.Size(linelength, 1);
-    // You can try more different parameters
-    let horizontal_kernel = cv.getStructuringElement(cv.MORPH_RECT, ksize3);
-    let anchor1 = new cv.Point(-1, -1);
-    cv.morphologyEx(
-      thresh,
-      remove_horizontal,
-      cv.MORPH_OPEN,
-      horizontal_kernel,
-      anchor1,
-      2,
-      cv.BORDER_CONSTANT,
-      cv.morphologyDefaultBorderValue(),
-    );
-    let contours3 = new cv.MatVector();
-    let hierarchy3 = new cv.Mat();
-    cv.findContours(remove_horizontal, contours3, hierarchy3, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-    let fillColor1 = new cv.Scalar(255, 255, 255);
-    cv.drawContours(dst, contours3, -1, fillColor1, drawcontoursizeh);
-
-    remove_vertical.delete();
-    contours2.delete();
-    hierarchy2.delete();
-    vertical_kernel.delete();
-    remove_horizontal.delete();
-    contours3.delete();
-    hierarchy3.delete();
-    horizontal_kernel.delete();
-  }
-
-  // Step 3 Repair kernel
-  let ksize4 = new cv.Size(repairsize, repairsize);
-  let repair_kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, ksize4);
-  let mask = new cv.Mat();
-  let dtype = -1;
-  // 1. Create a Mat which is full of zeros
-  let img = cv.Mat.ones(src.rows, src.cols, cv.CV_8UC3);
-  img.setTo(new cv.Scalar(255, 255, 255));
-  cv.cvtColor(img, img, cv.COLOR_BGR2GRAY, 0);
-  // 2. Create a Mat which is full of ones
-  // let mat = cv.Mat.ones(rows, cols, type);
-  let gray1 = new cv.Mat();
-  cv.cvtColor(dst, gray1, cv.COLOR_BGR2GRAY, 0);
-  // let img = cv.zeros(src.rows, src.cols, cv.CV_8UC3);
-  let dst1 = new cv.Mat();
-  cv.subtract(img, gray1, dst1, mask, dtype);
-  //cv.subtract(img, dst, dst1);
-  let dilate = new cv.Mat();
-  cv.dilate(dst1, dilate, repair_kernel, anchor, dilatesize, cv.BORDER_CONSTANT, cv.morphologyDefaultBorderValue());
-
-  let pre_result = new cv.Mat();
-  let result = new cv.Mat();
-
-  cv.bitwise_and(dilate, thresh, pre_result);
-  cv.morphologyEx(
-    pre_result,
-    result,
-    cv.MORPH_CLOSE,
-    repair_kernel,
-    anchor,
-    morphsize,
-    cv.BORDER_CONSTANT,
-    cv.morphologyDefaultBorderValue(),
-  );
-  let final = new cv.Mat();
-
-  cv.bitwise_and(result, thresh, final);
-  let invert_final = new cv.Mat();
-
-  cv.subtract(img, final, invert_final, mask, dtype);
-
-  //        cv.threshold(src, src, 177, 200, cv.THRESH_BINARY);
-  let contours = new cv.MatVector();
-  let hierarchy = new cv.Mat();
-  cv.findContours(final, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-  const letters = new Map();
-  let rects = [];
-  for (let ct = 0; ct < contours.size(); ct++) {
-    let cnt = contours.get(ct);
-    // You can try more different parameters
-    let rect = cv.boundingRect(cnt);
-    if (rect.width > 12 || rect.height > 12) {
-      //} && rect.width < rect.height) {
-      rects.push(rect);
-    }
-  }
-
-  // fusion entre rect qui intersect
-  let merge = mergeRect(rects);
-  let kk = 0;
-  while (merge !== null && kk < 200) {
-    rects = rects.filter(rect => rect !== merge.toRemove1 && rect !== merge.toRemove2);
-    rects.push(merge.u);
-    merge = mergeRect(rects);
-    kk = kk + 1;
-  }
-
-  // TODO interect on rect
-  rects.forEach(rect => {
-    let rectangleColor = new cv.Scalar(0, 0, 0);
-    let point1 = new cv.Point(rect.x, rect.y);
-    let point2 = new cv.Point(rect.x + rect.width, rect.y + rect.height);
-    let dst4 = new cv.Mat();
-    let dst2 = new cv.Mat();
-    let dst3 = new cv.Mat();
-    let s = new cv.Scalar(255, 0, 0, 255);
-
-    dst4 = roi(invert_final, rect, dst4); // You can try more different parameters
-
-    if (rect.width > rect.height) {
-      cv.copyMakeBorder(dst4, dst4, (rect.width - rect.height) / 2, (rect.width - rect.height) / 2, 1, 1, cv.BORDER_CONSTANT, s);
-    } else {
-      cv.copyMakeBorder(dst4, dst4, 1, 1, (rect.height - rect.width) / 2, (rect.height - rect.width) / 2, cv.BORDER_CONSTANT, s);
-    }
-
-    let dsize = new cv.Size(26, 26);
-    cv.resize(dst4, dst2, dsize, 0, 0, cv.INTER_AREA);
-    cv.copyMakeBorder(dst2, dst3, 1, 1, 1, 1, cv.BORDER_CONSTANT, s);
-    letters.set(rect, dst3);
-    dst4.delete();
-    dst2.delete();
-    cv.rectangle(invert_final, point1, point2, rectangleColor, 2, cv.LINE_AA, 0);
-  });
-
-  // src.delete();
-  gray.delete();
-  thresh.delete();
-
-  repair_kernel.delete();
-  mask.delete();
-  img.delete();
-  gray1.delete();
-  dst1.delete();
-  dilate.delete();
-  dst.delete();
-  pre_result.delete();
-  result.delete();
-
-  final.delete();
-  //invert_final.delete();
-  contours.delete();
-  hierarchy.delete();
-  let lettersf = [...letters];
-  lettersf.sort((a, b) => {
-    if (a[0].x < b[0].x) {
-      return -1;
-    } else {
-      return 1;
-    }
-  });
-
-  if (lookingForMissingLetter && lettersf.length > 3) {
-    const dstavg = (lettersf[lettersf.length - 1][0].x - lettersf[0][0].x) / lettersf.length;
-    let minDiffX = dstavg;
-    let maxHauteur = 0;
-    let maxLargeur = 0;
-    let minY = 800;
-    const nbrMissing = [];
-    for (let i = 0; i < lettersf.length - 1; i++) {
-      let diffXt = lettersf[i + 1][0].x - lettersf[i][0].x;
-      if (diffXt < minDiffX) {
-        minDiffX = diffXt;
-      }
-      if (diffXt > dstavg * 1.7) {
-        nbrMissing.push(i);
-      }
-      if (lettersf[i][0].y < minY) {
-        minY = lettersf[i][0].y;
-      }
-      if (lettersf[i][0].height > maxHauteur) {
-        maxHauteur = lettersf[i][0].height;
-      }
-      if (lettersf[i][0].width > maxLargeur) {
-        maxLargeur = lettersf[i][0].width;
-      }
-    }
-
-    const dstavg1 = (lettersf[lettersf.length - 1][0].x - lettersf[0][0].x) / (lettersf.length + nbrMissing.length);
-    nbrMissing.forEach(n => {
-      let x = lettersf[n][0].x + dstavg1;
-
-      let rectangleColor = new cv.Scalar(0, 0, 0);
-      let point1 = new cv.Point(x, minY);
-      let point2 = new cv.Point(x + maxLargeur, minY + maxHauteur);
-
-      let rect = new cv.Rect(x, minY, maxLargeur, maxHauteur);
-      let dst4 = new cv.Mat();
-      let dst2 = new cv.Mat();
-      let dst3 = new cv.Mat();
-
-      dst4 = roi(invert_final, rect, dst4);
-
-      let dsize = new cv.Size(26, 26);
-      cv.resize(dst4, dst2, dsize, 0, 0, cv.INTER_AREA);
-      let s = new cv.Scalar(255, 0, 0, 255);
-      cv.copyMakeBorder(dst2, dst3, 1, 1, 1, 1, cv.BORDER_CONSTANT, s);
-      letters.set(rect, dst3);
-      dst4.delete();
-      dst2.delete();
-      cv.rectangle(invert_final, point1, point2, rectangleColor, 2, cv.LINE_AA, 0);
-    });
-    lettersf = [...letters];
-    lettersf.sort((a, b) => {
-      if (a[0].x < b[0].x) {
-        return -1;
-      } else {
-        return 1;
-      }
-    });
-  }
-  return {
-    letter: lettersf,
-
-    invert_final: invert_final,
-  };
-}*/
