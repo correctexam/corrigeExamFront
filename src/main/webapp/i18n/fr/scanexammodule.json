@@ -406,6 +406,9 @@
     "envoiemailActionTooltip": "Déclenche l'envoi du mail à chaque étudiant avec le corps du message ci-dessus",
     "statToggleValueTooltip": "Permet de basculer entre les valeurs brutes ou les valeurs normalisées",
     "voirCopieStatistiquesTooltip": "Permet de retourner vers la vue correction pour cet étudiant",
-    "voirCopieFullPageTooltip": "Permet de voir la copie scannée pour cet étudiant(dans une fenêtre modale)"
+    "voirCopieFullPageTooltip": "Permet de voir la copie scannée pour cet étudiant(dans une fenêtre modale)",
+    "pasdepageassociee": "Aucune copie à associer",
+    "pasdepageassocieeNextTooltip": "Il n'y a plus aucune copie à associer à la suite de cette copie",
+    "pasdepageassocieePreviousTooltip": "Il n'y a aucune copie à associer avant cette copie"
   }
 }
