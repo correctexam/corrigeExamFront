@@ -46,16 +46,43 @@
     <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
-      <p-inputSwitch class="float-end" [(ngModel)]="noalign" (onChange)="changeAlign()"></p-inputSwitch>
+      <p-inputSwitch
+        class="float-end"
+        [(ngModel)]="noalign"
+        (onChange)="changeAlign()"
+        [tooltipPosition]="'bottom'"
+        [pTooltip]="'scanexam.noAlignTooltip' | translate"
+        [tooltipZIndex]="'3000'"
+      ></p-inputSwitch>
     </div>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <label><span jhiTranslate="scanexam.zoomfactor"> Facteur agrandissement : </span>({{ factor }})</label>
-      <p-slider *ngIf="noteSteps > 0" [ngModel]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImageGrowFactor($event)">
+      <p-slider
+        *ngIf="noteSteps > 0"
+        [ngModel]="factor"
+        [min]="1"
+        [max]="2"
+        [step]="0.1"
+        (onChange)="reloadImageGrowFactor($event)"
+        [tooltipPosition]="'bottom'"
+        [pTooltip]="'scanexam.factorQuestionTooltip' | translate"
+        [tooltipZIndex]="'3000'"
+      >
       </p-slider>
     </div>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <label><span jhiTranslate="scanexam.pageshift">Décallage de page(s) : </span>({{ pageOffset }})</label>
-      <p-slider [ngModel]="pageOffset" [min]="-5" [max]="5" [step]="1" (onChange)="reloadImageOffset($event)"> </p-slider>
+      <p-slider
+        [ngModel]="pageOffset"
+        [min]="-5"
+        [max]="5"
+        [step]="1"
+        (onChange)="reloadImageOffset($event)"
+        [tooltipPosition]="'bottom'"
+        [pTooltip]="'scanexam.shiftPageQuestionTooltip' | translate"
+        [tooltipZIndex]="'3000'"
+      >
+      </p-slider>
     </div>
 
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
@@ -177,6 +204,9 @@
               (click)="layoutsidebarVisible = true"
               icon="pi pi-arrow-right"
               [disabled]="blocked"
+              [pTooltip]="'scanexam.showLayoutOptionsCorrectionTooltip' | translate"
+              [tooltipZIndex]="'3000'"
+              [tooltipPosition]="'bottom'"
             ></p-button>
 
             <button
@@ -254,19 +284,40 @@
             </button>
           </div>
         </div>
-        <div class="d-flex justify-content-center" ng-if="questionnofirst !== -1">
-          <p-paginator
-            [currentPageReportTemplate]="'scanexam.currentpage' | translate"
-            [rows]="1"
-            [first]="questionindex!"
-            [totalRecords]="nbreQuestions!"
-            (onPageChange)="changeQuestion($event)"
-            [showJumpToPageDropdown]="true"
-            [showPageLinks]="false"
-            [pTooltip]="getQuestionTooltip()"
-            [tooltipPosition]="'bottom'"
-          ></p-paginator>
-          <div></div>
+        <div class="grid">
+          <div class="col-3">
+            <div class="d-flex justify-content-left">
+              <h3
+                *ngIf="
+                  this.questions &&
+                  this.questions!.length > this.questionindex &&
+                  this.questions![this.questionindex]?.libelle &&
+                  this.questions![this.questionindex].libelle !== ''
+                "
+              >
+                {{ this.questions![this.questionindex].libelle }}
+              </h3>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="d-flex justify-content-center" ng-if="questionnofirst !== -1">
+              <p-paginator
+                [currentPageReportTemplate]="'scanexam.currentpage' | translate"
+                [rows]="1"
+                [first]="questionindex!"
+                [totalRecords]="nbreQuestions!"
+                (onPageChange)="changeQuestion($event)"
+                [showJumpToPageDropdown]="true"
+                [showPageLinks]="false"
+                [tooltipPosition]="'bottom'"
+                [pTooltip]="'scanexam.showPaginatorQuestionCorrectionTooltip' | translate"
+                [tooltipZIndex]="'3000'"
+              ></p-paginator>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="d-flex justify-content-end"></div>
+          </div>
         </div>
 
         <div class="d-flex justify-content-center" *ngFor="let k of questions; let i = index">
@@ -284,6 +335,9 @@
             (onPageChange)="changeStudent($event)"
             [showJumpToPageDropdown]="true"
             [showPageLinks]="false"
+            [pTooltip]="'scanexam.showPaginatorCopieCorrectionTooltip' | translate"
+            [tooltipZIndex]="'3000'"
+            [tooltipPosition]="'bottom'"
           >
           </p-paginator>
         </div>
@@ -353,7 +407,15 @@
           </div>
           <div *ngIf="resp" style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <label jhiTranslate="scanexam.excellente">Excellente réponse: </label>
-            <p-inputSwitch [disabled]="blocked" class="float-end" [(ngModel)]="resp!.star" (onChange)="updateResponse()"></p-inputSwitch>
+            <p-inputSwitch
+              [disabled]="blocked"
+              class="float-end"
+              [(ngModel)]="resp!.star"
+              (onChange)="updateResponse()"
+              [tooltipPosition]="'bottom'"
+              [pTooltip]="'scanexam.starAnswerTooltip' | translate"
+              [tooltipZIndex]="'3000'"
+            ></p-inputSwitch>
           </div>
           <div *ngIf="resp" style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <label jhiTranslate="scanexam.badanswer">Mauvaise réponse remarquable: </label>
@@ -362,6 +424,9 @@
               class="float-end"
               [(ngModel)]="resp!.worststar"
               (onChange)="updateResponse()"
+              [tooltipPosition]="'bottom'"
+              [pTooltip]="'scanexam.worstAnswerTooltip' | translate"
+              [tooltipZIndex]="'3000'"
             ></p-inputSwitch>
           </div>
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">

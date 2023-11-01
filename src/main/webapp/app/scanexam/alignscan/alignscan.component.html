@@ -95,7 +95,12 @@
       </p-selectButton>
 
       <h5 jhiTranslate="scanexam.alignscanbrpage">Nombre de page à utiliser dans le template d'exam</h5>
-      <p-inputNumber [(ngModel)]="nbreFeuilleParCopie" [showButtons]="true"></p-inputNumber>
+      <p-inputNumber
+        [pTooltip]="'scanexam.nbrepageintemplateTooltip' | translate"
+        [tooltipPosition]="'right'"
+        [(ngModel)]="nbreFeuilleParCopie"
+        [showButtons]="true"
+      ></p-inputNumber>
     </div>
     <jhi-viewandreorderpages
       [alignPage]="true"

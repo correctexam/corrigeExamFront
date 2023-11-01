@@ -107,6 +107,9 @@
               class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
               pButton
               type="button"
+              [tooltipPosition]="'left'"
+              [pTooltip]="'scanexam.voircopieTooltip' | translate"
+              [tooltipZIndex]="'3000'"
             >
               <span>{{ 'scanexam.continue' | translate }}</span>
             </button>
@@ -117,6 +120,9 @@
               class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
               pButton
               type="button"
+              [tooltipPosition]="'right'"
+              [pTooltip]="'scanexam.voircopieTooltip' | translate"
+              [tooltipZIndex]="'3000'"
             >
               <span>{{ 'scanexam.voir' | translate }}</span>
             </button>

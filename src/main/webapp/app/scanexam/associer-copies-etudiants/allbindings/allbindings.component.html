@@ -28,6 +28,7 @@
       <td>
         <button
           *ngIf="sheet.predictionprecision >= 1"
+          [disabled]="nobutton"
           [pTooltip]="'scanexam.bindTooltip' | translate"
           class="p-button p-button-primary"
           (click)="bindStudent(sheet.recognizedStudent, sheet.currentStudent, sheet)"

@@ -33,11 +33,25 @@
       </div>
       <div class="col-12">
         <label jhiTranslate="scanexam.envoipdf">Envoi de la copie en pdf:</label>
-        <p-checkbox [binary]="true" [(ngModel)]="mailpdf" [style]="{ width: '100%' }" />
+        <p-checkbox
+          [binary]="true"
+          [(ngModel)]="mailpdf"
+          [style]="{ width: '100%' }"
+          [pTooltip]="'scanexam.envoiemailPdfTooltip' | translate"
+          [tooltipPosition]="'top'"
+          [tooltipZIndex]="'3000'"
+        />
       </div>
       <div *ngIf="!currentStudentMail" class="col-12">
         <label jhiTranslate="scanexam.envoiabi">Envoi du mail aux absents:</label>
-        <p-checkbox [binary]="true" [(ngModel)]="mailabi" [style]="{ width: '100%' }" />
+        <p-checkbox
+          [binary]="true"
+          [(ngModel)]="mailabi"
+          [style]="{ width: '100%' }"
+          [pTooltip]="'scanexam.envoiemailAbsentTooltip' | translate"
+          [tooltipPosition]="'top'"
+          [tooltipZIndex]="'3000'"
+        />
       </div>
       <div class="col-12" *ngIf="mailabi">
         <label jhiTranslate="scanexam.mailabibody">Corps du mail:</label>
@@ -53,6 +67,9 @@
         data-cy="entityCreateSaveButton"
         class="p-button p-button-primary"
         (click)="envoiEmailEtudiant()"
+        [pTooltip]="'scanexam.envoiemailActionTooltip' | translate"
+        [tooltipPosition]="'top'"
+        [tooltipZIndex]="'3000'"
       >
         <fa-icon [icon]="faEnvelope"></fa-icon>&nbsp;<span jhiTranslate="scanexam.envoiemail">Envoi mail étudiants</span>
       </button>
@@ -81,6 +98,9 @@
           id="save-entity"
           data-cy="entityCreateSaveButton"
           class="p-button p-button-primary"
+          [pTooltip]="'scanexam.envoiemailTooltip' | translate"
+          [tooltipPosition]="'top'"
+          [tooltipZIndex]="'3000'"
           (click)="showEmailStudent()"
         >
           <fa-icon [icon]="faEnvelope"></fa-icon>&nbsp;<span jhiTranslate="scanexam.envoimailstudent">Envoi mail étudiants</span>
@@ -92,14 +112,34 @@
           data-cy="entityCreateSaveButton"
           class="p-button p-button-primary"
           (click)="exportExcel()"
+          [pTooltip]="'scanexam.exportExcelTooltip' | translate"
+          [tooltipPosition]="'top'"
+          [tooltipZIndex]="'3000'"
         >
           <fa-icon [icon]="faEnvelope"></fa-icon>&nbsp;<span jhiTranslate="scanexam.exportexcel">Export Excel</span>
         </button>
 
-        <a class="p-button p-button-primary" pButton [routerLink]="'/statistics/' + this.examid" type="button" *ngIf="this.examid">
+        <a
+          class="p-button p-button-primary"
+          pButton
+          [routerLink]="'/statistics/' + this.examid"
+          type="button"
+          *ngIf="this.examid"
+          [pTooltip]="'scanexam.voirStatistiquesTooltip' | translate"
+          [tooltipPosition]="'top'"
+          [tooltipZIndex]="'3000'"
+        >
           <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span jhiTranslate="scanexam.showstat">Show statistics</span>
         </a>
-        <a *ngIf="!this.examid" class="disabled p-button p-button-primary" type="button" pButton>
+        <a
+          *ngIf="!this.examid"
+          class="disabled p-button p-button-primary"
+          type="button"
+          pButton
+          [pTooltip]="'scanexam.voirStatistiquesTooltip' | translate"
+          [tooltipPosition]="'top'"
+          [tooltipZIndex]="'3000'"
+        >
           <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span jhiTranslate="scanexam.showstat">Show statistics</span>
         </a>
 
@@ -109,12 +149,23 @@
           [routerLink]="'/voirreponsesstarunstar/' + this.examid"
           type="button"
           *ngIf="this.examid"
+          [pTooltip]="'scanexam.voirReponsesRepresentativeTooltip' | translate"
+          [tooltipPosition]="'top'"
+          [tooltipZIndex]="'3000'"
         >
           <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span jhiTranslate="scanexam.showanswer"
             >Show representative answers</span
           >
         </a>
-        <a *ngIf="!this.examid" class="disabled p-button p-button-primary" pButton type="button">
+        <a
+          *ngIf="!this.examid"
+          class="disabled p-button p-button-primary"
+          pButton
+          type="button"
+          [pTooltip]="'scanexam.voirReponsesRepresentativeTooltip' | translate"
+          [tooltipPosition]="'top'"
+          [tooltipZIndex]="'3000'"
+        >
           <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span jhiTranslate="scanexam.showanswer"
             >Show representative answers</span
           ></a
@@ -145,15 +196,38 @@
             <td *ngIf="!student.abi">{{ student.note }}</td>
             <td *ngIf="student.abi">0</td>
             <td *ngIf="student.studentNumber">
-              <a href="{{ 'answer/' + exam?.id + '/1' + '/' + student.studentNumber }}" jhiTranslate="scanexam.correction1">correction</a>
+              <a
+                [pTooltip]="'scanexam.showresultLienProfTooltip' | translate"
+                [tooltipPosition]="'top'"
+                [tooltipZIndex]="'3000'"
+                href="{{ 'answer/' + exam?.id + '/1' + '/' + student.studentNumber }}"
+                jhiTranslate="scanexam.correction1"
+                >correction</a
+              >
             </td>
             <td *ngIf="!student.studentNumber">ABI</td>
             <td *ngIf="!student.abi">
-              <a target="_blank" href="{{ 'copie/' + student.uuid + '/1' }}" jhiTranslate="scanexam.lien">link</a>
+              <a
+                [pTooltip]="'scanexam.showresultLienEleveTooltip' | translate"
+                [tooltipPosition]="'top'"
+                [tooltipZIndex]="'3000'"
+                target="_blank"
+                href="{{ 'copie/' + student.uuid + '/1' }}"
+                jhiTranslate="scanexam.lien"
+                >link</a
+              >
             </td>
             <td *ngIf="student.abi">ABI</td>
             <td *ngIf="!student.abi">
-              <a target="_blank" href="{{ 'exportpdf/' + examid! + '/' + student.uuid }}" jhiTranslate="scanexam.pdf">pdf</a>
+              <a
+                [pTooltip]="'scanexam.showresultLienPdfTooltip' | translate"
+                [tooltipPosition]="'top'"
+                [tooltipZIndex]="'3000'"
+                target="_blank"
+                href="{{ 'exportpdf/' + examid! + '/' + student.uuid }}"
+                jhiTranslate="scanexam.pdf"
+                >pdf</a
+              >
             </td>
             <td *ngIf="student.abi">ABI</td>
             <td *ngIf="!student.abi">
