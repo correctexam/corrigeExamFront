@@ -52,13 +52,20 @@
               <canvas [id]="'' + value" #nomImageVisible></canvas>
             </div>
             <div class="flex card-content">
-              <div *ngIf="candropordelete" class="flex-none flex align-items-center justify-content-center">
+              <div *ngIf="candropordelete" class="flex-none flex align-items-left justify-content-left">
                 <span (click)="rotateImage(value)" [pTooltip]="'scanexam.rotateImageTooltip' | translate"
                   ><fa-icon icon="rotate-right"
                 /></span>
               </div>
-              <div class="flex-grow-1 flex align-items-center"></div>
-              <div *ngIf="candropordelete" class="flex-none flex align-items-center justify-content-center">
+              <div class="flex-grow-1 flex align-items-center justify-content-center">
+                <span
+                  *ngIf="alignPage"
+                  (click)="replaceImageWithNonAlign(value)"
+                  [pTooltip]="'scanexam.replacealignementWithNonAlignTooltip' | translate"
+                  ><fa-icon icon="align-left"
+                /></span>
+              </div>
+              <div *ngIf="candropordelete" class="flex-none flex align-items-end justify-content-end">
                 <span (click)="deleteImage(value)" [pTooltip]="'scanexam.deleteImageTooltip' | translate"><fa-icon icon="trash" /></span>
               </div>
             </div>

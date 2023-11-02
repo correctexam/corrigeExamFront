@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/member-ordering */
@@ -159,6 +160,7 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
       }*/
 
       Promise.all(promises).then(e => {
+        this.canvass = new Map([...this.canvass.entries()].sort((a, b) => a[0] - b[0]));
         this.canvass.forEach((e1, k1) => {
           const div = Math.floor((k1 - 1) / this.templatePage) + 1;
           if (this.clusters.get(div) === undefined) {
@@ -178,32 +180,42 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
     });
   }
 
-  async loadImage(file: any, page1: number): Promise<number> {
+  async loadImage(file1: any, pageNumber: number): Promise<number> {
     return new Promise(resolve => {
-      const i = new Image();
+      const page1 = pageNumber;
+      const file = file1;
+      fetch(file).then(res => {
+        res.blob().then(blob => {
+          createImageBitmap(blob).then(i => {
+            if (this.windowWidth < 991) {
+              this.factorScale = 0.95;
+            }
+            this.scale = (window.innerWidth * this.factorScale) / i.width;
+
+            const editedImage: HTMLCanvasElement = document.createElement('canvas');
+            editedImage.width = i.width * this.scale;
+            editedImage.height = i.height * this.scale;
+            const ctx = editedImage.getContext('2d');
+
+            const editedImage1: HTMLCanvasElement = document.createElement('canvas');
+            editedImage1.width = i.width;
+            editedImage1.height = i.height;
+            const ctx2 = editedImage1.getContext('2d');
+            ctx2!.drawImage(i, 0, 0);
+            ctx!.scale(this.scale, this.scale);
+            ctx!.drawImage(editedImage1, 0, 0);
+            this.canvass.set(page1, editedImage);
+            resolve(page1);
+          });
+        });
+      });
+    });
+
+    /*      const i = new Image();
       i.onload = () => {
-        if (this.windowWidth < 991) {
-          this.factorScale = 0.95;
-        }
-        this.scale = (window.innerWidth * this.factorScale) / i.width;
-
-        const editedImage: HTMLCanvasElement = document.createElement('canvas');
-        editedImage.width = i.width * this.scale;
-        editedImage.height = i.height * this.scale;
-        const ctx = editedImage.getContext('2d');
-
-        const editedImage1: HTMLCanvasElement = document.createElement('canvas');
-        editedImage1.width = i.width;
-        editedImage1.height = i.height;
-        const ctx2 = editedImage1.getContext('2d');
-        ctx2!.drawImage(i, 0, 0);
-        ctx!.scale(this.scale, this.scale);
-        ctx!.drawImage(editedImage1, 0, 0);
-        this.canvass.set(page1, editedImage);
-        resolve(page1);
       };
       i.src = file;
-    });
+    });*/
   }
 
   @HostListener('window:resize', ['$event'])
@@ -305,7 +317,6 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
 
     this.reloadImageClassify();
     if (this.alignPage) {
-      console.error('move from ', currentDragAndDrop, value);
       this.candropordelete = false;
       await this.db.moveAlignPages(this.examId, currentDragAndDrop, value);
     } else {
@@ -397,6 +408,31 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
       };
       i.src = file;
     });
+  }
+
+  async replaceImageWithNonAlign(pageNumber: number) {
+    // const imagesAligned = await this.db.getAlignImageBetweenAndSortByPageNumber(this.examId, pageNumber, pageNumber);
+    console.time('replaceImage');
+    const imagesNonAligned = await this.db.getFirstNonAlignImage(this.examId, pageNumber);
+    console.timeLog('replaceImage', 'load image');
+
+    if (imagesNonAligned !== undefined) {
+      await this.db.removePageAlignForExamForPage(this.examId, pageNumber);
+      console.timeLog('replaceImage', 'remove image');
+
+      await this.db.addAligneImage({
+        examId: this.examId,
+        pageNumber,
+        value: imagesNonAligned.value,
+      });
+      console.timeLog('replaceImage', 'add image');
+
+      await this.loadImage(JSON.parse(imagesNonAligned.value).pages, pageNumber);
+      console.timeLog('replaceImage', 'loadImage');
+      console.timeEnd('replaceImage');
+
+      this.reloadImageClassify();
+    }
   }
 
   async rotateImage(pageNumber: number) {

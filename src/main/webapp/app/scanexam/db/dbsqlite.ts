@@ -363,6 +363,13 @@ export class SqliteCacheService implements CacheService {
     }).toPromise();
   }
 
+  removePageAlignForExamForPage(examId: number, page: number): Promise<any> {
+    return this._dispatch('removePageAlignForExamForPage', {
+      examId: examId,
+      page: page,
+    }).toPromise();
+  }
+
   removePageNonAlignForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<any> {
     return this._dispatch('removePageNonAlignForExamForPages', {
       examId: examId,
