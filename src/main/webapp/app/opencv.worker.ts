@@ -387,7 +387,7 @@ async function imageCropFromZoneAsync(p: { msg: any; payload: any; uid: string }
       width: z1.size().width,
       height: z1.size().height,
     };
-    source.currentTarget.postMessage({ msg: p.msg, payload: output, uid: p.uid }, [output.image]);
+    source.target.postMessage({ msg: p.msg, payload: output, uid: p.uid }, [output.image]);
     z1.delete();
   }
 }
@@ -625,7 +625,8 @@ async function doPredictionsAsync(p: {
       }
       console.timeEnd('analysePage');
     }
-    source.currentTarget.postMessage({ msg: p.msg, payload: outputs, uid: p.uid }, opts);
+    console.error(JSON.stringify(source));
+    source.target.postMessage({ msg: p.msg, payload: outputs, uid: p.uid }, opts);
   } else {
     // TODO
     p1.firstnamePagesToAnalyze;
@@ -871,7 +872,7 @@ function imageCrop(p: { msg: any; payload: any; uid: string }): void {
   const res: Transferable = imageDataFromMat(dst).data.buffer;
 
   // put [res]
-  source.currentTarget.postMessage({ msg: p.msg, payload: res, uid: p.uid }, [res]);
+  source.target.postMessage({ msg: p.msg, payload: res, uid: p.uid }, [res]);
   dst.delete();
   src.delete();
 }

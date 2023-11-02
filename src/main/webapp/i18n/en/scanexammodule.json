@@ -35,7 +35,7 @@
     "alignement": "Alignment",
     "selectedstudent": "Selected Students:",
     "aistudent": "Recognized Students:",
-    "removealignement": "Delete alignment:",
+    "removealignement": "Ignore alignment:",
     "removealignementTooltip": "Enables you to work on non-aligned sheets",
     "showgalleria": "Show full page",
     "zoomfactor": "Zoom factor:",
@@ -402,6 +402,7 @@
     "voirCopieStatistiquesTooltip": "Go to the correction view for this student",
     "voirCopieFullPageTooltip": "View the scanned copy for this student (in a modal window).",
     "pasdepageassocieeNextTooltip": "There are no more sheet to associate following this sheet.",
-    "pasdepageassocieePreviousTooltip": "There is no sheet to associate prior to this sheet"
+    "pasdepageassocieePreviousTooltip": "There is no sheet to associate prior to this sheet",
+    "replacealignementWithNonAlignTooltip": "Replaces the aligned version with the non-aligned version for this sheet"
   }
 }

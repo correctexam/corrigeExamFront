@@ -135,6 +135,17 @@ export class ExamIndexDB extends Dexie {
     });
   }
 
+  async removePageAlignForExamForPage(page: number) {
+    await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
+      //      this.exams.delete(this.examId);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      this.alignImages.where({ examId: this.examId, pageNumber: page }).delete();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      // .then(a => this.alignImages.delete(a!.id!));
+    });
+  }
+
   async removePageAlignForExamForPages(pageStart: number, pageEnd: number) {
     await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
       //      this.exams.delete(this.examId);
@@ -382,6 +393,16 @@ export class AppDB implements CacheService {
     return db1.removePageAlignForExam();
   }
 
+  async removePageAlignForExamForPage(examId: number, page: number): Promise<void> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return db1.removePageAlignForExamForPage(page);
+  }
+
   async removePageAlignForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<void> {
     let db1 = this.dbs.get(examId);
     if (db1 === undefined) {
@@ -602,6 +623,8 @@ export interface CacheService {
   removePageAlignForExam(examId: number): Promise<void>;
   removeElementForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<void>;
   removePageAlignForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<void>;
+  removePageAlignForExamForPage(examId: number, page: number): Promise<void>;
+
   removePageNonAlignForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<void>;
   addAligneImage(elt: AlignImage): Promise<any>;
   addNonAligneImage(elt: AlignImage): Promise<any>;
