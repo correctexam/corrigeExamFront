@@ -22,7 +22,9 @@
       <div class="grid" style="width: 90vw">
         <div class="col-4"></div>
         <div class="col-4 text-center">
-          <i class="pi pi-lock" style="font-size: 3rem"> </i><BR />
+          <p-progressSpinner></p-progressSpinner>
+          <!--          <i class="pi pi-lock" style="font-size: 3rem"> </i>-->
+          <BR />
           <div *ngIf="message !== undefined && message.length > 0">
             {{ message }} <BR />
             {{ submessage }}
