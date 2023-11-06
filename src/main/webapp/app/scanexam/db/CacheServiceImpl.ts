@@ -49,6 +49,10 @@ export class CacheServiceImpl implements CacheService {
     return this.service.removePageAlignForExamForPage(examId, page);
   }
 
+  removePageNonAlignForExamForPage(examId: number, page: number): Promise<void> {
+    return this.service.removePageNonAlignForExamForPage(examId, page);
+  }
+
   removePageNonAlignForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<void> {
     return this.service.removePageNonAlignForExamForPages(examId, pageStart, pageEnd);
   }

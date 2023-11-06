@@ -784,6 +784,12 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
           });
         });
       });
+    } else {
+      this.messageService.add({
+        severity: 'info',
+        summary: this.translateService.instant('scanexam.pasdepageassociee'),
+        detail: this.translateService.instant('scanexam.pasdepageassocieeTooltip'),
+      });
     }
   }
 

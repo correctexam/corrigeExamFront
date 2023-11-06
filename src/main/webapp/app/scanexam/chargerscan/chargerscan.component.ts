@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable no-console */
@@ -492,6 +493,7 @@ export class ChargerscanComponent implements OnInit {
       this.avancement = this.currentPageAlignOver;
       this.currentPageAlignOver = this.currentPageAlignOver + 1;
       this.observerPage?.complete();
+      console.timeEnd('processPage');
     }
   }
 
@@ -501,21 +503,31 @@ export class ChargerscanComponent implements OnInit {
 
   public async processPage(page: number, template: boolean): Promise<number> {
     const scale = { scale: this.scale };
+    if (page === 1 && !template) console.time('processPage');
+    if (page === 1 && !template) console.timeLog('processPage', 'before getDataURL ', page);
     const dataURL = await this.pdfService.getPageAsImage(page, scale);
+    if (page === 1 && !template) console.timeLog('processPage', 'getDataURL ', page);
     const p = await this.saveImageScan(dataURL, page, template);
+    if (page === 1 && !template) console.timeLog('processPage', 'saveImageScan ', page);
+
     return p + 1;
   }
 
   async saveImageScan(file: any, pagen: number, template: boolean): Promise<number> {
     // await this.saveNonAligneImage(pagen, file);
     return new Promise(resolve => {
+      if (pagen === 1 && !template) console.timeLog('processPage', 'start', pagen);
+
       const i = new Image();
       i.onload = async () => {
+        if (pagen === 1 && !template) console.timeLog('processPage', 'image Loaded ', pagen);
         const editedImage = document.createElement('canvas');
         editedImage.width = i.width;
         editedImage.height = i.height;
         const ctx = editedImage.getContext('2d');
         ctx!.drawImage(i, 0, 0);
+        if (pagen === 1 && !template) console.timeLog('processPage', 'draw first canvas ', pagen);
+
         let exportImageType = 'image/webp';
         let compression = 0.65;
         if (
@@ -546,7 +558,9 @@ export class ChargerscanComponent implements OnInit {
         if (template) {
           await this.saveTemplateImage(pagen, webPImageURL);
         } else {
+          if (pagen === 1 && !template) console.timeLog('processPage', 'before save ', pagen);
           await this.saveNonAligneImage(pagen, webPImageURL);
+          if (pagen === 1 && !template) console.timeLog('processPage', 'after save ', pagen);
         }
         resolve(pagen);
       };

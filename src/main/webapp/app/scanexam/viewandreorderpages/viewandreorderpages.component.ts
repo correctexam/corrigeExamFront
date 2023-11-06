@@ -342,10 +342,10 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
     this.candropordelete = false;
     if (this.alignPage) {
       await this.db.moveAlignPages(this.examId, pageNumber, lastPage);
-      await this.db.removePageAlignForExamForPages(this.examId, lastPage, lastPage);
+      await this.db.removePageAlignForExamForPage(this.examId, lastPage);
     } else {
       await this.db.moveNonAlignPages(this.examId, pageNumber, lastPage);
-      await this.db.removePageNonAlignForExamForPages(this.examId, lastPage, lastPage);
+      await this.db.removePageNonAlignForExamForPage(this.examId, lastPage);
     }
     this.candropordelete = true;
   }

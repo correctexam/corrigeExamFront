@@ -186,13 +186,17 @@ export class AlignImagesService {
    */
   private _dispatch<T>(msg1: any, pay: any, transferable?: any): Observable<T> {
     const uuid1 = uuid(); // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
+    console.time('dispatch' + uuid1);
     this.ready.then(() => {
+      console.timeLog('dispatch' + uuid1, 'before send message', msg1, pay);
+
       // console.log( ' send message ' + msg1 + ' ' + uuid1)
       if (transferable) {
         this.worker.postMessage({ msg: msg1, uid: uuid1, payload: pay }, transferable);
       } else {
         this.worker.postMessage({ msg: msg1, uid: uuid1, payload: pay });
       }
+      console.timeEnd('dispatch' + uuid1);
     });
     const p = new Subject<T>();
     this.subjects.set(uuid1, p);
