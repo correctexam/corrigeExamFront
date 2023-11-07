@@ -19,6 +19,7 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
+  "ignorePatterns": ["**/tfjs/**"],
   "rules": {
     "@angular-eslint/component-selector": [
       "error",
