@@ -1,0 +1,31 @@
+/**
+ * @license
+ * Copyright 2019 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+/**
+ * Parse the result of the c++ method, which has the shape equivalent to
+ * `Result`.
+ */
+export function parseResultStruct(backend, resOffset) {
+  const result = new Int32Array(backend.wasm.HEAPU8.buffer, resOffset, 4);
+  const pSelectedIndices = result[0];
+  const selectedSize = result[1];
+  const pSelectedScores = result[2];
+  const pValidOutputs = result[3];
+  // Since the result was allocated on the heap, we have to delete it.
+  backend.wasm._free(resOffset);
+  return { pSelectedIndices, selectedSize, pSelectedScores, pValidOutputs };
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiTm9uTWF4U3VwcHJlc3Npb25fdXRpbC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uLy4uLy4uLy4uL3RmanMtYmFja2VuZC13YXNtL3NyYy9rZXJuZWxzL05vbk1heFN1cHByZXNzaW9uX3V0aWwudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7Ozs7Ozs7Ozs7Ozs7OztHQWVHO0FBV0g7OztHQUdHO0FBQ0gsTUFBTSxVQUFVLGlCQUFpQixDQUM3QixPQUFvQixFQUFFLFNBQWlCO0lBQ3pDLE1BQU0sTUFBTSxHQUFHLElBQUksVUFBVSxDQUFDLE9BQU8sQ0FBQyxJQUFJLENBQUMsTUFBTSxDQUFDLE1BQU0sRUFBRSxTQUFTLEVBQUUsQ0FBQyxDQUFDLENBQUM7SUFDeEUsTUFBTSxnQkFBZ0IsR0FBRyxNQUFNLENBQUMsQ0FBQyxDQUFDLENBQUM7SUFDbkMsTUFBTSxZQUFZLEdBQUcsTUFBTSxDQUFDLENBQUMsQ0FBQyxDQUFDO0lBQy9CLE1BQU0sZUFBZSxHQUFHLE1BQU0sQ0FBQyxDQUFDLENBQUMsQ0FBQztJQUNsQyxNQUFNLGFBQWEsR0FBRyxNQUFNLENBQUMsQ0FBQyxDQUFDLENBQUM7SUFDaEMsb0VBQW9FO0lBQ3BFLE9BQU8sQ0FBQyxJQUFJLENBQUMsS0FBSyxDQUFDLFNBQVMsQ0FBQyxDQUFDO0lBQzlCLE9BQU8sRUFBQyxnQkFBZ0IsRUFBRSxZQUFZLEVBQUUsZUFBZSxFQUFFLGFBQWEsRUFBQyxDQUFDO0FBQzFFLENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIEBsaWNlbnNlXG4gKiBDb3B5cmlnaHQgMjAxOSBHb29nbGUgTExDLiBBbGwgUmlnaHRzIFJlc2VydmVkLlxuICogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlIFwiTGljZW5zZVwiKTtcbiAqIHlvdSBtYXkgbm90IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS5cbiAqIFlvdSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdFxuICpcbiAqIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMFxuICpcbiAqIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmVcbiAqIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuIFwiQVMgSVNcIiBCQVNJUyxcbiAqIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLlxuICogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZFxuICogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuXG4gKiA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PVxuICovXG5cbmltcG9ydCB7QmFja2VuZFdhc219IGZyb20gJy4uL2JhY2tlbmRfd2FzbSc7XG5cbi8vIEFuYWxvZ291cyB0byBgc3RydWN0IFJlc3VsdGAgaW4gYG5vbl9tYXhfc3VwcHJlc3Npb25faW1wbC5oYC5cbmludGVyZmFjZSBSZXN1bHQge1xuICBwU2VsZWN0ZWRJbmRpY2VzOiBudW1iZXI7XG4gIHNlbGVjdGVkU2l6ZTogbnVtYmVyO1xuICBwU2VsZWN0ZWRTY29yZXM6IG51bWJlcjtcbiAgcFZhbGlkT3V0cHV0czogbnVtYmVyO1xufVxuLyoqXG4gKiBQYXJzZSB0aGUgcmVzdWx0IG9mIHRoZSBjKysgbWV0aG9kLCB3aGljaCBoYXMgdGhlIHNoYXBlIGVxdWl2YWxlbnQgdG9cbiAqIGBSZXN1bHRgLlxuICovXG5leHBvcnQgZnVuY3Rpb24gcGFyc2VSZXN1bHRTdHJ1Y3QoXG4gICAgYmFja2VuZDogQmFja2VuZFdhc20sIHJlc09mZnNldDogbnVtYmVyKTogUmVzdWx0IHtcbiAgY29uc3QgcmVzdWx0ID0gbmV3IEludDMyQXJyYXkoYmFja2VuZC53YXNtLkhFQVBVOC5idWZmZXIsIHJlc09mZnNldCwgNCk7XG4gIGNvbnN0IHBTZWxlY3RlZEluZGljZXMgPSByZXN1bHRbMF07XG4gIGNvbnN0IHNlbGVjdGVkU2l6ZSA9IHJlc3VsdFsxXTtcbiAgY29uc3QgcFNlbGVjdGVkU2NvcmVzID0gcmVzdWx0WzJdO1xuICBjb25zdCBwVmFsaWRPdXRwdXRzID0gcmVzdWx0WzNdO1xuICAvLyBTaW5jZSB0aGUgcmVzdWx0IHdhcyBhbGxvY2F0ZWQgb24gdGhlIGhlYXAsIHdlIGhhdmUgdG8gZGVsZXRlIGl0LlxuICBiYWNrZW5kLndhc20uX2ZyZWUocmVzT2Zmc2V0KTtcbiAgcmV0dXJuIHtwU2VsZWN0ZWRJbmRpY2VzLCBzZWxlY3RlZFNpemUsIHBTZWxlY3RlZFNjb3JlcywgcFZhbGlkT3V0cHV0c307XG59XG4iXX0=
