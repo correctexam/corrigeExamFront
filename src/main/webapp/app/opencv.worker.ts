@@ -252,12 +252,19 @@ addEventListener('message', e => {
           });
         },
       };
-
+      console.error(e.data.payload.fronturl);
+      let fronturl = '';
+      if (e.data.payload.fronturl) {
+        fronturl = e.data.payload.fronturl;
+      }
       //Load and await the .js OpenCV
       self1.importScripts(self1['Module'].scriptUrl);
-      self1.importScripts('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs');
-      self1.importScripts('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@3.20.0/dist/tf-backend-wasm.min.js');
-      tf.wasm.setWasmPaths('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@3.20.0/dist/');
+      //      self1.importScripts('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs');
+      self1.importScripts(fronturl + 'content/tfjs/tf-core.es2017.min.js');
+      //      self1.importScripts('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@3.20.0/dist/tf-backend-wasm.min.js');
+      self1.importScripts(fronturl + 'content/tfjs/dist/tf-backend-wasm.es2017.js');
+      //      tf.wasm.setWasmPaths('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@3.20.0/dist/');
+      tf.wasm.setWasmPaths(fronturl + 'content/tfjs/dist/');
 
       break;
     }
@@ -942,7 +949,6 @@ async function fprediction(
   const predict = [];
   for (let i = 0; i < res.letter.length; i++) {
     let res1 = m.predict(imageDataFromMat(res.letter[i][1]));
-    console.error(res1);
     if (onlyletter) {
       if (res1[0] === '1') {
         res1[0] = 'i';
@@ -959,7 +965,7 @@ async function fprediction(
       if (res1[0] === '9') {
         res1[0] = 'g';
       }
-    }
+    } //angular.io/guide/build#configuring-commonjs-dependencies
     predict.push(res1);
   }
   for (let i = 0; i < res.letter.length; i++) {

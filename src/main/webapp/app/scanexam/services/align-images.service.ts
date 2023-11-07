@@ -158,7 +158,7 @@ export class AlignImagesService {
         }
         console.log(`error on service work: ${JSON.stringify(e)}`);
       };
-      this.worker.postMessage({ msg: 'load', uid: '0' });
+      this.worker.postMessage({ msg: 'load', uid: '0', payload: { fronturl: FRONT_URL } });
       const p = new Subject();
       this.subjects.set('0', p);
 

@@ -1,0 +1,34 @@
+/**
+ * @license
+ * Copyright 2023 Google LLC.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+import { Unique } from '@tensorflow/tfjs-core';
+import { uniqueImplCPU } from '../kernel_utils/shared';
+function unique(args) {
+  const { inputs, attrs, backend } = args;
+  const { axis } = attrs;
+  const { x } = inputs;
+  const { outputValues, outputShape, indices } = uniqueImplCPU(backend.readSync(x.dataId), axis, x.shape, x.dtype);
+  return [
+    backend.makeOutput(outputShape, x.dtype, /*memoryOffset=*/ undefined, outputValues),
+    backend.makeOutput([indices.length], 'int32', /*memoryOffset=*/ undefined, indices),
+  ];
+}
+export const uniqueConfig = {
+  kernelName: Unique,
+  backendName: 'wasm',
+  kernelFunc: unique,
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiVW5pcXVlLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vLi4vLi4vdGZqcy1iYWNrZW5kLXdhc20vc3JjL2tlcm5lbHMvVW5pcXVlLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBOzs7Ozs7Ozs7Ozs7Ozs7R0FlRztBQUNILE9BQU8sRUFBdUMsTUFBTSxFQUE0QixNQUFNLHVCQUF1QixDQUFDO0FBRzlHLE9BQU8sRUFBQyxhQUFhLEVBQUMsTUFBTSx3QkFBd0IsQ0FBQztBQUVyRCxTQUFTLE1BQU0sQ0FDWCxJQUFzRTtJQUV4RSxNQUFNLEVBQUMsTUFBTSxFQUFFLEtBQUssRUFBRSxPQUFPLEVBQUMsR0FBRyxJQUFJLENBQUM7SUFDdEMsTUFBTSxFQUFDLElBQUksRUFBQyxHQUFHLEtBQUssQ0FBQztJQUNyQixNQUFNLEVBQUMsQ0FBQyxFQUFDLEdBQUcsTUFBTSxDQUFDO0lBRW5CLE1BQU0sRUFBQyxZQUFZLEVBQUUsV0FBVyxFQUFFLE9BQU8sRUFBQyxHQUN0QyxhQUFhLENBQUMsT0FBTyxDQUFDLFFBQVEsQ0FBQyxDQUFDLENBQUMsTUFBTSxDQUFDLEVBQUUsSUFBSSxFQUFFLENBQUMsQ0FBQyxLQUFLLEVBQUUsQ0FBQyxDQUFDLEtBQUssQ0FBQyxDQUFDO0lBRXRFLE9BQU87UUFDTCxPQUFPLENBQUMsVUFBVSxDQUNkLFdBQVcsRUFBRSxDQUFDLENBQUMsS0FBSyxFQUFFLGlCQUFpQixDQUFBLFNBQVMsRUFBRSxZQUFZLENBQUM7UUFDbkUsT0FBTyxDQUFDLFVBQVUsQ0FDZCxDQUFDLE9BQU8sQ0FBQyxNQUFNLENBQUMsRUFBRSxPQUFPLEVBQUUsaUJBQWlCLENBQUEsU0FBUyxFQUFFLE9BQU8sQ0FBQztLQUNwRSxDQUFDO0FBQ0osQ0FBQztBQUVELE1BQU0sQ0FBQyxNQUFNLFlBQVksR0FBaUI7SUFDeEMsVUFBVSxFQUFFLE1BQU07SUFDbEIsV0FBVyxFQUFFLE1BQU07SUFDbkIsVUFBVSxFQUFFLE1BQStCO0NBQzVDLENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIEBsaWNlbnNlXG4gKiBDb3B5cmlnaHQgMjAyMyBHb29nbGUgTExDLlxuICogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlIFwiTGljZW5zZVwiKTtcbiAqIHlvdSBtYXkgbm90IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS5cbiAqIFlvdSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdFxuICpcbiAqIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMFxuICpcbiAqIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmVcbiAqIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuIFwiQVMgSVNcIiBCQVNJUyxcbiAqIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLlxuICogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZFxuICogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuXG4gKiA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PVxuICovXG5pbXBvcnQge0tlcm5lbENvbmZpZywgS2VybmVsRnVuYywgVGVuc29ySW5mbywgVW5pcXVlLCBVbmlxdWVBdHRycywgVW5pcXVlSW5wdXRzfSBmcm9tICdAdGVuc29yZmxvdy90ZmpzLWNvcmUnO1xuXG5pbXBvcnQge0JhY2tlbmRXYXNtfSBmcm9tICcuLi9iYWNrZW5kX3dhc20nO1xuaW1wb3J0IHt1bmlxdWVJbXBsQ1BVfSBmcm9tICcuLi9rZXJuZWxfdXRpbHMvc2hhcmVkJztcblxuZnVuY3Rpb24gdW5pcXVlKFxuICAgIGFyZ3M6IHtpbnB1dHM6IFVuaXF1ZUlucHV0cywgYXR0cnM6IFVuaXF1ZUF0dHJzLCBiYWNrZW5kOiBCYWNrZW5kV2FzbX0pOlxuICAgIFRlbnNvckluZm9bXSB7XG4gIGNvbnN0IHtpbnB1dHMsIGF0dHJzLCBiYWNrZW5kfSA9IGFyZ3M7XG4gIGNvbnN0IHtheGlzfSA9IGF0dHJzO1xuICBjb25zdCB7eH0gPSBpbnB1dHM7XG5cbiAgY29uc3Qge291dHB1dFZhbHVlcywgb3V0cHV0U2hhcGUsIGluZGljZXN9ID1cbiAgICAgIHVuaXF1ZUltcGxDUFUoYmFja2VuZC5yZWFkU3luYyh4LmRhdGFJZCksIGF4aXMsIHguc2hhcGUsIHguZHR5cGUpO1xuXG4gIHJldHVybiBbXG4gICAgYmFja2VuZC5tYWtlT3V0cHV0KFxuICAgICAgICBvdXRwdXRTaGFwZSwgeC5kdHlwZSwgLyptZW1vcnlPZmZzZXQ9Ki91bmRlZmluZWQsIG91dHB1dFZhbHVlcyksXG4gICAgYmFja2VuZC5tYWtlT3V0cHV0KFxuICAgICAgICBbaW5kaWNlcy5sZW5ndGhdLCAnaW50MzInLCAvKm1lbW9yeU9mZnNldD0qL3VuZGVmaW5lZCwgaW5kaWNlcyksXG4gIF07XG59XG5cbmV4cG9ydCBjb25zdCB1bmlxdWVDb25maWc6IEtlcm5lbENvbmZpZyA9IHtcbiAga2VybmVsTmFtZTogVW5pcXVlLFxuICBiYWNrZW5kTmFtZTogJ3dhc20nLFxuICBrZXJuZWxGdW5jOiB1bmlxdWUgYXMgdW5rbm93biBhcyBLZXJuZWxGdW5jLFxufTtcbiJdfQ==
