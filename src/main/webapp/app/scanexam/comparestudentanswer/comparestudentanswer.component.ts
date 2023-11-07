@@ -35,17 +35,18 @@ import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { IZone } from 'app/entities/zone/zone.model';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { ICluster, IImageCluster, ImageZone, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.component';
+import { ICluster, IImageCluster, ImageZone } from '../associer-copies-etudiants/associer-copies-etudiants.component';
 // import { EventCanevascorrectionHandlerService } from '../corrigequestion/event-canevascorrection-handler.service';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { PreferenceService } from '../preference-page/preference.service';
-import { AlignImagesService } from '../services/align-images.service';
+import { AlignImagesService, IImageCropFromZoneInput } from '../services/align-images.service';
 import { IComments } from '../../entities/comments/comments.model';
 import { HttpClient } from '@angular/common/http';
 import { KeyValue, Location } from '@angular/common';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import jszip from 'jszip';
 import * as FileSaver from 'file-saver';
+import { firstValueFrom } from 'rxjs';
 
 export interface Zone4SameCommentOrSameGrade {
   answers: Answer[];
@@ -298,20 +299,6 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     }
   }
 
-  /*  reloadImageGrowFactor(event: any): void {
-    if (event.value !== this.factor) {
-      this.factor = event.value;
-      this.reloadImage();
-    }
-  }
-
-  reloadImageOffset(event: any): void {
-    if (event.value !== this.pageOffset) {
-      this.pageOffset = event.value;
-      this.reloadImage();
-    }
-  }*/
-
   async reloadImage() {
     if (this.zones4comments !== undefined) {
       this.blocked = true;
@@ -335,6 +322,35 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
       this.blocked = false;
       this.firstImageLoadedReolve!();
     }
+  }
+
+  async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
+    const imageToCrop: IImageCropFromZoneInput = {
+      examId: +this.examId!,
+      factor: +this.factor,
+      align: !this.noalign,
+      template: false,
+      indexDb: this.preferenceService.getPreference().cacheDb === 'indexdb',
+      page: pageInscan,
+      z: zone,
+    };
+    const crop = await firstValueFrom(this.alignImagesService.imageCropFromZone(imageToCrop));
+    this.computeScale(crop.width);
+    return {
+      i: new ImageData(new Uint8ClampedArray(crop.image), crop.width, crop.height),
+      h: crop.height,
+      w: crop.width,
+    };
+  }
+  computeScale(imageWidth: number): void {
+    if (this.windowWidth < 991) {
+      this.factorScale = 0.95;
+    }
+    let scale = (window.innerWidth * this.factorScale) / imageWidth;
+    if (scale > 2) {
+      scale = 2;
+    }
+    this.scale = scale;
   }
 
   reloadImageClassify() {
@@ -373,109 +389,6 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
       ctx1!.drawImage(editedImage, 0, 0);
       show(true);
     }
-  }
-
-  private reviver(key: any, value: any): any {
-    if (typeof value === 'object' && value !== null) {
-      if (value.dataType === 'Map') {
-        return new Map(value.value);
-      }
-    }
-    return value;
-  }
-  async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
-    if (this.noalign) {
-      return new Promise(resolve => {
-        this.db.getFirstNonAlignImage(+this.examId!, pageInscan).then(e2 => {
-          const image = JSON.parse(e2!.value, this.reviver);
-          this.loadImage(image.pages, pageInscan).then(v => {
-            let finalW = (zone.width! * v.width! * this.factor) / 100000;
-            let finalH = (zone.height! * v.height! * this.factor) / 100000;
-            let initX =
-              (zone.xInit! * v.width!) / 100000 - ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
-            if (initX < 0) {
-              finalW = finalW + initX;
-              initX = 0;
-            }
-            let initY =
-              (zone.yInit! * v.height!) / 100000 -
-              ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
-            if (initY < 0) {
-              finalH = finalH + initY;
-              initY = 0;
-            }
-            this.alignImagesService
-              .imageCrop({
-                image: v.image!.data.buffer,
-                imageWidth: v.image!.width,
-                imageHeight: v.image!.height,
-                x: initX,
-                y: initY,
-                width: finalW,
-                height: finalH,
-              })
-              .subscribe(res => resolve({ i: new ImageData(new Uint8ClampedArray(res), finalW, finalH), w: finalW, h: finalH }));
-          });
-        });
-      });
-    } else {
-      return new Promise(resolve => {
-        this.db.getFirstAlignImage(+this.examId!, pageInscan).then(e2 => {
-          const image = JSON.parse(e2!.value, this.reviver);
-
-          this.loadImage(image.pages, pageInscan).then(v => {
-            let finalW = (zone.width! * v.width! * this.factor) / 100000;
-            let finalH = (zone.height! * v.height! * this.factor) / 100000;
-            let initX =
-              (zone.xInit! * v.width!) / 100000 - ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
-            if (initX < 0) {
-              finalW = finalW + initX;
-              initX = 0;
-            }
-            let initY =
-              (zone.yInit! * v.height!) / 100000 -
-              ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
-            if (initY < 0) {
-              finalH = finalH + initY;
-              initY = 0;
-            }
-            this.alignImagesService
-              .imageCrop({
-                image: v.image!.data.buffer,
-                imageWidth: v.image!.width,
-                imageHeight: v.image!.height,
-
-                x: initX,
-                y: initY,
-                width: finalW,
-                height: finalH,
-              })
-              .subscribe(res => resolve({ i: new ImageData(new Uint8ClampedArray(res), finalW, finalH), w: finalW, h: finalH }));
-          });
-        });
-      });
-    }
-  }
-
-  async loadImage(file: any, page1: number): Promise<IPage> {
-    return new Promise(resolve => {
-      const i = new Image();
-      i.onload = () => {
-        const editedImage: HTMLCanvasElement = <HTMLCanvasElement>document.createElement('canvas');
-        editedImage.width = i.width;
-        if (this.windowWidth < 991) {
-          this.factorScale = 0.95;
-        }
-        this.scale = (window.innerWidth * this.factorScale) / i.width;
-        //        this.eventHandler.scale = this.scale;
-        editedImage.height = i.height;
-        const ctx = editedImage.getContext('2d');
-        ctx!.drawImage(i, 0, 0);
-        const inputimage = ctx!.getImageData(0, 0, i.width, i.height);
-        resolve({ image: inputimage, page: page1, width: i.width, height: i.height });
-      };
-      i.src = file;
-    });
   }
 
   @HostListener('window:resize', ['$event'])

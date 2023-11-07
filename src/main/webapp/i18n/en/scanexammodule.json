@@ -401,8 +401,9 @@
     "statToggleValueTooltip": "Toggles between raw and normalized values",
     "voirCopieStatistiquesTooltip": "Go to the correction view for this student",
     "voirCopieFullPageTooltip": "View the scanned copy for this student (in a modal window).",
-    "pasdepageassocieeNextTooltip": "There are no more sheet to associate following this sheet.",
+    "pasdepageassocieeNextTooltip": "There is no more sheet to associate following this sheet.",
     "pasdepageassocieePreviousTooltip": "There is no sheet to associate prior to this sheet",
-    "replacealignementWithNonAlignTooltip": "Replaces the aligned version with the non-aligned version for this sheet"
+    "replacealignementWithNonAlignTooltip": "Replaces the aligned version with the non-aligned version for this sheet",
+    "pasdepageassocieeTooltip": "There is no more sheet to associate for this exam"
   }
 }

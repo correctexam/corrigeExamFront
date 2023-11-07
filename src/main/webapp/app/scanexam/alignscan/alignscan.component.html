@@ -24,7 +24,10 @@
     <div class="grid" style="width: 90vw">
       <div class="col-4"></div>
       <div class="col-4 text-center">
-        <i class="pi pi-lock" style="font-size: 3rem"> </i><BR /> {{ avancement }}{{ avancementunit }} <BR /> {{ message }} <BR />
+        <!--<i class="pi pi-lock" style="font-size: 3rem"> </i>-->
+        <p-progressSpinner></p-progressSpinner>
+
+        <BR /> {{ avancement }}{{ avancementunit }} <BR /> {{ message }} <BR />
         {{ submessage }}
         <span *ngIf="submessage !== undefined && submessage.length > 0">{{ progress }} / 100</span>
         <BR />

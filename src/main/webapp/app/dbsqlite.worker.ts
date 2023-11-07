@@ -187,6 +187,17 @@ addEventListener('message', e => {
       db1.removePageAlignForExamForPage(_sqlite3, e.data);
       break;
     }
+    case 'removePageNonAlignForExamForPage': {
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.payload.examId);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.payload.examId, db1);
+      }
+      db1.removePageNonAlignForExamForPage(_sqlite3, e.data);
+      break;
+    }
+
     case 'removePageNonAlignForExamForPages': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
@@ -695,6 +706,21 @@ class DB {
     this.initDb(sqlite3);
     try {
       this.db.exec('delete from align where page=' + payload.page);
+      postMessage({
+        msg: data.msg,
+        uid: data.uid,
+        payload: {},
+      });
+    } finally {
+      this.close();
+    }
+  }
+  removePageNonAlignForExamForPage(sqlite3: any, data: any) {
+    const payload = data.payload;
+
+    this.initDb(sqlite3);
+    try {
+      this.db.exec('delete from nonalign where page=' + payload.page);
       postMessage({
         msg: data.msg,
         uid: data.uid,

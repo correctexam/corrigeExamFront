@@ -252,12 +252,19 @@ addEventListener('message', e => {
           });
         },
       };
-
+      console.error(e.data.payload.fronturl);
+      let fronturl = '';
+      if (e.data.payload.fronturl) {
+        fronturl = e.data.payload.fronturl;
+      }
       //Load and await the .js OpenCV
       self1.importScripts(self1['Module'].scriptUrl);
-      self1.importScripts('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs');
-      self1.importScripts('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@3.20.0/dist/tf-backend-wasm.min.js');
-      tf.wasm.setWasmPaths('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@3.20.0/dist/');
+      //      self1.importScripts('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs');
+      self1.importScripts(fronturl + 'content/tfjs/tf-core.es2017.min.js');
+      //      self1.importScripts('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@3.20.0/dist/tf-backend-wasm.min.js');
+      self1.importScripts(fronturl + 'content/tfjs/dist/tf-backend-wasm.es2017.js');
+      //      tf.wasm.setWasmPaths('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@3.20.0/dist/');
+      tf.wasm.setWasmPaths(fronturl + 'content/tfjs/dist/');
 
       break;
     }
@@ -486,136 +493,146 @@ async function doPredictionsAsync(p: {
         output.firstnameZone = z2Buffer;
         output.ineZone = z3Buffer;
         if (p1.assist) {
-          // Load Template
-          console.timeLog('analysePage', 'before template load');
-          const t = await getTemplateImage(p1.pageTemplate, p1.examId, p1.indexDb);
-          console.timeLog('analysePage', 'after template load');
-          if (t !== undefined) {
-            console.timeLog('analysePage', 'before template image load');
-            const ti = await loadImage(t);
-            console.timeLog('analysePage', 'after template image load');
-            let z1t: any;
-            let z2t: any;
-            let z3t: any;
-            let predictname: any;
-            let predictfirstname: any;
-            let predictine: any;
-            console.timeLog('analysePage', 'before cropZone template');
+          try {
+            // Load Template
+            console.timeLog('analysePage', 'before template load');
+            const t = await getTemplateImage(p1.pageTemplate, p1.examId, p1.indexDb);
+            console.timeLog('analysePage', 'after template load');
+            if (t !== undefined) {
+              console.timeLog('analysePage', 'before template image load');
+              const ti = await loadImage(t);
+              console.timeLog('analysePage', 'after template image load');
+              let z1t: any;
+              let z2t: any;
+              let z3t: any;
+              let predictname: any;
+              let predictfirstname: any;
+              let predictine: any;
+              console.timeLog('analysePage', 'before cropZone template');
 
-            if (p1.nameZone) {
-              z1t = cropZone(ti, p1.nameZone, p1.factor);
-            }
-            if (p1.firstnameZone) {
-              z2t = cropZone(ti, p1.firstnameZone, p1.factor);
-            }
-            if (p1.ineZone) {
-              z3t = cropZone(ti, p1.ineZone, p1.factor);
-            }
-            console.timeLog('analysePage', 'after cropZone template');
+              if (p1.nameZone) {
+                z1t = cropZone(ti, p1.nameZone, p1.factor);
+              }
+              if (p1.firstnameZone) {
+                z2t = cropZone(ti, p1.firstnameZone, p1.factor);
+              }
+              if (p1.ineZone) {
+                z3t = cropZone(ti, p1.ineZone, p1.factor);
+              }
+              console.timeLog('analysePage', 'after cropZone template');
 
-            console.timeLog('analysePage', 'before doPredidction4zone name');
+              console.timeLog('analysePage', 'before doPredidction4zone name');
 
-            if (z1 !== undefined && z1t !== undefined) {
-              predictname = await doPredidction4zone(true, z1, z1t, p1.preferences, p1.looking4missing, p1.removeHorizontal, p1.debug!);
-              //            output.name = res1.solution[0] as string;
-              //            output.namePrecision = +res1.solution[1];
-              z1t.delete();
-              if (predictname.debug) {
-                const z1BufferDebug = imageDataFromMat(predictname.debug).data.buffer;
-                if (z1BufferDebug) {
-                  opts.push(z1BufferDebug);
-                  output.nameZoneDebug = z1BufferDebug;
+              if (z1 !== undefined && z1t !== undefined) {
+                predictname = await doPredidction4zone(true, z1, z1t, p1.preferences, p1.looking4missing, p1.removeHorizontal, p1.debug!);
+                //            output.name = res1.solution[0] as string;
+                //            output.namePrecision = +res1.solution[1];
+                z1t.delete();
+                if (predictname.debug) {
+                  const z1BufferDebug = imageDataFromMat(predictname.debug).data.buffer;
+                  if (z1BufferDebug) {
+                    opts.push(z1BufferDebug);
+                    output.nameZoneDebug = z1BufferDebug;
+                  }
+                  predictname.debug.delete();
                 }
-                predictname.debug.delete();
               }
-            }
-            console.timeLog('analysePage', 'after doPredidction4zone name');
-            console.timeLog('analysePage', 'before doPredidction4zone firstname');
-            if (z2 !== undefined && z2t !== undefined) {
-              predictfirstname = await doPredidction4zone(
-                true,
-                z2,
-                z2t,
-                p1.preferences,
-                p1.looking4missing,
-                p1.removeHorizontal,
-                p1.debug!,
-              );
-              //            output.firstname = res2.solution[0] as string;
-              //            output.firstnamePrecision = +res2.solution[1];
-              z2t.delete();
-              if (predictfirstname.debug) {
-                const z2BufferDebug = imageDataFromMat(predictfirstname.debug).data.buffer;
-                if (z2BufferDebug) {
-                  opts.push(z2BufferDebug);
-                  output.firstnameZoneDebug = z2BufferDebug;
+              console.timeLog('analysePage', 'after doPredidction4zone name');
+              console.timeLog('analysePage', 'before doPredidction4zone firstname');
+              if (z2 !== undefined && z2t !== undefined) {
+                predictfirstname = await doPredidction4zone(
+                  true,
+                  z2,
+                  z2t,
+                  p1.preferences,
+                  p1.looking4missing,
+                  p1.removeHorizontal,
+                  p1.debug!,
+                );
+                //            output.firstname = res2.solution[0] as string;
+                //            output.firstnamePrecision = +res2.solution[1];
+                z2t.delete();
+                if (predictfirstname.debug) {
+                  const z2BufferDebug = imageDataFromMat(predictfirstname.debug).data.buffer;
+                  if (z2BufferDebug) {
+                    opts.push(z2BufferDebug);
+                    output.firstnameZoneDebug = z2BufferDebug;
+                  }
+                  predictfirstname.debug.delete();
                 }
-                predictfirstname.debug.delete();
               }
-            }
-            console.timeLog('analysePage', 'after doPredidction4zone firstname');
-            console.timeLog('analysePage', 'before doPredidction4zone ine');
+              console.timeLog('analysePage', 'after doPredidction4zone firstname');
+              console.timeLog('analysePage', 'before doPredidction4zone ine');
 
-            if (z3 !== undefined && z3t !== undefined) {
-              predictine = await doPredidction4zone(false, z3, z3t, p1.preferences, p1.looking4missing, p1.removeHorizontal, p1.debug!);
-              //            output.ine = res3.solution[0] as string;
-              //            output.inePrecision = +res3.solution[1];
-              z3t.delete();
-              if (predictine.debug) {
-                const z3BufferDebug = imageDataFromMat(predictine.debug).data.buffer;
-                if (z3BufferDebug) {
-                  opts.push(z3BufferDebug);
-                  output.ineZoneDebug = z3BufferDebug;
+              if (z3 !== undefined && z3t !== undefined) {
+                predictine = await doPredidction4zone(false, z3, z3t, p1.preferences, p1.looking4missing, p1.removeHorizontal, p1.debug!);
+                //            output.ine = res3.solution[0] as string;
+                //            output.inePrecision = +res3.solution[1];
+                z3t.delete();
+                if (predictine.debug) {
+                  const z3BufferDebug = imageDataFromMat(predictine.debug).data.buffer;
+                  if (z3BufferDebug) {
+                    opts.push(z3BufferDebug);
+                    output.ineZoneDebug = z3BufferDebug;
+                  }
+                  predictine.debug.delete();
                 }
-                predictine.debug.delete();
               }
-            }
-            console.timeLog('analysePage', 'after doPredidction4zone ine');
-            console.timeLog('analysePage', 'before computescore');
+              console.timeLog('analysePage', 'after doPredidction4zone ine');
+              console.timeLog('analysePage', 'before computescore');
 
-            if (predictname?.solution?.length > 0 && predictfirstname?.solution?.length > 0) {
-              const predictnamelength: number = predictname.solution.length;
-              const predictfirstnamelength: number = predictfirstname.solution.length;
-              const cand = p1.candidates.filter(
-                c => Math.abs(predictnamelength - c.name!.length) <= 2 && Math.abs(predictfirstnamelength - c.firstname!.length) <= 2,
-              );
-              statCAndPerPage.set(output.page, new Map());
-              cand.forEach(c => {
-                const c1 = { ...c };
-                const sizedistance = Math.abs(predictnamelength - c.name!.length) + Math.abs(predictfirstnamelength - c.firstname!.length);
-                c1.score = 1000 / Math.pow(2, sizedistance);
-                c1.proba = computeStatPredict(c1, predictname, predictfirstname, predictine);
-                statCAndPerPage.get(output.page)?.set(c1.id!, c1);
-              });
-              const res = Array.from(statCAndPerPage.get(output.page)!.values()).sort((a, b) => b.proba! * b.score! - a.proba! * a.score!);
-              let finalres = [];
-              if (res.length > 2) {
-                finalres = [res[0], res[1], res[2]];
-              } else {
-                finalres = res;
+              if (predictname?.solution?.length > 0 && predictfirstname?.solution?.length > 0) {
+                const predictnamelength: number = predictname.solution.length;
+                const predictfirstnamelength: number = predictfirstname.solution.length;
+                const cand = p1.candidates.filter(
+                  c => Math.abs(predictnamelength - c.name!.length) <= 2 && Math.abs(predictfirstnamelength - c.firstname!.length) <= 2,
+                );
+                statCAndPerPage.set(output.page, new Map());
+                cand.forEach(c => {
+                  const c1 = { ...c };
+                  const sizedistance =
+                    Math.abs(predictnamelength - c.name!.length) + Math.abs(predictfirstnamelength - c.firstname!.length);
+                  c1.score = 1000 / Math.pow(2, sizedistance);
+                  c1.proba = computeStatPredict(c1, predictname, predictfirstname, predictine);
+                  statCAndPerPage.get(output.page)?.set(c1.id!, c1);
+                });
+                const res = Array.from(statCAndPerPage.get(output.page)!.values()).sort(
+                  (a, b) => b.proba! * b.score! - a.proba! * a.score!,
+                );
+                let finalres = [];
+                if (res.length > 2) {
+                  finalres = [res[0], res[1], res[2]];
+                } else {
+                  finalres = res;
+                }
+                output.resultPrediction = finalres;
+              } else if (predictname?.solution?.length > 0) {
+                const predictnamelength: number = predictname.solution.length;
+                const cand = p1.candidates.filter(c => Math.abs(predictnamelength - c.name!.length) <= 2);
+                statCAndPerPage.set(output.page, new Map());
+                cand.forEach(c => {
+                  const c1 = { ...c };
+                  const sizedistance = Math.abs(predictnamelength - c.name!.length);
+                  c1.score = 1000 / Math.pow(2, sizedistance);
+                  c1.proba = computeStatPredict(c1, predictname, predictfirstname, predictine);
+                  statCAndPerPage.get(output.page)?.set(c1.id!, c1);
+                });
+                const res = Array.from(statCAndPerPage.get(output.page)!.values()).sort(
+                  (a, b) => b.proba! * b.score! - a.proba! * a.score!,
+                );
+                let finalres = [];
+                if (res.length > 2) {
+                  finalres = [res[0], res[1], res[2]];
+                } else {
+                  finalres = res;
+                }
+                output.resultPrediction = finalres;
               }
-              output.resultPrediction = finalres;
-            } else if (predictname?.solution?.length > 0) {
-              const predictnamelength: number = predictname.solution.length;
-              const cand = p1.candidates.filter(c => Math.abs(predictnamelength - c.name!.length) <= 2);
-              statCAndPerPage.set(output.page, new Map());
-              cand.forEach(c => {
-                const c1 = { ...c };
-                const sizedistance = Math.abs(predictnamelength - c.name!.length);
-                c1.score = 1000 / Math.pow(2, sizedistance);
-                c1.proba = computeStatPredict(c1, predictname, predictfirstname, predictine);
-                statCAndPerPage.get(output.page)?.set(c1.id!, c1);
-              });
-              const res = Array.from(statCAndPerPage.get(output.page)!.values()).sort((a, b) => b.proba! * b.score! - a.proba! * a.score!);
-              let finalres = [];
-              if (res.length > 2) {
-                finalres = [res[0], res[1], res[2]];
-              } else {
-                finalres = res;
-              }
-              output.resultPrediction = finalres;
+              console.timeLog('analysePage', 'after computescore');
             }
-            console.timeLog('analysePage', 'after computescore');
+          } catch (exp: any) {
+            console.error('could not perform name analysis', exp);
+            continue;
           }
         }
         outputs.push(output);
@@ -942,7 +959,6 @@ async function fprediction(
   const predict = [];
   for (let i = 0; i < res.letter.length; i++) {
     let res1 = m.predict(imageDataFromMat(res.letter[i][1]));
-    console.error(res1);
     if (onlyletter) {
       if (res1[0] === '1') {
         res1[0] = 'i';
@@ -959,7 +975,7 @@ async function fprediction(
       if (res1[0] === '9') {
         res1[0] = 'g';
       }
-    }
+    } //angular.io/guide/build#configuring-commonjs-dependencies
     predict.push(res1);
   }
   for (let i = 0; i < res.letter.length; i++) {

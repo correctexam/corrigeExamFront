@@ -1395,79 +1395,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     };
   }
 
-  /* async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
-    if (this.noalign) {
-      return new Promise(resolve => {
-        this.db.getFirstNonAlignImage(+this.examId!, pageInscan).then(e2 => {
-          const image = JSON.parse(e2!.value, this.reviver);
-          this.loadImage(image.pages, pageInscan).then(v => {
-            let finalW = (zone.width! * v.width! * this.factor) / 100000;
-            let finalH = (zone.height! * v.height! * this.factor) / 100000;
-            let initX =
-              (zone.xInit! * v.width!) / 100000 - ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
-            if (initX < 0) {
-              finalW = finalW + initX;
-              initX = 0;
-            }
-            let initY =
-              (zone.yInit! * v.height!) / 100000 -
-              ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
-            if (initY < 0) {
-              finalH = finalH + initY;
-              initY = 0;
-            }
-            this.alignImagesService
-              .imageCrop({
-                image: v.image!.data.buffer,
-                imageWidth: v.image!.width,
-                imageHeight: v.image!.height,
-                x: initX,
-                y: initY,
-                width: finalW,
-                height: finalH,
-              })
-              .subscribe(res => resolve({ i: new ImageData(new Uint8ClampedArray(res), finalW, finalH), w: finalW, h: finalH }));
-          });
-        });
-      });
-    } else {
-      return new Promise(resolve => {
-        this.db.getFirstAlignImage(+this.examId!, pageInscan).then(e2 => {
-          const image = JSON.parse(e2!.value, this.reviver);
-
-          this.loadImage(image.pages, pageInscan).then(v => {
-            let finalW = (zone.width! * v.width! * this.factor) / 100000;
-            let finalH = (zone.height! * v.height! * this.factor) / 100000;
-            let initX =
-              (zone.xInit! * v.width!) / 100000 - ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
-            if (initX < 0) {
-              finalW = finalW + initX;
-              initX = 0;
-            }
-            let initY =
-              (zone.yInit! * v.height!) / 100000 -
-              ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
-            if (initY < 0) {
-              finalH = finalH + initY;
-              initY = 0;
-            }
-            this.alignImagesService
-              .imageCrop({
-                image: v.image!.data.buffer,
-                imageWidth: v.image!.width,
-                imageHeight: v.image!.height,
-                x: initX,
-                y: initY,
-                width: finalW,
-                height: finalH,
-              })
-              .subscribe(res => resolve({ i: new ImageData(new Uint8ClampedArray(res), finalW, finalH), w: finalW, h: finalH }));
-          });
-        });
-      });
-    }
-  } */
-
   async getStudentResponse(questionsId: number[], currentStudent: number): Promise<StudentResponse> {
     return new Promise(resolve => {
       const sheets = (this.students?.map(st => st.examSheets) as any)
@@ -1499,42 +1426,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
     });
   }
-
-  /*  async getTemplateImage4Zone(zone: IZone): Promise<ImageZone> {
-    return new Promise(resolve => {
-      this.db.getFirstTemplate(+this.examId!, zone.pageNumber!).then(e2 => {
-        const image = JSON.parse(e2!.value, this.reviver);
-        this.loadImage(image.pages, zone.pageNumber!).then(v => {
-          let finalW = (zone.width! * v.width! * this.factor) / 100000;
-          let finalH = (zone.height! * v.height! * this.factor) / 100000;
-          let initX =
-            (zone.xInit! * v.width!) / 100000 - ((zone.width! * v.width! * this.factor) / 100000 - (zone.width! * v.width!) / 100000) / 2;
-          if (initX < 0) {
-            finalW = finalW + initX;
-            initX = 0;
-          }
-          let initY =
-            (zone.yInit! * v.height!) / 100000 -
-            ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
-          if (initY < 0) {
-            finalH = finalH + initY;
-            initY = 0;
-          }
-          this.alignImagesService
-            .imageCrop({
-              image: v.image!.data.buffer,
-              imageWidth: v.image!.width,
-              imageHeight: v.image!.height,
-              x: initX,
-              y: initY,
-              width: finalW,
-              height: finalH,
-            })
-            .subscribe(res => resolve({ i: new ImageData(new Uint8ClampedArray(res), finalW, finalH), w: finalW, h: finalH }));
-        });
-      });
-    });
-  }*/
 
   showGalleria(): void {
     this.blocked = true;

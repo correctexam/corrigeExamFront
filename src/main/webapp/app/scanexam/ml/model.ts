@@ -4,7 +4,9 @@
  * class Model
  * Loads the Tensorflow model and preprocesses and predicts images
  */
-declare let tf: any;
+import * as tf from '@tensorflow/tfjs';
+
+// declare let tf: any;
 
 export class MLModel {
   alphabet!: string;
@@ -45,13 +47,15 @@ export class MLModel {
   public loadModel(letteranddigit: boolean): Promise<any> {
     console.time('Load model');
     if (letteranddigit) {
-      console.log('load letter');
+      console.log('load letter', tf);
+
       return tf.loadLayersModel('content/classifier/letterclassifier/model.json').then((model: any) => {
         this._model = model;
         console.timeEnd('Load model');
       });
     } else {
       console.log('load digit');
+      tf.loadLayersModel('https://storage.googleapis.com/tfjs-models/tfjs/iris_v1/model.json').then((model1: any) => model1.summary());
       return tf.loadLayersModel('content/classifier/digitclassifier/model.json').then((model: any) => {
         this._model = model;
         console.timeEnd('Load model');
@@ -99,11 +103,11 @@ export class MLModel {
       let tensor = tf.browser
         .fromPixels(pixelData, 1)
         // pad it such that w = h = max(w, h)
-        .pad(padSquare, 255.0);
+        .pad(padSquare as any, 255.0);
 
       // scale it down
       tensor = tf.image
-        .resizeBilinear(tensor, [resizeDim, resizeDim])
+        .resizeBilinear(tensor as any, [resizeDim, resizeDim])
         // pad it with blank pixels along the edges (to better match the training data)
         .pad(
           [
@@ -111,7 +115,7 @@ export class MLModel {
             [edgeSize, edgeSize],
             [0, 0],
           ],
-          255.0
+          255.0,
         );
 
       // invert and normalize to match training data

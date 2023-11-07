@@ -33,7 +33,10 @@
       <div class="grid" style="width: 90vw">
         <div class="col-4"></div>
         <div class="col-4 text-center">
-          <i class="pi pi-lock" style="font-size: 3rem"> </i><BR />
+          <!--<i class="pi pi-lock" style="font-size: 3rem"> </i>-->
+          <p-progressSpinner></p-progressSpinner>
+
+          <BR />
           <div *ngIf="message !== undefined && message.length > 0">{{ message }} <BR /></div>
         </div>
         <div class="col-4"></div>
