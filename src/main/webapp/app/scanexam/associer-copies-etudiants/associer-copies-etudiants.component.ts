@@ -236,6 +236,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
               this.refreshStudentList().then(() => {
                 console.timeLog('loadpage', 'after loadstudentList');
                 this.loadImage().then(() => {
+                  this.blocked = false;
                   console.timeEnd('loadpage');
                 });
               });
@@ -526,7 +527,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     const studentsbody = await firstValueFrom(this.studentService.query({ courseId: this.exam.courseId }));
     this.students = studentsbody.body!;
     this.refreshLocalStudentList();
-    this.blocked = false;
+    //    this.blocked = false;
   }
 
   filterLocalStudentList(): void {
