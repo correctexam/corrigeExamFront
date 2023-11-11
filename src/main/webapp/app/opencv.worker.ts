@@ -343,8 +343,7 @@ async function loadImage(ii: NonAlignImage | AlignImage): Promise<ImageData> {
   const editedImage = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
   const ctx = editedImage.getContext('2d');
   ctx!.drawImage(imageBitmap, 0, 0);
-  const inputimage = ctx!.getImageData(0, 0, imageBitmap.width, imageBitmap.height);
-  return inputimage;
+  return ctx!.getImageData(0, 0, imageBitmap.width, imageBitmap.height);
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-unused-vars

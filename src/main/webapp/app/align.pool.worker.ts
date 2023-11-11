@@ -401,6 +401,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
         result['imagesDebugTracesWidth'] = dstdebug.size().width;
         result['imagesDebugTracesHeight'] = dstdebug.size().height;
+        dstdebug.delete();
+        matVec.delete();
       }
 
       mat1.delete();
@@ -432,6 +434,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
         result['imagesDebugTracesWidth'] = dstdebug.size().width;
         result['imagesDebugTracesHeight'] = dstdebug.size().height;
+        dstdebug.delete();
+        matVec.delete();
       }
 
       //  console.log('no match for page ' + pageNumber);
@@ -520,6 +524,9 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       matches.delete();
       good_matches.delete();
       bf.delete();
+      //       im1Graydst.delete();
+      //      im2Graydst.delete();
+
       return false;
     }
     //  console.log("pass par la 7 ", "page ", pageNumber + "zone " + ii)
@@ -925,9 +932,10 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
         result['imagesDebugTracesWidth'] = dstdebug.size().width;
         result['imagesDebugTracesHeight'] = dstdebug.size().height;
+        dstdebug.delete();
+        matVec.delete();
       }
       _srcMat.delete();
-
       srcMat.delete();
       dst.delete();
       circlesMat.delete();
@@ -938,6 +946,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       srcTri.delete();
       dstTri.delete();
       dst1.delete();
+      M.delete();
+
       //      console.error('find circle');
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return result;
@@ -950,6 +960,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       srcMat2.delete();
       _srcMat2.delete();
       circlesMat1.delete();
+
       //  console.error('cannot find circle');
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
