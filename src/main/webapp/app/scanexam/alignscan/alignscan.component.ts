@@ -196,8 +196,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
             alt: 'Description for Image 2',
             title: 'Exam',
           });
-        } else {
-          console.error('no debug image', e.pageNumber);
         }
 
         this.saveEligneImage(apage.page!, im).then(() => {
