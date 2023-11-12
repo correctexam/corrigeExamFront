@@ -183,6 +183,8 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
         };
 
         const im = new ImageData(new Uint8ClampedArray(apage.image!), apage.width, apage.height);
+        apage.image = undefined;
+        e.imageAligned = undefined;
         if (e.imagesDebugTracesWidth !== undefined) {
           const debugpage = {
             image: e.imagesDebugTraces,
@@ -191,6 +193,9 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
             height: e.imagesDebugTracesHeight,
           };
           const dim = new ImageData(new Uint8ClampedArray(debugpage.image!), debugpage.width, debugpage.height);
+          debugpage.image = undefined;
+          e.imagesDebugTraces = undefined;
+
           this.images.push({
             src: this.imageDataToDataURL(dim),
             alt: 'Description for Image 2',
