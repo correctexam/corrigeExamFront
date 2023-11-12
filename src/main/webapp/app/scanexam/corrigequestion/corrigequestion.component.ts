@@ -1608,25 +1608,22 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.db.getFirstTemplate(+this.examId!, z!.pageNumber!).then(e2 => {
             const image = JSON.parse(e2!.value, this.reviver);
             this.loadImage(image.pages, z!.pageNumber!).then(v => {
-              this.db.getFirstNonAlignImage(+this.examId!, page).then(e3 => {
-                const image1 = JSON.parse(e3!.value, this.reviver);
-                this.loadImage(image1.pages, page).then(v1 => {
-                  const inp: IImageAlignementInput = {
-                    imageA: v.image!.data.buffer,
-                    imageB: v1.image!.data.buffer,
-                    heightA: v.height,
-                    widthA: v.width,
-                    heightB: v1.height,
-                    widthB: v1.width,
-                    pageNumber: page,
-                    marker: mark,
-                    preference: this.preferenceService.getPreference(),
-                    debug: false,
-                  };
+              const inp: IImageAlignementInput = {
+                imageA: v.image!.data.buffer,
+                //                    imageB: v1.image!.data.buffer,
+                heightA: v.height,
+                widthA: v.width,
+                //                    heightB: v1.height,
+                //                    widthB: v1.width,
+                pageNumber: page,
+                marker: mark,
+                preference: this.preferenceService.getPreference(),
+                debug: false,
+                examId: +this.examId!,
+                indexDb: this.preferenceService.getPreference().cacheDb === 'indexdb',
+              };
 
-                  this.observer!.next(inp);
-                });
-              });
+              this.observer!.next(inp);
             });
           });
         });
@@ -1642,7 +1639,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.observer = observer;
     });
     fromWorkerPool<IImageAlignementInput, IImageAlignement>(worker1, this.observable, {
-      selectTransferables: input => [input.imageA, input.imageB],
+      selectTransferables: input => [input.imageA],
     }).subscribe(
       e => {
         const apage = {

@@ -11,6 +11,8 @@
 const dbs = new Map<number, DB>();
 let _sqlite3: any;
 let portopenCvWorker: any;
+const portWorkerPool: any[] = [];
+
 addEventListener('message', e => {
   /* if (e.data?.payload?.examId) {
     [...dbs.keys()]
@@ -22,6 +24,7 @@ addEventListener('message', e => {
 
   switch (e.data.msg) {
     case 'hello': {
+      portWorkerPool;
       const response = `worker response to ${e.data.msg}`;
       postMessage({ msg: response });
 
@@ -30,7 +33,6 @@ addEventListener('message', e => {
     case 'shareWorker': {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const port = e.data.port; // (C)
-      portopenCvWorker = port;
       port.onmessage = (e1: any) => {
         switch (e1.data.msg) {
           case 'getFirstNonAlignImage': {
@@ -68,6 +70,12 @@ addEventListener('message', e => {
         //        console.error(e1.data);
         //        port.postMessage(['hello', 'world']);
       };
+      if (e.data.uid === '-1') {
+        portopenCvWorker = port;
+      } else {
+        portWorkerPool.push(port);
+      }
+
       break;
     }
     case 'load': {

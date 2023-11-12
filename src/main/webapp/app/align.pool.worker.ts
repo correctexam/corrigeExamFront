@@ -9,6 +9,7 @@ declare let cv: any;
 
 import { DoTransferableWorkUnit, runWorker } from 'observable-webworker';
 import { Observable } from 'rxjs';
+import { AlignImage, AppDB, NonAlignImage } from './scanexam/db/db';
 
 interface IImageAlignement {
   imageAligned?: ArrayBuffer;
@@ -22,17 +23,16 @@ interface IImageAlignement {
 
 interface IImageAlignementInput {
   imageA?: ArrayBuffer;
-  imageB?: ArrayBuffer;
   marker?: boolean;
   x?: number;
   y?: number;
   widthA?: number;
   heightA?: number;
-  widthB?: number;
-  heightB?: number;
   pageNumber: number;
   preference: IPreference;
   debug: boolean;
+  examId: number;
+  indexDb: boolean;
 }
 
 export interface IPreference {
@@ -53,6 +53,56 @@ export interface IPreference {
   defaultAlignAlgowithMarker: boolean;
 }
 
+let _sqlite3: any;
+const dbs = new Map<number, DB>();
+
+class DB {
+  db: any;
+
+  constructor(public examName: number) {}
+
+  error(...args: string[]): void {
+    console.error(...args);
+  }
+
+  initDb(sqlite3: any): void {
+    if (this.db === undefined || !this.db.isOpen()) {
+      const oo = sqlite3.oo1; /*high-level OO API*/
+      if (sqlite3.opfs) {
+        //        console.time('open');
+        this.db = new oo.OpfsDb('/' + this.examName + '.sqlite3');
+        //        console.timeEnd('open');
+      } else {
+        this.db = new oo.DB('/' + this.examName + '.sqlite3', 'ct');
+      }
+    }
+  }
+
+  close(): void {
+    this.db.close();
+  }
+
+  initemptyDb(sqlite3: any): void {
+    this.initDb(sqlite3);
+    try {
+      this.db.exec('CREATE TABLE IF NOT EXISTS template(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
+      this.db.exec('CREATE TABLE IF NOT EXISTS align(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
+      this.db.exec('CREATE TABLE IF NOT EXISTS nonalign(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
+    } finally {
+      this.close();
+    }
+  }
+
+  getFirstNonAlignImage(sqlite3: any, pageInscan: number): any {
+    //    console.error("getFirstNonAlignImage",data.payload.pageInscan, t)
+    this.initDb(sqlite3);
+    try {
+      return this.db.selectValue('select imageData from nonalign where page=' + pageInscan);
+    } finally {
+      this.close();
+    }
+  }
+}
 export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlignementInput, IImageAlignement> {
   opencvready: Promise<void> = new Promise<void>(resolve => {
     const self1 = self as any;
@@ -73,53 +123,130 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     };
     self1.importScripts(self1['Module'].scriptUrl);
   });
+  db: AppDB | undefined;
+  initSqlLite = false;
+  sqlliteReady: (sqlite: boolean) => Promise<void> = (sqlite: boolean) =>
+    sqlite
+      ? new Promise<void>(resolve => {
+          const self1 = self as any;
+          self1['Module'] = {
+            scriptUrl: 'content/sqlite/sqlite3.js',
+          };
+
+          // Load and await the .js OpenCV
+          self1.importScripts(self1['Module'].scriptUrl);
+          // const db1 = new DB(e.data.exam);
+          // dbs.set(e.data.exam, db1);
+          self1
+            .sqlite3InitModule({
+              print: console.log,
+              printErr: console.error,
+            })
+            .then(function (sqlite3var: any) {
+              _sqlite3 = sqlite3var;
+              resolve();
+            })
+            .catch((err: any) => {
+              console.log(err);
+            });
+        })
+      : new Promise<void>(resolve => {
+          resolve();
+        });
+
+  reviver(key: any, value: any): any {
+    if (typeof value === 'object' && value !== null) {
+      if (value.dataType === 'Map') {
+        return new Map(value.value);
+      }
+    }
+    return value;
+  }
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-unused-vars
+  async loadImage(ii: NonAlignImage | AlignImage): Promise<ImageData> {
+    const image = JSON.parse(ii.value, this.reviver);
+    const res = await fetch(image.pages);
+    const blob = await res.blob();
+    const imageBitmap = await createImageBitmap(blob);
+    const editedImage = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
+    const ctx = editedImage.getContext('2d');
+    ctx!.drawImage(imageBitmap, 0, 0);
+    return ctx!.getImageData(0, 0, imageBitmap.width, imageBitmap.height);
+  }
+
+  async getScanImage(page: number, examId: number, indexDb: boolean): Promise<NonAlignImage | AlignImage | undefined> {
+    if (indexDb) {
+      if (this.db === undefined) {
+        this.db = new AppDB();
+      }
+      return await this.db.getFirstNonAlignImage(examId, page);
+    } else {
+      let db1 = dbs.get(examId);
+      if (db1 === undefined) {
+        db1 = new DB(examId);
+        dbs.set(examId, db1);
+      }
+
+      return {
+        examId,
+
+        pageNumber: page,
+        value: db1.getFirstNonAlignImage(_sqlite3, page),
+      };
+    }
+  }
 
   public workUnit(input: IImageAlignementInput): Observable<IImageAlignement> {
     return new Observable(observer => {
       this.opencvready
-        .then(() => {
+        .then(async () => {
+          if (!input.indexDb && !this.initSqlLite) {
+            await this.sqlliteReady(!input.indexDb);
+            this.initSqlLite = true;
+          }
+
           //    console.error('start worker');
-          if (!input.marker) {
-            try {
-              const res = this.alignImage(
+          const im = await this.getScanImage(input.pageNumber, input.examId, input.indexDb);
+          if (im !== undefined) {
+            const im1 = await this.loadImage(im);
+            if (!input.marker) {
+              try {
+                const res = this.alignImage(
+                  input.imageA,
+                  im1,
+                  input.widthA!,
+                  input.heightA!,
+                  false,
+                  input.preference.numberofpointToMatch,
+                  input.preference.numberofpointToMatch,
+                  input.pageNumber,
+                  input.debug,
+                );
+                input.imageA = undefined;
+
+                res.pageNumber = input.pageNumber;
+                observer.next(res);
+                observer.complete();
+              } catch (error) {
+                console.error(error);
+              }
+            } else {
+              const res = this.alignImageBasedOnCircle(
                 input.imageA,
-                input.imageB,
+                im1,
                 input.widthA!,
                 input.heightA!,
-                input.widthB!,
-                input.heightB!,
-                false,
-                input.preference.numberofpointToMatch,
-                input.preference.numberofpointToMatch,
                 input.pageNumber,
+                input.preference,
                 input.debug,
               );
-              input.imageA = undefined;
-              input.imageB = undefined;
-
               res.pageNumber = input.pageNumber;
               observer.next(res);
               observer.complete();
-            } catch (error) {
-              console.error(error);
             }
-          } else {
-            const res = this.alignImageBasedOnCircle(
-              input.imageA,
-              input.imageB,
-              input.widthA!,
-              input.heightA!,
-              input.widthB!,
-              input.heightB!,
-              input.pageNumber,
-              input.preference,
-              input.debug,
-            );
-            res.pageNumber = input.pageNumber;
-            observer.next(res);
-            observer.complete();
           }
         })
+
         .catch(err => {
           console.log(err);
         });
@@ -180,11 +307,9 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
 
   alignImage(
     image_Aba: any,
-    image_Bba: any,
+    image_Bba: ImageData,
     widthA: number,
     heightA: number,
-    widthB: number,
-    heightB: number,
     allimage: boolean,
     numberofpointToMatch: number,
     numberofgoodpointToMatch: number,
@@ -193,7 +318,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
   ): any {
     //im2 is the original reference image we are trying to align to
     const image_A = new ImageData(new Uint8ClampedArray(image_Aba), widthA, heightA);
-    const image_B = new ImageData(new Uint8ClampedArray(image_Bba), widthB, heightB);
+    const image_B = image_Bba;
+    // new ImageData(new Uint8ClampedArray(image_Bba), widthB, heightB);
 
     const im2 = cv.matFromImageData(image_A);
     let _im1 = cv.matFromImageData(image_B);
@@ -409,11 +535,12 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       mat2.delete();
       h.delete();
       image_B_final_result.delete();
+      image_Bba.data.set([]);
       //  console.log('Good match for page ' + pageNumber);
     } else {
-      result['imageAligned'] = image_Bba.slice(0);
-      result['imageAlignedWidth'] = widthB;
-      result['imageAlignedHeight'] = heightB;
+      result['imageAligned'] = image_Bba.data.buffer;
+      result['imageAlignedWidth'] = image_Bba.width;
+      result['imageAlignedHeight'] = image_Bba.height;
       //      let matVec = new cv.MatVector();
       // Push a Mat back into MatVector
       /* matVec.push_back(im2);
@@ -440,6 +567,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
 
       //  console.log('no match for page ' + pageNumber);
     }
+    image_A.data.set([]);
     _im1.delete();
     im1.delete();
     im2.delete();
@@ -690,19 +818,17 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
 
   alignImageBasedOnCircle(
     image_Aba: any,
-    image_Bba: any,
+    image_Bba: ImageData,
     widthA: number,
     heightA: number,
-    widthB: number,
-    heightB: number,
     pageNumber: number,
     preference: IPreference,
     debug: boolean,
   ): any {
     //im2 is the original reference image we are trying to align to
     const imageA = new ImageData(new Uint8ClampedArray(image_Aba), widthA, heightA);
-    const imageB = new ImageData(new Uint8ClampedArray(image_Bba), widthB, heightB);
-
+    //    const imageB = new ImageData(new Uint8ClampedArray(image_Bba), widthB, heightB);
+    const imageB = image_Bba;
     let _srcMat = cv.matFromImageData(imageA);
     let srcMat = new cv.Mat(); ///cv.Mat.zeros(srcMat.rows, srcMat.cols, cv.CV_8U);
 
@@ -969,8 +1095,6 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         image_Bba,
         widthA,
         heightA,
-        widthB,
-        heightB,
         false,
         preference.numberofpointToMatch,
         preference.numberofgoodpointToMatch,

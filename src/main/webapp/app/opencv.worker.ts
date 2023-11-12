@@ -252,7 +252,6 @@ addEventListener('message', e => {
           });
         },
       };
-      console.error(e.data.payload.fronturl);
       let fronturl = '';
       if (e.data.payload.fronturl) {
         fronturl = e.data.payload.fronturl;
