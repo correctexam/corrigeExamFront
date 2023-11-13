@@ -53,6 +53,7 @@ import {
   faMagnifyingGlassArrowRight,
   faArrowRight,
   faAlignLeft,
+  faEdit,
 
   // jhipster-needle-add-icon-import
 } from '@fortawesome/free-solid-svg-icons';
@@ -112,5 +113,6 @@ export const fontAwesomeIcons = [
   faMagnifyingGlassArrowRight,
   faArrowRight,
   faAlignLeft,
+  faEdit,
   // jhipster-needle-add-icon-import
 ];

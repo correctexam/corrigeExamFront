@@ -299,6 +299,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                   }
                 });
                 this.currentTextComment4Question = com.body!;
+                this.currentTextComment4Question.forEach(com1 => {
+                  this.active.set(com1.id!, false);
+                });
               } else {
                 const com = await firstValueFrom(this.gradedCommentService.query({ questionId: questions![0].id }));
                 this.resp.gradedcomments!.forEach(com1 => {
@@ -308,6 +311,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                   }
                 });
                 this.currentGradedComment4Question = com.body!;
+                this.currentGradedComment4Question.forEach(com1 => {
+                  this.active.set(com1.id!, false);
+                });
               }
             } else {
               this.resp = new StudentResponse(undefined, this.currentNote);
@@ -320,9 +326,15 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               if (questions![0].gradeType === GradeType.DIRECT) {
                 const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
                 this.currentTextComment4Question = com.body!;
+                this.currentTextComment4Question.forEach(com1 => {
+                  this.active.set(com1.id!, false);
+                });
               } else {
                 const com = await firstValueFrom(this.gradedCommentService.query({ questionId: questions![0].id }));
                 this.currentGradedComment4Question = com.body!;
+                this.currentGradedComment4Question.forEach(com1 => {
+                  this.active.set(com1.id!, false);
+                });
               }
             }
           }
@@ -432,6 +444,14 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.currentKeyBoardShorcut = res[0].key;
       }
     }
+  }
+
+  active: Map<number, boolean> = new Map();
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  editComment(comment: any) {
+    this.active.set(comment.id, true);
+    this.minimizeComment = false;
   }
 
   resetAllShortCut() {
@@ -1486,6 +1506,15 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       });
     } else {
       this.textCommentService.update(l).subscribe(() => {});
+    }
+    if (l.id) {
+      this.active.set(l.id, false);
+    }
+  }
+
+  closeEditComment(l: IGradedComment | ITextComment) {
+    if (l.id) {
+      this.active.set(l.id, false);
     }
   }
 

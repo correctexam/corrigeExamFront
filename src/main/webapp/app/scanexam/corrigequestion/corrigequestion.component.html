@@ -475,8 +475,19 @@
                 >
                   <fa-icon icon="keyboard"></fa-icon>
                 </span>
+                <span class="float-end">&nbsp;&nbsp;</span>
+                <span
+                  class="float-end"
+                  [tooltipPosition]="'left'"
+                  [tooltipZIndex]="'3000'"
+                  [pTooltip]="'scanexam.editCommentTooltip' | translate"
+                  (click)="editComment(comment)"
+                >
+                  <fa-icon icon="edit"></fa-icon>
+                </span>
+
                 <div *ngIf="!minimizeComment">
-                  <p-inplace [closable]="true">
+                  <p-inplace [active]="active.get(comment.id)" [closable]="true" (onDeactivate)="closeEditComment(comment)">
                     <ng-template pTemplate="display">
                       <h5 class="card-title">{{ comment.text }}</h5>
                     </ng-template>
@@ -490,7 +501,7 @@
                       />
                     </ng-template>
                   </p-inplace>
-                  <p-inplace [closable]="true">
+                  <p-inplace [active]="active.get(comment.id)" [closable]="true" (onDeactivate)="closeEditComment(comment)">
                     <ng-template pTemplate="display">
                       <p class="card-text">{{ comment.description }}</p>
                     </ng-template>
@@ -568,6 +579,17 @@
                 >
                   <fa-icon icon="keyboard"></fa-icon>
                 </span>
+                <span *ngIf="currentQuestion?.typeAlgoName !== 'QCM'" class="float-end">&nbsp;&nbsp;</span>
+                <span
+                  *ngIf="currentQuestion?.typeAlgoName !== 'QCM'"
+                  class="float-end"
+                  [tooltipPosition]="'left'"
+                  [tooltipZIndex]="'3000'"
+                  [pTooltip]="'scanexam.editCommentTooltip' | translate"
+                  (click)="editComment(comment)"
+                >
+                  <fa-icon icon="edit"></fa-icon>
+                </span>
                 <div *ngIf="!minimizeComment">
                   <div *ngIf="currentQuestion?.typeAlgoName === 'QCM'">
                     <h5 class="card-title">{{ comment.text }}</h5>
@@ -575,7 +597,7 @@
                   </div>
 
                   <div *ngIf="currentQuestion?.typeAlgoName !== 'QCM'">
-                    <p-inplace [closable]="true">
+                    <p-inplace [closable]="true" [active]="active.get(comment.id)" (onDeactivate)="closeEditComment(comment)">
                       <ng-template pTemplate="display">
                         <h5 class="card-title">{{ comment.text }}</h5>
                       </ng-template>
@@ -589,7 +611,7 @@
                         />
                       </ng-template>
                     </p-inplace>
-                    <p-inplace [closable]="true">
+                    <p-inplace [closable]="true" [active]="active.get(comment.id)" (onDeactivate)="closeEditComment(comment)">
                       <ng-template pTemplate="display">
                         <p class="card-text">{{ comment.description }}</p>
                       </ng-template>
@@ -603,7 +625,7 @@
                         />
                       </ng-template>
                     </p-inplace>
-                    <p-inplace [closable]="true">
+                    <p-inplace [closable]="true" [active]="active.get(comment.id)" (onDeactivate)="closeEditComment(comment)">
                       <ng-template pTemplate="display">
                         <p class="card-text" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
                           <span jhiTranslate="scanexam.noteassociecomment"> Note associée à ce commentaire : </span>
