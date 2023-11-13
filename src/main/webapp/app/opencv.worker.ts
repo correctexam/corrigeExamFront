@@ -244,7 +244,7 @@ addEventListener('message', e => {
       //self.importScripts('./content/opencv/4/opencv.js')
       const self1 = self as any;
       self1['Module'] = {
-        scriptUrl: 'content/opencv/4/opencv.js',
+        scriptUrl: 'content/opencv/5/opencv.js',
         onRuntimeInitialized() {
           cv.then((cv1: any) => {
             cv = cv1;

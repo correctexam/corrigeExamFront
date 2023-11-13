@@ -107,7 +107,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
   opencvready: Promise<void> = new Promise<void>(resolve => {
     const self1 = self as any;
     self1['Module'] = {
-      scriptUrl: 'content/opencv/4/opencv.js',
+      scriptUrl: 'content/opencv/5/opencv.js',
       onRuntimeInitialized() {
         cv.then((cv1: any) => {
           cv = cv1;
@@ -206,9 +206,10 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
           }
 
           //    console.error('start worker');
-          const im = await this.getScanImage(input.pageNumber, input.examId, input.indexDb);
+          let im = await this.getScanImage(input.pageNumber, input.examId, input.indexDb);
           if (im !== undefined) {
             const im1 = await this.loadImage(im);
+            im = undefined;
             if (!input.marker) {
               try {
                 const res = this.alignImage(
@@ -305,6 +306,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     allimage: boolean,
     numberofpointToMatch: number,
     numberofgoodpointToMatch: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     debug: boolean,
   ): any {
     const image_A = new ImageData(new Uint8ClampedArray(image_Aba), widthA, heightA);
@@ -326,7 +328,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     cv.cvtColor(im1, im1Gray, cv.COLOR_BGRA2GRAY);
     cv.cvtColor(im2, im2Gray, cv.COLOR_BGRA2GRAY);
     //  console.log("pass par la 2 ", "page ", pageNumber)
-    const squareSizeorigin = Math.trunc(im2.size().width / 20);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const squareSizeorigin = Math.trunc(im2.size().width / 10);
     let points1: any[] = [];
     let points2: any[] = [];
     let result: any = {};
@@ -385,6 +388,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       res3 = true;
       res4 = true;
     }
+    // eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
     if (res1 && res2 && res3 && res4) {
       let mat1 = cv.matFromArray(points1.length / 2, 1, cv.CV_32FC2, points1);
       let mat2 = cv.matFromArray(points2.length / 2, 1, cv.CV_32FC2, points2);
@@ -416,7 +420,6 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         result['imagesDebugTracesWidth'] = dstdebug.size().width;
         result['imagesDebugTracesHeight'] = dstdebug.size().height;
         result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
-        // dstdebug.delete();
         matVec.delete();
       }
       result['imageAlignedWidth'] = image_B_final_result.size().width;
@@ -463,16 +466,11 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     numberofpointToMatch: number,
     numberofgoodpointToMatch: number,
   ): boolean {
-    // console.log("pass par la 4 ", "page ", pageNumber + "zone " + ii)
-
     let im1Graydst = new cv.Mat();
     im1Graydst = this.roi(im1Gray, zone1);
 
-    //   console.log("pass par la 45 ", "page ", pageNumber + "zone " + ii)
-
     let im2Graydst = new cv.Mat();
     im2Graydst = this.roi(im2Gray, zone1);
-    //  console.log("pass par la 5 ", "page ", pageNumber + "zone " + ii)
 
     let keypoints1 = new cv.KeyPointVector();
     let keypoints2 = new cv.KeyPointVector();
@@ -484,12 +482,19 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     let tmp2 = im2Graydst;
     orb.detectAndCompute(im1Graydst, tmp1, keypoints1, descriptors1);
     orb.detectAndCompute(im2Graydst, tmp2, keypoints2, descriptors2);
+    const im1GraydstWidth = im1Graydst.size().width;
+    const im1GraydstHeight = im1Graydst.size().height;
+    im1Graydst.delete();
+    im2Graydst.delete();
+    orb.delete();
 
     let good_matches = new cv.DMatchVector();
 
     let bf = new cv.BFMatcher();
     let matches = new cv.DMatchVectorVector();
     bf.knnMatch(descriptors1, descriptors2, matches, 2);
+    descriptors1.delete();
+    descriptors2.delete();
 
     //  let counter = 0;
     for (let i = 0; i < matches.size(); ++i) {
@@ -501,7 +506,16 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         good_matches.push_back(dMatch1);
       }
     }
-    //  console.log("pass par la 6 ", "page ", pageNumber + "zone " + ii)
+
+    if (good_matches.size() === 0) {
+      keypoints1.delete();
+      keypoints2.delete();
+      matches.delete();
+      good_matches.delete();
+      bf.delete();
+
+      return false;
+    }
 
     let points1tmp: number[] = [];
     let points2tmp: number[] = [];
@@ -514,25 +528,6 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     let goodmatchtokeep = 0;
     let distances = [];
 
-    if (good_matches.size() === 0) {
-      orb.delete();
-      keypoints1.delete();
-      keypoints2.delete();
-      descriptors1.delete();
-      descriptors2.delete();
-      //      tmp1.delete();
-      //      tmp2.delete();
-      im1Graydst.delete();
-      im2Graydst.delete();
-      matches.delete();
-      good_matches.delete();
-      bf.delete();
-      //       im1Graydst.delete();
-      //      im2Graydst.delete();
-
-      return false;
-    }
-    //  console.log("pass par la 7 ", "page ", pageNumber + "zone " + ii)
     const indexGood = [];
     for (let i = 0; i < good_matches.size(); i++) {
       let distancesquare =
@@ -540,7 +535,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         (points1tmp[2 * i + 1] - points2tmp[2 * i + 1]) * (points1tmp[2 * i + 1] - points2tmp[2 * i + 1]);
       // TODO compute average points
 
-      if (distancesquare < Math.trunc((3 * im1Graydst.size().width) / 20) * Math.trunc((3 * im1Graydst.size().height) / 20)) {
+      if (distancesquare < Math.trunc((3 * im1GraydstWidth) / 20) * Math.trunc((3 * im1GraydstHeight) / 20)) {
         distances.push(distancesquare);
         goodmatchtokeep = goodmatchtokeep + 1;
         indexGood.push(i);
@@ -552,15 +547,9 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     if (devs < 1) {
       devs = 1;
     }
-    //    console.error('first match' , goodmatchtokeep, numberofpointToMatch)
     if (goodmatchtokeep <= numberofpointToMatch) {
-      orb.delete();
       keypoints1.delete();
       keypoints2.delete();
-      descriptors1.delete();
-      descriptors2.delete();
-      im1Graydst.delete();
-      im2Graydst.delete();
       matches.delete();
       good_matches.delete();
       bf.delete();
@@ -583,18 +572,12 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     }
 
     if (realgoodmatchtokeep <= numberofgoodpointToMatch) {
-      orb.delete();
       keypoints1.delete();
       keypoints2.delete();
-      descriptors1.delete();
-      descriptors2.delete();
-      //      tmp1.delete();
-      //      tmp2.delete();
-      im1Graydst.delete();
-      im2Graydst.delete();
       matches.delete();
       good_matches.delete();
       bf.delete();
+
       return false;
     } else {
       const good_matchesToKeep: number[] = [];
@@ -628,28 +611,17 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       good_matchesToKeep.push(intergood_matchesToKeep[3]);
       good_matchesToKeep.push(intergood_matchesToKeep[4]);
 
-      // console.error('last realgoodmatchtokeep', good_matchesToKeep.length, numberofgoodpointToMatch);
-
       good_matchesToKeep.forEach(i => {
         points1.push(keypoints1.get(good_matches.get(+i).queryIdx).pt.x + zone1.x);
         points1.push(keypoints1.get(good_matches.get(+i).queryIdx).pt.y + zone1.y);
         points2.push(keypoints2.get(good_matches.get(+i).trainIdx).pt.x + zone1.x);
         points2.push(keypoints2.get(good_matches.get(+i).trainIdx).pt.y + zone1.y);
       });
-      orb.delete();
       keypoints1.delete();
       keypoints2.delete();
-      descriptors1.delete();
-      descriptors2.delete();
-      //      tmp1.delete();
-      //      tmp2.delete();
-      im1Graydst.delete();
-      im2Graydst.delete();
       matches.delete();
       good_matches.delete();
       bf.delete();
-
-      // console.log('good match for zone ' + ii + ' = ' + realgoodmatchtokeep);
 
       return true;
     }
@@ -911,18 +883,13 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
 
       _srcMat.delete();
       srcMat.delete();
-      //      dst.delete();
       circlesMat.delete();
       srcMat1.delete();
-      // srcMat2.delete();
-      //      _srcMat2.delete();
       circlesMat1.delete();
       srcTri.delete();
       dstTri.delete();
-      //      dst1.delete();
       M.delete();
 
-      //      console.error('find circle');
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return result;
     } else {
@@ -934,8 +901,6 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       srcMat2.delete();
       //    _srcMat2.delete();
       circlesMat1.delete();
-
-      //  console.error('cannot find circle');
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return this.alignImage(

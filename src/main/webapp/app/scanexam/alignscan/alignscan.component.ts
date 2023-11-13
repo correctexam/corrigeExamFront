@@ -36,8 +36,6 @@ export interface IPage {
   height?: number;
 }
 
-const nbreCore = 10; // navigator.hardwareConcurrency - 2;
-
 @Component({
   selector: 'jhi-align-scan',
   templateUrl: './alignscan.component.html',
@@ -113,6 +111,10 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   _showVignette = false;
   showMapping = false;
 
+  layoutsidebarVisible = false;
+  nbreCore = navigator.hardwareConcurrency - 2;
+  nbreCoreMax = navigator.hardwareConcurrency - 2;
+
   constructor(
     public examService: ExamService,
     protected activatedRoute: ActivatedRoute,
@@ -176,7 +178,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
 
     fromWorkerPool<IImageAlignementInput, IImageAlignement>(worker1, this.observable, {
       selectTransferables: input => [input.imageA],
-      workerCount: nbreCore,
+      workerCount: this.nbreCore,
       fallbackWorkerCount: 3,
     }).subscribe(
       (e: IImageAlignement) => {
@@ -355,7 +357,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     }
 
     while (
-      this.currentPageAlign < this.startPage + Math.floor(nbreCore * 1.5) /* (navigator.hardwareConcurrency - 1) /* * 2 */ &&
+      this.currentPageAlign < this.startPage + Math.floor(this.nbreCore * 1.5) /* (navigator.hardwareConcurrency - 1) /* * 2 */ &&
       this.currentPageAlign < this.numberPagesInScan + 1
     ) {
       this.observerPage!.next(this.currentPageAlign);

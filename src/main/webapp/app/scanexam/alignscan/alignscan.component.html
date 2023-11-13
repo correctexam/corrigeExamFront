@@ -35,10 +35,38 @@
       <div class="col-4"></div>
     </div>
   </p-blockUI>
+  <p-sidebar [(visible)]="layoutsidebarVisible">
+    <h3 jhiTranslate="scanexam.alignoptions">Layout options</h3>
+
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <label><span jhiTranslate="scanexam.nbreCore"> Nombre de coeur: </span>&nbsp; <span> </span> ({{ nbreCore }})</label>
+      <p-slider
+        [(ngModel)]="nbreCore"
+        [min]="1"
+        [max]="nbreCoreMax"
+        [step]="1"
+        [pTooltip]="'scanexam.nbreCoreTooltip' | translate"
+        [tooltipZIndex]="'3000'"
+        [tooltipPosition]="'right'"
+      >
+      </p-slider>
+    </div>
+  </p-sidebar>
 
   <div class="sm:col-12 md:col-12 lg:col-12 xl:col-12">
     <div class="grid grid-nogutter">
-      <div class="col-12 md:col-4">
+      <div class="col-12 md:col-1">
+        <p-button
+          class="sm:text-xs md:text-xs lg:text-base"
+          styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
+          (click)="layoutsidebarVisible = true"
+          icon="pi pi-arrow-right"
+          [pTooltip]="'scanexam.showLayoutOptionsTooltip' | translate"
+          [tooltipPosition]="'right'"
+          [disabled]="blocked"
+        ></p-button>
+      </div>
+      <div class="col-12 md:col-3">
         <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" jhiTranslate="scanexam.align">Aligner scans</h2>
       </div>
       <div class="col-12 md:col-8 flex flex-row-reverse">
