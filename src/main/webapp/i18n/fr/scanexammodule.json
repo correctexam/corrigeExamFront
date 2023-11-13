@@ -414,6 +414,7 @@
     "pasdepageassocieePreviousTooltip": "Il n'y a aucune copie à associer avant cette copie",
     "alignoptions": "Options de l'algorithme",
     "nbreCore": "Nombre de coeur(s) utilisé(s)",
-    "nbreCoreTooltip": "Plus vous utilisez un nombre de coeur élevé pour faire cet opération d'alignement, plus vous consomerez des resources CPU mais surtout mémoire. N'hésitez pas à descendre ce chiffres si cette étpe solicite trop votre navigateur"
+    "nbreCoreTooltip": "Plus vous utilisez un nombre de coeur élevé pour faire cet opération d'alignement, plus vous consomerez des resources CPU mais surtout mémoire. N'hésitez pas à descendre ce chiffres si cette étpe solicite trop votre navigateur",
+    "showAlignementOptionsTooltip": "Permet de modifier certaines options associées à l'algorithme d'alignement des copies"
   }
 }
