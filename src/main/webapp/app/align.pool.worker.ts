@@ -9,6 +9,7 @@ declare let cv: any;
 
 import { DoTransferableWorkUnit, runWorker } from 'observable-webworker';
 import { Observable } from 'rxjs';
+import { AlignImage, AppDB, NonAlignImage } from './scanexam/db/db';
 
 interface IImageAlignement {
   imageAligned?: ArrayBuffer;
@@ -22,17 +23,16 @@ interface IImageAlignement {
 
 interface IImageAlignementInput {
   imageA?: ArrayBuffer;
-  imageB?: ArrayBuffer;
   marker?: boolean;
   x?: number;
   y?: number;
   widthA?: number;
   heightA?: number;
-  widthB?: number;
-  heightB?: number;
   pageNumber: number;
   preference: IPreference;
   debug: boolean;
+  examId: number;
+  indexDb: boolean;
 }
 
 export interface IPreference {
@@ -53,11 +53,61 @@ export interface IPreference {
   defaultAlignAlgowithMarker: boolean;
 }
 
+let _sqlite3: any;
+const dbs = new Map<number, DB>();
+
+class DB {
+  db: any;
+
+  constructor(public examName: number) {}
+
+  error(...args: string[]): void {
+    console.error(...args);
+  }
+
+  initDb(sqlite3: any): void {
+    if (this.db === undefined || !this.db.isOpen()) {
+      const oo = sqlite3.oo1; /*high-level OO API*/
+      if (sqlite3.opfs) {
+        //        console.time('open');
+        this.db = new oo.OpfsDb('/' + this.examName + '.sqlite3');
+        //        console.timeEnd('open');
+      } else {
+        this.db = new oo.DB('/' + this.examName + '.sqlite3', 'ct');
+      }
+    }
+  }
+
+  close(): void {
+    this.db.close();
+  }
+
+  initemptyDb(sqlite3: any): void {
+    this.initDb(sqlite3);
+    try {
+      this.db.exec('CREATE TABLE IF NOT EXISTS template(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
+      this.db.exec('CREATE TABLE IF NOT EXISTS align(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
+      this.db.exec('CREATE TABLE IF NOT EXISTS nonalign(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
+    } finally {
+      this.close();
+    }
+  }
+
+  getFirstNonAlignImage(sqlite3: any, pageInscan: number): any {
+    //    console.error("getFirstNonAlignImage",data.payload.pageInscan, t)
+    this.initDb(sqlite3);
+    try {
+      return this.db.selectValue('select imageData from nonalign where page=' + pageInscan);
+    } finally {
+      this.close();
+    }
+  }
+}
 export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlignementInput, IImageAlignement> {
   opencvready: Promise<void> = new Promise<void>(resolve => {
     const self1 = self as any;
     self1['Module'] = {
-      scriptUrl: 'content/opencv/4/opencv.js',
+      scriptUrl: 'content/opencv/5/opencv.js',
       onRuntimeInitialized() {
         cv.then((cv1: any) => {
           cv = cv1;
@@ -73,53 +123,122 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     };
     self1.importScripts(self1['Module'].scriptUrl);
   });
+  db: AppDB | undefined;
+  initSqlLite = false;
+  sqlliteReady: (sqlite: boolean) => Promise<void> = (sqlite: boolean) =>
+    sqlite
+      ? new Promise<void>(resolve => {
+          const self1 = self as any;
+          self1['Module'] = {
+            scriptUrl: 'content/sqlite/sqlite3.js',
+          };
+
+          // Load and await the .js OpenCV
+          self1.importScripts(self1['Module'].scriptUrl);
+          // const db1 = new DB(e.data.exam);
+          // dbs.set(e.data.exam, db1);
+          self1
+            .sqlite3InitModule({
+              print: console.log,
+              printErr: console.error,
+            })
+            .then(function (sqlite3var: any) {
+              _sqlite3 = sqlite3var;
+              resolve();
+            })
+            .catch((err: any) => {
+              console.log(err);
+            });
+        })
+      : new Promise<void>(resolve => {
+          resolve();
+        });
+
+  reviver(key: any, value: any): any {
+    if (typeof value === 'object' && value !== null) {
+      if (value.dataType === 'Map') {
+        return new Map(value.value);
+      }
+    }
+    return value;
+  }
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-unused-vars
+  async loadImage(ii: NonAlignImage | AlignImage): Promise<ImageData> {
+    const image = JSON.parse(ii.value, this.reviver);
+    const res = await fetch(image.pages);
+    const blob = await res.blob();
+    const imageBitmap = await createImageBitmap(blob);
+    const editedImage = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
+    const ctx = editedImage.getContext('2d');
+    ctx!.drawImage(imageBitmap, 0, 0);
+    return ctx!.getImageData(0, 0, imageBitmap.width, imageBitmap.height);
+  }
+
+  async getScanImage(page: number, examId: number, indexDb: boolean): Promise<NonAlignImage | AlignImage | undefined> {
+    if (indexDb) {
+      if (this.db === undefined) {
+        this.db = new AppDB();
+      }
+      return await this.db.getFirstNonAlignImage(examId, page);
+    } else {
+      let db1 = dbs.get(examId);
+      if (db1 === undefined) {
+        db1 = new DB(examId);
+        dbs.set(examId, db1);
+      }
+
+      return {
+        examId,
+
+        pageNumber: page,
+        value: db1.getFirstNonAlignImage(_sqlite3, page),
+      };
+    }
+  }
 
   public workUnit(input: IImageAlignementInput): Observable<IImageAlignement> {
     return new Observable(observer => {
       this.opencvready
-        .then(() => {
-          //    console.error('start worker');
-          if (!input.marker) {
-            try {
-              const res = this.alignImage(
-                input.imageA,
-                input.imageB,
-                input.widthA!,
-                input.heightA!,
-                input.widthB!,
-                input.heightB!,
-                false,
-                input.preference.numberofpointToMatch,
-                input.preference.numberofpointToMatch,
-                input.pageNumber,
-                input.debug,
-              );
-              input.imageA = undefined;
-              input.imageB = undefined;
+        .then(async () => {
+          if (!input.indexDb && !this.initSqlLite) {
+            await this.sqlliteReady(!input.indexDb);
+            this.initSqlLite = true;
+          }
 
+          //    console.error('start worker');
+          let im = await this.getScanImage(input.pageNumber, input.examId, input.indexDb);
+          if (im !== undefined) {
+            const im1 = await this.loadImage(im);
+            im = undefined;
+            if (!input.marker) {
+              try {
+                const res = this.alignImage(
+                  input.imageA,
+                  im1,
+                  input.widthA!,
+                  input.heightA!,
+                  false,
+                  input.preference.numberofpointToMatch,
+                  input.preference.numberofpointToMatch,
+                  input.debug,
+                );
+                input.imageA = undefined;
+
+                res.pageNumber = input.pageNumber;
+                observer.next(res);
+                observer.complete();
+              } catch (error) {
+                console.error(error);
+              }
+            } else {
+              const res = this.alignImageBasedOnCircle(input.imageA, im1, input.widthA!, input.heightA!, input.preference, input.debug);
               res.pageNumber = input.pageNumber;
               observer.next(res);
               observer.complete();
-            } catch (error) {
-              console.error(error);
             }
-          } else {
-            const res = this.alignImageBasedOnCircle(
-              input.imageA,
-              input.imageB,
-              input.widthA!,
-              input.heightA!,
-              input.widthB!,
-              input.heightB!,
-              input.pageNumber,
-              input.preference,
-              input.debug,
-            );
-            res.pageNumber = input.pageNumber;
-            observer.next(res);
-            observer.complete();
           }
         })
+
         .catch(err => {
           console.log(err);
         });
@@ -135,7 +254,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
 
   imageDataFromMat(mat: any): any {
     // convert the mat type to cv.CV_8U
-    const img = new cv.Mat();
+    const img = mat; //new cv.Mat();
     const depth = mat.type() % 8;
     const scale = depth <= cv.CV_8S ? 1.0 : depth <= cv.CV_32S ? 1.0 / 256.0 : 255.0;
     const shift = depth === cv.CV_8S || depth === cv.CV_16S ? 128.0 : 0.0;
@@ -155,7 +274,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         throw new Error('Bad number of channels (Source image must have 1, 3 or 4 channels)');
     }
     const clampedArray = new ImageData(new Uint8ClampedArray(img.data), img.cols, img.rows);
-    img.delete();
+    //    img.delete();
+    mat.delete();
     return clampedArray;
   }
 
@@ -180,37 +300,36 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
 
   alignImage(
     image_Aba: any,
-    image_Bba: any,
+    image_Bba: ImageData,
     widthA: number,
     heightA: number,
-    widthB: number,
-    heightB: number,
     allimage: boolean,
     numberofpointToMatch: number,
     numberofgoodpointToMatch: number,
-    pageNumber: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     debug: boolean,
   ): any {
-    //im2 is the original reference image we are trying to align to
     const image_A = new ImageData(new Uint8ClampedArray(image_Aba), widthA, heightA);
-    const image_B = new ImageData(new Uint8ClampedArray(image_Bba), widthB, heightB);
+    const image_B = image_Bba;
 
     const im2 = cv.matFromImageData(image_A);
     let _im1 = cv.matFromImageData(image_B);
+    let im1 = _im1;
+    if (im2.size().width !== _im1.size().width || im2.size().height !== _im1.size().height) {
+      im1 = new cv.Mat();
+      let dsize = new cv.Size(im2.size().width, im2.size().height);
+      // You can try more different parameters
+      cv.resize(_im1, im1, dsize, 0, 0, cv.INTER_AREA);
+      _im1.delete();
+    }
 
-    let im1 = new cv.Mat();
-    let dsize = new cv.Size(im2.size().width, im2.size().height);
-    // You can try more different parameters
-    cv.resize(_im1, im1, dsize, 0, 0, cv.INTER_AREA);
-    //TODO delete _im1
-
-    //  console.log("pass par la 1 ", "page ", pageNumber)
     let im1Gray = new cv.Mat();
     let im2Gray = new cv.Mat();
     cv.cvtColor(im1, im1Gray, cv.COLOR_BGRA2GRAY);
     cv.cvtColor(im2, im2Gray, cv.COLOR_BGRA2GRAY);
     //  console.log("pass par la 2 ", "page ", pageNumber)
-    const squareSizeorigin = Math.trunc(im2.size().width / 20);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const squareSizeorigin = Math.trunc(im2.size().width / 10);
     let points1: any[] = [];
     let points2: any[] = [];
     let result: any = {};
@@ -225,19 +344,10 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       let squareSize = squareSizeorigin;
       while (!res1 && squareSize < (minPageWidth * 3) / 4 && squareSize < (minPageHeight * 2) / 3) {
         let zone1 = new cv.Rect(0, 0, squareSize, squareSize);
+
         //   console.log("pass par la 3 ", "page ", pageNumber)
 
-        res1 = this.matchSmallImage(
-          im1Gray,
-          im2Gray,
-          points1,
-          points2,
-          zone1,
-          1,
-          numberofpointToMatch,
-          numberofgoodpointToMatch,
-          pageNumber,
-        );
+        res1 = this.matchSmallImage(im1Gray, im2Gray, points1, points2, zone1, numberofpointToMatch, numberofgoodpointToMatch);
         if (!res1) {
           squareSize = squareSize + Math.trunc(minPageWidth / 10);
         }
@@ -246,17 +356,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       squareSize = squareSizeorigin;
       while (!res2 && squareSize < (minPageWidth * 3) / 4 && squareSize < (minPageHeight * 2) / 3) {
         let zone2 = new cv.Rect(minPageWidth - squareSize, 0, minPageWidth, squareSize);
-        res2 = this.matchSmallImage(
-          im1Gray,
-          im2Gray,
-          points1,
-          points2,
-          zone2,
-          2,
-          numberofpointToMatch,
-          numberofgoodpointToMatch,
-          pageNumber,
-        );
+        res2 = this.matchSmallImage(im1Gray, im2Gray, points1, points2, zone2, numberofpointToMatch, numberofgoodpointToMatch);
         if (!res2) {
           squareSize = squareSize + Math.trunc(minPageWidth / 10);
         }
@@ -265,17 +365,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       squareSize = squareSizeorigin;
       while (!res3 && squareSize < (minPageWidth * 3) / 4 && squareSize < (minPageHeight * 2) / 3) {
         let zone3 = new cv.Rect(0, minPageHeight - squareSize, squareSize, minPageHeight);
-        res3 = this.matchSmallImage(
-          im1Gray,
-          im2Gray,
-          points1,
-          points2,
-          zone3,
-          3,
-          numberofpointToMatch,
-          numberofgoodpointToMatch,
-          pageNumber,
-        );
+        res3 = this.matchSmallImage(im1Gray, im2Gray, points1, points2, zone3, numberofpointToMatch, numberofgoodpointToMatch);
 
         if (!res3) {
           squareSize = squareSize + Math.trunc(minPageWidth / 10);
@@ -285,100 +375,29 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       squareSize = squareSizeorigin;
       while (!res4 && squareSize < (minPageWidth * 3) / 4 && squareSize < (minPageHeight * 2) / 3) {
         let zone4 = new cv.Rect(minPageWidth - squareSize, minPageHeight - squareSize, minPageWidth, minPageHeight);
-        res4 = this.matchSmallImage(
-          im1Gray,
-          im2Gray,
-          points1,
-          points2,
-          zone4,
-          4,
-          numberofpointToMatch,
-          numberofgoodpointToMatch,
-          pageNumber,
-        );
+        res4 = this.matchSmallImage(im1Gray, im2Gray, points1, points2, zone4, numberofpointToMatch, numberofgoodpointToMatch);
         if (!res4) {
           squareSize = squareSize + Math.trunc(minPageWidth / 10);
         }
       }
     } else {
       let zone6 = new cv.Rect(0, 0, minPageWidth, minPageHeight);
-      res1 = this.matchSmallImage(im1Gray, im2Gray, points1, points2, zone6, 1, numberofpointToMatch, numberofgoodpointToMatch, pageNumber);
+      res1 = this.matchSmallImage(im1Gray, im2Gray, points1, points2, zone6, numberofpointToMatch, numberofgoodpointToMatch);
 
       res2 = true;
       res3 = true;
       res4 = true;
     }
-    //    console.log('points1:', points1, 'points2:', points2);
+    // eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
     if (res1 && res2 && res3 && res4) {
-      /*if (points1.length % 4 !== 0){
-        const t =points1.length % 4;
-        console.error(t);
-        points1 = points1.splice(0,points1.length -t);
-
-      }*/
-      //      let mat1 = cv.matFromArray(points1.length/2, 1, cv.CV_32FC1, points1);
-      //      let mat2 = cv.matFromArray(4, 1, cv.CV_32FC2, points2);
-
       let mat1 = cv.matFromArray(points1.length / 2, 1, cv.CV_32FC2, points1);
       let mat2 = cv.matFromArray(points2.length / 2, 1, cv.CV_32FC2, points2);
 
-      // let h = cv.findHomography(mat1, mat2, cv.RANSAC);
-
       let h = cv.findHomography(mat1, mat2, cv.RANSAC);
 
-      /*      if (h.empty())
-      {
+      let image_B_final_result = im1;
+      cv.warpPerspective(image_B_final_result, image_B_final_result, h, im2.size());
 
-        alert("homography matrix empty!");
-        return;
-      }
-      else{
-        let good_inlier_matches = new cv.DMatchVector();
-        for (let i = 0; i < findHomographyMask.rows; i=i+2) {
-                 if(findHomographyMask.data[i] === 1 || findHomographyMask.data[i+1] === 1) {
-              let x = points2[i];
-              let y = points2[i + 1];
-              for (let j = 0; j < keypoints2.size(); ++j) {
-          if (x === keypoints2.get(j).pt.x && y === keypoints2.get(j).pt.y) {
-             for (let k = 0; k < good_matches.size(); ++k) {
-            if (j === good_matches.get(k).trainIdx) {
-                     good_inlier_matches.push_back(good_matches.get(k));
-            }
-             }
-          }
-             }
-                 }
-        }
-        var inlierMatches = new cv.Mat();
-        let color = new cv.Scalar(0, 255, 0, 255);
-        cv.drawMatches(im1, keypoints1, im2, keypoints2, good_inlier_matches, inlierMatches, color);
-       // cv.imshow('inlierMatches', inlierMatches);
-*/
-
-      // TODO pass the canvas
-
-      //let M = cv.getPerspectiveTransform(mat1, mat2);
-
-      /*  if (h.empty()) {
-         console.log('homography matrix empty!');
-         return;
-       } */
-
-      //      let mat1 = cv.matFromArray(4, 1, cv.CV_32FC2, points1);
-      //     let mat2 = cv.matFromArray(4, 1, cv.CV_32FC2, points2);
-
-      let image_B_final_result = new cv.Mat();
-      cv.warpPerspective(im1, image_B_final_result, h, im2.size());
-
-      //            let M = cv.getPerspectiveTransform(mat1, mat2);
-      //      let image_B_final_result = new cv.Mat();
-      //      console.error(points1, points2);
-
-      //    cv.warpPerspective(im1, image_B_final_result, M, im2.size(), cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
-
-      result['imageAligned'] = this.imageDataFromMat(image_B_final_result).data.buffer;
-      result['imageAlignedWidth'] = image_B_final_result.size().width;
-      result['imageAlignedHeight'] = image_B_final_result.size().height;
       if (debug) {
         let matVec = new cv.MatVector();
         // Push a Mat back into MatVector
@@ -398,30 +417,20 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
           cv.line(dstdebug, p1, p2, [0, 255, 0, 255], 1);
         }
 
-        result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
         result['imagesDebugTracesWidth'] = dstdebug.size().width;
         result['imagesDebugTracesHeight'] = dstdebug.size().height;
+        result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
+        matVec.delete();
       }
+      result['imageAlignedWidth'] = image_B_final_result.size().width;
+      result['imageAlignedHeight'] = image_B_final_result.size().height;
+      result['imageAligned'] = this.imageDataFromMat(image_B_final_result).data.buffer;
 
       mat1.delete();
       mat2.delete();
       h.delete();
-      image_B_final_result.delete();
-      //  console.log('Good match for page ' + pageNumber);
+      image_Bba.data.set([]);
     } else {
-      result['imageAligned'] = image_Bba.slice(0);
-      result['imageAlignedWidth'] = widthB;
-      result['imageAlignedHeight'] = heightB;
-      //      let matVec = new cv.MatVector();
-      // Push a Mat back into MatVector
-      /* matVec.push_back(im2);
-      matVec.push_back(im1);
-      let dstdebug = new cv.Mat();
-      // cv.hconcat(matVec,dstdebug);
-      result['imagesDebugTraces'] = image_Bba.slice(0);
-      result['imagesDebugTracesWidth'] = widthB;
-      result['imagesDebugTracesHeight'] = heightB; */
-
       if (debug) {
         let matVec = new cv.MatVector();
         // Push a Mat back into MatVector
@@ -429,15 +438,19 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         matVec.push_back(im1);
         let dstdebug = new cv.Mat();
         cv.hconcat(matVec, dstdebug);
-        result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
         result['imagesDebugTracesWidth'] = dstdebug.size().width;
         result['imagesDebugTracesHeight'] = dstdebug.size().height;
+        result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
+        matVec.delete();
       }
+      result['imageAligned'] = image_Bba.data.buffer;
+      result['imageAlignedWidth'] = image_Bba.width;
+      result['imageAlignedHeight'] = image_Bba.height;
 
-      //  console.log('no match for page ' + pageNumber);
+      im1.delete();
     }
-    _im1.delete();
-    im1.delete();
+    image_A.data.set([]);
+    //_im1.delete();
     im2.delete();
     im1Gray.delete();
     im2Gray.delete();
@@ -450,22 +463,14 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     points1: any[],
     points2: any[],
     zone1: any,
-    ii: number,
     numberofpointToMatch: number,
     numberofgoodpointToMatch: number,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _pageNumber: number,
   ): boolean {
-    // console.log("pass par la 4 ", "page ", pageNumber + "zone " + ii)
-
     let im1Graydst = new cv.Mat();
     im1Graydst = this.roi(im1Gray, zone1);
 
-    //   console.log("pass par la 45 ", "page ", pageNumber + "zone " + ii)
-
     let im2Graydst = new cv.Mat();
     im2Graydst = this.roi(im2Gray, zone1);
-    //  console.log("pass par la 5 ", "page ", pageNumber + "zone " + ii)
 
     let keypoints1 = new cv.KeyPointVector();
     let keypoints2 = new cv.KeyPointVector();
@@ -473,16 +478,23 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     let descriptors2 = new cv.Mat();
 
     let orb = new cv.AKAZE();
-    let tmp1 = new cv.Mat();
-    let tmp2 = new cv.Mat();
+    let tmp1 = im1Graydst;
+    let tmp2 = im2Graydst;
     orb.detectAndCompute(im1Graydst, tmp1, keypoints1, descriptors1);
     orb.detectAndCompute(im2Graydst, tmp2, keypoints2, descriptors2);
+    const im1GraydstWidth = im1Graydst.size().width;
+    const im1GraydstHeight = im1Graydst.size().height;
+    im1Graydst.delete();
+    im2Graydst.delete();
+    orb.delete();
 
     let good_matches = new cv.DMatchVector();
 
     let bf = new cv.BFMatcher();
     let matches = new cv.DMatchVectorVector();
     bf.knnMatch(descriptors1, descriptors2, matches, 2);
+    descriptors1.delete();
+    descriptors2.delete();
 
     //  let counter = 0;
     for (let i = 0; i < matches.size(); ++i) {
@@ -494,7 +506,16 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         good_matches.push_back(dMatch1);
       }
     }
-    //  console.log("pass par la 6 ", "page ", pageNumber + "zone " + ii)
+
+    if (good_matches.size() === 0) {
+      keypoints1.delete();
+      keypoints2.delete();
+      matches.delete();
+      good_matches.delete();
+      bf.delete();
+
+      return false;
+    }
 
     let points1tmp: number[] = [];
     let points2tmp: number[] = [];
@@ -507,33 +528,14 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     let goodmatchtokeep = 0;
     let distances = [];
 
-    if (good_matches.size() === 0) {
-      orb.delete();
-      keypoints1.delete();
-      keypoints2.delete();
-      descriptors1.delete();
-      descriptors2.delete();
-      tmp1.delete();
-      tmp2.delete();
-      im1Graydst.delete();
-      im2Graydst.delete();
-      matches.delete();
-      good_matches.delete();
-      bf.delete();
-      return false;
-    }
-    //  console.log("pass par la 7 ", "page ", pageNumber + "zone " + ii)
     const indexGood = [];
     for (let i = 0; i < good_matches.size(); i++) {
       let distancesquare =
         (points1tmp[2 * i] - points2tmp[2 * i]) * (points1tmp[2 * i] - points2tmp[2 * i]) +
         (points1tmp[2 * i + 1] - points2tmp[2 * i + 1]) * (points1tmp[2 * i + 1] - points2tmp[2 * i + 1]);
       // TODO compute average points
-      //  console.error('distancesquare', distancesquare)
-      //  console.error('maxdistance', Math.trunc((3 * im1Graydst.size().width) / 20) * Math.trunc((3 * im1Graydst.size().width) / 20))
 
-      if (distancesquare < Math.trunc((3 * im1Graydst.size().width) / 20) * Math.trunc((3 * im1Graydst.size().height) / 20)) {
-        //   console.error('pass par la')
+      if (distancesquare < Math.trunc((3 * im1GraydstWidth) / 20) * Math.trunc((3 * im1GraydstHeight) / 20)) {
         distances.push(distancesquare);
         goodmatchtokeep = goodmatchtokeep + 1;
         indexGood.push(i);
@@ -545,17 +547,9 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     if (devs < 1) {
       devs = 1;
     }
-    //    console.error('first match' , goodmatchtokeep, numberofpointToMatch)
     if (goodmatchtokeep <= numberofpointToMatch) {
-      orb.delete();
       keypoints1.delete();
       keypoints2.delete();
-      descriptors1.delete();
-      descriptors2.delete();
-      tmp1.delete();
-      tmp2.delete();
-      im1Graydst.delete();
-      im2Graydst.delete();
       matches.delete();
       good_matches.delete();
       bf.delete();
@@ -577,25 +571,16 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       }
     }
 
-    // console.log(realgoodmatchtokeep)
-    //  console.error('first realgoodmatchtokeep', realgoodmatchtokeep, numberofgoodpointToMatch);
-
     if (realgoodmatchtokeep <= numberofgoodpointToMatch) {
-      orb.delete();
       keypoints1.delete();
       keypoints2.delete();
-      descriptors1.delete();
-      descriptors2.delete();
-      tmp1.delete();
-      tmp2.delete();
-      im1Graydst.delete();
-      im2Graydst.delete();
       matches.delete();
       good_matches.delete();
       bf.delete();
+
       return false;
     } else {
-      let good_matchesToKeep: number[] = [];
+      const good_matchesToKeep: number[] = [];
       const distancesfinal: number[] = [];
       intergood_matchesToKeep.forEach(i => {
         const distancesquare =
@@ -626,28 +611,17 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       good_matchesToKeep.push(intergood_matchesToKeep[3]);
       good_matchesToKeep.push(intergood_matchesToKeep[4]);
 
-      // console.error('last realgoodmatchtokeep', good_matchesToKeep.length, numberofgoodpointToMatch);
-
       good_matchesToKeep.forEach(i => {
         points1.push(keypoints1.get(good_matches.get(+i).queryIdx).pt.x + zone1.x);
         points1.push(keypoints1.get(good_matches.get(+i).queryIdx).pt.y + zone1.y);
         points2.push(keypoints2.get(good_matches.get(+i).trainIdx).pt.x + zone1.x);
         points2.push(keypoints2.get(good_matches.get(+i).trainIdx).pt.y + zone1.y);
       });
-      orb.delete();
       keypoints1.delete();
       keypoints2.delete();
-      descriptors1.delete();
-      descriptors2.delete();
-      tmp1.delete();
-      tmp2.delete();
-      im1Graydst.delete();
-      im2Graydst.delete();
       matches.delete();
       good_matches.delete();
       bf.delete();
-
-      // console.log('good match for zone ' + ii + ' = ' + realgoodmatchtokeep);
 
       return true;
     }
@@ -683,23 +657,19 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
 
   alignImageBasedOnCircle(
     image_Aba: any,
-    image_Bba: any,
+    image_Bba: ImageData,
     widthA: number,
     heightA: number,
-    widthB: number,
-    heightB: number,
-    pageNumber: number,
     preference: IPreference,
     debug: boolean,
   ): any {
     //im2 is the original reference image we are trying to align to
     const imageA = new ImageData(new Uint8ClampedArray(image_Aba), widthA, heightA);
-    const imageB = new ImageData(new Uint8ClampedArray(image_Bba), widthB, heightB);
-
+    //    const imageB = new ImageData(new Uint8ClampedArray(image_Bba), widthB, heightB);
+    const imageB = image_Bba;
     let _srcMat = cv.matFromImageData(imageA);
     let srcMat = new cv.Mat(); ///cv.Mat.zeros(srcMat.rows, srcMat.cols, cv.CV_8U);
 
-    let dst = new cv.Mat(); ///cv.Mat.zeros(srcMat.rows, srcMat.cols, cv.CV_8U);
     // let color = new cv.Scalar(255, 0, 0);
     // let displayMat = srcMat.clone();
     let circlesMat = new cv.Mat();
@@ -762,10 +732,16 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     }
 
     let _srcMat2 = cv.matFromImageData(imageB);
-    let srcMat2 = new cv.Mat();
-    let dsize1 = new cv.Size(srcMat.size().width, srcMat.size().height);
-    // You can try more different parameters
-    cv.resize(_srcMat2, srcMat2, dsize1, 0, 0, cv.INTER_AREA);
+    let srcMat2 = _srcMat2; //new cv.Mat();
+
+    if (srcMat2.size().width !== srcMat.size().width || srcMat2.size().height !== srcMat.size().height) {
+      srcMat2 = new cv.Mat();
+      let dsize1 = new cv.Size(srcMat.size().width, srcMat.size().height);
+
+      // You can try more different parameters
+      cv.resize(_srcMat2, srcMat2, dsize1, 0, 0, cv.INTER_AREA);
+      _srcMat2.delete();
+    }
 
     let srcMat1 = new cv.Mat();
     let circlesMat1 = new cv.Mat();
@@ -793,14 +769,16 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       }
 
       let rect1 = new cv.Rect(x - r3, y - r3, width1, height1);
+      let dstrect2 = new cv.Mat();
       let dstrect1 = new cv.Mat();
-      dstrect1 = this.roi(srcMat1, rect1);
-      cv.threshold(dstrect1, dstrect1, 0, 255, cv.THRESH_OTSU + cv.THRESH_BINARY);
+      dstrect2 = this.roi(srcMat1, rect1);
+      cv.threshold(dstrect2, dstrect1, 0, 255, cv.THRESH_OTSU + cv.THRESH_BINARY);
       if (cv.countNonZero(dstrect1) < seuil) {
         goodpointsx.push(x);
         goodpointsy.push(y);
       }
       dstrect1.delete();
+      dstrect2.delete();
     }
 
     let x5, y5;
@@ -844,49 +822,20 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     if (goodpointsx.length >= 4) {
       let srcTri = cv.matFromArray(4, 1, cv.CV_32FC2, [x1, y1, x2, y2, x3, y3, x4, y4]);
       let dstTri = cv.matFromArray(4, 1, cv.CV_32FC2, [x5, y5, x6, y6, x7, y7, x8, y8]);
-      //  let srcTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x4, y4, x2, y2, x3, y3]);
-      //  let dstTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x8, y8, x6, y6, x7, y7]);
-      /*  let M = cv.getPerspectiveTransform(dstTri,srcTri);
-  //  let M = cv.getAffineTransform(srcTri, dstTri);
-  //  console.log(M)
-    let dsize = new cv.Size(srcMat1.rows, srcMat1.cols);
-
-    cv.warpPerspective(srcMat1, dst, M, dsize, cv.BORDER_CONSTANT , cv.BORDER_REPLICATE, new cv.Scalar());*/
-
-      //59    Find homography
-      //60    h = findHomography( points1, points2, RANSAC );
-      //    let h = cv.findHomography(dstTri, srcTri, cv.RANSAC);
-      //    let dsize = new cv.Size(srcMat.cols, srcMat.rows);
-
-      /*   if (h.empty()) {
-        console.log('homography matrix empty!');
-        return;
-      }*/
-      //    let mat1 = cv.matFromArray(4, 1, cv.CV_32FC2, points1);
-      //   let mat2 = cv.matFromArray(4, 1, cv.CV_32FC2,points2);
       let M = cv.getPerspectiveTransform(dstTri, srcTri);
       let dsize = new cv.Size(srcMat.cols, srcMat.rows);
       for (let i = 0; i < srcTri.rows; ++i) {
-        //      let x = srcTri.data32F[i * 2];
-        //      let y = srcTri.data32F[i * 2 + 1];
         const xx = dstTri.data32F[i * 2];
         const yy = dstTri.data32F[i * 2 + 1];
         let radius = 15;
         let center = new cv.Point(xx, yy);
-        //      cv.circle(srcMat, center, radius, [0, 0, 255, 255], 1);
         cv.circle(srcMat2, center, radius, [0, 0, 255, 255], 1);
       }
+      let dst = srcMat2; // new cv.Mat(); ///cv.Mat.zeros(srcMat.rows, srcMat.cols, cv.CV_8U);
 
       cv.warpPerspective(srcMat2, dst, M, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
 
-      let dst1 = dst.clone();
       let result = {} as any;
-      result['imageAligned'] = this.imageDataFromMat(dst1).data.buffer;
-      result['imageAlignedWidth'] = dst1.size().width;
-      result['imageAlignedHeight'] = dst1.size().height;
-      // result['imagesDebugTraces'] = this.imageDataFromMat(dst1).data.buffer;
-      // result['imagesDebugTracesWidth'] = dst1.size().width;
-      // result['imagesDebugTracesHeight'] = dst1.size().height;
 
       if (debug) {
         let matVec = new cv.MatVector();
@@ -922,35 +871,36 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         cv.circle(dstdebug, p2, 15, [0, 255, 0, 255], 1);
         cv.line(dstdebug, p1, p2, [0, 255, 0, 255], 1);
 
-        result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
         result['imagesDebugTracesWidth'] = dstdebug.size().width;
         result['imagesDebugTracesHeight'] = dstdebug.size().height;
+        result['imagesDebugTraces'] = this.imageDataFromMat(dstdebug).data.buffer;
+        // dstdebug.delete();
+        matVec.delete();
       }
-      _srcMat.delete();
+      result['imageAlignedWidth'] = dst.size().width;
+      result['imageAlignedHeight'] = dst.size().height;
+      result['imageAligned'] = this.imageDataFromMat(dst).data.buffer;
 
+      _srcMat.delete();
       srcMat.delete();
-      dst.delete();
       circlesMat.delete();
       srcMat1.delete();
-      srcMat2.delete();
-      _srcMat2.delete();
       circlesMat1.delete();
       srcTri.delete();
       dstTri.delete();
-      dst1.delete();
-      //      console.error('find circle');
+      M.delete();
+
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return result;
     } else {
       _srcMat.delete();
       srcMat.delete();
-      dst.delete();
+      // dst.delete();
       circlesMat.delete();
       srcMat1.delete();
       srcMat2.delete();
-      _srcMat2.delete();
+      //    _srcMat2.delete();
       circlesMat1.delete();
-      //  console.error('cannot find circle');
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return this.alignImage(
@@ -958,12 +908,9 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         image_Bba,
         widthA,
         heightA,
-        widthB,
-        heightB,
         false,
         preference.numberofpointToMatch,
         preference.numberofgoodpointToMatch,
-        pageNumber,
         debug,
       );
     }

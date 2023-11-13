@@ -411,6 +411,9 @@
     "pasdepageassociee": "Aucune copie à associer",
     "pasdepageassocieeTooltip": "Il n'y a plus aucune copie à associer pour cet examen",
     "pasdepageassocieeNextTooltip": "Il n'y a plus aucune copie à associer à la suite de cette copie",
-    "pasdepageassocieePreviousTooltip": "Il n'y a aucune copie à associer avant cette copie"
+    "pasdepageassocieePreviousTooltip": "Il n'y a aucune copie à associer avant cette copie",
+    "alignoptions": "Options de l'algorithme",
+    "nbreCore": "Nombre de coeur(s) utilisé(s)",
+    "nbreCoreTooltip": "Plus vous utilisez un nombre de coeur élevé pour faire cet opération d'alignement, plus vous consomerez des resources CPU mais surtout mémoire. N'hésitez pas à descendre ce chiffres si cette étpe solicite trop votre navigateur"
   }
 }

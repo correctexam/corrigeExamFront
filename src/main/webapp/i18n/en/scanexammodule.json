@@ -404,6 +404,9 @@
     "pasdepageassocieeNextTooltip": "There is no more sheet to associate following this sheet.",
     "pasdepageassocieePreviousTooltip": "There is no sheet to associate prior to this sheet",
     "replacealignementWithNonAlignTooltip": "Replaces the aligned version with the non-aligned version for this sheet",
-    "pasdepageassocieeTooltip": "There is no more sheet to associate for this exam"
+    "pasdepageassocieeTooltip": "There is no more sheet to associate for this exam",
+    "alignoptions": "Algorithm options",
+    "nbreCore": "Number of cores used",
+    "nbreCoreTooltip": "The more cores you use to perform this alignment operation, the more CPU and memory resources you will consume. Don't hesitate to lower this number if this step is too demanding on your browser."
   }
 }

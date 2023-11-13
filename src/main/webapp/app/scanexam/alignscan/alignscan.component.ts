@@ -111,6 +111,10 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   _showVignette = false;
   showMapping = false;
 
+  layoutsidebarVisible = false;
+  nbreCore = navigator.hardwareConcurrency - 2;
+  nbreCoreMax = navigator.hardwareConcurrency - 2;
+
   constructor(
     public examService: ExamService,
     protected activatedRoute: ActivatedRoute,
@@ -138,14 +142,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   }
 
   ngOnInit(): void {
-    /*    this.translateService.get('scanexam.off').subscribe(off=> {
-      this.alignementOptions = [
-        { label: off, value: 'off' ,tooltip:this.translateService.instant('scanexam.offtooltip')},
-        { label: this.translateService.instant('scanexam.withmarker'), value: 'marker' },
-        { label: this.translateService.instant('scanexam.withoutmarker'), value: 'nomarker' },
-      ];
-    })*/
-
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('examid') !== null) {
         this.examId = params.get('examid')!;
@@ -179,34 +175,28 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     this.observable = new Observable(observer => {
       this.observer = observer;
     });
+
     fromWorkerPool<IImageAlignementInput, IImageAlignement>(worker1, this.observable, {
-      selectTransferables: input => [input.imageA, input.imageB],
+      selectTransferables: input => [input.imageA],
+      workerCount: this.nbreCore,
+      fallbackWorkerCount: 3,
     }).subscribe(
       (e: IImageAlignement) => {
-        const apage = {
-          image: e.imageAligned,
-          page: e.pageNumber,
-          width: e.imageAlignedWidth!,
-          height: e.imageAlignedHeight,
-        };
-
-        const im = new ImageData(new Uint8ClampedArray(apage.image!), apage.width, apage.height);
+        const im = new ImageData(new Uint8ClampedArray(e.imageAligned!), e.imageAlignedWidth!, e.imageAlignedHeight);
+        e.imageAligned = undefined;
         if (e.imagesDebugTracesWidth !== undefined) {
-          const debugpage = {
-            image: e.imagesDebugTraces,
-            page: e.pageNumber,
-            width: e.imagesDebugTracesWidth!,
-            height: e.imagesDebugTracesHeight,
-          };
-          const dim = new ImageData(new Uint8ClampedArray(debugpage.image!), debugpage.width, debugpage.height);
+          const dim = new ImageData(new Uint8ClampedArray(e.imagesDebugTraces!), e.imagesDebugTracesWidth!, e.imagesDebugTracesHeight);
+          e.imagesDebugTraces = undefined;
+
           this.images.push({
-            src: this.fgetBase64Image(dim, e.pageNumber!),
+            src: this.imageDataToDataURL(dim),
             alt: 'Description for Image 2',
             title: 'Exam',
           });
         }
 
-        this.saveEligneImage(apage.page!, im).then(() => {
+        this.saveEligneImage(e.pageNumber!, im).then(() => {
+          im.data.set([]);
           if (this.currentPageAlign < this.numberPagesInScan + 1) {
             this.observerPage?.next(this.currentPageAlign);
             this.currentPageAlign = this.currentPageAlign + 1;
@@ -256,8 +246,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   async process(debug: boolean): Promise<void> {
     this.showMapping = debug;
     this._showVignette = false;
-    this.initPool();
-    this.load();
     this.translateService.get('scanexam.alignementencours').subscribe(res => (this.message = '' + res));
 
     this.blocked = true;
@@ -271,42 +259,39 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
       this.currentPageAlignOver = 1;
       this.avancement = 0;
     }
+    await this.load();
     await this.loadTemplatePage();
+    this.initPool();
+
     this.exportAsImage();
   }
   async loadTemplatePage(): Promise<void> {
     return new Promise(resolve => {
+      const promises: Promise<void>[] = [];
       for (let i = 1; i <= this.nbreFeuilleParCopie; i++) {
-        this.db.getFirstTemplate(+this.examId!, i).then(dataURL => {
-          const image = JSON.parse(dataURL!.value, this.reviver);
-
-          this.loadImage(image.pages, i, (_image: ImageData, _page: number, _width: number, _height: number) => {
-            this.templatePages.set(_page, {
-              image: _image.data.buffer,
-              page: _page,
-              width: _width,
-              height: _height,
+        const p1 = new Promise<void>(resolve1 => {
+          this.db.getFirstTemplate(+this.examId!, i).then(dataURL => {
+            const image = JSON.parse(dataURL!.value, this.reviver);
+            this.loadImage(image.pages, i, (_image: ImageData, _page: number, _width: number, _height: number) => {
+              this.templatePages.set(_page, {
+                image: _image.data.buffer,
+                page: _page,
+                width: _width,
+                height: _height,
+              });
+              resolve1();
             });
-            if (_page === this.nbreFeuilleParCopie) {
-              resolve();
-            }
           });
         });
+        promises.push(p1);
       }
+      Promise.all(promises).then(() => resolve());
     });
   }
 
   private async saveData(): Promise<any> {
-    this.translateService.get('scanexam.savetemplateencours').subscribe(res => (this.message = '' + res));
-
     // Change if partial update
     if (!this.partialAlign) {
-      const templatePages64: Map<number, string> = new Map();
-      this.templatePages.forEach((e, k) => {
-        const pixels = new ImageData(new Uint8ClampedArray(e.image!), e.width!, e.height!);
-        templatePages64.set(k, this.fgetBase64Image(pixels, k));
-      });
-
       await this.db.addExam(+this.examId);
     }
 
@@ -315,12 +300,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
       this.cacheUploadService.exportCache(+this.examId, this.translateService, this.messageService, value, this).then(() => {
         this.blocked = false;
 
-        /* if (!this.partialAlign) {
-          setTimeout(() => {
-            this._showVignette =true;
-
-          }, 1000);
-        } else { */
         if (this.showMapping) {
           this.displayBasic = true;
         } else {
@@ -333,16 +312,12 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
         this.endPage = value;
         this.numberPagesInScan = value;
         this.db.countAlignImage(+this.examId).then(e => (this.nbPageAlignInCache = e));
-
-        // }
       });
     });
   }
 
   async saveEligneImage(pageN: number, imageD: ImageData): Promise<void> {
-    const imageString = this.fgetBase64Image(imageD, pageN);
-    //    console.error('ask saving page', pageN);
-    //    console.time('' + pageN);
+    const imageString = this.imageDataToDataURL(imageD);
     await this.db.addAligneImage({
       examId: +this.examId,
       pageNumber: pageN,
@@ -353,25 +328,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
         this.replacer,
       ),
     });
-    // console.timeEnd('' + pageN);
-    //  console.error('end saving page', pageN);
   }
-
-  /* async saveEligneImageBase64(pageN: number, imageD: any): Promise<void> {
-    console.error('ask saving page', pageN)
-    await this.db.addAligneImage({
-      examId: +this.examId,
-      pageNumber: pageN,
-      value: JSON.stringify(
-        {
-          pages: imageD!,
-        },
-        this.replacer,
-      ),
-    });
-    console.error('end saving page', pageN)
-
-  }*/
 
   gotoUE(): any {
     this.router.navigateByUrl('/exam/' + this.examId);
@@ -400,7 +357,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     }
 
     while (
-      this.currentPageAlign < this.startPage + (navigator.hardwareConcurrency - 1) * 2 &&
+      this.currentPageAlign < this.startPage + Math.floor(this.nbreCore * 1.5) /* (navigator.hardwareConcurrency - 1) /* * 2 */ &&
       this.currentPageAlign < this.numberPagesInScan + 1
     ) {
       this.observerPage!.next(this.currentPageAlign);
@@ -409,9 +366,9 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   }
 
   public async alignPage(page: number): Promise<number> {
-    const dataURL = await this.db.getFirstNonAlignImage(+this.examId, page);
-    if (dataURL !== undefined) {
-      if (this.alignement === 'off') {
+    if (this.alignement === 'off') {
+      const dataURL = await this.db.getFirstNonAlignImage(+this.examId, page);
+      if (dataURL !== undefined) {
         await this.db.addAligneImage({
           examId: +this.examId,
           pageNumber: page,
@@ -432,18 +389,16 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
         }
         return page;
       } else {
-        const image = JSON.parse(dataURL!.value, this.reviver);
-
-        const p = await this.aligneImages(image.pages, page);
-        return p! + 1;
+        this.messageService.add({
+          severity: 'error',
+          summary: this.translateService.instant('scanexam.npagealign'),
+          detail: this.translateService.instant('scanexam.npagealigndetails') + page,
+        });
+        return page;
       }
     } else {
-      this.messageService.add({
-        severity: 'error',
-        summary: this.translateService.instant('scanexam.npagealign'),
-        detail: this.translateService.instant('scanexam.npagealigndetails') + page,
-      });
-      return page;
+      const p = this.aligneImages(page);
+      return p! + 1;
     }
   }
 
@@ -470,74 +425,35 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     i.src = file;
   }
 
-  async aligneImages(file: any, pagen: number): Promise<number> {
-    // await this.saveNonAligneImage(pagen, file);
-    return new Promise(resolve => {
-      const i = new Image();
-      i.onload = () => {
-        const editedImage = <HTMLCanvasElement>document.createElement('canvas');
-        editedImage.width = i.width;
-        editedImage.height = i.height;
-        const ctx = editedImage.getContext('2d');
-        ctx!.drawImage(i, 0, 0);
-        const inputimage1 = ctx!.getImageData(0, 0, i.width, i.height);
+  aligneImages(pagen: number): number {
+    let paget = pagen % this.nbreFeuilleParCopie;
+    if (paget === 0) {
+      paget = this.nbreFeuilleParCopie;
+    }
 
-        let paget = pagen % this.nbreFeuilleParCopie;
-        if (paget === 0) {
-          paget = this.nbreFeuilleParCopie;
-        }
-
-        if (this.alignement !== 'off') {
-          const pref = this.preferenceService.getPreference();
-
-          this.observer!.next({
-            imageA: this.templatePages.get(paget)!.image!.slice(0),
-            imageB: inputimage1.data.buffer!,
-            widthA: this.templatePages.get(paget)!.width,
-            heightA: this.templatePages.get(paget)!.height,
-            widthB: i.width!,
-            heightB: i.height!,
-            marker: this.alignement === 'marker',
-            pageNumber: pagen,
-            preference: pref,
-            debug: this.showMapping,
-          });
-
-          resolve(pagen);
-        }
-      };
-      i.src = file;
-    });
+    if (this.alignement !== 'off') {
+      const pref = this.preferenceService.getPreference();
+      this.observer!.next({
+        imageA: this.templatePages.get(paget)!.image!.slice(0),
+        widthA: this.templatePages.get(paget)!.width,
+        heightA: this.templatePages.get(paget)!.height,
+        marker: this.alignement === 'marker',
+        pageNumber: pagen,
+        preference: pref,
+        debug: this.showMapping,
+        examId: +this.examId,
+        indexDb: this.preferenceService.getPreference().cacheDb === 'indexdb',
+      });
+    }
+    return pagen;
   }
 
-  private fgetBase64Image(img: ImageData, pageN: number): string {
+  private imageDataToDataURL(img: ImageData): string {
     const canvas = document.createElement('canvas');
     canvas.width = img.width;
     canvas.height = img.height;
-
     const ctx = canvas.getContext('2d');
     ctx?.putImageData(img, 0, 0);
-    let compression = 1;
-    let paget = pageN % this.nbreFeuilleParCopie;
-    if (paget === 0) {
-      paget = this.nbreFeuilleParCopie;
-    }
-
-    /*    if (
-      this.preferenceService.getPreference().exportImageCompression !== undefined &&
-      this.preferenceService.getPreference().exportImageCompression > 0 &&
-      this.preferenceService.getPreference().exportImageCompression <= 1
-    ) {
-      compression = this.preferenceService.getPreference().exportImageCompression;
-    }
-    let paget = pageN % this.nbreFeuilleParCopie;
-    if (paget === 0) {
-      paget = this.nbreFeuilleParCopie;
-    }
-    if (this.pageWithQCM.includes(paget) && compression < 0.95) {
-      compression = 0.95;
-    }
-*/
     let exportImageType = 'image/webp';
     if (
       this.preferenceService.getPreference().imageTypeExport !== undefined &&
@@ -545,9 +461,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     ) {
       exportImageType = this.preferenceService.getPreference().imageTypeExport;
     }
-    const dataURL = canvas.toDataURL(exportImageType, compression);
-    return dataURL;
-    // return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+    return canvas.toDataURL(exportImageType);
   }
 
   replacer(key: any, value: any): any {

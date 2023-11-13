@@ -22,6 +22,7 @@ export interface IImageAlignement {
   imagesDebugTraces?: ArrayBuffer;
   imagesDebugTracesWidth?: number;
   imagesDebugTracesHeight?: number;
+  workerIndex?: number;
 }
 
 export interface IPreference {
@@ -51,17 +52,19 @@ export interface IImageAlignementInput {
   //  imageA?: ImageData;
   //  imageB?: ImageData;
   imageA: ArrayBuffer;
-  imageB: ArrayBuffer;
+  //  imageB: ArrayBuffer;
   marker?: boolean;
   x?: number;
   y?: number;
   widthA?: number;
   heightA?: number;
-  widthB?: number;
-  heightB?: number;
+  //  widthB?: number;
+  //  heightB?: number;
   pageNumber?: number;
   preference: IPreference;
   debug: boolean;
+  examId: number;
+  indexDb: boolean;
 }
 export interface IImageCropInput {
   image?: ArrayBuffer;

@@ -244,7 +244,7 @@ addEventListener('message', e => {
       //self.importScripts('./content/opencv/4/opencv.js')
       const self1 = self as any;
       self1['Module'] = {
-        scriptUrl: 'content/opencv/4/opencv.js',
+        scriptUrl: 'content/opencv/5/opencv.js',
         onRuntimeInitialized() {
           cv.then((cv1: any) => {
             cv = cv1;
@@ -252,7 +252,6 @@ addEventListener('message', e => {
           });
         },
       };
-      console.error(e.data.payload.fronturl);
       let fronturl = '';
       if (e.data.payload.fronturl) {
         fronturl = e.data.payload.fronturl;
@@ -343,8 +342,7 @@ async function loadImage(ii: NonAlignImage | AlignImage): Promise<ImageData> {
   const editedImage = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
   const ctx = editedImage.getContext('2d');
   ctx!.drawImage(imageBitmap, 0, 0);
-  const inputimage = ctx!.getImageData(0, 0, imageBitmap.width, imageBitmap.height);
-  return inputimage;
+  return ctx!.getImageData(0, 0, imageBitmap.width, imageBitmap.height);
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-unused-vars
