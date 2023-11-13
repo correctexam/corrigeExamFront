@@ -314,10 +314,10 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     let _im1 = cv.matFromImageData(image_B);
     let im1 = _im1;
     if (im2.size().width !== _im1.size().width || im2.size().height !== _im1.size().height) {
-      //new cv.Mat();
+      im1 = new cv.Mat();
       let dsize = new cv.Size(im2.size().width, im2.size().height);
       // You can try more different parameters
-      cv.resize(im1, im1, dsize, 0, 0, cv.INTER_AREA);
+      cv.resize(_im1, im1, dsize, 0, 0, cv.INTER_AREA);
     }
 
     let im1Gray = new cv.Mat();
@@ -758,10 +758,15 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     }
 
     let _srcMat2 = cv.matFromImageData(imageB);
-    let srcMat2 = new cv.Mat();
-    let dsize1 = new cv.Size(srcMat.size().width, srcMat.size().height);
-    // You can try more different parameters
-    cv.resize(_srcMat2, srcMat2, dsize1, 0, 0, cv.INTER_AREA);
+    let srcMat2 = _srcMat2; //new cv.Mat();
+
+    if (srcMat2.size().width !== srcMat.size().width || srcMat2.size().height !== srcMat.size().height) {
+      srcMat2 = new cv.Mat();
+      let dsize1 = new cv.Size(srcMat.size().width, srcMat.size().height);
+
+      // You can try more different parameters
+      cv.resize(_srcMat2, srcMat2, dsize1, 0, 0, cv.INTER_AREA);
+    }
 
     let srcMat1 = new cv.Mat();
     let circlesMat1 = new cv.Mat();
