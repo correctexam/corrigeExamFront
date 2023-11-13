@@ -36,7 +36,7 @@ export interface IPage {
   height?: number;
 }
 
-const nbreCore = 7;
+const nbreCore = 10; // navigator.hardwareConcurrency - 2;
 
 @Component({
   selector: 'jhi-align-scan',
