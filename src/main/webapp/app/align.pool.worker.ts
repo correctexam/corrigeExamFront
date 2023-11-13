@@ -219,7 +219,6 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
                   false,
                   input.preference.numberofpointToMatch,
                   input.preference.numberofpointToMatch,
-                  input.pageNumber,
                   input.debug,
                 );
                 input.imageA = undefined;
@@ -231,15 +230,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
                 console.error(error);
               }
             } else {
-              const res = this.alignImageBasedOnCircle(
-                input.imageA,
-                im1,
-                input.widthA!,
-                input.heightA!,
-                input.pageNumber,
-                input.preference,
-                input.debug,
-              );
+              const res = this.alignImageBasedOnCircle(input.imageA, im1, input.widthA!, input.heightA!, input.preference, input.debug);
               res.pageNumber = input.pageNumber;
               observer.next(res);
               observer.complete();
@@ -314,24 +305,21 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     allimage: boolean,
     numberofpointToMatch: number,
     numberofgoodpointToMatch: number,
-    pageNumber: number,
     debug: boolean,
   ): any {
-    //im2 is the original reference image we are trying to align to
     const image_A = new ImageData(new Uint8ClampedArray(image_Aba), widthA, heightA);
     const image_B = image_Bba;
-    // new ImageData(new Uint8ClampedArray(image_Bba), widthB, heightB);
 
     const im2 = cv.matFromImageData(image_A);
     let _im1 = cv.matFromImageData(image_B);
+    let im1 = _im1;
+    if (im2.size().width !== _im1.size().width || im2.size().height !== _im1.size().height) {
+      //new cv.Mat();
+      let dsize = new cv.Size(im2.size().width, im2.size().height);
+      // You can try more different parameters
+      cv.resize(im1, im1, dsize, 0, 0, cv.INTER_AREA);
+    }
 
-    let im1 = new cv.Mat();
-    let dsize = new cv.Size(im2.size().width, im2.size().height);
-    // You can try more different parameters
-    cv.resize(_im1, im1, dsize, 0, 0, cv.INTER_AREA);
-    //TODO delete _im1
-
-    //  console.log("pass par la 1 ", "page ", pageNumber)
     let im1Gray = new cv.Mat();
     let im2Gray = new cv.Mat();
     cv.cvtColor(im1, im1Gray, cv.COLOR_BGRA2GRAY);
@@ -457,7 +445,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       im1.delete();
     }
     image_A.data.set([]);
-    _im1.delete();
+    //_im1.delete();
     im2.delete();
     im1Gray.delete();
     im2Gray.delete();
@@ -549,11 +537,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         (points1tmp[2 * i] - points2tmp[2 * i]) * (points1tmp[2 * i] - points2tmp[2 * i]) +
         (points1tmp[2 * i + 1] - points2tmp[2 * i + 1]) * (points1tmp[2 * i + 1] - points2tmp[2 * i + 1]);
       // TODO compute average points
-      //  console.error('distancesquare', distancesquare)
-      //  console.error('maxdistance', Math.trunc((3 * im1Graydst.size().width) / 20) * Math.trunc((3 * im1Graydst.size().width) / 20))
 
       if (distancesquare < Math.trunc((3 * im1Graydst.size().width) / 20) * Math.trunc((3 * im1Graydst.size().height) / 20)) {
-        //   console.error('pass par la')
         distances.push(distancesquare);
         goodmatchtokeep = goodmatchtokeep + 1;
         indexGood.push(i);
@@ -572,8 +557,6 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       keypoints2.delete();
       descriptors1.delete();
       descriptors2.delete();
-      // tmp1.delete();
-      // tmp2.delete();
       im1Graydst.delete();
       im2Graydst.delete();
       matches.delete();
@@ -596,9 +579,6 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         // break;
       }
     }
-
-    // console.log(realgoodmatchtokeep)
-    //  console.error('first realgoodmatchtokeep', realgoodmatchtokeep, numberofgoodpointToMatch);
 
     if (realgoodmatchtokeep <= numberofgoodpointToMatch) {
       orb.delete();
@@ -706,7 +686,6 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     image_Bba: ImageData,
     widthA: number,
     heightA: number,
-    pageNumber: number,
     preference: IPreference,
     debug: boolean,
   ): any {
@@ -877,9 +856,6 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       cv.warpPerspective(srcMat2, dst, M, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
 
       let result = {} as any;
-      // result['imagesDebugTraces'] = this.imageDataFromMat(dst1).data.buffer;
-      // result['imagesDebugTracesWidth'] = dst1.size().width;
-      // result['imagesDebugTracesHeight'] = dst1.size().height;
 
       if (debug) {
         let matVec = new cv.MatVector();
@@ -962,7 +938,6 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         false,
         preference.numberofpointToMatch,
         preference.numberofgoodpointToMatch,
-        pageNumber,
         debug,
       );
     }
