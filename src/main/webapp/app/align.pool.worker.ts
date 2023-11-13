@@ -318,6 +318,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       let dsize = new cv.Size(im2.size().width, im2.size().height);
       // You can try more different parameters
       cv.resize(_im1, im1, dsize, 0, 0, cv.INTER_AREA);
+      _im1.delete();
     }
 
     let im1Gray = new cv.Mat();
@@ -340,6 +341,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       let squareSize = squareSizeorigin;
       while (!res1 && squareSize < (minPageWidth * 3) / 4 && squareSize < (minPageHeight * 2) / 3) {
         let zone1 = new cv.Rect(0, 0, squareSize, squareSize);
+
         //   console.log("pass par la 3 ", "page ", pageNumber)
 
         res1 = this.matchSmallImage(im1Gray, im2Gray, points1, points2, zone1, numberofpointToMatch, numberofgoodpointToMatch);
@@ -766,6 +768,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
 
       // You can try more different parameters
       cv.resize(_srcMat2, srcMat2, dsize1, 0, 0, cv.INTER_AREA);
+      _srcMat2.delete();
     }
 
     let srcMat1 = new cv.Mat();
@@ -912,7 +915,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       circlesMat.delete();
       srcMat1.delete();
       // srcMat2.delete();
-      _srcMat2.delete();
+      //      _srcMat2.delete();
       circlesMat1.delete();
       srcTri.delete();
       dstTri.delete();
@@ -929,7 +932,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       circlesMat.delete();
       srcMat1.delete();
       srcMat2.delete();
-      _srcMat2.delete();
+      //    _srcMat2.delete();
       circlesMat1.delete();
 
       //  console.error('cannot find circle');
