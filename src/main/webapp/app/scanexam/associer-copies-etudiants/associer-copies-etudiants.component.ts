@@ -262,7 +262,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     this.shortcuts.push(
       {
         // ArrowRight
-        key: ['ctrl + right', 'meta + right'],
+        key: ['ctrl + right', 'cmd + right'],
         label: 'Navigation',
         description: this.translateService.instant('scanexam.nextstudent'),
         command: () => this.nextStudent(),
@@ -270,7 +270,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       },
       {
         // ArrowLeft
-        key: ['ctrl + left', 'meta + left'],
+        key: ['ctrl + left', 'cmd + left'],
         label: 'Navigation',
         description: this.translateService.instant('scanexam.previousstudent'),
         command: () => this.previousStudent(),
