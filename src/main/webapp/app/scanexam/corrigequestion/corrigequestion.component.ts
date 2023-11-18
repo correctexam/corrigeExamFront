@@ -370,7 +370,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.shortcuts.push(
       {
         // ArrowRight
-        key: ['ctrl + right', 'meta + right'],
+        key: ['ctrl + right', 'cmd + right'],
         label: 'Navigation',
         description: this.translateService.instant('scanexam.nextstudent'),
         command: () => this.nextStudent(),
@@ -378,7 +378,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       },
       {
         // ArrowLeft
-        key: ['ctrl + left', 'meta + left'],
+        key: ['ctrl + left', 'cmd + left'],
         label: 'Navigation',
         description: this.translateService.instant('scanexam.previousstudent'),
         command: () => this.previousStudent(),
@@ -386,14 +386,14 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       },
 
       {
-        key: ['ctrl + up', 'meta + up'],
+        key: ['ctrl + up', 'cmd + up'],
         label: 'Navigation',
         description: this.translateService.instant('scanexam.previousquestion'),
         command: () => this.previousQuestion(),
         preventDefault: true,
       },
       {
-        key: ['ctrl + down', 'meta + down'],
+        key: ['ctrl + down', 'cmd + down'],
         label: 'Navigation',
         description: this.translateService.instant('scanexam.nextquestion'),
         command: () => this.nextQuestion(),
