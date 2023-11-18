@@ -84,6 +84,7 @@ export class ZoneCorrectionHandler {
     canvas.on('selection:updated', (e: any) => this.onSelectionUpdated(e as any));
     canvas.on('object:moving', (e: any) => this.onObjectMoving(e as any));
     canvas.on('object:scaling', (e: any) => this.onObjectScaling(e as any));
+    canvas.on('object:modified', () => this.onObjectModified());
   }
 
   private onCanvasMouseDown(event: { e: Event }) {
@@ -99,6 +100,11 @@ export class ZoneCorrectionHandler {
     this.eventHandler.canvas = this.canvas!;
     this.eventHandler.mouseUp();
   }
+  private onObjectModified() {
+    this.eventHandler.canvas = this.canvas!;
+    this.eventHandler.objectModified();
+  }
+
   private onSelectionCreated(e: any) {
     this.eventHandler.canvas = this.canvas!;
 

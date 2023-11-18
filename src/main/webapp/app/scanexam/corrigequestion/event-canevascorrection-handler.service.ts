@@ -30,7 +30,7 @@ import { Injectable } from '@angular/core';
 import { CustomFabricGroup } from '../annotate-template/paint/models';
 import { IComments } from '../../entities/comments/comments.model';
 import { CommentsService } from '../../entities/comments/service/comments.service';
-import { SVG, extend as SVGextend, Element as SVGElement, G } from '@svgdotjs/svg.js';
+import { SVG, extend as SVGextend, Element as SVGElement, G, Text } from '@svgdotjs/svg.js';
 import { Platform } from '@angular/cdk/platform';
 
 const RANGE_AROUND_CENTER = 20;
@@ -57,12 +57,58 @@ export class EventCanevascorrectionHandlerService {
             draw = SVG(svg.split('\n').splice(2).join('\n'));
           }
           draw.scale(this.scale, this.scale, 0, 0);
-          fabric.loadSVGFromString(draw.svg(), (objects, options) => {
-            // const obj = fabric.util.groupSVGElements(objects, options);
+          const s2 = draw.svg((node: any) => {
+            if (node instanceof Text) {
+              node.attr('svgjs:data', null);
+              //                node.attr("font-size",node.attr("font-size")/this.scale)
+              const text = node.node;
+              if (text.childNodes.length > 0) {
+                const content = text.childNodes[0].textContent;
+                let x = text.children[0].getAttribute('x');
+                let y = text.children[0].getAttribute('y');
+                if (x === undefined) {
+                  x = '0';
+                }
+                if (y === undefined) {
+                  y = '0';
+                }
+
+                (node.parent() as G).translate(+x!, +y!);
+                text.removeChild(text.childNodes[0]);
+                if (content) {
+                  text.innerHTML = content; // text.childNodes[0].textContent
+                } else {
+                  text.innerHTML = 'Text';
+                }
+              }
+            }
+          });
+          fabric.loadSVGFromString(s2, (objects, options) => {
+            // const obj = fabric.util.fabricShapeService(objects, options);
             c.clear();
             if (objects.length > 0) {
-              objects.forEach(obj => c.add(obj));
+              objects.forEach(obj => {
+                if (obj.type === 'text') {
+                  obj = this.convertToIText(obj);
+                  (obj as any).firstText = (obj as any).text;
+                  (obj as any).textState = 'original';
+                }
+                c.add(obj);
+              });
               c.renderAll();
+              if (
+                this._selectedTool === DrawingTools.SELECT ||
+                this._selectedTool === DrawingTools.ERASER ||
+                this._selectedTool === DrawingTools.FILL
+              ) {
+                c.forEachObject(obj => {
+                  obj.selectable = true;
+                });
+              } else {
+                c.forEachObject(obj => {
+                  obj.selectable = false;
+                });
+              }
             }
           });
         }
@@ -166,6 +212,17 @@ export class EventCanevascorrectionHandlerService {
     private platform: Platform,
   ) {}
 
+  convertToIText(obj: any) {
+    const text = obj.text;
+    const textobj = obj.toObject();
+    delete textobj.text;
+    delete textobj.type;
+    textobj.fontSize = 20;
+    const itext = new fabric.IText(text, textobj);
+    itext.styles = {};
+    return itext;
+  }
+
   registerSelectedToolObserver(f: (d: DrawingTools) => void): any {
     this.drawingToolObserver = f;
   }
@@ -264,6 +321,7 @@ export class EventCanevascorrectionHandlerService {
           pointer,
           fontSize: 20,
         });
+        // console.error('createIText')
         break;
     }
   }
@@ -355,6 +413,14 @@ export class EventCanevascorrectionHandlerService {
         }),
       );
     }
+    if (this._selectedTool === DrawingTools.TEXT) {
+      this.selectedTool = DrawingTools.SELECT;
+      this.updateComments().then(e2 =>
+        e2.subscribe(e1 => {
+          this.currentComment = e1.body;
+        }),
+      );
+    }
 
     if (this._selectedTool !== DrawingTools.POLYGON) {
       this._elementUnderDrawing = undefined;
@@ -416,11 +482,11 @@ export class EventCanevascorrectionHandlerService {
     const l = newLeft;
     const t = newTop;
     const nid = id;
-    this.updateComments().then(e2 =>
+    /*    this.updateComments().then(e2 =>
       e2.subscribe(e1 => {
         this.currentComment = e1.body!;
       }),
-    );
+    );*/
 
     if (type !== FabricObjectType.ELLIPSE) {
       return;
@@ -437,17 +503,25 @@ export class EventCanevascorrectionHandlerService {
     });
   }
 
+  objectModified() {
+    this.updateComments().then(e2 =>
+      e2.subscribe(e1 => {
+        this.currentComment = e1.body!;
+      }),
+    );
+  }
+
   objectScaling(id: string, type: FabricObjectType, newScales: { x: number; y: number }, newCoords: { left: number; top: number }) {
     const o1 = this.canvas.getObjects().filter(o => (o as any).id === id)[0];
     const l = o1.aCoords?.tl.x;
     const t = o1.aCoords?.tl.y;
     const w = o1.aCoords?.br.x! - o1.aCoords?.tl.x!;
     const h = o1.aCoords?.br.y! - o1.aCoords?.tl.y!;
-    this.updateComments().then(e2 =>
+    /*  this.updateComments().then(e2 =>
       e2.subscribe(e1 => {
         this.currentComment = e1.body!;
       }),
-    );
+    );*/
 
     if (type !== FabricObjectType.ELLIPSE) {
       return;
