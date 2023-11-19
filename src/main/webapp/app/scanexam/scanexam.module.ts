@@ -29,9 +29,9 @@ import { GraphicalToolbarComponent } from './annotate-template/paint/toolbar/too
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EventHandlerService } from './annotate-template/paint/event-handler.service';
 import { FabricShapeService } from './annotate-template/paint/shape.service';
-import { ColourPaletteComponent } from './annotate-template/paint/toolbar/colour-palette/colour-palette.component';
+import { ColourPaletteComponent } from './corrigequestion/toolbar/colour-palette/colour-palette.component';
 import { FabricCanvasComponent } from './annotate-template/paint/fabric-canvas/fabric-canvas.component';
-import { ThicknessSliderComponent } from './annotate-template/paint/toolbar/thickness-slider/thickness-slider.component';
+import { ThicknessSliderComponent } from './corrigequestion/toolbar/thickness-slider/thickness-slider.component';
 
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { QuestionpropertiesviewComponent } from './annotate-template/paint/questionpropertiesview/questionpropertiesview.component';
@@ -93,6 +93,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { ViewandreorderpagesComponent } from './viewandreorderpages/viewandreorderpages.component';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AllbindingsComponent } from './associer-copies-etudiants/allbindings/allbindings.component';
+import { FontsizeSliderComponent } from './corrigequestion/toolbar/fontsize-slider/fontsize-slider.component';
 
 // set the location of the OpenCV files
 // registerAllModules();
@@ -461,6 +462,8 @@ export const CompareAnswer_ROUTE: Route = {
     ExportanonymoupdfComponent,
     ViewandreorderpagesComponent,
     AllbindingsComponent,
+    ColourPaletteComponent,
+    FontsizeSliderComponent,
   ],
   imports: [
     CommonModule,

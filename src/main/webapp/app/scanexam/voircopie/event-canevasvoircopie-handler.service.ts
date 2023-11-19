@@ -18,6 +18,7 @@ import { Injectable } from '@angular/core';
 import { IComments } from '../../entities/comments/comments.model';
 import { CommentsService } from '../../entities/comments/service/comments.service';
 import { SVG, extend as SVGextend, Element as SVGElement, G, Text } from '@svgdotjs/svg.js';
+import { svgadapter } from '../svg.util';
 
 @Injectable({
   providedIn: 'root',
@@ -41,30 +42,7 @@ export class EventCanevasVoirCopieHandlerService {
             draw = SVG(svg.split('\n').splice(2).join('\n'));
           }
           draw.scale(this.scale, this.scale, 0, 0);
-          const s2 = draw.svg((node: any) => {
-            if (node instanceof Text) {
-              node.attr('svgjs:data', null);
-              const text = node.node;
-              if (text.childNodes.length > 0) {
-                const content = text.childNodes[0].textContent;
-                let x = text.children[0].getAttribute('x');
-                let y = text.children[0].getAttribute('y');
-                if (x === undefined) {
-                  x = '0';
-                }
-                if (y === undefined) {
-                  y = '0';
-                }
-                (node.parent() as G).translate(+x!, +y!);
-                text.removeChild(text.childNodes[0]);
-                if (content) {
-                  text.innerHTML = content; // text.childNodes[0].textContent
-                } else {
-                  text.innerHTML = 'Text';
-                }
-              }
-            }
-          });
+          const s2 = draw.svg(svgadapter);
           fabric.loadSVGFromString(s2, (objects, options) => {
             // const obj = fabric.util.groupSVGElements(objects, options);
             if (objects.length > 0) {

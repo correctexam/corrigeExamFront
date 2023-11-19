@@ -409,6 +409,12 @@
     "nbreCore": "Number of cores used",
     "nbreCoreTooltip": "The more cores you use to perform this alignment operation, the more CPU and memory resources you will consume. Don't hesitate to lower this number if this step is too demanding on your browser.",
     "showAlignementOptionsTooltip": "Enables you to modify certain options associated with the sheet alignment algorithm",
-    "editCommentTooltip": "Edit the values for this comment (even if the title or description have not been defined beforehand)"
+    "editCommentTooltip": "Edit the values for this comment (even if the title or description have not been defined beforehand)",
+    "epaisseur": "Path thickness: ",
+    "epaisseurTooltip": "Used to adjust path thickness",
+    "fontsize": "Font size: ",
+    "fontsizeTooltip": "Used to adjust the font size",
+    "colour": "Color: ",
+    "colourTooltip": "Choice of color for text and lines"
   }
 }

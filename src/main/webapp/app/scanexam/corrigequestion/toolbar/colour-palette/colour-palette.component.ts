@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Component } from '@angular/core';
-import { EventHandlerService } from '../../event-handler.service';
-import { DrawingColours } from '../../models';
+import { DrawingColours } from '../../../annotate-template/paint/models';
+import { EventCanevascorrectionHandlerService } from 'app/scanexam/corrigequestion/event-canevascorrection-handler.service';
 
 @Component({
   selector: 'jhi-colour-palette',
@@ -12,7 +12,7 @@ export class ColourPaletteComponent {
   public colours = Object.values(DrawingColours);
   public selectedColour: DrawingColours;
 
-  constructor(private fabricService: EventHandlerService) {
+  constructor(private fabricService: EventCanevascorrectionHandlerService) {
     this.selectedColour = fabricService.selectedColour;
   }
 

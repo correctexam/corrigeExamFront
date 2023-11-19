@@ -1,0 +1,11 @@
+<label><span jhiTranslate="scanexam.fontsize">fontsize : </span>&nbsp;({{ value }} pt)</label>
+<p-slider
+  [(ngModel)]="value"
+  [min]="min"
+  [max]="max"
+  [step]="smallStep"
+  [tooltipPosition]="'bottom'"
+  [pTooltip]="'scanexam.fontsizeTooltip' | translate"
+  [tooltipZIndex]="'3000'"
+>
+</p-slider>
