@@ -304,7 +304,6 @@ export class EventCanevascorrectionHandlerService {
           pointer,
           fontSize: this.selectedFontsize,
         });
-        // console.error('createIText')
         break;
     }
   }
