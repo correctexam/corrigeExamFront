@@ -449,7 +449,7 @@
         </div>
 
         <div class="grid" *ngIf="currentQuestion && currentQuestion?.gradeType === 'DIRECT' && currentQuestion?.typeAlgoName !== 'QCM'">
-          <div *ngFor="let comment of currentTextComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
+          <div *ngFor="let comment of currentTextComment4Question" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <div class="card" [style]="getStyle(comment)">
               <div class="card-body">
                 <span class="float-end" (click)="removeTextComment(comment)">
@@ -499,7 +499,7 @@
                 </span>
 
                 <div *ngIf="!minimizeComment">
-                  <p-inplace [active]="active.get(comment.id)" [closable]="true" (onDeactivate)="closeEditComment(comment)">
+                  <p-inplace [active]="active.get(comment.id!)" [closable]="true" (onDeactivate)="closeEditComment(comment)">
                     <ng-template pTemplate="display">
                       <h5 class="card-title">{{ comment.text }}</h5>
                     </ng-template>
@@ -513,7 +513,7 @@
                       />
                     </ng-template>
                   </p-inplace>
-                  <p-inplace [active]="active.get(comment.id)" [closable]="true" (onDeactivate)="closeEditComment(comment)">
+                  <p-inplace [active]="active.get(comment.id!)" [closable]="true" (onDeactivate)="closeEditComment(comment)">
                     <ng-template pTemplate="display">
                       <p class="card-text">{{ comment.description }}</p>
                     </ng-template>
@@ -543,7 +543,7 @@
                   >
                 </div>
                 <div *ngIf="minimizeComment" (click)="toggleTComment(comment)">
-                  <h5 [tooltipZIndex]="'3000'" [pTooltip]="comment.description" tooltipPosition="left" class="card-title">
+                  <h5 [tooltipZIndex]="'3000'" [pTooltip]="comment.description!" tooltipPosition="left" class="card-title">
                     {{ comment.text }}
                   </h5>
                 </div>
@@ -553,7 +553,7 @@
         </div>
 
         <div class="grid" *ngIf="(currentQuestion && currentQuestion?.gradeType !== 'DIRECT') || currentQuestion?.typeAlgoName === 'QCM'">
-          <div *ngFor="let comment of currentGradedComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
+          <div *ngFor="let comment of currentGradedComment4Question" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <div class="card" [style]="getStyle(comment)">
               <div class="card-body">
                 <span *ngIf="currentQuestion?.typeAlgoName !== 'QCM'" class="float-end clickable" (click)="removeGradedComment(comment)"
@@ -609,7 +609,7 @@
                   </div>
 
                   <div *ngIf="currentQuestion?.typeAlgoName !== 'QCM'">
-                    <p-inplace [closable]="true" [active]="active.get(comment.id)" (onDeactivate)="closeEditComment(comment)">
+                    <p-inplace [closable]="true" [active]="active.get(comment.id!)" (onDeactivate)="closeEditComment(comment)">
                       <ng-template pTemplate="display">
                         <h5 class="card-title">{{ comment.text }}</h5>
                       </ng-template>
@@ -623,7 +623,7 @@
                         />
                       </ng-template>
                     </p-inplace>
-                    <p-inplace [closable]="true" [active]="active.get(comment.id)" (onDeactivate)="closeEditComment(comment)">
+                    <p-inplace [closable]="true" [active]="active.get(comment.id!)" (onDeactivate)="closeEditComment(comment)">
                       <ng-template pTemplate="display">
                         <p class="card-text">{{ comment.description }}</p>
                       </ng-template>
@@ -637,7 +637,7 @@
                         />
                       </ng-template>
                     </p-inplace>
-                    <p-inplace [closable]="true" [active]="active.get(comment.id)" (onDeactivate)="closeEditComment(comment)">
+                    <p-inplace [closable]="true" [active]="active.get(comment.id!)" (onDeactivate)="closeEditComment(comment)">
                       <ng-template pTemplate="display">
                         <p class="card-text" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
                           <span jhiTranslate="scanexam.noteassociecomment"> Note associée à ce commentaire : </span>
@@ -675,7 +675,7 @@
                 </div>
                 <div *ngIf="minimizeComment" (click)="toggleGComment(comment)">
                   <div *ngIf="currentQuestion?.typeAlgoName! === 'QCM'">
-                    <h5 [tooltipZIndex]="'3000'" [pTooltip]="comment.description" tooltipPosition="left" class="card-title">
+                    <h5 [tooltipZIndex]="'3000'" [pTooltip]="comment.description!" tooltipPosition="left" class="card-title">
                       {{ comment.text }}
                     </h5>
                   </div>
