@@ -359,9 +359,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       );
     }
 
-    /*    console.error(candidateName.map((e: any) => (this.latinise(e)! as string).toLowerCase()));
-    console.error(candidateFirstName.map((e: any) => (this.latinise(e)! as string)?.toLowerCase()));
-    console.error(candidateIne.map((e: any) => (this.latinise(e)! as string)?.toLowerCase())); */
     let pageNumber = z1?.pageNumber;
     if (pageNumber === undefined) {
       pageNumber = z2?.pageNumber;

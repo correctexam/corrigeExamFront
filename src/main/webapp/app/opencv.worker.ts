@@ -640,7 +640,7 @@ async function doPredictionsAsync(p: {
       }
       console.timeEnd('analysePage');
     }
-    console.error(JSON.stringify(source));
+    // console.error(JSON.stringify(source));
     source.target.postMessage({ msg: p.msg, payload: outputs, uid: p.uid }, opts);
   } else {
     // TODO
