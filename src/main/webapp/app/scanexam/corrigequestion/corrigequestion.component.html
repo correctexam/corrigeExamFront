@@ -98,6 +98,21 @@
     </div>
 
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <label><span jhiTranslate="scanexam.scalefactor">Facteur d'échelle</span></label>
+
+      <p-selectButton
+        [options]="scaleOptions"
+        [ngModel]="scalePolicy"
+        (onChange)="updateScalePolicy($event)"
+        optionLabel="name"
+        optionValue="value"
+        [tooltipPosition]="'bottom'"
+        [pTooltip]="'scanexam.scalefactorTooltip' | translate"
+        [tooltipZIndex]="'3000'"
+      ></p-selectButton>
+    </div>
+
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <button
         type="text"
         pButton

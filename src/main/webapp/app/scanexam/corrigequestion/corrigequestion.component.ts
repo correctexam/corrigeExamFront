@@ -62,6 +62,12 @@ import { IKeyBoardShortCutPreferenceEntry, KeyboardShortcutService } from '../pr
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { DrawingTools } from '../annotate-template/paint/models';
 
+enum ScalePolicy {
+  FitWidth = 1,
+  FitHeight = 2,
+  Original = 3,
+}
+
 @Component({
   selector: 'jhi-corrigequestion',
   templateUrl: './corrigequestion.component.html',
@@ -1386,7 +1392,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       z: zone,
     };
     const crop = await firstValueFrom(this.alignImagesService.imageCropFromZone(imageToCrop));
-    this.computeScale(crop.width);
+    this.computeScale(crop.width, crop.height);
 
     return {
       i: new ImageData(new Uint8ClampedArray(crop.image), crop.width, crop.height),
@@ -1406,7 +1412,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       z: zone,
     };
     const crop = await firstValueFrom(this.alignImagesService.imageCropFromZone(imageToCrop));
-    this.computeScale(crop.width);
+    this.computeScale(crop.width, crop.height);
 
     return {
       i: new ImageData(new Uint8ClampedArray(crop.image), crop.width, crop.height),
@@ -1462,15 +1468,45 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.displayBasic = false;
   }
 
-  computeScale(imageWidth: number): void {
-    let factorScale = 0.75;
-    if (this.windowWidth < 991) {
-      factorScale = 0.95;
+  scalePolicy = ScalePolicy.FitWidth;
+  scaleOptions = [
+    { name: 'FitWidth', value: ScalePolicy.FitWidth },
+    { name: 'FitHeight', value: ScalePolicy.FitHeight },
+    { name: 'No Fit', value: ScalePolicy.Original },
+  ];
+  updateScalePolicy(event: any) {
+    this.scalePolicy = event.value;
+    this.reloadImage();
+  }
+  computeScale(imageWidth: number, imageHeight: number): void {
+    let scale = 1;
+    if (this.scalePolicy === ScalePolicy.FitWidth) {
+      let factorScale = 0.75;
+      if (this.windowWidth < 991) {
+        factorScale = 0.95;
+      }
+      scale = (window.innerWidth * factorScale) / imageWidth;
+      if (scale > 2) {
+        scale = 2;
+      }
+    } else if (this.scalePolicy === ScalePolicy.FitHeight) {
+      const factorScale = 0.7;
+      scale = (window.innerHeight * factorScale) / imageHeight;
+      if (scale > 2) {
+        scale = 2;
+      }
+      let factorScaleW = 0.75;
+      if (this.windowWidth < 991) {
+        factorScaleW = 0.95;
+      }
+      if (imageWidth * scale > factorScaleW * window.innerWidth) {
+        scale = (window.innerWidth * factorScaleW) / imageWidth;
+      }
+    } else {
+      // Fitnormal
+      scale = 1;
     }
-    let scale = (window.innerWidth * factorScale) / imageWidth;
-    if (scale > 2) {
-      scale = 2;
-    }
+
     this.scale = scale;
     this.eventHandler.scale = this.scale;
   }
@@ -1481,7 +1517,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       i.onload = () => {
         const editedImage: HTMLCanvasElement = <HTMLCanvasElement>document.createElement('canvas');
         editedImage.width = i.width;
-        this.computeScale(i.width);
+        this.computeScale(i.width, i.height);
         editedImage.height = i.height;
         const ctx = editedImage.getContext('2d');
         ctx!.drawImage(i, 0, 0);

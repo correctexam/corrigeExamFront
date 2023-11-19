@@ -415,6 +415,8 @@
     "fontsize": "Font size: ",
     "fontsizeTooltip": "Used to adjust the font size",
     "colour": "Color: ",
-    "colourTooltip": "Choice of color for text and lines"
+    "colourTooltip": "Choice of color for text and lines",
+    "scalefactor": "Scaling :",
+    "scalefactorTooltip": "Used to change the page scaling factor"
   }
 }
