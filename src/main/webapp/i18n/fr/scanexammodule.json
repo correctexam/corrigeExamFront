@@ -422,6 +422,8 @@
     "fontsize": "Taille de la font : ",
     "fontsizeTooltip": "Permet de régler la taille de la font",
     "colour": "Couleur : ",
-    "colourTooltip": "Choix de la couleur pour le texte et les traits"
+    "colourTooltip": "Choix de la couleur pour le texte et les traits",
+    "scalefactor": "Mise à l'échelle :",
+    "scalefactorTooltip": "Permet de changer le facteur de mise à l'échelle"
   }
 }
