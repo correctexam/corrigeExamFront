@@ -32,6 +32,7 @@ import { IComments } from '../../entities/comments/comments.model';
 import { CommentsService } from '../../entities/comments/service/comments.service';
 import { SVG, extend as SVGextend, Element as SVGElement, G, Text } from '@svgdotjs/svg.js';
 import { Platform } from '@angular/cdk/platform';
+import { svgadapter } from '../svg.util';
 
 const RANGE_AROUND_CENTER = 20;
 
@@ -57,32 +58,7 @@ export class EventCanevascorrectionHandlerService {
             draw = SVG(svg.split('\n').splice(2).join('\n'));
           }
           draw.scale(this.scale, this.scale, 0, 0);
-          const s2 = draw.svg((node: any) => {
-            if (node instanceof Text) {
-              node.attr('svgjs:data', null);
-              //                node.attr("font-size",node.attr("font-size")/this.scale)
-              const text = node.node;
-              if (text.childNodes.length > 0) {
-                const content = text.childNodes[0].textContent;
-                let x = text.children[0].getAttribute('x');
-                let y = text.children[0].getAttribute('y');
-                if (x === undefined) {
-                  x = '0';
-                }
-                if (y === undefined) {
-                  y = '0';
-                }
-
-                (node.parent() as G).translate(+x!, +y!);
-                text.removeChild(text.childNodes[0]);
-                if (content) {
-                  text.innerHTML = content; // text.childNodes[0].textContent
-                } else {
-                  text.innerHTML = 'Text';
-                }
-              }
-            }
-          });
+          const s2 = draw.svg(svgadapter);
           fabric.loadSVGFromString(s2, (objects, options) => {
             // const obj = fabric.util.fabricShapeService(objects, options);
             c.clear();
@@ -125,6 +101,7 @@ export class EventCanevascorrectionHandlerService {
   public modelViewpping = new Map<string, number>();
   //  zones: { [zoneNumber: number]: ZoneCorrectionHandler } = {};
   public scale = 1;
+
   set selectedTool(t: DrawingTools) {
     if (this.canvas !== undefined && this.canvas !== null) {
       this.canvas.discardActiveObject();
@@ -184,15 +161,17 @@ export class EventCanevascorrectionHandlerService {
     return this._selectedTool;
   }
   _selectedColour: DrawingColours = DrawingColours.RED;
-  set selectedColour(c: DrawingColours) {
+  public set selectedColour(c: DrawingColours) {
     this._selectedColour = c;
     this.canvas.discardActiveObject();
     this.canvas.renderAll();
   }
-  get selectedColour(): DrawingColours {
+  public get selectedColour(): DrawingColours {
     return this._selectedColour;
   }
   selectedThickness: DrawingThickness = DrawingThickness.MEDIUM;
+  selectedFontsize: number = 20;
+
   private _isMouseDown = false;
   public _elementUnderDrawing:
     | CustomFabricEllipse
@@ -217,7 +196,11 @@ export class EventCanevascorrectionHandlerService {
     const textobj = obj.toObject();
     delete textobj.text;
     delete textobj.type;
-    textobj.fontSize = 20;
+
+    textobj.fontSize = obj.fontSize;
+    textobj.fontFamily = obj.fontFamily;
+    textobj.fontStyle = obj.fontStyle;
+    textobj.fontWeight = obj.fontWeight;
     const itext = new fabric.IText(text, textobj);
     itext.styles = {};
     return itext;
@@ -319,7 +302,7 @@ export class EventCanevascorrectionHandlerService {
           thickness: this.selectedThickness / 2,
           colour: this._selectedColour,
           pointer,
-          fontSize: 20,
+          fontSize: this.selectedFontsize,
         });
         // console.error('createIText')
         break;

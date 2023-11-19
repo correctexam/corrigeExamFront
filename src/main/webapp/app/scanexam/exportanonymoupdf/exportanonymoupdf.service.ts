@@ -25,6 +25,7 @@ import { IComments } from 'app/entities/comments/comments.model';
 import { SVG, Text, G } from '@svgdotjs/svg.js';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { firstValueFrom } from 'rxjs';
+import { svgadapter } from '../svg.util';
 
 const coefficient = 100000;
 
@@ -243,37 +244,7 @@ export class ExportPdfService {
         }
         draw.node.attributes.removeNamedItem('transform');
 
-        const svg = new Blob(
-          [
-            draw.svg((node: any) => {
-              if (node instanceof Text) {
-                node.attr('svgjs:data', null);
-                //                node.attr("font-size",node.attr("font-size")/this.scale)
-                const text = node.node;
-                if (text.childNodes.length > 0) {
-                  const content = text.childNodes[0].textContent;
-                  let x = text.children[0].getAttribute('x');
-                  let y = text.children[0].getAttribute('y');
-                  if (x === undefined) {
-                    x = '0';
-                  }
-                  if (y === undefined) {
-                    y = '0';
-                  }
-
-                  (node.parent() as G).translate(+x!, +y!);
-                  text.removeChild(text.childNodes[0]);
-                  if (content) {
-                    text.innerHTML = content; // text.childNodes[0].textContent
-                  } else {
-                    text.innerHTML = 'Text';
-                  }
-                }
-              }
-            }),
-          ],
-          { type: 'image/svg+xml' },
-        );
+        const svg = new Blob([draw.svg(svgadapter)], { type: 'image/svg+xml' });
         const url = URL.createObjectURL(svg);
         const img1 = new Image();
         img1.onload = () => {

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { EventHandlerService } from '../../event-handler.service';
-import { DrawingThickness } from '../../models';
+import { DrawingThickness } from '../../../annotate-template/paint/models';
+import { EventCanevascorrectionHandlerService } from 'app/scanexam/corrigequestion/event-canevascorrection-handler.service';
 
 @Component({
   selector: 'jhi-thickness-slider',
@@ -20,7 +20,7 @@ export class ThicknessSliderComponent {
     this.v = this.eventHandler.selectedThickness;
   }
 
-  constructor(private eventHandler: EventHandlerService) {
+  constructor(private eventHandler: EventCanevascorrectionHandlerService) {
     this.v = this.eventHandler.selectedThickness;
   }
 }
