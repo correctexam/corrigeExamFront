@@ -33,6 +33,8 @@ import { CommentsService } from '../../entities/comments/service/comments.servic
 import { SVG, extend as SVGextend, Element as SVGElement, G, Text } from '@svgdotjs/svg.js';
 import { Platform } from '@angular/cdk/platform';
 import { svgadapter } from '../svg.util';
+import { constants } from 'os';
+import { firstValueFrom } from 'rxjs';
 
 const RANGE_AROUND_CENTER = 20;
 
@@ -298,22 +300,24 @@ export class EventCanevascorrectionHandlerService {
         }
         break;
       case DrawingTools.TEXT:
-        this.fabricShapeService.createIText(this.canvas, {
+        // eslint-disable-next-line no-case-declarations
+        const fabicText = this.fabricShapeService.createIText(this.canvas, {
           thickness: this.selectedThickness / 2,
           colour: this._selectedColour,
           pointer,
           fontSize: this.selectedFontsize,
         });
+        this.canvas.setActiveObject(fabicText);
+        fabicText.selectAll();
+        fabicText.enterEditing();
+        //      (fabicText as any).hiddenTextarea.focus();
         break;
     }
   }
 
   async updateComments() {
     if (this.currentComment === null) {
-      const e1 = await this.commentsService
-        .query({ zonegeneratedid: (this.canvas as any).zoneid })
-        .pipe()
-        .toPromise();
+      const e1 = await firstValueFrom(this.commentsService.query({ zonegeneratedid: (this.canvas as any).zoneid }));
       if (e1!.body === undefined || e1!.body?.length === 0) {
         const draw = SVG(this.canvas.toSVG().split('\n').splice(2).join('\n'));
         draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
@@ -337,10 +341,9 @@ export class EventCanevascorrectionHandlerService {
     if (canvas === this.canvas) {
       return this.updateComments();
     } else {
-      const e1 = await this.commentsService
-        .query({ zonegeneratedid: (canvas as any).zoneid })
-        .pipe()
-        .toPromise();
+      const e1 = await firstValueFrom(this.commentsService.query({ zonegeneratedid: (canvas as any).zoneid }));
+      //        .pipe()
+      //        .toPromise();
       if (e1!.body === undefined || e1!.body?.length === 0) {
         const draw = SVG(canvas.toSVG().split('\n').splice(2).join('\n'));
         draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
@@ -396,7 +399,6 @@ export class EventCanevascorrectionHandlerService {
       );
     }
     if (this._selectedTool === DrawingTools.TEXT) {
-      this.selectedTool = DrawingTools.SELECT;
       this.updateComments().then(e2 =>
         e2.subscribe(e1 => {
           this.currentComment = e1.body;
@@ -486,6 +488,13 @@ export class EventCanevascorrectionHandlerService {
   }
 
   objectModified() {
+    switch (this._selectedTool) {
+      case DrawingTools.TEXT:
+        this.selectedTool = DrawingTools.SELECT;
+        break;
+      default:
+        break;
+    }
     this.updateComments().then(e2 =>
       e2.subscribe(e1 => {
         this.currentComment = e1.body!;
