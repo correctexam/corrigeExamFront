@@ -191,6 +191,13 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
         } else {
           this.currentGradedComment4Question = this.resp.gradedcomments!;
         }
+      } else {
+        this.currentNote = 0;
+        if (this.questions![0].gradeType === GradeType.DIRECT && this.questions![0].typeAlgoName !== 'QCM') {
+          this.currentTextComment4Question = [];
+        } else {
+          this.currentTextComment4Question = [];
+        }
       }
     }
   }
