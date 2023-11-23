@@ -149,6 +149,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
                   this.nbreFeuilleParCopie = this.sheet!.pagemax! - this.sheet!.pagemin! + 1;
                   // Step 2 Query Scan in local DB
                   this.finalize().then(() => {
+                    this.initEmail();
                     this.populateBestSolutions();
                   });
                 }
@@ -466,8 +467,17 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
       return value;
     }
   }
-  getEmail(): string {
+
+  email: string = '';
+
+  async initEmail() {
     if (this.selectionStudents !== undefined && this.exam !== undefined && this.questions !== undefined) {
+      const courseid = this.exam.courseId;
+      const emailsObj = await firstValueFrom(
+        this.http.get<any>(this.applicationConfigService.getEndpointFor('api/getAllEmailProfs4course/' + courseid)),
+      );
+      const emails: (string | undefined)[] = emailsObj.emails;
+
       const firsName = this.selectionStudents![0].firstname!;
       const lastName = this.selectionStudents![0].name!;
       const examName = this.exam!.name!;
@@ -495,12 +505,24 @@ ${firsName}
 `;
 
       if (this.translateService.currentLang === 'fr') {
-        return "mailto:?subject=Retour sur l'examen " + this.exam!.name + '&body=' + tfr;
+        this.email =
+          'mailto:' +
+          emails.filter(e => e !== undefined && e !== '').join(',') +
+          "?subject=Retour sur l'examen " +
+          this.exam!.name +
+          '&body=' +
+          tfr;
       } else {
-        return 'mailto:?subject=Feedback on your ewam ' + this.exam!.name + '&body=' + ten;
+        this.email =
+          'mailto:' +
+          emails.filter(e => e !== undefined && e !== '').join(',') +
+          '?subject=Feedback on your ewam ' +
+          this.exam!.name +
+          '&body=' +
+          ten;
       }
     } else {
-      return '';
+      this.email = '';
     }
   }
 
