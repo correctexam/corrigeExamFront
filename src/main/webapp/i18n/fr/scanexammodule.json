@@ -424,6 +424,8 @@
     "colour": "Couleur : ",
     "colourTooltip": "Choix de la couleur pour le texte et les traits",
     "scalefactor": "Mise à l'échelle :",
-    "scalefactorTooltip": "Permet de changer le facteur de mise à l'échelle"
+    "scalefactorTooltip": "Permet de changer le facteur de mise à l'échelle",
+    "gotoCorrection": "Aller à la correction",
+    "gotoCorrectionTooltipView": "Permet d'aller à la vue correction quand on est authentifié en tant que prof"
   }
 }

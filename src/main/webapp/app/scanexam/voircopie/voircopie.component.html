@@ -54,11 +54,21 @@
           <span *ngIf="bestSolutions.length === 0" jhiTranslate="scanexam.nogoodsolution">Aucune bonne solution identifiée</span>
         </div>
         <div class="d-flex justify-content-center">
-          <a target="_blank" [href]="getEmail()" jhiTranslate="scanexam.echangemail"
+          <a *ngIf="email !== ''" target="_blank" [href]="email" jhiTranslate="scanexam.echangemail"
             >Echange avec l'équipe pédagogique suite à une incompréhension de la correction</a
           >
         </div>
         <div style="padding-top: 1rem; padding-bottom: 1rem"></div>
+        <div *jhiHasAnyAuthority="['ROLE_USER', 'ROLE_ADMIN']" class="d-flex justify-content-center">
+          <a
+            *ngIf="correctionLink"
+            target="_blank"
+            [routerLink]="correctionLink"
+            jhiTranslate="scanexam.gotoCorrection"
+            [pTooltip]="'scanexam.gotoCorrectionTooltipView' | translate"
+            >Aller à la vue correction</a
+          >
+        </div>
       </div>
 
       <div class="col-12 sm:col-12 md:col-12 lg:col-3 xl:col-2">

@@ -417,6 +417,8 @@
     "colour": "Color: ",
     "colourTooltip": "Choice of color for text and lines",
     "scalefactor": "Scaling :",
-    "scalefactorTooltip": "Used to change the page scaling factor"
+    "scalefactorTooltip": "Used to change the page scaling factor",
+    "gotoCorrection": "Go to correction view",
+    "gotoCorrectionTooltipView": "Used to go to the correction view when you are logged in as a teacher"
   }
 }
