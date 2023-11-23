@@ -73,6 +73,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   uuid = '';
   sheet: IExamSheet | undefined;
   resolve: any;
+  correctionLink: string | undefined;
   note = new Promise<number>(resolve => {
     this.resolve = resolve;
   });
@@ -144,7 +145,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
                   this.questionindex = +params.get('questionno')! - 1;
 
                   // Step 1 Query templates
-
+                  this.correctionLink = '/answer/' + this.exam.id! + '/' + params.get('questionno') + '/' + (this.currentStudent + 1);
                   this.nbreFeuilleParCopie = this.sheet!.pagemax! - this.sheet!.pagemin! + 1;
                   // Step 2 Query Scan in local DB
                   this.finalize().then(() => {

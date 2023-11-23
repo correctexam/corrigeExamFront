@@ -59,6 +59,16 @@
           >
         </div>
         <div style="padding-top: 1rem; padding-bottom: 1rem"></div>
+        <div *jhiHasAnyAuthority="['ROLE_USER', 'ROLE_ADMIN']" class="d-flex justify-content-center">
+          <a
+            *ngIf="correctionLink"
+            target="_blank"
+            [routerLink]="correctionLink"
+            jhiTranslate="scanexam.gotoCorrection"
+            [pTooltip]="'scanexam.gotoCorrectionTooltipView' | translate"
+            >Aller à la vue correction</a
+          >
+        </div>
       </div>
 
       <div class="col-12 sm:col-12 md:col-12 lg:col-3 xl:col-2">
