@@ -1,4 +1,11 @@
-<p-sidebar [position]="'right'" [(visible)]="layoutsidebarVisible">
+<p-sidebar
+  [position]="'right'"
+  [(visible)]="layoutsidebarVisible"
+  [blockScroll]="true"
+  [showCloseIcon]="true"
+  styleClass="p-0"
+  appendTo="body"
+>
   <jhi-create-comments [question]="questions[0]"></jhi-create-comments>
 </p-sidebar>
 

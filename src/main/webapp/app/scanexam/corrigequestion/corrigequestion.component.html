@@ -373,7 +373,10 @@
         </div>
       </div>
 
-      <div class="col-12 sm:col-12 md:col-12 lg:col-3 xl:col-2">
+      <div
+        class="col-12 sm:col-12 md:col-12 lg:col-3 xl:col-2"
+        style="overflow-y: auto; overflow-x: hidden; max-height: 85vh; position: sticky; top: 0"
+      >
         <div class="grid grid-nogutter">
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <div *ngIf="currentQuestion?.libelle !== undefined && currentQuestion?.libelle !== ''">
@@ -465,7 +468,11 @@
         </div>
 
         <div class="grid" *ngIf="currentQuestion && currentQuestion?.gradeType === 'DIRECT' && currentQuestion?.typeAlgoName !== 'QCM'">
-          <div *ngFor="let comment of currentTextComment4Question" style="padding: 0.2rem" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
+          <div
+            *ngFor="let comment of currentTextComment4Question"
+            style="padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 0.2rem; padding-bottom: 0.2rem"
+            class="sm:col-3 md:col-3 lg:col-12 xl:col-12"
+          >
             <div class="card" [style]="getStyle(comment)">
               <div class="card-body">
                 <span class="float-end" (click)="removeTextComment(comment)">
@@ -569,7 +576,11 @@
         </div>
 
         <div class="grid" *ngIf="(currentQuestion && currentQuestion?.gradeType !== 'DIRECT') || currentQuestion?.typeAlgoName === 'QCM'">
-          <div *ngFor="let comment of currentGradedComment4Question" style="padding: 0.2rem" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
+          <div
+            *ngFor="let comment of currentGradedComment4Question"
+            style="padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 0.2rem; padding-bottom: 0.2rem"
+            class="sm:col-3 md:col-3 lg:col-12 xl:col-12"
+          >
             <div class="card" [style]="getStyle(comment)">
               <div class="card-body">
                 <span *ngIf="currentQuestion?.typeAlgoName !== 'QCM'" class="float-end clickable" (click)="removeGradedComment(comment)"
@@ -720,7 +731,7 @@
             currentQuestion?.typeAlgoName !== 'QCM'
           "
         >
-          <div style="padding-left: 0.2rem; padding-right: 0.2rem; padding-top: 0.8rem" class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
+          <div style="padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 0.8rem" class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
             <div class="card">
               <div class="card-body">
                 <h5 class="card-title" jhiTranslate="scanexam.newcomment">Nouveau commentaire</h5>
