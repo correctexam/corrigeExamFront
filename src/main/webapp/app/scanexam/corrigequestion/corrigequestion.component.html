@@ -227,8 +227,9 @@
       <div class="col-12 sm:col-12 md:col-12 lg:col-9 xl:col-10">
         <div class="d-flex justify-content-center">
           <div class="col-5">
-            <p-button
+            <button
               class="sm:text-xs md:text-xs lg:text-base"
+              pButton
               styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
               (click)="layoutsidebarVisible = true"
               icon="pi pi-arrow-right"
@@ -236,7 +237,7 @@
               [pTooltip]="'scanexam.showLayoutOptionsCorrectionTooltip' | translate"
               [tooltipZIndex]="'3000'"
               [tooltipPosition]="'bottom'"
-            ></p-button>
+            ></button>
 
             <button
               class="sm:text-xs md:text-xs lg:text-base"
@@ -464,7 +465,7 @@
         </div>
 
         <div class="grid" *ngIf="currentQuestion && currentQuestion?.gradeType === 'DIRECT' && currentQuestion?.typeAlgoName !== 'QCM'">
-          <div *ngFor="let comment of currentTextComment4Question" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
+          <div *ngFor="let comment of currentTextComment4Question" style="padding: 0.2rem" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <div class="card" [style]="getStyle(comment)">
               <div class="card-body">
                 <span class="float-end" (click)="removeTextComment(comment)">
@@ -568,7 +569,7 @@
         </div>
 
         <div class="grid" *ngIf="(currentQuestion && currentQuestion?.gradeType !== 'DIRECT') || currentQuestion?.typeAlgoName === 'QCM'">
-          <div *ngFor="let comment of currentGradedComment4Question" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
+          <div *ngFor="let comment of currentGradedComment4Question" style="padding: 0.2rem" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <div class="card" [style]="getStyle(comment)">
               <div class="card-body">
                 <span *ngIf="currentQuestion?.typeAlgoName !== 'QCM'" class="float-end clickable" (click)="removeGradedComment(comment)"
@@ -719,7 +720,7 @@
             currentQuestion?.typeAlgoName !== 'QCM'
           "
         >
-          <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
+          <div style="padding-left: 0.2rem; padding-right: 0.2rem; padding-top: 0.8rem" class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
             <div class="card">
               <div class="card-body">
                 <h5 class="card-title" jhiTranslate="scanexam.newcomment">Nouveau commentaire</h5>
