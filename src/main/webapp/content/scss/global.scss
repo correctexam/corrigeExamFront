@@ -73,10 +73,10 @@ Generic styles
 /* other generic styles */
 
 .jh-card {
-  padding: 1.5%;
-  margin-top: 20px;
-  margin-left: 20px;
-  margin-right: 20px;
+  padding: 0.5%;
+  margin-top: 5px;
+  margin-left: 5px;
+  margin-right: 5px;
   border: none;
 }
 
@@ -237,7 +237,11 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 .p-inplace .p-inplace-display {
   padding: 0rem 0rem;
   border-radius: 2px;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .pdock {
