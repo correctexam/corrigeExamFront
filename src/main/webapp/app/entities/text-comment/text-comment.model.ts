@@ -7,6 +7,7 @@ export interface ITextComment {
   zonegeneratedid?: string | null;
   questionId?: number;
   studentResponses?: IStudentResponse[];
+  shortcut?: string | string[];
 }
 
 export class TextComment implements ITextComment {
@@ -16,7 +17,8 @@ export class TextComment implements ITextComment {
     public description?: string | null,
     public zonegeneratedid?: string | null,
     public questionId?: number,
-    public studentResponses?: IStudentResponse[]
+    public studentResponses?: IStudentResponse[],
+    public shortcut?: string | string[],
   ) {}
 }
 

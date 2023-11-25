@@ -343,6 +343,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 });
               }
             }
+            this.populateDefaultShortCut();
           }
           this.showImage = new Array<boolean>(questions.length);
 
@@ -454,6 +455,37 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   active: Map<number, boolean> = new Map();
 
+  populateDefaultShortCut(): void {
+    const toRemove: number[] = [];
+    const comments: (IGradedComment | ITextComment)[] = [];
+    if (this.currentGradedComment4Question) {
+      comments.push(...this.currentGradedComment4Question);
+    }
+    if (this.currentTextComment4Question) {
+      comments.push(...this.currentTextComment4Question);
+    }
+
+    if (this.keyboardShortcutService.getShortCutPreference().shortcuts.has(this.examId + '_' + this.questionindex)) {
+      const res: IKeyBoardShortCutPreferenceEntry[] = this.keyboardShortcutService
+        .getShortCutPreference()
+        .shortcuts.get(this.examId + '_' + this.questionindex)!;
+      res
+        .filter(e1 => e1.examId === +this.examId! && e1.questionIndex === +this.questionindex)
+        .forEach(entry => {
+          toRemove.push(entry.commentId);
+          const c2 = comments.filter(c => c.id === entry.commentId);
+          if (c2.length > 0) {
+            c2[0].shortcut = entry.key;
+          }
+        });
+    }
+    for (const { index, comment } of comments.map((c1, i) => ({ index: i, comment: c1 }))) {
+      if (!toRemove.includes(comment.id!)) {
+        comment.shortcut = ['ctrl + ' + (index + 1), 'cmd + ' + (index + 1)];
+      }
+    }
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   editComment(comment: any) {
     this.active.set(comment.id, true);
@@ -464,6 +496,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.testdisableAndEnableKeyBoardShortCut = false;
     this.shortCut4Comment = false;
     this.keyboardShortcutService.clearToDefault();
+    this.populateDefaultShortCut();
+
     setTimeout(() => {
       (this.testdisableAndEnableKeyBoardShortCut = true), 300;
     });
@@ -515,6 +549,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       ]);
     }
     this.keyboardShortcutService.save(shorts);
+    this.populateDefaultShortCut();
     this.commentShortcut = null;
     this.currentKeyBoardShorcut = '';
     setTimeout(() => {
@@ -747,6 +782,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     return new Promise<IStudentResponse>((resolve, reject) => {
       this.gradedCommentService.create(comment).subscribe(e1 => {
         if (e1.body !== null) {
+          this.testdisableAndEnableKeyBoardShortCut = false;
+          this.populateDefaultShortCut();
+          setTimeout(() => {
+            (this.testdisableAndEnableKeyBoardShortCut = true), 300;
+          });
           resolve(e1.body!);
         } else {
           reject(null);
@@ -1079,6 +1119,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               this.resp = resp1.body!;
               (currentComment as any).checked = true;
               this.currentTextComment4Question?.push(currentComment);
+              this.testdisableAndEnableKeyBoardShortCut = false;
+              this.populateDefaultShortCut();
+              setTimeout(() => {
+                (this.testdisableAndEnableKeyBoardShortCut = true), 300;
+              });
+
               this.titreCommentaire = '';
               this.descCommentaire = '';
               this.blocked = false;
@@ -1101,6 +1147,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
               (currentComment as any).checked = true;
               this.currentGradedComment4Question?.push(currentComment);
+              this.testdisableAndEnableKeyBoardShortCut = false;
+              this.populateDefaultShortCut();
+              setTimeout(() => {
+                (this.testdisableAndEnableKeyBoardShortCut = true), 300;
+              });
+
               this.computeNote(false, this.resp!, this.currentQuestion!);
               this.titreCommentaire = '';
               this.descCommentaire = '';

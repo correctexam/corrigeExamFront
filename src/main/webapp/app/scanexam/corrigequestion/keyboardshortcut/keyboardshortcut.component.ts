@@ -8,6 +8,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { IKeyBoardShortCutPreferenceEntry, KeyboardShortcutService } from 'app/scanexam/preference-page/keyboardshortcut.service';
 import { KeyboardShortcutsComponent, ShortcutInput } from 'ng-keyboard-shortcuts';
+import { IGradedComment } from '../../../entities/graded-comment/graded-comment.model';
+import { ITextComment } from '../../../entities/text-comment/text-comment.model';
 
 @Component({
   selector: 'jhi-keyboardshortcut',
@@ -23,6 +25,11 @@ export class KeyboardshortcutComponent implements AfterViewInit {
   @Input()
   questionindex = 0;
 
+  @Input()
+  textcomments?: ITextComment[];
+  @Input()
+  gradedcomments?: IGradedComment[];
+
   @Output()
   toggleTCommentById: EventEmitter<number> = new EventEmitter();
   @Output()
@@ -34,7 +41,7 @@ export class KeyboardshortcutComponent implements AfterViewInit {
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
     protected keyboardShortcutService: KeyboardShortcutService,
-    protected translateService: TranslateService
+    protected translateService: TranslateService,
   ) {}
 
   ngAfterViewInit(): void {
@@ -42,6 +49,15 @@ export class KeyboardshortcutComponent implements AfterViewInit {
   }
 
   private installKeyBindings(): void {
+    const toRemove: number[] = [];
+    const comments: (IGradedComment | ITextComment)[] = [];
+    if (this.gradedcomments) {
+      comments.push(...this.gradedcomments);
+    }
+    if (this.textcomments) {
+      comments.push(...this.textcomments);
+    }
+
     if (this.keyboardShortcutService.getShortCutPreference().shortcuts.has(this.examId + '_' + this.questionindex)) {
       const res: IKeyBoardShortCutPreferenceEntry[] = this.keyboardShortcutService
         .getShortCutPreference()
@@ -50,6 +66,7 @@ export class KeyboardshortcutComponent implements AfterViewInit {
         .filter(e1 => e1.examId === +this.examId && e1.questionIndex === +this.questionindex)
         .forEach(entry => {
           const textComment = entry.textComment;
+          toRemove.push(entry.commentId);
           this.keyboardShortcuts.push({
             key: entry.key,
             label: this.translateService.instant('gradeScopeIsticApp.comments.detail.title'),
@@ -64,6 +81,23 @@ export class KeyboardshortcutComponent implements AfterViewInit {
             preventDefault: true,
           });
         });
+    }
+    for (const { index, comment } of comments.map((c1, i) => ({ index: i, comment: c1 }))) {
+      if (!toRemove.includes(comment.id!)) {
+        this.keyboardShortcuts.push({
+          key: ['ctrl + ' + (index + 1), 'cmd + ' + (index + 1)],
+          label: this.translateService.instant('gradeScopeIsticApp.comments.detail.title'),
+          description: 'toggle ' + comment.description,
+          command: () => {
+            if ('grade' in comment) {
+              this.toggleGCommentById.emit(comment.id);
+            } else {
+              this.toggleTCommentById.emit(comment.id);
+            }
+          },
+          preventDefault: true,
+        });
+      }
     }
   }
 }
