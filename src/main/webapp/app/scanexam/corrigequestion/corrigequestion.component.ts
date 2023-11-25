@@ -264,6 +264,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
         // eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
         if (this.questionindex4shortcut !== questionindex4shortcut_prev) {
+          this.currentGradedComment4Question = [];
+          this.currentTextComment4Question = [];
+
           if (params.get('questionno') !== null) {
             this.questionindex = +params.get('questionno')! - 1;
           }
@@ -317,6 +320,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                   }
                 });
                 this.currentGradedComment4Question = com.body!;
+
                 this.currentGradedComment4Question.forEach(com1 => {
                   this.active.set(com1.id!, false);
                 });
