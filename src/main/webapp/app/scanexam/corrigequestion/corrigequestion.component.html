@@ -726,14 +726,20 @@
                     </p>
                   </div>
                   <div *ngIf="currentQuestion?.typeAlgoName! !== 'QCM'" (click)="toggleGComment(comment)">
-                    <h5 [tooltipZIndex]="'3000'" [pTooltip]="comment!.description!" tooltipPosition="left" class="card-title">
-                      {{ comment.text }} ( <span *ngIf="currentQuestion && currentQuestion?.gradeType! === 'NEGATIVE'"> - </span
-                      ><span *ngIf="currentQuestion && currentQuestion?.gradeType! === 'POSITIVE'"> + </span>
+                    <p
+                      [tooltipZIndex]="'3000'"
+                      [escape]="false"
+                      [pTooltip]="comment!.description! + '<small>(' + comment.shortcut + ')</small>'"
+                      tooltipPosition="left"
+                      class="card-title"
+                    >
+                      {{ comment.text }} (<span *ngIf="currentQuestion && currentQuestion?.gradeType! === 'NEGATIVE'">- </span
+                      ><span *ngIf="currentQuestion && currentQuestion?.gradeType! === 'POSITIVE'">+ </span>
                       <span *ngIf="questionStep > 0">{{ comment.grade! / questionStep }}</span>
                       <span *ngIf="questionStep <= 0">{{ comment.grade! }}</span>
 
-                      pt)
-                    </h5>
+                      pt) <span style="font-size: x-small"> ({{ comment.shortcut }}) </span>
+                    </p>
                   </div>
                 </div>
               </div>

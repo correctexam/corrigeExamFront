@@ -782,7 +782,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     return new Promise<IStudentResponse>((resolve, reject) => {
       this.gradedCommentService.create(comment).subscribe(e1 => {
         if (e1.body !== null) {
+          this.testdisableAndEnableKeyBoardShortCut = false;
           this.populateDefaultShortCut();
+          setTimeout(() => {
+            (this.testdisableAndEnableKeyBoardShortCut = true), 300;
+          });
           resolve(e1.body!);
         } else {
           reject(null);
@@ -1115,7 +1119,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               this.resp = resp1.body!;
               (currentComment as any).checked = true;
               this.currentTextComment4Question?.push(currentComment);
+              this.testdisableAndEnableKeyBoardShortCut = false;
               this.populateDefaultShortCut();
+              setTimeout(() => {
+                (this.testdisableAndEnableKeyBoardShortCut = true), 300;
+              });
+
               this.titreCommentaire = '';
               this.descCommentaire = '';
               this.blocked = false;
@@ -1138,7 +1147,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
               (currentComment as any).checked = true;
               this.currentGradedComment4Question?.push(currentComment);
+              this.testdisableAndEnableKeyBoardShortCut = false;
               this.populateDefaultShortCut();
+              setTimeout(() => {
+                (this.testdisableAndEnableKeyBoardShortCut = true), 300;
+              });
 
               this.computeNote(false, this.resp!, this.currentQuestion!);
               this.titreCommentaire = '';
