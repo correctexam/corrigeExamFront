@@ -313,3 +313,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
     border: none;
   }
 }
+
+.p-tooltip-text small {
+  font-size: x-small;
+}

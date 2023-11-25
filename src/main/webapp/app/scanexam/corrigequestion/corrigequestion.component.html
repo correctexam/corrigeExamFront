@@ -39,6 +39,8 @@
       (toggleGCommentById)="toggleGCommentById($event)"
       [examId]="+examId!"
       [questionindex]="questionindex4shortcut!"
+      [textcomments]="currentTextComment4Question"
+      [gradedcomments]="currentGradedComment4Question"
     ></jhi-keyboardshortcut>
   </ng-container>
 
@@ -538,7 +540,9 @@
                   </p-inplace>
                   <p-inplace [active]="active.get(comment.id!)" [closable]="true" (onDeactivate)="closeEditComment(comment)">
                     <ng-template pTemplate="display">
-                      <p class="card-text">{{ comment.description }}</p>
+                      <p class="card-text">
+                        {{ comment.description }} <span style="font-size: x-small"> ({{ comment.shortcut }}) </span>
+                      </p>
                     </ng-template>
                     <ng-template pTemplate="content">
                       <input
@@ -566,9 +570,15 @@
                   >
                 </div>
                 <div *ngIf="minimizeComment" (click)="toggleTComment(comment)">
-                  <h5 [tooltipZIndex]="'3000'" [pTooltip]="comment.description!" tooltipPosition="left" class="card-title">
-                    {{ comment.text }}
-                  </h5>
+                  <p
+                    [tooltipZIndex]="'3000'"
+                    [escape]="false"
+                    [pTooltip]="comment.description! + '<small>(' + comment.shortcut + ')</small>'"
+                    tooltipPosition="left"
+                    class="card-title"
+                  >
+                    {{ comment.text }} <span style="font-size: x-small"> ({{ comment.shortcut }}) </span>
+                  </p>
                 </div>
               </div>
             </div>
@@ -632,7 +642,9 @@
                 <div *ngIf="!minimizeComment">
                   <div *ngIf="currentQuestion?.typeAlgoName === 'QCM'">
                     <h5 class="card-title">{{ comment.text }}</h5>
-                    <p class="card-text">{{ comment.description }}</p>
+                    <p class="card-text">
+                      {{ comment.description }} <span style="font-size: x-small"> ({{ comment.shortcut }}) </span>
+                    </p>
                   </div>
 
                   <div *ngIf="currentQuestion?.typeAlgoName !== 'QCM'">
@@ -652,7 +664,9 @@
                     </p-inplace>
                     <p-inplace [closable]="true" [active]="active.get(comment.id!)" (onDeactivate)="closeEditComment(comment)">
                       <ng-template pTemplate="display">
-                        <p class="card-text">{{ comment.description }}</p>
+                        <p class="card-text">
+                          {{ comment.description }} <span style="font-size: x-small"> ({{ comment.shortcut }}) </span>
+                        </p>
                       </ng-template>
                       <ng-template pTemplate="content">
                         <input
@@ -702,9 +716,14 @@
                 </div>
                 <div *ngIf="minimizeComment" (click)="toggleGComment(comment)">
                   <div *ngIf="currentQuestion?.typeAlgoName! === 'QCM'">
-                    <h5 [tooltipZIndex]="'3000'" [pTooltip]="comment.description!" tooltipPosition="left" class="card-title">
-                      {{ comment.text }}
-                    </h5>
+                    <p
+                      [tooltipZIndex]="'3000'"
+                      [pTooltip]="comment.description! + '<small>(' + comment.shortcut + ')</small>'"
+                      tooltipPosition="left"
+                      class="card-title"
+                    >
+                      {{ comment.text }}<span style="font-size: x-small"> ({{ comment.shortcut }}) </span>
+                    </p>
                   </div>
                   <div *ngIf="currentQuestion?.typeAlgoName! !== 'QCM'" (click)="toggleGComment(comment)">
                     <h5 [tooltipZIndex]="'3000'" [pTooltip]="comment!.description!" tooltipPosition="left" class="card-title">
