@@ -64,7 +64,7 @@ export class ResultatStudentcourseComponent implements OnInit {
             this.mailabiBody = this.translate.instant('scanexam.mailabitemplate');
           });
           this.loadEtudiants();
-          this.loadLibelle();
+          // this.loadLibelle();
         });
         this.translate.onLangChange.subscribe(() => {
           this.translate.get('scanexam.mailtemplate').subscribe(data => {
@@ -154,61 +154,61 @@ export class ResultatStudentcourseComponent implements OnInit {
     });
   }
 
-  loadLibelle(): void {
-    this.blocked = true;
-    this.http.get(this.applicationConfigService.getEndpointFor('api/getLibelleQuestions/' + this.examid)).subscribe(s => {
-      // eslint-disable-next-line no-console
-      this.libelles = s as any;
-      this.blocked = false;
-    });
+  async loadLibelle(): Promise<void> {
+    const l = (await firstValueFrom(
+      this.http.get(this.applicationConfigService.getEndpointFor('api/getLibelleQuestions/' + this.examid)),
+    )) as any;
+    this.libelles = l;
   }
 
   exportExcel(): void {
-    import('xlsx').then(xlsx => {
-      let maxQuestion = 0;
-      this.studentsresult.forEach(res => {
-        // eslint-disable-next-line no-console
-        for (const key in res.notequestions) {
-          // eslint-disable-next-line no-prototype-builtins
-          if (res.notequestions.hasOwnProperty(key)) {
-            if (+key > maxQuestion) {
-              maxQuestion = +key;
+    this.loadLibelle().then(() => {
+      import('xlsx').then(xlsx => {
+        let maxQuestion = 0;
+        this.studentsresult.forEach(res => {
+          // eslint-disable-next-line no-console
+          for (const key in res.notequestions) {
+            // eslint-disable-next-line no-prototype-builtins
+            if (res.notequestions.hasOwnProperty(key)) {
+              if (+key > maxQuestion) {
+                maxQuestion = +key;
+              }
             }
           }
-        }
-      });
-      this.studentsresult.forEach(res => {
-        for (let i = 1; i <= maxQuestion; i++) {
-          if (this.libelles[i] !== undefined && this.libelles[i] !== '') {
-            res['Q' + i + ' (' + this.libelles[i] + ')'] = undefined;
-          } else {
-            res['Q' + i] = undefined;
-          }
-        }
-      });
-
-      this.studentsresult.forEach(res => {
-        if (res['note'] !== undefined) {
-          res['note'] = parseFloat(res['note'].replaceAll(',', '.'));
-        }
-        if (res['abi'] !== undefined) {
-          res['abi'] = !!res['abi'];
-        }
-        for (const key in res.notequestions) {
-          // eslint-disable-next-line no-prototype-builtins
-          if (res.notequestions.hasOwnProperty(key)) {
-            if (this.libelles[key] !== undefined && this.libelles[key] !== '') {
-              res['Q' + key + ' (' + this.libelles[key] + ')'] = parseFloat(res.notequestions[key].replaceAll(',', '.'));
+        });
+        this.studentsresult.forEach(res => {
+          for (let i = 1; i <= maxQuestion; i++) {
+            if (this.libelles[i] !== undefined && this.libelles[i] !== '') {
+              res['Q' + i + ' (' + this.libelles[i] + ')'] = undefined;
             } else {
-              res['Q' + key] = parseFloat(res.notequestions[key].replaceAll(',', '.'));
+              res['Q' + i] = undefined;
             }
           }
-        }
+        });
+
+        this.studentsresult.forEach(res => {
+          if (res['note'] !== undefined) {
+            res['note'] = parseFloat(res['note'].replaceAll(',', '.'));
+          }
+          if (res['abi'] !== undefined) {
+            res['abi'] = !!res['abi'];
+          }
+          for (const key in res.notequestions) {
+            // eslint-disable-next-line no-prototype-builtins
+            if (res.notequestions.hasOwnProperty(key)) {
+              if (this.libelles[key] !== undefined && this.libelles[key] !== '') {
+                res['Q' + key + ' (' + this.libelles[key] + ')'] = parseFloat(res.notequestions[key].replaceAll(',', '.'));
+              } else {
+                res['Q' + key] = parseFloat(res.notequestions[key].replaceAll(',', '.'));
+              }
+            }
+          }
+        });
+        const worksheet = xlsx.utils.json_to_sheet(this.studentsresult);
+        const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
+        const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
+        this.saveAsExcelFile(excelBuffer, 'students');
       });
-      const worksheet = xlsx.utils.json_to_sheet(this.studentsresult);
-      const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
-      const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
-      this.saveAsExcelFile(excelBuffer, 'students');
     });
   }
 
