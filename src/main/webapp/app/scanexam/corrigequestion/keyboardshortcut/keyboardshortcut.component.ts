@@ -84,19 +84,28 @@ export class KeyboardshortcutComponent implements AfterViewInit {
     }
     for (const { index, comment } of comments.map((c1, i) => ({ index: i, comment: c1 }))) {
       if (!toRemove.includes(comment.id!)) {
-        this.keyboardShortcuts.push({
-          key: ['ctrl + ' + (index + 1), 'cmd + ' + (index + 1)],
-          label: this.translateService.instant('gradeScopeIsticApp.comments.detail.title'),
-          description: 'toggle ' + comment.description,
-          command: () => {
-            if ('grade' in comment) {
-              this.toggleGCommentById.emit(comment.id);
-            } else {
-              this.toggleTCommentById.emit(comment.id);
-            }
-          },
-          preventDefault: true,
-        });
+        let sh = '' + (index + 1);
+        let createShortcut = true;
+        if (index + 1 > 9 && index + 1 < 36) {
+          sh = String.fromCharCode(87 + index + 1);
+        } else if (index + 1 >= 36) {
+          createShortcut = false;
+        }
+        if (createShortcut) {
+          this.keyboardShortcuts.push({
+            key: ['ctrl + ' + sh, 'cmd + ' + sh],
+            label: this.translateService.instant('gradeScopeIsticApp.comments.detail.title'),
+            description: 'toggle ' + comment.description,
+            command: () => {
+              if ('grade' in comment) {
+                this.toggleGCommentById.emit(comment.id);
+              } else {
+                this.toggleTCommentById.emit(comment.id);
+              }
+            },
+            preventDefault: true,
+          });
+        }
       }
     }
   }

@@ -82,6 +82,29 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   currentZoneVoirCopieHandler: ZoneVoirCopieHandler | undefined;
   scale = 1;
   windowWidth = 1;
+
+  activeIndex = 1;
+  responsiveOptions2: any[] = [
+    {
+      breakpoint: '1500px',
+      numVisible: 5,
+    },
+    {
+      breakpoint: '1024px',
+      numVisible: 3,
+    },
+    {
+      breakpoint: '768px',
+      numVisible: 2,
+    },
+    {
+      breakpoint: '560px',
+      numVisible: 1,
+    },
+  ];
+  displayBasic = false;
+  images: any[] = [];
+
   constructor(
     protected applicationConfigService: ApplicationConfigService,
     private http: HttpClient,
@@ -163,6 +186,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   async finalize() {
     // this.courseService.find(this.exam!.courseId!).subscribe(e => (this.course = e.body!));
 
+    this.images = [];
     // Step 4 Query zone 4 questions
     this.blocked = false;
     const b = await firstValueFrom(this.questionService.query({ examId: this.exam!.id }));
@@ -214,6 +238,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   }
 
   reloadImage() {
+    this.images = [];
     this.questions!.forEach((q, i) => {
       this.showImage[i] = false;
       this.loadZone(
@@ -348,6 +373,12 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
           if (count === 0) {
             this.cacheUploadService.getNoAlignImage(this.exam!.id!, pageInscan).subscribe(body => {
               const image = JSON.parse(body, this.reviver);
+              this.images.push({
+                src: image.pages,
+                alt: 'Description for Image 2',
+                title: 'Exam',
+              });
+
               db.addNonAligneImage({
                 examId: this.exam!.id!,
                 pageNumber: pageInscan,
@@ -359,6 +390,11 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
           } else if (count > 0) {
             db.getFirstNonAlignImage(+this.exam!.id!, pageInscan).then(e2 => {
               const image = JSON.parse(e2!.value, this.reviver);
+              this.images.push({
+                src: image.pages,
+                alt: 'Description for Image 2',
+                title: 'Exam',
+              });
               this.loadImage1(image, pageInscan, zone, resolve);
             });
           } else {
@@ -374,6 +410,12 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
           if (count === 0) {
             this.cacheUploadService.getAlignImage(this.exam!.id!, pageInscan).subscribe(body => {
               const image = JSON.parse(body, this.reviver);
+              this.images.push({
+                src: image.pages,
+                alt: 'Description for Image 2',
+                title: 'Exam',
+              });
+
               db.addAligneImage({
                 examId: this.exam!.id!,
                 pageNumber: pageInscan,
@@ -385,6 +427,12 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
           } else if (count > 0) {
             db.getFirstAlignImage(+this.exam!.id!, pageInscan).then(e2 => {
               const image = JSON.parse(e2!.value, this.reviver);
+              this.images.push({
+                src: image.pages,
+                alt: 'Description for Image 2',
+                title: 'Exam',
+              });
+
               this.loadImage1(image, pageInscan, zone, resolve);
             });
           } else {
@@ -544,10 +592,16 @@ ${firsName}
 
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
+    this.displayBasic = false;
     const old = this.windowWidth;
     this.windowWidth = event.target.innerWidth;
     if (old / event.target.innerWidth > 1.15 || old / event.target.innerWidth < 0.85) {
       this.reloadImage();
     }
+  }
+
+  showGalleria(): void {
+    console.error(this.images.length, this.images);
+    this.displayBasic = true;
   }
 }
