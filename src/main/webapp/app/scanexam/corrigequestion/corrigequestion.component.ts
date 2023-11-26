@@ -485,7 +485,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
     for (const { index, comment } of comments.map((c1, i) => ({ index: i, comment: c1 }))) {
       if (!toRemove.includes(comment.id!)) {
-        comment.shortcut = ['ctrl + ' + (index + 1), 'cmd + ' + (index + 1)];
+        let sh = '' + (index + 1);
+        let createShortcut = true;
+        if (index + 1 > 9 && index + 1 < 36) {
+          sh = String.fromCharCode(87 + index + 1);
+        } else if (index + 1 >= 36) {
+          createShortcut = false;
+        }
+        if (createShortcut) {
+          comment.shortcut = ['ctrl + ' + sh, 'cmd + ' + sh];
+        }
       }
     }
   }
@@ -509,7 +518,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   saveShortCut() {
     this.testdisableAndEnableKeyBoardShortCut = false;
-
     this.shortCut4Comment = false;
     const shorts = this.keyboardShortcutService.getShortCutPreference();
     if (shorts.shortcuts.has(this.examId! + '_' + this.questionindex)) {

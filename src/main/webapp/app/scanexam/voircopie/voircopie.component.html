@@ -4,6 +4,26 @@
     <!--<i class="pi pi-lock" style="font-size: 3rem"></i>-->
     <p-progressSpinner></p-progressSpinner>
   </p-blockUI>
+  <p-galleria
+    [value]="images"
+    [(visible)]="displayBasic"
+    [responsiveOptions]="responsiveOptions2"
+    [circular]="true"
+    [fullScreen]="true"
+    [showItemNavigators]="true"
+    [baseZIndex]="100000"
+    [showThumbnails]="false"
+    [containerStyle]="{ 'max-height': '90vh' }"
+  >
+    <ng-template pTemplate="item" let-item>
+      <div
+        class="grid grid-nogutter justify-content-center"
+        style="overflow-x: hidden; overflow-y: scroll; border: #000000 1px solid; height: 96vh; width: 90vw"
+      >
+        <img [src]="item.src" style="display: block" />
+      </div>
+    </ng-template>
+  </p-galleria>
 
   <div class="col-12">
     <div class="grid grid-nogutter">
@@ -19,7 +39,20 @@
       <div class="col-4 flex flex-row-reverse"></div>
     </div>
     <div class="grid grid-nogutter" style="padding-bottom: 1rem; padding-top: 1rem">
-      <div class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-10">
+      <div class="col-1 sm:col-1 md:col-1 lg:col-1 xl:col-1">
+        <div class="d-flex justify-content-center">
+          <button
+            pButton
+            (click)="showGalleria()"
+            jhiTranslate="scanexam.showgalleria"
+            [pTooltip]="'scanexam.showFullPageTooltip' | translate"
+            [tooltipPosition]="'bottom'"
+          >
+            Voir page complète
+          </button>
+        </div>
+      </div>
+      <div class="col-10 sm:col-10 md:col-10 lg:col-10 xl:col-10">
         <div class="d-flex justify-content-center" ng-if="questionnofirst !== -1">
           <p-paginator
             [currentPageReportTemplate]="'scanexam.currentpagetemplate' | translate"
@@ -31,6 +64,9 @@
             [showPageLinks]="false"
           ></p-paginator>
         </div>
+      </div>
+      <div class="col-1 sm:col-1 md:col-1 lg:col-1 xl:col-1">
+        <div class="d-flex justify-content-center"></div>
       </div>
     </div>
     <div class="grid grid-nogutter" style="padding-bottom: 1rem; padding-top: 1rem">

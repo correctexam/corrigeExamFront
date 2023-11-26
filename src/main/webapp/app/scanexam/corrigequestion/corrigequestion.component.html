@@ -275,6 +275,8 @@
               [disabled]="!examId && blocked"
               (click)="showGalleria()"
               jhiTranslate="scanexam.showgalleria"
+              [pTooltip]="'scanexam.showFullPageTooltip' | translate"
+              [tooltipPosition]="'bottom'"
             >
               Show full page
             </button>
