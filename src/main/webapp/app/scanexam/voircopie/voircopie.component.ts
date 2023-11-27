@@ -13,7 +13,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { StudentService } from 'app/entities/student/service/student.service';
-import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AlignImagesService } from '../services/align-images.service';
 import { db } from '../db/dbstudent';
@@ -110,7 +109,6 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     private http: HttpClient,
 
     public examService: ExamService,
-    public zoneService: ZoneService,
     public studentService: StudentService,
     protected activatedRoute: ActivatedRoute,
     public confirmationService: ConfirmationService,
@@ -242,7 +240,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     this.questions!.forEach((q, i) => {
       this.showImage[i] = false;
       this.loadZone(
-        q.zoneId,
+        q.zoneDTO,
         b => {
           this.showImage[i] = b;
         },
@@ -305,19 +303,17 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   }
 
   async loadZone(
-    zoneId: number | undefined,
+    zone: IZone | undefined,
     showImageRef: (s: boolean) => void,
     imageRef: ElementRef<any> | undefined,
     currentStudent: number,
     index: number,
   ): Promise<IZone | undefined> {
     return new Promise<IZone | undefined>(resolve => {
-      if (zoneId) {
-        this.zoneService.find(zoneId).subscribe(e => {
-          this.getAllImage4Zone(currentStudent! * this.nbreFeuilleParCopie! + e.body!.pageNumber!, e.body!).then(p => {
-            this.displayImage(p, imageRef, showImageRef, index);
-            resolve(e.body!);
-          });
+      if (zone) {
+        this.getAllImage4Zone(currentStudent! * this.nbreFeuilleParCopie! + zone.pageNumber!, zone).then(p => {
+          this.displayImage(p, imageRef, showImageRef, index);
+          resolve(zone);
         });
       } else {
         resolve(undefined);

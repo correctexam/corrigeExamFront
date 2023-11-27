@@ -1,6 +1,7 @@
 import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
+import { Zone } from '../zone/zone.model';
 
 export interface IQuestion {
   id?: number;
@@ -17,6 +18,7 @@ export interface IQuestion {
   typeId?: number;
   examName?: string;
   examId?: number;
+  zoneDTO?: Zone;
 }
 
 export class Question implements IQuestion {
@@ -34,6 +36,7 @@ export class Question implements IQuestion {
     public typeId?: number,
     public examName?: string,
     public examId?: number,
+    public zoneDTO?: Zone,
   ) {}
 }
 export function getQuestionIdentifier(question: IQuestion): number | undefined {
