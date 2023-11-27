@@ -1,0 +1,11 @@
+<label><span jhiTranslate="scanexam.epaisseur">épaisseur : </span>&nbsp;({{ value }})</label>
+<p-slider
+  [(ngModel)]="value"
+  [min]="min"
+  [max]="max"
+  [step]="smallStep"
+  [tooltipPosition]="'bottom'"
+  [pTooltip]="'scanexam.epaisseurTooltip' | translate"
+  [tooltipZIndex]="'3000'"
+>
+</p-slider>

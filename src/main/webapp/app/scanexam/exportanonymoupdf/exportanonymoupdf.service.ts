@@ -22,9 +22,10 @@ import { ApplicationConfigService } from '../../core/config/application-config.s
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 import { ExportPDFDto, Questionspdf, Sheetspdf, StudentResponsepdf } from './exportpdf.model';
 import { IComments } from 'app/entities/comments/comments.model';
-import { SVG } from '@svgdotjs/svg.js';
+import { SVG, Text, G } from '@svgdotjs/svg.js';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { firstValueFrom } from 'rxjs';
+import { svgadapter } from '../svg.util';
 
 const coefficient = 100000;
 
@@ -98,7 +99,6 @@ export class ExportPdfService {
     );
 
     const exportPromises: Promise<void>[] = [];
-    console.error(this.examExport);
     this.examExport?.sheetspdf?.forEach((sheet, index1) => {
       exportPromises.push(this.processPage(sheet, index1));
     });
@@ -244,7 +244,7 @@ export class ExportPdfService {
         }
         draw.node.attributes.removeNamedItem('transform');
 
-        const svg = new Blob([draw.svg()], { type: 'image/svg+xml' });
+        const svg = new Blob([draw.svg(svgadapter)], { type: 'image/svg+xml' });
         const url = URL.createObjectURL(svg);
         const img1 = new Image();
         img1.onload = () => {

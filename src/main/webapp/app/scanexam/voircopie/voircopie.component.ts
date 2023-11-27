@@ -73,6 +73,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   uuid = '';
   sheet: IExamSheet | undefined;
   resolve: any;
+  correctionLink: string | undefined;
   note = new Promise<number>(resolve => {
     this.resolve = resolve;
   });
@@ -81,6 +82,29 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   currentZoneVoirCopieHandler: ZoneVoirCopieHandler | undefined;
   scale = 1;
   windowWidth = 1;
+
+  activeIndex = 1;
+  responsiveOptions2: any[] = [
+    {
+      breakpoint: '1500px',
+      numVisible: 5,
+    },
+    {
+      breakpoint: '1024px',
+      numVisible: 3,
+    },
+    {
+      breakpoint: '768px',
+      numVisible: 2,
+    },
+    {
+      breakpoint: '560px',
+      numVisible: 1,
+    },
+  ];
+  displayBasic = false;
+  images: any[] = [];
+
   constructor(
     protected applicationConfigService: ApplicationConfigService,
     private http: HttpClient,
@@ -144,10 +168,11 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
                   this.questionindex = +params.get('questionno')! - 1;
 
                   // Step 1 Query templates
-
+                  this.correctionLink = '/answer/' + this.exam.id! + '/' + params.get('questionno') + '/' + (this.currentStudent + 1);
                   this.nbreFeuilleParCopie = this.sheet!.pagemax! - this.sheet!.pagemin! + 1;
                   // Step 2 Query Scan in local DB
                   this.finalize().then(() => {
+                    this.initEmail();
                     this.populateBestSolutions();
                   });
                 }
@@ -161,6 +186,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   async finalize() {
     // this.courseService.find(this.exam!.courseId!).subscribe(e => (this.course = e.body!));
 
+    this.images = [];
     // Step 4 Query zone 4 questions
     this.blocked = false;
     const b = await firstValueFrom(this.questionService.query({ examId: this.exam!.id }));
@@ -191,6 +217,15 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
         } else {
           this.currentGradedComment4Question = this.resp.gradedcomments!;
         }
+      } else {
+        this.currentNote = 0;
+        if (this.questions![0].gradeType === GradeType.DIRECT && this.questions![0].typeAlgoName !== 'QCM') {
+          this.currentTextComment4Question = [];
+          this.currentGradedComment4Question = [];
+        } else {
+          this.currentGradedComment4Question = [];
+          this.currentTextComment4Question = [];
+        }
       }
     }
   }
@@ -203,6 +238,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   }
 
   reloadImage() {
+    this.images = [];
     this.questions!.forEach((q, i) => {
       this.showImage[i] = false;
       this.loadZone(
@@ -337,6 +373,12 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
           if (count === 0) {
             this.cacheUploadService.getNoAlignImage(this.exam!.id!, pageInscan).subscribe(body => {
               const image = JSON.parse(body, this.reviver);
+              this.images.push({
+                src: image.pages,
+                alt: 'Description for Image 2',
+                title: 'Exam',
+              });
+
               db.addNonAligneImage({
                 examId: this.exam!.id!,
                 pageNumber: pageInscan,
@@ -348,6 +390,11 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
           } else if (count > 0) {
             db.getFirstNonAlignImage(+this.exam!.id!, pageInscan).then(e2 => {
               const image = JSON.parse(e2!.value, this.reviver);
+              this.images.push({
+                src: image.pages,
+                alt: 'Description for Image 2',
+                title: 'Exam',
+              });
               this.loadImage1(image, pageInscan, zone, resolve);
             });
           } else {
@@ -363,6 +410,12 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
           if (count === 0) {
             this.cacheUploadService.getAlignImage(this.exam!.id!, pageInscan).subscribe(body => {
               const image = JSON.parse(body, this.reviver);
+              this.images.push({
+                src: image.pages,
+                alt: 'Description for Image 2',
+                title: 'Exam',
+              });
+
               db.addAligneImage({
                 examId: this.exam!.id!,
                 pageNumber: pageInscan,
@@ -374,6 +427,12 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
           } else if (count > 0) {
             db.getFirstAlignImage(+this.exam!.id!, pageInscan).then(e2 => {
               const image = JSON.parse(e2!.value, this.reviver);
+              this.images.push({
+                src: image.pages,
+                alt: 'Description for Image 2',
+                title: 'Exam',
+              });
+
               this.loadImage1(image, pageInscan, zone, resolve);
             });
           } else {
@@ -456,8 +515,17 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
       return value;
     }
   }
-  getEmail(): string {
+
+  email: string = '';
+
+  async initEmail() {
     if (this.selectionStudents !== undefined && this.exam !== undefined && this.questions !== undefined) {
+      const courseid = this.exam.courseId;
+      const emailsObj = await firstValueFrom(
+        this.http.get<any>(this.applicationConfigService.getEndpointFor('api/getAllEmailProfs4course/' + courseid)),
+      );
+      const emails: (string | undefined)[] = emailsObj.emails;
+
       const firsName = this.selectionStudents![0].firstname!;
       const lastName = this.selectionStudents![0].name!;
       const examName = this.exam!.name!;
@@ -485,12 +553,24 @@ ${firsName}
 `;
 
       if (this.translateService.currentLang === 'fr') {
-        return "mailto:?subject=Retour sur l'examen " + this.exam!.name + '&body=' + tfr;
+        this.email =
+          'mailto:' +
+          emails.filter(e => e !== undefined && e !== '').join(',') +
+          "?subject=Retour sur l'examen " +
+          this.exam!.name +
+          '&body=' +
+          tfr;
       } else {
-        return 'mailto:?subject=Feedback on your ewam ' + this.exam!.name + '&body=' + ten;
+        this.email =
+          'mailto:' +
+          emails.filter(e => e !== undefined && e !== '').join(',') +
+          '?subject=Feedback on your ewam ' +
+          this.exam!.name +
+          '&body=' +
+          ten;
       }
     } else {
-      return '';
+      this.email = '';
     }
   }
 
@@ -512,10 +592,16 @@ ${firsName}
 
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
+    this.displayBasic = false;
     const old = this.windowWidth;
     this.windowWidth = event.target.innerWidth;
     if (old / event.target.innerWidth > 1.15 || old / event.target.innerWidth < 0.85) {
       this.reloadImage();
     }
+  }
+
+  showGalleria(): void {
+    console.error(this.images.length, this.images);
+    this.displayBasic = true;
   }
 }

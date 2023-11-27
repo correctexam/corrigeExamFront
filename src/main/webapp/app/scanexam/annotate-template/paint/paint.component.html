@@ -2,8 +2,18 @@
   <div class="">
     <jhi-fabric-canvas [exam]="exam" [content]="content" [numeroEvent]="numero"></jhi-fabric-canvas>
   </div>
-  <div class="flex flex-column flex-grow-1 top-0 right-0 p-1 m-2">
-    <button type="submit" (click)="previousState()" class="right-0 p-button-primary" pButton data-cy="entityDetailsBackButton">
+  <div
+    class="flex flex-column flex-grow-1 top-0 right-0 p-1 m-2"
+    style="overflow-y: auto; overflow-x: hidden; max-height: 85vh; position: sticky; top: 0"
+  >
+    <button
+      style="overflow: visible"
+      type="submit"
+      (click)="previousState()"
+      class="right-0 p-button-primary"
+      pButton
+      data-cy="entityDetailsBackButton"
+    >
       <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
     </button>
     <div class="templateForm">

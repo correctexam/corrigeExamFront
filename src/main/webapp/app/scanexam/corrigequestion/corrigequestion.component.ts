@@ -62,6 +62,12 @@ import { IKeyBoardShortCutPreferenceEntry, KeyboardShortcutService } from '../pr
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { DrawingTools } from '../annotate-template/paint/models';
 
+enum ScalePolicy {
+  FitWidth = 1,
+  FitHeight = 2,
+  Original = 3,
+}
+
 @Component({
   selector: 'jhi-corrigequestion',
   templateUrl: './corrigequestion.component.html',
@@ -258,6 +264,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
         // eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
         if (this.questionindex4shortcut !== questionindex4shortcut_prev) {
+          this.currentGradedComment4Question = [];
+          this.currentTextComment4Question = [];
+
           if (params.get('questionno') !== null) {
             this.questionindex = +params.get('questionno')! - 1;
           }
@@ -311,6 +320,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                   }
                 });
                 this.currentGradedComment4Question = com.body!;
+
                 this.currentGradedComment4Question.forEach(com1 => {
                   this.active.set(com1.id!, false);
                 });
@@ -337,6 +347,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 });
               }
             }
+            this.populateDefaultShortCut();
           }
           this.showImage = new Array<boolean>(questions.length);
 
@@ -370,7 +381,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.shortcuts.push(
       {
         // ArrowRight
-        key: ['ctrl + right', 'meta + right'],
+        key: ['ctrl + right', 'cmd + right'],
         label: 'Navigation',
         description: this.translateService.instant('scanexam.nextstudent'),
         command: () => this.nextStudent(),
@@ -378,7 +389,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       },
       {
         // ArrowLeft
-        key: ['ctrl + left', 'meta + left'],
+        key: ['ctrl + left', 'cmd + left'],
         label: 'Navigation',
         description: this.translateService.instant('scanexam.previousstudent'),
         command: () => this.previousStudent(),
@@ -386,14 +397,14 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       },
 
       {
-        key: ['ctrl + up', 'meta + up'],
+        key: ['ctrl + up', 'cmd + up'],
         label: 'Navigation',
         description: this.translateService.instant('scanexam.previousquestion'),
         command: () => this.previousQuestion(),
         preventDefault: true,
       },
       {
-        key: ['ctrl + down', 'meta + down'],
+        key: ['ctrl + down', 'cmd + down'],
         label: 'Navigation',
         description: this.translateService.instant('scanexam.nextquestion'),
         command: () => this.nextQuestion(),
@@ -448,6 +459,46 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   active: Map<number, boolean> = new Map();
 
+  populateDefaultShortCut(): void {
+    const toRemove: number[] = [];
+    const comments: (IGradedComment | ITextComment)[] = [];
+    if (this.currentGradedComment4Question) {
+      comments.push(...this.currentGradedComment4Question);
+    }
+    if (this.currentTextComment4Question) {
+      comments.push(...this.currentTextComment4Question);
+    }
+
+    if (this.keyboardShortcutService.getShortCutPreference().shortcuts.has(this.examId + '_' + this.questionindex)) {
+      const res: IKeyBoardShortCutPreferenceEntry[] = this.keyboardShortcutService
+        .getShortCutPreference()
+        .shortcuts.get(this.examId + '_' + this.questionindex)!;
+      res
+        .filter(e1 => e1.examId === +this.examId! && e1.questionIndex === +this.questionindex)
+        .forEach(entry => {
+          toRemove.push(entry.commentId);
+          const c2 = comments.filter(c => c.id === entry.commentId);
+          if (c2.length > 0) {
+            c2[0].shortcut = entry.key;
+          }
+        });
+    }
+    for (const { index, comment } of comments.map((c1, i) => ({ index: i, comment: c1 }))) {
+      if (!toRemove.includes(comment.id!)) {
+        let sh = '' + (index + 1);
+        let createShortcut = true;
+        if (index + 1 > 9 && index + 1 < 36) {
+          sh = String.fromCharCode(87 + index + 1);
+        } else if (index + 1 >= 36) {
+          createShortcut = false;
+        }
+        if (createShortcut) {
+          comment.shortcut = ['ctrl + ' + sh, 'cmd + ' + sh];
+        }
+      }
+    }
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   editComment(comment: any) {
     this.active.set(comment.id, true);
@@ -458,6 +509,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.testdisableAndEnableKeyBoardShortCut = false;
     this.shortCut4Comment = false;
     this.keyboardShortcutService.clearToDefault();
+    this.populateDefaultShortCut();
+
     setTimeout(() => {
       (this.testdisableAndEnableKeyBoardShortCut = true), 300;
     });
@@ -465,7 +518,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   saveShortCut() {
     this.testdisableAndEnableKeyBoardShortCut = false;
-
     this.shortCut4Comment = false;
     const shorts = this.keyboardShortcutService.getShortCutPreference();
     if (shorts.shortcuts.has(this.examId! + '_' + this.questionindex)) {
@@ -509,6 +561,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       ]);
     }
     this.keyboardShortcutService.save(shorts);
+    this.populateDefaultShortCut();
     this.commentShortcut = null;
     this.currentKeyBoardShorcut = '';
     setTimeout(() => {
@@ -741,6 +794,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     return new Promise<IStudentResponse>((resolve, reject) => {
       this.gradedCommentService.create(comment).subscribe(e1 => {
         if (e1.body !== null) {
+          this.testdisableAndEnableKeyBoardShortCut = false;
+          this.populateDefaultShortCut();
+          setTimeout(() => {
+            (this.testdisableAndEnableKeyBoardShortCut = true), 300;
+          });
           resolve(e1.body!);
         } else {
           reject(null);
@@ -1073,6 +1131,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               this.resp = resp1.body!;
               (currentComment as any).checked = true;
               this.currentTextComment4Question?.push(currentComment);
+              this.testdisableAndEnableKeyBoardShortCut = false;
+              this.populateDefaultShortCut();
+              setTimeout(() => {
+                (this.testdisableAndEnableKeyBoardShortCut = true), 300;
+              });
+
               this.titreCommentaire = '';
               this.descCommentaire = '';
               this.blocked = false;
@@ -1095,6 +1159,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
               (currentComment as any).checked = true;
               this.currentGradedComment4Question?.push(currentComment);
+              this.testdisableAndEnableKeyBoardShortCut = false;
+              this.populateDefaultShortCut();
+              setTimeout(() => {
+                (this.testdisableAndEnableKeyBoardShortCut = true), 300;
+              });
+
               this.computeNote(false, this.resp!, this.currentQuestion!);
               this.titreCommentaire = '';
               this.descCommentaire = '';
@@ -1386,7 +1456,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       z: zone,
     };
     const crop = await firstValueFrom(this.alignImagesService.imageCropFromZone(imageToCrop));
-    this.computeScale(crop.width);
+    this.computeScale(crop.width, crop.height);
 
     return {
       i: new ImageData(new Uint8ClampedArray(crop.image), crop.width, crop.height),
@@ -1406,7 +1476,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       z: zone,
     };
     const crop = await firstValueFrom(this.alignImagesService.imageCropFromZone(imageToCrop));
-    this.computeScale(crop.width);
+    this.computeScale(crop.width, crop.height);
 
     return {
       i: new ImageData(new Uint8ClampedArray(crop.image), crop.width, crop.height),
@@ -1462,15 +1532,45 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.displayBasic = false;
   }
 
-  computeScale(imageWidth: number): void {
-    let factorScale = 0.75;
-    if (this.windowWidth < 991) {
-      factorScale = 0.95;
+  scalePolicy = ScalePolicy.FitWidth;
+  scaleOptions = [
+    { name: 'FitWidth', value: ScalePolicy.FitWidth },
+    { name: 'FitHeight', value: ScalePolicy.FitHeight },
+    { name: 'No Fit', value: ScalePolicy.Original },
+  ];
+  updateScalePolicy(event: any) {
+    this.scalePolicy = event.value;
+    this.reloadImage();
+  }
+  computeScale(imageWidth: number, imageHeight: number): void {
+    let scale = 1;
+    if (this.scalePolicy === ScalePolicy.FitWidth) {
+      let factorScale = 0.75;
+      if (this.windowWidth < 991) {
+        factorScale = 0.95;
+      }
+      scale = (window.innerWidth * factorScale) / imageWidth;
+      if (scale > 2) {
+        scale = 2;
+      }
+    } else if (this.scalePolicy === ScalePolicy.FitHeight) {
+      const factorScale = 0.7;
+      scale = (window.innerHeight * factorScale) / imageHeight;
+      if (scale > 2) {
+        scale = 2;
+      }
+      let factorScaleW = 0.75;
+      if (this.windowWidth < 991) {
+        factorScaleW = 0.95;
+      }
+      if (imageWidth * scale > factorScaleW * window.innerWidth) {
+        scale = (window.innerWidth * factorScaleW) / imageWidth;
+      }
+    } else {
+      // Fitnormal
+      scale = 1;
     }
-    let scale = (window.innerWidth * factorScale) / imageWidth;
-    if (scale > 2) {
-      scale = 2;
-    }
+
     this.scale = scale;
     this.eventHandler.scale = this.scale;
   }
@@ -1481,7 +1581,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       i.onload = () => {
         const editedImage: HTMLCanvasElement = <HTMLCanvasElement>document.createElement('canvas');
         editedImage.width = i.width;
-        this.computeScale(i.width);
+        this.computeScale(i.width, i.height);
         editedImage.height = i.height;
         const ctx = editedImage.getContext('2d');
         ctx!.drawImage(i, 0, 0);

@@ -17,7 +17,8 @@ import { CustomFabricObject } from '../annotate-template/paint/models';
 import { Injectable } from '@angular/core';
 import { IComments } from '../../entities/comments/comments.model';
 import { CommentsService } from '../../entities/comments/service/comments.service';
-import { SVG, extend as SVGextend, Element as SVGElement, G } from '@svgdotjs/svg.js';
+import { SVG, extend as SVGextend, Element as SVGElement, G, Text } from '@svgdotjs/svg.js';
+import { svgadapter } from '../svg.util';
 
 @Injectable({
   providedIn: 'root',
@@ -41,11 +42,14 @@ export class EventCanevasVoirCopieHandlerService {
             draw = SVG(svg.split('\n').splice(2).join('\n'));
           }
           draw.scale(this.scale, this.scale, 0, 0);
-
-          fabric.loadSVGFromString(draw.svg(), (objects, options) => {
+          const s2 = draw.svg(svgadapter);
+          fabric.loadSVGFromString(s2, (objects, options) => {
             // const obj = fabric.util.groupSVGElements(objects, options);
             if (objects.length > 0) {
-              objects.forEach(obj => c.add(obj));
+              objects.forEach(obj => {
+                obj.selectable = false;
+                c.add(obj);
+              });
               c.renderAll();
             }
           });
@@ -57,7 +61,10 @@ export class EventCanevasVoirCopieHandlerService {
   public allcanvas: fabric.Canvas[] = [];
   public scale = 1;
 
-  constructor(private fabricShapeService: FabricShapeService, public commentsService: CommentsService) {}
+  constructor(
+    private fabricShapeService: FabricShapeService,
+    public commentsService: CommentsService,
+  ) {}
 
   extendToObjectWithId(): void {
     fabric.Object.prototype.toObject = (function (toObject) {

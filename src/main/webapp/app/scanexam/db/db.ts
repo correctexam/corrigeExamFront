@@ -292,7 +292,6 @@ export class ExamIndexDB extends Dexie {
   }
 
   async moveAlignPages(from: number, to: number) {
-    console.error('move', from, to);
     if (from !== to) {
       await this.alignImages
         .where({ examId: this.examId, pageNumber: from })

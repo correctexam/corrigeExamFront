@@ -8,6 +8,7 @@ export interface IGradedComment {
   grade?: number | null;
   questionId?: number;
   studentResponses?: IStudentResponse[];
+  shortcut?: string | string[];
 }
 
 export class GradedComment implements IGradedComment {
@@ -18,7 +19,8 @@ export class GradedComment implements IGradedComment {
     public description?: string | null,
     public grade?: number | null,
     public questionId?: number,
-    public studentResponses?: IStudentResponse[]
+    public studentResponses?: IStudentResponse[],
+    public shortcut?: string | string[],
   ) {}
 }
 

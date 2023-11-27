@@ -30,8 +30,11 @@ import { Injectable } from '@angular/core';
 import { CustomFabricGroup } from '../annotate-template/paint/models';
 import { IComments } from '../../entities/comments/comments.model';
 import { CommentsService } from '../../entities/comments/service/comments.service';
-import { SVG, extend as SVGextend, Element as SVGElement, G } from '@svgdotjs/svg.js';
+import { SVG, extend as SVGextend, Element as SVGElement, G, Text } from '@svgdotjs/svg.js';
 import { Platform } from '@angular/cdk/platform';
+import { svgadapter } from '../svg.util';
+import { constants } from 'os';
+import { firstValueFrom } from 'rxjs';
 
 const RANGE_AROUND_CENTER = 20;
 
@@ -57,12 +60,33 @@ export class EventCanevascorrectionHandlerService {
             draw = SVG(svg.split('\n').splice(2).join('\n'));
           }
           draw.scale(this.scale, this.scale, 0, 0);
-          fabric.loadSVGFromString(draw.svg(), (objects, options) => {
-            // const obj = fabric.util.groupSVGElements(objects, options);
+          const s2 = draw.svg(svgadapter);
+          fabric.loadSVGFromString(s2, (objects, options) => {
+            // const obj = fabric.util.fabricShapeService(objects, options);
             c.clear();
             if (objects.length > 0) {
-              objects.forEach(obj => c.add(obj));
+              objects.forEach(obj => {
+                if (obj.type === 'text') {
+                  obj = this.convertToIText(obj);
+                  (obj as any).firstText = (obj as any).text;
+                  (obj as any).textState = 'original';
+                }
+                c.add(obj);
+              });
               c.renderAll();
+              if (
+                this._selectedTool === DrawingTools.SELECT ||
+                this._selectedTool === DrawingTools.ERASER ||
+                this._selectedTool === DrawingTools.FILL
+              ) {
+                c.forEachObject(obj => {
+                  obj.selectable = true;
+                });
+              } else {
+                c.forEachObject(obj => {
+                  obj.selectable = false;
+                });
+              }
             }
           });
         }
@@ -79,6 +103,7 @@ export class EventCanevascorrectionHandlerService {
   public modelViewpping = new Map<string, number>();
   //  zones: { [zoneNumber: number]: ZoneCorrectionHandler } = {};
   public scale = 1;
+
   set selectedTool(t: DrawingTools) {
     if (this.canvas !== undefined && this.canvas !== null) {
       this.canvas.discardActiveObject();
@@ -138,15 +163,17 @@ export class EventCanevascorrectionHandlerService {
     return this._selectedTool;
   }
   _selectedColour: DrawingColours = DrawingColours.RED;
-  set selectedColour(c: DrawingColours) {
+  public set selectedColour(c: DrawingColours) {
     this._selectedColour = c;
     this.canvas.discardActiveObject();
     this.canvas.renderAll();
   }
-  get selectedColour(): DrawingColours {
+  public get selectedColour(): DrawingColours {
     return this._selectedColour;
   }
   selectedThickness: DrawingThickness = DrawingThickness.MEDIUM;
+  selectedFontsize: number = 20;
+
   private _isMouseDown = false;
   public _elementUnderDrawing:
     | CustomFabricEllipse
@@ -165,6 +192,21 @@ export class EventCanevascorrectionHandlerService {
     public commentsService: CommentsService,
     private platform: Platform,
   ) {}
+
+  convertToIText(obj: any) {
+    const text = obj.text;
+    const textobj = obj.toObject();
+    delete textobj.text;
+    delete textobj.type;
+
+    textobj.fontSize = obj.fontSize;
+    textobj.fontFamily = obj.fontFamily;
+    textobj.fontStyle = obj.fontStyle;
+    textobj.fontWeight = obj.fontWeight;
+    const itext = new fabric.IText(text, textobj);
+    itext.styles = {};
+    return itext;
+  }
 
   registerSelectedToolObserver(f: (d: DrawingTools) => void): any {
     this.drawingToolObserver = f;
@@ -258,22 +300,24 @@ export class EventCanevascorrectionHandlerService {
         }
         break;
       case DrawingTools.TEXT:
-        this.fabricShapeService.createIText(this.canvas, {
+        // eslint-disable-next-line no-case-declarations
+        const fabicText = this.fabricShapeService.createIText(this.canvas, {
           thickness: this.selectedThickness / 2,
           colour: this._selectedColour,
           pointer,
-          fontSize: 20,
+          fontSize: this.selectedFontsize,
         });
+        this.canvas.setActiveObject(fabicText);
+        fabicText.selectAll();
+        fabicText.enterEditing();
+        //      (fabicText as any).hiddenTextarea.focus();
         break;
     }
   }
 
   async updateComments() {
     if (this.currentComment === null) {
-      const e1 = await this.commentsService
-        .query({ zonegeneratedid: (this.canvas as any).zoneid })
-        .pipe()
-        .toPromise();
+      const e1 = await firstValueFrom(this.commentsService.query({ zonegeneratedid: (this.canvas as any).zoneid }));
       if (e1!.body === undefined || e1!.body?.length === 0) {
         const draw = SVG(this.canvas.toSVG().split('\n').splice(2).join('\n'));
         draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
@@ -297,10 +341,9 @@ export class EventCanevascorrectionHandlerService {
     if (canvas === this.canvas) {
       return this.updateComments();
     } else {
-      const e1 = await this.commentsService
-        .query({ zonegeneratedid: (canvas as any).zoneid })
-        .pipe()
-        .toPromise();
+      const e1 = await firstValueFrom(this.commentsService.query({ zonegeneratedid: (canvas as any).zoneid }));
+      //        .pipe()
+      //        .toPromise();
       if (e1!.body === undefined || e1!.body?.length === 0) {
         const draw = SVG(canvas.toSVG().split('\n').splice(2).join('\n'));
         draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
@@ -349,6 +392,13 @@ export class EventCanevascorrectionHandlerService {
     this._isMouseDown = false;
     if (this._selectedTool === DrawingTools.PENCIL) {
       this._elementUnderDrawing = this.fabricShapeService.finishPath(this.canvas, this._elementUnderDrawing as CustomFabricPath);
+      this.updateComments().then(e2 =>
+        e2.subscribe(e1 => {
+          this.currentComment = e1.body;
+        }),
+      );
+    }
+    if (this._selectedTool === DrawingTools.TEXT) {
       this.updateComments().then(e2 =>
         e2.subscribe(e1 => {
           this.currentComment = e1.body;
@@ -416,11 +466,11 @@ export class EventCanevascorrectionHandlerService {
     const l = newLeft;
     const t = newTop;
     const nid = id;
-    this.updateComments().then(e2 =>
+    /*    this.updateComments().then(e2 =>
       e2.subscribe(e1 => {
         this.currentComment = e1.body!;
       }),
-    );
+    );*/
 
     if (type !== FabricObjectType.ELLIPSE) {
       return;
@@ -437,17 +487,32 @@ export class EventCanevascorrectionHandlerService {
     });
   }
 
+  objectModified() {
+    switch (this._selectedTool) {
+      case DrawingTools.TEXT:
+        this.selectedTool = DrawingTools.SELECT;
+        break;
+      default:
+        break;
+    }
+    this.updateComments().then(e2 =>
+      e2.subscribe(e1 => {
+        this.currentComment = e1.body!;
+      }),
+    );
+  }
+
   objectScaling(id: string, type: FabricObjectType, newScales: { x: number; y: number }, newCoords: { left: number; top: number }) {
     const o1 = this.canvas.getObjects().filter(o => (o as any).id === id)[0];
     const l = o1.aCoords?.tl.x;
     const t = o1.aCoords?.tl.y;
     const w = o1.aCoords?.br.x! - o1.aCoords?.tl.x!;
     const h = o1.aCoords?.br.y! - o1.aCoords?.tl.y!;
-    this.updateComments().then(e2 =>
+    /*  this.updateComments().then(e2 =>
       e2.subscribe(e1 => {
         this.currentComment = e1.body!;
       }),
-    );
+    );*/
 
     if (type !== FabricObjectType.ELLIPSE) {
       return;

@@ -262,7 +262,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     this.shortcuts.push(
       {
         // ArrowRight
-        key: ['ctrl + right', 'meta + right'],
+        key: ['ctrl + right', 'cmd + right'],
         label: 'Navigation',
         description: this.translateService.instant('scanexam.nextstudent'),
         command: () => this.nextStudent(),
@@ -270,7 +270,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       },
       {
         // ArrowLeft
-        key: ['ctrl + left', 'meta + left'],
+        key: ['ctrl + left', 'cmd + left'],
         label: 'Navigation',
         description: this.translateService.instant('scanexam.previousstudent'),
         command: () => this.previousStudent(),
@@ -359,9 +359,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       );
     }
 
-    /*    console.error(candidateName.map((e: any) => (this.latinise(e)! as string).toLowerCase()));
-    console.error(candidateFirstName.map((e: any) => (this.latinise(e)! as string)?.toLowerCase()));
-    console.error(candidateIne.map((e: any) => (this.latinise(e)! as string)?.toLowerCase())); */
     let pageNumber = z1?.pageNumber;
     if (pageNumber === undefined) {
       pageNumber = z2?.pageNumber;

@@ -39,6 +39,8 @@
       (toggleGCommentById)="toggleGCommentById($event)"
       [examId]="+examId!"
       [questionindex]="questionindex4shortcut!"
+      [textcomments]="currentTextComment4Question"
+      [gradedcomments]="currentGradedComment4Question"
     ></jhi-keyboardshortcut>
   </ng-container>
 
@@ -83,6 +85,33 @@
         [tooltipZIndex]="'3000'"
       >
       </p-slider>
+    </div>
+
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <jhi-colour-palette></jhi-colour-palette>
+    </div>
+
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <jhi-thickness-slider></jhi-thickness-slider>
+    </div>
+
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <jhi-fontsize-slider></jhi-fontsize-slider>
+    </div>
+
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <label><span jhiTranslate="scanexam.scalefactor">Facteur d'échelle</span></label>
+
+      <p-selectButton
+        [options]="scaleOptions"
+        [ngModel]="scalePolicy"
+        (onChange)="updateScalePolicy($event)"
+        optionLabel="name"
+        optionValue="value"
+        [tooltipPosition]="'bottom'"
+        [pTooltip]="'scanexam.scalefactorTooltip' | translate"
+        [tooltipZIndex]="'3000'"
+      ></p-selectButton>
     </div>
 
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
@@ -200,8 +229,9 @@
       <div class="col-12 sm:col-12 md:col-12 lg:col-9 xl:col-10">
         <div class="d-flex justify-content-center">
           <div class="col-5">
-            <p-button
+            <button
               class="sm:text-xs md:text-xs lg:text-base"
+              pButton
               styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
               (click)="layoutsidebarVisible = true"
               icon="pi pi-arrow-right"
@@ -209,7 +239,7 @@
               [pTooltip]="'scanexam.showLayoutOptionsCorrectionTooltip' | translate"
               [tooltipZIndex]="'3000'"
               [tooltipPosition]="'bottom'"
-            ></p-button>
+            ></button>
 
             <button
               class="sm:text-xs md:text-xs lg:text-base"
@@ -245,6 +275,8 @@
               [disabled]="!examId && blocked"
               (click)="showGalleria()"
               jhiTranslate="scanexam.showgalleria"
+              [pTooltip]="'scanexam.showFullPageTooltip' | translate"
+              [tooltipPosition]="'bottom'"
             >
               Show full page
             </button>
@@ -345,7 +377,10 @@
         </div>
       </div>
 
-      <div class="col-12 sm:col-12 md:col-12 lg:col-3 xl:col-2">
+      <div
+        class="col-12 sm:col-12 md:col-12 lg:col-3 xl:col-2"
+        style="overflow-y: auto; overflow-x: hidden; max-height: 85vh; position: sticky; top: 0"
+      >
         <div class="grid grid-nogutter">
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <div *ngIf="currentQuestion?.libelle !== undefined && currentQuestion?.libelle !== ''">
@@ -407,7 +442,7 @@
               <fa-icon icon="code-compare"></fa-icon>
             </span>
           </div>
-          <div *ngIf="resp" style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
+          <div *ngIf="resp" style="padding-bottom: 0.4rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <label jhiTranslate="scanexam.excellente">Excellente réponse: </label>
             <p-inputSwitch
               [disabled]="blocked"
@@ -419,7 +454,7 @@
               [tooltipZIndex]="'3000'"
             ></p-inputSwitch>
           </div>
-          <div *ngIf="resp" style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
+          <div *ngIf="resp" style="padding-bottom: 0.4rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <label jhiTranslate="scanexam.badanswer">Mauvaise réponse remarquable: </label>
             <p-inputSwitch
               [disabled]="blocked"
@@ -431,13 +466,17 @@
               [tooltipZIndex]="'3000'"
             ></p-inputSwitch>
           </div>
-          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
+          <div style="padding-bottom: 0.3rem; margin-bottom: 0.7rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <jhi-graphical-toolbarcorrection></jhi-graphical-toolbarcorrection>
           </div>
         </div>
 
         <div class="grid" *ngIf="currentQuestion && currentQuestion?.gradeType === 'DIRECT' && currentQuestion?.typeAlgoName !== 'QCM'">
-          <div *ngFor="let comment of currentTextComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
+          <div
+            *ngFor="let comment of currentTextComment4Question"
+            style="padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 0.2rem; padding-bottom: 0.2rem"
+            class="sm:col-3 md:col-3 lg:col-12 xl:col-12"
+          >
             <div class="card" [style]="getStyle(comment)">
               <div class="card-body">
                 <span class="float-end" (click)="removeTextComment(comment)">
@@ -487,7 +526,7 @@
                 </span>
 
                 <div *ngIf="!minimizeComment">
-                  <p-inplace [active]="active.get(comment.id)" [closable]="true" (onDeactivate)="closeEditComment(comment)">
+                  <p-inplace [active]="active.get(comment.id!)" [closable]="true" (onDeactivate)="closeEditComment(comment)">
                     <ng-template pTemplate="display">
                       <h5 class="card-title">{{ comment.text }}</h5>
                     </ng-template>
@@ -501,9 +540,11 @@
                       />
                     </ng-template>
                   </p-inplace>
-                  <p-inplace [active]="active.get(comment.id)" [closable]="true" (onDeactivate)="closeEditComment(comment)">
+                  <p-inplace [active]="active.get(comment.id!)" [closable]="true" (onDeactivate)="closeEditComment(comment)">
                     <ng-template pTemplate="display">
-                      <p class="card-text">{{ comment.description }}</p>
+                      <p class="card-text">
+                        {{ comment.description }} <span style="font-size: x-small"> ({{ comment.shortcut }}) </span>
+                      </p>
                     </ng-template>
                     <ng-template pTemplate="content">
                       <input
@@ -531,9 +572,15 @@
                   >
                 </div>
                 <div *ngIf="minimizeComment" (click)="toggleTComment(comment)">
-                  <h5 [tooltipZIndex]="'3000'" [pTooltip]="comment.description" tooltipPosition="left" class="card-title">
-                    {{ comment.text }}
-                  </h5>
+                  <p
+                    [tooltipZIndex]="'3000'"
+                    [escape]="false"
+                    [pTooltip]="comment.description! + '<small>(' + comment.shortcut + ')</small>'"
+                    tooltipPosition="left"
+                    class="card-title"
+                  >
+                    {{ comment.text }} <span style="font-size: x-small"> ({{ comment.shortcut }}) </span>
+                  </p>
                 </div>
               </div>
             </div>
@@ -541,7 +588,11 @@
         </div>
 
         <div class="grid" *ngIf="(currentQuestion && currentQuestion?.gradeType !== 'DIRECT') || currentQuestion?.typeAlgoName === 'QCM'">
-          <div *ngFor="let comment of currentGradedComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
+          <div
+            *ngFor="let comment of currentGradedComment4Question"
+            style="padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 0.2rem; padding-bottom: 0.2rem"
+            class="sm:col-3 md:col-3 lg:col-12 xl:col-12"
+          >
             <div class="card" [style]="getStyle(comment)">
               <div class="card-body">
                 <span *ngIf="currentQuestion?.typeAlgoName !== 'QCM'" class="float-end clickable" (click)="removeGradedComment(comment)"
@@ -593,11 +644,13 @@
                 <div *ngIf="!minimizeComment">
                   <div *ngIf="currentQuestion?.typeAlgoName === 'QCM'">
                     <h5 class="card-title">{{ comment.text }}</h5>
-                    <p class="card-text">{{ comment.description }}</p>
+                    <p class="card-text">
+                      {{ comment.description }} <span style="font-size: x-small"> ({{ comment.shortcut }}) </span>
+                    </p>
                   </div>
 
                   <div *ngIf="currentQuestion?.typeAlgoName !== 'QCM'">
-                    <p-inplace [closable]="true" [active]="active.get(comment.id)" (onDeactivate)="closeEditComment(comment)">
+                    <p-inplace [closable]="true" [active]="active.get(comment.id!)" (onDeactivate)="closeEditComment(comment)">
                       <ng-template pTemplate="display">
                         <h5 class="card-title">{{ comment.text }}</h5>
                       </ng-template>
@@ -611,9 +664,11 @@
                         />
                       </ng-template>
                     </p-inplace>
-                    <p-inplace [closable]="true" [active]="active.get(comment.id)" (onDeactivate)="closeEditComment(comment)">
+                    <p-inplace [closable]="true" [active]="active.get(comment.id!)" (onDeactivate)="closeEditComment(comment)">
                       <ng-template pTemplate="display">
-                        <p class="card-text">{{ comment.description }}</p>
+                        <p class="card-text">
+                          {{ comment.description }} <span style="font-size: x-small"> ({{ comment.shortcut }}) </span>
+                        </p>
                       </ng-template>
                       <ng-template pTemplate="content">
                         <input
@@ -625,7 +680,7 @@
                         />
                       </ng-template>
                     </p-inplace>
-                    <p-inplace [closable]="true" [active]="active.get(comment.id)" (onDeactivate)="closeEditComment(comment)">
+                    <p-inplace [closable]="true" [active]="active.get(comment.id!)" (onDeactivate)="closeEditComment(comment)">
                       <ng-template pTemplate="display">
                         <p class="card-text" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
                           <span jhiTranslate="scanexam.noteassociecomment"> Note associée à ce commentaire : </span>
@@ -663,19 +718,30 @@
                 </div>
                 <div *ngIf="minimizeComment" (click)="toggleGComment(comment)">
                   <div *ngIf="currentQuestion?.typeAlgoName! === 'QCM'">
-                    <h5 [tooltipZIndex]="'3000'" [pTooltip]="comment.description" tooltipPosition="left" class="card-title">
-                      {{ comment.text }}
-                    </h5>
+                    <p
+                      [tooltipZIndex]="'3000'"
+                      [pTooltip]="comment.description! + '<small>(' + comment.shortcut + ')</small>'"
+                      tooltipPosition="left"
+                      class="card-title"
+                    >
+                      {{ comment.text }}<span style="font-size: x-small"> ({{ comment.shortcut }}) </span>
+                    </p>
                   </div>
                   <div *ngIf="currentQuestion?.typeAlgoName! !== 'QCM'" (click)="toggleGComment(comment)">
-                    <h5 [tooltipZIndex]="'3000'" [pTooltip]="comment!.description!" tooltipPosition="left" class="card-title">
-                      {{ comment.text }} ( <span *ngIf="currentQuestion && currentQuestion?.gradeType! === 'NEGATIVE'"> - </span
-                      ><span *ngIf="currentQuestion && currentQuestion?.gradeType! === 'POSITIVE'"> + </span>
+                    <p
+                      [tooltipZIndex]="'3000'"
+                      [escape]="false"
+                      [pTooltip]="comment!.description! + '<small>(' + comment.shortcut + ')</small>'"
+                      tooltipPosition="left"
+                      class="card-title"
+                    >
+                      {{ comment.text }} (<span *ngIf="currentQuestion && currentQuestion?.gradeType! === 'NEGATIVE'">- </span
+                      ><span *ngIf="currentQuestion && currentQuestion?.gradeType! === 'POSITIVE'">+ </span>
                       <span *ngIf="questionStep > 0">{{ comment.grade! / questionStep }}</span>
                       <span *ngIf="questionStep <= 0">{{ comment.grade! }}</span>
 
-                      pt)
-                    </h5>
+                      pt) <span style="font-size: x-small"> ({{ comment.shortcut }}) </span>
+                    </p>
                   </div>
                 </div>
               </div>
@@ -692,7 +758,7 @@
             currentQuestion?.typeAlgoName !== 'QCM'
           "
         >
-          <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
+          <div style="padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 0.8rem" class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
             <div class="card">
               <div class="card-body">
                 <h5 class="card-title" jhiTranslate="scanexam.newcomment">Nouveau commentaire</h5>
