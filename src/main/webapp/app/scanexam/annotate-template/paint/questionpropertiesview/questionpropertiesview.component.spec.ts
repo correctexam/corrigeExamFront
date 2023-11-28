@@ -96,6 +96,8 @@ describe('QuestionpropertiesviewComponent', () => {
     mockPrefService.savePref4Question = jest.fn();
 
     mockEvtHandler = TestBed.inject(EventHandlerService);
+    component.eventHandler = mockEvtHandler;
+
     mockEvtHandler.getSelectedQuestion = jest.fn(() => selectedQuestion);
     mockEvtHandler.updateQuestion = jest.fn();
     mockQuestionService = TestBed.inject(QuestionService);
