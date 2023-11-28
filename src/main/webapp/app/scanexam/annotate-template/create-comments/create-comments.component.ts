@@ -259,6 +259,11 @@ export class CreateCommentsComponent implements OnInit {
           },
           {
             questionId: this._q.id,
+            text: 'ok',
+            grade: this._q.gradeType === GradeType.NEGATIVE ? 0 : this._q.step! * this._q.point!,
+          },
+          {
+            questionId: this._q.id,
             text: this.translate.instant('scanexam.adddefaultvide'),
             grade: this._q.gradeType === GradeType.NEGATIVE ? this._q.step! * this._q.point! : 0,
           },
