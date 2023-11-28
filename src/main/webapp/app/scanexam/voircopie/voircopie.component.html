@@ -72,7 +72,25 @@
     <div class="grid grid-nogutter" style="padding-bottom: 1rem; padding-top: 1rem">
       <div class="col-12 sm:col-12 md:col-12 lg:col-9 xl:col-10">
         <div class="d-flex justify-content-center">
-          <h2 *ngIf="questionNumeros.length > questionindex">
+          <h2
+            *ngIf="
+              questionNumeros.length > questionindex &&
+              questions !== undefined &&
+              questions!.length > 0 &&
+              questions![0].libelle !== undefined &&
+              questions![0].libelle !== ''
+            "
+          >
+            {{ questions![0].libelle }}
+          </h2>
+          <h2
+            *ngIf="
+              questionNumeros.length > questionindex &&
+              questions !== undefined &&
+              questions!.length > 0 &&
+              (questions![0].libelle === undefined || questions![0].libelle === '')
+            "
+          >
             <span jhiTranslate="scanexam.question1">Question </span>{{ questionNumeros[questionindex] }}
           </h2>
         </div>
