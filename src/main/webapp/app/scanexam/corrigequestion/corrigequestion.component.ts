@@ -23,7 +23,6 @@ import { CourseService } from 'app/entities/course/service/course.service';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { StudentService } from 'app/entities/student/service/student.service';
-import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import {
   AlignImagesService,
@@ -33,7 +32,6 @@ import {
   IQCMInput,
 } from '../services/align-images.service';
 import { IExam } from '../../entities/exam/exam.model';
-import { ICourse } from 'app/entities/course/course.model';
 import { IStudent } from '../../entities/student/student.model';
 import { ImageZone, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.component';
 import { IZone } from 'app/entities/zone/zone.model';
@@ -104,7 +102,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   nbreFeuilleParCopie: number | undefined;
   numberPagesInScan: number | undefined;
   exam: IExam | undefined;
-  course: ICourse | undefined;
+  // course: ICourse | undefined;
   students: IStudent[] | undefined;
   currentStudent = 0;
   selectionStudents: IStudent[] | undefined;
@@ -171,7 +169,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   showSpinner = false;
   constructor(
     public examService: ExamService,
-    public zoneService: ZoneService,
     public courseService: CourseService,
     public studentService: StudentService,
     protected activatedRoute: ActivatedRoute,
@@ -215,8 +212,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.maxNote = 0;
     this.resp = undefined;
     const examId_prev = this.examId;
-    const studentid_prev = this.studentid;
-    const questionindex4shortcut_prev = this.questionindex4shortcut;
+    let studentid_prev = this.studentid;
+    let questionindex4shortcut_prev = this.questionindex4shortcut;
     //      'answer/:examid/:questionno/:studentid',
     if (params.get('examid') !== null) {
       this.examId = params.get('examid')!;
@@ -235,27 +232,22 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.currentStudent = this.studentid - 1;
         // Step 1 Query templates
         if (this.examId !== examId_prev) {
+          studentid_prev = -1;
+          questionindex4shortcut_prev = -1;
+          questionindex4shortcut_prev = -1;
           this.nbreFeuilleParCopie = await this.db.countPageTemplate(+this.examId);
           this.numberPagesInScan = await this.db.countAlignImage(+this.examId!);
           const data = await firstValueFrom(this.examService.find(+this.examId!));
           this.exam = data.body!;
-          const e = await firstValueFrom(this.courseService.find(this.exam.courseId!));
-          this.course = e.body!;
-        }
-        // Step 2 Query Scan in local DB
+          const b = await firstValueFrom(this.questionService.query({ examId: this.exam!.id }));
+          this.questionNumeros = Array.from(new Set(b.body!.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
+          this.nbreQuestions = this.questionNumeros.length;
 
-        // Step 3 Query Students for Exam
-
-        if (this.examId !== examId_prev) {
           await this.refreshStudentList(forceRefreshStudent);
         }
         if (this.studentid !== studentid_prev) {
           this.getSelectedStudent();
         }
-        // Step 4 Query zone 4 questions
-        const b = await firstValueFrom(this.questionService.query({ examId: this.exam!.id }));
-        this.questionNumeros = Array.from(new Set(b.body!.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
-        this.nbreQuestions = this.questionNumeros.length;
 
         // must be done here as the change of the nbreQuestions triggers the event of change question with page = 0
         let questions: IQuestion[] | undefined = undefined;
@@ -274,15 +266,35 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           const q1 = await firstValueFrom(
             this.questionService.query({ examId: this.exam!.id, numero: this.questionNumeros[this.questionindex!] }),
           );
+          if (q1.body !== null && q1.body.length > 0) {
+            questions = q1.body!;
+            this.noteSteps = questions[0].point! * questions[0].step!;
+            this.questionStep = questions[0].step!;
+            this.maxNote = questions[0].point!;
+            this.currentQuestion = questions[0];
 
-          questions = q1.body!;
+            if (questions![0].gradeType === GradeType.DIRECT && questions![0].typeAlgoName !== 'QCM') {
+              const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
+              this.currentTextComment4Question = com.body!;
+              this.currentTextComment4Question.forEach(com1 => {
+                this.active.set(com1.id!, false);
+              });
+            } else {
+              const com = await firstValueFrom(this.gradedCommentService.query({ questionId: questions![0].id }));
+              this.currentGradedComment4Question = com.body!;
+              this.currentGradedComment4Question.forEach(com1 => {
+                this.active.set(com1.id!, false);
+              });
+            }
+          }
         }
+
+        this.currentGradedComment4Question?.forEach(com2 => ((com2 as any).checked = false));
+        this.currentTextComment4Question?.forEach(com2 => ((com2 as any).checked = false));
+
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (questions !== undefined && questions.length > 0) {
           this.noteSteps = questions[0].point! * questions[0].step!;
-          this.questionStep = questions[0].step!;
-          this.maxNote = questions[0].point!;
-          this.currentQuestion = questions[0];
 
           const sheets = (this.selectionStudents?.map(st => st.examSheets) as any)
             .flat()
@@ -300,29 +312,22 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               this.currentNote = this.resp.note!;
               await this.computeNote(false, this.resp!, this.currentQuestion!);
               if (questions![0].gradeType === GradeType.DIRECT && questions![0].typeAlgoName !== 'QCM') {
-                const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
                 this.resp.textcomments!.forEach(com1 => {
-                  const elt = com.body!.find(com2 => com2.id === com1.id);
+                  const elt = this.currentTextComment4Question?.find(com2 => com2.id === com1.id);
                   if (elt !== undefined) {
                     (elt as any).checked = true;
+                  } else {
+                    (elt as any).checked = false;
                   }
-                });
-                this.currentTextComment4Question = com.body!;
-                this.currentTextComment4Question.forEach(com1 => {
-                  this.active.set(com1.id!, false);
                 });
               } else {
-                const com = await firstValueFrom(this.gradedCommentService.query({ questionId: questions![0].id }));
                 this.resp.gradedcomments!.forEach(com1 => {
-                  const elt = com.body!.find(com2 => com2.id === com1.id);
+                  const elt = this.currentGradedComment4Question?.find(com2 => com2.id === com1.id);
                   if (elt !== undefined) {
                     (elt as any).checked = true;
+                  } else {
+                    (elt as any).checked = false;
                   }
-                });
-                this.currentGradedComment4Question = com.body!;
-
-                this.currentGradedComment4Question.forEach(com1 => {
-                  this.active.set(com1.id!, false);
                 });
               }
             } else {
@@ -333,19 +338,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               this.resp.questionId = questions![0].id;
               //            this.studentResponseService.create(this.resp!).subscribe(sr1 => {
               //                                      this.resp = sr1.body!;
-              if (questions![0].gradeType === GradeType.DIRECT) {
-                const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
-                this.currentTextComment4Question = com.body!;
-                this.currentTextComment4Question.forEach(com1 => {
-                  this.active.set(com1.id!, false);
-                });
-              } else {
-                const com = await firstValueFrom(this.gradedCommentService.query({ questionId: questions![0].id }));
-                this.currentGradedComment4Question = com.body!;
-                this.currentGradedComment4Question.forEach(com1 => {
-                  this.active.set(com1.id!, false);
-                });
-              }
             }
             this.populateDefaultShortCut();
           }
@@ -593,7 +585,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     if (this.questions) {
       for (const { i, q } of this.questions.map((value, index) => ({ i: index, q: value }))) {
         this.showImage[i] = false;
-        const z = await this.loadZone(q.zoneId);
+        const z = q.zoneDTO; // await this.loadZone(q.zoneId);
         const pagewithoffset = this.currentStudent! * this.nbreFeuilleParCopie! + z!.pageNumber! + this.pageOffset;
         const pagewithoutoffset = this.currentStudent! * this.nbreFeuilleParCopie! + z!.pageNumber!;
         let page = pagewithoutoffset;
@@ -637,77 +629,78 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           q.gradedcomments = [];
           q.textcomments = [];
 
-          this.loadZone(q.zoneId).then(z => {
-            const promises: Promise<ImageZone>[] = [];
-            const t: IQCMInput = {
-              preference: this.preferenceService.getPreference(),
-            };
-            t.pages = [];
-            this.getTemplateImage4Zone(z!).then(p => {
-              t.imageTemplate = p.i;
+          //    this.loadZone(q.zoneId).then(z => {
+          const z = q.zoneDTO;
+          const promises: Promise<ImageZone>[] = [];
+          const t: IQCMInput = {
+            preference: this.preferenceService.getPreference(),
+          };
+          t.pages = [];
+          this.getTemplateImage4Zone(z!).then(p => {
+            t.imageTemplate = p.i;
 
-              for (let st = 0; st < this.numberPagesInScan! / this.nbreFeuilleParCopie!; st++) {
-                const pagewithoffset = st! * this.nbreFeuilleParCopie! + z!.pageNumber! + this.pageOffset;
-                const pagewithoutoffset = st * this.nbreFeuilleParCopie! + z!.pageNumber!;
-                let page = pagewithoutoffset;
-                if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
-                  page = pagewithoffset;
-                }
-                promises.push(this.getAllImage4Zone(page, z!));
+            for (let st = 0; st < this.numberPagesInScan! / this.nbreFeuilleParCopie!; st++) {
+              const pagewithoffset = st! * this.nbreFeuilleParCopie! + z!.pageNumber! + this.pageOffset;
+              const pagewithoutoffset = st * this.nbreFeuilleParCopie! + z!.pageNumber!;
+              let page = pagewithoutoffset;
+              if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
+                page = pagewithoffset;
               }
+              promises.push(this.getAllImage4Zone(page, z!));
+            }
 
-              // t.imageTemplate;
-              Promise.all(promises).then(value => {
-                value.forEach((value1, index1) => {
-                  if (index1 === 1) {
-                    t.widthZone = value1.w!;
-                    t.heightZone = value1.h!;
-                  }
+            // t.imageTemplate;
+            Promise.all(promises).then(value => {
+              value.forEach((value1, index1) => {
+                if (index1 === 1) {
+                  t.widthZone = value1.w!;
+                  t.heightZone = value1.h!;
+                }
 
-                  t.pages!.push({ imageInput: value1.i, numero: index1 });
-                });
-                this.alignImagesService.correctQCM(t).subscribe(
-                  res => {
-                    this.processSolutions(res.solutions).then(() => {
-                      const qid = this.questions!.map(qq => qq.id);
-                      let sid = '';
-                      const sheets = (this.selectionStudents?.map(st => st.examSheets) as any)
-                        .flat()
-                        .filter(
-                          (ex: any) =>
-                            ex?.scanId === this.exam!.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie!,
-                        );
-                      if (sheets !== undefined && sheets!.length > 0) {
-                        sid = sheets[0]?.id;
-                      }
-                      this.studentResponseService
-                        .query({
-                          sheetId: sid,
-                          questionsId: qid,
-                        })
-                        .subscribe(sr => {
-                          if (sr.body !== null && sr.body.length > 0) {
-                            this.resp = sr.body![0];
-                            this.computeNote(false, this.resp, this.currentQuestion!);
-                            this.blocked = false;
-                          } else {
-                            this.blocked = false;
-                          }
-                        });
-                    });
-                  },
-                  err => {
-                    this.blocked = false;
-                    this.messageService.add({
-                      severity: 'error',
-                      summary: this.translateService.instant('scanexam.couldnotcorrectQCM'),
-                      detail: this.translateService.instant('scanexam.couldnotcorrectQCMdetails') + ' ' + err.message,
-                    });
-                  },
-                );
+                t.pages!.push({ imageInput: value1.i, numero: index1 });
               });
+              this.alignImagesService.correctQCM(t).subscribe(
+                res => {
+                  this.processSolutions(res.solutions).then(() => {
+                    const qid = this.questions!.map(qq => qq.id);
+                    let sid = '';
+                    const sheets = (this.selectionStudents?.map(st => st.examSheets) as any)
+                      .flat()
+                      .filter(
+                        (ex: any) =>
+                          ex?.scanId === this.exam!.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie!,
+                      );
+                    if (sheets !== undefined && sheets!.length > 0) {
+                      sid = sheets[0]?.id;
+                    }
+                    this.studentResponseService
+                      .query({
+                        sheetId: sid,
+                        questionsId: qid,
+                      })
+                      .subscribe(sr => {
+                        if (sr.body !== null && sr.body.length > 0) {
+                          this.resp = sr.body![0];
+                          this.computeNote(false, this.resp, this.currentQuestion!);
+                          this.blocked = false;
+                        } else {
+                          this.blocked = false;
+                        }
+                      });
+                  });
+                },
+                err => {
+                  this.blocked = false;
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: this.translateService.instant('scanexam.couldnotcorrectQCM'),
+                    detail: this.translateService.instant('scanexam.couldnotcorrectQCMdetails') + ' ' + err.message,
+                  });
+                },
+              );
             });
           });
+          //    });
         });
       });
     } else {
@@ -1310,29 +1303,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async loadZone(
-    zoneId: number | undefined,
-    // showImageRef: (s: boolean) => void,
-    // imageRef: ElementRef<any> | undefined,
-    // currentStudent: number,
-    // index: number
-  ): Promise<IZone | undefined> {
-    return new Promise<IZone | undefined>(resolve => {
-      if (zoneId) {
-        this.zoneService.find(zoneId).subscribe(e => {
-          resolve(e.body!);
-          /*          this.getAllImage4Zone(page, e.body!).then(p => {
-
-            this.displayImage(p, imageRef, showImageRef, index);
-
-          });*/
-        });
-      } else {
-        resolve(undefined);
-      }
-    });
-  }
-
   displayImage(
     v: ImageZone,
     imageRef: ElementRef<any> | undefined,
@@ -1620,7 +1590,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   changeAlign(): void {
     this.images = [];
-    // this.loadAllPages();
     this.reloadImage();
   }
   getStudentName(): string | undefined {
@@ -1632,43 +1601,40 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.blocked = true;
 
       this.questions!.forEach((q, index) => {
-        // this.showImage[i] = false;
-        this.loadZone(q.zoneId).then(z => {
-          // const promises: Promise<ImageZone>[] = [];
-          const t: IQCMInput = {
-            preference: this.preferenceService.getPreference(),
-          };
-          t.pages = [];
-          this.getTemplateImage4Zone(z!).then(p => {
-            t.imageTemplate = p.i;
-            const pagewithoffset = this.currentStudent * this.nbreFeuilleParCopie! + z!.pageNumber! + this.pageOffset;
-            const pagewithoutoffset = this.currentStudent * this.nbreFeuilleParCopie! + z!.pageNumber!;
-            let page = pagewithoutoffset;
-            if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
-              page = pagewithoffset;
-            }
-            this.getAllImage4Zone(page, z!).then(value1 => {
-              t.widthZone = value1.w!;
-              t.heightZone = value1.h!;
-              t.pages!.push({ imageInput: value1.i, numero: 1 });
-              this.alignImagesService.correctQCM(t).subscribe(res => {
-                this.blocked = false;
-                res.solutions?.forEach(e => {
-                  const v: ImageZone = {
-                    i: e.imageSolution!,
-                    w: value1.w!,
-                    h: value1.h!,
-                  };
-                  this.displayImage(
-                    v,
-                    this.canvassQCM,
-                    b => {
-                      this.showImageQCM = b;
-                    },
-                    index,
-                    false,
-                  );
-                });
+        const z = q.zoneDTO;
+        const t: IQCMInput = {
+          preference: this.preferenceService.getPreference(),
+        };
+        t.pages = [];
+        this.getTemplateImage4Zone(z!).then(p => {
+          t.imageTemplate = p.i;
+          const pagewithoffset = this.currentStudent * this.nbreFeuilleParCopie! + z!.pageNumber! + this.pageOffset;
+          const pagewithoutoffset = this.currentStudent * this.nbreFeuilleParCopie! + z!.pageNumber!;
+          let page = pagewithoutoffset;
+          if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
+            page = pagewithoffset;
+          }
+          this.getAllImage4Zone(page, z!).then(value1 => {
+            t.widthZone = value1.w!;
+            t.heightZone = value1.h!;
+            t.pages!.push({ imageInput: value1.i, numero: 1 });
+            this.alignImagesService.correctQCM(t).subscribe(res => {
+              this.blocked = false;
+              res.solutions?.forEach(e => {
+                const v: ImageZone = {
+                  i: e.imageSolution!,
+                  w: value1.w!,
+                  h: value1.h!,
+                };
+                this.displayImage(
+                  v,
+                  this.canvassQCM,
+                  b => {
+                    this.showImageQCM = b;
+                  },
+                  index,
+                  false,
+                );
               });
             });
           });
@@ -1727,35 +1693,36 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.blocked = true;
       this.initPool();
       this.questions!.forEach(q => {
-        this.loadZone(q.zoneId).then(z => {
-          const pagewithoffset = this.currentStudent! * this.nbreFeuilleParCopie! + z!.pageNumber! + this.pageOffset;
-          const pagewithoutoffset = this.currentStudent! * this.nbreFeuilleParCopie! + z!.pageNumber!;
-          let page = pagewithoutoffset;
-          if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
-            page = pagewithoffset;
-          }
-          this.db.getFirstTemplate(+this.examId!, z!.pageNumber!).then(e2 => {
-            const image = JSON.parse(e2!.value, this.reviver);
-            this.loadImage(image.pages, z!.pageNumber!).then(v => {
-              const inp: IImageAlignementInput = {
-                imageA: v.image!.data.buffer,
-                //                    imageB: v1.image!.data.buffer,
-                heightA: v.height,
-                widthA: v.width,
-                //                    heightB: v1.height,
-                //                    widthB: v1.width,
-                pageNumber: page,
-                marker: mark,
-                preference: this.preferenceService.getPreference(),
-                debug: false,
-                examId: +this.examId!,
-                indexDb: this.preferenceService.getPreference().cacheDb === 'indexdb',
-              };
+        //   this.loadZone(q.zoneId).then(z => {
+        const z = q.zoneDTO;
+        const pagewithoffset = this.currentStudent! * this.nbreFeuilleParCopie! + z!.pageNumber! + this.pageOffset;
+        const pagewithoutoffset = this.currentStudent! * this.nbreFeuilleParCopie! + z!.pageNumber!;
+        let page = pagewithoutoffset;
+        if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
+          page = pagewithoffset;
+        }
+        this.db.getFirstTemplate(+this.examId!, z!.pageNumber!).then(e2 => {
+          const image = JSON.parse(e2!.value, this.reviver);
+          this.loadImage(image.pages, z!.pageNumber!).then(v => {
+            const inp: IImageAlignementInput = {
+              imageA: v.image!.data.buffer,
+              //                    imageB: v1.image!.data.buffer,
+              heightA: v.height,
+              widthA: v.width,
+              //                    heightB: v1.height,
+              //                    widthB: v1.width,
+              pageNumber: page,
+              marker: mark,
+              preference: this.preferenceService.getPreference(),
+              debug: false,
+              examId: +this.examId!,
+              indexDb: this.preferenceService.getPreference().cacheDb === 'indexdb',
+            };
 
-              this.observer!.next(inp);
-            });
+            this.observer!.next(inp);
           });
         });
+        // });
       });
     }
   }
