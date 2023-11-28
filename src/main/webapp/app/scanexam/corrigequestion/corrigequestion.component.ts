@@ -1913,4 +1913,63 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
     }
   }
+  questionpropertiesviewVisible = false;
+  editQuestion(): void {
+    this.questionpropertiesviewVisible = true;
+  }
+  updateQuestion(questions: Array<IQuestion>): void {
+    for (const q of questions) {
+      const q2 = this.questions?.find(q1 => q1.id === q.id);
+      if (q2) {
+        q2.libelle = q.libelle;
+        q2.point = q.point;
+        q2.step = q.step;
+        q2.validExpression = q.validExpression;
+        q2.gradeType = q.gradeType;
+        q2.typeId = q.typeId;
+      }
+    }
+  }
+
+  addTextComment($event: ITextComment): void {
+    this.currentTextComment4Question?.push($event);
+    this.testdisableAndEnableKeyBoardShortCut = false;
+    this.populateDefaultShortCut();
+    setTimeout(() => {
+      (this.testdisableAndEnableKeyBoardShortCut = true), 300;
+    });
+  }
+  updateTextComment($event: ITextComment): void {
+    const c1 = this.currentTextComment4Question?.find(c => (c.id = $event.id));
+    if (c1) {
+      if (c1.description !== $event.description) {
+        c1.description = $event.description;
+      }
+      if (c1.text !== $event.text) {
+        c1.text = $event.text;
+      }
+    }
+  }
+  addGradedComment($event: IGradedComment): void {
+    this.currentGradedComment4Question?.push($event);
+    this.testdisableAndEnableKeyBoardShortCut = false;
+    this.populateDefaultShortCut();
+    setTimeout(() => {
+      (this.testdisableAndEnableKeyBoardShortCut = true), 300;
+    });
+  }
+  updateGradedComment($event: IGradedComment): void {
+    const c1 = this.currentGradedComment4Question?.find(c => (c.id = $event.id));
+    if (c1) {
+      if (c1.description !== $event.description) {
+        c1.description = $event.description;
+      }
+      if (c1.text !== $event.text) {
+        c1.text = $event.text;
+      }
+      if (c1.grade !== $event.grade) {
+        c1.grade = $event.grade;
+      }
+    }
+  }
 }

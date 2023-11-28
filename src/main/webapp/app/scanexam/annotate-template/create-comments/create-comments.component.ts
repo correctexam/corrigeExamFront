@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
@@ -19,6 +19,18 @@ export class CreateCommentsComponent implements OnInit {
   _q?: Question;
   currentTextComment4Question: ITextComment[] | undefined;
   currentGradedComment4Question: IGradedComment[] | undefined;
+
+  @Output()
+  addTextComment: EventEmitter<ITextComment> = new EventEmitter<ITextComment>();
+  @Output()
+  addGradedComment: EventEmitter<IGradedComment> = new EventEmitter<IGradedComment>();
+  @Output()
+  updateTextComment: EventEmitter<ITextComment> = new EventEmitter<ITextComment>();
+  @Output()
+  updateGradedComment: EventEmitter<IGradedComment> = new EventEmitter<IGradedComment>();
+
+  @Input()
+  couldDelete = true;
 
   questionStep = 0;
   titreCommentaire = '';
@@ -51,7 +63,7 @@ export class CreateCommentsComponent implements OnInit {
   constructor(
     public gradedCommentService: GradedCommentService,
     public textCommentService: TextCommentService,
-    public translate: TranslateService
+    public translate: TranslateService,
   ) {}
   // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
   ngOnInit(): void {}
@@ -80,6 +92,7 @@ export class CreateCommentsComponent implements OnInit {
       this.textCommentService.create(t).subscribe(e => {
         const currentComment = e.body!;
         this.currentTextComment4Question?.push(currentComment);
+        this.addTextComment.emit(currentComment);
         this.titreCommentaire = '';
         this.descCommentaire = '';
         this.blocked = false;
@@ -96,6 +109,8 @@ export class CreateCommentsComponent implements OnInit {
       this.gradedCommentService.create(t).subscribe(e => {
         const currentComment = e.body!;
         this.currentGradedComment4Question?.push(currentComment);
+        this.addGradedComment.emit(currentComment);
+
         this.titreCommentaire = '';
         this.descCommentaire = '';
         this.noteCommentaire = 0;
@@ -110,13 +125,16 @@ export class CreateCommentsComponent implements OnInit {
         (l as IGradedComment).grade = 0;
       }
       this.gradedCommentService.update(l).subscribe(() => {
+        this.updateGradedComment.emit(l);
         const coms = this.currentGradedComment4Question?.filter(c => c.id === l.id!);
         if (coms !== undefined && coms.length > 0) {
           coms[0].grade = (l as any).grade;
         }
       });
     } else {
-      this.textCommentService.update(l).subscribe(() => {});
+      this.textCommentService.update(l).subscribe(() => {
+        this.updateTextComment.emit(l);
+      });
     }
   }
 
@@ -124,7 +142,7 @@ export class CreateCommentsComponent implements OnInit {
     this.currentTextComment4Question = this.currentTextComment4Question!.filter(e => e.id !== comment.id);
     this.textCommentService.delete(comment.id!).subscribe(() =>
       // eslint-disable-next-line no-console
-      console.log('delete')
+      console.log('delete'),
     );
   }
 
@@ -169,6 +187,7 @@ export class CreateCommentsComponent implements OnInit {
           this.textCommentService.create(t).subscribe(e => {
             const currentComment = e.body!;
             this.currentTextComment4Question?.push(currentComment);
+            this.addTextComment.emit(currentComment);
             this.titreCommentaire = '';
             this.descCommentaire = '';
             this.blocked = false;
@@ -188,6 +207,7 @@ export class CreateCommentsComponent implements OnInit {
           this.gradedCommentService.create(t).subscribe(e => {
             const currentComment = e.body!;
             this.currentGradedComment4Question?.push(currentComment);
+            this.addGradedComment.emit(currentComment);
             this.titreCommentaire = '';
             this.descCommentaire = '';
             this.noteCommentaire = 0;
@@ -223,6 +243,8 @@ export class CreateCommentsComponent implements OnInit {
           this.textCommentService.create(t).subscribe(e => {
             const currentComment = e.body!;
             this.currentTextComment4Question?.push(currentComment);
+            this.addTextComment.emit(currentComment);
+
             this.titreCommentaire = '';
             this.descCommentaire = '';
             this.blocked = false;
@@ -255,6 +277,8 @@ export class CreateCommentsComponent implements OnInit {
           this.gradedCommentService.create(t).subscribe(e => {
             const currentComment = e.body!;
             this.currentGradedComment4Question?.push(currentComment);
+            this.addGradedComment.emit(currentComment);
+
             this.titreCommentaire = '';
             this.descCommentaire = '';
             this.noteCommentaire = 0;

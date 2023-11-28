@@ -419,6 +419,7 @@
     "scalefactor": "Scaling :",
     "scalefactorTooltip": "Used to change the page scaling factor",
     "gotoCorrection": "Go to correction view",
-    "gotoCorrectionTooltipView": "Used to go to the correction view when you are logged in as a teacher"
+    "gotoCorrectionTooltipView": "Used to go to the correction view when you are logged in as a teacher",
+    "editquestionTooltip": "Enables you to edit the properties of the question to update the scoring"
   }
 }

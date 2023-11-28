@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { IExam } from '../../../entities/exam/exam.model';
 import { Subject } from 'rxjs';
+import { EventHandlerService } from './event-handler.service';
 
 @Component({
   selector: 'jhi-paint',
@@ -14,6 +15,8 @@ export class PaintComponent {
   exam!: IExam;
 
   numero = new Subject<string>();
+
+  constructor(public eventHandlerService: EventHandlerService) {}
 
   previousState(): void {
     window.history.back();
