@@ -7,6 +7,7 @@ import { Component } from '@angular/core';
 import { faUserGraduate, faHashtag, faEraser, faHandPointer, faTrash, faPencil } from '@fortawesome/free-solid-svg-icons';
 import { DrawingTools } from 'app/scanexam/annotate-template/paint/models';
 import { EventCanevascorrectionHandlerService } from '../event-canevascorrection-handler.service';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'jhi-graphical-toolbarcorrection',
@@ -24,7 +25,10 @@ export class GraphicalToolbarCorrectionComponent {
   DrawingTools = DrawingTools;
   selected: DrawingTools;
 
-  constructor(private eventService: EventCanevascorrectionHandlerService) {
+  constructor(
+    private eventService: EventCanevascorrectionHandlerService,
+    private confirmationService: ConfirmationService,
+  ) {
     this.selected = this.eventService.selectedTool;
   }
 
@@ -32,6 +36,7 @@ export class GraphicalToolbarCorrectionComponent {
     this.eventService.registerSelectedToolObserver(s => {
       this.selected = s;
     });
+    this.eventService.setConfirmationService(this.confirmationService);
   }
 
   async select(tool: DrawingTools) {
