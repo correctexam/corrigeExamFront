@@ -160,7 +160,7 @@
     "profshared": "Partage en cours",
     "votrecopie": "Votre copie :",
     "note1": "Note :",
-    "currentpagetemplate": "{currentPage} question sur {totalPages} questions(s)'",
+    "currentpagetemplate": "Question {currentPage} sur {totalPages} questions(s)'",
     "question1": "Question ",
     "showsample": "Voir des exemples de solutions correctes pour cette question :",
     "nogoodsolution": "Aucune bonne solution identifiée",
