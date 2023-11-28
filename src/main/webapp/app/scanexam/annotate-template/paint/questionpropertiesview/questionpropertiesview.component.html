@@ -6,7 +6,14 @@
   styleClass="p-0"
   appendTo="body"
 >
-  <jhi-create-comments [question]="questions[0]"></jhi-create-comments>
+  <jhi-create-comments
+    [question]="questions[0]"
+    (addTextComment)="addTextCommentM($event)"
+    (addGradedComment)="addGradedCommentM($event)"
+    (updateGradedComment)="updateGradedCommentM($event)"
+    (updateTextComment)="updateTextCommentM($event)"
+    [couldDelete]="couldDelete"
+  ></jhi-create-comments>
 </p-sidebar>
 
 <hr *ngIf="questions.length > 0" />
@@ -16,7 +23,7 @@
       <div>
         <jhi-alert-error></jhi-alert-error>
 
-        <div class="row">
+        <div class="row" *ngIf="canUpdateNumero">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.numero" for="field_numero">Numero</label>
           <input
             type="number"

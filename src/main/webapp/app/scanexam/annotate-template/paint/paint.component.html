@@ -20,7 +20,7 @@
       <h3>Palette</h3>
       <hr />
       <jhi-graphical-toolbar></jhi-graphical-toolbar>
-      <jhi-questionpropertiesview (updatenumero)="updateNumero($event)"></jhi-questionpropertiesview>
+      <jhi-questionpropertiesview [eventHandler]="eventHandlerService" (updatenumero)="updateNumero($event)"></jhi-questionpropertiesview>
     </div>
   </div>
 </div>

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { HttpResponse } from '@angular/common/http';
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
 import { UntypedFormBuilder, Validators, UntypedFormGroup } from '@angular/forms';
 import { IQuestionType } from 'app/entities/question-type/question-type.model';
 import { QuestionTypeService } from 'app/entities/question-type/service/question-type.service';
@@ -13,6 +13,8 @@ import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { PreferenceService } from '../../../preference-page/preference.service';
 import { OnDestroy } from '@angular/core';
+import { ITextComment } from 'app/entities/text-comment/text-comment.model';
+import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
 
 type SelectableEntity = IQuestionType;
 export type EntityResponseType = HttpResponse<IQuestion>;
@@ -44,6 +46,13 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   /** The selected questions. This is an array since a same question can be divided into several parts.
    * The first question of the array, if not empty, is the truely selected question. An empty array means no selection. */
   public questions: Array<IQuestion> = [];
+
+  @Input()
+  public questionsInput: Array<IQuestion> = [];
+
+  @Input()
+  public canUpdateNumero = true;
+
   public layoutsidebarVisible = false;
   public manualid = 2;
   public qcmid = 3;
@@ -79,13 +88,44 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   @Output()
   public updatenumero: EventEmitter<string> = new EventEmitter<string>();
 
+  @Output()
+  public updatedQuestions: EventEmitter<Array<IQuestion>> = new EventEmitter<Array<IQuestion>>();
+
+  @Output()
+  addTextComment: EventEmitter<ITextComment> = new EventEmitter<ITextComment>();
+  @Output()
+  addGradedComment: EventEmitter<IGradedComment> = new EventEmitter<IGradedComment>();
+  @Output()
+  updateTextComment: EventEmitter<ITextComment> = new EventEmitter<ITextComment>();
+  @Output()
+  updateGradedComment: EventEmitter<IGradedComment> = new EventEmitter<IGradedComment>();
+
+  @Input()
+  couldDelete = true;
+
+  addTextCommentM($event: ITextComment): void {
+    this.addTextComment.emit($event);
+  }
+  updateTextCommentM($event: ITextComment): void {
+    this.updateTextComment.emit($event);
+  }
+  addGradedCommentM($event: IGradedComment): void {
+    this.addGradedComment.emit($event);
+  }
+  updateGradedCommentM($event: IGradedComment): void {
+    this.updateGradedComment.emit($event);
+  }
+
   private selectionSubscription: Subscription | undefined = undefined;
+
+  @Input()
+  eventHandler?: EventHandlerService;
 
   constructor(
     private questionService: QuestionService,
     private questionTypeService: QuestionTypeService,
     private fb: UntypedFormBuilder,
-    private eventHandler: EventHandlerService,
+    //    private eventHandler: EventHandlerService,
     private preferenceService: PreferenceService,
   ) {}
 
@@ -115,13 +155,18 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       });
     });
 
-    this.selectionSubscription = this.eventHandler.getSelectedQuestion().subscribe(selectedQ => {
+    this.selectionSubscription = this.eventHandler?.getSelectedQuestion().subscribe(selectedQ => {
       if (selectedQ === undefined) {
         this.questions = [];
       } else {
         this.updateQuestions(selectedQ.id!, selectedQ.examId!, selectedQ.numero!);
       }
     });
+
+    if (this.questionsInput.length > 0) {
+      this.questions = this.questionsInput;
+      this.updateForm();
+    }
   }
 
   private async updateQuestions(qid: number, examId: number, numero: number): Promise<void> {
@@ -203,9 +248,10 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   private onSaveSuccess(updatedQuestions: Array<IQuestion>): void {
     this.questions = updatedQuestions;
     this.questions.forEach(q => {
-      this.eventHandler.updateQuestion(q);
+      this.eventHandler?.updateQuestion(q);
     });
     this.isSaving = false;
+    this.updatedQuestions.emit(updatedQuestions);
   }
 
   private onSaveError(): void {
@@ -260,7 +306,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
         return Promise.resolve(new HttpResponse<IQuestion>());
       })
       .then(() => {
-        this.eventHandler.setCurrentQuestionNumber(number);
+        this.eventHandler?.setCurrentQuestionNumber(number);
         this.updatenumero.next(number);
         this.updateForm();
         this.isSaving = false;

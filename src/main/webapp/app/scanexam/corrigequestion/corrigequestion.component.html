@@ -43,6 +43,20 @@
       [gradedcomments]="currentGradedComment4Question"
     ></jhi-keyboardshortcut>
   </ng-container>
+  <p-sidebar [(visible)]="questionpropertiesviewVisible" [modal]="true" position="right">
+    <div *ngIf="questionpropertiesviewVisible">
+      <jhi-questionpropertiesview
+        [canUpdateNumero]="false"
+        [questionsInput]="questions!"
+        (updatedQuestions)="updateQuestion($event)"
+        [couldDelete]="false"
+        (addGradedComment)="addGradedComment($event)"
+        (addTextComment)="addTextComment($event)"
+        (updateGradedComment)="updateGradedComment($event)"
+        (updateTextComment)="updateTextComment($event)"
+      ></jhi-questionpropertiesview>
+    </div>
+  </p-sidebar>
 
   <p-sidebar [(visible)]="layoutsidebarVisible">
     <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
@@ -440,6 +454,17 @@
               (click)="compareMark($event, resp!)"
             >
               <fa-icon icon="code-compare"></fa-icon>
+            </span>
+            <span *ngIf="resp?.id" class="float-end"> &nbsp; &nbsp; </span>
+
+            <span
+              class="float-end"
+              [tooltipPosition]="'left'"
+              [tooltipZIndex]="'3000'"
+              [pTooltip]="'scanexam.editquestionTooltip' | translate"
+              (click)="editQuestion()"
+            >
+              <fa-icon icon="edit"></fa-icon>
             </span>
           </div>
           <div *ngIf="resp" style="padding-bottom: 0.4rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">

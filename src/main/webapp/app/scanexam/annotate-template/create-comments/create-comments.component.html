@@ -3,7 +3,7 @@
     <div *ngFor="let comment of currentTextComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
       <div class="card">
         <div class="card-body">
-          <span class="float-end" (click)="removeTextComment(comment)">
+          <span *ngIf="couldDelete" class="float-end" (click)="removeTextComment(comment)">
             <fa-icon icon="times"></fa-icon>
           </span>
           <div>
@@ -45,7 +45,7 @@
     <div *ngFor="let comment of currentGradedComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
       <div class="card">
         <div class="card-body">
-          <span *ngIf="_q?.typeAlgoName !== 'QCM'" class="float-end clickable" (click)="removeGradedComment(comment)"
+          <span *ngIf="_q?.typeAlgoName !== 'QCM' && couldDelete" class="float-end clickable" (click)="removeGradedComment(comment)"
             ><fa-icon icon="times"></fa-icon
           ></span>
           <div>
