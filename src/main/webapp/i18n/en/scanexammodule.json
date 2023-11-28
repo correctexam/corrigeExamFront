@@ -157,7 +157,7 @@
     "profshared": "Current sharing",
     "votrecopie": "Your copy:",
     "note1": "Grade :",
-    "currentpagetemplate": "{currentPage} question on {totalPages} questions(s)'",
+    "currentpagetemplate": "Question {currentPage} on {totalPages} questions(s)'",
     "question1": "Question ",
     "showsample": "See examples of correct solutions for this question:",
     "nogoodsolution": "No good solution identified",
