@@ -27,6 +27,7 @@ import { CacheDownloadNotification, CacheUploadNotification, CacheUploadService 
 import { TranslateService } from '@ngx-translate/core';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { firstValueFrom } from 'rxjs';
+import { PreferenceService } from '../preference-page/preference.service';
 
 @Component({
   selector: 'jhi-exam-detail',
@@ -60,6 +61,12 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
   progress = 0;
   onExamNameEdit = false;
 
+  firsthelp = false;
+  firsthelpvalue = true;
+  showInfoExam = false;
+
+  infoExamDetail = { nbrepagenonalign: 0, nbrepagealign: 0, nbrepagetemplate: 0, nbrecopie: 0, cond1: false, cond2: false, cond3: false };
+
   constructor(
     public courseService: CourseService,
     public examService: ExamService,
@@ -74,6 +81,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     public cacheUploadService: CacheUploadService,
     private translateService: TranslateService,
     private db: CacheServiceImpl,
+    private preferenceService: PreferenceService,
   ) {}
   setShowAlignement(v: boolean): void {
     this.showAlignement = v;
@@ -87,6 +95,8 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
   }
 
   ngOnInit(): void {
+    this.firsthelpvalue = this.preferenceService.showFirstCorrectMessage();
+    this.firsthelp = this.firsthelpvalue;
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('examid') !== null) {
         this.blocked = true;
@@ -183,6 +193,14 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
         title: this.translateService.instant('scanexam.synchroserverbrowserdetail'),
         command1: () => {
           this.confirmDownload();
+        },
+      },
+      {
+        label: this.translateService.instant('scanexam.info'),
+        icon: this.appConfig.getFrontUrl() + 'content/images/info-icon.svg',
+        title: this.translateService.instant('scanexam.infodetail'),
+        command1: () => {
+          this.getExamStatus();
         },
       },
     ];
@@ -333,5 +351,34 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     firstValueFrom(this.examService.update(this.exam!)).catch(() => {
       this.exam!.name = oldName;
     });
+  }
+
+  changeStartPreference(): void {
+    this.preferenceService.setFirstCorrectMessage(this.firsthelpvalue);
+  }
+
+  async getExamStatus(): Promise<void> {
+    const dbTemplate = await this.db.countPageTemplate(+this.examId);
+    const p = await this.db.countNonAlignImage(+this.examId);
+    const p1 = await this.db.countAlignImage(+this.examId);
+
+    const nbreSheet = (this.students!.map(s => s.examSheets) as any)
+      .flat()
+      .filter((ex1: any) => ex1.scanId === this.exam!.scanfileId && ex1.pagemin !== -1).length;
+
+    const samepage = p > 0 && p1 > 0 && p === p1;
+    const cond2 = nbreSheet === p1 / dbTemplate;
+
+    this.infoExamDetail = {
+      nbrepagenonalign: p,
+      nbrepagealign: p1,
+      nbrepagetemplate: dbTemplate,
+      nbrecopie: nbreSheet,
+      cond1: samepage,
+      cond2,
+      cond3: samepage && cond2,
+    };
+
+    this.showInfoExam = true;
   }
 }
