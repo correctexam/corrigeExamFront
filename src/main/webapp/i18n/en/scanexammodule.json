@@ -325,7 +325,8 @@
     "envoipdf": "Send the pdf of the annotated copy as an attachment:",
     "lienelevepdf": "Link to annotated student sheet",
     "pdf": "pdf",
-    "reloadscan": "Reload a new scan",
+    "reloadscan": "Reload a new scan (replace or merge)",
+    "reloadScan": "Reload a new scan (replace or merge)",
     "rescan": "Analyse from pdf",
     "processingencours": "Images processing ongoing",
     "voirvignettealign": "Page thumbnails",
@@ -427,6 +428,9 @@
     "info": "Information on the exam cache",
     "infodetail": "Provides information on the exam cache, so that you can sometimes understand why it is not possible to access the correction and result stage",
     "showInfoExamTitle": "Exam cache information",
-    "infoExamDetails": "For this review there are: <ul> <li> {{nbrepagenonalign}} unaligned image(s) in cache.</li><li> {{nbrepagealign}} aligned image(s) in cache.</li><li> {{nbrepagetemplate}} image(s) from the exam statement in cache.</li><li> {{nbrecopie}} associated copy(ies).</li>. <p> As a result, the condition <i>numberpagesnonaligned in cache == nnumberpagesaligned</i> in cache evaluates to <b>{{cond1}}</b> and the condition <i>numberassociationstudent == nnumberpagesaligned / nnumberpagedintemplate</i> evaluates to <b>{{cond2}}</b>. </p><p> The global constraint to access the correction is evaluated to <b>{{cond3}}</b>.</p>"
+    "infoExamDetails": "For this review there are: <ul> <li> {{nbrepagenonalign}} unaligned image(s) in cache.</li><li> {{nbrepagealign}} aligned image(s) in cache.</li><li> {{nbrepagetemplate}} image(s) from the exam statement in cache.</li><li> {{nbrecopie}} associated copy(ies).</li>. <p> As a result, the condition <i>numberpagesnonaligned in cache == nnumberpagesaligned</i> in cache evaluates to <b>{{cond1}}</b> and the condition <i>numberassociationstudent == nnumberpagesaligned / nnumberpagedintemplate</i> evaluates to <b>{{cond2}}</b>. </p><p> The global constraint to access the correction is evaluated to <b>{{cond3}}</b>.</p>",
+    "firsthelpcoursedetail": "<p>This page allows you to create one or more exams for your course and load the list of students for this course. This is because in correctExam, a course is associated with a list of students. 🛈 So from one year to the next, it's best to recreate a new course. </p><p>We offer an import/export mechanism with or without student data, which makes it possible to retrieve data from another instance of correctexam or to import an exam from a previous year without student data. </p><p> On this page, you can also control the sharing of your course with colleagues who need to help you with marking. There is no notion of access rights. A colleague with whom you share your module will have exactly the same rights as you (We're still colleagues first and foremost 🙂 ). <p><p> This page also allows you to delete the module. Warning, this action is irreversible.</p>",
+    "bindall": "🏇",
+    "bindAllTooltip": "Lets you associate all copies whose recognition score is greater than or equal to the score of this copy."
   }
 }

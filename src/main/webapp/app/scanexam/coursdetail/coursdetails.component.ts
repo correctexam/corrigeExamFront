@@ -22,6 +22,7 @@ import { SharecourseComponent } from '../sharecourse/sharecourse.component';
 import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, scan } from 'rxjs';
 import { HttpClient, HttpResponse } from '@angular/common/http';
+import { PreferenceService } from '../preference-page/preference.service';
 
 export interface CacheUploadNotification {
   setMessage(v: string): void;
@@ -60,6 +61,9 @@ export class CoursdetailsComponent implements OnInit {
   blocked = false;
   message = '';
 
+  firsthelp = false;
+  firsthelpvalue = true;
+
   constructor(
     protected applicationConfigService: ApplicationConfigService,
 
@@ -71,10 +75,14 @@ export class CoursdetailsComponent implements OnInit {
     public appConfig: ApplicationConfigService,
     public dialogService: DialogService,
     private translateService: TranslateService,
-    private http: HttpClient
+    private http: HttpClient,
+    private preferenceService: PreferenceService,
   ) {}
 
   ngOnInit(): void {
+    this.firsthelpvalue = this.preferenceService.showFirstCourseMessage();
+    this.firsthelp = this.firsthelpvalue;
+
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('courseid') !== null) {
         this.courseId = params.get('courseid')!;
@@ -92,7 +100,7 @@ export class CoursdetailsComponent implements OnInit {
           e => (this.course = e.body!),
           () => {
             this.router.navigateByUrl('/');
-          }
+          },
         );
       }
     });
@@ -235,5 +243,9 @@ export class CoursdetailsComponent implements OnInit {
     firstValueFrom(this.courseService.update(this.course!)).catch(() => {
       this.course!.name = oldName;
     });
+  }
+
+  changeStartPreference(): void {
+    this.preferenceService.setFirstCourseMessage(this.firsthelpvalue);
   }
 }

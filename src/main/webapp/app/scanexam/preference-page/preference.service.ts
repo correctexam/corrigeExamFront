@@ -110,6 +110,22 @@ export class PreferenceService {
     this.localStorageService.store('firstCorrectMessage', shortcut);
   }
 
+  resetFirstCourseMessage(): void {
+    this.localStorageService.store('firstCourseMessage', true);
+  }
+
+  showFirstCourseMessage(): boolean {
+    const pref: boolean | null = this.localStorageService.retrieve('firstCourseMessage');
+    if (pref === null) {
+      this.localStorageService.store('firstCourseMessage', true);
+      return true;
+    }
+    return pref;
+  }
+  setFirstCourseMessage(shortcut: boolean): void {
+    this.localStorageService.store('firstCourseMessage', shortcut);
+  }
+
   minimizeComments(): boolean {
     const pref: boolean | null = this.localStorageService.retrieve('minimizeComments');
     if (pref === null) {
