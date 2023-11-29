@@ -35,6 +35,8 @@ import { Platform } from '@angular/cdk/platform';
 import { svgadapter } from '../svg.util';
 import { constants } from 'os';
 import { firstValueFrom } from 'rxjs';
+import { ConfirmationService } from 'primeng/api';
+import { TranslateService } from '@ngx-translate/core';
 
 const RANGE_AROUND_CENTER = 20;
 
@@ -44,6 +46,8 @@ const RANGE_AROUND_CENTER = 20;
 export class EventCanevascorrectionHandlerService {
   public imageDataUrl!: string;
   public _canvas!: fabric.Canvas;
+  private confService!: ConfirmationService;
+
   get canvas(): fabric.Canvas {
     return this._canvas;
   }
@@ -124,19 +128,7 @@ export class EventCanevascorrectionHandlerService {
     }
     if (this.selectedTool === DrawingTools.GARBAGE) {
       //      const background = this.canvas.backgroundImage;
-      this.allcanvas.forEach(c => {
-        c.getObjects().forEach(o => this.canvas.remove(o));
-        c.clear();
-        c.renderAll();
-        this.updateAllComments(c).then(e2 =>
-          e2.subscribe(e1 => {
-            if (c === this.canvas) {
-              this.currentComment = e1.body!;
-            }
-          }),
-        );
-      });
-      this.modelViewpping.clear();
+      this.removeAll();
     } else if (this.selectedTool === DrawingTools.ERASER) {
       const ps = [...this.allcanvas.keys()];
       this.allcanvas.forEach(c => {
@@ -191,7 +183,35 @@ export class EventCanevascorrectionHandlerService {
     private fabricShapeService: FabricShapeService,
     public commentsService: CommentsService,
     private platform: Platform,
+    private translateService: TranslateService,
   ) {}
+
+  removeAll(): void {
+    this.translateService.get('scanexam.removeAllAnnotation4studentsheet').subscribe(name => {
+      this.confService.confirm({
+        message: name,
+        accept: () => {
+          this.allcanvas.forEach(c => {
+            c.getObjects().forEach(o => this.canvas.remove(o));
+            c.clear();
+            c.renderAll();
+            this.updateAllComments(c).then(e2 =>
+              e2.subscribe(e1 => {
+                if (c === this.canvas) {
+                  this.currentComment = e1.body!;
+                }
+              }),
+            );
+          });
+          this.modelViewpping.clear();
+          this.selectedTool = DrawingTools.SELECT;
+        },
+        reject: () => {
+          this.selectedTool = DrawingTools.SELECT;
+        },
+      });
+    });
+  }
 
   convertToIText(obj: any) {
     const text = obj.text;
@@ -210,6 +230,10 @@ export class EventCanevascorrectionHandlerService {
 
   registerSelectedToolObserver(f: (d: DrawingTools) => void): any {
     this.drawingToolObserver = f;
+  }
+
+  public setConfirmationService(confService: ConfirmationService): void {
+    this.confService = confService;
   }
 
   addBGImageSrcToCanvas(): Promise<void> {
@@ -432,7 +456,6 @@ export class EventCanevascorrectionHandlerService {
     switch (this._selectedTool) {
       case DrawingTools.SELECT:
         break;
-
       case DrawingTools.ERASER:
         if (object.type === FabricObjectType.ELLIPSE) {
           const otherEllipses = this.getOtherEllipses(object.id);

@@ -82,8 +82,7 @@ export class AllbindingsComponent implements OnInit {
     return canvas.toDataURL();
   }
 
-  async bindStudent(student: IStudent, currentStudent: number, element: any): Promise<void> {
-    this.nobutton = true;
+  async bindStudentInternal(student: IStudent, currentStudent: number, element: any): Promise<void> {
     let examSheet4CurrentStudentId: (number | undefined)[] = [];
     if (student.examSheets) {
       examSheet4CurrentStudentId = student.examSheets.filter((ex: any) => ex?.scanId === this.exam.scanfileId).map(ex1 => ex1.id);
@@ -130,8 +129,34 @@ export class AllbindingsComponent implements OnInit {
       await firstValueFrom(this.studentService.update(student));
     }
     element.bound = true;
+  }
+
+  async bindAllStudent(element: any): Promise<void> {
+    this.nobutton = true;
+    const students = [...this.students.filter(s => s.predictionprecision >= element.predictionprecision)];
+    students.sort((a: any, b: any) => b.predictionprecision - a.predictionprecision);
+    for (const s of students) {
+      try {
+        if (s.bound === undefined || s.bound === false) {
+          await this.bindStudentInternal(s.recognizedStudent, s.currentStudent, s);
+        }
+      } catch (e) {
+        console.error('could not bind ', s.recognizedStudent);
+      }
+    }
     this.nobutton = false;
   }
+
+  async bindStudent(student: IStudent, currentStudent: number, element: any): Promise<void> {
+    this.nobutton = true;
+    try {
+      await this.bindStudentInternal(student, currentStudent, element);
+    } catch (e) {
+      console.error('could not bind ', student);
+    }
+    this.nobutton = false;
+  }
+
   selectedColor(item: any): string {
     if (item.bound) {
       return 'text-green-400';

@@ -254,6 +254,7 @@
     "downloadcacheencoursdetail": "(This may take some time)",
     "importToDexie": "Import in the current local database",
     "removeAllAnnotation": "Are you sure you want to delete all the annotations for this exam?",
+    "removeAllAnnotation4studentsheet": "Are you sure you want to delete all the annotations for this answer?",
     "comparecopie": "Sheet comparison",
     "tooltipCompareComment": "Comparison of copies with the same commentary",
     "tooltipCompareMark": "Comparison of copies with the same score",
@@ -324,7 +325,8 @@
     "envoipdf": "Send the pdf of the annotated copy as an attachment:",
     "lienelevepdf": "Link to annotated student sheet",
     "pdf": "pdf",
-    "reloadscan": "Reload a new scan",
+    "reloadscan": "Reload a new scan (replace or merge)",
+    "reloadScan": "Reload a new scan (replace or merge)",
     "rescan": "Analyse from pdf",
     "processingencours": "Images processing ongoing",
     "voirvignettealign": "Page thumbnails",
@@ -420,6 +422,15 @@
     "scalefactorTooltip": "Used to change the page scaling factor",
     "gotoCorrection": "Go to correction view",
     "gotoCorrectionTooltipView": "Used to go to the correction view when you are logged in as a teacher",
-    "editquestionTooltip": "Enables you to edit the properties of the question to update the scoring"
+    "editquestionTooltip": "Enables you to edit the properties of the question to update the scoring",
+    "firsthelpTitle": "Tips",
+    "firsthelpdetail": "This view gives you access to 6 important stages in the marking process. <ul><li> Step 1 (<i>Annotate template</i>) allows you to identify the areas of interest in your exam paper and build your mark scheme.</li><li> Step 2 and 3 (<i>Upload student scan and Straighten scan</i>) allows you to upload your pdf containing the scans and build a local cache of all the pages in the scan pdf as aligned and unaligned images. This cache is then synchronised with the server so that it can be downloaded by a colleague accessing the exam correction or by yourself if you change browser or devices (correction on tablet for example). <This cache can be recreated at any time if necessary without any risk</b> of data loss. It is always possible to rebuild the cache by repeating step 2 click on <i>Reanalyse from pdf<i>, then repeat step 3 (page alignment). In each of these steps, you can see the state of the cache through the <i>thumbnail<i> part present in step 2, cache of unaligned images and step 3, cache of aligned images. </li><li> Step 4 allows each copy to be associated with one or more students present in the list of students imported when a module is created. </li><li> To access step 5 (Correct copy) and step 6 (View results) , the following condition must be satisfied: <br><b>number ofnonaligned pages in cache == nbrepagesaligned in cache and nbreassociationandstudent == nbrepagesaligned / nbrepagedintemplate. </b> <br>(For example, if I have three pages in my template, 12 pages in the scan pdf so 12 aligned images and 12 unaligned images in the cache and 4 associated copies then I can access the correction) If this condition is not met then it is not possible to access either the correction or the result phase. </li></ul><p>Very generally, if you encounter a problem at this point. It's either that your local cache isn't good, or that the number of associated copies doesn't match the ratio, number of sheets in the cache / no. of feulles in the template. You can access this information on the status of your cache by clicking on the information icon in the dock at the top of this page.</p>",
+    "info": "Information on the exam cache",
+    "infodetail": "Provides information on the exam cache, so that you can sometimes understand why it is not possible to access the correction and result stage",
+    "showInfoExamTitle": "Exam cache information",
+    "infoExamDetails": "For this review there are: <ul> <li> {{nbrepagenonalign}} unaligned image(s) in cache.</li><li> {{nbrepagealign}} aligned image(s) in cache.</li><li> {{nbrepagetemplate}} image(s) from the exam statement in cache.</li><li> {{nbrecopie}} associated copy(ies).</li>. <p> As a result, the condition <i>numberpagesnonaligned in cache == nnumberpagesaligned</i> in cache evaluates to <b>{{cond1}}</b> and the condition <i>numberassociationstudent == nnumberpagesaligned / nnumberpagedintemplate</i> evaluates to <b>{{cond2}}</b>. </p><p> The global constraint to access the correction is evaluated to <b>{{cond3}}</b>.</p>",
+    "firsthelpcoursedetail": "<p>This page allows you to create one or more exams for your course and load the list of students for this course. This is because in correctExam, a course is associated with a list of students. 🛈 So from one year to the next, it's best to recreate a new course. </p><p>We offer an import/export mechanism with or without student data, which makes it possible to retrieve data from another instance of correctexam or to import an exam from a previous year without student data. </p><p> On this page, you can also control the sharing of your course with colleagues who need to help you with marking. There is no notion of access rights. A colleague with whom you share your module will have exactly the same rights as you (We're still colleagues first and foremost 🙂 ). <p><p> This page also allows you to delete the module. Warning, this action is irreversible.</p>",
+    "bindall": "🏇",
+    "bindAllTooltip": "Lets you associate all copies whose recognition score is greater than or equal to the score of this copy."
   }
 }

@@ -1,3 +1,18 @@
+<p-dialog [header]="'scanexam.firsthelpTitle' | translate" [(visible)]="firsthelp" [style]="{ width: '90vw' }">
+  <div style="display: flex; justify-content: space-around">
+    <span jhiTranslate="scanexam.firsthelpcoursedetail"></span>
+  </div>
+  <BR />
+  <BR />
+  <div style="display: flex; justify-content: flex-end; margin-right: 1rem">
+    <span jhiTranslate="scanexam.shortcutopenatstart"></span>&nbsp;
+    <input type="checkbox" [(ngModel)]="firsthelpvalue" (change)="changeStartPreference()" />
+  </div>
+  <ng-template pTemplate="footer">
+    <button type="button" pButton label="ok" (click)="firsthelp = false"></button>
+  </ng-template>
+</p-dialog>
+
 <div>
   <p-dock [styleClass]="'pdock'" [model]="dockItems" position="top">
     <ng-template pTemplate="item" let-item>

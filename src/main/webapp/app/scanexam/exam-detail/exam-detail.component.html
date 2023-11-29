@@ -1,5 +1,26 @@
 <div>
   <p-toast></p-toast>
+  <p-dialog [header]="'scanexam.firsthelpTitle' | translate" [(visible)]="firsthelp" [style]="{ width: '90vw' }">
+    <div style="display: flex; justify-content: space-around">
+      <span jhiTranslate="scanexam.firsthelpdetail"></span>
+    </div>
+    <BR />
+    <BR />
+    <div style="display: flex; justify-content: flex-end; margin-right: 1rem">
+      <span jhiTranslate="scanexam.shortcutopenatstart"></span>&nbsp;
+      <input type="checkbox" [(ngModel)]="firsthelpvalue" (change)="changeStartPreference()" />
+    </div>
+    <ng-template pTemplate="footer">
+      <button type="button" pButton label="ok" (click)="firsthelp = false"></button>
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog [header]="'scanexam.showInfoExamTitle' | translate" [(visible)]="showInfoExam" [style]="{ width: '50vw' }">
+    <span jhiTranslate="scanexam.infoExamDetails" [translateValues]="infoExamDetail"></span>
+    <ng-template pTemplate="footer">
+      <button type="button" pButton label="ok" (click)="showInfoExam = false"></button>
+    </ng-template>
+  </p-dialog>
 
   <p-dock [styleClass]="'pdock'" [model]="dockItems" position="top">
     <ng-template pTemplate="item" let-item>

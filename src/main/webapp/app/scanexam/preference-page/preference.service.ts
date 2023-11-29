@@ -90,9 +90,40 @@ export class PreferenceService {
   setKeyboardShortcuts(shortcut: boolean): void {
     this.localStorageService.store('shortcut', shortcut);
   }
-
   resetKeyboardShortcuts(): void {
     this.localStorageService.store('shortcut', true);
+  }
+
+  resetFirstCorrectMessage(): void {
+    this.localStorageService.store('firstCorrectMessage', true);
+  }
+
+  showFirstCorrectMessage(): boolean {
+    const pref: boolean | null = this.localStorageService.retrieve('firstCorrectMessage');
+    if (pref === null) {
+      this.localStorageService.store('firstCorrectMessage', true);
+      return true;
+    }
+    return pref;
+  }
+  setFirstCorrectMessage(shortcut: boolean): void {
+    this.localStorageService.store('firstCorrectMessage', shortcut);
+  }
+
+  resetFirstCourseMessage(): void {
+    this.localStorageService.store('firstCourseMessage', true);
+  }
+
+  showFirstCourseMessage(): boolean {
+    const pref: boolean | null = this.localStorageService.retrieve('firstCourseMessage');
+    if (pref === null) {
+      this.localStorageService.store('firstCourseMessage', true);
+      return true;
+    }
+    return pref;
+  }
+  setFirstCourseMessage(shortcut: boolean): void {
+    this.localStorageService.store('firstCourseMessage', shortcut);
   }
 
   minimizeComments(): boolean {
