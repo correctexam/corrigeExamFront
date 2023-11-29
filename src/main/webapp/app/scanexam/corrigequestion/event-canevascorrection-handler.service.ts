@@ -204,6 +204,10 @@ export class EventCanevascorrectionHandlerService {
             );
           });
           this.modelViewpping.clear();
+          this.selectedTool = DrawingTools.SELECT;
+        },
+        reject: () => {
+          this.selectedTool = DrawingTools.SELECT;
         },
       });
     });
