@@ -55,7 +55,7 @@ export class FabricCanvasComponent implements OnInit {
     private questionService: QuestionService,
     private examService: ExamService,
     private preferenceService: PreferenceService,
-    private pdfViewerService: NgxExtendedPdfViewerService
+    private pdfViewerService: NgxExtendedPdfViewerService,
   ) {
     //    pdfDefaultOptions.assetsFolder = 'bleeding-edge';
   }
@@ -200,7 +200,7 @@ export class FabricCanvasComponent implements OnInit {
                 this.exam.idzoneId = z1.body!.id!;
                 this.renderZone(z1.body as CustomZone);
                 this.eventHandler.createRedBox('scanexam.ineuc1', z1.body!, rect.p);
-              })
+              }),
             );
           }
           break;
@@ -212,7 +212,7 @@ export class FabricCanvasComponent implements OnInit {
                 this.exam.firstnamezoneId = z1.body!.id!;
                 this.renderZone(z1.body as CustomZone);
                 this.eventHandler.createRedBox('scanexam.prenomuc1', z1.body!, rect.p);
-              })
+              }),
             );
           }
           break;
@@ -224,7 +224,7 @@ export class FabricCanvasComponent implements OnInit {
                 this.exam.namezoneId = z1.body!.id!;
                 this.renderZone(z1.body as CustomZone);
                 this.eventHandler.createRedBox('scanexam.nomuc1', z1.body!, rect.p);
-              })
+              }),
             );
           }
           break;
@@ -301,7 +301,7 @@ export class FabricCanvasComponent implements OnInit {
       yInit: Math.trunc(
         (Math.floor(rect.y * ppc * this.eventHandler.coefficient) / height -
           Math.floor(rect.h * ppc * this.eventHandler.coefficient) / height) *
-          scale
+          scale,
       ),
       width: Math.trunc(Math.floor((rect.w * ppc * this.eventHandler.coefficient) / width) * scale),
       height: Math.trunc((Math.floor(rect.h * ppc * this.eventHandler.coefficient) / height) * scale),
