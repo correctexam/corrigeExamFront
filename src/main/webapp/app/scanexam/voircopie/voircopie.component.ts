@@ -451,12 +451,20 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
         finalW = finalW + initX;
         initX = 0;
       }
+      if (finalW + initX > v.image!.width) {
+        finalW = v.image!.width - initX;
+      }
+
       let initY =
         (zone.yInit! * v.height!) / 100000 - ((zone.height! * v.height! * this.factor) / 100000 - (zone.height! * v.height!) / 100000) / 2;
       if (initY < 0) {
         finalH = finalH + initY;
         initY = 0;
       }
+      if (finalH + initY > v.image!.height) {
+        finalH = v.image!.height - initY;
+      }
+
       this.alignImagesService
         .imageCrop({
           image: v.image!.data.buffer,

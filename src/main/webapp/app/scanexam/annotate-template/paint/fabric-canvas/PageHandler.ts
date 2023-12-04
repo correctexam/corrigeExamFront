@@ -132,6 +132,7 @@ export class PageHandler {
     const canvas: PagedCanvas = new fabric.Canvas(this.annotationCanvas, {
       selection: false,
       preserveObjectStacking: true,
+      width: +this.pdfCanvas.style.width.replace('px', ''),
     }) as PagedCanvas;
     canvas.page = this.page;
 
