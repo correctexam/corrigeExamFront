@@ -180,6 +180,16 @@
                   >
                 </b>
               </p>
+              <p *ngFor="let item of getHybridGradedComments((zones4comments?.answers)![value]); let index = index">
+                Commentaire {{ index + 1 }}:
+                <b
+                  >{{ item.text }}
+                  <span *ngIf="item.grade && zones4comments !== undefined && zones4comments?.algoName !== 'QCM'"
+                    >( <span *ngIf="item.grade > 0">+ </span> {{ item.grade! }} <span *ngIf="item.relative">%</span
+                    ><span *ngIf="!item.relative"> pt</span> )</span
+                  >
+                </b>
+              </p>
               <p *ngFor="let item of getTextComments((zones4comments?.answers)![value]); let index = index">
                 Commentaire{{ index + 1 }}: <b>{{ item.text }}</b>
               </p>

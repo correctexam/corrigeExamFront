@@ -135,6 +135,7 @@ describe('QuestionpropertiesviewComponent', () => {
         gradeType: GradeType.NEGATIVE,
         typeId: undefined,
         zoneId: 100,
+        defaultpoint: undefined,
       };
 
       otherQ = {
@@ -148,6 +149,7 @@ describe('QuestionpropertiesviewComponent', () => {
         gradeType: GradeType.POSITIVE,
         typeId: undefined,
         zoneId: 1002,
+        defaultpoint: undefined,
       };
 
       jest.spyOn(component.editForm, 'patchValue');

@@ -396,6 +396,20 @@ export const CompareGradedCommentAnswer_ROUTE: Route = {
   },
 };
 
+export const CompareHybridCommentAnswer_ROUTE: Route = {
+  path: 'comparehybridcomment/:examid/:commentid',
+  canActivate: [UserRouteAccessService],
+  component: ComparestudentanswerComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'scanexam.comparecopie',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-6-correct-copies-question-by-question-or-student-by-student-or-any-other-combination',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-6-corriger-ses-copies-question-par-question-ou-etudiant-par-etudiant-ou-tout-autre-combinaison',
+    },
+  },
+};
+
 export const CompareMarkAnswer_ROUTE: Route = {
   path: 'comparemark/:examid/:respid',
   canActivate: [UserRouteAccessService],
@@ -540,6 +554,7 @@ export const CompareAnswer_ROUTE: Route = {
       CompareAnswer_ROUTE,
       EXPORTPDF_ROUTE,
       EXPORTPDFBYSHEET_ROUTE,
+      CompareHybridCommentAnswer_ROUTE,
     ]),
     TabViewModule,
   ],

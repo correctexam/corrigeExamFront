@@ -9,6 +9,8 @@ import { Question } from 'app/entities/question/question.model';
 import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
 import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 import { saveAs } from 'file-saver';
+import { HybridGradedCommentService } from '../../../entities/hybrid-graded-comment/service/hybrid-graded-comment.service';
+import { IHybridGradedComment, NewHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-graded-comment.model';
 @Component({
   selector: 'jhi-create-comments',
 
@@ -19,15 +21,20 @@ export class CreateCommentsComponent implements OnInit {
   _q?: Question;
   currentTextComment4Question: ITextComment[] | undefined;
   currentGradedComment4Question: IGradedComment[] | undefined;
+  currentHybridGradedComment4Question: IHybridGradedComment[] | undefined;
 
   @Output()
   addTextComment: EventEmitter<ITextComment> = new EventEmitter<ITextComment>();
   @Output()
   addGradedComment: EventEmitter<IGradedComment> = new EventEmitter<IGradedComment>();
   @Output()
+  addHybridGradedComment: EventEmitter<IHybridGradedComment> = new EventEmitter<IHybridGradedComment>();
+  @Output()
   updateTextComment: EventEmitter<ITextComment> = new EventEmitter<ITextComment>();
   @Output()
   updateGradedComment: EventEmitter<IGradedComment> = new EventEmitter<IGradedComment>();
+  @Output()
+  updateHybridGradedComment: EventEmitter<IHybridGradedComment> = new EventEmitter<IHybridGradedComment>();
 
   @Input()
   couldDelete = true;
@@ -38,6 +45,14 @@ export class CreateCommentsComponent implements OnInit {
   noteCommentaire = 0;
   noteSteps = 0;
   blocked = false;
+  relativeOptions = [
+    { label: 'relative', value: true },
+    { label: 'absolute', value: false },
+  ];
+  grade = 0;
+  relative = true;
+  step = 1;
+
   @Input()
   set question(q: Question | undefined) {
     this._q = q;
@@ -48,6 +63,7 @@ export class CreateCommentsComponent implements OnInit {
     } else {
       this.currentTextComment4Question = [];
       this.currentGradedComment4Question = [];
+      this.currentHybridGradedComment4Question = [];
       this.questionStep = 0;
       this.titreCommentaire = '';
       this.descCommentaire = '';
@@ -62,6 +78,7 @@ export class CreateCommentsComponent implements OnInit {
 
   constructor(
     public gradedCommentService: GradedCommentService,
+    public hybridGradedCommentService: HybridGradedCommentService,
     public textCommentService: TextCommentService,
     public translate: TranslateService,
   ) {}
@@ -72,6 +89,10 @@ export class CreateCommentsComponent implements OnInit {
     if (this._q!.gradeType === GradeType.DIRECT) {
       this.textCommentService.query({ questionId: this._q!.id }).subscribe(com => {
         this.currentTextComment4Question = com.body!;
+      });
+    } else if (this._q!.gradeType === GradeType.HYBRID) {
+      this.hybridGradedCommentService.query({ questionId: this._q!.id }).subscribe(com => {
+        this.currentHybridGradedComment4Question = com.body!;
       });
     } else {
       this.gradedCommentService.query({ questionId: this._q!.id }).subscribe(com => {
@@ -97,7 +118,7 @@ export class CreateCommentsComponent implements OnInit {
         this.descCommentaire = '';
         this.blocked = false;
       });
-    } else if (this._q !== undefined && this._q.gradeType !== GradeType.DIRECT) {
+    } else if (this._q !== undefined && this._q.gradeType !== GradeType.DIRECT && this._q.gradeType !== GradeType.HYBRID) {
       const t: IGradedComment = {
         questionId: this._q.id,
         text: this.titreCommentaire,
@@ -116,24 +137,69 @@ export class CreateCommentsComponent implements OnInit {
         this.noteCommentaire = 0;
         this.blocked = false;
       });
+    } else if (this._q !== undefined && this._q.gradeType === GradeType.HYBRID) {
+      const t: NewHybridGradedComment = {
+        id: null,
+        questionId: this._q.id,
+        text: this.titreCommentaire,
+        description: this.descCommentaire,
+        grade: !this.grade ? 0 : this.grade,
+        step: !this.step ? 1 : this.step,
+        relative: this.relative,
+        // studentResponses: [{ id: this.resp?.id }],
+      };
+      this.blocked = true;
+      this.hybridGradedCommentService.create(t).subscribe(e => {
+        const currentComment = e.body!;
+        this.currentHybridGradedComment4Question?.push(currentComment);
+        this.addHybridGradedComment.emit(currentComment);
+        this.titreCommentaire = '';
+        this.descCommentaire = '';
+        this.noteCommentaire = 0;
+        this.grade = 0;
+        this.step = 1;
+        this.relative = true;
+
+        this.blocked = false;
+      });
     }
   }
 
-  updateComment($event: any, l: IGradedComment | ITextComment, graded: boolean): any {
-    if (graded) {
+  updateComment($event: any, l: IGradedComment | ITextComment | IHybridGradedComment, graded: boolean, hybrid: boolean): any {
+    if (graded && !hybrid) {
       if ((l as IGradedComment).grade === null) {
         (l as IGradedComment).grade = 0;
       }
-      this.gradedCommentService.update(l).subscribe(() => {
-        this.updateGradedComment.emit(l);
+      this.gradedCommentService.update(l as IGradedComment).subscribe(() => {
+        this.updateGradedComment.emit(l as IGradedComment);
         const coms = this.currentGradedComment4Question?.filter(c => c.id === l.id!);
         if (coms !== undefined && coms.length > 0) {
           coms[0].grade = (l as any).grade;
         }
       });
+    } else if (hybrid) {
+      if ((l as IHybridGradedComment).grade === null) {
+        (l as IHybridGradedComment).grade = 0;
+      }
+      if ((l as IHybridGradedComment).step === null) {
+        (l as IHybridGradedComment).step = 1;
+      }
+      if ((l as IHybridGradedComment).relative === null) {
+        (l as IHybridGradedComment).relative = true;
+      }
+
+      this.hybridGradedCommentService.update(l as IHybridGradedComment).subscribe(() => {
+        this.updateHybridGradedComment.emit(l as IHybridGradedComment);
+        const coms = this.currentHybridGradedComment4Question?.filter(c => c.id === l.id!);
+        if (coms !== undefined && coms.length > 0) {
+          coms[0].grade = (l as any).grade;
+          coms[0].step = (l as any).step;
+          coms[0].relative = (l as any).relative;
+        }
+      });
     } else {
-      this.textCommentService.update(l).subscribe(() => {
-        this.updateTextComment.emit(l);
+      this.textCommentService.update(l as ITextComment).subscribe(() => {
+        this.updateTextComment.emit(l as ITextComment);
       });
     }
   }
@@ -154,6 +220,14 @@ export class CreateCommentsComponent implements OnInit {
     });
   }
 
+  removeHybridComment(comment: IHybridGradedComment): void {
+    this.currentHybridGradedComment4Question = this.currentHybridGradedComment4Question!.filter(e => e.id !== comment.id);
+    this.hybridGradedCommentService.delete(comment.id).subscribe(() => {
+      // eslint-disable-next-line no-console
+      console.log('delete');
+    });
+  }
+
   exportComment(): void {
     if (this._q !== undefined && this._q.gradeType === GradeType.DIRECT) {
       const coms: ITextComment[] = [];
@@ -163,10 +237,18 @@ export class CreateCommentsComponent implements OnInit {
         coms.push(comCopy);
       });
       return saveAs(new Blob([JSON.stringify(coms, null, 2)], { type: 'JSON' }), 'commentsQ' + this._q.numero! + '.json');
-    } else if (this._q !== undefined) {
+    } else if (this._q !== undefined && this._q.gradeType !== GradeType.DIRECT && this._q.gradeType !== GradeType.HYBRID) {
       const coms: IGradedComment[] = [];
       this.currentGradedComment4Question?.forEach(com => {
         const comCopy = { ...com };
+        delete comCopy.id;
+        coms.push(comCopy);
+      });
+      return saveAs(new Blob([JSON.stringify(coms, null, 2)], { type: 'JSON' }), 'commentsQ' + this._q.numero! + '.json');
+    } else if (this._q !== undefined && this._q.gradeType === GradeType.HYBRID) {
+      const coms: IHybridGradedComment[] = [];
+      this.currentHybridGradedComment4Question?.forEach(com => {
+        const comCopy = { ...com } as any;
         delete comCopy.id;
         coms.push(comCopy);
       });
@@ -247,6 +329,46 @@ export class CreateCommentsComponent implements OnInit {
 
             this.titreCommentaire = '';
             this.descCommentaire = '';
+            this.blocked = false;
+          });
+        });
+      } else if (this._q !== undefined && this._q.gradeType === GradeType.HYBRID) {
+        const comments: NewHybridGradedComment[] = [
+          {
+            id: null,
+            questionId: this._q.id,
+            text: this.translate.instant('scanexam.adddefaultexcellent'),
+            relative: true,
+            grade: 100,
+            step: 1,
+          },
+          {
+            id: null,
+            questionId: this._q.id,
+            text: this.translate.instant('scanexam.adddefaultvide'),
+            relative: true,
+            grade: -100,
+            step: 1,
+          },
+          {
+            id: null,
+            questionId: this._q.id,
+            text: this.translate.instant('scanexam.adddefaultfaux'),
+            relative: true,
+            grade: -100,
+            step: 1,
+          },
+        ];
+        comments.forEach(com => {
+          this.hybridGradedCommentService.create(com).subscribe(e => {
+            const currentComment = e.body!;
+            this.currentHybridGradedComment4Question?.push(currentComment);
+            this.addHybridGradedComment.emit(currentComment);
+            this.titreCommentaire = '';
+            this.descCommentaire = '';
+            this.grade = 0;
+            this.step = 1;
+            this.relative = true;
             this.blocked = false;
           });
         });

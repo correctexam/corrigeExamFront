@@ -10,6 +10,7 @@ import { IKeyBoardShortCutPreferenceEntry, KeyboardShortcutService } from 'app/s
 import { KeyboardShortcutsComponent, ShortcutInput } from 'ng-keyboard-shortcuts';
 import { IGradedComment } from '../../../entities/graded-comment/graded-comment.model';
 import { ITextComment } from '../../../entities/text-comment/text-comment.model';
+import { IHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-graded-comment.model';
 
 @Component({
   selector: 'jhi-keyboardshortcut',
@@ -30,10 +31,16 @@ export class KeyboardshortcutComponent implements AfterViewInit {
   @Input()
   gradedcomments?: IGradedComment[];
 
+  @Input()
+  hybridgradedcomments?: IHybridGradedComment[];
+
   @Output()
   toggleTCommentById: EventEmitter<number> = new EventEmitter();
   @Output()
   toggleGCommentById: EventEmitter<number> = new EventEmitter();
+
+  @Output()
+  toggleHCommentById: EventEmitter<number> = new EventEmitter();
 
   public keyboardShortcuts: ShortcutInput[] = [];
   public shortcutLog = '';
@@ -50,12 +57,15 @@ export class KeyboardshortcutComponent implements AfterViewInit {
 
   private installKeyBindings(): void {
     const toRemove: number[] = [];
-    const comments: (IGradedComment | ITextComment)[] = [];
+    const comments: (IGradedComment | ITextComment | IHybridGradedComment)[] = [];
     if (this.gradedcomments) {
       comments.push(...this.gradedcomments);
     }
     if (this.textcomments) {
       comments.push(...this.textcomments);
+    }
+    if (this.hybridgradedcomments) {
+      comments.push(...this.hybridgradedcomments);
     }
 
     if (this.keyboardShortcutService.getShortCutPreference().shortcuts.has(this.examId + '_' + this.questionindex)) {
@@ -66,6 +76,7 @@ export class KeyboardshortcutComponent implements AfterViewInit {
         .filter(e1 => e1.examId === +this.examId && e1.questionIndex === +this.questionindex)
         .forEach(entry => {
           const textComment = entry.textComment;
+          const hybridcomment = entry.hybridComment;
           toRemove.push(entry.commentId);
           this.keyboardShortcuts.push({
             key: entry.key,
@@ -74,6 +85,8 @@ export class KeyboardshortcutComponent implements AfterViewInit {
             command: () => {
               if (textComment) {
                 this.toggleTCommentById.emit(entry.commentId);
+              } else if (hybridcomment) {
+                this.toggleHCommentById.emit(entry.commentId);
               } else {
                 this.toggleGCommentById.emit(entry.commentId);
               }
@@ -92,12 +105,16 @@ export class KeyboardshortcutComponent implements AfterViewInit {
           createShortcut = false;
         }
         if (createShortcut) {
+          console.error('will create sc' + sh);
           this.keyboardShortcuts.push({
             key: ['ctrl + ' + sh, 'cmd + ' + sh],
             label: this.translateService.instant('gradeScopeIsticApp.comments.detail.title'),
             description: 'toggle ' + comment.description,
             command: () => {
-              if ('grade' in comment) {
+              if ('step' in comment) {
+                console.error(comment);
+                this.toggleHCommentById.emit(comment.id);
+              } else if ('grade' in comment) {
                 this.toggleGCommentById.emit(comment.id);
               } else {
                 this.toggleTCommentById.emit(comment.id);

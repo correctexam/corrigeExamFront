@@ -12,7 +12,7 @@
       "updated": "Le Student Response avec l'identifiant {{ param }} a été mis à jour",
       "deleted": "Le Student Response avec l'identifiant {{ param }} a été supprimé",
       "delete": {
-        "question": "Etes-vous certain de vouloir supprimer le Student Response {{ id }} ?"
+        "question": "Êtes-vous certain de vouloir supprimer le Student Response {{ id }} ?"
       },
       "detail": {
         "title": "Student Response"
@@ -22,6 +22,7 @@
       "star": "Star",
       "worststar": "Mauvaise réponse remarquable",
       "comments": "Comments",
+      "hybridcommentsValue": "Hybridcomments Value",
       "question": "Question",
       "sheet": "Sheet",
       "textcomments": "Textcomments",

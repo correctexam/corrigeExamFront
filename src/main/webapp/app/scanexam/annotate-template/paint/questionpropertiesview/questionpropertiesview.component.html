@@ -100,25 +100,6 @@
             </option>
           </select>
         </div>
-        <div *ngIf="editForm.get(['typeId'])!.value !== qcmid" class="row">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.step" for="field_reponsefausse">Pas </label>
-
-          <p-listbox
-            [options]="pasPointResponseOptions"
-            name="step"
-            id="field_step1"
-            data-cy="step"
-            formControlName="step"
-            [multiple]="false"
-            optionLabel="name"
-            optionValue="value"
-            [pTooltip]="'scanexam.steptooltip' | translate"
-            [tooltipPosition]="'left'"
-            (onChange)="contentChange()"
-            [tooltipZIndex]="'3000'"
-          ></p-listbox>
-        </div>
-
         <div *ngIf="editForm.get(['typeId'])!.value === manualid" class="row">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.gradeType" for="field_gradeType">Grade Type</label>
           <select
@@ -137,6 +118,46 @@
             </option>
           </select>
         </div>
+
+        <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value !== hybrid" class="row">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.step" for="field_reponsefausse">Pas </label>
+
+          <p-listbox
+            [options]="pasPointResponseOptions"
+            name="step"
+            id="field_step1"
+            data-cy="step"
+            formControlName="step"
+            [multiple]="false"
+            optionLabel="name"
+            optionValue="value"
+            [pTooltip]="'scanexam.steptooltip' | translate"
+            [tooltipPosition]="'left'"
+            (onChange)="contentChange()"
+            [tooltipZIndex]="'3000'"
+          ></p-listbox>
+        </div>
+
+        <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value === hybrid" class="row">
+          <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.defaultpoint" for="field_defaultpoint"
+            >Point par défault</label
+          >
+          <p-knob
+            [min]="0"
+            [max]="100"
+            [step]="10"
+            formControlName="defaultpoint"
+            (onChange)="defaultpointChange()"
+            valueTemplate="{value}%"
+            name="defaultpoint"
+            id="field_defaultpoint"
+            data-cy="defaultpoint"
+            [pTooltip]="'scanexam.defaultpointTooltip' | translate"
+            [tooltipPosition]="'left'"
+            [tooltipZIndex]="'3000'"
+          ></p-knob>
+        </div>
+
         <div *ngIf="editForm.get(['typeId'])!.value === qcmid" class="row">
           <label for="validexp" jhiTranslate="scanexam.validanswerexpression" style="display: block; margin-bottom: 4px"
             >Expression valide</label
@@ -155,6 +176,7 @@
             style="margin-right: 0.5em"
             [pTooltip]="'scanexam.expressiontooltip' | translate"
             [tooltipPosition]="'left'"
+            (keyup)="contentChangeCheck()"
             (change)="contentChangeCheck()"
             [tooltipZIndex]="'3000'"
           />

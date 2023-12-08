@@ -4,4 +4,6 @@ export enum GradeType {
   POSITIVE = 'POSITIVE',
 
   NEGATIVE = 'NEGATIVE',
+
+  HYBRID = 'HYBRID',
 }

@@ -28,7 +28,7 @@ export class StudentResponse implements IStudentResponse {
     public sheetName?: string,
     public sheetId?: number,
     public textcomments?: ITextComment[] | null,
-    public gradedcomments?: IGradedComment[] | null
+    public gradedcomments?: IGradedComment[] | null,
   ) {
     this.star = this.star ?? false;
     this.worststar = this.worststar ?? false;
