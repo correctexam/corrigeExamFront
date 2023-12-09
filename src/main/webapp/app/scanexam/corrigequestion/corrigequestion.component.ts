@@ -1006,7 +1006,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.resp = ret!.body!;
     }
     const ah = await firstValueFrom(this.answer2HybridGradedCommentService.updateAnswer2Hybrid(this.resp?.id, comment.id));
-    console.error(ah);
     if (ah.body?.hybridcommentsId) {
       //          this.answer2HybridGradedCommentMap.set(ah.body.hybridcommentsId!, ah.body.stepValue!);
       if (comment.step !== undefined && comment.step !== null && comment.step > 2) {
@@ -1157,13 +1156,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           resolve(resp);
         }
       } else if (currentQ.gradeType === GradeType.HYBRID && currentQ.typeAlgoName !== 'QCM') {
-        console.error('compute for hybrid');
         let currentNote = 0;
         let absoluteNote2Add = 0;
         let pourcentage = currentQ.defaultpoint!;
         this.currentHybridGradedComment4Question?.forEach(g => {
           if (this.answer2HybridGradedCommentMap.has(g.id)) {
-            console.error('initial ', currentNote);
             const stepValue = this.answer2HybridGradedCommentMap.get(g.id);
             if (stepValue! > 0) {
               if (g.relative) {
@@ -1180,7 +1177,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         } else if (currentNote < 0) {
           currentNote = 0;
         }
-        resp.note = currentNote;
+        resp.note = currentNote * 100;
         this.currentNote = currentNote;
         if (update) {
           this.studentResponseService.partialUpdate(resp).subscribe(b => {
@@ -1876,9 +1873,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         message: this.translateService.instant('scanexam.removehybridcommentconfirmation'),
         accept: () => {
           this.currentHybridGradedComment4Question = this.currentHybridGradedComment4Question!.filter(e => e.id !== comment.id);
-          this.answer2HybridGradedCommentMap.delete(comment.id);
-          this.computeNote(false, this.resp!, this.currentQuestion!);
-
+          setTimeout(() => {
+            this.answer2HybridGradedCommentMap.delete(comment.id);
+            this.computeNote(true, this.resp!, this.currentQuestion!);
+          }, 3);
           this.hybridGradedCommentService.delete(comment!.id!).subscribe(() => {
             console.log('delete');
           });

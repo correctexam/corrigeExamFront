@@ -105,14 +105,12 @@ export class KeyboardshortcutComponent implements AfterViewInit {
           createShortcut = false;
         }
         if (createShortcut) {
-          console.error('will create sc' + sh);
           this.keyboardShortcuts.push({
             key: ['ctrl + ' + sh, 'cmd + ' + sh],
             label: this.translateService.instant('gradeScopeIsticApp.comments.detail.title'),
             description: 'toggle ' + comment.description,
             command: () => {
               if ('step' in comment) {
-                console.error(comment);
                 this.toggleHCommentById.emit(comment.id);
               } else if ('grade' in comment) {
                 this.toggleGCommentById.emit(comment.id);

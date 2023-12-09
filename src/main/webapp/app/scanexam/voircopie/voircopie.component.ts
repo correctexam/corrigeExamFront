@@ -605,7 +605,6 @@ ${firsName}
   }
 
   showGalleria(): void {
-    console.error(this.images.length, this.images);
     this.displayBasic = true;
   }
 }
