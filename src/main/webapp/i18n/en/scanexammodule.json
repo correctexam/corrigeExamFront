@@ -213,6 +213,7 @@
     "gobackresultat": "Back to results",
     "removetextcommentconfirmation": "You are going to delete a comment, it will be deleted for all the copies on which it was applied.",
     "removegradedcommentconfirmation": "You are going to delete a comment, it will be deleted for all the copies on which it was applied.",
+    "removehybridcommentconfirmation": "You are going to delete a comment, it will be deleted for all the copies on which it was applied.",
     "yes": "yes",
     "no": "no",
     "confirmation": "Confirmation",

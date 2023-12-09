@@ -2034,12 +2034,18 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   removeAllAnswer(): void {
-    this.examService.deleteAllAnswerAndComment(+this.examId!).subscribe(() => window.location.reload());
+    setTimeout(() => {
+      this.answer2HybridGradedCommentMap.clear();
+      this.examService.deleteAllAnswerAndComment(+this.examId!).subscribe(() => window.location.reload());
+    }, 3);
   }
 
   removeAnswer(): void {
     if (!this.blocked) {
-      this.examService.deleteAnswer(this.resp!.id!).subscribe(() => this.ngOnInit());
+      setTimeout(() => {
+        this.answer2HybridGradedCommentMap.clear();
+        this.examService.deleteAnswer(this.resp!.id!).subscribe(() => this.ngOnInit());
+      }, 3);
     }
   }
 

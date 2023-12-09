@@ -278,7 +278,7 @@ export class ExportPdfService {
       const imgData = canvas.toDataURL('image/jpeg', compression);
       const dimensions = await this.getImageDimensions(imgData);
       pdf.addImage(imgData, 'JPEG', 0, 0, dimensions.width / (dimensions.width / 210), dimensions.height / (dimensions.height / 297));
-      this.addTextOrGradedComments(pdf, page, sheet);
+      this.addTextOrGradedOrHybridComments(pdf, page, sheet);
       //      const page1 = page % this.nbrPageInTemplate;
       const page1 = this.nbrPageInTemplate === 1 ? 1 : page % this.nbrPageInTemplate;
       if (page1 === 1) {
@@ -353,18 +353,22 @@ export class ExportPdfService {
           currentNote = currentNote + currentQ.point!;
         }
       });
+    } else if (currentQ.gradeType === GradeType.HYBRID && currentQ.typeAlgoName !== 'QCM') {
+      currentNote = resp.note!;
     } else {
       currentNote = resp.note!;
     }
 
-    if (currentQ.step! > 0) {
+    if (currentQ.step! > 0 && !(currentQ.gradeType === GradeType.HYBRID && currentQ.typeAlgoName !== 'QCM')) {
       return currentNote / currentQ.step!;
+    } else if (currentQ.gradeType === GradeType.HYBRID && currentQ.typeAlgoName !== 'QCM') {
+      return currentNote / 100.0;
     } else {
       return currentNote;
     }
   }
 
-  private addTextOrGradedComments(pdf: jsPDF, page: number, sheet: Sheetspdf): void {
+  private addTextOrGradedOrHybridComments(pdf: jsPDF, page: number, sheet: Sheetspdf): void {
     let pageref = this.nbrPageInTemplate === 1 ? 1 : page % this.nbrPageInTemplate;
     if (pageref === 0) {
       pageref = this.nbrPageInTemplate;
@@ -408,6 +412,43 @@ export class ExportPdfService {
           });
           decallage = decallage + 10;
         });
+        resp1.hybridcommentspdf?.forEach(hc => {
+          const currentQ = this.questionMap.get(resp1.questionID!)!;
+          let content = '';
+          if (currentQ.gradeType === GradeType.HYBRID && hc.stepValue !== undefined && hc.stepValue > 0) {
+            // +1 * /2 * (grade) %
+            if (hc.grade !== undefined && hc.grade > 0) {
+              content = content + '+ ';
+            } else {
+              content = content + '- ';
+            }
+            if (hc.stepMax !== undefined && hc.stepValue < hc.stepMax) {
+              content = content + hc.stepValue + ' / ' + hc.stepMax + ' * ';
+            }
+            if (hc.grade !== undefined && hc.relative !== undefined && hc.relative) {
+              content = content + Math.abs(hc.grade) + '%' + ' (' + this.questionMap.get(resp1.questionID!)!.point! + ')\n';
+            } else if (hc.grade !== undefined && hc.relative !== undefined && !hc.relative) {
+              content = content + Math.abs(hc.grade) + 'pt\n';
+            }
+
+            content = content + (hc.description ? hc.description : '');
+            pdf.createAnnotation({
+              type: 'text',
+              title: hc.text,
+              bounds: {
+                x: 0,
+                y: (this.questionMap.get(resp1.questionID!)!.zonepdf!.YInit! * 297) / coefficient + decallage,
+                w: 200,
+                h: 80,
+              },
+              contents: content,
+              open: false,
+            });
+
+            decallage = decallage + 10;
+          }
+        });
+
         resp1.textcommentspdf?.forEach(tc => {
           pdf.createAnnotation({
             type: 'text',

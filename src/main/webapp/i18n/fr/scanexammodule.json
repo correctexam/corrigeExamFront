@@ -219,6 +219,7 @@
     "gobackresultat": "Retourner à la vue résultat",
     "removetextcommentconfirmation": "Vous allez supprimer un commentaire, il sera supprimé pour l'ensemble des copies sur lequel il était appliqué.",
     "removegradedcommentconfirmation": "Vous allez supprimer un commentaire, il sera supprimé pour l'ensemble des copies sur lequel il était appliqué.",
+    "removehybridcommentconfirmation": "Vous allez supprimer un commentaire, il sera supprimé pour l'ensemble des copies sur lequel il était appliqué.",
     "yes": "oui",
     "no": "non",
     "confirmation": "Confirmation",
