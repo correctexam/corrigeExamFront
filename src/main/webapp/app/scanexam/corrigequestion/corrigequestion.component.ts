@@ -549,9 +549,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.keyboardShortcutService.clearToDefault();
     this.populateDefaultShortCut();
 
-    setTimeout(() => {
-      this.testdisableAndEnableKeyBoardShortCut = true;
-    }, 300);
+    setTimeout(() => (this.testdisableAndEnableKeyBoardShortCut = true), 30);
   }
 
   saveShortCut() {
@@ -1012,9 +1010,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         setTimeout(() => {
           this.answer2HybridGradedCommentMap.set(ah.body!.hybridcommentsId!, ah.body!.stepValue!);
         }, 3);
-      } else {
-        this.answer2HybridGradedCommentMap.set(ah.body!.hybridcommentsId!, ah.body!.stepValue!);
       }
+      this.answer2HybridGradedCommentMap.set(ah.body!.hybridcommentsId!, ah.body!.stepValue!);
 
       if (ah.body.stepValue !== null && ah.body.stepValue !== undefined && ah.body.stepValue > 0) {
         (comment as any).checked = true;
@@ -1105,6 +1102,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.computeNote(true, this.resp!, this.currentQuestion!).then(() => (this.blocked = false));
       });
     }
+  }
+  updateNote4updateQuestion(update: boolean, resp: IStudentResponse, currentQ: IQuestion[]): Promise<IStudentResponse> {
+    this.updateQuestion(currentQ);
+    return this.computeNote(update, resp, currentQ[0]);
   }
 
   computeNote(update: boolean, resp: IStudentResponse, currentQ: IQuestion): Promise<IStudentResponse> {
@@ -1775,7 +1776,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  closeEditComment(l: IGradedComment | ITextComment) {
+  closeEditComment(l: IGradedComment | ITextComment | IHybridGradedComment) {
     if (l.id) {
       this.active.set(l.id, false);
     }
@@ -2169,6 +2170,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         q2.typeId = q.typeId;
       }
     }
+    if (this.resp && this.questions && this.questions.length > 0) {
+      this.computeNote(true, this.resp, this.questions[0]);
+    }
   }
 
   addTextComment($event: ITextComment): void {
@@ -2194,10 +2198,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.currentGradedComment4Question?.push($event);
     this.testdisableAndEnableKeyBoardShortCut = false;
     this.populateDefaultShortCut();
-    setTimeout(() => {
-      this.testdisableAndEnableKeyBoardShortCut = true;
-    }, 300);
+    setTimeout(() => (this.testdisableAndEnableKeyBoardShortCut = true), 30);
   }
+
   updateGradedComment($event: IGradedComment): void {
     const c1 = this.currentGradedComment4Question?.find(c => (c.id = $event.id));
     if (c1) {
@@ -2210,6 +2213,85 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       if (c1.grade !== $event.grade) {
         c1.grade = $event.grade;
       }
+    }
+  }
+
+  addHybridComment($event: IHybridGradedComment): void {
+    this.currentHybridGradedComment4Question?.push($event);
+    this.testdisableAndEnableKeyBoardShortCut = false;
+    this.populateDefaultShortCut();
+    setTimeout(() => (this.testdisableAndEnableKeyBoardShortCut = true), 30);
+  }
+
+  updateHybridComment($event: IHybridGradedComment): void {
+    const c1 = this.currentHybridGradedComment4Question?.find(c => (c.id = $event.id));
+    if (c1) {
+      let computen = false;
+      if (c1.description !== $event.description) {
+        c1.description = $event.description;
+      }
+      if (c1.text !== $event.text) {
+        c1.text = $event.text;
+      }
+      if (c1.grade !== $event.grade) {
+        c1.grade = $event.grade;
+        computen = true;
+      }
+      if (c1.relative !== $event.relative) {
+        c1.relative = $event.relative;
+        computen = true;
+      }
+      if (c1.step !== $event.step) {
+        c1.step = $event.step;
+        computen = true;
+      }
+      if (computen && this.resp !== undefined && this.currentQuestion !== undefined) {
+        this.computeNote(true, this.resp, this.currentQuestion);
+      }
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  changestepValue($event: any, comment: IHybridGradedComment): void {
+    if ($event) {
+      this.setStepValueHComment($event, comment);
+    } else {
+      this.setStepValueHComment(0, comment);
+    }
+  }
+
+  async setStepValueHComment(stepvalue: number, comment: IHybridGradedComment) {
+    if (!this.blocked) {
+      this.blocked = true;
+      await this.setStepValueHCommentInternal(stepvalue, comment);
+      this.blocked = false;
+    }
+  }
+
+  async setStepValueHCommentInternal(stepvalue: number, comment: IHybridGradedComment) {
+    if (!this.resp!.id) {
+      const ret = await firstValueFrom(this.updateResponseRequest(this.resp!));
+      this.resp = ret!.body!;
+    }
+    const ah = await firstValueFrom(
+      this.answer2HybridGradedCommentService.updateAnswer2HybridWithStepValue(this.resp?.id, comment.id, stepvalue),
+    );
+    if (ah.body?.hybridcommentsId) {
+      //          this.answer2HybridGradedCommentMap.set(ah.body.hybridcommentsId!, ah.body.stepValue!);
+      if (comment.step !== undefined && comment.step !== null && comment.step > 2) {
+        setTimeout(() => {
+          this.answer2HybridGradedCommentMap.set(ah.body!.hybridcommentsId!, ah.body!.stepValue!);
+        }, 3);
+      }
+      this.answer2HybridGradedCommentMap.set(ah.body!.hybridcommentsId!, ah.body!.stepValue!);
+
+      if (ah.body.stepValue !== null && ah.body.stepValue !== undefined && ah.body.stepValue > 0) {
+        (comment as any).checked = true;
+      } else {
+        (comment as any).checked = false;
+      }
+
+      await this.computeNote(true, this.resp!, this.currentQuestion!);
     }
   }
 }

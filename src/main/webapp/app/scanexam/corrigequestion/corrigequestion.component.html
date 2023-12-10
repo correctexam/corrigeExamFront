@@ -54,8 +54,10 @@
         [couldDelete]="false"
         (addGradedComment)="addGradedComment($event)"
         (addTextComment)="addTextComment($event)"
+        (addHybridGradedComment)="addHybridComment($event)"
         (updateGradedComment)="updateGradedComment($event)"
         (updateTextComment)="updateTextComment($event)"
+        (updateHybridGradedComment)="updateHybridComment($event)"
       ></jhi-questionpropertiesview>
     </div>
   </p-sidebar>
@@ -381,7 +383,7 @@
                 resp?.id &&
                 currentNote !== undefined
               "
-              ><b>{{ currentNote! / questionStep }}</b></span
+              ><b>{{ currentNote! / questionStep | number: '1.0-2' }}</b></span
             >
             <span
               *ngIf="(currentQuestion?.typeAlgoName === 'QCM' || currentQuestion?.gradeType !== 'HYBRID') && questionStep <= 0 && resp?.id"
@@ -403,7 +405,7 @@
                 questions !== undefined &&
                 questions!.length > 0
               "
-              ><b> {{ currentNote }} / {{ questions![0].point! }}</b></span
+              ><b> {{ currentNote | number: '1.0-2' }} / {{ questions![0].point! }}</b></span
             >
             <span *ngIf="!resp?.id" jhiTranslate="scanexam.noneval">non évalué</span>
             <span
@@ -810,7 +812,7 @@
                 </span>
                 <div *ngIf="!minimizeComment">
                   <div>
-                    <p-inplace [closable]="true">
+                    <p-inplace [closable]="true" [active]="active.get(comment.id!)" (onDeactivate)="closeEditComment(comment)">
                       <ng-template pTemplate="display">
                         <h5 class="card-title">{{ comment.text }}</h5>
                       </ng-template>
@@ -824,7 +826,7 @@
                         />
                       </ng-template>
                     </p-inplace>
-                    <p-inplace [closable]="true">
+                    <p-inplace [closable]="true" [active]="active.get(comment.id!)" (onDeactivate)="closeEditComment(comment)">
                       <ng-template pTemplate="display">
                         <p class="card-text">{{ comment.description }}</p>
                       </ng-template>
@@ -839,7 +841,7 @@
                       </ng-template>
                     </p-inplace>
 
-                    <p-inplace [closable]="true">
+                    <p-inplace [closable]="true" [active]="active.get(comment.id!)" (onDeactivate)="closeEditComment(comment)">
                       <ng-template pTemplate="display">
                         <span *ngIf="comment.grade !== null && comment.grade !== undefined && comment.grade > 0"> + </span>
                         {{ comment.grade }} <span *ngIf="!comment.relative"> pt</span> <span *ngIf="comment.relative"> %</span>
@@ -887,7 +889,7 @@
                       </ng-template>
                     </p-inplace>
 
-                    <p-inplace [closable]="true">
+                    <p-inplace [closable]="true" [active]="active.get(comment.id!)" (onDeactivate)="closeEditComment(comment)">
                       <ng-template pTemplate="display">
                         <span> Nombre de pas:</span>
                         {{ comment.step }}
@@ -912,7 +914,8 @@
                     <p-rating
                       *ngIf="comment?.step !== undefined && comment?.step !== null && comment.step! > 1"
                       [stars]="comment.step!"
-                      [disabled]="true"
+                      [disabled]="blocked"
+                      (ngModelChange)="changestepValue($event, comment)"
                       [ngModel]="answer2HybridGradedCommentMap.get(comment.id)"
                       [style]="{ width: '100%' }"
                     ></p-rating>
@@ -949,7 +952,8 @@
                       <p-rating
                         *ngIf="comment?.step !== undefined && comment?.step !== null && comment.step! > 1"
                         [stars]="comment.step!"
-                        [disabled]="true"
+                        [disabled]="blocked"
+                        (ngModelChange)="changestepValue($event, comment)"
                         [ngModel]="answer2HybridGradedCommentMap.get(comment.id)"
                       ></p-rating>
                     </p>

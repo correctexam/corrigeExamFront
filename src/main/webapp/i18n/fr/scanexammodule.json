@@ -441,6 +441,7 @@
     "hybridcommentgrade": "Note associée à ce commentaire",
     "hybridcommentGradeTooltip": "Permet de décider la note associée à ce commentaire qui peut être positive ou négative et être exprimé en point (de manière absolue) ou en pourcentage (de manière relative). Il est à noter que dans le mode de calcul, une fois appliquer tous les commentaires par le correcteur, la note d'un élève pour une question ne pourra être inférieure à zéro en mode hybride ni dépassé la note maximale associée à cette question.",
     "hybridcommentStep": "Nombre de tranche(s)",
-    "hybridcommentStepTooltip": "Permet d'exprimer si le correcteur pourra diviser la valeur de ce commentaire en un nombre de tranche(s). Ainsi, si la note de ce commentaire vaut 80% de la note globale et que le nombre de tranche est 2, le correcteur pourra ne pas appliquer ce commentaire, appliquer ce commentaire avec une tranche (40% de la note globale), appliquer ce commentaire avec deux tranches 80% de la note globale"
+    "hybridcommentStepTooltip": "Permet d'exprimer si le correcteur pourra diviser la valeur de ce commentaire en un nombre de tranche(s). Ainsi, si la note de ce commentaire vaut 80% de la note globale et que le nombre de tranche est 2, le correcteur pourra ne pas appliquer ce commentaire, appliquer ce commentaire avec une tranche (40% de la note globale), appliquer ce commentaire avec deux tranches 80% de la note globale",
+    "hybridcommentGrade": "Note"
   }
 }

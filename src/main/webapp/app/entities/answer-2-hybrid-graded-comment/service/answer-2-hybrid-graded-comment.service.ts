@@ -43,6 +43,20 @@ export class Answer2HybridGradedCommentService {
     );
   }
 
+  updateAnswer2HybridWithStepValue(
+    responseId: number | undefined,
+    hybridCommentId: number,
+    stepValue: number,
+  ): Observable<EntityResponseType> {
+    return this.http.put<IAnswer2HybridGradedComment>(
+      `${this.applicationConfigService.getEndpointFor(
+        'api/update-2-hybrid-graded-comments-with-stepvalue',
+      )}/${responseId}/${hybridCommentId}/${stepValue}`,
+      {},
+      { observe: 'response' },
+    );
+  }
+
   partialUpdate(answer2HybridGradedComment: PartialUpdateAnswer2HybridGradedComment): Observable<EntityResponseType> {
     return this.http.patch<IAnswer2HybridGradedComment>(
       `${this.resourceUrl}/${this.getAnswer2HybridGradedCommentIdentifier(answer2HybridGradedComment)}`,

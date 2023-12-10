@@ -15,6 +15,7 @@ import { PreferenceService } from '../../../preference-page/preference.service';
 import { OnDestroy } from '@angular/core';
 import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
+import { IHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-graded-comment.model';
 
 type SelectableEntity = IQuestionType;
 export type EntityResponseType = HttpResponse<IQuestion>;
@@ -98,9 +99,14 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   @Output()
   addGradedComment: EventEmitter<IGradedComment> = new EventEmitter<IGradedComment>();
   @Output()
+  addHybridGradedComment: EventEmitter<IHybridGradedComment> = new EventEmitter<IHybridGradedComment>();
+
+  @Output()
   updateTextComment: EventEmitter<ITextComment> = new EventEmitter<ITextComment>();
   @Output()
   updateGradedComment: EventEmitter<IGradedComment> = new EventEmitter<IGradedComment>();
+  @Output()
+  updateHybridGradedComment: EventEmitter<IHybridGradedComment> = new EventEmitter<IHybridGradedComment>();
 
   @Input()
   couldDelete = true;
@@ -116,6 +122,12 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   }
   updateGradedCommentM($event: IGradedComment): void {
     this.updateGradedComment.emit($event);
+  }
+  addHybridGradedCommentM($event: IHybridGradedComment): void {
+    this.addHybridGradedComment.emit($event);
+  }
+  updateHybridGradedCommentM($event: IHybridGradedComment): void {
+    this.updateHybridGradedComment.emit($event);
   }
 
   private selectionSubscription: Subscription | undefined = undefined;
