@@ -65,7 +65,7 @@ export interface Zone4SameCommentOrSameGrade {
 export interface Answer {
   comments: IComments[];
   gradedComments: number[];
-  hybridgradedComments: number[];
+  hybridgradedComments: any;
   note: number;
   pagemin: number;
   pagemax: number;
@@ -219,6 +219,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             )
             .subscribe(res => {
               this.zones4comments = res;
+              console.error(this.zones4comments);
               this.zones4comments.answers!.forEach((_, index) => {
                 this.clusters.get(0)?.push(index);
               });
@@ -442,9 +443,18 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   getHybridGradedComments(a: Answer): IHybridGradedComment[] {
     //    a.textComments.forEach(tid -> this.zone)
     if (this.zones4comments !== undefined) {
-      return this.zones4comments!.hybridComments.filter(t => a.hybridgradedComments.includes(t.id!));
+      return this.zones4comments!.hybridComments.filter(t => (a.hybridgradedComments as any)[t.id!] !== undefined);
     } else {
       return [];
+    }
+  }
+
+  getHybridGradedCommentsValue(a: Answer, hc: IHybridGradedComment): number {
+    //    a.textComments.forEach(tid -> this.zone)
+    if ((a.hybridgradedComments as any)[hc.id] !== undefined) {
+      return a.hybridgradedComments[hc.id] as number;
+    } else {
+      return 0;
     }
   }
 

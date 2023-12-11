@@ -189,6 +189,10 @@
                 Commentaire {{ index + 1 }}:
                 <b
                   >{{ item.text }}
+                  <span *ngIf="item.step && item.step > 1"
+                    >({{ getHybridGradedCommentsValue((zones4comments?.answers)![value], item) }} / {{ item?.step }})</span
+                  >
+
                   <span *ngIf="item.grade && zones4comments !== undefined && zones4comments?.algoName !== 'QCM'"
                     >( <span *ngIf="item.grade > 0">+ </span> {{ item.grade! }} <span *ngIf="item.relative">%</span
                     ><span *ngIf="!item.relative"> pt</span> )</span
