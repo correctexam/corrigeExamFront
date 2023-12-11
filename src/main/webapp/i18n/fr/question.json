@@ -12,7 +12,7 @@
       "updated": "Le Question avec l'identifiant {{ param }} a été mis à jour",
       "deleted": "Le Question avec l'identifiant {{ param }} a été supprimé",
       "delete": {
-        "question": "Etes-vous certain de vouloir supprimer le Question {{ id }} ?"
+        "question": "Êtes-vous certain de vouloir supprimer le Question {{ id }} ?"
       },
       "detail": {
         "title": "Question"
@@ -21,10 +21,14 @@
       "numero": "Numero",
       "point": "Point",
       "step": "Step",
+      "validExpression": "Valid Expression",
       "gradeType": "Type de notation",
+      "libelle": "Libellé",
+      "defaultpoint": "Points(s) par défaut",
       "zone": "Zone",
       "textcomments": "Textcomments",
       "gradedcomments": "Gradedcomments",
+      "hybridcomments": "Hybridcomments",
       "type": "Type",
       "exam": "Exam"
     }

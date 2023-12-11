@@ -10,6 +10,7 @@ export interface IQuestion {
   step?: number | null;
   validExpression?: string | null;
   libelle?: string | null;
+  defaultpoint?: number | null;
   gradeType?: GradeType | null;
   textcomments?: ITextComment[] | null;
   gradedcomments?: IGradedComment[] | null;

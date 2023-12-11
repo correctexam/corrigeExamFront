@@ -15,6 +15,7 @@ import { PreferenceService } from '../../../preference-page/preference.service';
 import { OnDestroy } from '@angular/core';
 import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
+import { IHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-graded-comment.model';
 
 type SelectableEntity = IQuestionType;
 export type EntityResponseType = HttpResponse<IQuestion>;
@@ -56,6 +57,8 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   public layoutsidebarVisible = false;
   public manualid = 2;
   public qcmid = 3;
+  readonly hybrid = GradeType.HYBRID;
+
   public isSaving = false;
   public questiontypes: IQuestionType[] = [];
   public editForm!: UntypedFormGroup;
@@ -96,9 +99,14 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   @Output()
   addGradedComment: EventEmitter<IGradedComment> = new EventEmitter<IGradedComment>();
   @Output()
+  addHybridGradedComment: EventEmitter<IHybridGradedComment> = new EventEmitter<IHybridGradedComment>();
+
+  @Output()
   updateTextComment: EventEmitter<ITextComment> = new EventEmitter<ITextComment>();
   @Output()
   updateGradedComment: EventEmitter<IGradedComment> = new EventEmitter<IGradedComment>();
+  @Output()
+  updateHybridGradedComment: EventEmitter<IHybridGradedComment> = new EventEmitter<IHybridGradedComment>();
 
   @Input()
   couldDelete = true;
@@ -114,6 +122,12 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   }
   updateGradedCommentM($event: IGradedComment): void {
     this.updateGradedComment.emit($event);
+  }
+  addHybridGradedCommentM($event: IHybridGradedComment): void {
+    this.addHybridGradedComment.emit($event);
+  }
+  updateHybridGradedCommentM($event: IHybridGradedComment): void {
+    this.updateHybridGradedComment.emit($event);
   }
 
   private selectionSubscription: Subscription | undefined = undefined;
@@ -142,6 +156,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       zoneId: [],
       typeId: [pref.typeId],
       examId: [],
+      defaultpoint: [pref.defaultpoint],
     });
 
     this.questionTypeService.query().subscribe((res: HttpResponse<IQuestionType[]>) => {
@@ -200,6 +215,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
         libelle: question.libelle,
         gradeType: question.gradeType,
         typeId: question.typeId,
+        defaultpoint: question.defaultpoint,
       },
       {
         emitEvent: false,
@@ -221,6 +237,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       q.libelle = this.editForm.get(['libelle'])!.value;
       q.gradeType = this.editForm.get(['gradeType'])!.value;
       q.typeId = this.editForm.get(['typeId'])!.value;
+      q.defaultpoint = this.editForm.get(['defaultpoint'])?.value;
     });
 
     // Saving the current preferences
@@ -230,6 +247,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
         step: this.questions[0].step!,
         gradeType: this.questions[0].gradeType!,
         typeId: this.questions[0].typeId!,
+        defaultpoint: this.questions[0].defaultpoint!,
       });
     }
 
@@ -300,6 +318,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
           this.questions[0].step = this.questions[1].step;
           this.questions[0].typeId = this.questions[1].typeId;
           this.questions[0].libelle = this.questions[1].libelle;
+          this.questions[0].defaultpoint = this.questions[1].defaultpoint!;
 
           return firstValueFrom(this.questionService.update(this.questions[0]));
         }
@@ -353,6 +372,14 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
    */
   public pointChange(input: any): void {
     this.updateStepList(input.target.value);
+    this.contentChange();
+  }
+
+  /**
+   * When interacting with the point step widget
+   */
+  public defaultpointChange(): void {
+    // this.updateStepList(input.target.value);
     this.contentChange();
   }
 

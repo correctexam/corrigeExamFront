@@ -59,6 +59,9 @@ import { KeyboardShortcutsComponent, ShortcutEventOutput, ShortcutInput } from '
 import { IKeyBoardShortCutPreferenceEntry, KeyboardShortcutService } from '../preference-page/keyboardshortcut.service';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { DrawingTools } from '../annotate-template/paint/models';
+import { IHybridGradedComment, NewHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-graded-comment.model';
+import { HybridGradedCommentService } from 'app/entities/hybrid-graded-comment/service/hybrid-graded-comment.service';
+import { Answer2HybridGradedCommentService } from '../../entities/answer-2-hybrid-graded-comment/service/answer-2-hybrid-graded-comment.service';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -126,6 +129,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   scale = 1;
   currentTextComment4Question: ITextComment[] | undefined;
   currentGradedComment4Question: IGradedComment[] | undefined;
+  currentHybridGradedComment4Question: IHybridGradedComment[] | undefined;
+
   windowWidth = 0;
   currentZoneCorrectionHandler: Map<string, ZoneCorrectionHandler> = new Map(); // | undefined;
   shortcuts: ShortcutInput[] = [];
@@ -167,6 +172,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   pageOffset = 0;
   init = true;
   showSpinner = false;
+
+  relativeOptions = [
+    { label: 'relative', value: true },
+    { label: 'absolute', value: false },
+  ];
+  grade = 0;
+  relative = true;
+  step = 1;
+  answer2HybridGradedCommentMap: Map<number, number> = new Map();
+
   constructor(
     public examService: ExamService,
     public courseService: CourseService,
@@ -180,6 +195,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     public questionService: QuestionService,
     public gradedCommentService: GradedCommentService,
     public textCommentService: TextCommentService,
+    public hybridGradedCommentService: HybridGradedCommentService,
+    public answer2HybridGradedCommentService: Answer2HybridGradedCommentService,
     public studentResponseService: StudentResponseService,
     private changeDetector: ChangeDetectorRef,
     private eventHandler: EventCanevascorrectionHandlerService,
@@ -258,6 +275,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (this.questionindex4shortcut !== questionindex4shortcut_prev) {
           this.currentGradedComment4Question = [];
           this.currentTextComment4Question = [];
+          this.currentHybridGradedComment4Question = [];
 
           if (params.get('questionno') !== null) {
             this.questionindex = +params.get('questionno')! - 1;
@@ -279,6 +297,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               this.currentTextComment4Question.forEach(com1 => {
                 this.active.set(com1.id!, false);
               });
+            } else if (questions![0].gradeType === GradeType.HYBRID && questions![0].typeAlgoName !== 'QCM') {
+              const com = await firstValueFrom(this.hybridGradedCommentService.query({ questionId: questions![0].id }));
+              this.currentHybridGradedComment4Question = com.body!;
+              this.currentHybridGradedComment4Question.forEach(com1 => {
+                this.active.set(com1.id!, false);
+              });
             } else {
               const com = await firstValueFrom(this.gradedCommentService.query({ questionId: questions![0].id }));
               this.currentGradedComment4Question = com.body!;
@@ -291,6 +315,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
         this.currentGradedComment4Question?.forEach(com2 => ((com2 as any).checked = false));
         this.currentTextComment4Question?.forEach(com2 => ((com2 as any).checked = false));
+        this.currentHybridGradedComment4Question?.forEach(com2 => ((com2 as any).checked = false));
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (questions !== undefined && questions.length > 0) {
@@ -308,13 +333,31 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             );
             if (sr.body !== null && sr.body.length > 0) {
               this.resp = sr.body![0];
-
               this.currentNote = this.resp.note!;
+              this.answer2HybridGradedCommentMap.clear();
+              const answersHybrid = (await firstValueFrom(this.answer2HybridGradedCommentService.query({ answerId: this.resp.id }))).body;
+              if (answersHybrid !== null) {
+                for (const answerHybrid of answersHybrid) {
+                  if (answerHybrid.hybridcommentsId !== undefined && answerHybrid.hybridcommentsId !== null && answerHybrid.stepValue) {
+                    this.answer2HybridGradedCommentMap.set(answerHybrid.hybridcommentsId, answerHybrid.stepValue);
+                  }
+                }
+              }
+
               await this.computeNote(false, this.resp!, this.currentQuestion!);
               if (questions![0].gradeType === GradeType.DIRECT && questions![0].typeAlgoName !== 'QCM') {
                 this.resp.textcomments!.forEach(com1 => {
                   const elt = this.currentTextComment4Question?.find(com2 => com2.id === com1.id);
                   if (elt !== undefined) {
+                    (elt as any).checked = true;
+                  } else {
+                    (elt as any).checked = false;
+                  }
+                });
+              } else if (questions![0].gradeType === GradeType.HYBRID && questions![0].typeAlgoName !== 'QCM') {
+                this.answer2HybridGradedCommentMap.forEach((com1v, com1k) => {
+                  const elt = this.currentHybridGradedComment4Question?.find(com2 => com2.id === com1k);
+                  if (elt !== undefined && com1v > 0) {
                     (elt as any).checked = true;
                   } else {
                     (elt as any).checked = false;
@@ -453,12 +496,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   populateDefaultShortCut(): void {
     const toRemove: number[] = [];
-    const comments: (IGradedComment | ITextComment)[] = [];
-    if (this.currentGradedComment4Question) {
+    const comments: (IGradedComment | ITextComment | IHybridGradedComment)[] = [];
+    if (this.currentGradedComment4Question && this.currentGradedComment4Question.length > 0) {
       comments.push(...this.currentGradedComment4Question);
     }
-    if (this.currentTextComment4Question) {
+    if (this.currentTextComment4Question && this.currentTextComment4Question.length > 0) {
       comments.push(...this.currentTextComment4Question);
+    }
+
+    if (this.currentHybridGradedComment4Question && this.currentHybridGradedComment4Question.length > 0) {
+      comments.push(...this.currentHybridGradedComment4Question);
     }
 
     if (this.keyboardShortcutService.getShortCutPreference().shortcuts.has(this.examId + '_' + this.questionindex)) {
@@ -503,9 +550,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.keyboardShortcutService.clearToDefault();
     this.populateDefaultShortCut();
 
-    setTimeout(() => {
-      (this.testdisableAndEnableKeyBoardShortCut = true), 300;
-    });
+    setTimeout(() => (this.testdisableAndEnableKeyBoardShortCut = true), 30);
   }
 
   saveShortCut() {
@@ -530,6 +575,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             this.currentQuestion !== undefined &&
             this.currentQuestion.gradeType === GradeType.DIRECT &&
             this.currentQuestion.typeAlgoName !== 'QCM',
+          hybridComment:
+            this.currentQuestion !== undefined &&
+            this.currentQuestion.gradeType === GradeType.HYBRID &&
+            this.currentQuestion.typeAlgoName !== 'QCM',
+
           examId: +this.examId!,
           description: this.commentShortcut.text,
         });
@@ -547,6 +597,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             this.currentQuestion !== undefined &&
             this.currentQuestion.gradeType === GradeType.DIRECT &&
             this.currentQuestion.typeAlgoName !== 'QCM',
+          hybridComment:
+            this.currentQuestion !== undefined &&
+            this.currentQuestion.gradeType === GradeType.HYBRID &&
+            this.currentQuestion.typeAlgoName !== 'QCM',
 
           description: this.commentShortcut.text,
         },
@@ -557,8 +611,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.commentShortcut = null;
     this.currentKeyBoardShorcut = '';
     setTimeout(() => {
-      (this.testdisableAndEnableKeyBoardShortCut = true), 300;
-    });
+      this.testdisableAndEnableKeyBoardShortCut = true;
+    }, 30);
   }
 
   cleanShortCut() {
@@ -614,6 +668,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
   cleanAllCorrection(q: IQuestion): Observable<HttpResponse<IQuestion>> {
+    // TODO Check
     return this.questionService.cleanAllCorrectionAndComment(q);
   }
   workOnQCM() {
@@ -855,7 +910,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   changeNote1(e: ShortcutEventOutput): void {
     if (
       this.currentQuestion !== undefined &&
-      !(this.currentQuestion.gradeType !== GradeType.DIRECT || this.currentQuestion.typeAlgoName === 'QCM') &&
+      this.currentQuestion.gradeType === GradeType.DIRECT &&
+      this.currentQuestion.typeAlgoName !== 'QCM' &&
       !this.isTextInput(e.event.target) &&
       this.resp !== undefined &&
       this.noteSteps >= +e.event.key
@@ -883,12 +939,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  checked(comment: ITextComment | IGradedComment): boolean {
+  checked(comment: ITextComment | IGradedComment | IHybridGradedComment): boolean {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return (comment as any).checked;
   }
 
-  getStyle(comment: ITextComment | IGradedComment): any {
+  getStyle(comment: ITextComment | IGradedComment | IHybridGradedComment): any {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     if ((comment as any).checked) {
       if (comment.description?.startsWith('correct')) {
@@ -934,6 +990,40 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       });
     }
   }
+
+  async incrementHComment(comment: IHybridGradedComment) {
+    if (!this.blocked) {
+      this.blocked = true;
+      await this.incrementHCommentInternal(comment);
+      this.blocked = false;
+    }
+  }
+
+  async incrementHCommentInternal(comment: IHybridGradedComment) {
+    if (!this.resp!.id) {
+      const ret = await firstValueFrom(this.updateResponseRequest(this.resp!));
+      this.resp = ret!.body!;
+    }
+    const ah = await firstValueFrom(this.answer2HybridGradedCommentService.updateAnswer2Hybrid(this.resp?.id, comment.id));
+    if (ah.body?.hybridcommentsId) {
+      //          this.answer2HybridGradedCommentMap.set(ah.body.hybridcommentsId!, ah.body.stepValue!);
+      if (comment.step !== undefined && comment.step !== null && comment.step > 2) {
+        setTimeout(() => {
+          this.answer2HybridGradedCommentMap.set(ah.body!.hybridcommentsId!, ah.body!.stepValue!);
+        }, 3);
+      }
+      this.answer2HybridGradedCommentMap.set(ah.body!.hybridcommentsId!, ah.body!.stepValue!);
+
+      if (ah.body.stepValue !== null && ah.body.stepValue !== undefined && ah.body.stepValue > 0) {
+        (comment as any).checked = true;
+      } else {
+        (comment as any).checked = false;
+      }
+
+      await this.computeNote(true, this.resp!, this.currentQuestion!);
+    }
+  }
+
   async retirerTComment(comment: ITextComment) {
     if (!this.blocked) {
       this.blocked = true;
@@ -965,6 +1055,15 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       const res = this.currentGradedComment4Question?.filter(c => c.id === commentId);
       if (res !== undefined && res.length > 0) {
         this.toggleGComment(res[0]);
+      }
+    }
+  }
+
+  toggleHCommentById(commentId: any) {
+    if (!this.blocked) {
+      const res = this.currentHybridGradedComment4Question?.filter(c => c.id === commentId);
+      if (res !== undefined && res.length > 0) {
+        this.incrementHComment(res[0]);
       }
     }
   }
@@ -1004,6 +1103,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.computeNote(true, this.resp!, this.currentQuestion!).then(() => (this.blocked = false));
       });
     }
+  }
+  updateNote4updateQuestion(update: boolean, resp: IStudentResponse, currentQ: IQuestion[]): Promise<IStudentResponse> {
+    this.updateQuestion(currentQ);
+    return this.computeNote(update, resp, currentQ[0]);
   }
 
   computeNote(update: boolean, resp: IStudentResponse, currentQ: IQuestion): Promise<IStudentResponse> {
@@ -1054,6 +1157,45 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         } else {
           resolve(resp);
         }
+      } else if (currentQ.gradeType === GradeType.HYBRID && currentQ.typeAlgoName !== 'QCM') {
+        let currentNote = 0;
+        let absoluteNote2Add = 0;
+        let pourcentage = currentQ.defaultpoint ? currentQ.defaultpoint : 0;
+        this.currentHybridGradedComment4Question?.forEach(g => {
+          if (this.answer2HybridGradedCommentMap.has(g.id)) {
+            const stepValue = this.answer2HybridGradedCommentMap.get(g.id);
+            if (stepValue! > 0) {
+              if (g.relative) {
+                pourcentage = pourcentage + (stepValue! / g.step!) * g.grade!;
+              } else {
+                absoluteNote2Add = absoluteNote2Add + (stepValue! / g.step!) * g.grade!;
+              }
+            }
+          }
+        });
+        currentNote = (currentQ.point! * pourcentage) / 100.0 + absoluteNote2Add;
+        if (currentNote > currentQ.point!) {
+          currentNote = currentQ.point!;
+        } else if (currentNote < 0) {
+          currentNote = 0;
+        }
+        resp.note = currentNote * 100;
+
+        this.currentNote = currentNote;
+        if (update) {
+          this.studentResponseService.partialUpdate(resp).subscribe(b => {
+            if (b.body !== null) {
+              resolve(b.body);
+            } else {
+              reject(null);
+            }
+          });
+        } else {
+          resolve(resp);
+        }
+
+        // TODO
+        resolve(resp);
       } else if (currentQ.typeAlgoName === 'QCM' && currentQ.step! > 0) {
         let currentNote = 0;
         resp.gradedcomments?.forEach(g => {
@@ -1135,7 +1277,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               this.blocked = false;
             });
           });
-        } else if (this.currentQuestion !== undefined && this.currentQuestion.gradeType !== GradeType.DIRECT) {
+        } else if (
+          this.currentQuestion !== undefined &&
+          this.currentQuestion.gradeType !== GradeType.DIRECT &&
+          this.currentQuestion.gradeType !== GradeType.HYBRID
+        ) {
           const t: IGradedComment = {
             questionId: this.currentQuestion.id,
             text: this.titreCommentaire,
@@ -1162,6 +1308,37 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               this.titreCommentaire = '';
               this.descCommentaire = '';
               this.noteCommentaire = 0;
+              this.blocked = false;
+            });
+          });
+        } else if (this.currentQuestion !== undefined && this.currentQuestion.gradeType === GradeType.HYBRID) {
+          const t: NewHybridGradedComment = {
+            id: null,
+            questionId: this.currentQuestion.id,
+            text: this.titreCommentaire,
+            description: this.descCommentaire,
+            grade: !this.grade ? 0 : this.grade,
+            step: !this.step ? 1 : this.step,
+            relative: this.relative,
+            // studentResponses: [{ id: this.resp?.id }],
+          };
+          this.blocked = true;
+          this.hybridGradedCommentService.create(t).subscribe(e => {
+            const currentComment = e.body!;
+            this.currentHybridGradedComment4Question?.push(currentComment);
+
+            this.incrementHCommentInternal(currentComment).then(() => {
+              this.populateDefaultShortCut();
+              setTimeout(() => {
+                this.testdisableAndEnableKeyBoardShortCut = true;
+              }, 30);
+              this.titreCommentaire = '';
+              this.descCommentaire = '';
+              this.noteCommentaire = 0;
+              this.grade = 0;
+              this.step = 1;
+              this.relative = true;
+
               this.blocked = false;
             });
           });
@@ -1562,27 +1739,46 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  updateComment($event: any, l: IGradedComment | ITextComment, graded: boolean): any {
-    if (graded) {
+  updateComment($event: any, l: IGradedComment | ITextComment | IHybridGradedComment, graded: boolean, hybrid: boolean): any {
+    if (graded && !hybrid) {
       if ((l as IGradedComment).grade === null) {
         (l as IGradedComment).grade = 0;
       }
-      this.gradedCommentService.update(l).subscribe(() => {
+      this.gradedCommentService.update(l as IGradedComment).subscribe(() => {
         const coms = this.resp?.gradedcomments?.filter(c => c.id === l.id!);
         if (coms !== undefined && coms.length > 0) {
           coms[0].grade = (l as any).grade;
           this.computeNote(true, this.resp!, this.currentQuestion!);
         }
       });
+    } else if (hybrid) {
+      if ((l as IHybridGradedComment).grade === null) {
+        (l as IHybridGradedComment).grade = 0;
+      }
+      if ((l as IHybridGradedComment).step === null) {
+        (l as IHybridGradedComment).step = 1;
+      }
+      if ((l as IHybridGradedComment).relative === null) {
+        (l as IHybridGradedComment).relative = true;
+      }
+      this.hybridGradedCommentService.update(l as IHybridGradedComment).subscribe(() => {
+        const coms = this.currentHybridGradedComment4Question?.filter(c => c.id === l.id!);
+        if (coms !== undefined && coms.length > 0) {
+          coms[0].grade = (l as any).grade;
+          coms[0].step = (l as any).step;
+          coms[0].relative = (l as any).relative;
+          this.computeNote(true, this.resp!, this.currentQuestion!);
+        }
+      });
     } else {
-      this.textCommentService.update(l).subscribe(() => {});
+      this.textCommentService.update(l as ITextComment).subscribe(() => {});
     }
     if (l.id) {
       this.active.set(l.id, false);
     }
   }
 
-  closeEditComment(l: IGradedComment | ITextComment) {
+  closeEditComment(l: IGradedComment | ITextComment | IHybridGradedComment) {
     if (l.id) {
       this.active.set(l.id, false);
     }
@@ -1674,6 +1870,24 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
+  removeHybridComment(comment: IHybridGradedComment): void {
+    if (!this.blocked) {
+      this.confirmationService.confirm({
+        message: this.translateService.instant('scanexam.removehybridcommentconfirmation'),
+        accept: () => {
+          this.currentHybridGradedComment4Question = this.currentHybridGradedComment4Question!.filter(e => e.id !== comment.id);
+          setTimeout(() => {
+            this.answer2HybridGradedCommentMap.delete(comment.id);
+            this.computeNote(true, this.resp!, this.currentQuestion!);
+          }, 3);
+          this.hybridGradedCommentService.delete(comment!.id!).subscribe(() => {
+            console.log('delete');
+          });
+        },
+      });
+    }
+  }
+
   // ----------------- code for realign -----------------------
 
   realign(): void {
@@ -1745,7 +1959,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           height: e.imageAlignedHeight,
         };
         const im = new ImageData(new Uint8ClampedArray(apage.image!), apage.width, apage.height);
-        // TODO remove just align
         this.removeElementForPages(+this.examId!, e.pageNumber!, e.pageNumber!).then(
           () => {
             this.saveEligneImage(apage.page!, this.fgetBase64Image(im)).then(
@@ -1824,12 +2037,18 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   removeAllAnswer(): void {
-    this.examService.deleteAllAnswerAndComment(+this.examId!).subscribe(() => window.location.reload());
+    setTimeout(() => {
+      this.answer2HybridGradedCommentMap.clear();
+      this.examService.deleteAllAnswerAndComment(+this.examId!).subscribe(() => window.location.reload());
+    }, 3);
   }
 
   removeAnswer(): void {
     if (!this.blocked) {
-      this.examService.deleteAnswer(this.resp!.id!).subscribe(() => this.ngOnInit());
+      setTimeout(() => {
+        this.answer2HybridGradedCommentMap.clear();
+        this.examService.deleteAnswer(this.resp!.id!).subscribe(() => this.ngOnInit());
+      }, 3);
     }
   }
 
@@ -1869,6 +2088,32 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
     }
   }
+
+  compareHybridComment(event: any, comment: IHybridGradedComment, stepValue: number) {
+    if (!this.blocked) {
+      if (event.ctrlKey || event.metaKey) {
+        this.zone.run(() => {
+          const url = this.router.serializeUrl(
+            this.router.createUrlTree(['/comparehybridcomment/' + this.examId + '/' + comment.id + '/' + stepValue]),
+          );
+          if ('/' !== this.applicationConfigService.getFrontUrl()) {
+            if (this.applicationConfigService.getFrontUrl().endsWith('/') && url.startsWith('/')) {
+              window.open(this.applicationConfigService.getFrontUrl().slice(0, -1) + url, '_blank');
+            } else {
+              window.open(this.applicationConfigService.getFrontUrl() + url, '_blank');
+            }
+          } else {
+            window.open(url, '_blank');
+          }
+        });
+      } else {
+        this.zone.run(() => {
+          this.router.navigate(['/comparehybridcomment/' + this.examId + '/' + comment.id + '/' + stepValue]);
+        });
+      }
+    }
+  }
+
   compareTextComment(event: any, comment: ITextComment) {
     if (!this.blocked) {
       if (event.ctrlKey || event.metaKey) {
@@ -1929,6 +2174,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         q2.typeId = q.typeId;
       }
     }
+    if (this.resp && this.questions && this.questions.length > 0) {
+      this.computeNote(true, this.resp, this.questions[0]);
+    }
   }
 
   addTextComment($event: ITextComment): void {
@@ -1936,8 +2184,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.testdisableAndEnableKeyBoardShortCut = false;
     this.populateDefaultShortCut();
     setTimeout(() => {
-      (this.testdisableAndEnableKeyBoardShortCut = true), 300;
-    });
+      this.testdisableAndEnableKeyBoardShortCut = true;
+    }, 30);
   }
   updateTextComment($event: ITextComment): void {
     const c1 = this.currentTextComment4Question?.find(c => (c.id = $event.id));
@@ -1954,10 +2202,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.currentGradedComment4Question?.push($event);
     this.testdisableAndEnableKeyBoardShortCut = false;
     this.populateDefaultShortCut();
-    setTimeout(() => {
-      (this.testdisableAndEnableKeyBoardShortCut = true), 300;
-    });
+    setTimeout(() => (this.testdisableAndEnableKeyBoardShortCut = true), 30);
   }
+
   updateGradedComment($event: IGradedComment): void {
     const c1 = this.currentGradedComment4Question?.find(c => (c.id = $event.id));
     if (c1) {
@@ -1970,6 +2217,85 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       if (c1.grade !== $event.grade) {
         c1.grade = $event.grade;
       }
+    }
+  }
+
+  addHybridComment($event: IHybridGradedComment): void {
+    this.currentHybridGradedComment4Question?.push($event);
+    this.testdisableAndEnableKeyBoardShortCut = false;
+    this.populateDefaultShortCut();
+    setTimeout(() => (this.testdisableAndEnableKeyBoardShortCut = true), 30);
+  }
+
+  updateHybridComment($event: IHybridGradedComment): void {
+    const c1 = this.currentHybridGradedComment4Question?.find(c => (c.id = $event.id));
+    if (c1) {
+      let computen = false;
+      if (c1.description !== $event.description) {
+        c1.description = $event.description;
+      }
+      if (c1.text !== $event.text) {
+        c1.text = $event.text;
+      }
+      if (c1.grade !== $event.grade) {
+        c1.grade = $event.grade;
+        computen = true;
+      }
+      if (c1.relative !== $event.relative) {
+        c1.relative = $event.relative;
+        computen = true;
+      }
+      if (c1.step !== $event.step) {
+        c1.step = $event.step;
+        computen = true;
+      }
+      if (computen && this.resp !== undefined && this.currentQuestion !== undefined) {
+        this.computeNote(true, this.resp, this.currentQuestion);
+      }
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  changestepValue($event: any, comment: IHybridGradedComment): void {
+    if ($event) {
+      this.setStepValueHComment($event, comment);
+    } else {
+      this.setStepValueHComment(0, comment);
+    }
+  }
+
+  async setStepValueHComment(stepvalue: number, comment: IHybridGradedComment) {
+    if (!this.blocked) {
+      this.blocked = true;
+      await this.setStepValueHCommentInternal(stepvalue, comment);
+      this.blocked = false;
+    }
+  }
+
+  async setStepValueHCommentInternal(stepvalue: number, comment: IHybridGradedComment) {
+    if (!this.resp!.id) {
+      const ret = await firstValueFrom(this.updateResponseRequest(this.resp!));
+      this.resp = ret!.body!;
+    }
+    const ah = await firstValueFrom(
+      this.answer2HybridGradedCommentService.updateAnswer2HybridWithStepValue(this.resp?.id, comment.id, stepvalue),
+    );
+    if (ah.body?.hybridcommentsId) {
+      //          this.answer2HybridGradedCommentMap.set(ah.body.hybridcommentsId!, ah.body.stepValue!);
+      if (comment.step !== undefined && comment.step !== null && comment.step > 2) {
+        setTimeout(() => {
+          this.answer2HybridGradedCommentMap.set(ah.body!.hybridcommentsId!, ah.body!.stepValue!);
+        }, 3);
+      }
+      this.answer2HybridGradedCommentMap.set(ah.body!.hybridcommentsId!, ah.body!.stepValue!);
+
+      if (ah.body.stepValue !== null && ah.body.stepValue !== undefined && ah.body.stepValue > 0) {
+        (comment as any).checked = true;
+      } else {
+        (comment as any).checked = false;
+      }
+
+      await this.computeNote(true, this.resp!, this.currentQuestion!);
     }
   }
 }

@@ -4,7 +4,8 @@
       "null": "",
       "DIRECT": "DIRECT",
       "POSITIVE": "POSITIVE",
-      "NEGATIVE": "NEGATIVE"
+      "NEGATIVE": "NEGATIVE",
+      "HYBRID": "HYBRID"
     }
   }
 }

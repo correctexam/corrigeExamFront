@@ -219,6 +219,7 @@
     "gobackresultat": "Retourner à la vue résultat",
     "removetextcommentconfirmation": "Vous allez supprimer un commentaire, il sera supprimé pour l'ensemble des copies sur lequel il était appliqué.",
     "removegradedcommentconfirmation": "Vous allez supprimer un commentaire, il sera supprimé pour l'ensemble des copies sur lequel il était appliqué.",
+    "removehybridcommentconfirmation": "Vous allez supprimer un commentaire, il sera supprimé pour l'ensemble des copies sur lequel il était appliqué.",
     "yes": "oui",
     "no": "non",
     "confirmation": "Confirmation",
@@ -436,6 +437,11 @@
     "infoExamDetails": "Pour cet examen, il y a : <ul> <li> {{nbrepagenonalign}} image(s) non alignée(s) dans le cache.</li><li>  {{nbrepagealign}} image(s) alignée(s) dans le cache.</li><li>  {{nbrepagetemplate}} image(s) issue(s) de l'énoncé de l'examen dans le cache.</li><li>   {{nbrecopie}} copie(s) associée(s).</li>.<p> Par conséquence, la condition <i>nbrepagesnonalignées en cache == nbrepagesalignées</i> dans le cache est évaluée à <b>{{cond1}}</b> et la condition <i>nbredassociationetudiant == nbrepagesalignées / nbrepagedansletemplate</i> est évaluée à <b>{{cond2}}</b>.</p><p> La contrainte globale pour accéder à la correction est évaluée à <b>{{cond3}}</b>.</p>",
     "firsthelpcoursedetail": "<p>Cette page vous permet de créer un ou plusieurs examen(s) pour votre cours et charger la liste des étudiants pour ce cours. En effet, dans correctExam, un cours est associé à une liste d'étudiants. 🛈 Donc d'une année sur l'autre, il vaut mieux recréer un nouveau cours. </p><p>Nous offrons un mécanisme d'import/export avec ou sans les données étudiantes, ce qui permet de récupérer les données depuis une autre instance de correctexam ou d'importer un examen d'une année précédente sans les données étudiantes. </p><p> Dans cette page, vous pouvez aussi piloter le partage de votre cours avec des collègues qui doivent vous aider dans la correction. Il n'y a pas de notion de droit d'accès. Un collègue avec qui vous partagez votre module aura exactement les mêmes droits que vous (On reste collègue avant tout 🙂). <p><p> Cette page vous permet aussi de détruire le module. Attention, cette action est irréversible.</p>",
     "bindall": "🏇",
-    "bindAllTooltip": "Permet d'associer toutes les copies dont le score de reconnaissance est supérieur ou égale au score de cette copie."
+    "bindAllTooltip": "Permet d'associer toutes les copies dont le score de reconnaissance est supérieur ou égale au score de cette copie.",
+    "hybridcommentgrade": "Note associée à ce commentaire",
+    "hybridcommentGradeTooltip": "Permet de décider la note associée à ce commentaire qui peut être positive ou négative et être exprimé en point (de manière absolue) ou en pourcentage (de manière relative). Il est à noter que dans le mode de calcul, une fois appliquer tous les commentaires par le correcteur, la note d'un élève pour une question ne pourra être inférieure à zéro en mode hybride ni dépassé la note maximale associée à cette question.",
+    "hybridcommentStep": "Nombre de tranche(s)",
+    "hybridcommentStepTooltip": "Permet d'exprimer si le correcteur pourra diviser la valeur de ce commentaire en un nombre de tranche(s). Ainsi, si la note de ce commentaire vaut 80% de la note globale et que le nombre de tranche est 2, le correcteur pourra ne pas appliquer ce commentaire, appliquer ce commentaire avec une tranche (40% de la note globale), appliquer ce commentaire avec deux tranches 80% de la note globale",
+    "hybridcommentGrade": "Note"
   }
 }

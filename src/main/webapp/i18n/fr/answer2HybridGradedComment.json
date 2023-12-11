@@ -1,0 +1,26 @@
+{
+  "gradeScopeIsticApp": {
+    "answer2HybridGradedComment": {
+      "home": {
+        "title": "Answer2HybridGradedComments",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Answer 2 Hybrid Graded Comment",
+        "createOrEditLabel": "Créer ou éditer un Answer 2 Hybrid Graded Comment",
+        "notFound": "Aucun Answer 2 Hybrid Graded Comment trouvé"
+      },
+      "created": "Un nouveau Answer 2 Hybrid Graded Comment a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Answer 2 Hybrid Graded Comment avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Answer 2 Hybrid Graded Comment avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Answer 2 Hybrid Graded Comment {{ id }} ?"
+      },
+      "detail": {
+        "title": "Answer 2 Hybrid Graded Comment"
+      },
+      "id": "ID",
+      "stepValue": "Step Value",
+      "hybridcomments": "Hybridcomments",
+      "studentResponse": "Student Response"
+    }
+  }
+}

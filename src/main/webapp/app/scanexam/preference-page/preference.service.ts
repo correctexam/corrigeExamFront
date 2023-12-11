@@ -10,6 +10,7 @@ interface IPreferenceForQuestion {
   step: number;
   gradeType: GradeType;
   typeId: number;
+  defaultpoint?: number;
 }
 @Injectable({
   providedIn: 'root',

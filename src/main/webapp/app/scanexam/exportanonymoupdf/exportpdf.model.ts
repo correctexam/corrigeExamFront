@@ -40,6 +40,7 @@ export interface Sheetspdf {
 
 export interface StudentResponsepdf {
   gradedcommentspdf?: Gradedcommentspdf[];
+  hybridcommentspdf?: Hybridcommentspdf[];
   ID?: number;
   note?: number;
   questionID?: number;
@@ -54,6 +55,16 @@ export interface Gradedcommentspdf {
   grade?: number;
   text?: string;
   zonegeneratedid?: string;
+}
+
+export interface Hybridcommentspdf {
+  description?: string;
+  grade?: number;
+  text?: string;
+  stepMax?: number;
+  stepValue?: number;
+  relative?: boolean;
+  answerGrade?: number;
 }
 
 export interface Textcommentspdf {

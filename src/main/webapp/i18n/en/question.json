@@ -21,10 +21,14 @@
       "numero": "Numero",
       "point": "Point",
       "step": "Step",
+      "validExpression": "Valid Expression",
       "gradeType": "Grade Type",
+      "libelle": "Libelle",
+      "defaultpoint": "Defaultpoint",
       "zone": "Zone",
       "textcomments": "Textcomments",
       "gradedcomments": "Gradedcomments",
+      "hybridcomments": "Hybridcomments",
       "type": "Type",
       "exam": "Exam"
     }

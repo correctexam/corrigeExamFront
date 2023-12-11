@@ -47,6 +47,7 @@ import { ApplicationConfigService } from 'app/core/config/application-config.ser
 import jszip from 'jszip';
 import * as FileSaver from 'file-saver';
 import { firstValueFrom } from 'rxjs';
+import { IHybridGradedComment } from '../../entities/hybrid-graded-comment/hybrid-graded-comment.model';
 
 export interface Zone4SameCommentOrSameGrade {
   answers: Answer[];
@@ -57,12 +58,14 @@ export interface Zone4SameCommentOrSameGrade {
   step: number;
   algoName: string;
   textComments: ITextComment[];
+  hybridComments: IHybridGradedComment[];
   zones: IZone[];
 }
 
 export interface Answer {
   comments: IComments[];
   gradedComments: number[];
+  hybridgradedComments: any;
   note: number;
   pagemin: number;
   pagemax: number;
@@ -198,6 +201,25 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             )
             .subscribe(res => {
               this.zones4comments = res;
+              this.zones4comments.answers!.forEach((_, index) => {
+                this.clusters.get(0)?.push(index);
+              });
+              if (this.clusters.get(0) === undefined || this.clusters.get(0)!.length === 0) {
+                this.blocked = false;
+              }
+
+              // console.error(this.zones4comments)
+            });
+        } else if (params.get('commentid') !== null && this.router.url.includes('comparehybridcomment')) {
+          this.http
+            .get<Zone4SameCommentOrSameGrade>(
+              this.applicationConfigService.getEndpointFor(
+                'api/getZone4HybridComment/' + this.examId + '/' + params.get('commentid') + '/' + params.get('stepValue'),
+              ),
+            )
+            .subscribe(res => {
+              this.zones4comments = res;
+              console.error(this.zones4comments);
               this.zones4comments.answers!.forEach((_, index) => {
                 this.clusters.get(0)?.push(index);
               });
@@ -418,6 +440,24 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     }
   }
 
+  getHybridGradedComments(a: Answer): IHybridGradedComment[] {
+    //    a.textComments.forEach(tid -> this.zone)
+    if (this.zones4comments !== undefined) {
+      return this.zones4comments!.hybridComments.filter(t => (a.hybridgradedComments as any)[t.id!] !== undefined);
+    } else {
+      return [];
+    }
+  }
+
+  getHybridGradedCommentsValue(a: Answer, hc: IHybridGradedComment): number {
+    //    a.textComments.forEach(tid -> this.zone)
+    if ((a.hybridgradedComments as any)[hc.id] !== undefined) {
+      return a.hybridgradedComments[hc.id] as number;
+    } else {
+      return 0;
+    }
+  }
+
   pointisNan(k: Answer, zones4comments: Zone4SameCommentOrSameGrade | undefined): boolean {
     if (zones4comments !== undefined && zones4comments.step > 0) {
       return Number.isNaN(k.note / zones4comments.step) || Number.isNaN(zones4comments.point);
@@ -620,6 +660,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
       templat: templat,
       copies: l,
     };
+    // TODO manager stepvalue
     this.http
       .post<Zone4SameCommentOrSameGrade>(
         this.applicationConfigService.getEndpointFor('api/updateStudentResponse4Cluster/' + this.examId + '/' + this.qId),
@@ -634,10 +675,14 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
           .subscribe(res => {
             this.zones4comments!.textComments = res.textComments;
             this.zones4comments!.gradedComments = res.gradedComments;
+            // TODO manager stepvalue
+            this.zones4comments!.hybridComments = res.hybridComments;
+
             for (const v of l) {
               this.zones4comments!.answers[v].note = res.answers[v].note;
               this.zones4comments!.answers[v].textComments = res.answers[v].textComments;
               this.zones4comments!.answers[v].gradedComments = res.answers[v].gradedComments;
+              this.zones4comments!.answers[v].hybridgradedComments = res.answers[v].hybridgradedComments;
             }
           });
       });

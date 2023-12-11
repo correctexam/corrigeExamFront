@@ -15,6 +15,7 @@ export interface IKeyBoardShortCutPreferenceEntry {
   examId: number;
   label: string;
   textComment: boolean;
+  hybridComment: boolean;
   questionIndex: number;
 
   /**
