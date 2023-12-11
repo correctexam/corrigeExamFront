@@ -397,7 +397,7 @@ export const CompareGradedCommentAnswer_ROUTE: Route = {
 };
 
 export const CompareHybridCommentAnswer_ROUTE: Route = {
-  path: 'comparehybridcomment/:examid/:commentid',
+  path: 'comparehybridcomment/:examid/:commentid/:stepValue',
   canActivate: [UserRouteAccessService],
   component: ComparestudentanswerComponent,
   data: {

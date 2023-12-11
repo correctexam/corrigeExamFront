@@ -39,6 +39,9 @@ import { HttpClient } from '@angular/common/http';
 import { CacheUploadService } from '../exam-detail/cacheUpload.service';
 import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
+import { IHybridGradedCommentWithStepValue } from '../../entities/hybrid-graded-comment/hybrid-graded-comment.model';
+import { HybridGradedCommentService } from 'app/entities/hybrid-graded-comment/service/hybrid-graded-comment.service';
+import { Answer2HybridGradedCommentService } from 'app/entities/answer-2-hybrid-graded-comment/service/answer-2-hybrid-graded-comment.service';
 
 @Component({
   selector: 'jhi-voircopie',
@@ -78,6 +81,8 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   });
   currentTextComment4Question: ITextComment[] | undefined;
   currentGradedComment4Question: IGradedComment[] | undefined;
+  currentHybridGradedComment4Question: IHybridGradedCommentWithStepValue[] | undefined;
+
   currentZoneVoirCopieHandler: ZoneVoirCopieHandler | undefined;
   scale = 1;
   windowWidth = 1;
@@ -125,6 +130,8 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     public finalResultService: FinalResultService,
     public cacheUploadService: CacheUploadService,
     private translateService: TranslateService,
+    private hybridGradedCommentService: HybridGradedCommentService,
+    private answer2HybridGradedCommentService: Answer2HybridGradedCommentService,
   ) {}
 
   ngOnInit(): void {
@@ -138,6 +145,10 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
       this.resp = undefined;
       //      'answer/:examid/:questionno/:studentid',
       if (params.get('uuid') !== null) {
+        this.currentTextComment4Question = [];
+        this.currentGradedComment4Question = [];
+        this.currentHybridGradedComment4Question = [];
+
         this.uuid = params.get('uuid')!;
         this.sheetService.query({ name: params.get('uuid') }).subscribe(s => {
           this.sheet = s.body![0];
@@ -210,20 +221,36 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
       if (sr.body !== null && sr.body.length > 0) {
         this.resp = sr.body![0];
         this.currentNote = this.resp.note!;
+
         if (this.questions![0].gradeType === GradeType.DIRECT && this.questions![0].typeAlgoName !== 'QCM') {
           this.currentTextComment4Question = this.resp.textcomments!;
+        } else if (this.questions![0].gradeType === GradeType.HYBRID && this.questions![0].typeAlgoName !== 'QCM') {
+          this.currentTextComment4Question = [];
+          this.currentGradedComment4Question = [];
+          const com = await firstValueFrom(this.hybridGradedCommentService.query({ questionId: this.questions![0].id }));
+          const currentHybridGradedComment4QuestionAll = com.body as IHybridGradedCommentWithStepValue[] | undefined;
+          const answersHybrid = (await firstValueFrom(this.answer2HybridGradedCommentService.query({ answerId: this.resp!.id }))).body;
+          if (answersHybrid !== null) {
+            for (const answerHybrid of answersHybrid) {
+              if (answerHybrid.hybridcommentsId !== undefined && answerHybrid.hybridcommentsId !== null && answerHybrid.stepValue) {
+                const hc = currentHybridGradedComment4QuestionAll?.find(e => answerHybrid.hybridcommentsId! === e.id);
+                if (hc !== undefined) {
+                  hc.stepValue = answerHybrid.stepValue;
+                  if (hc.stepValue > 0) {
+                    this.currentHybridGradedComment4Question?.push(hc);
+                  }
+                }
+              }
+            }
+          }
         } else {
           this.currentGradedComment4Question = this.resp.gradedcomments!;
         }
       } else {
         this.currentNote = 0;
-        if (this.questions![0].gradeType === GradeType.DIRECT && this.questions![0].typeAlgoName !== 'QCM') {
-          this.currentTextComment4Question = [];
-          this.currentGradedComment4Question = [];
-        } else {
-          this.currentGradedComment4Question = [];
-          this.currentTextComment4Question = [];
-        }
+        this.currentTextComment4Question = [];
+        this.currentGradedComment4Question = [];
+        this.currentHybridGradedComment4Question = [];
       }
     }
   }

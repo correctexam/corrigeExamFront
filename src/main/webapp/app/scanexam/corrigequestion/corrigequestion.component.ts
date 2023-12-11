@@ -275,6 +275,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (this.questionindex4shortcut !== questionindex4shortcut_prev) {
           this.currentGradedComment4Question = [];
           this.currentTextComment4Question = [];
+          this.currentHybridGradedComment4Question = [];
 
           if (params.get('questionno') !== null) {
             this.questionindex = +params.get('questionno')! - 1;
@@ -1159,7 +1160,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       } else if (currentQ.gradeType === GradeType.HYBRID && currentQ.typeAlgoName !== 'QCM') {
         let currentNote = 0;
         let absoluteNote2Add = 0;
-        let pourcentage = currentQ.defaultpoint!;
+        let pourcentage = currentQ.defaultpoint ? currentQ.defaultpoint : 0;
         this.currentHybridGradedComment4Question?.forEach(g => {
           if (this.answer2HybridGradedCommentMap.has(g.id)) {
             const stepValue = this.answer2HybridGradedCommentMap.get(g.id);
@@ -1179,6 +1180,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           currentNote = 0;
         }
         resp.note = currentNote * 100;
+
         this.currentNote = currentNote;
         if (update) {
           this.studentResponseService.partialUpdate(resp).subscribe(b => {
@@ -2087,11 +2089,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  compareHybridComment(event: any, comment: IHybridGradedComment) {
+  compareHybridComment(event: any, comment: IHybridGradedComment, stepValue: number) {
     if (!this.blocked) {
       if (event.ctrlKey || event.metaKey) {
         this.zone.run(() => {
-          const url = this.router.serializeUrl(this.router.createUrlTree(['/comparehybridcomment/' + this.examId + '/' + comment.id]));
+          const url = this.router.serializeUrl(
+            this.router.createUrlTree(['/comparehybridcomment/' + this.examId + '/' + comment.id + '/' + stepValue]),
+          );
           if ('/' !== this.applicationConfigService.getFrontUrl()) {
             if (this.applicationConfigService.getFrontUrl().endsWith('/') && url.startsWith('/')) {
               window.open(this.applicationConfigService.getFrontUrl().slice(0, -1) + url, '_blank');
@@ -2104,7 +2108,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       } else {
         this.zone.run(() => {
-          this.router.navigate(['/comparehybridcomment/' + this.examId + '/' + comment.id]);
+          this.router.navigate(['/comparehybridcomment/' + this.examId + '/' + comment.id + '/' + stepValue]);
         });
       }
     }

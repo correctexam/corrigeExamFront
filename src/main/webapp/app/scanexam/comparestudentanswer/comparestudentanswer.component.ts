@@ -213,7 +213,9 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
         } else if (params.get('commentid') !== null && this.router.url.includes('comparehybridcomment')) {
           this.http
             .get<Zone4SameCommentOrSameGrade>(
-              this.applicationConfigService.getEndpointFor('api/getZone4HybridComment/' + this.examId + '/' + params.get('commentid')),
+              this.applicationConfigService.getEndpointFor(
+                'api/getZone4HybridComment/' + this.examId + '/' + params.get('commentid') + '/' + params.get('stepValue'),
+              ),
             )
             .subscribe(res => {
               this.zones4comments = res;

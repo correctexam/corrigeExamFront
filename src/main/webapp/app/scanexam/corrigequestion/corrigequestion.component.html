@@ -774,7 +774,13 @@
                   [tooltipPosition]="'left'"
                   [tooltipZIndex]="'3000'"
                   [pTooltip]="'scanexam.tooltipCompareComment' | translate"
-                  (click)="compareHybridComment($event, comment)"
+                  (click)="
+                    compareHybridComment(
+                      $event,
+                      comment,
+                      answer2HybridGradedCommentMap.has(comment.id) ? answer2HybridGradedCommentMap.get(comment.id)! : 0
+                    )
+                  "
                 >
                   <fa-icon icon="code-compare"></fa-icon>
                 </span>
@@ -891,7 +897,7 @@
 
                     <p-inplace [closable]="true" [active]="active.get(comment.id!)" (onDeactivate)="closeEditComment(comment)">
                       <ng-template pTemplate="display">
-                        <span> Nombre de pas:</span>
+                        <span jhiTranslate="scanexam.hybridcommentStep"> Nombre de pas:</span>
                         {{ comment.step }}
                       </ng-template>
                       <ng-template pTemplate="content">

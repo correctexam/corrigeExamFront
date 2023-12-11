@@ -164,11 +164,16 @@
             <div class="card-content">
               <p *ngIf="!pointisNan((zones4comments?.answers)![value], zones4comments)">
                 Note:
-                <span *ngIf="zones4comments !== undefined && zones4comments.step > 0"
+                <span *ngIf="zones4comments !== undefined && zones4comments.step > 0 && zones4comments.gradeType !== 'HYBRID'"
                   ><b>{{ zones4comments.answers![value].note / zones4comments.step }}/{{ zones4comments.point }}</b></span
                 >
-                <span *ngIf="zones4comments !== undefined && zones4comments.step <= 0"
+                <span *ngIf="zones4comments !== undefined && zones4comments.step <= 0" && zones4comments.gradeType!="" ="HYBRID"
                   ><b *ngIf="zones4comments.point !== 0">{{ zones4comments.answers![value].note }}/{{ zones4comments.point }}</b></span
+                >
+                <span *ngIf="zones4comments !== undefined && zones4comments.gradeType === 'HYBRID'"
+                  ><b *ngIf="zones4comments.point !== 0"
+                    >{{ zones4comments.answers![value].note / 100 | number: '0.0-2' }}/{{ zones4comments.point }}</b
+                  ></span
                 >
               </p>
               <p *ngFor="let item of getGradedComments((zones4comments?.answers)![value]); let index = index">
