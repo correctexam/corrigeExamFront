@@ -63,6 +63,10 @@ export class HybridGradedCommentService {
     return o1 && o2 ? this.getHybridGradedCommentIdentifier(o1) === this.getHybridGradedCommentIdentifier(o2) : o1 === o2;
   }
 
+  countHowManyUse(id: number): Observable<number> {
+    return this.http.get<number>(`${this.resourceUrl}/countHowManyUse/${id}`);
+  }
+
   addHybridGradedCommentToCollectionIfMissing<Type extends Pick<IHybridGradedComment, 'id'>>(
     hybridGradedCommentCollection: Type[],
     ...hybridGradedCommentsToCheck: (Type | null | undefined)[]

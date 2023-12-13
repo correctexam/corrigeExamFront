@@ -14,7 +14,10 @@ export type EntityArrayResponseType = HttpResponse<IGradedComment[]>;
 export class GradedCommentService {
   protected resourceUrl: string;
 
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+  constructor(
+    protected http: HttpClient,
+    protected applicationConfigService: ApplicationConfigService,
+  ) {
     this.resourceUrl = this.applicationConfigService.getEndpointFor('api/graded-comments');
   }
 
@@ -47,6 +50,10 @@ export class GradedCommentService {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
+  countHowManyUse(id: number): Observable<number> {
+    return this.http.get<number>(`${this.resourceUrl}/countHowManyUse/${id}`);
+  }
+
   addGradedCommentToCollectionIfMissing(
     gradedCommentCollection: IGradedComment[],
     ...gradedCommentsToCheck: (IGradedComment | null | undefined)[]
@@ -54,7 +61,7 @@ export class GradedCommentService {
     const gradedComments: IGradedComment[] = gradedCommentsToCheck.filter(isPresent);
     if (gradedComments.length > 0) {
       const gradedCommentCollectionIdentifiers = gradedCommentCollection.map(
-        gradedCommentItem => getGradedCommentIdentifier(gradedCommentItem)!
+        gradedCommentItem => getGradedCommentIdentifier(gradedCommentItem)!,
       );
       const gradedCommentsToAdd = gradedComments.filter(gradedCommentItem => {
         const gradedCommentIdentifier = getGradedCommentIdentifier(gradedCommentItem);

@@ -11,6 +11,7 @@ import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 import { saveAs } from 'file-saver';
 import { HybridGradedCommentService } from '../../../entities/hybrid-graded-comment/service/hybrid-graded-comment.service';
 import { IHybridGradedComment, NewHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-graded-comment.model';
+import { Inplace } from 'primeng/inplace';
 @Component({
   selector: 'jhi-create-comments',
 
@@ -414,5 +415,10 @@ export class CreateCommentsComponent implements OnInit {
         });
       }
     });
+  }
+  checkEnterOrEscape($event: any, el: Inplace): void {
+    if ($event.keyCode === 13 || $event.keyCode === 27) {
+      el.deactivate();
+    }
   }
 }
