@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Question } from 'app/entities/question/question.model';
 
 @Component({
@@ -9,6 +9,9 @@ import { Question } from 'app/entities/question/question.model';
 export class SummaryTemplateComponent {
   @Input()
   questions: Map<number, Question> = new Map();
+
+  @Output()
+  gotoQ: EventEmitter<Question> = new EventEmitter<Question>();
 
   public getSortedQuestions(): Array<Question> {
     return [...this.questions.values()].sort((a, b) => a.numero! - b.numero!);
@@ -30,5 +33,9 @@ export class SummaryTemplateComponent {
         .slice(0, i)
         .filter(q2 => q2.numero === q.numero).length > 0
     );
+  }
+
+  public goToQuestion(q: Question): void {
+    this.gotoQ.emit(q);
   }
 }
