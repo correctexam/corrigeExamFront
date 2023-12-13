@@ -62,7 +62,6 @@ export class FabricCanvasComponent implements OnInit {
 
   public ngOnInit(): void {
     this.eventHandler.reinit(this.exam, this.zones);
-
     this.activatedRoute.paramMap.subscribe(params => {
       this.examId = parseInt(params.get('examid') ?? '-1', 10);
 
@@ -178,11 +177,24 @@ export class FabricCanvasComponent implements OnInit {
           }
         });
       }
+
       if (this.pdfViewerService.isRenderQueueEmpty()) {
         this.loadingPdfMetadata(evt.source.scale);
+
         this.blocked = false;
       }
     }
+  }
+
+  goToQuestion(q: Question): void {
+    if (q.zoneDTO?.pageNumber && q.zoneDTO?.yInit && this.eventHandler.pages?.[1]) {
+      const p = q.zoneDTO.pageNumber;
+      const y = (q.zoneDTO.yInit * this.eventHandler.pages[1].pageViewer.canvas.clientHeight) / 100000;
+      this.scrollPageandTop(p, y);
+    }
+  }
+  scrollPageandTop(page: number, top: number): void {
+    this.pdfViewerService.scrollPageIntoView(page, { top, left: 0 });
   }
 
   public async loadingPdfMetadata(pdfScale: number): Promise<void> {

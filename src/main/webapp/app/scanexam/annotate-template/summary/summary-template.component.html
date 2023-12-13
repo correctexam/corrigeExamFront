@@ -2,7 +2,9 @@
   <h3 jhiTranslate="scanexam.resumebareme">Résumé du sujet</h3>
   <hr />
   <div *ngFor="let q of getSortedQuestions(); index as i">
-    <b>Q{{ q.numero }}</b>
+    <a (click)="goToQuestion(q)"
+      ><b>Q{{ q.numero }}</b></a
+    >
     <div *ngIf="isFollowingQuestion(i, q); then follow; else nofollow"></div>
     <ng-template #follow>( <span jhiTranslate="scanexam.suite"></span> )</ng-template>
     <ng-template #nofollow
