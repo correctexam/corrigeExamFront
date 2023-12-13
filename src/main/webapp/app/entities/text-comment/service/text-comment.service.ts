@@ -14,7 +14,10 @@ export type EntityArrayResponseType = HttpResponse<ITextComment[]>;
 export class TextCommentService {
   protected resourceUrl: string;
 
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+  constructor(
+    protected http: HttpClient,
+    protected applicationConfigService: ApplicationConfigService,
+  ) {
     this.resourceUrl = this.applicationConfigService.getEndpointFor('api/text-comments');
   }
 
@@ -45,6 +48,10 @@ export class TextCommentService {
 
   delete(id: number): Observable<HttpResponse<{}>> {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  }
+
+  countHowManyUse(id: number): Observable<number> {
+    return this.http.get<number>(`${this.resourceUrl}/countHowManyUse/${id}`);
   }
 
   addTextCommentToCollectionIfMissing(

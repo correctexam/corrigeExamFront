@@ -7,7 +7,7 @@
             <fa-icon icon="times"></fa-icon>
           </span>
           <div>
-            <p-inplace [closable]="true">
+            <p-inplace #texttitle [closable]="true">
               <ng-template pTemplate="display">
                 <h5 class="card-title">{{ comment.text }}</h5>
               </ng-template>
@@ -18,10 +18,12 @@
                   [(ngModel)]="comment.text"
                   [style]="{ width: '80%' }"
                   (change)="updateComment($event, comment, false, false)"
+                  (focusout)="texttitle.deactivate()"
+                  (keyup)="checkEnterOrEscape($event, texttitle)"
                 />
               </ng-template>
             </p-inplace>
-            <p-inplace [closable]="true">
+            <p-inplace #textdescription [closable]="true">
               <ng-template pTemplate="display">
                 <p class="card-text">{{ comment.description }}</p>
               </ng-template>
@@ -31,6 +33,8 @@
                   type="text"
                   [(ngModel)]="comment.description"
                   (change)="updateComment($event, comment, false, false)"
+                  (focusout)="textdescription.deactivate()"
+                  (keyup)="checkEnterOrEscape($event, textdescription)"
                   [style]="{ width: '80%' }"
                 />
               </ng-template>
@@ -55,7 +59,7 @@
             </div>
 
             <div *ngIf="_q?.typeAlgoName !== 'QCM'">
-              <p-inplace [closable]="true">
+              <p-inplace #gradedtitle [closable]="true">
                 <ng-template pTemplate="display">
                   <h5 class="card-title">{{ comment.text }}</h5>
                 </ng-template>
@@ -64,12 +68,14 @@
                     pInputText
                     type="text"
                     [(ngModel)]="comment.text"
+                    (focusout)="gradedtitle.deactivate()"
+                    (keyup)="checkEnterOrEscape($event, gradedtitle)"
                     [style]="{ width: '80%' }"
                     (change)="updateComment($event, comment, true, false)"
                   />
                 </ng-template>
               </p-inplace>
-              <p-inplace [closable]="true">
+              <p-inplace #gradeddescription [closable]="true">
                 <ng-template pTemplate="display">
                   <p class="card-text">{{ comment.description }}</p>
                 </ng-template>
@@ -79,6 +85,8 @@
                     type="text"
                     [(ngModel)]="comment.description"
                     (change)="updateComment($event, comment, true, false)"
+                    (focusout)="gradeddescription.deactivate()"
+                    (keyup)="checkEnterOrEscape($event, gradeddescription)"
                     [style]="{ width: '80%' }"
                   />
                 </ng-template>
@@ -117,7 +125,7 @@
           ></span>
           <div>
             <div>
-              <p-inplace [closable]="true">
+              <p-inplace #hybridtitle [closable]="true">
                 <ng-template pTemplate="display">
                   <h5 class="card-title">{{ comment.text }}</h5>
                 </ng-template>
@@ -128,10 +136,12 @@
                     [(ngModel)]="comment.text"
                     [style]="{ width: '80%' }"
                     (change)="updateComment($event, comment, true, true)"
+                    (focusout)="hybridtitle.deactivate()"
+                    (keyup)="checkEnterOrEscape($event, hybridtitle)"
                   />
                 </ng-template>
               </p-inplace>
-              <p-inplace [closable]="true">
+              <p-inplace #hybriddescription [closable]="true">
                 <ng-template pTemplate="display">
                   <p class="card-text">{{ comment.description }}</p>
                 </ng-template>
@@ -141,6 +151,8 @@
                     type="text"
                     [(ngModel)]="comment.description"
                     (change)="updateComment($event, comment, true, true)"
+                    (focusout)="hybriddescription.deactivate()"
+                    (keyup)="checkEnterOrEscape($event, hybriddescription)"
                     [style]="{ width: '80%' }"
                   />
                 </ng-template>

@@ -62,6 +62,7 @@ import { DrawingTools } from '../annotate-template/paint/models';
 import { IHybridGradedComment, NewHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-graded-comment.model';
 import { HybridGradedCommentService } from 'app/entities/hybrid-graded-comment/service/hybrid-graded-comment.service';
 import { Answer2HybridGradedCommentService } from '../../entities/answer-2-hybrid-graded-comment/service/answer-2-hybrid-graded-comment.service';
+import { Inplace } from 'primeng/inplace';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -95,6 +96,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   qcmcorrect!: ElementRef;
   @ViewChild('imageQcmDebugs')
   canvassQCM!: ElementRef;
+
   shortcut = true;
   shortcutvalue = true;
   showImageQCM = false;
@@ -1740,6 +1742,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   updateComment($event: any, l: IGradedComment | ITextComment | IHybridGradedComment, graded: boolean, hybrid: boolean): any {
+    if (l.id) {
+      setTimeout(() => {
+        console.error('set ', l.id);
+        this.active.set(l.id!, false);
+      }, 30);
+    }
+
     if (graded && !hybrid) {
       if ((l as IGradedComment).grade === null) {
         (l as IGradedComment).grade = 0;
@@ -1773,12 +1782,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     } else {
       this.textCommentService.update(l as ITextComment).subscribe(() => {});
     }
-    if (l.id) {
-      this.active.set(l.id, false);
-    }
   }
 
   closeEditComment(l: IGradedComment | ITextComment | IHybridGradedComment) {
+    console.error('close');
     if (l.id) {
       this.active.set(l.id, false);
     }
@@ -1843,47 +1850,59 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   removeTextComment(comment: ITextComment): void {
-    this.confirmationService.confirm({
-      message: this.translateService.instant('scanexam.removetextcommentconfirmation'),
-      accept: () => {
-        this.retirerTComment(comment).then(() => {
-          this.currentTextComment4Question = this.currentTextComment4Question!.filter(e => e.id !== comment.id);
-          this.textCommentService.delete(comment!.id!).subscribe(() => console.log('delete'));
-        });
-      },
+    firstValueFrom(this.textCommentService.countHowManyUse(comment.id!)).then(c1 => {
+      this.confirmationService.confirm({
+        message: this.translateService.instant('scanexam.removetextcommentconfirmation', { c1 }),
+        accept: () => {
+          this.retirerTComment(comment).then(() => {
+            this.currentTextComment4Question = this.currentTextComment4Question!.filter(e => e.id !== comment.id);
+            this.textCommentService.delete(comment!.id!).subscribe(() => console.log('delete'));
+          });
+        },
+      });
     });
   }
 
   removeGradedComment(comment: IGradedComment): void {
     if (!this.blocked) {
-      this.confirmationService.confirm({
-        message: this.translateService.instant('scanexam.removegradedcommentconfirmation'),
-        accept: () => {
-          this.retirerGComment(comment).then(() => {
-            this.currentGradedComment4Question = this.currentGradedComment4Question!.filter(e => e.id !== comment.id);
-            this.gradedCommentService.delete(comment!.id!).subscribe(() => {
-              console.log('delete');
+      firstValueFrom(this.gradedCommentService.countHowManyUse(comment.id!)).then(c1 => {
+        this.confirmationService.confirm({
+          message: this.translateService.instant('scanexam.removegradedcommentconfirmation', { c1 }),
+          accept: () => {
+            this.retirerGComment(comment).then(() => {
+              this.currentGradedComment4Question = this.currentGradedComment4Question!.filter(e => e.id !== comment.id);
+              this.gradedCommentService.delete(comment!.id!).subscribe(() => {
+                console.log('delete');
+              });
             });
-          });
-        },
+          },
+        });
       });
+    }
+  }
+
+  checkEnterOrEscape($event: any, el: Inplace): void {
+    if ($event.keyCode === 13 || $event.keyCode === 27) {
+      el.deactivate();
     }
   }
 
   removeHybridComment(comment: IHybridGradedComment): void {
     if (!this.blocked) {
-      this.confirmationService.confirm({
-        message: this.translateService.instant('scanexam.removehybridcommentconfirmation'),
-        accept: () => {
-          this.currentHybridGradedComment4Question = this.currentHybridGradedComment4Question!.filter(e => e.id !== comment.id);
-          setTimeout(() => {
-            this.answer2HybridGradedCommentMap.delete(comment.id);
-            this.computeNote(true, this.resp!, this.currentQuestion!);
-          }, 3);
-          this.hybridGradedCommentService.delete(comment!.id!).subscribe(() => {
-            console.log('delete');
-          });
-        },
+      firstValueFrom(this.hybridGradedCommentService.countHowManyUse(comment.id!)).then(c1 => {
+        this.confirmationService.confirm({
+          message: this.translateService.instant('scanexam.removehybridcommentconfirmation', { c1 }),
+          accept: () => {
+            this.currentHybridGradedComment4Question = this.currentHybridGradedComment4Question!.filter(e => e.id !== comment.id);
+            setTimeout(() => {
+              this.answer2HybridGradedCommentMap.delete(comment.id);
+              this.computeNote(true, this.resp!, this.currentQuestion!);
+            }, 3);
+            this.hybridGradedCommentService.delete(comment!.id!).subscribe(() => {
+              console.log('delete');
+            });
+          },
+        });
       });
     }
   }
