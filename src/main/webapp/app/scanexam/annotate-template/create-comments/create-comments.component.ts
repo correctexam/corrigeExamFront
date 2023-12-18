@@ -271,11 +271,36 @@ export class CreateCommentsComponent implements OnInit {
             const currentComment = e.body!;
             this.currentTextComment4Question?.push(currentComment);
             this.addTextComment.emit(currentComment);
-            this.titreCommentaire = '';
-            this.descCommentaire = '';
-            this.blocked = false;
           });
         });
+        this.titreCommentaire = '';
+        this.descCommentaire = '';
+      }
+    } else if (this._q !== undefined && this._q.gradeType === GradeType.HYBRID) {
+      const comments = JSON.parse(await event.files[0].text()) as IHybridGradedComment[] | undefined | null;
+      if (comments !== undefined && comments !== null && comments.length > 0) {
+        comments.forEach(com => {
+          const t: NewHybridGradedComment = {
+            id: null,
+            questionId: this._q!.id,
+            text: com.text,
+            description: com.description,
+            relative: com.relative ? com.relative : false,
+            grade: com.grade ? com.grade : 0,
+            step: com.step ? com.step : 1,
+          };
+
+          this.hybridGradedCommentService.create(t).subscribe(e => {
+            const currentComment = e.body!;
+            this.currentHybridGradedComment4Question?.push(currentComment);
+            this.addHybridGradedComment.emit(currentComment);
+          });
+        });
+        this.titreCommentaire = '';
+        this.descCommentaire = '';
+        this.step = 1;
+        this.relative = false;
+        this.grade = 0;
       }
     } else if (this._q !== undefined) {
       const comments = JSON.parse(await event.files[0].text()) as IGradedComment[] | undefined | null;
@@ -291,14 +316,14 @@ export class CreateCommentsComponent implements OnInit {
             const currentComment = e.body!;
             this.currentGradedComment4Question?.push(currentComment);
             this.addGradedComment.emit(currentComment);
-            this.titreCommentaire = '';
-            this.descCommentaire = '';
-            this.noteCommentaire = 0;
-            this.blocked = false;
           });
         });
+        this.titreCommentaire = '';
+        this.descCommentaire = '';
+        this.noteCommentaire = 0;
       }
     }
+    this.blocked = false;
   }
 
   addDefault(): void {
