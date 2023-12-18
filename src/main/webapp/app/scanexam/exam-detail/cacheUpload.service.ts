@@ -91,7 +91,7 @@ export class CacheUploadService {
       let nbrPart = Math.trunc((numberPageInScan - 1) / step) + 2;
       const lastPart = numberPageInScan % step;
       if (lastPart === 0) {
-        nbrPart = nbrPart - 1;
+        nbrPart = nbrPart + 1;
       }
       o.filter = (table: string, value: any) => {
         return (
