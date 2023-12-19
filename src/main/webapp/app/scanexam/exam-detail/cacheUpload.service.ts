@@ -273,6 +273,34 @@ export class CacheUploadService {
     }
   }
 
+  async importCacheLocal(
+    examId: number,
+    translateService: TranslateService,
+    messageService: MessageService,
+    cacheDownloadNotification: CacheDownloadNotification,
+    i: number,
+    data: Blob,
+  ): Promise<void> {
+    try {
+      translateService.get('scanexam.importToDexie').subscribe(res => cacheDownloadNotification.setMessage('' + res + ''));
+      cacheDownloadNotification.setSubMessage('Part ' + (i + 1));
+
+      return await this.db.import(examId, data, {
+        acceptNameDiff: true,
+        acceptMissingTables: true,
+        acceptVersionDiff: true,
+        acceptChangedPrimaryKey: true,
+      });
+    } catch (err: any) {
+      console.error(err);
+      messageService.add({
+        severity: 'warn',
+        summary: translateService.instant('scanexam.downloadcacheko'),
+        detail: translateService.instant('scanexam.downloadcachekodetail'),
+      });
+    }
+  }
+
   async importCache(
     examId: number,
     translateService: TranslateService,
@@ -292,7 +320,7 @@ export class CacheUploadService {
         });
       });
 
-      const datas: Blob[] = [];
+      //      const datas: Blob[] = [];
       let data = (await p) as Blob;
       if (data.size === 0) {
         p = new Promise(resolve => {
@@ -315,7 +343,8 @@ export class CacheUploadService {
           cacheDownloadNotification.setMessage('');
           return;
         } else {
-          datas.push(data);
+          //          datas.push(data);
+          await this.importCacheLocal(examId, translateService, messageService, cacheDownloadNotification, 0, data);
           let part = 1;
           cacheDownloadNotification.setSubMessage('Part ' + part);
 
@@ -326,7 +355,9 @@ export class CacheUploadService {
           });
           data = (await p) as Blob;
           while (data.size > 0) {
-            datas.push(data);
+            //            datas.push(data);
+            await this.importCacheLocal(examId, translateService, messageService, cacheDownloadNotification, part, data);
+
             part = part + 1;
             cacheDownloadNotification.setSubMessage('Part ' + part);
 
@@ -339,9 +370,9 @@ export class CacheUploadService {
           }
         }
       } else {
-        datas.push(data);
+        await this.importCacheLocal(examId, translateService, messageService, cacheDownloadNotification, 0, data);
       }
-      for (let i = 0; i < datas.length; i++) {
+      /* for (let i = 0; i < datas.length; i++) {
         try {
           translateService.get('scanexam.importToDexie').subscribe(res => cacheDownloadNotification.setMessage('' + res + ''));
           cacheDownloadNotification.setSubMessage('Part ' + (i + 1));
@@ -357,13 +388,12 @@ export class CacheUploadService {
             severity: 'warn',
             summary: translateService.instant('scanexam.downloadcacheko'),
             detail: translateService.instant('scanexam.downloadcachekodetail'),
-          });
-          cacheDownloadNotification.setBlocked(false);
-          cacheDownloadNotification.setMessage('');
-          cacheDownloadNotification.setSubMessage('');
-          return;
-        }
-      }
+          });*/
+      //          cacheDownloadNotification.setBlocked(false);
+      //          cacheDownloadNotification.setMessage('');
+      //          cacheDownloadNotification.setSubMessage('');
+      //          return;
+      // }
 
       messageService.add({
         severity: 'success',
