@@ -89,6 +89,23 @@
                         Export
                       </button>
                     </div>
+                    <ng-container *ngIf="exams.length > 1">
+                      <div
+                        *ngFor="let exam of exams"
+                        class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2"
+                      >
+                        <button
+                          class="p-button p-button-primary"
+                          (click)="exportExam(exam.id!)"
+                          [pTooltip]="'scanexam.exportexamtooltip' | translate"
+                          [tooltipZIndex]="'3000'"
+                          jhiTranslate="scanexam.examexport"
+                          [translateValues]="{ examName: exam.name }"
+                        >
+                          Export {{ exam.name }}
+                        </button>
+                      </div>
+                    </ng-container>
                   </div>
                 </div>
               </div>

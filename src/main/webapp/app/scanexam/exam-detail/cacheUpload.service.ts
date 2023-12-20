@@ -5,7 +5,7 @@ import { ExportOptions } from 'dexie-export-import';
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse } from '@angular/common/http';
-import { Observable, scan } from 'rxjs';
+import { Observable, firstValueFrom, scan } from 'rxjs';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
@@ -83,7 +83,7 @@ export class CacheUploadService {
     if (this.preferenceService.getPreference().cacheDb !== 'sqlite') {
       const o: ExportOptions = {
         noTransaction: true,
-        //        numRowsPerChunk: 100,
+        numRowsPerChunk: 6000,
         prettyJson: true,
       };
       cacheUploadNotification.setBlocked(true);
@@ -314,21 +314,9 @@ export class CacheUploadService {
 
     if (this.preferenceService.getPreference().cacheDb !== 'sqlite') {
       await this.db.removeElementForExam(examId);
-      let p = new Promise(resolve => {
-        this.getCache(examId + 'indexdb.json').subscribe(data => {
-          resolve(data);
-        });
-      });
-
-      //      const datas: Blob[] = [];
-      let data = (await p) as Blob;
+      let data: Blob = (await firstValueFrom(this.getCache(examId + 'indexdb.json'))) as Blob;
       if (data.size === 0) {
-        p = new Promise(resolve => {
-          this.getCache(examId + '_exam_template_indexdb.json').subscribe(d => {
-            resolve(d);
-          });
-        });
-        data = (await p) as Blob;
+        data = await firstValueFrom(this.getCache(examId + '_exam_template_indexdb.json'));
 
         if (data.size === 0) {
           if (showFailMessage) {
@@ -338,62 +326,26 @@ export class CacheUploadService {
               detail: translateService.instant('scanexam.downloadcachekodetail'),
             });
           }
-
           cacheDownloadNotification.setBlocked(false);
           cacheDownloadNotification.setMessage('');
           return;
         } else {
-          //          datas.push(data);
           await this.importCacheLocal(examId, translateService, messageService, cacheDownloadNotification, 0, data);
           let part = 1;
           cacheDownloadNotification.setSubMessage('Part ' + part);
 
-          p = new Promise(resolve => {
-            this.getCache(examId + '_part_' + part + '_indexdb.json').subscribe(d => {
-              resolve(d);
-            });
-          });
-          data = (await p) as Blob;
+          // p = new Promise(resolve => {
+          data = await firstValueFrom(this.getCache(examId + '_part_' + part + '_indexdb.json'));
           while (data.size > 0) {
-            //            datas.push(data);
             await this.importCacheLocal(examId, translateService, messageService, cacheDownloadNotification, part, data);
-
             part = part + 1;
             cacheDownloadNotification.setSubMessage('Part ' + part);
-
-            p = new Promise(resolve => {
-              this.getCache(examId + '_part_' + part + '_indexdb.json').subscribe(d => {
-                resolve(d);
-              });
-            });
-            data = (await p) as Blob;
+            data = await firstValueFrom(this.getCache(examId + '_part_' + part + '_indexdb.json'));
           }
         }
       } else {
         await this.importCacheLocal(examId, translateService, messageService, cacheDownloadNotification, 0, data);
       }
-      /* for (let i = 0; i < datas.length; i++) {
-        try {
-          translateService.get('scanexam.importToDexie').subscribe(res => cacheDownloadNotification.setMessage('' + res + ''));
-          cacheDownloadNotification.setSubMessage('Part ' + (i + 1));
-
-          await this.db.import(examId, datas[i], {
-            acceptNameDiff: true,
-            acceptMissingTables: true,
-            acceptVersionDiff: true,
-            acceptChangedPrimaryKey: true,
-          });
-        } catch (err: any) {
-          messageService.add({
-            severity: 'warn',
-            summary: translateService.instant('scanexam.downloadcacheko'),
-            detail: translateService.instant('scanexam.downloadcachekodetail'),
-          });*/
-      //          cacheDownloadNotification.setBlocked(false);
-      //          cacheDownloadNotification.setMessage('');
-      //          cacheDownloadNotification.setSubMessage('');
-      //          return;
-      // }
 
       messageService.add({
         severity: 'success',

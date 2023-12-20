@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faLink } from '@fortawesome/free-solid-svg-icons';
 import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { Exam } from 'app/entities/exam/exam.model';
@@ -25,6 +25,7 @@ export class CreerexamComponent implements OnInit, AfterViewInit {
   isSaving = false;
   coursName = '';
   faDownload = faDownload;
+  faLink = faLink;
   editForm: UntypedFormGroup;
   errorParsingPdf = false;
 
@@ -38,7 +39,7 @@ export class CreerexamComponent implements OnInit, AfterViewInit {
     protected courseService: CourseService,
     protected examService: ExamService,
     protected templateService: TemplateService,
-    private ref: ChangeDetectorRef
+    private ref: ChangeDetectorRef,
   ) {
     this.editForm = this.fb.group({
       name: [null, [Validators.required]],
@@ -138,5 +139,13 @@ export class CreerexamComponent implements OnInit, AfterViewInit {
 
   public onPdfLoaded(): void {
     this.errorParsingPdf = false;
+  }
+
+  gotToAsciiDoc(): void {
+    window.open('https://correctexam.github.io/asciidoclive2pdf/', '_blank');
+  }
+
+  gotToMd(): void {
+    window.open('https://correctexam.github.io//hackmd.io2pdf/', '_blank');
   }
 }

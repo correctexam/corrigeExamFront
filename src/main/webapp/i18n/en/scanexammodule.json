@@ -78,6 +78,8 @@
     "wordtemplate": "Word template",
     "odttemplate": "LibreOffice template",
     "latextemplate": "LaTeX template",
+    "asciidoctemplate": "AsciiDoc template",
+    "mdtemplate": "MarkDown template",
     "enonceexam": "Exam statement (PDF format):",
     "pdferror": "Invalid or corrupted PDF file",
     "annotatetemplate": "Annotate template",
@@ -276,6 +278,9 @@
     "courseimportexport": "Import/Export",
     "courseimport": "Import",
     "courseexport": "Export",
+    "examexport": "Export {{examName}}",
+    "exportexamtooltip": "Export exam's data for reusing them",
+
     "courseimporttooltip": "Import course's data using json format",
     "courseexporttooltip": "Export course's data using json format",
     "importexportcoursetooltip": "Import/Export course's data for reusing them",
@@ -437,6 +442,7 @@
     "hybridcommentGradeTooltip": "This is used to decide the grade associated with this comment, which can be positive or negative and expressed as a point (absolute) or as a percentage (relative). Note that in the scoring mode, once all the comments have been applied by the marker, a student's mark for a question cannot be lower than zero in hybrid mode, nor can it exceed the maximum mark associated with that question.",
     "hybridcommentStep": "Number of slice(s)",
     "hybridcommentStepTooltip": "Used to indicate whether the marker can divide the value of this comment into a number of slices. For example, if the mark for this comment is 80% of the overall mark and the number of brackets is 2, the marker may not apply this comment, apply this comment with one slice (40% of the overall mark) or apply this comment with two slices (80% of the overall mark).",
-    "hybridcommentGrade": "Grade"
+    "hybridcommentGrade": "Grade",
+    "downloadpdf": "Download pdfs"
   }
 }
