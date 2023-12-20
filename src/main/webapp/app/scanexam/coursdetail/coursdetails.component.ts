@@ -143,13 +143,41 @@ export class CoursdetailsComponent implements OnInit {
         downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, { type: 'blob' }));
         downloadLink.setAttribute('download', filename);
         document.body.appendChild(downloadLink);
-
         this.blocked = false;
         this.message = '';
-
         downloadLink.click();
       });
   }
+
+  exportExam(examId: number): void {
+    let endpoint = 'api/exportExam/';
+    if (!this.includeStudentsData) {
+      endpoint = 'api/exportExamWithoutStudentData/';
+    }
+    this.layoutsidebarVisible = false;
+    this.message = this.translateService.instant('scanexam.exportencours');
+    this.blocked = true;
+
+    this.http
+      .get<Blob>(this.applicationConfigService.getEndpointFor(`${endpoint}${this.courseId}/${examId}`), {
+        observe: 'response',
+        responseType: 'blob' as 'json',
+      })
+      .subscribe(response => {
+        // this.downLoadFile(s, "application/json")
+        const filename: string = this.getFileName(response);
+        const binaryData = [];
+        binaryData.push(response.body!);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, { type: 'blob' }));
+        downloadLink.setAttribute('download', filename);
+        document.body.appendChild(downloadLink);
+        this.blocked = false;
+        this.message = '';
+        downloadLink.click();
+      });
+  }
+
   initCmpt(): void {
     this.dockItems = [
       {

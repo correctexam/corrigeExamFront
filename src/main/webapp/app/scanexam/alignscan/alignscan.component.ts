@@ -19,7 +19,7 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { CacheUploadService, CacheUploadNotification } from '../exam-detail/cacheUpload.service';
 import { TranslateService } from '@ngx-translate/core';
 import { fromWorkerPool } from 'observable-webworker';
-import { Observable, Subscriber } from 'rxjs';
+import { Observable, Subscriber, firstValueFrom } from 'rxjs';
 import { worker1 } from '../services/workerimport';
 import { PreferenceService } from '../preference-page/preference.service';
 import { DialogService } from 'primeng/dynamicdialog';
@@ -28,6 +28,8 @@ import { PartialAlignModalComponent } from './partial-align-modal/partial-align-
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { QuestionService } from '../../entities/question/service/question.service';
 import { ZoneService } from '../../entities/zone/service/zone.service';
+import { TemplateService } from 'app/entities/template/service/template.service';
+import { ScanService } from 'app/entities/scan/service/scan.service';
 
 export interface IPage {
   image?: ArrayBuffer;
@@ -127,6 +129,8 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     public db: CacheServiceImpl,
     protected questionService: QuestionService,
     protected zoneService: ZoneService,
+    protected templateService: TemplateService,
+    protected scanService: ScanService,
   ) {}
   setMessage(v: string): void {
     this.message = v;
@@ -497,5 +501,33 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
 
   showVignette(): void {
     this._showVignette = !this._showVignette;
+  }
+
+  async downloadTemplate(): Promise<void> {
+    const e1 = (await firstValueFrom(this.templateService.getPdf(this.exam!.templateId!))) as Blob;
+
+    // this.downLoadFile(s, "application/json")
+    const filename: string = this.exam ? 'template-' + this.exam.id + '.pdf' : 'template.pdf';
+    const downloadLink = document.createElement('a');
+    downloadLink.href = window.URL.createObjectURL(e1);
+    downloadLink.setAttribute('download', filename);
+    document.body.appendChild(downloadLink);
+    this.blocked = false;
+    this.message = '';
+    downloadLink.click();
+  }
+
+  async downloadScan(): Promise<void> {
+    const e1 = (await firstValueFrom(this.scanService.getPdf(this.exam!.scanfileId!))) as Blob;
+
+    // this.downLoadFile(s, "application/json")
+    const filename: string = this.exam ? 'scan-' + this.exam.id + '.pdf' : 'scan.pdf';
+    const downloadLink = document.createElement('a');
+    downloadLink.href = window.URL.createObjectURL(e1);
+    downloadLink.setAttribute('download', filename);
+    document.body.appendChild(downloadLink);
+    this.blocked = false;
+    this.message = '';
+    downloadLink.click();
   }
 }

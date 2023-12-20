@@ -79,6 +79,8 @@
     "wordtemplate": "Modèle de sujet Word",
     "odttemplate": "Modèle de sujet LibreOffice",
     "latextemplate": "Modèle de sujet LaTeX",
+    "asciidoctemplate": "Modèle de sujet AsciiDoc",
+    "mdtemplate": "Modèle de sujet MarkDown",
     "enonceexam": "Enoncé de l'examen (au format PDF) :",
     "pdferror": "Fichier PDF invalide ou corrompu",
     "annotatetemplate": "Annoter template",
@@ -280,6 +282,8 @@
     "courseimportexport": "Import/Export",
     "courseimport": "Import",
     "courseexport": "Export",
+    "examexport": "Export {{examName}}",
+    "exportexamtooltip": "Export les données de l'examen en json",
     "courseimporttooltip": "Importer des données d'une UE en json",
     "courseexporttooltip": "Exporter des données de l'UE en json",
     "importexportcoursetooltip": "Importer ou exporter les données de l'UE afin de les réutiliser",
@@ -442,6 +446,7 @@
     "hybridcommentGradeTooltip": "Permet de décider la note associée à ce commentaire qui peut être positive ou négative et être exprimé en point (de manière absolue) ou en pourcentage (de manière relative). Il est à noter que dans le mode de calcul, une fois appliquer tous les commentaires par le correcteur, la note d'un élève pour une question ne pourra être inférieure à zéro en mode hybride ni dépassé la note maximale associée à cette question.",
     "hybridcommentStep": "Nombre de tranche(s)",
     "hybridcommentStepTooltip": "Permet d'exprimer si le correcteur pourra diviser la valeur de ce commentaire en un nombre de tranche(s). Ainsi, si la note de ce commentaire vaut 80% de la note globale et que le nombre de tranche est 2, le correcteur pourra ne pas appliquer ce commentaire, appliquer ce commentaire avec une tranche (40% de la note globale), appliquer ce commentaire avec deux tranches 80% de la note globale",
-    "hybridcommentGrade": "Note"
+    "hybridcommentGrade": "Note",
+    "downloadpdf": "Téléchargement pdfs"
   }
 }

@@ -7,7 +7,7 @@
 
   <div class="sm:col-12 md:col-12 lg:col-8 xl:col-8">
     <div class="grid grid-nogutter">
-      <div class="col-5">
+      <div class="col-4">
         <h2
           id="jhi-course-heading"
           data-cy="CourseCreateUpdateHeading"
@@ -17,7 +17,7 @@
           Créer un examen pour le cours {{ coursName }}
         </h2>
       </div>
-      <div class="col-7 flex flex-row-reverse">
+      <div class="col-8 flex flex-row-reverse">
         <button
           [disabled]="!this.courseid"
           type="submit"
@@ -28,6 +28,27 @@
         >
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackue">Retourner au module</span>
         </button>
+        <button
+          [disabled]="!this.courseid"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="p-button p-button-primary"
+          (click)="gotToMd()"
+        >
+          <fa-icon [icon]="faLink"></fa-icon>&nbsp;<span jhiTranslate="scanexam.mdtemplate">Modèle de sujet en markdown</span>
+        </button>
+        <button
+          [disabled]="!this.courseid"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="p-button p-button-primary"
+          (click)="gotToAsciiDoc()"
+        >
+          <fa-icon [icon]="faLink"></fa-icon>&nbsp;<span jhiTranslate="scanexam.asciidoctemplate">Modèle de sujet en asciidoc</span>
+        </button>
+
         <button
           [disabled]="!this.courseid"
           type="submit"
@@ -48,6 +69,7 @@
         >
           <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span jhiTranslate="scanexam.odttemplate">Modèle de sujet LibreOffice</span>
         </button>
+
         <button
           [disabled]="!this.courseid"
           type="submit"

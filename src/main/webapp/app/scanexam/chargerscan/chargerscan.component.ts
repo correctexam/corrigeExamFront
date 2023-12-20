@@ -262,15 +262,21 @@ export class ChargerscanComponent implements OnInit {
 
   protected pipeToSaveResponse(result: Observable<HttpEvent<Upload>>): void {
     //  console.log(result)
-    result.pipe(scan(calculateState, initialState)).subscribe(data => {
-      this.progress = data.progress;
-      if (data.progress >= 100) {
-        this.message = this.translate.instant('scanexam.sqlinsertfile');
-      }
+    result.pipe(scan(calculateState, initialState)).subscribe({
+      next: data => {
+        this.progress = data.progress;
+        if (data.progress >= 100) {
+          this.message = this.translate.instant('scanexam.sqlinsertfile');
+        }
 
-      if (data.state === 'DONE') {
-        this.onSaveSuccess();
-      }
+        if (data.state === 'DONE') {
+          this.onSaveSuccess();
+        }
+      },
+      error: () => {
+        this.onSaveError();
+      },
+      complete: () => console.log('the end'),
     });
   }
 
