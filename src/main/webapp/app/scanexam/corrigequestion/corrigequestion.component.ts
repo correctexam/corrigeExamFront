@@ -318,6 +318,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.currentGradedComment4Question?.forEach(com2 => ((com2 as any).checked = false));
         this.currentTextComment4Question?.forEach(com2 => ((com2 as any).checked = false));
         this.currentHybridGradedComment4Question?.forEach(com2 => ((com2 as any).checked = false));
+        //        this.currentHybridGradedComment4Question?.forEach(com2 => ());
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (questions !== undefined && questions.length > 0) {
@@ -376,6 +377,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 });
               }
             } else {
+              this.answer2HybridGradedCommentMap.clear();
               this.resp = new StudentResponse(undefined, this.currentNote);
               this.resp.note = this.currentNote;
               this.resp.questionId = questions![0].id;
@@ -1195,8 +1197,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         } else {
           resolve(resp);
         }
-
-        // TODO
         resolve(resp);
       } else if (currentQ.typeAlgoName === 'QCM' && currentQ.step! > 0) {
         let currentNote = 0;
