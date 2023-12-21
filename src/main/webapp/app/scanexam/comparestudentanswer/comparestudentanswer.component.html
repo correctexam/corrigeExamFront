@@ -194,7 +194,7 @@
                   >
 
                   <span *ngIf="item.grade && zones4comments !== undefined && zones4comments?.algoName !== 'QCM'"
-                    >( <span *ngIf="item.grade > 0">+ </span> {{ item.grade! / 4 | number: '1.0-2' }} <span *ngIf="item.relative">%</span
+                    >( <span *ngIf="item.grade > 0">+ </span> {{ item.grade! | number: '1.0-2' }} <span *ngIf="item.relative">%</span
                     ><span *ngIf="!item.relative"> pt</span> )</span
                   >
                 </b>

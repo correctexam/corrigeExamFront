@@ -361,10 +361,11 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     const dbTemplate = await this.db.countPageTemplate(+this.examId);
     const p = await this.db.countNonAlignImage(+this.examId);
     const p1 = await this.db.countAlignImage(+this.examId);
-
-    const nbreSheet = (this.students!.map(s => s.examSheets) as any)
-      .flat()
-      .filter((ex1: any) => ex1.scanId === this.exam!.scanfileId && ex1.pagemin !== -1).length;
+    const nbreSheet = this.students
+      ? (this.students.map(s => s.examSheets) as any)
+          .flat()
+          .filter((ex1: any) => ex1.scanId === this.exam!.scanfileId && ex1.pagemin !== -1).length
+      : 0;
 
     const samepage = p > 0 && p1 > 0 && p === p1;
     const cond2 = nbreSheet === p1 / dbTemplate;
