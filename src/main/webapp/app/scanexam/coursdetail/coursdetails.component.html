@@ -89,7 +89,7 @@
                         Export
                       </button>
                     </div>
-                    <ng-container *ngIf="exams.length > 1">
+                    <ng-container *ngIf="exams !== undefined && exams !== null && exams.length > 1">
                       <div
                         *ngFor="let exam of exams"
                         class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2"
