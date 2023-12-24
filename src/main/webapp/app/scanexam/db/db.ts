@@ -68,7 +68,8 @@ export class ExamIndexDB extends Dexie {
   }
 
   async removeElementForExam() {
-    await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
+    return this.delete();
+    /*  await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
       this.exams.delete(this.examId);
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -93,7 +94,7 @@ export class ExamIndexDB extends Dexie {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         .then(a => this.nonAlignImages.bulkDelete(a.map(t => t.id!)));
       //      this.populate();
-    });
+    });*/
   }
 
   async removePageAlignForExam() {
@@ -382,6 +383,8 @@ export class AppDB implements CacheService {
       db1 = new ExamIndexDB(examId);
       this.dbs.set(examId, db1);
     }
+    this.dbs.delete(examId);
+
     return db1.removeElementForExam();
   }
 
