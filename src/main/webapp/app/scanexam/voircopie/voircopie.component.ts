@@ -364,7 +364,14 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
 
       if (this.currentZoneVoirCopieHandler === undefined) {
         const zh = new ZoneVoirCopieHandler(
-          '' + this.exam!.id + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index,
+          '' +
+            this.exam!.id +
+            '_' +
+            this.selectionStudents![0].examSheets![0].id! +
+            '_' +
+            this.questionNumeros[this.questionindex] +
+            '_' +
+            index,
           this.eventHandler,
           this.resp?.id,
         );
@@ -373,12 +380,26 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
       } else {
         if (
           this.currentZoneVoirCopieHandler.zoneid ===
-          '' + this.exam!.id + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index
+          '' +
+            this.exam!.id +
+            '_' +
+            this.selectionStudents![0].examSheets![0].id! +
+            '_' +
+            this.questionNumeros[this.questionindex] +
+            '_' +
+            index
         ) {
           this.currentZoneVoirCopieHandler.updateCanvas(imageRef!.nativeElement);
         } else {
           const zh = new ZoneVoirCopieHandler(
-            '' + this.exam!.id + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index,
+            '' +
+              this.exam!.id +
+              '_' +
+              this.selectionStudents![0].examSheets![0].id! +
+              '_' +
+              this.questionNumeros[this.questionindex] +
+              '_' +
+              index,
             this.eventHandler,
             this.resp?.id,
           );

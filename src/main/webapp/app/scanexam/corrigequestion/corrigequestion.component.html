@@ -251,7 +251,14 @@
           </div>
 
           <div class="col-1">
-            <fa-icon [size]="'2x'" [tooltipZIndex]="'3000'" [pTooltip]="getStudentName()!" tooltipPosition="left" icon="eye"></fa-icon>
+            <fa-icon
+              *ngIf="studentName !== undefined"
+              [size]="'2x'"
+              [tooltipZIndex]="'3000'"
+              [pTooltip]="studentName"
+              tooltipPosition="left"
+              icon="eye"
+            ></fa-icon>
           </div>
 
           <div class="col-4 flex flex-row-reverse">

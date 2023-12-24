@@ -21,7 +21,7 @@ import { StudentService } from 'app/entities/student/service/student.service';
 import { IStudent, Student } from '../../entities/student/student.model';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 import { IExamSheet } from '../../entities/exam-sheet/exam-sheet.model';
-import { v4 as uuid } from 'uuid';
+// import { v4 as uuid } from 'uuid';
 import { faHouseSignal } from '@fortawesome/free-solid-svg-icons';
 import { Listbox } from 'primeng/listbox';
 import { PreferenceService } from '../preference-page/preference.service';
@@ -185,6 +185,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
 
   constructor(
     public examService: ExamService,
+    public examsheetService: ExamSheetService,
     public zoneService: ZoneService,
     public courseService: CourseService,
     public studentService: StudentService,
@@ -226,6 +227,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
               this.nbreFeuilleParCopie = value[0];
               this.numberPagesInScan = value[1];
               this.exam = value[2].body!;
+              console.error(this.exam);
               console.timeLog('loadpage', 'after countTemplate');
               this.activeIndex = this.currentStudent! * this.nbreFeuilleParCopie!;
               this.factor = 1;
@@ -594,6 +596,76 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   }
 
   async bindStudent(): Promise<void> {
+    const examSheet4CurrentStudent1: IExamSheet[] = [...new Set(this.students.flatMap(s => s.examSheets!))].filter(
+      sh =>
+        sh.pagemin === this.currentStudent * this.nbreFeuilleParCopie &&
+        sh.pagemax === (this.currentStudent + 1) * this.nbreFeuilleParCopie - 1 &&
+        sh.scanId === this.exam.scanfileId,
+    );
+    // ExamSheetExist
+    if (examSheet4CurrentStudent1.length === 1) {
+      const sheet = examSheet4CurrentStudent1[0];
+      sheet.students = this.selectionStudents;
+      await firstValueFrom(
+        this.examsheetService.updateStudents(
+          sheet.id!,
+          this.selectionStudents.map(e => e.id as number),
+        ),
+      );
+    } else if (examSheet4CurrentStudent1.length > 1) {
+      this.messageService.add({
+        severity: 'error',
+        summary: this.translateService.instant('scanexam.deuxfeuillepourlamemecopie'),
+        detail: this.translateService.instant('scanexam.deuxfeuillepourlamemecopieTooltip'),
+      });
+    }
+    // ExamSheetNotExist
+    else {
+      const sheets: IExamSheet[] | null = (
+        await firstValueFrom(
+          this.examsheetService.query({
+            scanId: this.exam!.scanfileId,
+            pagemin: this.currentStudent * this.nbreFeuilleParCopie,
+            pagemax: (this.currentStudent + 1) * this.nbreFeuilleParCopie - 1,
+          }),
+        )
+      ).body;
+      if (sheets !== null && sheets.length === 1) {
+        await firstValueFrom(
+          this.examsheetService.updateStudents(
+            sheets[0].id!,
+            this.selectionStudents.map(e => e.id as number),
+          ),
+        );
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: this.translateService.instant('scanexam.deuxfeuillepourlamemecopie'),
+          detail: this.translateService.instant('scanexam.deuxfeuillepourlamemecopieTooltip'),
+        });
+      }
+    }
+    await this.refreshStudentList();
+  }
+
+  async unbindCurrentStudent(): Promise<void> {
+    const examSheet4CurrentStudent1: IExamSheet[] = [...new Set(this.students.flatMap(s => s.examSheets!))].filter(
+      sh =>
+        sh.pagemin === this.currentStudent * this.nbreFeuilleParCopie &&
+        sh.pagemax === (this.currentStudent + 1) * this.nbreFeuilleParCopie - 1,
+    );
+    // ExamSheetExist
+    if (examSheet4CurrentStudent1.length >= 0) {
+      const sheet = examSheet4CurrentStudent1[0];
+      sheet.students = [];
+      await firstValueFrom(this.examsheetService.updateStudents(sheet.id!, []));
+      await this.refreshStudentList();
+      this.blocked = false;
+    }
+  }
+  /*
+
+    // old version
     const examSheet4CurrentStudent: IExamSheet[] = (
       this.students.filter(s => this.selectionStudents.map((s1: IStudent) => s1.id)!.includes(s.id)).map(s => s.examSheets) as any
     )
@@ -617,7 +689,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       await firstValueFrom(this.sheetService.update(ex2));
     }
 
-    // Pour l'étudiant sélectionné. récupère la sheet. Si elle exite, on met à jour les bonnes pages sinon on crée la page.
+    // Pour l'étudiant sélectionné. récupère la sheet. Si elle existe, on met à jour les bonnes pages sinon on crée la page.
 
     const selectedStudent = this.students.filter(s => this.selectionStudents.map((s1: IStudent) => s1.id)!.includes(s.id));
     for (const student of selectedStudent) {
@@ -642,10 +714,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
           await firstValueFrom(this.studentService.update(s1));
         }
       }
-    }
-
-    await this.refreshStudentList();
-  }
+    }*/
 
   showGalleria(): void {
     this.blocked = true;

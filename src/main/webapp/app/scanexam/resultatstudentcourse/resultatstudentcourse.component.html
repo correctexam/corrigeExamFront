@@ -209,6 +209,7 @@
             <td *ngIf="!student.studentNumber">ABI</td>
             <td *ngIf="!student.abi">
               <a
+                *ngIf="student.mail != 'anonymous@anonymous.fr'"
                 [pTooltip]="'scanexam.showresultLienEleveTooltip' | translate"
                 [tooltipPosition]="'top'"
                 [tooltipZIndex]="'3000'"
@@ -233,6 +234,7 @@
             <td *ngIf="student.abi">ABI</td>
             <td *ngIf="!student.abi">
               <button
+                *ngIf="student.mail != 'anonymous@anonymous.fr'"
                 type="submit"
                 id="save-entity"
                 data-cy="entityCreateSaveButton"
