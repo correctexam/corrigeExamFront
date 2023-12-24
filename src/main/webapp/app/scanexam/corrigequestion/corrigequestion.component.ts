@@ -32,7 +32,7 @@ import {
   IQCMInput,
 } from '../services/align-images.service';
 import { IExam } from '../../entities/exam/exam.model';
-import { IStudent } from '../../entities/student/student.model';
+// import { IStudent } from '../../entities/student/student.model';
 import { ImageZone, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.component';
 import { IZone } from 'app/entities/zone/zone.model';
 import { QuestionService } from '../../entities/question/service/question.service';
@@ -63,6 +63,7 @@ import { IHybridGradedComment, NewHybridGradedComment } from 'app/entities/hybri
 import { HybridGradedCommentService } from 'app/entities/hybrid-graded-comment/service/hybrid-graded-comment.service';
 import { Answer2HybridGradedCommentService } from '../../entities/answer-2-hybrid-graded-comment/service/answer-2-hybrid-graded-comment.service';
 import { Inplace } from 'primeng/inplace';
+import { IExamSheet } from 'app/entities/exam-sheet/exam-sheet.model';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -107,10 +108,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   nbreFeuilleParCopie: number | undefined;
   numberPagesInScan: number | undefined;
   exam: IExam | undefined;
+  sheet: IExamSheet | undefined;
+
   // course: ICourse | undefined;
-  students: IStudent[] | undefined;
+  //  students: IStudent[] | undefined;
   currentStudent = 0;
-  selectionStudents: IStudent[] | undefined;
+  //  selectionStudents: IStudent[] | null |undefined;
+  studentName: string | undefined;
   numberofzone: number | undefined = 0;
   questions: IQuestion[] | undefined;
   blocked = true;
@@ -225,7 +229,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.testdisableAndEnableKeyBoardShortCut = false;
     this.init = true;
 
-    let forceRefreshStudent = false;
+    //    let forceRefreshStudent = false;
     this.currentNote = 0;
     this.noteSteps = 0;
     this.maxNote = 0;
@@ -238,7 +242,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.examId = params.get('examid')!;
       if (this.images.length === 0) {
         this.examId = params.get('examid')!;
-        forceRefreshStudent = true;
+        //   forceRefreshStudent = true;
       }
       if (params.get('questionno') !== null) {
         this.questionindex4shortcut = +params.get('questionno')! - 1;
@@ -262,10 +266,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.questionNumeros = Array.from(new Set(b.body!.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
           this.nbreQuestions = this.questionNumeros.length;
 
-          await this.refreshStudentList(forceRefreshStudent);
+          //          await this.refreshStudentList(forceRefreshStudent);
         }
         if (this.studentid !== studentid_prev) {
-          this.getSelectedStudent();
+          this.getSelectedStudent(this.currentStudent);
         }
 
         // must be done here as the change of the nbreQuestions triggers the event of change question with page = 0
@@ -324,13 +328,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (questions !== undefined && questions.length > 0) {
           this.noteSteps = questions[0].point! * questions[0].step!;
 
-          const sheets = (this.selectionStudents?.map(st => st.examSheets) as any)
-            .flat()
-            .filter((ex: any) => ex?.scanId === this.exam!.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie!);
-          if (sheets !== undefined && sheets!.length > 0) {
+          if (this.sheet !== undefined) {
             const sr = await firstValueFrom(
               this.studentResponseService.query({
-                sheetId: sheets[0]?.id,
+                sheetId: this.sheet.id!,
                 questionsId: questions!.map(q => q.id),
               }),
             );
@@ -381,7 +382,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               this.resp = new StudentResponse(undefined, this.currentNote);
               this.resp.note = this.currentNote;
               this.resp.questionId = questions![0].id;
-              this.resp.sheetId = sheets[0]?.id;
+              this.resp.sheetId = this.sheet.id;
               this.resp.questionId = questions![0].id;
               //            this.studentResponseService.create(this.resp!).subscribe(sr1 => {
               //                                      this.resp = sr1.body!;
@@ -672,7 +673,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
   cleanAllCorrection(q: IQuestion): Observable<HttpResponse<IQuestion>> {
-    // TODO Check
     return this.questionService.cleanAllCorrectionAndComment(q);
   }
   workOnQCM() {
@@ -722,15 +722,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 res => {
                   this.processSolutions(res.solutions).then(() => {
                     const qid = this.questions!.map(qq => qq.id);
-                    let sid = '';
-                    const sheets = (this.selectionStudents?.map(st => st.examSheets) as any)
-                      .flat()
-                      .filter(
-                        (ex: any) =>
-                          ex?.scanId === this.exam!.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie!,
-                      );
-                    if (sheets !== undefined && sheets!.length > 0) {
-                      sid = sheets[0]?.id;
+                    let sid = 0;
+                    if (this.sheet !== undefined) {
+                      sid = this.sheet.id!;
                     }
                     this.studentResponseService
                       .query({
@@ -764,7 +758,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       });
     } else {
       console.log('no support of QCM on multiple pages');
-      // TODO
       this.messageService.add({
         severity: 'warning',
         summary: this.translateService.instant('scanexam.nosupportQMCmultiplepage'),
@@ -821,7 +814,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   async processAnswer(e: IQCMSolution) {
     if (e.solution !== undefined /* && e.solution !== '' */) {
-      const resp = await this.getStudentResponse(
+      const resp = await this.getStudentResponse4CurrentStudent(
         this.questions!.map(q => q.id!),
         e.numero!,
       );
@@ -1453,7 +1446,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.router.navigateByUrl('/marking-summary/' + this.examId!);
   }
 
-  async refreshStudentList(force: boolean): Promise<void> {
+  /*  async refreshStudentList(force: boolean): Promise<void> {
     await new Promise<void>(res => {
       if (force || this.students === undefined || this.students.length === 0) {
         this.studentService.query({ courseId: this.exam!.courseId }).subscribe(studentsbody => {
@@ -1464,10 +1457,28 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         res();
       }
     });
-  }
+  } */
 
-  getSelectedStudent() {
-    const filterStudent = this.students!.filter(
+  async getSelectedStudent(currentStudent: number) {
+    const _sheets = await firstValueFrom(
+      this.sheetService.query({
+        scanId: this.exam!.scanfileId,
+        pagemin: currentStudent * this.nbreFeuilleParCopie!,
+        pagemax: (currentStudent + 1) * this.nbreFeuilleParCopie! - 1,
+      }),
+    );
+    if (_sheets.body !== null && _sheets.body.length > 0) {
+      this.sheet = _sheets.body[0];
+      this.studentService.query({ sheetId: this.sheet.id! }).subscribe(e => {
+        if (e.body !== null) {
+          this.studentName = e.body.map(e1 => e1.firstname + ' ' + e1.name).join(', ');
+        } else {
+          this.studentName = undefined;
+        }
+      });
+    }
+
+    /* const filterStudent = this.students!.filter(
       s => s.examSheets?.some(ex => ex.scanId === this.exam!.scanfileId && ex.pagemin === this.currentStudent * this.nbreFeuilleParCopie!),
     );
     this.selectionStudents = filterStudent;
@@ -1479,7 +1490,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           detail: this.translateService.instant('scanexam.copienotassociateddetails'),
         });
       });
-    }
+    }*/
   }
 
   displayImage(
@@ -1501,25 +1512,25 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       ctx1!.scale(this.scale, this.scale);
       ctx1!.drawImage(editedImage, 0, 0);
       show(true);
-      if (updateanotationcanvas) {
+      if (updateanotationcanvas && this.sheet !== undefined) {
         if (
           this.currentZoneCorrectionHandler.get(
-            '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index,
+            '' + this.examId + '_' + this.sheet.id! + '_' + this.questionNumeros[this.questionindex] + '_' + index,
           ) === undefined
         ) {
           const zh = new ZoneCorrectionHandler(
-            '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index,
+            '' + this.examId + '_' + this.sheet.id! + '_' + this.questionNumeros[this.questionindex] + '_' + index,
             this.eventHandler,
             this.resp?.id,
           );
           zh.updateCanvas(imageRef!.nativeElement);
           this.currentZoneCorrectionHandler.set(
-            '' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index,
+            '' + this.examId + '_' + this.sheet.id! + '_' + this.questionNumeros[this.questionindex] + '_' + index,
             zh,
           );
         } else {
           this.currentZoneCorrectionHandler
-            .get('' + this.examId + '_' + this.selectionStudents![0].id + '_' + this.questionNumeros[this.questionindex] + '_' + index)!
+            .get('' + this.examId + '_' + this.sheet.id! + '_' + this.questionNumeros[this.questionindex] + '_' + index)!
             .updateCanvas(imageRef!.nativeElement);
         }
       }
@@ -1634,36 +1645,66 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     };
   }
 
-  async getStudentResponse(questionsId: number[], currentStudent: number): Promise<StudentResponse> {
-    return new Promise(resolve => {
-      const sheets = (this.students?.map(st => st.examSheets) as any)
-        .flat()
-        .filter((ex: any) => ex?.scanId === this.exam!.scanfileId && ex?.pagemin === currentStudent * this.nbreFeuilleParCopie!);
-      let sheetId = undefined;
-      if (sheets !== undefined && sheets!.length > 0) {
-        sheetId = sheets[0]?.id;
+  async getStudentResponse4CurrentStudent(questionsId: number[], currentStudent: number): Promise<StudentResponse> {
+    const _sheets = await firstValueFrom(
+      this.sheetService.query({
+        scanId: this.exam!.scanfileId,
+        pagemin: currentStudent * this.nbreFeuilleParCopie!,
+        pagemax: (currentStudent + 1) * this.nbreFeuilleParCopie! - 1,
+      }),
+    );
+    let sheet: IExamSheet | undefined;
+    if (_sheets.body !== null && _sheets.body.length > 0) {
+      sheet = _sheets.body[0];
+    }
+
+    if (sheet !== undefined) {
+      const _sr = (
+        await firstValueFrom(
+          this.studentResponseService.query({
+            sheetId: sheet!.id!,
+            questionsId: questionsId,
+          }),
+        )
+      ).body;
+      if (_sr !== null && _sr.length > 0) {
+        return _sr[0];
+      } else {
+        const st: IStudentResponse = {};
+        st.note = this.currentNote;
+        st.questionId = this.questions![0].id;
+        st.sheetId = sheet!.id!;
+        const sr1 = await firstValueFrom(this.studentResponseService.create(st));
+        return sr1.body!;
       }
-      this.studentResponseService
-        .query({
-          sheetId: sheetId,
-          questionsId: questionsId,
-        })
-        .subscribe(sr => {
-          if (sr.body !== null && sr.body.length > 0) {
-            resolve(sr.body![0]);
-          } else {
-            const st: IStudentResponse = {};
-            st.note = this.currentNote;
-            st.questionId = this.questions![0].id;
-            if (sheets !== undefined && sheets!.length > 0) {
-              st.sheetId = sheets[0]?.id;
-            }
-            this.studentResponseService.create(st).subscribe(sr1 => {
-              resolve(sr1.body!);
-            });
-          }
-        });
-    });
+    } else {
+      throw new Error('No sheet for this page, should never happen');
+    }
+  }
+
+  async getStudentResponse(questionsId: number[]): Promise<StudentResponse> {
+    if (this.sheet !== undefined) {
+      const _sr = (
+        await firstValueFrom(
+          this.studentResponseService.query({
+            sheetId: this.sheet!.id!,
+            questionsId: questionsId,
+          }),
+        )
+      ).body;
+      if (_sr !== null && _sr.length > 0) {
+        return _sr[0];
+      } else {
+        const st: IStudentResponse = {};
+        st.note = this.currentNote;
+        st.questionId = this.questions![0].id;
+        st.sheetId = this.sheet!.id!;
+        const sr1 = await firstValueFrom(this.studentResponseService.create(st));
+        return sr1.body!;
+      }
+    } else {
+      throw new Error('No sheet for this page, should never happen');
+    }
   }
 
   showGalleria(): void {
@@ -1795,9 +1836,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.images = [];
     this.reloadImage();
   }
-  getStudentName(): string | undefined {
-    return this.selectionStudents?.map(e1 => e1.firstname + ' ' + e1.name).join(', ');
-  }
+  // getStudentName(): string | undefined {
+  // }
 
   computeQCMdebug() {
     if (this.questions?.length === 1) {

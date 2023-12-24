@@ -231,10 +231,12 @@ export class ExportPdfService {
       const widthz = (z!.width! * canvas.width) / coefficient;
       const heightz = (z!.height! * canvas.height) / coefficient;
 
-      const zoneid = this.examExport!.ID + '_' + sheet.studentpdf![0].ID + '_' + question.numero + '_' + questionindex;
-      // zonegeneratedid = idexam + idstudent + questionnumero+zoneindex
+      const zoneid = this.examExport!.ID + '_' + sheet.ID + '_' + question.numero + '_' + questionindex;
+
+      // zonegeneratedid = idexam + idsheet + questionnumero+zoneindex
 
       const comms = this.comments.filter(e => e.zonegeneratedid === zoneid);
+      console.error(comms.length);
 
       if (comms.length > 0) {
         const data = comms[0].jsonData!;

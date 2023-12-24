@@ -18,8 +18,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { ExamSheetService } from '../../entities/exam-sheet/service/exam-sheet.service';
-import { StudentService } from '../../entities/student/service/student.service';
-import { IStudent } from 'app/entities/student/student.model';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { AccountService } from '../../core/auth/account.service';
 import { MessageService } from 'primeng/api';
@@ -28,6 +26,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { firstValueFrom } from 'rxjs';
 import { PreferenceService } from '../preference-page/preference.service';
+import { IExamSheet } from 'app/entities/exam-sheet/exam-sheet.model';
 
 @Component({
   selector: 'jhi-exam-detail',
@@ -55,7 +54,8 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
   showCorrection = false;
   nbreFeuilleParCopie = 0;
   numberPagesInScan = 0;
-  students: IStudent[] | undefined;
+  // students: IStudent[] | undefined;
+  sheets: IExamSheet[] = [];
   message = '';
   submessage = '';
   progress = 0;
@@ -73,7 +73,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     protected activatedRoute: ActivatedRoute,
     public confirmationService: ConfirmationService,
     public examSheetService: ExamSheetService,
-    public studentService: StudentService,
+    //    public studentService: StudentService,
     public router: Router,
     public appConfig: ApplicationConfigService,
     public accountService: AccountService,
@@ -213,21 +213,30 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
       this.db.countAlignImage(+this.examId).then(e1 => {
         this.numberPagesInScan = e1;
 
-        this.studentService.query({ courseId: this.exam!.courseId }).subscribe(
-          studentsbody => {
-            this.blocked = false;
-
-            this.students = studentsbody.body!;
-            const ex2 = (this.students.map(s => s.examSheets) as any)
-              .flat()
-              .filter((ex1: any) => ex1.scanId === this.exam!.scanfileId && ex1.pagemin !== -1).length;
-            //            console.error(ex2, this.numberPagesInScan / this.nbreFeuilleParCopie, this.numberPagesInScan, this.nbreFeuilleParCopie);
-            this.showCorrection = ex2 === this.numberPagesInScan / this.nbreFeuilleParCopie && this.showAssociation && this.showAlignement;
-          },
-          () => {
-            this.blocked = false;
-          },
-        );
+        this.examSheetService
+          .query({
+            page: 0,
+            size: 5000,
+            scanId: this.exam!.scanfileId,
+            nbreFeuilleParCopie: this.nbreFeuilleParCopie,
+            numberPagesInScan: this.numberPagesInScan,
+          })
+          .subscribe(
+            sheetsbody => {
+              this.blocked = false;
+              console.error(sheetsbody);
+              this.sheets = sheetsbody.body!;
+              //            const ex2 = (this.students.map(s => s.examSheets) as any)
+              //              .flat()
+              //              .filter((ex1: any) => ex1.scanId === this.exam!.scanfileId && ex1.pagemin !== -1).length;
+              //            console.error(ex2, this.numberPagesInScan / this.nbreFeuilleParCopie, this.numberPagesInScan, this.nbreFeuilleParCopie);
+              this.showCorrection =
+                this.sheets.length === this.numberPagesInScan / this.nbreFeuilleParCopie && this.showAssociation && this.showAlignement;
+            },
+            () => {
+              this.blocked = false;
+            },
+          );
       });
     });
   }
@@ -361,11 +370,12 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     const dbTemplate = await this.db.countPageTemplate(+this.examId);
     const p = await this.db.countNonAlignImage(+this.examId);
     const p1 = await this.db.countAlignImage(+this.examId);
-    const nbreSheet = this.students
+    const nbreSheet = this.sheets.length;
+    /* this.students
       ? (this.students.map(s => s.examSheets) as any)
           .flat()
           .filter((ex1: any) => ex1.scanId === this.exam!.scanfileId && ex1.pagemin !== -1).length
-      : 0;
+      : 0; */
 
     const samepage = p > 0 && p1 > 0 && p === p1;
     const cond2 = nbreSheet === p1 / dbTemplate;

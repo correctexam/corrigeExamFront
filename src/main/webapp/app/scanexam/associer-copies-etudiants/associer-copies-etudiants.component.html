@@ -138,10 +138,13 @@
         <div class="col-10 d-flex justify-content-center">
           <div>
             <span jhiTranslate="scanexam.selectedstudent">Etudiant(es) Séléctionné(es):</span> {{ selectionStudentsString() }}
+            <button *ngIf="selectionStudents.length > 0" pButton icon="pi pi-times" (click)="unbindCurrentStudent()"></button>
+
             <BR />
-            <span *ngIf="assisted && recognizedStudent !== undefined && predictionprecision > 0.07"
-              ><span jhiTranslate="scanexam.aistudent">Etudiant(es) Reconnu(es):</span> {{ showRecognizedStudent() }}</span
-            >
+            <ng-container *ngIf="assisted && recognizedStudent !== undefined && predictionprecision > 0.07">
+              <span><span jhiTranslate="scanexam.aistudent">Etudiant(es) Reconnu(es):</span> {{ showRecognizedStudent() }}</span>
+            </ng-container>
+
             <p-button
               [pTooltip]="'scanexam.validaterecognizedTooltip' | translate"
               (onClick)="selectRecogniezStudent()"

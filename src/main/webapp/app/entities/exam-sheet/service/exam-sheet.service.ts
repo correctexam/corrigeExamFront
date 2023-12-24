@@ -14,7 +14,10 @@ export type EntityArrayResponseType = HttpResponse<IExamSheet[]>;
 export class ExamSheetService {
   protected resourceUrl: string;
 
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+  constructor(
+    protected http: HttpClient,
+    protected applicationConfigService: ApplicationConfigService,
+  ) {
     this.resourceUrl = this.applicationConfigService.getEndpointFor('api/exam-sheets');
   }
 
@@ -45,6 +48,12 @@ export class ExamSheetService {
 
   delete(id: number): Observable<HttpResponse<{}>> {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  }
+
+  updateStudents(sheetid: number, studentId: number[]): Observable<EntityResponseType> {
+    return this.http.put<IExamSheet>(`${this.resourceUrl}/boundstudents/${sheetid}`, studentId, {
+      observe: 'response',
+    });
   }
 
   addExamSheetToCollectionIfMissing(
