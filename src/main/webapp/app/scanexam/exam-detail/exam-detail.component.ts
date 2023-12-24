@@ -224,8 +224,8 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
           .subscribe(
             sheetsbody => {
               this.blocked = false;
-              console.error(sheetsbody);
-              this.sheets = sheetsbody.body!;
+              this.sheets = sheetsbody.body!.filter(sh => sh.pagemin !== -1);
+
               //            const ex2 = (this.students.map(s => s.examSheets) as any)
               //              .flat()
               //              .filter((ex1: any) => ex1.scanId === this.exam!.scanfileId && ex1.pagemin !== -1).length;
