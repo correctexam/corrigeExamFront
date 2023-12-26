@@ -448,7 +448,7 @@
     "hybridcommentStepTooltip": "Permet d'exprimer si le correcteur pourra diviser la valeur de ce commentaire en un nombre de tranche(s). Ainsi, si la note de ce commentaire vaut 80% de la note globale et que le nombre de tranche est 2, le correcteur pourra ne pas appliquer ce commentaire, appliquer ce commentaire avec une tranche (40% de la note globale), appliquer ce commentaire avec deux tranches 80% de la note globale",
     "hybridcommentGrade": "Note",
     "downloadpdf": "Téléchargement pdfs",
-    "stepPageTooltip": "Nombre d'images traitées en batch",
-    "stepPage": "Permet de configurer le nombre d'images traitées en batch avant libération de la mémoire"
+    "stepPage": "Nombre d'images traitées en batch",
+    "stepPageTooltip": "Permet de configurer le nombre d'images traitées en batch avant libération de la mémoire"
   }
 }
