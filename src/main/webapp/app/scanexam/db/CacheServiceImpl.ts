@@ -63,6 +63,9 @@ export class CacheServiceImpl implements CacheService {
   addNonAligneImage(elt: AlignImage): Promise<any> {
     return this.service.addNonAligneImage(elt);
   }
+  addNonAligneImages(elts: AlignImage[]): Promise<any> {
+    return this.service.addNonAligneImages(elts);
+  }
   export(examId: number, options?: ExportOptions | undefined): Promise<Blob> {
     return this.service.export(examId, options);
   }

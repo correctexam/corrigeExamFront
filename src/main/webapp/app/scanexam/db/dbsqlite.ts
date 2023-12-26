@@ -209,6 +209,26 @@ export class SqliteCacheService implements CacheService {
     return this._dispatch('addNonAligneImage', el1, [el1.value]).toPromise();
   }
 
+  async addNonAligneImages(elts: ImageDB[]) {
+    const enc = new TextEncoder(); // always utf-8
+    if (elts.length > 0) {
+      const els: any[] = [];
+      const els1: ArrayBufferLike[] = [];
+      elts.forEach(elt => {
+        const el1 = {
+          examId: elt.examId,
+          pageNumber: elt.pageNumber,
+          value: enc.encode(elt.value).buffer,
+        };
+        els.push(el1);
+        els1.push(el1.value);
+      });
+
+      return this._dispatch('addNonAligneImages', els, els1).toPromise();
+    }
+    return;
+  }
+
   export(examId: number, options?: ExportOptions | undefined): Promise<any> {
     return this._dispatch('export', {
       examId: examId,

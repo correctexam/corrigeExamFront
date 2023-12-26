@@ -199,6 +199,9 @@ export class ExamIndexDB extends Dexie {
   async addNonAligneImage(elt: AlignImage) {
     await this.nonAlignImages.put(elt);
   }
+  async addNonAligneImages(elts: AlignImage[]) {
+    await this.nonAlignImages.bulkAdd(elts);
+  }
 
   export(options?: ExportOptions): Promise<Blob> {
     return super.export(options);
@@ -464,6 +467,19 @@ export class AppDB implements CacheService {
     return db1.addNonAligneImage(elt);
   }
 
+  async addNonAligneImages(elts: AlignImage[]): Promise<void> {
+    if (elts.length > 0) {
+      let db1 = this.dbs.get(elts[0].examId);
+      if (db1 === undefined) {
+        db1 = new ExamIndexDB(elts[0].examId);
+        this.dbs.set(elts[0].examId, db1);
+      }
+      return db1.addNonAligneImages(elts);
+    } else {
+      return;
+    }
+  }
+
   export(examId: number, options?: ExportOptions): Promise<Blob> {
     let db1 = this.dbs.get(examId);
     if (db1 === undefined) {
@@ -652,6 +668,7 @@ export interface CacheService {
   removePageNonAlignForExamForPages(examId: number, pageStart: number, pageEnd: number): Promise<void>;
   addAligneImage(elt: AlignImage): Promise<any>;
   addNonAligneImage(elt: AlignImage): Promise<any>;
+  addNonAligneImages(elts: AlignImage[]): Promise<any>;
   export(examId: number, options?: ExportOptions): Promise<Blob>;
   import(examId: number, blob: Blob, options?: ImportOptions): Promise<void>;
   countPageTemplate(examId: number): Promise<number>;

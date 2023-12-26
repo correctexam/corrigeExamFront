@@ -443,6 +443,8 @@
     "hybridcommentStep": "Number of slice(s)",
     "hybridcommentStepTooltip": "Used to indicate whether the marker can divide the value of this comment into a number of slices. For example, if the mark for this comment is 80% of the overall mark and the number of brackets is 2, the marker may not apply this comment, apply this comment with one slice (40% of the overall mark) or apply this comment with two slices (80% of the overall mark).",
     "hybridcommentGrade": "Grade",
-    "downloadpdf": "Download pdfs"
+    "downloadpdf": "Download pdfs",
+    "stepPageTooltip": "Number of images processed in batch",
+    "stepPage": "Used to configure the number of images processed in batch before memory is released"
   }
 }
