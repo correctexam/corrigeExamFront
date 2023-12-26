@@ -52,6 +52,20 @@
       </p-slider>
     </div>
 
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <label><span jhiTranslate="scanexam.stepPage"> Step ProcessImage: </span>&nbsp; <span> </span> ({{ stepPage }})</label>
+      <p-slider
+        [(ngModel)]="stepPage"
+        [min]="50"
+        [max]="500"
+        [step]="50"
+        [pTooltip]="'scanexam.stepPageTooltip' | translate"
+        [tooltipZIndex]="'3000'"
+        [tooltipPosition]="'right'"
+      >
+      </p-slider>
+    </div>
+
     <h3 jhiTranslate="scanexam.downloadpdf">Téléchargement pdfs</h3>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <a (click)="downloadTemplate()">template.pdf</a>

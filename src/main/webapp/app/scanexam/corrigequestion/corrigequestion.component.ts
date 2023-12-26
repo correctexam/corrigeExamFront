@@ -269,7 +269,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           //          await this.refreshStudentList(forceRefreshStudent);
         }
         if (this.studentid !== studentid_prev) {
-          this.getSelectedStudent(this.currentStudent);
+          await this.getSelectedStudent(this.currentStudent);
         }
 
         // must be done here as the change of the nbreQuestions triggers the event of change question with page = 0
@@ -397,7 +397,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               this.questions = undefined;
               setTimeout(() => {
                 this.questions = questions;
-              }, 0);
+              }, 20);
             }, 1);
           }
 

@@ -6,7 +6,6 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ExamSheetService } from '../../../entities/exam-sheet/service/exam-sheet.service';
 import { firstValueFrom } from 'rxjs';
 import { StudentService } from 'app/entities/student/service/student.service';
-import { v4 as uuid } from 'uuid';
 
 @Component({
   selector: 'jhi-allbindings',
@@ -83,52 +82,37 @@ export class AllbindingsComponent implements OnInit {
   }
 
   async bindStudentInternal(student: IStudent, currentStudent: number, element: any): Promise<void> {
-    let examSheet4CurrentStudentId: (number | undefined)[] = [];
-    if (student.examSheets) {
-      examSheet4CurrentStudentId = student.examSheets.filter((ex: any) => ex?.scanId === this.exam.scanfileId).map(ex1 => ex1.id);
+    console.error(this.students);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    const examSheet4CurrentStudent1: IExamSheet[] = [...new Set(this.students.flatMap(s => s.recognizedStudent.examSheets!))].filter(
+      sh =>
+        sh.pagemin === currentStudent * this.nbreFeuilleParCopie &&
+        sh.pagemax === (currentStudent + 1) * this.nbreFeuilleParCopie - 1 &&
+        sh.scanId === this.exam.scanfileId,
+    );
+    // ExamSheetExist
+    if (examSheet4CurrentStudent1.length === 1) {
+      const sheet = examSheet4CurrentStudent1[0];
+      sheet.students = [student];
+      await firstValueFrom(this.sheetService.updateStudents(sheet.id!, [student.id!]));
+      element.bound = true;
     }
-    // Récupère la sheet courante.
-    const examSheet4CurrentPage: IExamSheet[] = (
-      this.students
-        .filter(
-          s =>
-            s.examSheets?.some(
-              (ex: any) => ex?.scanId === this.exam.scanfileId && ex.pagemin === currentStudent * this.nbreFeuilleParCopie,
-            ),
+    // ExamSheetNotExist
+    else {
+      const sheets: IExamSheet[] | null = (
+        await firstValueFrom(
+          this.sheetService.query({
+            scanId: this.exam.scanfileId,
+            pagemin: currentStudent * this.nbreFeuilleParCopie,
+            pagemax: (currentStudent + 1) * this.nbreFeuilleParCopie - 1,
+          }),
         )
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        .map(s => s.examSheets) as any
-    ).flat();
-    // Passe cette sheet à -1 -1. sémantique plus associé
-
-    for (const ex of examSheet4CurrentPage.filter(ex2 => !examSheet4CurrentStudentId.includes(ex2.id))) {
-      ex.pagemin = -1;
-      ex.pagemax = -1;
-      await firstValueFrom(this.sheetService.update(ex));
-    }
-
-    // Pour l'étudiant sélectionné. récupère la sheet. Si elle exite, on met à jour les bonnes pages sinon on crée la page.
-
-    const examS4Student = student.examSheets?.filter((ex: IExamSheet) => ex.scanId === this.exam.scanfileId);
-    if (examS4Student !== undefined && examS4Student.length > 0) {
-      for (const ex of examS4Student) {
-        ex.pagemin = currentStudent * this.nbreFeuilleParCopie;
-        ex.pagemax = (currentStudent + 1) * this.nbreFeuilleParCopie - 1;
-        await firstValueFrom(this.sheetService.update(ex));
+      ).body;
+      if (sheets !== null && sheets.length === 1) {
+        await firstValueFrom(this.sheetService.updateStudents(sheets[0].id!, [student.id!]));
+        element.bound = true;
       }
-    } else {
-      const sheet: IExamSheet = {
-        name: uuid(),
-        pagemin: currentStudent * this.nbreFeuilleParCopie,
-        pagemax: (currentStudent + 1) * this.nbreFeuilleParCopie - 1,
-        scanId: this.exam.scanfileId,
-        students: [student],
-      };
-      const e = await firstValueFrom(this.sheetService.create(sheet));
-      student.examSheets?.push(e.body!);
-      await firstValueFrom(this.studentService.update(student));
     }
-    element.bound = true;
   }
 
   async bindAllStudent(element: any): Promise<void> {
@@ -141,6 +125,7 @@ export class AllbindingsComponent implements OnInit {
           await this.bindStudentInternal(s.recognizedStudent, s.currentStudent, s);
         }
       } catch (e) {
+        console.error(e);
         console.error('could not bind ', s.recognizedStudent);
       }
     }

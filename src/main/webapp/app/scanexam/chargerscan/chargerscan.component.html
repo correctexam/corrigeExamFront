@@ -68,7 +68,7 @@
         </ng-container>
       </div>
     </div>
-    <div *ngIf="reloadScan || pageInTemplate === 0 || pageInScan === 0">
+    <div *ngIf="reloadScan || pageInTemplate === 0 || pageAlreadyScan === 0">
       <div class="col-12 md:col-12">
         <!--            <p-toggleButton [(ngModel)]="merge" onLabel="Concatenation" offLabel="Remplacement"></p-toggleButton>-->
         <div class="flex flex-row flex-wrap card-container">
@@ -107,7 +107,7 @@
     </div>
     <jhi-viewandreorderpages
       #viewpage
-      *ngIf="showVignette && !reloadScan && examid && pageInTemplate > 0 && pageInScan > 0"
+      *ngIf="showVignette && !reloadScan && examid && pageInTemplate > 0 && pageAlreadyScan > 0"
       [examId]="+examid!"
     ></jhi-viewandreorderpages>
   </div>

@@ -16,7 +16,7 @@ import { ExamService } from 'app/entities/exam/service/exam.service';
 import { IScan, Scan } from 'app/entities/scan/scan.model';
 // import { AlertError } from 'app/shared/alert/alert-error.model';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { finalize, firstValueFrom, Observable, scan, Subscriber } from 'rxjs';
+import { finalize, firstValueFrom, Observable, scan } from 'rxjs';
 import { ScanService } from '../../entities/scan/service/scan.service';
 import { IExam } from '../../entities/exam/exam.model';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
@@ -27,6 +27,7 @@ import { QuestionService } from 'app/entities/question/service/question.service'
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { PreferenceService } from '../preference-page/preference.service';
 import { ViewandreorderpagesComponent } from '../viewandreorderpages/viewandreorderpages.component';
+import { PromisePool } from '@supercharge/promise-pool';
 
 interface Upload {
   progress: number;
@@ -75,13 +76,14 @@ export class ChargerscanComponent implements OnInit {
   editForm: UntypedFormGroup;
   progress = 0;
   pageInTemplate = 0;
-  pageInScan = 0;
+  pageAlreadyScan = 0;
   message = '';
   reloadScan = false;
   merge = true;
   saveTemplate = true;
-  observablePage: Observable<number> | undefined;
-  observerPage: Subscriber<number> | undefined;
+  loaded = false;
+  //  observablePage: Observable<number> | undefined;
+  //  observerPage: Subscriber<number> | undefined;
 
   @ViewChild('viewpage')
   viewcomponent!: ViewandreorderpagesComponent;
@@ -110,7 +112,6 @@ export class ChargerscanComponent implements OnInit {
   // private editedImage: HTMLCanvasElement | undefined;
   templatePages: Map<number, IPage> = new Map();
   phase1 = false;
-  loaded = false;
   alignement = 'marker';
   alignementOptions = [
     { label: 'Off', value: 'off' },
@@ -187,7 +188,7 @@ export class ChargerscanComponent implements OnInit {
   }
   async init(): Promise<void> {
     const p = await this.db.countNonAlignImage(+this.examid!);
-    this.pageInScan = p;
+    this.pageAlreadyScan = p;
     const templatePage = await this.db.countPageTemplate(+this.examid!);
     this.pageInTemplate = templatePage;
   }
@@ -288,7 +289,11 @@ export class ChargerscanComponent implements OnInit {
   }
 
   protected onSaveSuccess(): void {
-    this.initCacheProcessing(false);
+    if (this.merge) {
+      this.initCacheProcessing(false);
+    } else {
+      this.initCacheProcessing(true);
+    }
     this.reloadScan = false;
     //    this.gotoUE();
   }
@@ -369,22 +374,25 @@ export class ChargerscanComponent implements OnInit {
       }
       const e1 = await firstValueFrom(this.templateService.getPdf(this.exam.templateId));
       this.blob1 = e1;
+      this.loaded = true;
     }
   }
-
+  i = 1;
   public async pdfloaded(): Promise<void> {
-    if (!this.phase1) {
-      this.nbreFeuilleParCopie = this.pdfService.numberOfPages();
-    }
-    this.loaded = true;
-    if (this.phase1) {
-      if (this.pdfService.numberOfPages() !== 0) {
-        // Change if partial update
-        this.numberPagesInScan = this.pdfService.numberOfPages();
-        this.avancementunit = ' / ' + this.numberPagesInScan;
+    if (this.loaded && this.pdfService.numberOfPages() !== 0) {
+      if (!this.phase1) {
+        this.nbreFeuilleParCopie = this.pdfService.numberOfPages();
+        await this.process();
+      } else {
+        if (this.pdfService.numberOfPages() !== 0 && this.i < 20) {
+          // Change if partial update
+          this.numberPagesInScan = this.pdfService.numberOfPages();
+          this.avancementunit = ' / ' + this.numberPagesInScan;
+          await this.process();
+          this.i = this.i + 1;
+        }
       }
     }
-    await this.process();
   }
 
   blob: any;
@@ -405,59 +413,68 @@ export class ChargerscanComponent implements OnInit {
             if (this.blob !== undefined) {
               this.blob1 = this.blob;
             } else {
-              const e1 = await firstValueFrom(this.scanService.getPdf(this.exam.scanfileId));
-              this.blob1 = e1;
+              this.blob1 = await firstValueFrom(this.scanService.getPdf(this.exam.scanfileId));
             }
           }
         }
       }
     } else {
-      this.observablePage = new Observable(observer => {
-        this.observerPage = observer;
-      });
-
-      this.observablePage.subscribe(
-        e => {
-          this.processPage(e, false);
-          //          this.alignPage(e);
-        },
-        err => console.log(err),
-        () => {
-          this.phase1 = false;
-          this.blob = undefined;
-          this.blob1 = undefined;
-          this.blocked = false;
-          this.firstPageToLoad = 0;
-          if (this.viewcomponent !== undefined) {
-            this.viewcomponent.update();
-          } else {
-            this.db.countNonAlignImage(+this.examid!).then(p => {
-              this.db.countPageTemplate(+this.examid!).then(p1 => {
-                this.pageInScan = p;
-                this.pageInTemplate = p1;
-                this.showVignette = true;
-              });
-            });
-          }
-
-          this.progress = 0;
-          this.submessage = '';
-          this.message = '';
-          //          this.saveData();
-        },
-      );
-
       this.startPage = 1;
       this.currentPageAlign = 1;
 
-      while (
-        this.currentPageAlign < this.startPage + ((navigator.hardwareConcurrency - 1) * 3) / 2 &&
-        this.currentPageAlign < this.numberPagesInScan + 1
-      ) {
-        this.observerPage!.next(this.currentPageAlign);
-        this.currentPageAlign = this.currentPageAlign + 1;
+      const pagesnumber: number[] = [];
+      for (let i = 1; i <= this.numberPagesInScan; i++) {
+        pagesnumber.push(i);
       }
+      await PromisePool.for(pagesnumber)
+        .withConcurrency(30)
+        /*        .onTaskStarted((page, pool) => {
+          console.log(`Progress: ${pool.processedPercentage()}%`);
+          console.log(`Active tasks: ${pool.processedItems().length}`);
+          console.log(`Active tasks: ${pool.activeTasksCount()}`);
+          console.log(`Finished tasks: ${pool.processedItems().length}`);
+          console.log(`Finished tasks: ${pool.processedCount()}`);
+        })*/
+        .onTaskFinished((page, pool) => {
+          this.progress = pool.processedPercentage();
+          this.avancement = this.currentPageAlignOver;
+          this.currentPageAlignOver = this.currentPageAlignOver + 1;
+          this.submessage = '' + this.avancement + this.avancementunit;
+        })
+        .process(async page => {
+          console.error('send process', page);
+          await this.processPage(page, false);
+        });
+      //        await Promise.all(this.imagesP);
+      console.error('end of processing');
+      /*        if (this.images1.length>20){
+          await this.db.addNonAligneImages(this.images1);
+          this.images1 = [];
+        }*/
+
+      this.loaded = false;
+      // this.blob = undefined;
+      // this.blob1 = undefined;
+      // this.phase1 = false;
+      this.blocked = false;
+      this.firstPageToLoad = 0;
+      if (this.viewcomponent !== undefined) {
+        this.viewcomponent.update();
+      } else {
+        this.db.countNonAlignImage(+this.examid!).then(p => {
+          this.db.countPageTemplate(+this.examid!).then(p1 => {
+            this.pageAlreadyScan = p;
+            this.pageInTemplate = p1;
+            this.showVignette = true;
+          });
+        });
+      }
+
+      this.progress = 0;
+      this.submessage = '';
+      this.message = '';
     }
+    this.blocked = false;
   }
 
   async saveTemplateImage(pageN: number, imageD: any): Promise<void> {
@@ -475,8 +492,10 @@ export class ChargerscanComponent implements OnInit {
     }
   }
 
+  images1: any[] = [];
+
   async saveNonAligneImage(pageN: number, imageD: any): Promise<void> {
-    await this.db.addNonAligneImage({
+    const im1 = {
       examId: +this.examid!,
       pageNumber: pageN + this.firstPageToLoad,
       value: JSON.stringify(
@@ -485,51 +504,45 @@ export class ChargerscanComponent implements OnInit {
         },
         this.replacer,
       ),
-    });
-    if (this.currentPageAlign < this.numberPagesInScan + 1) {
-      this.observerPage?.next(this.currentPageAlign);
-      this.currentPageAlign = this.currentPageAlign + 1;
-    }
-    if (this.currentPageAlignOver < this.numberPagesInScan) {
-      this.avancement = this.currentPageAlignOver;
-      this.currentPageAlignOver = this.currentPageAlignOver + 1;
-      this.progress = Math.floor((this.avancement * 100) / this.numberPagesInScan);
-      this.submessage = '' + this.avancement + this.avancementunit;
-    } else {
-      this.avancement = this.currentPageAlignOver;
-      this.currentPageAlignOver = this.currentPageAlignOver + 1;
-      this.observerPage?.complete();
-      console.timeEnd('processPage');
-    }
+    };
+    await this.db.addNonAligneImage(im1);
+    /* this.images1.push(im1)
+    if (this.images1.length>20){
+      await this.db.addNonAligneImages(this.images1);
+      this.images1 = [];
+    }*/
   }
 
   gotoUE(): any {
     this.router.navigateByUrl('/exam/' + this.examid!);
   }
 
-  public async processPage(page: number, template: boolean): Promise<number> {
+  //  imagesP: Promise<void>[] = [];
+  public async processPage(page: number, template: boolean): Promise<void> {
+    console.error('process page');
     const scale = { scale: this.scale };
-    if (page === 1 && !template) console.time('processPage');
-    if (page === 1 && !template) console.timeLog('processPage', 'before getDataURL ', page);
+    if (page < 10 && !template) console.time('processPage' + page);
+    if (page < 10 && !template) console.timeLog('processPage' + page, 'before getDataURL ', page);
     const dataURL = await this.pdfService.getPageAsImage(page, scale);
-    if (page === 1 && !template) console.timeLog('processPage', 'getDataURL ', page);
-    const p = await this.saveImageScan(dataURL, page, template);
-    if (page === 1 && !template) console.timeLog('processPage', 'saveImageScan ', page);
-
-    return p + 1;
+    //    this.pdfService.getP
+    if (page < 10 && !template) console.timeLog('processPage' + page, 'getDataURL ', page);
+    await this.saveImageScan(dataURL, page, template);
+    if (page < 10 && !template) console.timeLog('processPage' + page, 'saveImageScan ', page);
   }
 
-  async saveImageScan(file: any, pagen: number, template: boolean): Promise<number> {
-    // await this.saveNonAligneImage(pagen, file);
+  saveImageScan(file: any, pagen: number, template: boolean): Promise<void> {
     return new Promise(resolve => {
       if (pagen === 1 && !template) console.timeLog('processPage', 'start', pagen);
 
       const i = new Image();
       i.onload = async () => {
         if (pagen === 1 && !template) console.timeLog('processPage', 'image Loaded ', pagen);
-        const editedImage = document.createElement('canvas');
-        editedImage.width = i.width;
-        editedImage.height = i.height;
+        const editedImage = new OffscreenCanvas(i.width, i.height);
+
+        // document.createElement('canvas');
+        // document.createOff
+        // editedImage.width = i.width;
+        // editedImage.height = i.height;
         const ctx = editedImage.getContext('2d');
         ctx!.drawImage(i, 0, 0);
         if (pagen === 1 && !template) console.timeLog('processPage', 'draw first canvas ', pagen);
@@ -560,15 +573,22 @@ export class ChargerscanComponent implements OnInit {
           exportImageType = this.preferenceService.getPreference().imageTypeExport;
         }
 
-        const webPImageURL = editedImage.toDataURL(exportImageType, compression);
+        const webPImageBlob = await editedImage.convertToBlob({
+          type: exportImageType,
+          quality: compression,
+        });
+        const webPImageURL = await blobToDataURL(webPImageBlob);
         if (template) {
           await this.saveTemplateImage(pagen, webPImageURL);
+          console.error('save template ' + pagen);
+          resolve();
         } else {
           if (pagen === 1 && !template) console.timeLog('processPage', 'before save ', pagen);
           await this.saveNonAligneImage(pagen, webPImageURL);
+          resolve();
+
           if (pagen === 1 && !template) console.timeLog('processPage', 'after save ', pagen);
         }
-        resolve(pagen);
       };
       i.src = file;
     });
@@ -584,4 +604,18 @@ export class ChargerscanComponent implements OnInit {
       return value;
     }
   }
+}
+
+function blobToDataURL(blob: Blob): Promise<string | ArrayBuffer | null> {
+  return new Promise<string | ArrayBuffer | null>((resolve, reject) => {
+    const a = new FileReader();
+    a.onload = e => {
+      if (e.target !== null) {
+        resolve(e.target.result);
+      } else {
+        reject();
+      }
+    };
+    a.readAsDataURL(blob);
+  });
 }
