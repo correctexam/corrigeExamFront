@@ -450,6 +450,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     if ((this.currentStudent + 1) * this.nbreFeuilleParCopie < this.numberPagesInScan) {
       this.currentStudent = this.currentStudent + 1;
       this.goToStudent(this.currentStudent);
+    } else {
+      this.blocked = false;
     }
   }
 
