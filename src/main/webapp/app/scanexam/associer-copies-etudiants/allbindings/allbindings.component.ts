@@ -82,7 +82,6 @@ export class AllbindingsComponent implements OnInit {
   }
 
   async bindStudentInternal(student: IStudent, currentStudent: number, element: any): Promise<void> {
-    console.error(this.students);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     const examSheet4CurrentStudent1: IExamSheet[] = [...new Set(this.students.flatMap(s => s.recognizedStudent.examSheets!))].filter(
       sh =>
@@ -125,7 +124,6 @@ export class AllbindingsComponent implements OnInit {
           await this.bindStudentInternal(s.recognizedStudent, s.currentStudent, s);
         }
       } catch (e) {
-        console.error(e);
         console.error('could not bind ', s.recognizedStudent);
       }
     }
