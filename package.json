@@ -33,6 +33,7 @@
     "webapp:build:prodgithubpage": "FRONT_URL=https://correctexam.github.io/corrigeExamFront/ SERVER_API_URL=https://api.gradescope.barais.fr/ ng build --configuration production --base-href=/corrigeExamFront/",
     "webapp:build:prodlocal": "FRONT_URL=/ SERVER_API_URL=/ ng build --configuration production",
     "webapp:build:prodnetlify": "FRONT_URL=https://correctexam.netlify.app/ SERVER_API_URL=https://api.gradescope.barais.fr/ ng build --configuration production --base-href=/",
+    "webapp:build:prodcloudfare": "FRONT_URL=https://correctexam.pages.dev/ SERVER_API_URL=https://api.gradescope.barais.fr/ ng build --configuration production --base-href=/",
     "webapp:dev": "FRONT_URL=/ SERVER_API_URL=/ ng serve",
     "webapp:dev-ssl": "ng serve --ssl",
     "webapp:dev-verbose": "ng serve --verbose",
