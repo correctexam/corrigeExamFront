@@ -215,6 +215,19 @@ export class PreferenceService {
     }
   }
 
+  saveCommentSort4Question(examId_qId: string, pref: Map<number, number>): void {
+    this.localStorageService.store('commentsort_' + examId_qId, JSON.stringify(pref, this.replacer));
+  }
+  getCommentSort4Question(examId_qId: string): Map<number, number> {
+    const spref: string | null = this.localStorageService.retrieve('commentsort_' + examId_qId);
+    if (spref === null) {
+      return new Map();
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return JSON.parse(spref, this.reviver);
+    }
+  }
+
   replacer(key: any, value: any): any {
     if (value instanceof Map) {
       return {

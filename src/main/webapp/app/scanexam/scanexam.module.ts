@@ -49,7 +49,6 @@ import { RatingModule } from 'primeng/rating';
 import { GraphicalToolbarCorrectionComponent } from './corrigequestion/toolbar/toolbar.component';
 import { InplaceModule } from 'primeng/inplace';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
-import { ArraySortPipe } from './sort';
 import { SortByDirective } from '../shared/sort/sort-by.directive';
 import { VoirCopieComponent } from './voircopie/voircopie.component';
 import { ResultatStudentcourseComponent } from './resultatstudentcourse/resultatstudentcourse.component';
@@ -94,6 +93,8 @@ import { ViewandreorderpagesComponent } from './viewandreorderpages/viewandreord
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AllbindingsComponent } from './associer-copies-etudiants/allbindings/allbindings.component';
 import { FontsizeSliderComponent } from './corrigequestion/toolbar/fontsize-slider/fontsize-slider.component';
+import { CommentSortPipe } from './sortComment';
+import { ArraySortPipe } from './sort';
 
 // set the location of the OpenCV files
 // registerAllModules();
@@ -460,7 +461,6 @@ export const CompareAnswer_ROUTE: Route = {
     GraphicalToolbarCorrectionComponent,
     VoirCopieComponent,
     ResultatStudentcourseComponent,
-    ArraySortPipe,
     StatsExamComponent,
     VoirReponseComponent,
     VoirReponsesStarUnstarComponent,
@@ -478,6 +478,8 @@ export const CompareAnswer_ROUTE: Route = {
     AllbindingsComponent,
     ColourPaletteComponent,
     FontsizeSliderComponent,
+    CommentSortPipe,
+    ArraySortPipe,
   ],
   imports: [
     CommonModule,
