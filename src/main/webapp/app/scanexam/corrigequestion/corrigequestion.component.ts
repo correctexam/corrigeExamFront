@@ -64,6 +64,7 @@ import { HybridGradedCommentService } from 'app/entities/hybrid-graded-comment/s
 import { Answer2HybridGradedCommentService } from '../../entities/answer-2-hybrid-graded-comment/service/answer-2-hybrid-graded-comment.service';
 import { Inplace } from 'primeng/inplace';
 import { IExamSheet } from 'app/entities/exam-sheet/exam-sheet.model';
+import { OrderList } from 'primeng/orderlist';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -101,6 +102,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   shortcut = true;
   shortcutvalue = true;
   showImageQCM = false;
+  sortCommentVisible = false;
 
   @ViewChildren('nomImage')
   canvass!: QueryList<ElementRef>;
@@ -2356,5 +2358,19 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
       await this.computeNote(true, this.resp!, this.currentQuestion!);
     }
+  }
+
+  selectedComment: (ITextComment | IGradedComment | IHybridGradedComment)[] = [];
+  sortComments(comment: ITextComment | IGradedComment | IHybridGradedComment): void {
+    this.selectedComment = [comment];
+    console.error(this.selectedComment);
+    this.sortCommentVisible = true;
+  }
+  reorderComments(event: any, el: OrderList) {
+    const m: Map<number, number> = new Map();
+    el.value?.forEach((e, index) => {
+      m.set(e.id, index);
+    });
+    this.preferenceService.saveCommentSort4Question(this.examId + '_' + this.currentQuestion!.id!, m);
   }
 }

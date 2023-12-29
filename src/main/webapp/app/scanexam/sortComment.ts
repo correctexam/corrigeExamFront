@@ -7,11 +7,13 @@ import { IHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-
 
 @Pipe({
   name: 'commentsort',
+  pure: false,
 })
 export class CommentSortPipe implements PipeTransform {
   constructor(public preferenceService: PreferenceService) {}
 
-  transform(array: (IHybridGradedComment | ITextComment | IGradedComment)[] | undefined, examId_qId: string): any[] | null {
+  transform(array: (IHybridGradedComment | ITextComment | IGradedComment)[] | undefined, examId: string, qId: number): any[] {
+    const examId_qId = examId + '_' + qId;
     if (array === undefined || !Array.isArray(array) || array.length === 0) {
       return [];
     }
@@ -42,7 +44,7 @@ export class CommentSortPipe implements PipeTransform {
       return r;
     } else {
       array.forEach((e, index) => {
-        m.set(index, e.id!);
+        m.set(e.id!, index);
       });
       this.preferenceService.saveCommentSort4Question(examId_qId, m);
       return array;

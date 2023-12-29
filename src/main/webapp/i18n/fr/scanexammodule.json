@@ -449,6 +449,8 @@
     "hybridcommentGrade": "Note",
     "downloadpdf": "Téléchargement pdfs",
     "stepPage": "Nombre d'images traitées en batch",
-    "stepPageTooltip": "Permet de configurer le nombre d'images traitées en batch avant libération de la mémoire"
+    "stepPageTooltip": "Permet de configurer le nombre d'images traitées en batch avant libération de la mémoire",
+    "sortCommentTooltip": "Fixe un ordre spécifique pour l'affichage des commentaires",
+    "comments": "Commentaires"
   }
 }
