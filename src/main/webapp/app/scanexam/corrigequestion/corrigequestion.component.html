@@ -61,6 +61,104 @@
       ></jhi-questionpropertiesview>
     </div>
   </p-sidebar>
+  <p-sidebar [(visible)]="sortCommentVisible" [modal]="true" position="right">
+    <div
+      *ngIf="sortCommentVisible && currentQuestion && currentQuestion?.gradeType === 'DIRECT' && currentQuestion?.typeAlgoName !== 'QCM'"
+    >
+      <p-orderList
+        [selection]="selectedComment!"
+        #reorderText
+        (onReorder)="reorderComments($event, reorderText)"
+        [value]="currentTextComment4Question! | commentsort: examId! : currentQuestion!.id!"
+        [listStyle]="{ height: '25rem' }"
+        [header]="'scanexam.comments' | translate"
+        [dragdrop]="true"
+      >
+        <ng-template let-comment pTemplate="item">
+          <div class="flex flex-wrap p-2 align-items-center gap-3">
+            <div class="flex-1 nullflex flex-column gap-2">
+              <span class="font-bold">{{ comment.text }}</span>
+              <div class="flex align-items-center gap-2">
+                <span>{{ comment.description }}</span>
+              </div>
+            </div>
+            <!-- <span class="font-bold text-900">{{ '$' + product.price }}</span>-->
+          </div>
+        </ng-template>
+      </p-orderList>
+    </div>
+    <div
+      *ngIf="
+        (sortCommentVisible && currentQuestion && currentQuestion?.gradeType !== 'DIRECT' && currentQuestion?.gradeType !== 'HYBRID') ||
+        currentQuestion?.typeAlgoName === 'QCM'
+      "
+    >
+      <p-orderList
+        [selection]="selectedComment!"
+        #reorderGraded
+        (onReorder)="reorderComments($event, reorderGraded)"
+        [value]="currentGradedComment4Question! | commentsort: examId! : currentQuestion!.id!"
+        [listStyle]="{ height: '25rem' }"
+        [header]="'scanexam.comments' | translate"
+        [dragdrop]="true"
+      >
+        <ng-template let-comment pTemplate="item">
+          <div class="flex flex-wrap p-2 align-items-center gap-3">
+            <div class="flex-1 flex flex-column gap-2">
+              <span class="font-bold">{{ comment.text }}</span>
+              <div class="flex align-items-center gap-2">
+                <span>{{ comment.description }}</span>
+              </div>
+            </div>
+            <BR />
+            <div *ngIf="currentQuestion?.typeAlgoName !== 'QCM'">
+              <span class="font-bold text-900"
+                >(<span *ngIf="currentQuestion && currentQuestion?.gradeType! === 'NEGATIVE'">- </span
+                ><span *ngIf="currentQuestion && currentQuestion?.gradeType! === 'POSITIVE'">+ </span>
+                <span *ngIf="questionStep > 0">{{ comment.grade! / questionStep }}</span>
+                <span *ngIf="questionStep <= 0">{{ comment.grade! }}</span>
+                pt)</span
+              >
+            </div>
+          </div>
+        </ng-template>
+      </p-orderList>
+    </div>
+    <div
+      *ngIf="sortCommentVisible && currentQuestion && currentQuestion?.gradeType === 'HYBRID' && currentQuestion?.typeAlgoName !== 'QCM'"
+    >
+      <p-orderList
+        [selection]="selectedComment!"
+        #reorderHybrid
+        (onReorder)="reorderComments($event, reorderHybrid)"
+        [value]="currentHybridGradedComment4Question! | commentsort: examId! : currentQuestion!.id!"
+        [listStyle]="{ height: '25rem' }"
+        [header]="'scanexam.comments' | translate"
+        [dragdrop]="true"
+      >
+        <ng-template let-comment pTemplate="item">
+          <div class="flex flex-wrap p-2 align-items-center gap-3">
+            <div class="flex-1 flex flex-column gap-2">
+              <span class="font-bold">{{ comment.text }}</span>
+              <div class="flex align-items-center gap-2">
+                <span>{{ comment.description }}</span>
+              </div>
+            </div>
+            <span class="text-900"
+              >(<span *ngIf="comment.grade !== null && comment.grade !== undefined && comment.grade > 0"> + </span> {{ comment.grade }}
+              <span *ngIf="!comment.relative"> pt</span> <span *ngIf="comment.relative"> %</span> )
+              <p-rating
+                *ngIf="comment?.step !== undefined && comment?.step !== null && comment.step! > 1"
+                [stars]="comment.step!"
+                [disabled]="true"
+                [ngModel]="answer2HybridGradedCommentMap.get(comment.id)"
+              ></p-rating>
+            </span>
+          </div>
+        </ng-template>
+      </p-orderList>
+    </div>
+  </p-sidebar>
 
   <p-sidebar [(visible)]="layoutsidebarVisible">
     <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
@@ -482,7 +580,7 @@
 
         <div class="grid" *ngIf="currentQuestion && currentQuestion?.gradeType === 'DIRECT' && currentQuestion?.typeAlgoName !== 'QCM'">
           <div
-            *ngFor="let comment of currentTextComment4Question"
+            *ngFor="let comment of currentTextComment4Question | commentsort: examId! : currentQuestion.id!"
             style="padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 0.2rem; padding-bottom: 0.2rem"
             class="sm:col-3 md:col-3 lg:col-12 xl:col-12"
           >
@@ -532,6 +630,16 @@
                   (click)="editComment(comment)"
                 >
                   <fa-icon icon="edit"></fa-icon>
+                </span>
+                <span class="float-end">&nbsp;&nbsp;</span>
+                <span
+                  class="float-end"
+                  [tooltipPosition]="'left'"
+                  [tooltipZIndex]="'3000'"
+                  [pTooltip]="'scanexam.sortCommentTooltip' | translate"
+                  (click)="sortComments(comment)"
+                >
+                  <fa-icon icon="sort"></fa-icon>
                 </span>
 
                 <div *ngIf="!minimizeComment">
@@ -614,7 +722,7 @@
           "
         >
           <div
-            *ngFor="let comment of currentGradedComment4Question"
+            *ngFor="let comment of currentGradedComment4Question | commentsort: examId! : currentQuestion!.id!"
             style="padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 0.2rem; padding-bottom: 0.2rem"
             class="sm:col-3 md:col-3 lg:col-12 xl:col-12"
           >
@@ -666,6 +774,17 @@
                 >
                   <fa-icon icon="edit"></fa-icon>
                 </span>
+                <span class="float-end">&nbsp;&nbsp;</span>
+                <span
+                  class="float-end"
+                  [tooltipPosition]="'left'"
+                  [tooltipZIndex]="'3000'"
+                  [pTooltip]="'scanexam.sortCommentTooltip' | translate"
+                  (click)="sortComments(comment)"
+                >
+                  <fa-icon icon="sort"></fa-icon>
+                </span>
+
                 <div *ngIf="!minimizeComment">
                   <div *ngIf="currentQuestion?.typeAlgoName === 'QCM'">
                     <h5 class="card-title">{{ comment.text }}</h5>
@@ -786,7 +905,7 @@
         <!-- vue hybrid comment -->
         <div class="grid" *ngIf="currentQuestion && currentQuestion?.gradeType === 'HYBRID' && currentQuestion?.typeAlgoName !== 'QCM'">
           <div
-            *ngFor="let comment of currentHybridGradedComment4Question"
+            *ngFor="let comment of currentHybridGradedComment4Question | commentsort: examId! : currentQuestion.id!"
             style="padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 0.2rem; padding-bottom: 0.2rem"
             class="sm:col-3 md:col-3 lg:col-12 xl:col-12"
           >
@@ -840,6 +959,16 @@
                   (click)="editComment(comment)"
                 >
                   <fa-icon icon="edit"></fa-icon>
+                </span>
+                <span class="float-end">&nbsp;&nbsp;</span>
+                <span
+                  class="float-end"
+                  [tooltipPosition]="'left'"
+                  [tooltipZIndex]="'3000'"
+                  [pTooltip]="'scanexam.sortCommentTooltip' | translate"
+                  (click)="sortComments(comment)"
+                >
+                  <fa-icon icon="sort"></fa-icon>
                 </span>
                 <div *ngIf="!minimizeComment">
                   <div>

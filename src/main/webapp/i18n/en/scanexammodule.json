@@ -445,6 +445,11 @@
     "hybridcommentGrade": "Grade",
     "downloadpdf": "Download pdfs",
     "stepPage": "Number of images processed in batch",
-    "stepPageTooltip": "Used to configure the number of images processed in batch before memory is released"
+    "stepPageTooltip": "Used to configure the number of images processed in batch before memory is released",
+    "sortCommentTooltip": "Sets a specific order for displaying comments",
+    "comments": "Comments",
+    "hybridcommentStepCalcul": "Computation rules",
+    "hybridcommentStepCalculTooltip": "Computation rules  = (number of points for the comment or question percentage) * number of steps affected / maximum possible number of steps",
+    "hybridcommentStepCalculResult": "({{stepValue}}/{{step}} out of {{grade}} {{ptsorprcts}})"
   }
 }
