@@ -1787,7 +1787,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   updateComment($event: any, l: IGradedComment | ITextComment | IHybridGradedComment, graded: boolean, hybrid: boolean): any {
     if (l.id) {
       setTimeout(() => {
-        console.error('set ', l.id);
         this.active.set(l.id!, false);
       }, 30);
     }
@@ -1828,7 +1827,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   closeEditComment(l: IGradedComment | ITextComment | IHybridGradedComment) {
-    console.error('close');
     if (l.id) {
       this.active.set(l.id, false);
     }
@@ -2401,7 +2399,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   selectedComment: (ITextComment | IGradedComment | IHybridGradedComment)[] = [];
   sortComments(comment: ITextComment | IGradedComment | IHybridGradedComment): void {
     this.selectedComment = [comment];
-    console.error(this.selectedComment);
     this.sortCommentVisible = true;
   }
   reorderComments(event: any, el: OrderList) {
