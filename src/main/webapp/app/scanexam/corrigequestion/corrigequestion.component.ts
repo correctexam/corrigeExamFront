@@ -1898,7 +1898,21 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         accept: () => {
           this.retirerTComment(comment).then(() => {
             this.currentTextComment4Question = this.currentTextComment4Question!.filter(e => e.id !== comment.id);
-            this.textCommentService.delete(comment!.id!).subscribe(() => console.log('delete'));
+            this.textCommentService.delete(comment!.id!).subscribe(() => {
+              const m = this.preferenceService.getCommentSort4Question(this.examId + '_' + this.currentQuestion!.id!);
+              if (m.has(comment!.id!)) {
+                const index = m.get(comment!.id!);
+                const m1 = new Map<number, number>();
+                m.forEach((v, k) => {
+                  if (v < index!) {
+                    m1.set(k, v);
+                  } else if (v > index!) {
+                    m1.set(k, v - 1);
+                  }
+                });
+                this.preferenceService.saveCommentSort4Question(this.examId + '_' + this.currentQuestion!.id!, m1);
+              }
+            });
           });
         },
       });
@@ -1914,7 +1928,19 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             this.retirerGComment(comment).then(() => {
               this.currentGradedComment4Question = this.currentGradedComment4Question!.filter(e => e.id !== comment.id);
               this.gradedCommentService.delete(comment!.id!).subscribe(() => {
-                console.log('delete');
+                const m = this.preferenceService.getCommentSort4Question(this.examId + '_' + this.currentQuestion!.id!);
+                if (m.has(comment!.id!)) {
+                  const index = m.get(comment!.id!);
+                  const m1 = new Map<number, number>();
+                  m.forEach((v, k) => {
+                    if (v < index!) {
+                      m1.set(k, v);
+                    } else if (v > index!) {
+                      m1.set(k, v - 1);
+                    }
+                  });
+                  this.preferenceService.saveCommentSort4Question(this.examId + '_' + this.currentQuestion!.id!, m1);
+                }
               });
             });
           },
@@ -1941,7 +1967,19 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               this.computeNote(true, this.resp!, this.currentQuestion!);
             }, 3);
             this.hybridGradedCommentService.delete(comment!.id!).subscribe(() => {
-              console.log('delete');
+              const m = this.preferenceService.getCommentSort4Question(this.examId + '_' + this.currentQuestion!.id!);
+              if (m.has(comment!.id!)) {
+                const index = m.get(comment!.id!);
+                const m1 = new Map<number, number>();
+                m.forEach((v, k) => {
+                  if (v < index!) {
+                    m1.set(k, v);
+                  } else if (v > index!) {
+                    m1.set(k, v - 1);
+                  }
+                });
+                this.preferenceService.saveCommentSort4Question(this.examId + '_' + this.currentQuestion!.id!, m1);
+              }
             });
           },
         });
