@@ -846,8 +846,10 @@ function groupImagePerContoursLength(p: { msg: any; payload: ICluster; uid: stri
   // const criteria = { criteria: cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, maxCount: 100, epsilon: 0.01 };
   const labels = new cv.Mat();
   const centers = new cv.Mat();
-
+  console.error(contourLengths);
   const data = cv.matFromArray(contourLengths.length / 2, 2, cv.CV_32F, contourLengths);
+  //const data = cv.matFromArray(contourLengths.length , 1, cv.CV_32F, contourLengths);
+
   cv.kmeans(data, numClusters, labels, crite, attempts, cv.KMEANS_PP_CENTERS, centers);
   // Exemple : Afficher les résultats du regroupement k-means
 
@@ -855,6 +857,7 @@ function groupImagePerContoursLength(p: { msg: any; payload: ICluster; uid: stri
 
   for (let k = 0; k < numClusters; k++) {
     order.push(centers.data32F[k * 2 + 1]);
+    //    order.push(centers.data32F[k  + 1]);
   }
   order.sort(function (a, b) {
     return a - b;
@@ -862,6 +865,7 @@ function groupImagePerContoursLength(p: { msg: any; payload: ICluster; uid: stri
   let mapping = new Map<number, number>();
   for (let k = 0; k < numClusters; k++) {
     mapping.set((centers.data32F.indexOf(order[k]) - 1) / 2, k);
+    //    mapping.set((centers.data32F.indexOf(order[k]) - 1) , k);
   }
 
   let res: number[] = [];
