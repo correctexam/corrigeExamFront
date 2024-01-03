@@ -442,11 +442,9 @@ export class ChargerscanComponent implements OnInit {
           this.submessage = '' + this.avancement + this.avancementunit;
         })
         .process(async page => {
-          console.error('send process', page);
           await this.processPage(page, false);
         });
       //        await Promise.all(this.imagesP);
-      console.error('end of processing');
       /*        if (this.images1.length>20){
           await this.db.addNonAligneImages(this.images1);
           this.images1 = [];
@@ -519,7 +517,6 @@ export class ChargerscanComponent implements OnInit {
 
   //  imagesP: Promise<void>[] = [];
   public async processPage(page: number, template: boolean): Promise<void> {
-    console.error('process page');
     const scale = { scale: this.scale };
     if (page < 10 && !template) console.time('processPage' + page);
     if (page < 10 && !template) console.timeLog('processPage' + page, 'before getDataURL ', page);
@@ -580,7 +577,6 @@ export class ChargerscanComponent implements OnInit {
         const webPImageURL = await blobToDataURL(webPImageBlob);
         if (template) {
           await this.saveTemplateImage(pagen, webPImageURL);
-          console.error('save template ' + pagen);
           resolve();
         } else {
           if (pagen === 1 && !template) console.timeLog('processPage', 'before save ', pagen);
