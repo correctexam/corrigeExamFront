@@ -349,8 +349,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
       nbrePageToProcess = this.numberPagesInScan - this.startPage + 1;
     }
 
-    console.error(nbrePageToProcess);
-
     let count = Math.floor(nbrePageToProcess / stepPage);
     for (let k = 0; k < count; k++) {
       const pagesnumber: number[] = [];
@@ -392,9 +390,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
       this.initPool();
     }
     const count2 = nbrePageToProcess % stepPage;
-    console.error(count2);
     let count1 = Math.floor(nbrePageToProcess / stepPage);
-    console.error(count1);
     if (count2 > 0) {
       const pagesnumber: number[] = [];
 
@@ -413,7 +409,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
           pagesnumber.push(i);
         }
       }
-      console.error(pagesnumber);
       await PromisePool.for(pagesnumber)
         .withConcurrency(this.nbreCore)
         .process(

@@ -227,7 +227,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
               this.nbreFeuilleParCopie = value[0];
               this.numberPagesInScan = value[1];
               this.exam = value[2].body!;
-              console.error(this.exam);
               console.timeLog('loadpage', 'after countTemplate');
               this.activeIndex = this.currentStudent! * this.nbreFeuilleParCopie!;
               this.factor = 1;

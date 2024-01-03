@@ -236,7 +236,6 @@ export class ExportPdfService {
       // zonegeneratedid = idexam + idsheet + questionnumero+zoneindex
 
       const comms = this.comments.filter(e => e.zonegeneratedid === zoneid);
-      console.error(comms.length);
 
       if (comms.length > 0) {
         const data = comms[0].jsonData!;
