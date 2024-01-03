@@ -809,7 +809,7 @@ function groupImagePerContoursLength(p: { msg: any; payload: ICluster; uid: stri
       //const gray = new cv.Mat();
       //cv.resize(_gray, gray, dsize, 0, 0, cv.INTER_AREA);
 
-      // cv.threshold(gray, gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
+      cv.threshold(gray, gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
 
       // Appliquer Canny Edge Detection
       const edges = new cv.Mat();
