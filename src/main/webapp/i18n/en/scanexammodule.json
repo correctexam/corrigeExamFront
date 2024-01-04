@@ -450,6 +450,11 @@
     "comments": "Comments",
     "hybridcommentStepCalcul": "Computation rules",
     "hybridcommentStepCalculTooltip": "Computation rules  = (number of points for the comment or question percentage) * number of steps affected / maximum possible number of steps",
-    "hybridcommentStepCalculResult": "({{stepValue}}/{{step}} out of {{grade}} {{ptsorprcts}})"
+    "hybridcommentStepCalculResult": "({{stepValue}}/{{step}} out of {{grade}} {{ptsorprcts}})",
+    "algoClustering": "Criteria for the clustering algorithm",
+    "contourLength": "Contour length",
+    "contourLengthAndNbreContour": "Length and number of contours",
+    "contourLengthTooltip": "One-dimensional Kmeans based on contour length",
+    "contourLengthAndNbreContourTooltip": "Two-dimensional Kmeans based on the length of contours and the number of contours with more than three pixels"
   }
 }

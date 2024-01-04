@@ -74,6 +74,31 @@ export function trace(message: any): void {
   postMessage({ msg: { log: message }, uid: '-2' });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function debugImage(imageData: ImageData): void {
+  try {
+    const c = new OffscreenCanvas(imageData.width, imageData.height);
+    const ctx = c.getContext('2d');
+    if (ctx) {
+      ctx.putImageData(imageData, 0, 0);
+      c.convertToBlob().then(blob => {
+        //        const dataUri = new FileReader().readAsDataURL(blob);
+
+        const reader = new FileReader();
+
+        reader.onloadend = function () {
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          const style = `font-size: 300px; background-image: url("${reader.result}"); background-size: contain; background-repeat: no-repeat;`;
+          console.error('%c     ', style);
+        };
+        reader.readAsDataURL(blob);
+      });
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }): void {
   const p1: IQCMOutput = {};
   p1.solutions = [];
@@ -84,7 +109,6 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
   cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
   const res = trouveCases(gray, p.payload.preference);
   // drawRectangle(src,res.cases)
-
   p.payload.pages?.forEach((srcEE, i) => {
     let grayE = new cv.Mat();
     let _srcE = cv.matFromImageData(srcEE.imageInput);
@@ -93,18 +117,64 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
     // You can try more different parameters
     cv.resize(_srcE, srcE, dsize1, 0, 0, cv.INTER_AREA);
 
-    cv.cvtColor(srcE, grayE, cv.COLOR_RGBA2GRAY, 0);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    let mat1 = new cv.Mat(src.rows, src.cols, src.type(), [255, 255, 255, 255]);
+    // debugImage(imageDataFromMat(mat1))
+    // debugImage(imageDataFromMat(srcE))
+    const boundings = res.cases.map((c: any) => cv.boundingRect(c));
+    let casesvideseleves = undefined;
+    if (boundings.length > 0) {
+      const minX = Math.min(...boundings.map((e: any) => e.x));
+      const minY = Math.min(...boundings.map((e: any) => e.y));
+      const maxX = Math.max(...boundings.map((e: any) => e.x + e.width));
+      const maxY = Math.max(...boundings.map((e: any) => e.y + e.height));
+      let dst1 = decoupe(srcE, { x: minX, y: minY }, { w: maxX - minX, h: maxY - minY });
+      let dst4 = new cv.Mat();
+      let dst6 = new cv.Mat();
+      const s = new cv.Scalar(255, 255, 255, 255);
+      // cv.copyMakeBorder(dst1, dst4, minY,srcE.size().height-maxY , minX,srcE.size().width - maxX , cv.BORDER_CONSTANT, s);
+      const bord = Math.min(5, minX, src.size().width - maxX, minY, src.size().height - maxY);
+      cv.copyMakeBorder(dst1, dst4, bord, bord, bord, bord, cv.BORDER_CONSTANT, s);
+      let dst5 = dst4.clone();
+      cv.copyMakeBorder(
+        dst5,
+        dst6,
+        minY - bord,
+        srcE.size().height - maxY - bord,
+        minX - bord,
+        srcE.size().width - maxX - bord,
+        cv.BORDER_CONSTANT,
+        s,
+      );
+
+      cv.cvtColor(dst6, grayE, cv.COLOR_RGBA2GRAY, 0);
+
+      const elevePref = { ...p.payload.preference };
+      elevePref.qcm_epsilon = Math.max(0.05, elevePref.qcm_epsilon);
+      elevePref.qcm_differences_avec_case_blanche = Math.max(0.4, elevePref.qcm_differences_avec_case_blanche);
+      casesvideseleves = trouveCases(grayE, elevePref);
+
+      dst1.delete();
+      dst4.delete();
+      dst5.delete();
+      dst6.delete();
+    }
 
     // eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
-    const casesvideseleves = trouveCases(grayE, p.payload.preference);
     let dstE;
     if (casesvideseleves !== undefined && casesvideseleves.cases !== undefined && casesvideseleves.cases.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const decalage = /* { x: 0, y: 0 }; // */ computeDecallage(casesvideseleves, res);
       dstE = applyTranslation(srcE, decalage);
+      // dstE = srcE
     } else {
       dstE = srcE;
     }
-    let results = analyseStudentSheet(res, src, dstE, p.payload.preference);
+
+    const elevePref = { ...p.payload.preference };
+    elevePref.qcm_differences_avec_case_blanche = Math.max(0.3, elevePref.qcm_differences_avec_case_blanche);
+
+    let results = analyseStudentSheet(res, src, dstE, elevePref);
     let e = imageDataFromMat(dstE);
 
     let solution: string[] = [];
@@ -119,6 +189,7 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
       numero: i,
       solution: solution.join('&'),
     });
+
     grayE.delete();
     srcE.delete();
     _srcE.delete();
@@ -518,6 +589,7 @@ function computeDecallage(casesvideseleves: any, casesvidesexamtemplate: any): a
   return __closest(decalages);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function applyTranslation(src1: any, decalage: any): any {
   let dst = new cv.Mat();
   if (decalage.x !== 0 || decalage.y !== 0) {

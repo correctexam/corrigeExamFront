@@ -229,6 +229,10 @@ export class AlignImagesService {
     const transferable = payload.images.map(image => image.image);
     return this._dispatch('groupImagePerContoursLength', payload, transferable);
   }
+  public groupImagePerContoursLengthAndNbreContours(payload: ICluster): Observable<number[]> {
+    const transferable = payload.images.map(image => image.image);
+    return this._dispatch('groupImagePerContoursLengthAndNbreContours', payload, transferable);
+  }
 
   public prediction(payload: IImagePredictionInput, letter: boolean): Observable<IImagePredictionOutput> {
     if (letter) {

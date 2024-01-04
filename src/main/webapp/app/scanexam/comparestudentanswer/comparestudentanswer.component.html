@@ -90,6 +90,21 @@
       >
       </p-slider>
     </div>
+    <div *ngIf="questionall" style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <div class="flex flex-column gap-3">
+        <label for=""><span jhiTranslate="scanexam.algoClustering"> Algo de clustering : </span></label>
+        <div *ngFor="let algo of algos" class="field-checkbox">
+          <p-radioButton
+            [inputId]="algo.key"
+            name="algo"
+            [value]="algo"
+            [(ngModel)]="selectedAlgo"
+            (onClick)="updateAlgoCluster($event)"
+          ></p-radioButton>
+          <label [for]="algo" class="ml-2"><span [jhiTranslate]="algo.trans" [pTooltip]="algo.transTooltip | translate"></span></label>
+        </div>
+      </div>
+    </div>
     <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <label><span jhiTranslate="scanexam.nbreImagePerLigne"> Nombre de tuile affichée par ligne : </span>({{ nbreColumn }})</label>

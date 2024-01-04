@@ -20,28 +20,6 @@ export class PreferencePageComponent implements OnInit {
 
   value: string = 'indexdb';
 
-  /*
-http://angular-form-builder.surge.sh/
-
-{
-        "qcm_min_width_shape": 10,
-      "qcm_min_height_shape" : 10,
-      "qcm_epsilon" : 0.0145, // 0.03
-      "qcm_differences_avec_case_blanche":0.22,
-  "linelength" : 15,
-  "repairsize" : 3,
-   "dilatesize" : 3,
-   "morphsize" : 3,
-   "drawcontoursizeh" : 4,
-   "drawcontoursizev" : 4,
-   "minCircle": 6,
-   "maxCircle": 20,
-   "numberofpointToMatch": 5,
-   "numberofgoodpointToMatch": 0,
-   "defaultAlignAlgowithMarker" : true
-}
-*/
-
   constructor(
     public ref: DynamicDialogRef,
     public config: DynamicDialogConfig,
