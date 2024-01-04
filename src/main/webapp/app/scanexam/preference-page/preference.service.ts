@@ -24,7 +24,7 @@ export class PreferenceService {
       const defaultvalue: IPreference = {
         qcm_min_width_shape: 10,
         qcm_min_height_shape: 10,
-        qcm_epsilon: 0.0145, // 0.03
+        qcm_epsilon: 0.02, // 0.03
         qcm_differences_avec_case_blanche: 0.1,
         linelength: 15,
         repairsize: 3,
@@ -57,7 +57,7 @@ export class PreferenceService {
     const defaultvalue = {
       qcm_min_width_shape: 10,
       qcm_min_height_shape: 10,
-      qcm_epsilon: 0.0145, // 0.03
+      qcm_epsilon: 0.02, // 0.03
       qcm_differences_avec_case_blanche: 0.1,
       linelength: 15,
       repairsize: 3,

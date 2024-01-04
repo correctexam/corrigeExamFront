@@ -87,6 +87,24 @@ export interface ClusterDTO {
   providers: [ConfirmationService, MessageService],
 })
 export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
+  selectedAlgo: any = {
+    id: 1,
+    name: 'contourLength',
+    trans: 'scanexam.contourLength',
+    key: 'A',
+    transTooltip: 'scanexam.contourLengthTooltip',
+  };
+
+  algos = [
+    this.selectedAlgo,
+    {
+      id: 2,
+      name: 'contourLengthAndNbreContour',
+      trans: 'scanexam.contourLengthAndNbreContour',
+      key: 'B',
+      transTooltip: 'scanexam.contourLengthAndNbreContourTooltip',
+    },
+  ];
   debug = false;
 
   @ViewChildren('nomImage')
@@ -490,7 +508,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     }
   }
 
-  classifyAll(): void {
+  async classifyAll(): Promise<void> {
     this.blocked = true;
 
     const inputImages: IImageCluster[] = [];
@@ -519,21 +537,23 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
       images: inputImages,
       nbrCluster: this.nbreCluster,
     };
-    this.alignImagesService.groupImagePerContoursLength(icluster).subscribe(res => {
-      const _cluster = new Map<number, number[]>();
-      for (let c1 = 0; c1 < this.nbreCluster; c1++) {
-        _cluster.set(c1, []);
-      }
-      this.clusters = _cluster;
-      res.forEach((t, index) => {
-        this.clusters.get(t)?.push(index);
-      });
-
-      this.preferenceService.saveCluster4Question(this.examId + '_' + this.qId, this.clusters);
-      //      this.imageInCluster = res;
-
-      this.reloadImageClassify();
+    const res =
+      this.selectedAlgo.id === 1
+        ? await firstValueFrom(this.alignImagesService.groupImagePerContoursLength(icluster))
+        : await firstValueFrom(this.alignImagesService.groupImagePerContoursLengthAndNbreContours(icluster));
+    const _cluster = new Map<number, number[]>();
+    for (let c1 = 0; c1 < this.nbreCluster; c1++) {
+      _cluster.set(c1, []);
+    }
+    this.clusters = _cluster;
+    res.forEach((t, index) => {
+      this.clusters.get(t)?.push(index);
     });
+
+    this.preferenceService.saveCluster4Question(this.examId + '_' + this.qId, this.clusters);
+    //      this.imageInCluster = res;
+
+    this.reloadImageClassify();
   }
 
   unclassifyAll(): void {
@@ -691,7 +711,14 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   updateNbrCluster(event: any) {
     this.nbreCluster = event.value;
     this.preferenceService.saveNbreCluster(event.value);
+    this.unclassifyAll();
   }
+
+  updateAlgoCluster(event: any) {
+    this.selectedAlgo = event.value;
+    this.unclassifyAll();
+  }
+
   async updateColumnEvent(event: any) {
     await this.updateColumn(event.value);
     this.preferenceService.saveImagePerLine(event.value);

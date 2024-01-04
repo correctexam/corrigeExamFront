@@ -212,7 +212,6 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
       // Step 2 Query Scan in local DB
       this.db.countAlignImage(+this.examId).then(e1 => {
         this.numberPagesInScan = e1;
-
         this.examSheetService
           .query({
             page: 0,

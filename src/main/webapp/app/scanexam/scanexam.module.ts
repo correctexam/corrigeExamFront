@@ -78,6 +78,8 @@ import { TabViewModule } from 'primeng/tabview';
 import { SummaryTemplateComponent } from './annotate-template/summary/summary-template.component';
 import { ComparestudentanswerComponent } from './comparestudentanswer/comparestudentanswer.component';
 import { SplitterModule } from 'primeng/splitter';
+import { RadioButtonModule } from 'primeng/radiobutton';
+
 import { FileUploadModule } from 'primeng/fileupload';
 import { KeyboardShortcutsModule } from 'ng-keyboard-shortcuts';
 import { PlatformModule } from '@angular/cdk/platform';
@@ -517,6 +519,7 @@ export const CompareAnswer_ROUTE: Route = {
     InplaceModule,
     InputTextModule,
     GalleriaModule,
+    RadioButtonModule,
     DynamicDialogModule,
     FileUploadModule,
     PickListModule,

@@ -454,6 +454,11 @@
     "comments": "Commentaires",
     "hybridcommentStepCalcul": "Calcul",
     "hybridcommentStepCalculTooltip": "Calcul = (nombre de points pour le commentaire ou pourcentatage de la question) * nombre de pas affecté(s) / nombre de pas maximum possibles",
-    "hybridcommentStepCalculResult": "({{stepValue}}/{{step}} de {{grade}} {{ptsorprcts}})"
+    "hybridcommentStepCalculResult": "({{stepValue}}/{{step}} de {{grade}} {{ptsorprcts}})",
+    "algoClustering": "Critères pour l'algorithme de clustering",
+    "contourLength": "Longueur des contours",
+    "contourLengthAndNbreContour": "Longueur et nombre de contours",
+    "contourLengthTooltip": "Kmeans à une dimension fondé sur la longueur des contours",
+    "contourLengthAndNbreContourTooltip": "Kmeans à deux dimensions fondé sur la longueur des contours et le nombre de contours de plus de trois pixels"
   }
 }
