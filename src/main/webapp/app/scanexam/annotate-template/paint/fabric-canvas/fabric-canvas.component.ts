@@ -18,7 +18,7 @@ import { PreferenceService } from 'app/scanexam/preference-page/preference.servi
 // const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 //  suppressScrollX: true,
 // };
-// import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer';
+import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer';
 
 export type CustomZone = IZone & { type: DrawingTools };
 
@@ -58,6 +58,7 @@ export class FabricCanvasComponent implements OnInit {
     private pdfViewerService: NgxExtendedPdfViewerService,
   ) {
     //    pdfDefaultOptions.assetsFolder = 'bleeding-edge';
+    pdfDefaultOptions.defaultCacheSize = 100;
   }
 
   public ngOnInit(): void {
@@ -121,7 +122,6 @@ export class FabricCanvasComponent implements OnInit {
       if (this.eventHandler.getCanvasForPage(page) === undefined) {
         this.eventHandler.pages[page].updateCanvas(evt.source);
       }
-
       if (this.zones[page] !== undefined) {
         this.zones[page].forEach(z => {
           switch (z.type) {
@@ -187,10 +187,19 @@ export class FabricCanvasComponent implements OnInit {
   }
 
   goToQuestion(q: Question): void {
-    if (q.zoneDTO?.pageNumber && q.zoneDTO?.yInit && this.eventHandler.pages?.[1]) {
+    if (q.zoneDTO?.pageNumber && q.zoneDTO?.yInit !== undefined && this.eventHandler.pages?.[1]) {
       const p = q.zoneDTO.pageNumber;
-      const y = (q.zoneDTO.yInit * this.eventHandler.pages[1].pageViewer.canvas.clientHeight) / 100000;
+      const y = (q.zoneDTO.yInit! * this.eventHandler.pages[1].pageViewer.canvas.clientHeight) / 100000;
       this.scrollPageandTop(p, y);
+    } else if (q.zoneId !== undefined) {
+      this.zoneService.find(q.zoneId).subscribe(z => {
+        const zoneDTO = z.body;
+        if (zoneDTO?.pageNumber && zoneDTO?.yInit !== undefined && this.eventHandler.pages?.[1]) {
+          const p = zoneDTO.pageNumber;
+          const y = (zoneDTO.yInit! * this.eventHandler.pages[1].pageViewer.canvas.clientHeight) / 100000;
+          this.scrollPageandTop(p, y);
+        }
+      });
     }
   }
   scrollPageandTop(page: number, top: number): void {
@@ -279,9 +288,11 @@ export class FabricCanvasComponent implements OnInit {
 
               this.questionService.create(q).subscribe(resq => {
                 if (resq.body?.id !== undefined) {
-                  this.eventHandler.questions.set(resq.body.id, q);
+                  this.eventHandler.questions.set(resq.body.id, resq.body);
                   this.renderZone(zone);
-                  this.eventHandler.createRedQuestionBox(zone, subq.p);
+                  if (this.eventHandler.pages[subq.p] !== undefined) {
+                    this.eventHandler.createRedQuestionBox(zone, subq.p);
+                  }
                 }
               });
             });
@@ -292,8 +303,10 @@ export class FabricCanvasComponent implements OnInit {
 
   private createZone(rect: Rect, scale: number): IZone {
     const ppc = 37.795275591;
-    const canvas = this.eventHandler.getCanvasForPage(rect.p);
-
+    const canvas =
+      this.eventHandler.getCanvasForPage(rect.p) !== undefined
+        ? this.eventHandler.getCanvasForPage(rect.p)
+        : this.eventHandler.getCanvasForPage(1);
     if (canvas === undefined) {
       return {
         pageNumber: rect.p,
