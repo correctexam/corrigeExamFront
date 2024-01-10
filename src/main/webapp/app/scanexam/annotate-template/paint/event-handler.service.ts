@@ -488,25 +488,26 @@ export class EventHandlerService {
 
   public createRedQuestionBox(zone: IZone, page: number): void {
     const canvas = this.allcanvas.get(page);
-
-    this.translateService.get('scanexam.questionuc1').subscribe((name: string) => {
-      this.questionService.query({ zoneId: zone.id }).subscribe(e => {
-        if (e.body !== null && e.body.length > 0) {
-          const r = this.fabricShapeService.createBoxFromScratch(
-            canvas!,
-            {
-              x: (zone.xInit! * this.pages[page].pageViewer.canvas.clientWidth) / this.coefficient,
-              y: (zone.yInit! * this.pages[page].pageViewer.canvas.clientHeight) / this.coefficient,
-            },
-            (zone.width! * this.pages[page].pageViewer.canvas.clientWidth) / this.coefficient,
-            (zone.height! * this.pages[page].pageViewer.canvas.clientHeight) / this.coefficient,
-            name + String(e.body[0].numero),
-            DrawingColours.GREEN,
-          );
-          this.modelViewpping.set(r.id, zone.id!);
-        }
+    if (canvas !== undefined) {
+      this.translateService.get('scanexam.questionuc1').subscribe((name: string) => {
+        this.questionService.query({ zoneId: zone.id }).subscribe(e => {
+          if (e.body !== null && e.body.length > 0) {
+            const r = this.fabricShapeService.createBoxFromScratch(
+              canvas,
+              {
+                x: (zone.xInit! * this.pages[page].pageViewer.canvas.clientWidth) / this.coefficient,
+                y: (zone.yInit! * this.pages[page].pageViewer.canvas.clientHeight) / this.coefficient,
+              },
+              (zone.width! * this.pages[page].pageViewer.canvas.clientWidth) / this.coefficient,
+              (zone.height! * this.pages[page].pageViewer.canvas.clientHeight) / this.coefficient,
+              name + String(e.body[0].numero),
+              DrawingColours.GREEN,
+            );
+            this.modelViewpping.set(r.id, zone.id!);
+          }
+        });
       });
-    });
+    }
   }
 
   public initPage(page: number, pageViewer: any): void {
