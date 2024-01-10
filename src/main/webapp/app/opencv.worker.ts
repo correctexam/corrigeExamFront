@@ -1430,10 +1430,12 @@ function extractImageNew(
     const bordertopBottom = (28 - dsize.height) / 2;
     const borderleftRight = (28 - dsize.width) / 2;
     cv.resize(dst4, dst2, dsize, 0, 0, cv.INTER_AREA);
-
-    cv.copyMakeBorder(dst2, dst3, bordertopBottom, bordertopBottom, borderleftRight, borderleftRight, cv.BORDER_CONSTANT, s);
+    let dst5 = dst2.clone();
+    cv.copyMakeBorder(dst5, dst3, bordertopBottom, bordertopBottom, borderleftRight, borderleftRight, cv.BORDER_CONSTANT, s);
 
     letters.set(rect, dst3);
+
+    dst5.delete();
     dst4.delete();
     dst2.delete();
     cv.rectangle(invert_final, point1, point2, rectangleColor, 2, cv.LINE_AA, 0);
