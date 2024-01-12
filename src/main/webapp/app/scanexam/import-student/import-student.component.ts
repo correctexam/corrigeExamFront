@@ -2,9 +2,12 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { ICourse } from 'app/entities/course/course.model';
+import { CourseService } from 'app/entities/course/service/course.service';
 import { IStudent } from 'app/entities/student/student.model';
 import FileSaver from 'file-saver';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -32,7 +35,7 @@ export class ImportStudentComponent implements OnInit {
   blocked = false;
   courseid: string | undefined = undefined;
   students: Std[] = [];
-
+  course: ICourse | undefined;
   constructor(
     protected applicationConfigService: ApplicationConfigService,
     private http: HttpClient,
@@ -40,7 +43,9 @@ export class ImportStudentComponent implements OnInit {
     private messageService: MessageService,
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
-    public confirmationService: ConfirmationService
+    public confirmationService: ConfirmationService,
+    private titleService: Title,
+    private courseService: CourseService,
   ) {}
 
   ngOnInit(): void {
@@ -49,6 +54,19 @@ export class ImportStudentComponent implements OnInit {
       if (params.get('courseid') !== null) {
         this.courseid = params.get('courseid')!;
         this.loadEtudiants();
+        this.courseService.find(+params.get('courseid')!).subscribe(
+          e => {
+            this.course = e.body!;
+            this.activatedRoute.data.subscribe(data => {
+              this.translate.get(data['pageTitle'], { courseName: this.course?.name }).subscribe(e1 => {
+                this.titleService.setTitle(e1);
+              });
+            });
+          },
+          () => {
+            this.router.navigateByUrl('/');
+          },
+        );
       }
     });
   }
@@ -82,7 +100,7 @@ export class ImportStudentComponent implements OnInit {
         typeof d.mail === 'string' &&
         d.mail.length > 0 &&
         typeof d.groupe === 'string' &&
-        d.groupe.length > 0
+        d.groupe.length > 0,
     );
     this.dataset.push(...data1);
 
@@ -220,7 +238,7 @@ export class ImportStudentComponent implements OnInit {
             detail: JSON.stringify(err),
           });
         });
-      }
+      },
     );
   }
 

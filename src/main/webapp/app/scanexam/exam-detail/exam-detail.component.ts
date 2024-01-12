@@ -27,6 +27,7 @@ import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { firstValueFrom } from 'rxjs';
 import { PreferenceService } from '../preference-page/preference.service';
 import { IExamSheet } from 'app/entities/exam-sheet/exam-sheet.model';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'jhi-exam-detail',
@@ -82,6 +83,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     private translateService: TranslateService,
     private db: CacheServiceImpl,
     private preferenceService: PreferenceService,
+    private titleService: Title,
   ) {}
   setShowAlignement(v: boolean): void {
     this.showAlignement = v;
@@ -103,6 +105,11 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
         this.examId = params.get('examid')!;
         this.examService.find(+this.examId).subscribe(ex => {
           this.exam = ex.body!;
+          this.activatedRoute.data.subscribe(e => {
+            this.translateService.get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
+              this.titleService.setTitle(e1);
+            });
+          });
 
           this.courseService.find(this.exam.courseId!).subscribe(
             e => (this.course = e.body!),

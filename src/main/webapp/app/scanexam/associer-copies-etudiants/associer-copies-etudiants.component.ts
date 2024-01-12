@@ -32,6 +32,7 @@ import { firstValueFrom } from 'rxjs';
 import { DoPredictionsInputSamePage } from 'app/opencv.worker';
 import { DialogService } from 'primeng/dynamicdialog';
 import { AllbindingsComponent } from './allbindings/allbindings.component';
+import { Title } from '@angular/platform-browser';
 
 export interface IPage {
   image?: ImageData;
@@ -199,6 +200,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     private db: CacheServiceImpl,
     private translateService: TranslateService,
     public dialogService: DialogService,
+    private titleService: Title,
   ) {}
 
   ngOnInit(): void {
@@ -227,6 +229,15 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
               this.nbreFeuilleParCopie = value[0];
               this.numberPagesInScan = value[1];
               this.exam = value[2].body!;
+
+              this.activatedRoute.data.subscribe(e => {
+                this.translateService
+                  .get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName })
+                  .subscribe(e1 => {
+                    this.titleService.setTitle(e1);
+                  });
+              });
+
               console.timeLog('loadpage', 'after countTemplate');
               this.activeIndex = this.currentStudent! * this.nbreFeuilleParCopie!;
               this.factor = 1;

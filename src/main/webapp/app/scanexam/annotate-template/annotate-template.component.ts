@@ -5,6 +5,8 @@ import { IExam } from 'app/entities/exam/exam.model';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { ConfirmationService } from 'primeng/api';
 import { TemplateService } from '../../entities/template/service/template.service';
+import { TranslateService } from '@ngx-translate/core';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'jhi-annotate-template',
@@ -23,6 +25,8 @@ export class AnnotateTemplateComponent implements OnInit {
     private examService: ExamService,
     private templateService: TemplateService,
     private activatedRoute: ActivatedRoute,
+    private translateService: TranslateService,
+    private titleService: Title,
   ) {}
 
   ngOnInit(): void {
@@ -30,10 +34,18 @@ export class AnnotateTemplateComponent implements OnInit {
       if (params.get('examid') !== null) {
         this.examId = params.get('examid')!;
         this.examService.find(+this.examId).subscribe(data => {
-          this.exam = data.body!;
-          this.templateService.getPdf(this.exam.templateId!).subscribe(t => {
-            this.pdf = t;
-          });
+          if (data.body !== null) {
+            this.exam = data.body;
+            this.activatedRoute.data.subscribe(e => {
+              this.translateService.get(e['pageTitle'], { examName: this.exam.name, courseName: this.exam.courseName }).subscribe(e1 => {
+                this.titleService.setTitle(e1);
+              });
+            });
+
+            this.templateService.getPdf(this.exam.templateId!).subscribe(t => {
+              this.pdf = t;
+            });
+          }
         });
       }
     });

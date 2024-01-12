@@ -31,6 +31,7 @@ import { ZoneService } from '../../entities/zone/service/zone.service';
 import { TemplateService } from 'app/entities/template/service/template.service';
 import { ScanService } from 'app/entities/scan/service/scan.service';
 import PromisePool from '@supercharge/promise-pool';
+import { Title } from '@angular/platform-browser';
 
 export interface IPage {
   image?: ArrayBuffer;
@@ -131,6 +132,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     protected zoneService: ZoneService,
     protected templateService: TemplateService,
     protected scanService: ScanService,
+    private titleService: Title,
   ) {}
   setMessage(v: string): void {
     this.message = v;
@@ -153,12 +155,20 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
           this.scale = this.preferenceService.getPreference().pdfscale;
         }
         this.examService.find(+this.examId).subscribe(data => {
-          this.exam = data.body!;
-          this.db.countPageTemplate(+this.examId).then(v => {
-            this.nbreFeuilleParCopie = v;
-            this.checkIfAlreadyAlign();
-            this.loaded = true;
-          });
+          if (data.body !== null) {
+            this.exam = data.body;
+            this.activatedRoute.data.subscribe(e => {
+              this.translateService.get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
+                this.titleService.setTitle(e1);
+              });
+            });
+
+            this.db.countPageTemplate(+this.examId).then(v => {
+              this.nbreFeuilleParCopie = v;
+              this.checkIfAlreadyAlign();
+              this.loaded = true;
+            });
+          }
         });
       }
     });

@@ -9,6 +9,8 @@ import { IQuestion } from 'app/entities/question/question.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
 import { Observable, firstValueFrom } from 'rxjs';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
+import { ExamService } from 'app/entities/exam/service/exam.service';
+import { Title } from '@angular/platform-browser';
 
 // Couleurs à utiliser
 const GRIS = 'rgba(179,181,198,1)';
@@ -90,6 +92,9 @@ export class StatsExamComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
     private router: Router,
+    private examService: ExamService,
+    private titleService: Title,
+
     private db: CacheServiceImpl,
   ) {}
 
@@ -100,6 +105,13 @@ export class StatsExamComponent implements OnInit {
       if (this.examid === '-1') {
         return;
       }
+      this.examService.find(+this.examid).subscribe(ex => {
+        this.activatedRoute.data.subscribe(e => {
+          this.translateService.get(e['pageTitle'], { examName: ex.body?.name, courseName: ex.body?.courseName }).subscribe(e1 => {
+            this.titleService.setTitle(e1);
+          });
+        });
+      });
 
       this.translateService.get('scanexam.noteattribuee').subscribe(() => {
         this.initStudents().then(() => {

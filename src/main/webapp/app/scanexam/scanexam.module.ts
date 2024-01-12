@@ -364,7 +364,7 @@ export const ShowResults_ROUTE: Route = {
   component: ResultatStudentcourseComponent,
   data: {
     authorities: ['ROLE_USER'],
-    pageTitle: 'home.voircopie',
+    pageTitle: 'home.voirresultat',
     documentation: {
       en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-8-sending-feedback-to-students',
       fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-8-envoyer-le-retour-aux-etudiants',

@@ -4,6 +4,8 @@ import { MarkingExamStateDTO, ExamService } from 'app/entities/exam/service/exam
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { HttpClient } from '@angular/common/http';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { TranslateService } from '@ngx-translate/core';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'jhi-marking-summary',
@@ -27,7 +29,9 @@ export class MarkingSummaryComponent implements OnInit {
     private router: Router,
     private db: CacheServiceImpl,
     protected applicationConfigService: ApplicationConfigService,
-    private http: HttpClient
+    private translateService: TranslateService,
+    private titleService: Title,
+    private http: HttpClient,
   ) {}
 
   public ngOnInit(): void {
@@ -41,6 +45,11 @@ export class MarkingSummaryComponent implements OnInit {
           .getExamDetails(this.examId)
           .then(dataExam => {
             this.dataExam = dataExam;
+            this.activatedRoute.data.subscribe(e => {
+              this.translateService.get(e['pageTitle'], { examName: this.dataExam.nameExam }).subscribe(e1 => {
+                this.titleService.setTitle(e1);
+              });
+            });
             // eslint-disable-next-line no-console
             this.questionNumeros = Array.from(new Set(this.dataExam.questions.map(q => q.numero))).sort((n1, n2) => n1 - n2);
           })

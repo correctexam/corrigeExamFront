@@ -23,6 +23,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, scan } from 'rxjs';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { PreferenceService } from '../preference-page/preference.service';
+import { Title } from '@angular/platform-browser';
 
 export interface CacheUploadNotification {
   setMessage(v: string): void;
@@ -77,6 +78,7 @@ export class CoursdetailsComponent implements OnInit {
     private translateService: TranslateService,
     private http: HttpClient,
     private preferenceService: PreferenceService,
+    private titleService: Title,
   ) {}
 
   ngOnInit(): void {
@@ -97,7 +99,14 @@ export class CoursdetailsComponent implements OnInit {
           this.exams = data.body!;
         });
         this.courseService.find(+params.get('courseid')!).subscribe(
-          e => (this.course = e.body!),
+          e => {
+            this.course = e.body!;
+            this.activatedRoute.data.subscribe(data => {
+              this.translateService.get(data['pageTitle'], { courseName: this.course?.name }).subscribe(e1 => {
+                this.titleService.setTitle(e1);
+              });
+            });
+          },
           () => {
             this.router.navigateByUrl('/');
           },
