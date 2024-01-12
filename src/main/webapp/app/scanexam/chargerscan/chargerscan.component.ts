@@ -28,6 +28,7 @@ import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { PreferenceService } from '../preference-page/preference.service';
 import { ViewandreorderpagesComponent } from '../viewandreorderpages/viewandreorderpages.component';
 import { PromisePool } from '@supercharge/promise-pool';
+import { Title } from '@angular/platform-browser';
 
 interface Upload {
   progress: number;
@@ -167,6 +168,7 @@ export class ChargerscanComponent implements OnInit {
     protected zoneService: ZoneService,
     protected preferenceService: PreferenceService,
     protected dataUtils: DataUtils,
+    private titleService: Title,
   ) {
     this.editForm = this.fb.group({
       content: [],
@@ -181,7 +183,12 @@ export class ChargerscanComponent implements OnInit {
         this.init().then(() => {});
         this.examService.find(+this.examid).subscribe(c => {
           this.exam = c.body!;
-          this.exam.scanfileId;
+          // this.exam.scanfileId;
+          this.activatedRoute.data.subscribe(e => {
+            this.translateService.get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
+              this.titleService.setTitle(e1);
+            });
+          });
         });
       }
     });

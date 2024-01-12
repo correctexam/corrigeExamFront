@@ -12,6 +12,8 @@ import { ExamService } from '../../entities/exam/service/exam.service';
 import { TemplateService } from '../../entities/template/service/template.service';
 import { ITemplate, Template } from '../../entities/template/template.model';
 import { HttpResponse } from '@angular/common/http';
+import { TranslateService } from '@ngx-translate/core';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'jhi-creerexam',
@@ -40,6 +42,8 @@ export class CreerexamComponent implements OnInit, AfterViewInit {
     protected examService: ExamService,
     protected templateService: TemplateService,
     private ref: ChangeDetectorRef,
+    private translateService: TranslateService,
+    private titleService: Title,
   ) {
     this.editForm = this.fb.group({
       name: [null, [Validators.required]],
@@ -55,7 +59,14 @@ export class CreerexamComponent implements OnInit, AfterViewInit {
       const id = params.get('courseid');
       if (id !== null) {
         this.courseid = id;
-        this.courseService.find(+this.courseid).subscribe(c => (this.coursName = c.body?.name ?? ''));
+        this.courseService.find(+this.courseid).subscribe(c => {
+          this.coursName = c.body?.name ?? '';
+          this.activatedRoute.data.subscribe(data => {
+            this.translateService.get(data['pageTitle'], { courseName: c.body?.name }).subscribe(e1 => {
+              this.titleService.setTitle(e1);
+            });
+          });
+        });
       }
     });
   }

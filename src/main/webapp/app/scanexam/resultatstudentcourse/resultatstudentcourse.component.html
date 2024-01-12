@@ -117,7 +117,20 @@
           [tooltipPosition]="'top'"
           [tooltipZIndex]="'3000'"
         >
-          <fa-icon [icon]="faEnvelope"></fa-icon>&nbsp;<span jhiTranslate="scanexam.exportexcel">Export Excel</span>
+          <fa-icon [icon]="faFileExcel"></fa-icon>&nbsp;<span jhiTranslate="scanexam.exportexcel">Export Excel</span>
+        </button>
+        <button
+          [disabled]="!this.examid"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="p-button p-button-primary"
+          (click)="exportCSV()"
+          [pTooltip]="'scanexam.exportCSVTooltip' | translate"
+          [tooltipPosition]="'top'"
+          [tooltipZIndex]="'3000'"
+        >
+          <fa-icon [icon]="faFileCsv"></fa-icon>&nbsp;<span jhiTranslate="scanexam.exportcsv">Export CSV</span>
         </button>
 
         <a

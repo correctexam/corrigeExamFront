@@ -12,9 +12,12 @@ import { ConfirmationService } from 'primeng/api';
 import * as FileSaver from 'file-saver';
 import { IExam } from '../../entities/exam/exam.model';
 import { ExamService } from '../../entities/exam/service/exam.service';
-import { faEnvelope, faTemperatureThreeQuarters } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faFileCsv, faFileExcel, faTemperatureThreeQuarters } from '@fortawesome/free-solid-svg-icons';
 import { ExportPdfService } from '../exportanonymoupdf/exportanonymoupdf.service';
 import { firstValueFrom } from 'rxjs';
+import { Title } from '@angular/platform-browser';
+import { mkConfig, generateCsv, download } from 'export-to-csv';
+const csvConfig = mkConfig({ useKeysAsHeaders: true });
 
 @Component({
   selector: 'jhi-resultatstudentcourse',
@@ -37,6 +40,8 @@ export class ResultatStudentcourseComponent implements OnInit {
   exam: IExam | undefined;
 
   faEnvelope = faEnvelope;
+  faFileExcel = faFileExcel;
+  faFileCsv = faFileCsv;
   fatemperaturethreequarters = faTemperatureThreeQuarters;
 
   constructor(
@@ -49,6 +54,7 @@ export class ResultatStudentcourseComponent implements OnInit {
     public confirmationService: ConfirmationService,
     public examService: ExamService,
     public exportPdfService: ExportPdfService,
+    private titleService: Title,
   ) {}
 
   ngOnInit(): void {
@@ -57,9 +63,15 @@ export class ResultatStudentcourseComponent implements OnInit {
         this.examid = params.get('examid')!;
 
         this.examService.find(+this.examid).subscribe(e => {
+          this.exam = e.body!;
+          this.activatedRoute.data.subscribe(data => {
+            this.translate.get(data['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
+              this.titleService.setTitle(e1);
+            });
+          });
+
           this.translate.get('scanexam.mailtemplate').subscribe(data => {
-            this.exam = e.body!;
-            this.mailSubject = this.translate.instant('scanexam.mailsubjecttemplate') + this.exam.name;
+            this.mailSubject = this.translate.instant('scanexam.mailsubjecttemplate') + this.exam?.name;
             this.mailBody = data;
             this.mailabiBody = this.translate.instant('scanexam.mailabitemplate');
           });
@@ -187,8 +199,8 @@ export class ResultatStudentcourseComponent implements OnInit {
         });
 
         this.studentsresult.forEach(res => {
-          if (res['note'] !== undefined) {
-            res['note'] = parseFloat(res['note'].replaceAll(',', '.'));
+          if (res['note'] !== undefined && (typeof res['note'] === 'string' || res['note'] instanceof String)) {
+            res['note'] = parseFloat((res['note'] as any).replaceAll(',', '.'));
           }
           if (res['abi'] !== undefined) {
             res['abi'] = !!res['abi'];
@@ -207,7 +219,12 @@ export class ResultatStudentcourseComponent implements OnInit {
         const worksheet = xlsx.utils.json_to_sheet(this.studentsresult);
         const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
         const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
-        this.saveAsExcelFile(excelBuffer, 'students');
+        let filename = 'students';
+        if (this.exam?.name) {
+          filename = 'students_export-' + this.exam.name + '-' + formatDateTime(new Date());
+        }
+
+        this.saveAsExcelFile(excelBuffer, filename);
       });
     });
   }
@@ -218,6 +235,75 @@ export class ResultatStudentcourseComponent implements OnInit {
     const data: Blob = new Blob([buffer], {
       type: EXCEL_TYPE,
     });
-    FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
+    FileSaver.saveAs(data, fileName + EXCEL_EXTENSION);
   }
+
+  exportCSV(): void {
+    this.loadLibelle().then(() => {
+      let maxQuestion = 0;
+
+      this.studentsresult.forEach(res => {
+        // eslint-disable-next-line no-console
+        for (const key in res.notequestions) {
+          // eslint-disable-next-line no-prototype-builtins
+          if (res.notequestions.hasOwnProperty(key)) {
+            if (+key > maxQuestion) {
+              maxQuestion = +key;
+            }
+          }
+        }
+      });
+      this.studentsresult.forEach(res => {
+        for (let i = 1; i <= maxQuestion; i++) {
+          if (this.libelles[i] !== undefined && this.libelles[i] !== '') {
+            res['Q' + i + ' (' + this.libelles[i] + ')'] = undefined;
+          } else {
+            res['Q' + i] = undefined;
+          }
+        }
+      });
+
+      this.studentsresult.forEach(res => {
+        if (res['note'] !== undefined && (typeof res['note'] === 'string' || res['note'] instanceof String)) {
+          res['note'] = parseFloat((res['note'] as any).replaceAll(',', '.'));
+        }
+        if (res['abi'] !== undefined) {
+          res['abi'] = !!res['abi'];
+        }
+        for (const key in res.notequestions) {
+          // eslint-disable-next-line no-prototype-builtins
+          if (res.notequestions.hasOwnProperty(key)) {
+            if (this.libelles[key] !== undefined && this.libelles[key] !== '') {
+              res['Q' + key + ' (' + this.libelles[key] + ')'] = parseFloat(res.notequestions[key].replaceAll(',', '.'));
+            } else {
+              res['Q' + key] = parseFloat(res.notequestions[key].replaceAll(',', '.'));
+            }
+          }
+        }
+      });
+      const studentsresult = JSON.parse(JSON.stringify(this.studentsresult));
+      studentsresult.forEach((e: any) => delete e.notequestions);
+      //        delete this.studentsresult.notequestions
+      const csv = generateCsv(csvConfig)(studentsresult);
+      if (this.exam?.name) {
+        csvConfig.filename = 'students_export-' + this.exam.name + '-' + formatDateTime(new Date());
+      }
+      // Get the button in your HTML
+      download(csvConfig)(csv);
+    });
+  }
+}
+
+function formatDate(date: Date): string {
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+}
+function formatDateTime(date: Date): string {
+  const formattedDate = formatDate(date); // Reuse formatDate function
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const seconds = date.getSeconds().toString().padStart(2, '0');
+  return `${formattedDate} ${hours}:${minutes}:${seconds}`;
 }

@@ -65,6 +65,7 @@ import { Answer2HybridGradedCommentService } from '../../entities/answer-2-hybri
 import { Inplace } from 'primeng/inplace';
 import { IExamSheet } from 'app/entities/exam-sheet/exam-sheet.model';
 import { OrderList } from 'primeng/orderlist';
+import { Title } from '@angular/platform-browser';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -214,6 +215,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     private zone: NgZone,
     private keyboardShortcutService: KeyboardShortcutService,
     private applicationConfigService: ApplicationConfigService,
+    private titleService: Title,
   ) {}
 
   ngOnInit(): void {
@@ -264,6 +266,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.numberPagesInScan = await this.db.countAlignImage(+this.examId!);
           const data = await firstValueFrom(this.examService.find(+this.examId!));
           this.exam = data.body!;
+          this.activatedRoute.data.subscribe(e => {
+            this.translateService.get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
+              this.titleService.setTitle(e1);
+            });
+          });
+
           const b = await firstValueFrom(this.questionService.query({ examId: this.exam!.id }));
           this.questionNumeros = Array.from(new Set(b.body!.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
           this.nbreQuestions = this.questionNumeros.length;
