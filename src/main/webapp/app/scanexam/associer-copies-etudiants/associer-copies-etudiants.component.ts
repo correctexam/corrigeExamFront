@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 /* eslint-disable @typescript-eslint/member-ordering */
@@ -6,7 +7,7 @@
 /* eslint-disable no-console */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { AfterViewInit, Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnInit, ViewChild, effect, signal } from '@angular/core';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ZoneService } from '../../entities/zone/service/zone.service';
 import { CourseService } from 'app/entities/course/service/course.service';
@@ -81,7 +82,12 @@ interface PredictResult {
 })
 export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   @ViewChild('list')
-  list!: Listbox;
+  list: Listbox | undefined;
+  set _list(l: Listbox | undefined) {}
+  get _list(): Listbox | undefined {
+    return this.list;
+  }
+
   faHouseSignal = faHouseSignal;
   blocked = false;
   examId = '';
@@ -125,12 +131,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   students: IStudent[] = [];
   assisted = true;
   baseTemplate = true;
-  studentsOptions: () => SelectItem[] = () => this.getStudentOptions();
+  studentsOptions: SelectItem[] = this.getStudentOptions();
 
   getStudentOptions(): SelectItem[] {
-    if (this.list?._options !== undefined && this.list._options!.length > 0) {
-      this.filterLocalStudentList();
-    }
     return this.students.map(student => ({
       value: student,
       label: student.name + ' - ' + student.firstname + ' - (' + student.ine + ')',
@@ -201,7 +204,16 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     private translateService: TranslateService,
     public dialogService: DialogService,
     private titleService: Title,
-  ) {}
+  ) {
+    effect(
+      () => {
+        if (this._list?._options().length > 0) {
+          this.refreshLocalStudentList();
+        }
+      },
+      { allowSignalWrites: true },
+    );
+  }
 
   ngOnInit(): void {
     this.filterbindstudent = this.preferenceService.getFilterStudentPreference();
@@ -262,6 +274,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
           this.currentStudent = +params.get('currentStudent')! - 1;
           this.activeIndex = this.currentStudent! * this.nbreFeuilleParCopie!;
           this.getFilterStudent();
+          this.filterLocalStudentList();
           this.loadImage().then(() => {
             this.blocked = false;
             console.timeEnd('loadpagesameexam');
@@ -312,7 +325,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       if (res[0].nameImage) {
         this.nameImageImg = this.imagedata_to_image(res[0].nameImage);
       }
-      //      console.error(res[0]);
       if (this.debug && res[0].nameImageDebug) {
         this.nameImageImgDebug = this.imagedata_to_image(res[0].nameImageDebug);
       }
@@ -456,7 +468,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   @HostListener('window:keydown.control.Enter', ['$event'])
   async selectRecogniezStudent(): Promise<void> {
     this.selectionStudents = [this.recognizedStudent];
-    await this.bindStudent();
+    await this.bindStudent(this.selectionStudents);
     if ((this.currentStudent + 1) * this.nbreFeuilleParCopie < this.numberPagesInScan) {
       this.currentStudent = this.currentStudent + 1;
       this.goToStudent(this.currentStudent);
@@ -466,23 +478,22 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   }
 
   selectedColor(item: any): string {
-    const list = this.list._options!.filter(
-      s =>
+    const list = this.list?._options!().filter(
+      (s: any) =>
         s.value.examSheets === null ||
         s.value.examSheets!.length === 0 ||
         !s.value.examSheets?.some((ex: any) => ex?.scanId === this.exam.scanfileId) ||
         s.value.examSheets?.some((ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === -1 && ex?.pagemax === -1),
     );
-    const list1 = this.list._options!.filter(
-      s =>
-        s.value.examSheets?.some(
-          (ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie,
-        ),
+    const list1 = this.list?._options!().filter((s: any) =>
+      s.value.examSheets?.some(
+        (ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie,
+      ),
     );
 
-    if (list.filter(e => e.label === item.label).length >= 1) {
+    if (list !== undefined && list.filter((e: any) => e.label === item.label).length >= 1) {
       return 'text-green-400';
-    } else if (list1.filter(e => e.label === item.label).length >= 1) {
+    } else if (list1 !== undefined && list1.filter((e: any) => e.label === item.label).length >= 1) {
       return '';
     } else {
       return 'text-red-400';
@@ -490,8 +501,10 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   }
 
   goToStudent(i: number): void {
-    this.list._filterValue = '';
-    this.list._filteredOptions = this.list._options;
+    if (this.list !== undefined) {
+      this.list._filterValue = signal('');
+      //      this.list._filteredOptions = this.list._options();
+    }
 
     if (i * this.nbreFeuilleParCopie < this.numberPagesInScan) {
       this.router.navigateByUrl('studentbindings/' + this.examId + '/' + (i + 1));
@@ -537,14 +550,15 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     this.blocked = true;
     const studentsbody = await firstValueFrom(this.studentService.query({ courseId: this.exam.courseId }));
     this.students = studentsbody.body!;
-    this.refreshLocalStudentList();
-    //    this.blocked = false;
+    this.studentsOptions = this.getStudentOptions();
   }
 
   filterLocalStudentList(): void {
-    if (this.filterbindstudent) {
-      this.list._filteredOptions = this.list._options!.filter(
-        s =>
+    if (this.filterbindstudent && this.list !== undefined) {
+      const l1 = this.getStudentOptions();
+
+      const l = l1.filter(
+        (s: any) =>
           s.value.examSheets === null ||
           s.value.examSheets!.length === 0 ||
           !s.value.examSheets?.some((ex: any) => ex?.scanId === this.exam.scanfileId) ||
@@ -553,14 +567,30 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
             (ex: any) => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie,
           ),
       );
+      if (
+        l.length !== this.list?._options!().length ||
+        (l.length > 0 && this.list?._options!().length > 0 && this.list?._options!()[0].value.id !== l[0].value.id)
+      ) {
+        this.list?._options.set(l);
+      }
     } else {
       // this.list._filterValue = '';
-      this.list._filteredOptions = this.list._options;
+
+      if (this.list !== undefined) {
+        const l = this.getStudentOptions();
+        if (l.length !== this.list?._options!().length) {
+          this.list?._options.set(l);
+        }
+
+        //        this.list._filteredOptions = this.list._options();
+      }
     }
   }
 
   refreshLocalStudentList(): void {
-    this.list._filterValue = '';
+    if (this.list !== undefined) {
+      this.list._filterValue.set('');
+    }
 
     this.preferenceService.saveFilterStudentPreference(this.filterbindstudent);
     this.filterLocalStudentList();
@@ -570,8 +600,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   }
 
   getFilterStudent(): void {
-    const filterStudent = this.students.filter(
-      s => s.examSheets?.some(ex => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie),
+    const filterStudent = this.students.filter(s =>
+      s.examSheets?.some(ex => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie),
     );
     this.selectionStudents = filterStudent;
     const freeStudent = this.students.filter(
@@ -591,7 +621,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     this.blocked = true;
     this.selectionStudents = [event];
 
-    await this.bindStudent();
+    await this.bindStudent(this.selectionStudents);
     if ((this.currentStudent + 1) * this.nbreFeuilleParCopie < this.numberPagesInScan) {
       this.currentStudent = this.currentStudent + 1;
       this.blocked = false;
@@ -601,27 +631,29 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       this.blocked = false;
     }
   }
-  async bindStudentOnClick(): Promise<void> {
+  async bindStudentOnClick(event: any): Promise<void> {
+    this.selectionStudents = event;
     this.blocked = true;
-    await this.bindStudent();
+    await this.bindStudent(event);
     this.blocked = false;
   }
 
-  async bindStudent(): Promise<void> {
+  async bindStudent(selectionStudents: IStudent[]): Promise<void> {
     const examSheet4CurrentStudent1: IExamSheet[] = [...new Set(this.students.flatMap(s => s.examSheets!))].filter(
       sh =>
         sh.pagemin === this.currentStudent * this.nbreFeuilleParCopie &&
         sh.pagemax === (this.currentStudent + 1) * this.nbreFeuilleParCopie - 1 &&
         sh.scanId === this.exam.scanfileId,
     );
+
     // ExamSheetExist
     if (examSheet4CurrentStudent1.length === 1) {
       const sheet = examSheet4CurrentStudent1[0];
-      sheet.students = this.selectionStudents;
+      sheet.students = selectionStudents;
       await firstValueFrom(
         this.examsheetService.updateStudents(
           sheet.id!,
-          this.selectionStudents.map(e => e.id as number),
+          selectionStudents.map(e => e.id as number),
         ),
       );
     } else if (examSheet4CurrentStudent1.length > 1) {
@@ -646,7 +678,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
         await firstValueFrom(
           this.examsheetService.updateStudents(
             sheets[0].id!,
-            this.selectionStudents.map(e => e.id as number),
+            selectionStudents.map(e => e.id as number),
           ),
         );
       } else {

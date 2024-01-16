@@ -239,14 +239,14 @@
       <!-- (onClick)="bindStudent()"-->
       <p-listbox
         #list
-        [options]="studentsOptions()"
+        [options]="studentsOptions"
         [(ngModel)]="selectionStudents"
         [filter]="true"
         [multiple]="true"
         [optionLabel]="'label'"
         [metaKeySelection]="true"
         [optionValue]="'value'"
-        (onClick)="bindStudentOnClick()"
+        (ngModelChange)="bindStudentOnClick($event)"
       >
         <ng-template let-table pTemplate="item">
           <div class="col-12" style="width: '100%'">
