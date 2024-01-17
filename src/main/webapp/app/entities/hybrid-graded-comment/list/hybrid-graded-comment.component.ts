@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, Data, ParamMap, Router } from '@angular/router';
 import { combineLatest, filter, Observable, switchMap, tap } from 'rxjs';
@@ -42,6 +42,7 @@ export class HybridGradedCommentComponent implements OnInit {
     public router: Router,
     protected dataUtils: DataUtils,
     protected modalService: NgbModal,
+    private zone: NgZone,
   ) {}
 
   trackId = (_index: number, item: IHybridGradedComment): number => this.hybridGradedCommentService.getHybridGradedCommentIdentifier(item);
@@ -136,10 +137,11 @@ export class HybridGradedCommentComponent implements OnInit {
       size: this.itemsPerPage,
       sort: this.getSortQueryParam(predicate, ascending),
     };
-
-    this.router.navigate(['./'], {
-      relativeTo: this.activatedRoute,
-      queryParams: queryParamsObj,
+    this.zone.run(() => {
+      this.router.navigate(['./'], {
+        relativeTo: this.activatedRoute,
+        queryParams: queryParamsObj,
+      });
     });
   }
 
