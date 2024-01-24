@@ -1,22 +1,27 @@
 <div *ngIf="examId === -1">{{ 'scanexam.errorExamId' | translate }}</div>
 <div *ngIf="errorMsg !== undefined">{{ errorMsg | translate }}</div>
 <div *ngIf="examId !== -1 && errorMsg === undefined">
-  <h1>
-    {{ 'scanexam.titleSummary' | translate }} {{ dataExam.nameExam }}
-    <button
-      *jhiHasAnyAuthority="'ROLE_ADMIN'"
-      type="submit"
-      class="p-button"
-      (click)="cleanSheet()"
-      [pTooltip]="'scanexam.cleanSheetTooltip' | translate"
-    >
-      <fa-icon icon="trash-alt"></fa-icon>&nbsp;<span jhiTranslate="scanexam.cleanSheet"></span>
-    </button>
-
-    <button type="submit" class="p-button p-button-primary" (click)="goToExam()">
-      <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam"></span>
-    </button>
-  </h1>
+  <div class="grid">
+    <div class="col-8">
+      <h1>
+        {{ 'scanexam.titleSummary' | translate }} {{ dataExam.nameExam }}
+        <button
+          *jhiHasAnyAuthority="'ROLE_ADMIN'"
+          type="submit"
+          class="p-button"
+          (click)="cleanSheet()"
+          [pTooltip]="'scanexam.cleanSheetTooltip' | translate"
+        >
+          <fa-icon icon="trash-alt"></fa-icon>&nbsp;<span jhiTranslate="scanexam.cleanSheet"></span>
+        </button>
+      </h1>
+    </div>
+    <div class="col-4">
+      <button type="submit" class="p-button p-button-primary" (click)="goToExam()">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam"></span>
+      </button>
+    </div>
+  </div>
   <br />
 
   <p-tabView>
