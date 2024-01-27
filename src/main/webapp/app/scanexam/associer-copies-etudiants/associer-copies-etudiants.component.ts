@@ -7,7 +7,7 @@
 /* eslint-disable no-console */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { AfterViewInit, Component, HostListener, OnInit, ViewChild, effect, signal } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnInit, ViewChild, effect } from '@angular/core';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ZoneService } from '../../entities/zone/service/zone.service';
 import { CourseService } from 'app/entities/course/service/course.service';
@@ -502,7 +502,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
 
   goToStudent(i: number): void {
     if (this.list !== undefined) {
-      this.list._filterValue = signal('');
+      this.list._filterValue.set('');
       //      this.list._filteredOptions = this.list._options();
     }
 
