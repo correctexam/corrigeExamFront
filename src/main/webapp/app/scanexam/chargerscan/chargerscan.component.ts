@@ -443,7 +443,7 @@ export class ChargerscanComponent implements OnInit {
           console.log(`Finished tasks: ${pool.processedCount()}`);
         })*/
         .onTaskFinished((page, pool) => {
-          this.progress = pool.processedPercentage();
+          this.progress = Math.round(pool.processedPercentage() * 10) / 10;
           this.avancement = this.currentPageAlignOver;
           this.currentPageAlignOver = this.currentPageAlignOver + 1;
           this.submessage = '' + this.avancement + this.avancementunit;
@@ -461,7 +461,7 @@ export class ChargerscanComponent implements OnInit {
       // this.blob = undefined;
       // this.blob1 = undefined;
       // this.phase1 = false;
-      this.blocked = false;
+      //      this.blocked = false;
       this.firstPageToLoad = 0;
       if (this.viewcomponent !== undefined) {
         this.viewcomponent.update();
