@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1706425801859,
+  "timestamp": 1706431828489,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -32,7 +32,7 @@
         "/581.efc038ad24c7830a.js",
         "/648.fe35019bb2613f21.js",
         "/654.e0a57901c7dcb5f7.js",
-        "/672.e5a5cc198cd5f950.js",
+        "/672.543f10b0c3576717.js",
         "/675.c08325c39bf42a44.js",
         "/737.91dd9385d1ff3ef1.js",
         "/797.d1f70c621848dd3a.js",
@@ -52,7 +52,7 @@
         "/main.32752d184e260c21.js",
         "/manifest.webapp",
         "/polyfills.60d9a832d57e0e9d.js",
-        "/runtime.1760f91d9a257808.js",
+        "/runtime.3cbeb85b86ff9dc8.js",
         "/scripts.001ad3870afff7e2.js",
         "/styles.134227bf3758ac00.css"
       ],
@@ -561,7 +561,7 @@
     "/581.efc038ad24c7830a.js": "22b667d7360c99635e8331ba7868f6a285d8c5db",
     "/648.fe35019bb2613f21.js": "2e113efbaccab1444b65698e94fa08aefde892cc",
     "/654.e0a57901c7dcb5f7.js": "b4736bad7be57133d51b981983103fa6be8c752b",
-    "/672.e5a5cc198cd5f950.js": "d38fca1012c57bf132941bcf588b18cc88edf095",
+    "/672.543f10b0c3576717.js": "51f0aec63b2a20dfe5b6d6ebbc173e6aedf4f870",
     "/675.c08325c39bf42a44.js": "6bfab9fc4754af3a244f0e03e05e5fe7feeeaa91",
     "/737.91dd9385d1ff3ef1.js": "ff2eff96ef54ef155a17a1e710308917746d0f10",
     "/797.d1f70c621848dd3a.js": "af5c20b7a3fe89d60ca6ddac22b2c2f2e73b909f",
@@ -1037,7 +1037,7 @@
     "/content/tfjs/wasm-out/tfjs-backend-wasm.worker.js": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
     "/favicon.ico": "69547cd4a95b59ac7e6818b6eb82befa061d0c16",
     "/hue.8b1818380241e6ac.png": "f81ae627637a684614aa726e206c73ce099a01fd",
-    "/index.html": "b8fcd3513ea4c7199e9278058728b4f8cc0bedd6",
+    "/index.html": "2042da99d81fc2f4369b81908434e9ece53a3c52",
     "/jhipster_family_member_3.87663f884fcea614.svg": "0690f4141a25d739ed9429b0b315cc94196a3644",
     "/logo-jhipster.6125d9b31ded8344.png": "e1e46028ec092ca351425b07707fcdd52146b0b3",
     "/main.32752d184e260c21.js": "bd56ce99f6309aae91353f1bed4ead4e2c59b100",
@@ -1048,7 +1048,7 @@
     "/primeicons.ba3f916dfb64be8c.woff2": "55a4b2a5f02e362405d8d874903af0b5f6a6c15d",
     "/primeicons.f8b9e8a4e401b603.woff": "b1648b50be13350fde8b5d9a6fe78354ddcc43e4",
     "/primeicons.ffecb2549ad1765a.eot": "e4df2355c405cd38aada36eda9015a810feab94c",
-    "/runtime.1760f91d9a257808.js": "c558ef445e0f6759984ff52a8fef1ec23ca0f0a0",
+    "/runtime.3cbeb85b86ff9dc8.js": "253c97b1a3052115de0d15bd9975fb9711e1a74f",
     "/scholar.1dee195c875f84af.svg": "f209bee39d583876623062129b455355884a53d0",
     "/scripts.001ad3870afff7e2.js": "471ef50d3c5766abca577255eec439885ae6c999",
     "/styles.134227bf3758ac00.css": "0162552e17dfef650b57d3a985fe31fe281aea7f"
