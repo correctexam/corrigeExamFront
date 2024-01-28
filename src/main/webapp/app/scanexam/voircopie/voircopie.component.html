@@ -128,19 +128,19 @@
       <div class="col-12 sm:col-12 md:col-12 lg:col-3 xl:col-2">
         <div class="grid grid-nogutter">
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
-            <ng-container *ngIf="questions && questions.length > 0 && questions[0].gradeType !== 'HYBRID'">
-              <p-rating [disabled]="true" *ngIf="noteSteps > 0" [stars]="noteSteps" [(ngModel)]="currentNote"></p-rating>
-            </ng-container>
             <span jhiTranslate="scanexam.noteattribuee">Note attribuée :</span>
-            <span *ngIf="questionStep > 0 && questions && questions.length > 0 && questions[0].gradeType !== 'HYBRID'">{{
+            <span *ngIf="questionStep > 0 && questions && questions.length > 0 && questions[0].gradeType !== 'HYBRID' && resp">{{
               currentNote / questionStep
             }}</span>
-            <span *ngIf="questionStep <= 0 && questions && questions.length > 0 && questions[0].gradeType !== 'HYBRID'">{{
+            <span *ngIf="questionStep <= 0 && questions && questions.length > 0 && questions[0].gradeType !== 'HYBRID' && resp">{{
               currentNote
             }}</span>
             <span *ngIf="questions && questions.length > 0 && questions[0].gradeType === 'HYBRID' && resp">{{
               resp!.note! / 100 | number: '1.0-2'
             }}</span>
+            <span *ngIf="questions && questions.length > 0 && resp"> / {{ questions[0].point }} </span>
+            <span *ngIf="resp === undefined" jhiTranslate="scanexam.noneval">Non évalué</span>
+
             <!--  <p-button icon="pi pi-refresh"></p-button>-->
           </div>
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
@@ -191,11 +191,11 @@
                 <h5 class="card-title">{{ comment.text }}</h5>
                 <p class="card-text">{{ comment.description }}</p>
                 <p *ngIf="comment.step && comment.step === 1">
-                  <span *ngIf="comment.grade !== null && comment.grade !== undefined && comment.grade > 0"> + </span> {{ comment.grade }}
+                  <span *ngIf="comment.grade !== null && comment.grade !== undefined && comment.grade >= 0"> + </span> {{ comment.grade }}
                   <span *ngIf="!comment.relative"> pt</span> <span *ngIf="comment.relative"> %</span>
                 </p>
                 <p *ngIf="comment.step && comment.step > 1">
-                  <span *ngIf="comment.grade !== null && comment.grade !== undefined && comment.grade > 0"> + </span>
+                  <span *ngIf="comment.grade !== null && comment.grade !== undefined && comment.grade >= 0"> + </span>
                   {{ (comment.grade! * comment.stepValue!) / comment.step! | number: '0.0-2' }} <span *ngIf="!comment.relative"> pt</span>
                   <span *ngIf="comment.relative"> %</span>
                   <BR />
