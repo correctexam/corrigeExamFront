@@ -462,6 +462,10 @@
     "contourLengthAndNbreContour": "Longueur et nombre de contours",
     "contourLengthTooltip": "Kmeans à une dimension fondé sur la longueur des contours",
     "contourLengthAndNbreContourTooltip": "Kmeans à deux dimensions fondé sur la longueur des contours et le nombre de contours de plus de trois pixels",
-    "abiabj": "Absence justifiée"
+    "abiabj": "Absence justifiée",
+    "exportCsv": "Exporter les notes du module au format CSV",
+    "exportExcel": "Exporter les notes du module au format Excel",
+    "exportCsvdetail": "Exporter les notes de tous les examens du module au format CSV",
+    "exportExceldetail": "Exporter les notes de tous les examens du module au format Excel (avec les détails pour chaque exam)"
   }
 }

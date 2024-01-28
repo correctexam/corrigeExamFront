@@ -9,15 +9,13 @@ import { TranslateService } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { MessageService } from 'primeng/api';
 import { ConfirmationService } from 'primeng/api';
-import * as FileSaver from 'file-saver';
 import { IExam } from '../../entities/exam/exam.model';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { faEnvelope, faFileCsv, faFileExcel, faTemperatureThreeQuarters } from '@fortawesome/free-solid-svg-icons';
 import { ExportPdfService } from '../exportanonymoupdf/exportanonymoupdf.service';
 import { firstValueFrom } from 'rxjs';
 import { Title } from '@angular/platform-browser';
-import { mkConfig, generateCsv, download } from 'export-to-csv';
-const csvConfig = mkConfig({ useKeysAsHeaders: true });
+import { ExportResultService, formatDateTime } from '../exportresult.service';
 
 @Component({
   selector: 'jhi-resultatstudentcourse',
@@ -54,6 +52,7 @@ export class ResultatStudentcourseComponent implements OnInit {
     public confirmationService: ConfirmationService,
     public examService: ExamService,
     public exportPdfService: ExportPdfService,
+    public exportResultService: ExportResultService,
     private titleService: Title,
   ) {}
 
@@ -176,141 +175,19 @@ export class ResultatStudentcourseComponent implements OnInit {
 
   exportExcel(): void {
     const studentsresult: any[] = JSON.parse(JSON.stringify(this.studentsresult));
-
+    const filename = this.exam?.name ? 'students_export-' + this.exam.name + '-' + formatDateTime(new Date()) : 'students';
     this.loadLibelle().then(() => {
-      import('xlsx').then(xlsx => {
-        let maxQuestion = 0;
-        studentsresult.forEach(res => {
-          // eslint-disable-next-line no-console
-          for (const key in res.notequestions) {
-            // eslint-disable-next-line no-prototype-builtins
-            if (res.notequestions.hasOwnProperty(key)) {
-              if (+key > maxQuestion) {
-                maxQuestion = +key;
-              }
-            }
-          }
-        });
-        studentsresult.forEach(res => {
-          for (let i = 1; i <= maxQuestion; i++) {
-            if (this.libelles[i] !== undefined && this.libelles[i] !== '') {
-              res['Q' + i + ' (' + this.libelles[i] + ')'] = undefined;
-            } else {
-              res['Q' + i] = undefined;
-            }
-          }
-        });
-
-        studentsresult.forEach(res => {
-          if (res['note'] !== undefined && (typeof res['note'] === 'string' || res['note'] instanceof String)) {
-            res['note'] = parseFloat((res['note'] as any).replaceAll(',', '.'));
-          }
-          if (res['abi'] !== undefined) {
-            if (res['abi'] === 1) {
-              res['abi'] = 'ABI';
-            } else if (res['abi'] === 2) {
-              res['abi'] = 'ABJ';
-            } else {
-              res['abi'] = false;
-            }
-          }
-          for (const key in res.notequestions) {
-            // eslint-disable-next-line no-prototype-builtins
-            if (res.notequestions.hasOwnProperty(key)) {
-              if (this.libelles[key] !== undefined && this.libelles[key] !== '') {
-                res['Q' + key + ' (' + this.libelles[key] + ')'] = parseFloat(res.notequestions[key].replaceAll(',', '.'));
-              } else {
-                res['Q' + key] = parseFloat(res.notequestions[key].replaceAll(',', '.'));
-              }
-            }
-          }
-        });
-        studentsresult.forEach((e: any) => delete e.notequestions);
-        studentsresult.forEach((e: any) => delete e.id);
-
-        const worksheet = xlsx.utils.json_to_sheet(studentsresult);
-        const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
-        const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
-        let filename = 'students';
-        if (this.exam?.name) {
-          filename = 'students_export-' + this.exam.name + '-' + formatDateTime(new Date());
-        }
-
-        this.saveAsExcelFile(excelBuffer, filename);
-      });
+      this.exportResultService.exportExcel(studentsresult, this.libelles, filename);
     });
-  }
-
-  saveAsExcelFile(buffer: any, fileName: string): void {
-    const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-    const EXCEL_EXTENSION = '.xlsx';
-    const data: Blob = new Blob([buffer], {
-      type: EXCEL_TYPE,
-    });
-    FileSaver.saveAs(data, fileName + EXCEL_EXTENSION);
   }
 
   exportCSV(): void {
+    const studentsresult: any[] = JSON.parse(JSON.stringify(this.studentsresult));
+    const filename = this.exam?.name ? 'students_export-' + this.exam.name + '-' + formatDateTime(new Date()) : 'students';
     this.loadLibelle().then(() => {
-      let maxQuestion = 0;
-      const studentsresult: any[] = JSON.parse(JSON.stringify(this.studentsresult));
-      studentsresult.forEach(res => {
-        // eslint-disable-next-line no-console
-        for (const key in res.notequestions) {
-          // eslint-disable-next-line no-prototype-builtins
-          if (res.notequestions.hasOwnProperty(key)) {
-            if (+key > maxQuestion) {
-              maxQuestion = +key;
-            }
-          }
-        }
-      });
-      studentsresult.forEach(res => {
-        for (let i = 1; i <= maxQuestion; i++) {
-          if (this.libelles[i] !== undefined && this.libelles[i] !== '') {
-            res['Q' + i + ' (' + this.libelles[i] + ')'] = undefined;
-          } else {
-            res['Q' + i] = undefined;
-          }
-        }
-      });
-
-      studentsresult.forEach(res => {
-        if (res['note'] !== undefined && (typeof res['note'] === 'string' || res['note'] instanceof String)) {
-          res['note'] = parseFloat((res['note'] as any).replaceAll(',', '.'));
-        }
-        if (res['abi'] !== undefined) {
-          if (res['abi'] === 1) {
-            res['abi'] = 'ABI';
-          } else if (res['abi'] === 2) {
-            res['abi'] = 'ABJ';
-          } else {
-            res['abi'] = false;
-          }
-        }
-        for (const key in res.notequestions) {
-          // eslint-disable-next-line no-prototype-builtins
-          if (res.notequestions.hasOwnProperty(key)) {
-            if (this.libelles[key] !== undefined && this.libelles[key] !== '') {
-              res['Q' + key + ' (' + this.libelles[key] + ')'] = parseFloat(res.notequestions[key].replaceAll(',', '.'));
-            } else {
-              res['Q' + key] = parseFloat(res.notequestions[key].replaceAll(',', '.'));
-            }
-          }
-        }
-      });
-      studentsresult.forEach((e: any) => delete e.notequestions);
-      studentsresult.forEach((e: any) => delete e.id);
-      //        delete this.studentsresult.notequestions
-      const csv = generateCsv(csvConfig)(studentsresult);
-      if (this.exam?.name) {
-        csvConfig.filename = 'students_export-' + this.exam.name + '-' + formatDateTime(new Date());
-      }
-      // Get the button in your HTML
-      download(csvConfig)(csv);
+      this.exportResultService.exportCSV(studentsresult, this.libelles, filename);
     });
   }
-
   updateStudentABJ(student: any): void {
     if (student.id) {
       firstValueFrom(
@@ -321,18 +198,4 @@ export class ResultatStudentcourseComponent implements OnInit {
       );
     }
   }
-}
-
-function formatDate(date: Date): string {
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}-${month}-${year}`;
-}
-function formatDateTime(date: Date): string {
-  const formattedDate = formatDate(date); // Reuse formatDate function
-  const hours = date.getHours().toString().padStart(2, '0');
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  const seconds = date.getSeconds().toString().padStart(2, '0');
-  return `${formattedDate} ${hours}:${minutes}:${seconds}`;
 }

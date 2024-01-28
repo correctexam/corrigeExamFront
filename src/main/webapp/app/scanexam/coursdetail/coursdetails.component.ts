@@ -24,6 +24,7 @@ import { firstValueFrom, scan } from 'rxjs';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { PreferenceService } from '../preference-page/preference.service';
 import { Title } from '@angular/platform-browser';
+import { ExportResultService, formatDateTime } from '../exportresult.service';
 
 export interface CacheUploadNotification {
   setMessage(v: string): void;
@@ -79,6 +80,7 @@ export class CoursdetailsComponent implements OnInit {
     private http: HttpClient,
     private preferenceService: PreferenceService,
     private titleService: Title,
+    private exportResultService: ExportResultService,
   ) {}
 
   ngOnInit(): void {
@@ -226,6 +228,22 @@ export class CoursdetailsComponent implements OnInit {
         },
       },
       {
+        label: this.translateService.instant('scanexam.exportExcel'),
+        icon: this.appConfig.getFrontUrl() + 'content/images/exportExcel.svg',
+        title: this.translateService.instant('scanexam.exportExceldetail'),
+        command1: () => {
+          this.exportExcel();
+        },
+      },
+      {
+        label: this.translateService.instant('scanexam.exportCsv'),
+        icon: this.appConfig.getFrontUrl() + 'content/images/exportCsv.svg',
+        title: this.translateService.instant('scanexam.exportCsvdetail'),
+        command1: () => {
+          this.exportCsv();
+        },
+      },
+      {
         label: this.translateService.instant('scanexam.export'),
         icon: this.appConfig.getFrontUrl() + 'content/images/import-export-outline-icon.svg',
         title: this.translateService.instant('scanexam.exportcoursetooltip'),
@@ -284,5 +302,30 @@ export class CoursdetailsComponent implements OnInit {
 
   changeStartPreference(): void {
     this.preferenceService.setFirstCourseMessage(this.firsthelpvalue);
+  }
+
+  async exportExcel(): Promise<void> {
+    const examResults = new Map<number, any[]>();
+    const examNames = new Map<number, string>();
+    for (const exam of this.exams) {
+      const s = await firstValueFrom(this.http.get<any[]>(this.applicationConfigService.getEndpointFor('api/showResult/' + exam.id)));
+      examResults.set(exam.id!, s);
+      examNames.set(exam.id!, exam.name ? exam.name : 'exam' + exam.id!);
+    }
+    const filename = this.course?.name ? 'students_export-' + this.course.name + '-' + formatDateTime(new Date()) : 'students';
+    this.exportResultService.exportExcelForModule(examNames, examResults, filename);
+  }
+
+  async exportCsv(): Promise<void> {
+    const examResults = new Map<number, any[]>();
+    const examNames = new Map<number, string>();
+    for (const exam of this.exams) {
+      const s = await firstValueFrom(this.http.get<any[]>(this.applicationConfigService.getEndpointFor('api/showResult/' + exam.id)));
+      examResults.set(exam.id!, s);
+      examNames.set(exam.id!, exam.name ? exam.name : 'exam' + exam.id!);
+    }
+    const filename = this.course?.name ? 'students_export-' + this.course.name + '-' + formatDateTime(new Date()) : 'students';
+
+    this.exportResultService.exportCsvForModule(examNames, examResults, filename);
   }
 }
