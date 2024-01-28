@@ -233,7 +233,7 @@ export class StatsExamComponent implements OnInit {
     this.infosStudents
       .filter(s => s.ine !== '')
       .forEach(s => {
-        if (s.abi) {
+        if (s.abi > 0) {
           this.nbStdABI++;
         } else {
           for (const key in s.notequestions) {
@@ -763,7 +763,7 @@ interface StudentRes {
   mail: string;
   nom: string;
   prenom: string;
-  abi: boolean;
+  abi: number;
   note?: string;
   notequestions: { [key: string]: string };
   studentNumber?: string;

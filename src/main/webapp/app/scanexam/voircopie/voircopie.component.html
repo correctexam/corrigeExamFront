@@ -191,11 +191,11 @@
                 <h5 class="card-title">{{ comment.text }}</h5>
                 <p class="card-text">{{ comment.description }}</p>
                 <p *ngIf="comment.step && comment.step === 1">
-                  <span *ngIf="comment.grade !== null && comment.grade !== undefined && comment.grade >= 0"> + </span> {{ comment.grade }}
+                  <span *ngIf="comment.grade !== null && comment.grade !== undefined && comment.grade >= 0"> +</span> {{ comment.grade }}
                   <span *ngIf="!comment.relative"> pt</span> <span *ngIf="comment.relative"> %</span>
                 </p>
                 <p *ngIf="comment.step && comment.step > 1">
-                  <span *ngIf="comment.grade !== null && comment.grade !== undefined && comment.grade >= 0"> + </span>
+                  <span *ngIf="comment.grade !== null && comment.grade !== undefined && comment.grade >= 0"> +</span>
                   {{ (comment.grade! * comment.stepValue!) / comment.step! | number: '0.0-2' }} <span *ngIf="!comment.relative"> pt</span>
                   <span *ngIf="comment.relative"> %</span>
                   <BR />

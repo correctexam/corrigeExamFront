@@ -162,6 +162,7 @@ export class ResultatStudentcourseComponent implements OnInit {
     this.http.get(this.applicationConfigService.getEndpointFor('api/showResult/' + this.examid)).subscribe(s => {
       // eslint-disable-next-line no-console
       this.studentsresult = s as any;
+
       this.blocked = false;
     });
   }
@@ -174,10 +175,12 @@ export class ResultatStudentcourseComponent implements OnInit {
   }
 
   exportExcel(): void {
+    const studentsresult: any[] = JSON.parse(JSON.stringify(this.studentsresult));
+
     this.loadLibelle().then(() => {
       import('xlsx').then(xlsx => {
         let maxQuestion = 0;
-        this.studentsresult.forEach(res => {
+        studentsresult.forEach(res => {
           // eslint-disable-next-line no-console
           for (const key in res.notequestions) {
             // eslint-disable-next-line no-prototype-builtins
@@ -188,7 +191,7 @@ export class ResultatStudentcourseComponent implements OnInit {
             }
           }
         });
-        this.studentsresult.forEach(res => {
+        studentsresult.forEach(res => {
           for (let i = 1; i <= maxQuestion; i++) {
             if (this.libelles[i] !== undefined && this.libelles[i] !== '') {
               res['Q' + i + ' (' + this.libelles[i] + ')'] = undefined;
@@ -198,12 +201,18 @@ export class ResultatStudentcourseComponent implements OnInit {
           }
         });
 
-        this.studentsresult.forEach(res => {
+        studentsresult.forEach(res => {
           if (res['note'] !== undefined && (typeof res['note'] === 'string' || res['note'] instanceof String)) {
             res['note'] = parseFloat((res['note'] as any).replaceAll(',', '.'));
           }
           if (res['abi'] !== undefined) {
-            res['abi'] = !!res['abi'];
+            if (res['abi'] === 1) {
+              res['abi'] = 'ABI';
+            } else if (res['abi'] === 2) {
+              res['abi'] = 'ABJ';
+            } else {
+              res['abi'] = false;
+            }
           }
           for (const key in res.notequestions) {
             // eslint-disable-next-line no-prototype-builtins
@@ -216,7 +225,10 @@ export class ResultatStudentcourseComponent implements OnInit {
             }
           }
         });
-        const worksheet = xlsx.utils.json_to_sheet(this.studentsresult);
+        studentsresult.forEach((e: any) => delete e.notequestions);
+        studentsresult.forEach((e: any) => delete e.id);
+
+        const worksheet = xlsx.utils.json_to_sheet(studentsresult);
         const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
         const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
         let filename = 'students';
@@ -241,8 +253,8 @@ export class ResultatStudentcourseComponent implements OnInit {
   exportCSV(): void {
     this.loadLibelle().then(() => {
       let maxQuestion = 0;
-
-      this.studentsresult.forEach(res => {
+      const studentsresult: any[] = JSON.parse(JSON.stringify(this.studentsresult));
+      studentsresult.forEach(res => {
         // eslint-disable-next-line no-console
         for (const key in res.notequestions) {
           // eslint-disable-next-line no-prototype-builtins
@@ -253,7 +265,7 @@ export class ResultatStudentcourseComponent implements OnInit {
           }
         }
       });
-      this.studentsresult.forEach(res => {
+      studentsresult.forEach(res => {
         for (let i = 1; i <= maxQuestion; i++) {
           if (this.libelles[i] !== undefined && this.libelles[i] !== '') {
             res['Q' + i + ' (' + this.libelles[i] + ')'] = undefined;
@@ -263,12 +275,18 @@ export class ResultatStudentcourseComponent implements OnInit {
         }
       });
 
-      this.studentsresult.forEach(res => {
+      studentsresult.forEach(res => {
         if (res['note'] !== undefined && (typeof res['note'] === 'string' || res['note'] instanceof String)) {
           res['note'] = parseFloat((res['note'] as any).replaceAll(',', '.'));
         }
         if (res['abi'] !== undefined) {
-          res['abi'] = !!res['abi'];
+          if (res['abi'] === 1) {
+            res['abi'] = 'ABI';
+          } else if (res['abi'] === 2) {
+            res['abi'] = 'ABJ';
+          } else {
+            res['abi'] = false;
+          }
         }
         for (const key in res.notequestions) {
           // eslint-disable-next-line no-prototype-builtins
@@ -281,8 +299,8 @@ export class ResultatStudentcourseComponent implements OnInit {
           }
         }
       });
-      const studentsresult = JSON.parse(JSON.stringify(this.studentsresult));
       studentsresult.forEach((e: any) => delete e.notequestions);
+      studentsresult.forEach((e: any) => delete e.id);
       //        delete this.studentsresult.notequestions
       const csv = generateCsv(csvConfig)(studentsresult);
       if (this.exam?.name) {
@@ -291,6 +309,17 @@ export class ResultatStudentcourseComponent implements OnInit {
       // Get the button in your HTML
       download(csvConfig)(csv);
     });
+  }
+
+  updateStudentABJ(student: any): void {
+    if (student.id) {
+      firstValueFrom(
+        this.http.put(
+          this.applicationConfigService.getEndpointFor('api/toggleAsAbJ/' + student.id + '/' + this.examid + '/' + student.abi),
+          undefined,
+        ),
+      );
+    }
   }
 }
 

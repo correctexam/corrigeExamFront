@@ -461,6 +461,7 @@
     "contourLength": "Longueur des contours",
     "contourLengthAndNbreContour": "Longueur et nombre de contours",
     "contourLengthTooltip": "Kmeans à une dimension fondé sur la longueur des contours",
-    "contourLengthAndNbreContourTooltip": "Kmeans à deux dimensions fondé sur la longueur des contours et le nombre de contours de plus de trois pixels"
+    "contourLengthAndNbreContourTooltip": "Kmeans à deux dimensions fondé sur la longueur des contours et le nombre de contours de plus de trois pixels",
+    "abiabj": "Absence justifiée"
   }
 }

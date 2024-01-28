@@ -199,6 +199,7 @@
             <th jhiTranslate="scanexam.lieneleve">LIEN</th>
             <th jhiTranslate="scanexam.lienelevepdf">LIEN</th>
             <th jhiTranslate="scanexam.envoimailpersonal">Envoi Mail</th>
+            <th jhiTranslate="scanexam.abiabj">ABI/ABJ</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-student>
@@ -207,8 +208,8 @@
             <td>{{ student.nom }}</td>
             <td>{{ student.prenom }}</td>
             <td>{{ student.mail }}</td>
-            <td *ngIf="!student.abi">{{ student.note }}</td>
-            <td *ngIf="student.abi">0</td>
+            <td *ngIf="student.abi === 0">{{ student.note }}</td>
+            <td *ngIf="student.abi > 0">0</td>
             <td *ngIf="student.studentNumber">
               <a
                 [pTooltip]="'scanexam.showresultLienProfTooltip' | translate"
@@ -219,8 +220,9 @@
                 >correction</a
               >
             </td>
-            <td *ngIf="!student.studentNumber">ABI</td>
-            <td *ngIf="!student.abi">
+            <td *ngIf="student.abi == 1">ABI</td>
+            <td *ngIf="student.abi == 2">ABJ</td>
+            <td *ngIf="student.abi === 0">
               <a
                 *ngIf="student.mail != 'anonymous@anonymous.fr'"
                 [pTooltip]="'scanexam.showresultLienEleveTooltip' | translate"
@@ -232,8 +234,9 @@
                 >link</a
               >
             </td>
-            <td *ngIf="student.abi">ABI</td>
-            <td *ngIf="!student.abi">
+            <td *ngIf="student.abi == 1">ABI</td>
+            <td *ngIf="student.abi == 2">ABJ</td>
+            <td *ngIf="student.abi === 0">
               <a
                 [pTooltip]="'scanexam.showresultLienPdfTooltip' | translate"
                 [tooltipPosition]="'top'"
@@ -244,7 +247,8 @@
                 >pdf</a
               >
             </td>
-            <td *ngIf="student.abi">ABI</td>
+            <td *ngIf="student.abi == 1">ABI</td>
+            <td *ngIf="student.abi == 2">ABJ</td>
             <td *ngIf="!student.abi">
               <button
                 *ngIf="student.mail != 'anonymous@anonymous.fr'"
@@ -259,7 +263,16 @@
                 <fa-icon icon="envelope"></fa-icon>
               </button>
             </td>
-            <td *ngIf="student.abi"></td>
+            <td *ngIf="student.abi > 0"></td>
+            <td *ngIf="student.abi === 0"></td>
+            <td *ngIf="student.abi > 0">
+              <p-inputSwitch
+                [trueValue]="2"
+                [falseValue]="1"
+                [(ngModel)]="student.abi"
+                (onChange)="updateStudentABJ(student)"
+              ></p-inputSwitch>
+            </td>
           </tr>
         </ng-template>
       </p-table>
