@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 384 512"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="exportExcel.svg"
+   inkscape:version="1.3.2 (1:1.3.2+202311252150+091e20ef0f)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.3652344"
+     inkscape:cx="192.27468"
+     inkscape:cy="256"
+     inkscape:window-width="1920"
+     inkscape:window-height="941"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+  <path
+     d="M 116.19278,334.77753 V 131.97495 c 0,-4.64755 3.72461,-8.45009 8.27695,-8.45009 h 82.76942 v 42.25052 c 0,9.34793 7.39752,16.90021 16.55388,16.90021 h 41.38471 v 152.10194 c 0,4.64756 -3.72461,8.45011 -8.27694,8.45011 H 124.46973 c -4.55234,0 -8.27695,-3.80255 -8.27695,-8.45011 z m 8.27695,-236.603002 c -18.26101,0 -33.107779,15.157392 -33.107779,33.800422 v 202.80258 c 0,18.64304 14.846769,33.80043 33.107779,33.80043 H 256.9008 c 18.26101,0 33.10777,-15.15739 33.10777,-33.80043 V 179.77087 c 0,-8.97823 -3.46597,-17.58677 -9.67367,-23.92436 L 233.4667,108.0506 c -6.2077,-6.33757 -14.58812,-9.876072 -23.38236,-9.876072 z M 171.4931,221.38765 c -4.19021,-5.54537 -12.00157,-6.49602 -17.43331,-2.21813 -5.43174,4.27785 -6.36291,12.25264 -2.17272,17.79801 l 23.07199,30.20914 -23.02024,30.26193 c -4.19021,5.54541 -3.25906,13.46737 2.1727,17.79806 5.43174,4.33068 13.19137,3.32724 17.4333,-2.21815 l 19.14044,-25.19189 19.19216,25.13908 c 4.1902,5.54538 12.00157,6.49602 17.43332,2.21814 5.43174,-4.27787 6.36288,-12.25265 2.17268,-17.79803 l -23.07197,-30.20914 23.02025,-30.26195 c 4.1902,-5.54538 3.25905,-13.46735 -2.1727,-17.79803 -5.43175,-4.33068 -13.19138,-3.32723 -17.43332,2.21815 l -19.14042,25.19189 z"
+     id="path1"
+     style="stroke-width:0.522691" />
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-weight:normal;font-size:58.3435px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.45859"
+     x="112.65511"
+     y="393.58017"
+     id="text1"
+     transform="scale(0.93255684,1.0723207)"><tspan
+       sodipodi:role="line"
+       id="tspan1"
+       x="112.65511"
+       y="393.58017"
+       style="stroke-width:1.45859">Export</tspan></text>
+</svg>
