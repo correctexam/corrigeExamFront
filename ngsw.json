@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1706382740869,
+  "timestamp": 1706425800851,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -32,7 +32,7 @@
         "/581.efc038ad24c7830a.js",
         "/648.fe35019bb2613f21.js",
         "/654.e0a57901c7dcb5f7.js",
-        "/672.323c9abfce796684.js",
+        "/672.d28d094d82dc446a.js",
         "/675.c08325c39bf42a44.js",
         "/737.91dd9385d1ff3ef1.js",
         "/797.d1f70c621848dd3a.js",
@@ -52,9 +52,9 @@
         "/main.32752d184e260c21.js",
         "/manifest.webapp",
         "/polyfills.60d9a832d57e0e9d.js",
-        "/runtime.0a89e11e087f35e5.js",
+        "/runtime.96244a5675783470.js",
         "/scripts.001ad3870afff7e2.js",
-        "/styles.f0601e2e94ce481b.css"
+        "/styles.134227bf3758ac00.css"
       ],
       "patterns": []
     },
@@ -561,7 +561,7 @@
     "/581.efc038ad24c7830a.js": "22b667d7360c99635e8331ba7868f6a285d8c5db",
     "/648.fe35019bb2613f21.js": "2e113efbaccab1444b65698e94fa08aefde892cc",
     "/654.e0a57901c7dcb5f7.js": "b4736bad7be57133d51b981983103fa6be8c752b",
-    "/672.323c9abfce796684.js": "572571a03d7d37ac825722a823e54a4def19fe54",
+    "/672.d28d094d82dc446a.js": "ba409bb23021b14b046e14e70664403fdf8328be",
     "/675.c08325c39bf42a44.js": "6bfab9fc4754af3a244f0e03e05e5fe7feeeaa91",
     "/737.91dd9385d1ff3ef1.js": "ff2eff96ef54ef155a17a1e710308917746d0f10",
     "/797.d1f70c621848dd3a.js": "af5c20b7a3fe89d60ca6ddac22b2c2f2e73b909f",
@@ -646,7 +646,7 @@
     "/content/opencv/5/opencv.js": "f2b1eb85ce648c0f3d0e32e68b5a2aab1303e344",
     "/content/opencv/howtobuild": "93b832b5f05ad5486d99c859729cd4b16b55656e",
     "/content/scss/_bootstrap-variables.scss": "d4ae52e8d88917653252fa42dc5fc3f320cde121",
-    "/content/scss/global.scss": "7b21483cfd0cbad4f0791d64b4450148c969a729",
+    "/content/scss/global.scss": "a32c05a3bd2e846a44e08a0598d096aadeb4c0b8",
     "/content/scss/vendor.scss": "8325a8a0f4f0e349045d66c5d17c1f0f33da66b3",
     "/content/sqlite/sqlite3-opfs-async-proxy.js": "dab8b663a8cf0a7801a8b67924f4cd6cd2549df0",
     "/content/sqlite/sqlite3-worker1-promiser.js": "d33dfc719e1b11bfbb39eb94baf9b3e16575b94a",
@@ -1037,7 +1037,7 @@
     "/content/tfjs/wasm-out/tfjs-backend-wasm.worker.js": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
     "/favicon.ico": "69547cd4a95b59ac7e6818b6eb82befa061d0c16",
     "/hue.8b1818380241e6ac.png": "f81ae627637a684614aa726e206c73ce099a01fd",
-    "/index.html": "9eb673c9aff10861a2d166e05a433e4265e55f31",
+    "/index.html": "7ac984bd76b30a8377c3b229851415f70407d831",
     "/jhipster_family_member_3.87663f884fcea614.svg": "0690f4141a25d739ed9429b0b315cc94196a3644",
     "/logo-jhipster.6125d9b31ded8344.png": "e1e46028ec092ca351425b07707fcdd52146b0b3",
     "/main.32752d184e260c21.js": "bd56ce99f6309aae91353f1bed4ead4e2c59b100",
@@ -1048,10 +1048,10 @@
     "/primeicons.ba3f916dfb64be8c.woff2": "55a4b2a5f02e362405d8d874903af0b5f6a6c15d",
     "/primeicons.f8b9e8a4e401b603.woff": "b1648b50be13350fde8b5d9a6fe78354ddcc43e4",
     "/primeicons.ffecb2549ad1765a.eot": "e4df2355c405cd38aada36eda9015a810feab94c",
-    "/runtime.0a89e11e087f35e5.js": "3bf2765ef1e8412b82c5359ebeec75c5ad430751",
+    "/runtime.96244a5675783470.js": "8643fabf1b30aeeb14fa7a4a6663e697bc64e4f0",
     "/scholar.1dee195c875f84af.svg": "f209bee39d583876623062129b455355884a53d0",
     "/scripts.001ad3870afff7e2.js": "471ef50d3c5766abca577255eec439885ae6c999",
-    "/styles.f0601e2e94ce481b.css": "f9e1be2ec64791a34d7572d7e261087b5e5a5932"
+    "/styles.134227bf3758ac00.css": "0162552e17dfef650b57d3a985fe31fe281aea7f"
   },
   "navigationUrls": [
     {

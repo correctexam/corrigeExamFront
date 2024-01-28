@@ -189,6 +189,10 @@ entity detail page css
       padding: 0.5em 0;
     }
     dd {
+      .p-button-primary {
+        margin-top: 10px;
+      }
+
       border-bottom: 1px solid #eee;
       padding: 0.5em 0;
       margin-left: 0;
