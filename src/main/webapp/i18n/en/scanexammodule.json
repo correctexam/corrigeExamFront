@@ -457,6 +457,7 @@
     "contourLength": "Contour length",
     "contourLengthAndNbreContour": "Length and number of contours",
     "contourLengthTooltip": "One-dimensional Kmeans based on contour length",
-    "contourLengthAndNbreContourTooltip": "Two-dimensional Kmeans based on the length of contours and the number of contours with more than three pixels"
+    "contourLengthAndNbreContourTooltip": "Two-dimensional Kmeans based on the length of contours and the number of contours with more than three pixels",
+    "abiabj": "Excused absence"
   }
 }
