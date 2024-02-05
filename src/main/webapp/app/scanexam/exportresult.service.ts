@@ -115,10 +115,9 @@ export class ExportResultService {
 
     const worksheetgen = xlsx.utils.json_to_sheet([...general.values()]);
     sheets.set('summary', worksheetgen);
-
     for (const examId of examresult.keys()) {
       for (const studentsresult of examresult.get(examId)!) {
-        studentsresult.forEach((e: any) => delete e.id);
+        delete studentsresult.id;
       }
       const worksheet = xlsx.utils.json_to_sheet(examresult.get(examId)!);
       sheets.set('exam ' + examId, worksheet);

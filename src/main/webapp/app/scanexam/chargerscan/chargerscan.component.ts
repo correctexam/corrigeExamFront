@@ -457,10 +457,8 @@ export class ChargerscanComponent implements OnInit {
           this.images1 = [];
         }*/
 
-      this.loaded = false;
       // this.blob = undefined;
       // this.blob1 = undefined;
-      // this.phase1 = false;
       //      this.blocked = false;
       this.firstPageToLoad = 0;
       if (this.viewcomponent !== undefined) {
@@ -478,8 +476,11 @@ export class ChargerscanComponent implements OnInit {
       this.progress = 0;
       this.submessage = '';
       this.message = '';
+      this.blocked = false;
+      this.loaded = false;
+      this.i = 1;
+      this.phase1 = false;
     }
-    this.blocked = false;
   }
 
   async saveTemplateImage(pageN: number, imageD: any): Promise<void> {
@@ -525,22 +526,22 @@ export class ChargerscanComponent implements OnInit {
   //  imagesP: Promise<void>[] = [];
   public async processPage(page: number, template: boolean): Promise<void> {
     const scale = { scale: this.scale };
-    if (page < 10 && !template) console.time('processPage' + page);
-    if (page < 10 && !template) console.timeLog('processPage' + page, 'before getDataURL ', page);
+    //    if (page < 10 && !template) console.time('processPage' + page);
+    //    if (page < 10 && !template) console.timeLog('processPage' + page, 'before getDataURL ', page);
     const dataURL = await this.pdfService.getPageAsImage(page, scale);
     //    this.pdfService.getP
-    if (page < 10 && !template) console.timeLog('processPage' + page, 'getDataURL ', page);
+    //    if (page < 10 && !template) console.timeLog('processPage' + page, 'getDataURL ', page);
     await this.saveImageScan(dataURL, page, template);
-    if (page < 10 && !template) console.timeLog('processPage' + page, 'saveImageScan ', page);
+    //    if (page < 10 && !template) console.timeLog('processPage' + page, 'saveImageScan ', page);
   }
 
   saveImageScan(file: any, pagen: number, template: boolean): Promise<void> {
     return new Promise(resolve => {
-      if (pagen === 1 && !template) console.timeLog('processPage', 'start', pagen);
+      //      if (pagen === 1 && !template) console.timeLog('processPage', 'start', pagen);
 
       const i = new Image();
       i.onload = async () => {
-        if (pagen === 1 && !template) console.timeLog('processPage', 'image Loaded ', pagen);
+        //        if (pagen === 1 && !template) console.timeLog('processPage', 'image Loaded ', pagen);
         const editedImage = new OffscreenCanvas(i.width, i.height);
 
         // document.createElement('canvas');
@@ -549,7 +550,7 @@ export class ChargerscanComponent implements OnInit {
         // editedImage.height = i.height;
         const ctx = editedImage.getContext('2d');
         ctx!.drawImage(i, 0, 0);
-        if (pagen === 1 && !template) console.timeLog('processPage', 'draw first canvas ', pagen);
+        //        if (pagen === 1 && !template) console.timeLog('processPage', 'draw first canvas ', pagen);
 
         let exportImageType = 'image/webp';
         let compression = 0.65;
@@ -586,11 +587,11 @@ export class ChargerscanComponent implements OnInit {
           await this.saveTemplateImage(pagen, webPImageURL);
           resolve();
         } else {
-          if (pagen === 1 && !template) console.timeLog('processPage', 'before save ', pagen);
+          //    if (pagen === 1 && !template) console.timeLog('processPage', 'before save ', pagen);
           await this.saveNonAligneImage(pagen, webPImageURL);
           resolve();
 
-          if (pagen === 1 && !template) console.timeLog('processPage', 'after save ', pagen);
+          //          if (pagen === 1 && !template) console.timeLog('processPage', 'after save ', pagen);
         }
       };
       i.src = file;
