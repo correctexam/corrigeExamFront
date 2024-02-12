@@ -65,6 +65,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
   firsthelp = false;
   firsthelpvalue = true;
   showInfoExam = false;
+  correctionFinish = false;
 
   infoExamDetail = { nbrepagenonalign: 0, nbrepagealign: 0, nbrepagetemplate: 0, nbrecopie: 0, cond1: false, cond2: false, cond3: false };
 
@@ -94,6 +95,11 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
 
   setShowCorrection(v: boolean): void {
     this.showCorrection = v;
+    if (v) {
+      this.examService.getExamStatusFinish(+this.examId).then(res => {
+        this.correctionFinish = res;
+      });
+    }
   }
 
   ngOnInit(): void {
@@ -238,6 +244,9 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
               //            console.error(ex2, this.numberPagesInScan / this.nbreFeuilleParCopie, this.numberPagesInScan, this.nbreFeuilleParCopie);
               this.showCorrection =
                 this.sheets.length === this.numberPagesInScan / this.nbreFeuilleParCopie && this.showAssociation && this.showAlignement;
+              this.examService.getExamStatusFinish(+this.examId).then(res => {
+                this.correctionFinish = res;
+              });
             },
             () => {
               this.blocked = false;
@@ -281,6 +290,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
             this.showAlignement = false;
             this.showAssociation = false;
             this.showCorrection = false;
+            this.correctionFinish = false;
           });
         },
       });

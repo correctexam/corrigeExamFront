@@ -149,8 +149,7 @@
             <fa-stack>
               <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
               <fa-icon [icon]="faBookOpenReader" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
-            ><BR />
-            <span jhiTranslate="scanexam.correctsheet">Corriger copies</span>
+            ><BR /> <span jhiTranslate="scanexam.correctsheet">Corriger copies</span><span *ngIf="correctionFinish">✅</span>
           </button>
           <button
             [routerLink]="'/showresults/' + this.examId"
