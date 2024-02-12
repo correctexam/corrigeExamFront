@@ -14,6 +14,7 @@ export type EntityArrayResponseType = HttpResponse<IExam[]>;
 export class ExamService {
   protected resourceUrl: string;
   protected resourceUrlCustom: string;
+  protected resourceUrlExamStatusFinish: string;
 
   constructor(
     protected http: HttpClient,
@@ -21,6 +22,7 @@ export class ExamService {
   ) {
     this.resourceUrl = this.applicationConfigService.getEndpointFor('api/exams');
     this.resourceUrlCustom = this.applicationConfigService.getEndpointFor('api/getExamStatus');
+    this.resourceUrlExamStatusFinish = this.applicationConfigService.getEndpointFor('api/getExamStatusFinish');
   }
 
   create(exam: IExam): Observable<EntityResponseType> {
@@ -95,6 +97,15 @@ export class ExamService {
    */
   public getExamDetails(examId: number): Promise<MarkingExamStateDTO> {
     return lastValueFrom(this.http.get<MarkingExamStateDTO>(`${this.resourceUrlCustom}/${examId}`));
+  }
+
+  /**
+   * Gets the summary data of an exam marking
+   * @param examId The ID of the exam to get
+   * @returns A promise of the query
+   */
+  public getExamStatusFinish(examId: number): Promise<boolean> {
+    return lastValueFrom(this.http.get<boolean>(`${this.resourceUrlExamStatusFinish}/${examId}`));
   }
 }
 
