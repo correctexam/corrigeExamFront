@@ -129,15 +129,32 @@
         <div class="grid grid-nogutter">
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <span jhiTranslate="scanexam.noteattribuee">Note attribuée :</span>
-            <span *ngIf="questionStep > 0 && questions && questions.length > 0 && questions[0].gradeType !== 'HYBRID' && resp">{{
-              currentNote / questionStep
-            }}</span>
-            <span *ngIf="questionStep <= 0 && questions && questions.length > 0 && questions[0].gradeType !== 'HYBRID' && resp">{{
-              currentNote
-            }}</span>
-            <span *ngIf="questions && questions.length > 0 && questions[0].gradeType === 'HYBRID' && resp">{{
-              resp!.note! / 100 | number: '1.0-2'
-            }}</span>
+            <span
+              *ngIf="
+                questionStep > 0 &&
+                questions &&
+                questions.length > 0 &&
+                (questions[0].gradeType !== 'HYBRID' || questions[0].typeAlgoName === 'QCM') &&
+                resp
+              "
+              >{{ currentNote / questionStep }}</span
+            >
+            <span
+              *ngIf="
+                questionStep <= 0 &&
+                questions &&
+                questions.length > 0 &&
+                (questions[0].gradeType !== 'HYBRID' || questions[0].typeAlgoName === 'QCM') &&
+                resp
+              "
+              >{{ currentNote }}</span
+            >
+            <span
+              *ngIf="
+                questions && questions.length > 0 && questions[0].gradeType === 'HYBRID' && questions[0].typeAlgoName !== 'QCM' && resp
+              "
+              >{{ resp!.note! / 100 | number: '1.0-2' }}</span
+            >
             <span *ngIf="questions && questions.length > 0 && resp"> / {{ questions[0].point }} </span>
             <span *ngIf="resp === undefined" jhiTranslate="scanexam.noneval">Non évalué</span>
 
