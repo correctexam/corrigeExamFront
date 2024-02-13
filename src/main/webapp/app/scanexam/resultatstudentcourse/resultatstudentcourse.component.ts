@@ -136,7 +136,7 @@ export class ResultatStudentcourseComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: data,
-            detail: this.translate.instant('scanexam.mailsemailnotsentdetailstdetails'),
+            detail: this.translate.instant('scanexam.mailnotsentdetails'),
           });
         });
       }
@@ -148,7 +148,7 @@ export class ResultatStudentcourseComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: data,
-          detail: this.translate.instant('scanexam.mailsemailnotsentdetailstdetails'),
+          detail: this.translate.instant('scanexam.mailnotsentdetails'),
         });
       });
     }
