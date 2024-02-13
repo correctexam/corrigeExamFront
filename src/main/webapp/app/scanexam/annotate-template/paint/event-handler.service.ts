@@ -663,9 +663,34 @@ export class EventHandlerService {
   }
 
   public objectMoving(id: string, type: FabricObjectType, newLeft: number, newTop: number): void {
-    const l = newLeft;
-    const t = newTop;
+    let l = newLeft;
+    let t = newTop;
     const nid = id;
+    const height = this.canvas.getActiveObject() ? this.canvas.getActiveObject()!.height! : 0;
+    const width = this.canvas.getActiveObject() ? this.canvas.getActiveObject()!.width! : 0;
+    if (l < 0) {
+      if (this.canvas.getActiveObject() !== undefined) {
+        this.canvas.getActiveObject()!.left = 0;
+      }
+      l = 0;
+    } else if (l > this.pages[this.canvas.page].pageViewer.canvas.clientWidth - width) {
+      l = this.pages[this.canvas.page].pageViewer.canvas.clientWidth - width;
+      if (this.canvas.getActiveObject() !== undefined) {
+        this.canvas.getActiveObject()!.left = this.pages[this.canvas.page].pageViewer.canvas.clientWidth - width;
+      }
+    }
+    if (t < 0) {
+      t = 0;
+      if (this.canvas.getActiveObject() !== undefined) {
+        this.canvas.getActiveObject()!.top = 0;
+      }
+    } else if (t > this.pages[this.canvas.page].pageViewer.canvas.clientHeight - height) {
+      t = this.pages[this.canvas.page].pageViewer.canvas.clientHeight - height;
+      if (this.canvas.getActiveObject() !== undefined) {
+        this.canvas.getActiveObject()!.top = this.pages[this.canvas.page].pageViewer.canvas.clientHeight - height;
+      }
+    }
+
     this.zoneService
       .partialUpdate({
         id: this.modelViewpping.get(nid),
@@ -696,15 +721,48 @@ export class EventHandlerService {
     newCoords: { left: number; top: number },
   ): void {
     const o1 = this.canvas.getObjects().filter(o => (o as any).id === id)[0];
-    const l = o1.aCoords?.tl.x;
-    const t = o1.aCoords?.tl.y;
-    const w = o1.aCoords?.br.x! - o1.aCoords?.tl.x!;
-    const h = o1.aCoords?.br.y! - o1.aCoords?.tl.y!;
+
+    let l = o1.aCoords?.tl.x!;
+    let w = o1.aCoords?.br.x! - o1.aCoords?.tl.x!;
+    let t = o1.aCoords?.tl.y!;
+    let h = o1.aCoords?.br.y! - o1.aCoords?.tl.y!;
+
+    if (l < 0) {
+      l = 0;
+
+      if (this.canvas.getActiveObject() !== undefined) {
+        this.canvas.getActiveObject()!.left = 0;
+        w = o1.aCoords?.br.x!;
+        this.canvas.getActiveObject()!.scaleX = w / this.canvas.getActiveObject()!.width!;
+      }
+    }
+
+    if (t < 0) {
+      t = 0;
+      if (this.canvas.getActiveObject() !== undefined) {
+        this.canvas.getActiveObject()!.top = 0;
+        h = o1.aCoords?.br.y!;
+        this.canvas.getActiveObject()!.scaleY = h / this.canvas.getActiveObject()!.height!;
+      }
+    }
+
+    if (l + w > this.pages[this.canvas.page].pageViewer.canvas.clientWidth) {
+      w = this.pages[this.canvas.page].pageViewer.canvas.clientWidth - l;
+      if (this.canvas.getActiveObject() !== undefined) {
+        this.canvas.getActiveObject()!.scaleX = w / this.canvas.getActiveObject()!.width!;
+      }
+    }
+    if (t + h > this.pages[this.canvas.page].pageViewer.canvas.clientHeight) {
+      h = this.pages[this.canvas.page].pageViewer.canvas.clientHeight - t;
+      if (this.canvas.getActiveObject() !== undefined) {
+        this.canvas.getActiveObject()!.scaleY = h / this.canvas.getActiveObject()!.height!;
+      }
+    }
     this.zoneService
       .partialUpdate({
         id: this.modelViewpping.get(id),
-        xInit: Math.trunc((l! * this.coefficient) / this.pages[this.canvas.page].pageViewer.canvas.clientWidth),
-        yInit: Math.trunc((t! * this.coefficient) / this.pages[this.canvas.page].pageViewer.canvas.clientHeight),
+        xInit: Math.trunc((l * this.coefficient) / this.pages[this.canvas.page].pageViewer.canvas.clientWidth),
+        yInit: Math.trunc((t * this.coefficient) / this.pages[this.canvas.page].pageViewer.canvas.clientHeight),
         width: Math.trunc((w * this.coefficient) / this.pages[this.canvas.page].pageViewer.canvas.clientWidth),
         height: Math.trunc((h * this.coefficient) / this.pages[this.canvas.page].pageViewer.canvas.clientHeight),
       })

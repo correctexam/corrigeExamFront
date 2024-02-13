@@ -80,7 +80,7 @@ export class FabricShapeService {
     thickness: DrawingThickness,
     colour: DrawingColours,
     fillcolour: DrawingColours,
-    pointer: Pointer
+    pointer: Pointer,
   ): CustomFabricRect {
     const rect = new fabric.Rect({
       left: pointer.x,
@@ -177,7 +177,7 @@ export class FabricShapeService {
     canvas: fabric.Canvas,
     selectedThickness: DrawingThickness,
     selectedColour: DrawingColours,
-    pointer: Pointer
+    pointer: Pointer,
   ): CustomFabricPath {
     const path = new fabric.Path(`M ${pointer.x} ${pointer.y}`, {
       strokeWidth: selectedThickness,
@@ -196,7 +196,7 @@ export class FabricShapeService {
     selectedThickness: DrawingThickness,
     selectedColour: DrawingColours,
     dashArray: number[],
-    pointer: Pointer
+    pointer: Pointer,
   ): CustomFabricLine {
     const line = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
       strokeWidth: selectedThickness,
@@ -215,7 +215,7 @@ export class FabricShapeService {
     canvas: fabric.Canvas,
     selectedThickness: DrawingThickness,
     selectedColour: DrawingColours,
-    pointer: Pointer
+    pointer: Pointer,
   ): CustomFabricPolygon {
     const polygon = new fabric.Polygon([pointer], {
       strokeWidth: selectedThickness,
@@ -237,7 +237,7 @@ export class FabricShapeService {
       colour?: DrawingColours;
       pointer: { x: number; y: number };
       fontSize?: number;
-    }
+    },
   ): CustomFabricIText {
     const iText = new fabric.IText(opts.content || 'Text', {
       strokeWidth: opts.thickness || DrawingThickness.THIN / 2,

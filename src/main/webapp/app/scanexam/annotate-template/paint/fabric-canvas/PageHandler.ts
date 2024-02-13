@@ -228,6 +228,7 @@ export class PageHandler {
   private onObjectModified(e: CanvasModifiedEvent): void {
     if (e.action === 'drag') {
       this.eventHandler.canvas = this.canvas;
+
       this.eventHandler.objectMoving(e.target.id, e.target.type, e.target.left, e.target.top);
     } else {
       this.eventHandler.canvas = this.canvas;
