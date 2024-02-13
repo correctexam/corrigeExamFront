@@ -265,7 +265,6 @@ export class FabricShapeService {
   }
 
   formRectangle(rect: CustomFabricRect, initPos: Pointer, pointer: Pointer) {
-    console.error(initPos, pointer);
     rect.set({
       width: Math.abs(initPos.x - pointer.x),
       height: Math.abs(initPos.y - pointer.y),
