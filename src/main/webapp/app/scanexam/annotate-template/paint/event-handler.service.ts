@@ -663,9 +663,34 @@ export class EventHandlerService {
   }
 
   public objectMoving(id: string, type: FabricObjectType, newLeft: number, newTop: number): void {
-    const l = newLeft;
-    const t = newTop;
+    let l = newLeft;
+    let t = newTop;
     const nid = id;
+    const height = this.canvas.getActiveObject() ? this.canvas.getActiveObject()!.height! : 0;
+    const width = this.canvas.getActiveObject() ? this.canvas.getActiveObject()!.width! : 0;
+    if (l < 0) {
+      if (this.canvas.getActiveObject() !== undefined) {
+        this.canvas.getActiveObject()!.left = 0;
+      }
+      l = 0;
+    } else if (l > this.pages[this.canvas.page].pageViewer.canvas.clientWidth - width) {
+      l = this.pages[this.canvas.page].pageViewer.canvas.clientWidth - width;
+      if (this.canvas.getActiveObject() !== undefined) {
+        this.canvas.getActiveObject()!.left = this.pages[this.canvas.page].pageViewer.canvas.clientWidth - width;
+      }
+    }
+    if (t < 0) {
+      t = 0;
+      if (this.canvas.getActiveObject() !== undefined) {
+        this.canvas.getActiveObject()!.top = 0;
+      }
+    } else if (t > this.pages[this.canvas.page].pageViewer.canvas.clientHeight - height) {
+      t = this.pages[this.canvas.page].pageViewer.canvas.clientHeight - height;
+      if (this.canvas.getActiveObject() !== undefined) {
+        this.canvas.getActiveObject()!.top = this.pages[this.canvas.page].pageViewer.canvas.clientHeight - height;
+      }
+    }
+
     this.zoneService
       .partialUpdate({
         id: this.modelViewpping.get(nid),
