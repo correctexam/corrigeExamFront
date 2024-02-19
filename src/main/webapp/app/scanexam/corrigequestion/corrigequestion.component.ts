@@ -920,7 +920,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     return new Promise<IStudentResponse>(resolve => {
       this.updateResponseRequest(resp).subscribe(resp1 => {
         if (this.currentStudent === numero) {
-          (comment as any)().checked = true;
+          (comment as any).checked = true;
         }
         this.computeNote(true, resp1.body!, this.currentQuestion!).then(value => {
           resolve(value);
