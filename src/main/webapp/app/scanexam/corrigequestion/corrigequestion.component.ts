@@ -17,6 +17,10 @@ import {
   HostListener,
   ViewChild,
   NgZone,
+  Signal,
+  signal,
+  WritableSignal,
+  effect,
 } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { CourseService } from 'app/entities/course/service/course.service';
@@ -66,11 +70,22 @@ import { Inplace } from 'primeng/inplace';
 import { IExamSheet } from 'app/entities/exam-sheet/exam-sheet.model';
 import { OrderList } from 'primeng/orderlist';
 import { Title } from '@angular/platform-browser';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { PromisePool } from '@supercharge/promise-pool';
 
 enum ScalePolicy {
   FitWidth = 1,
   FitHeight = 2,
   Original = 3,
+}
+
+interface CommentAction {
+  f:
+    | ((comment: ITextComment, self: CorrigequestionComponent) => Promise<void>)
+    | ((comment: IGradedComment, self: CorrigequestionComponent) => Promise<void>)
+    | ((comment: IHybridGradedComment, self: CorrigequestionComponent) => Promise<void>);
+  c: ITextComment | IGradedComment | IHybridGradedComment;
+  self: CorrigequestionComponent;
 }
 
 @Component({
@@ -136,9 +151,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   noalign = false;
   factor = 1;
   scale = 1;
-  currentTextComment4Question: ITextComment[] | undefined;
-  currentGradedComment4Question: IGradedComment[] | undefined;
-  currentHybridGradedComment4Question: IHybridGradedComment[] | undefined;
+  currentTextComment4Question: Signal<ITextComment>[] | undefined;
+  currentGradedComment4Question: Signal<IGradedComment>[] | undefined;
+  currentHybridGradedComment4Question: Signal<IHybridGradedComment>[] | undefined;
 
   windowWidth = 0;
   currentZoneCorrectionHandler: Map<string, ZoneCorrectionHandler> = new Map(); // | undefined;
@@ -156,7 +171,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   @ViewChild(KeyboardShortcutsComponent)
   private keyboard: KeyboardShortcutsComponent | undefined;
   @ViewChild('input') input: ElementRef | undefined;
-  testdisableAndEnableKeyBoardShortCut = false;
+  testdisableAndEnableKeyBoardShortCut: WritableSignal<boolean> = signal(false);
+  testdisableAndEnableKeyBoardShortCutSignal = false;
   activeIndex = 1;
   responsiveOptions2: any[] = [
     {
@@ -191,6 +207,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   step = 1;
   answer2HybridGradedCommentMap: Map<number, number> = new Map();
 
+  queriesPool: Array<CommentAction> = [];
+
   constructor(
     public examService: ExamService,
     public courseService: CourseService,
@@ -216,7 +234,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     private keyboardShortcutService: KeyboardShortcutService,
     private applicationConfigService: ApplicationConfigService,
     private titleService: Title,
-  ) {}
+  ) {
+    effect(() => {
+      this.testdisableAndEnableKeyBoardShortCutSignal = this.testdisableAndEnableKeyBoardShortCut();
+    });
+  }
 
   ngOnInit(): void {
     this.windowWidth = window.innerWidth;
@@ -230,7 +252,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async manageParam(params: ParamMap) {
-    this.testdisableAndEnableKeyBoardShortCut = false;
+    this.testdisableAndEnableKeyBoardShortCut.set(false);
     this.init = true;
 
     //    let forceRefreshStudent = false;
@@ -309,29 +331,47 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
             if (questions![0].gradeType === GradeType.DIRECT && questions![0].typeAlgoName !== 'QCM') {
               const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
-              this.currentTextComment4Question = com.body!;
+              /*              this.currentTextComment4Question = com.body!;
               this.currentTextComment4Question.forEach(com1 => {
                 this.active.set(com1.id!, false);
+              });*/
+              this.currentTextComment4Question = [];
+              com.body!.forEach(comment => {
+                this.currentTextComment4Question?.push(signal(comment));
+              });
+              this.currentTextComment4Question.forEach(com1 => {
+                this.active.set(com1().id!, signal(false));
               });
             } else if (questions![0].gradeType === GradeType.HYBRID && questions![0].typeAlgoName !== 'QCM') {
               const com = await firstValueFrom(this.hybridGradedCommentService.query({ questionId: questions![0].id }));
-              this.currentHybridGradedComment4Question = com.body!;
+              /*              this.currentHybridGradedComment4Question = com.body!;
               this.currentHybridGradedComment4Question.forEach(com1 => {
                 this.active.set(com1.id!, false);
+              });*/
+              this.currentHybridGradedComment4Question = [];
+              com.body!.forEach(comment => {
+                this.currentHybridGradedComment4Question?.push(signal(comment));
+              });
+
+              this.currentHybridGradedComment4Question.forEach(com1 => {
+                this.active.set(com1().id!, signal(false));
               });
             } else {
               const com = await firstValueFrom(this.gradedCommentService.query({ questionId: questions![0].id }));
-              this.currentGradedComment4Question = com.body!;
+              this.currentGradedComment4Question = [];
+              com.body!.forEach(comment => {
+                this.currentGradedComment4Question?.push(signal(comment));
+              });
+              //              this.currentGradedComment4Question = com.body!;
               this.currentGradedComment4Question.forEach(com1 => {
-                this.active.set(com1.id!, false);
+                this.active.set(com1().id!, signal(false));
               });
             }
           }
         }
-
-        this.currentGradedComment4Question?.forEach(com2 => ((com2 as any).checked = false));
-        this.currentTextComment4Question?.forEach(com2 => ((com2 as any).checked = false));
-        this.currentHybridGradedComment4Question?.forEach(com2 => ((com2 as any).checked = false));
+        this.currentGradedComment4Question?.forEach(com2 => ((com2() as any).checked = false));
+        this.currentTextComment4Question?.forEach(com2 => ((com2() as any).checked = false));
+        this.currentHybridGradedComment4Question?.forEach(com2 => ((com2() as any).checked = false));
         //        this.currentHybridGradedComment4Question?.forEach(com2 => ());
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -361,29 +401,29 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               await this.computeNote(false, this.resp!, this.currentQuestion!);
               if (questions![0].gradeType === GradeType.DIRECT && questions![0].typeAlgoName !== 'QCM') {
                 this.resp.textcomments!.forEach(com1 => {
-                  const elt = this.currentTextComment4Question?.find(com2 => com2.id === com1.id);
+                  const elt = this.currentTextComment4Question?.find(com2 => com2().id === com1.id);
                   if (elt !== undefined) {
-                    (elt as any).checked = true;
+                    (elt as any)().checked = true;
                   } else {
-                    (elt as any).checked = false;
+                    (elt as any)().checked = false;
                   }
                 });
               } else if (questions![0].gradeType === GradeType.HYBRID && questions![0].typeAlgoName !== 'QCM') {
                 this.answer2HybridGradedCommentMap.forEach((com1v, com1k) => {
-                  const elt = this.currentHybridGradedComment4Question?.find(com2 => com2.id === com1k);
+                  const elt = this.currentHybridGradedComment4Question?.find(com2 => com2().id === com1k);
                   if (elt !== undefined && com1v > 0) {
-                    (elt as any).checked = true;
+                    (elt as any)().checked = true;
                   } else {
-                    (elt as any).checked = false;
+                    (elt as any)().checked = false;
                   }
                 });
               } else {
                 this.resp.gradedcomments!.forEach(com1 => {
-                  const elt = this.currentGradedComment4Question?.find(com2 => com2.id === com1.id);
+                  const elt = this.currentGradedComment4Question?.find(com2 => com2().id === com1.id);
                   if (elt !== undefined) {
-                    (elt as any).checked = true;
+                    (elt as any)().checked = true;
                   } else {
-                    (elt as any).checked = false;
+                    (elt as any)().checked = false;
                   }
                 });
               }
@@ -418,7 +458,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         const c = this.currentStudent + 1;
         this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
       }
-      this.testdisableAndEnableKeyBoardShortCut = true;
+      this.testdisableAndEnableKeyBoardShortCut.set(true);
     }
   }
 
@@ -507,20 +547,20 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  active: Map<number, boolean> = new Map();
+  active: Map<number, WritableSignal<boolean>> = new Map();
 
   populateDefaultShortCut(): void {
     const toRemove: number[] = [];
     const comments: (IGradedComment | ITextComment | IHybridGradedComment)[] = [];
     if (this.currentGradedComment4Question && this.currentGradedComment4Question.length > 0) {
-      comments.push(...this.currentGradedComment4Question);
+      comments.push(...this.currentGradedComment4Question.map(e => e()));
     }
     if (this.currentTextComment4Question && this.currentTextComment4Question.length > 0) {
-      comments.push(...this.currentTextComment4Question);
+      comments.push(...this.currentTextComment4Question.map(e => e()));
     }
 
     if (this.currentHybridGradedComment4Question && this.currentHybridGradedComment4Question.length > 0) {
-      comments.push(...this.currentHybridGradedComment4Question);
+      comments.push(...this.currentHybridGradedComment4Question.map(e => e()));
     }
 
     if (this.keyboardShortcutService.getShortCutPreference().shortcuts.has(this.examId + '_' + this.questionindex)) {
@@ -554,22 +594,29 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  editComment(comment: any) {
-    this.active.set(comment.id, true);
+  editComment(l: any) {
+    if (this.active.has(l.id!)) {
+      this.active.get(l.id!)!.set(true);
+    } else {
+      this.active.set(l.id!, signal(true));
+    }
     this.minimizeComment = false;
   }
 
   resetAllShortCut() {
-    this.testdisableAndEnableKeyBoardShortCut = false;
+    this.testdisableAndEnableKeyBoardShortCut.set(false);
     this.shortCut4Comment = false;
     this.keyboardShortcutService.clearToDefault();
     this.populateDefaultShortCut();
 
-    setTimeout(() => (this.testdisableAndEnableKeyBoardShortCut = true), 30);
+    // this.testdisableAndEnableKeyBoardShortCut.set(true)
+
+    setTimeout(() => this.testdisableAndEnableKeyBoardShortCut.set(true), 30);
   }
 
   saveShortCut() {
-    this.testdisableAndEnableKeyBoardShortCut = false;
+    this.testdisableAndEnableKeyBoardShortCut.set(false);
+    //    this.testdisableAndEnableKeyBoardShortCut = false;
     this.shortCut4Comment = false;
     const shorts = this.keyboardShortcutService.getShortCutPreference();
     if (shorts.shortcuts.has(this.examId! + '_' + this.questionindex)) {
@@ -622,18 +669,23 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       ]);
     }
     this.keyboardShortcutService.save(shorts);
+    this.testdisableAndEnableKeyBoardShortCut.set(false);
     this.populateDefaultShortCut();
     this.commentShortcut = null;
     this.currentKeyBoardShorcut = '';
+    //    this.testdisableAndEnableKeyBoardShortCut.set(true);
+
     setTimeout(() => {
-      this.testdisableAndEnableKeyBoardShortCut = true;
+      this.testdisableAndEnableKeyBoardShortCut.set(true);
     }, 30);
   }
 
   cleanShortCut() {
     this.commentShortcut = null;
     this.currentKeyBoardShorcut = '';
-    this.testdisableAndEnableKeyBoardShortCut = true;
+    this.testdisableAndEnableKeyBoardShortCut.set(true);
+
+    //    this.testdisableAndEnableKeyBoardShortCut = true;
   }
 
   reloadImageGrowFactor(event: any): void {
@@ -785,9 +837,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     if (this.currentGradedComment4Question === undefined) {
       this.currentGradedComment4Question = [];
     }
-    validToCreate = validExp!.filter(c => !this.currentGradedComment4Question?.map(v => v.text).includes(c));
+    validToCreate = validExp!.filter(c => !this.currentGradedComment4Question?.map(v => v().text).includes(c));
     invalidToCreate = invalidExp!.filter(
-      c => !this.currentGradedComment4Question?.map(v => v.text).includes(c) && !validExp!.includes(c!) && c !== '',
+      c => !this.currentGradedComment4Question?.map(v => v().text).includes(c) && !validExp!.includes(c!) && c !== '',
     );
     invalidToCreate = [...new Set(invalidToCreate)];
 
@@ -800,7 +852,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         studentResponses: [],
       };
       const c1 = await this.createGradedComment(comment);
-      this.currentGradedComment4Question!.push(c1);
+      this.currentGradedComment4Question!.push(signal(c1));
     }
     for (const gcv of invalidToCreate) {
       const comment: IGradedComment = {
@@ -814,7 +866,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         studentResponses: [],
       };
       const c1 = await this.createGradedComment(comment);
-      this.currentGradedComment4Question!.push(c1);
+      this.currentGradedComment4Question!.push(signal(c1));
     }
     // UpdateStudentResponse
     for (const solution of solutions!) {
@@ -830,16 +882,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       );
 
       resp.gradedcomments?.forEach(gc => {
-        (gc as any).checked = false;
+        (gc as any)().checked = false;
       });
       resp!.gradedcomments = [];
       // Check if gradedcomment with good parameters exists
 
-      const gcs = this.currentGradedComment4Question?.filter(c => c.text === e.solution);
+      const gcs = this.currentGradedComment4Question?.filter(c => c().text === e.solution);
       // Comment already exists
       if (gcs !== undefined && gcs.length > 0) {
-        resp.gradedcomments.push(gcs[0]);
-        await this.updateStudentResponsAndComputeNote4QCM(resp, e.numero!, gcs[0]);
+        resp.gradedcomments.push(gcs[0]());
+        await this.updateStudentResponsAndComputeNote4QCM(resp, e.numero!, gcs[0]());
         // gcs[0].studentResponses?.push(resp!);
       }
     }
@@ -849,10 +901,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     return new Promise<IStudentResponse>((resolve, reject) => {
       this.gradedCommentService.create(comment).subscribe(e1 => {
         if (e1.body !== null) {
-          this.testdisableAndEnableKeyBoardShortCut = false;
+          this.testdisableAndEnableKeyBoardShortCut.set(false);
           this.populateDefaultShortCut();
+          //   this.testdisableAndEnableKeyBoardShortCut.set(true);
+
           setTimeout(() => {
-            (this.testdisableAndEnableKeyBoardShortCut = true), 300;
+            this.testdisableAndEnableKeyBoardShortCut.set(true), 300;
           });
           resolve(e1.body!);
         } else {
@@ -866,7 +920,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     return new Promise<IStudentResponse>(resolve => {
       this.updateResponseRequest(resp).subscribe(resp1 => {
         if (this.currentStudent === numero) {
-          (comment as any).checked = true;
+          (comment as any)().checked = true;
         }
         this.computeNote(true, resp1.body!, this.currentQuestion!).then(value => {
           resolve(value);
@@ -966,60 +1020,46 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async ajouterTComment(comment: ITextComment) {
-    if (!this.blocked) {
-      this.blocked = true;
-      if (!this.resp!.id) {
-        const ret = await this.updateResponseRequest(this.resp!).toPromise();
-        this.resp = ret!.body!;
-      }
+  private async ajouterTComment(comment: ITextComment, self: CorrigequestionComponent) {
+    if (!self.resp!.id) {
+      const ret = await firstValueFrom(self.updateResponseRequest(self.resp!));
+      self.resp = ret!.body!;
+    }
 
-      this.resp?.textcomments?.push(comment);
-      this.updateResponseRequest(this.resp!).subscribe(resp1 => {
-        this.resp = resp1.body!;
-        (comment as any).checked = true;
-        this.blocked = false;
-      });
-    }
-  }
-  async ajouterGComment(comment: IGradedComment) {
-    if (!this.blocked) {
-      this.blocked = true;
-      if (!this.resp!.id) {
-        const ret = await this.updateResponseRequest(this.resp!).toPromise();
-        this.resp = ret!.body!;
-      }
-      this.resp?.gradedcomments?.push(comment);
-      this.updateResponseRequest(this.resp!).subscribe(resp1 => {
-        this.resp = resp1.body!;
-        (comment as any).checked = true;
-        this.computeNote(true, this.resp!, this.currentQuestion!).then(() => (this.blocked = false));
-      });
-    }
+    self.resp?.textcomments?.push(comment);
+    const resp1 = await firstValueFrom(self.updateResponseRequest(self.resp!));
+    self.resp = resp1.body!;
   }
 
-  async incrementHComment(comment: IHybridGradedComment) {
-    if (!this.blocked) {
-      this.blocked = true;
-      await this.incrementHCommentInternal(comment);
-      this.blocked = false;
+  private async retirerTComment(comment: ITextComment, self: CorrigequestionComponent) {
+    if (!self.resp!.id) {
+      const ret = await firstValueFrom(self.updateResponseRequest(self.resp!));
+      self.resp = ret!.body!;
     }
+    self.resp!.textcomments = self.resp?.textcomments!.filter(e => e.id !== comment.id);
+    const resp1 = await firstValueFrom(self.updateResponseRequest(self.resp!));
+    self.resp = resp1.body!;
+    (comment as any).checked = false;
   }
 
-  async incrementHCommentInternal(comment: IHybridGradedComment) {
-    if (!this.resp!.id) {
-      const ret = await firstValueFrom(this.updateResponseRequest(this.resp!));
-      this.resp = ret!.body!;
+  incrementHComment(comment: IHybridGradedComment) {
+    this.fillorcreateQueryPool(this.incrementHCommentInternal, comment);
+  }
+
+  private async incrementHCommentInternal(comment: IHybridGradedComment, self: CorrigequestionComponent): Promise<void> {
+    if (!self.resp!.id) {
+      const ret = await firstValueFrom(self.updateResponseRequest(self.resp!));
+      self.resp = ret!.body!;
     }
-    const ah = await firstValueFrom(this.answer2HybridGradedCommentService.updateAnswer2Hybrid(this.resp?.id, comment.id));
+    const ah = await firstValueFrom(self.answer2HybridGradedCommentService.updateAnswer2Hybrid(self.resp?.id, comment.id));
     if (ah.body?.hybridcommentsId) {
       //          this.answer2HybridGradedCommentMap.set(ah.body.hybridcommentsId!, ah.body.stepValue!);
       if (comment.step !== undefined && comment.step !== null && comment.step > 2) {
         setTimeout(() => {
-          this.answer2HybridGradedCommentMap.set(ah.body!.hybridcommentsId!, ah.body!.stepValue!);
+          self.answer2HybridGradedCommentMap.set(ah.body!.hybridcommentsId!, ah.body!.stepValue!);
         }, 3);
       }
-      this.answer2HybridGradedCommentMap.set(ah.body!.hybridcommentsId!, ah.body!.stepValue!);
+      self.answer2HybridGradedCommentMap.set(ah.body!.hybridcommentsId!, ah.body!.stepValue!);
 
       if (ah.body.stepValue !== null && ah.body.stepValue !== undefined && ah.body.stepValue > 0) {
         (comment as any).checked = true;
@@ -1027,90 +1067,135 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         (comment as any).checked = false;
       }
 
-      await this.computeNote(true, this.resp!, this.currentQuestion!);
-    }
-  }
-
-  async retirerTComment(comment: ITextComment) {
-    if (!this.blocked) {
-      this.blocked = true;
-      if (!this.resp!.id) {
-        const ret = await this.updateResponseRequest(this.resp!).toPromise();
-        this.resp = ret!.body!;
-      }
-
-      this.resp!.textcomments = this.resp?.textcomments!.filter(e => e.id !== comment.id);
-      this.blocked = true;
-      this.updateResponseRequest(this.resp!).subscribe(resp1 => {
-        this.resp = resp1.body!;
-        this.blocked = false;
-        (comment as any).checked = false;
-      });
+      await self.computeNote(true, self.resp!, self.currentQuestion!);
     }
   }
 
   toggleTCommentById(commentId: any) {
-    if (!this.blocked) {
-      const res = this.currentTextComment4Question?.filter(c => c.id === commentId);
-      if (res !== undefined && res.length > 0) {
-        this.toggleTComment(res[0]);
-      }
+    const res = this.currentTextComment4Question?.filter(c => c().id === commentId);
+    if (res !== undefined && res.length > 0) {
+      this.toggleTComment(res[0]());
     }
   }
+
+  isResolved = true;
+  queryPoolPromise: any;
+
+  fillorcreateQueryPool(
+    f:
+      | ((comment: ITextComment, self: CorrigequestionComponent) => Promise<void>)
+      | ((comment: IGradedComment, self: CorrigequestionComponent) => Promise<void>)
+      | ((comment: IHybridGradedComment, self: CorrigequestionComponent) => Promise<void>),
+    c: ITextComment | IGradedComment | IHybridGradedComment,
+  ) {
+    if (!this.isResolved) {
+      this.queriesPool.push({ f, c, self: this });
+    } else {
+      this.isResolved = false;
+      this.queryPoolPromise = this.createQueryPool(f, c);
+      this.queryPoolPromise.then(() => {
+        this.blocked = false;
+        this.queriesPool = [];
+        this.isResolved = true;
+      });
+    }
+  }
+
+  async createQueryPool(
+    f:
+      | ((comment: ITextComment, self: CorrigequestionComponent) => Promise<void>)
+      | ((comment: IGradedComment, self: CorrigequestionComponent) => Promise<void>)
+      | ((comment: IHybridGradedComment, self: CorrigequestionComponent) => Promise<void>),
+    c: ITextComment | IGradedComment | IHybridGradedComment,
+  ): Promise<boolean> {
+    this.isResolved = false;
+    this.queriesPool = [];
+    this.blocked = true;
+
+    this.queriesPool.push({
+      f,
+      c,
+      self: this,
+    });
+    await PromisePool.withConcurrency(1)
+      .for(this.queriesPool)
+      .process(async prom => {
+        await prom.f(prom.c as any, prom.self);
+        /*         await new Promise((resolve)=> {
+            setTimeout(()=> resolve(undefined),100)
+          })*/
+      });
+    return true;
+  }
+
   toggleGCommentById(commentId: any) {
-    if (!this.blocked) {
-      const res = this.currentGradedComment4Question?.filter(c => c.id === commentId);
-      if (res !== undefined && res.length > 0) {
-        this.toggleGComment(res[0]);
-      }
+    const res = this.currentGradedComment4Question?.filter(c => c().id === commentId);
+    if (res !== undefined && res.length > 0) {
+      this.toggleGComment(res[0]());
     }
   }
 
   toggleHCommentById(commentId: any) {
-    if (!this.blocked) {
-      const res = this.currentHybridGradedComment4Question?.filter(c => c.id === commentId);
-      if (res !== undefined && res.length > 0) {
-        this.incrementHComment(res[0]);
-      }
+    const res = this.currentHybridGradedComment4Question?.filter(c => c().id === commentId);
+    if (res !== undefined && res.length > 0) {
+      this.incrementHComment(res[0]());
     }
   }
 
   toggleGComment(comment: IGradedComment) {
-    if (!this.blocked) {
-      if (!this.checked(comment)) {
-        this.ajouterGComment(comment);
-      } else {
-        this.retirerGComment(comment);
-      }
-    }
-  }
-  toggleTComment(comment: ITextComment) {
-    if (!this.blocked) {
-      if (!this.checked(comment)) {
-        this.ajouterTComment(comment);
-      } else {
-        this.retirerTComment(comment);
-      }
-    }
-  }
-
-  async retirerGComment(comment: IGradedComment) {
-    if (!this.blocked) {
-      this.blocked = true;
-      if (!this.resp!.id) {
-        const ret = await this.updateResponseRequest(this.resp!).toPromise();
-        this.resp = ret!.body!;
-      }
-      this.resp!.gradedcomments = this.resp?.gradedcomments!.filter(e => e.id !== comment.id);
-      this.blocked = true;
-      this.updateResponseRequest(this.resp!).subscribe(resp1 => {
-        this.resp = resp1.body!;
-
+    if (!this.checked(comment)) {
+      (comment as any).checked = true;
+      setTimeout(() => {
+        (comment as any).checked = true;
+      }, 30);
+      this.fillorcreateQueryPool(this.ajouterGComment, comment);
+    } else {
+      (comment as any).checked = false;
+      setTimeout(() => {
+        //         this.active.set(comment.id!, false);
         (comment as any).checked = false;
-        this.computeNote(true, this.resp!, this.currentQuestion!).then(() => (this.blocked = false));
-      });
+      }, 30);
+      this.fillorcreateQueryPool(this.retirerGComment, comment);
     }
   }
+
+  toggleTComment(comment: ITextComment) {
+    if (!this.checked(comment)) {
+      (comment as any).checked = true;
+      this.fillorcreateQueryPool(this.ajouterTComment, comment);
+    } else {
+      (comment as any).checked = false;
+      this.fillorcreateQueryPool(this.retirerTComment, comment);
+    }
+  }
+
+  private async ajouterGComment(comment: IGradedComment, self: CorrigequestionComponent) {
+    if (!self.resp!.id) {
+      const ret = await firstValueFrom(self.updateResponseRequest(self.resp!));
+      self.resp = ret!.body!;
+    }
+
+    self.resp?.gradedcomments?.push(comment);
+
+    const resp1 = await firstValueFrom(self.updateResponseRequest(self.resp!)); // .subscribe(resp1 => {
+    self.resp = resp1.body!;
+    await self.computeNote(true, self.resp!, self.currentQuestion!);
+    //    });
+  }
+
+  private async retirerGComment(comment: IGradedComment, self: CorrigequestionComponent) {
+    self.blocked = true;
+    if (!self.resp!.id) {
+      const ret = await firstValueFrom(self.updateResponseRequest(self.resp!));
+      self.resp = ret!.body!;
+    }
+    self.resp!.gradedcomments = self.resp?.gradedcomments!.filter(e => e.id !== comment.id);
+    self.blocked = true;
+    const resp1 = await firstValueFrom(self.updateResponseRequest(self.resp!)); // .subscribe(resp1 => {
+    self.resp = resp1.body!;
+    await self.computeNote(true, self.resp!, self.currentQuestion!);
+  }
+
   updateNote4updateQuestion(update: boolean, resp: IStudentResponse, currentQ: IQuestion[]): Promise<IStudentResponse> {
     this.updateQuestion(currentQ);
     return this.computeNote(update, resp, currentQ[0]);
@@ -1169,13 +1254,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         let absoluteNote2Add = 0;
         let pourcentage = currentQ.defaultpoint ? currentQ.defaultpoint : 0;
         this.currentHybridGradedComment4Question?.forEach(g => {
-          if (this.answer2HybridGradedCommentMap.has(g.id)) {
-            const stepValue = this.answer2HybridGradedCommentMap.get(g.id);
+          if (this.answer2HybridGradedCommentMap.has(g().id)) {
+            const stepValue = this.answer2HybridGradedCommentMap.get(g().id);
             if (stepValue! > 0) {
-              if (g.relative) {
-                pourcentage = pourcentage + (stepValue! / g.step!) * g.grade!;
+              if (g().relative) {
+                pourcentage = pourcentage + (stepValue! / g().step!) * g().grade!;
               } else {
-                absoluteNote2Add = absoluteNote2Add + (stepValue! / g.step!) * g.grade!;
+                absoluteNote2Add = absoluteNote2Add + (stepValue! / g().step!) * g().grade!;
               }
             }
           }
@@ -1270,11 +1355,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             this.updateResponseRequest(this.resp!).subscribe(resp1 => {
               this.resp = resp1.body!;
               (currentComment as any).checked = true;
-              this.currentTextComment4Question?.push(currentComment);
-              this.testdisableAndEnableKeyBoardShortCut = false;
+              this.currentTextComment4Question?.push(signal(currentComment));
+              this.testdisableAndEnableKeyBoardShortCut.set(false);
               this.populateDefaultShortCut();
+              //     this.testdisableAndEnableKeyBoardShortCut.set(true);
               setTimeout(() => {
-                (this.testdisableAndEnableKeyBoardShortCut = true), 300;
+                this.testdisableAndEnableKeyBoardShortCut.set(true), 300;
               });
 
               this.titreCommentaire = '';
@@ -1302,11 +1388,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               this.resp = resp1.body!;
 
               (currentComment as any).checked = true;
-              this.currentGradedComment4Question?.push(currentComment);
-              this.testdisableAndEnableKeyBoardShortCut = false;
+              this.currentGradedComment4Question?.push(signal(currentComment));
+              this.testdisableAndEnableKeyBoardShortCut.set(false);
               this.populateDefaultShortCut();
+              //   this.testdisableAndEnableKeyBoardShortCut.set(true);
+
               setTimeout(() => {
-                (this.testdisableAndEnableKeyBoardShortCut = true), 300;
+                this.testdisableAndEnableKeyBoardShortCut.set(true), 300;
               });
 
               this.computeNote(false, this.resp!, this.currentQuestion!);
@@ -1330,13 +1418,17 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.blocked = true;
           this.hybridGradedCommentService.create(t).subscribe(e => {
             const currentComment = e.body!;
-            this.currentHybridGradedComment4Question?.push(currentComment);
+            this.currentHybridGradedComment4Question?.push(signal(currentComment));
 
-            this.incrementHCommentInternal(currentComment).then(() => {
+            this.incrementHCommentInternal(currentComment, this).then(() => {
+              this.testdisableAndEnableKeyBoardShortCut.set(false);
+
               this.populateDefaultShortCut();
+              //  this.testdisableAndEnableKeyBoardShortCut.set(true);
+
               setTimeout(() => {
-                this.testdisableAndEnableKeyBoardShortCut = true;
-              }, 30);
+                this.testdisableAndEnableKeyBoardShortCut.set(true);
+              }, 300);
               this.titreCommentaire = '';
               this.descCommentaire = '';
               this.noteCommentaire = 0;
@@ -1360,7 +1452,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  previousStudent() {
+  async previousStudent() {
+    if (this.queryPoolPromise) {
+      await this.queryPoolPromise;
+    }
+
     if (!this.blocked) {
       this.cleanCanvassCache();
       const c = this.currentStudent;
@@ -1375,7 +1471,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  nextStudent() {
+  async nextStudent() {
+    if (this.queryPoolPromise) {
+      await this.queryPoolPromise;
+    }
     if (!this.blocked) {
       this.cleanCanvassCache();
 
@@ -1389,7 +1488,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
     }
   }
-  previousQuestion(): void {
+  async previousQuestion(): Promise<void> {
+    if (this.queryPoolPromise) {
+      await this.queryPoolPromise;
+    }
+
     if (!this.blocked) {
       this.cleanCanvassCache();
 
@@ -1403,7 +1506,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  nextQuestion(): void {
+  async nextQuestion(): Promise<void> {
+    if (this.queryPoolPromise) {
+      await this.queryPoolPromise;
+    }
+
     if (!this.blocked) {
       this.cleanCanvassCache();
       const c = this.currentStudent + 1;
@@ -1795,7 +1902,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   updateComment($event: any, l: IGradedComment | ITextComment | IHybridGradedComment, graded: boolean, hybrid: boolean): any {
     if (l.id) {
       setTimeout(() => {
-        this.active.set(l.id!, false);
+        if (this.active.has(l.id!)) {
+          this.active.get(l.id!)!.set(false);
+        } else {
+          this.active.set(l.id!, signal(false));
+        }
       }, 30);
     }
 
@@ -1821,11 +1932,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         (l as IHybridGradedComment).relative = true;
       }
       this.hybridGradedCommentService.update(l as IHybridGradedComment).subscribe(() => {
-        const coms = this.currentHybridGradedComment4Question?.filter(c => c.id === l.id!);
+        const coms = this.currentHybridGradedComment4Question?.filter(c => c().id === l.id!);
         if (coms !== undefined && coms.length > 0) {
-          coms[0].grade = (l as any).grade;
-          coms[0].step = (l as any).step;
-          coms[0].relative = (l as any).relative;
+          coms[0]().grade = (l as any).grade;
+          coms[0]().step = (l as any).step;
+          coms[0]().relative = (l as any).relative;
           this.computeNote(true, this.resp!, this.currentQuestion!);
         }
       });
@@ -1836,7 +1947,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   closeEditComment(l: IGradedComment | ITextComment | IHybridGradedComment) {
     if (l.id) {
-      this.active.set(l.id, false);
+      if (this.active.has(l.id!)) {
+        this.active.get(l.id!)!.set(false);
+      } else {
+        this.active.set(l.id!, signal(false));
+      }
     }
   }
 
@@ -1902,8 +2017,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.confirmationService.confirm({
         message: this.translateService.instant('scanexam.removetextcommentconfirmation', { c1 }),
         accept: () => {
-          this.retirerTComment(comment).then(() => {
-            this.currentTextComment4Question = this.currentTextComment4Question!.filter(e => e.id !== comment.id);
+          this.retirerTComment(comment, this).then(() => {
+            this.currentTextComment4Question = this.currentTextComment4Question!.filter(e => e().id !== comment.id);
             this.textCommentService.delete(comment!.id!).subscribe(() => {
               const m = this.preferenceService.getCommentSort4Question(this.examId + '_' + this.currentQuestion!.id!);
               if (m.has(comment!.id!)) {
@@ -1931,8 +2046,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.confirmationService.confirm({
           message: this.translateService.instant('scanexam.removegradedcommentconfirmation', { c1 }),
           accept: () => {
-            this.retirerGComment(comment).then(() => {
-              this.currentGradedComment4Question = this.currentGradedComment4Question!.filter(e => e.id !== comment.id);
+            this.retirerGComment(comment, this).then(() => {
+              this.currentGradedComment4Question = this.currentGradedComment4Question!.filter(e => e().id !== comment.id);
               this.gradedCommentService.delete(comment!.id!).subscribe(() => {
                 const m = this.preferenceService.getCommentSort4Question(this.examId + '_' + this.currentQuestion!.id!);
                 if (m.has(comment!.id!)) {
@@ -1967,7 +2082,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.confirmationService.confirm({
           message: this.translateService.instant('scanexam.removehybridcommentconfirmation', { c1 }),
           accept: () => {
-            this.currentHybridGradedComment4Question = this.currentHybridGradedComment4Question!.filter(e => e.id !== comment.id);
+            this.currentHybridGradedComment4Question = this.currentHybridGradedComment4Question!.filter(e => e().id !== comment.id);
             setTimeout(() => {
               this.answer2HybridGradedCommentMap.delete(comment.id);
               this.computeNote(true, this.resp!, this.currentQuestion!);
@@ -2285,73 +2400,77 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   addTextComment($event: ITextComment): void {
-    this.currentTextComment4Question?.push($event);
-    this.testdisableAndEnableKeyBoardShortCut = false;
+    this.currentTextComment4Question?.push(signal($event));
+    this.testdisableAndEnableKeyBoardShortCut.set(false);
+
     this.populateDefaultShortCut();
+    // this.testdisableAndEnableKeyBoardShortCut.set(false);
+
     setTimeout(() => {
-      this.testdisableAndEnableKeyBoardShortCut = true;
+      this.testdisableAndEnableKeyBoardShortCut.set(true);
     }, 30);
   }
   updateTextComment($event: ITextComment): void {
-    const c1 = this.currentTextComment4Question?.find(c => (c.id = $event.id));
+    const c1 = this.currentTextComment4Question?.find(c => (c().id = $event.id));
     if (c1) {
-      if (c1.description !== $event.description) {
-        c1.description = $event.description;
+      if (c1().description !== $event.description) {
+        c1().description = $event.description;
       }
-      if (c1.text !== $event.text) {
-        c1.text = $event.text;
+      if (c1().text !== $event.text) {
+        c1().text = $event.text;
       }
     }
   }
   addGradedComment($event: IGradedComment): void {
-    this.currentGradedComment4Question?.push($event);
-    this.testdisableAndEnableKeyBoardShortCut = false;
+    this.currentGradedComment4Question?.push(signal($event));
+    this.testdisableAndEnableKeyBoardShortCut.set(false);
     this.populateDefaultShortCut();
-    setTimeout(() => (this.testdisableAndEnableKeyBoardShortCut = true), 30);
+    // this.testdisableAndEnableKeyBoardShortCut.set(true);
+    setTimeout(() => this.testdisableAndEnableKeyBoardShortCut.set(true), 30);
   }
 
   updateGradedComment($event: IGradedComment): void {
-    const c1 = this.currentGradedComment4Question?.find(c => (c.id = $event.id));
+    const c1 = this.currentGradedComment4Question?.find(c => (c().id = $event.id));
     if (c1) {
-      if (c1.description !== $event.description) {
-        c1.description = $event.description;
+      if (c1().description !== $event.description) {
+        c1().description = $event.description;
       }
-      if (c1.text !== $event.text) {
-        c1.text = $event.text;
+      if (c1().text !== $event.text) {
+        c1().text = $event.text;
       }
-      if (c1.grade !== $event.grade) {
-        c1.grade = $event.grade;
+      if (c1().grade !== $event.grade) {
+        c1().grade = $event.grade;
       }
     }
   }
 
   addHybridComment($event: IHybridGradedComment): void {
-    this.currentHybridGradedComment4Question?.push($event);
-    this.testdisableAndEnableKeyBoardShortCut = false;
+    this.currentHybridGradedComment4Question?.push(signal($event));
+    this.testdisableAndEnableKeyBoardShortCut.set(false);
     this.populateDefaultShortCut();
-    setTimeout(() => (this.testdisableAndEnableKeyBoardShortCut = true), 30);
+    setTimeout(() => this.testdisableAndEnableKeyBoardShortCut.set(true), 300);
   }
 
   updateHybridComment($event: IHybridGradedComment): void {
-    const c1 = this.currentHybridGradedComment4Question?.find(c => (c.id = $event.id));
+    const c1 = this.currentHybridGradedComment4Question?.find(c => (c().id = $event.id));
     if (c1) {
       let computen = false;
-      if (c1.description !== $event.description) {
-        c1.description = $event.description;
+      if (c1().description !== $event.description) {
+        c1().description = $event.description;
       }
-      if (c1.text !== $event.text) {
-        c1.text = $event.text;
+      if (c1().text !== $event.text) {
+        c1().text = $event.text;
       }
-      if (c1.grade !== $event.grade) {
-        c1.grade = $event.grade;
+      if (c1().grade !== $event.grade) {
+        c1().grade = $event.grade;
         computen = true;
       }
-      if (c1.relative !== $event.relative) {
-        c1.relative = $event.relative;
+      if (c1().relative !== $event.relative) {
+        c1().relative = $event.relative;
         computen = true;
       }
-      if (c1.step !== $event.step) {
-        c1.step = $event.step;
+      if (c1().step !== $event.step) {
+        c1().step = $event.step;
         computen = true;
       }
       if (computen && this.resp !== undefined && this.currentQuestion !== undefined) {
