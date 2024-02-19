@@ -1166,7 +1166,8 @@
           *ngIf="
             (!minimizeComment ||
               ((currentGradedComment4Question === undefined || currentGradedComment4Question?.length === 0) &&
-                (currentTextComment4Question === undefined || currentTextComment4Question?.length === 0))) &&
+                (currentTextComment4Question === undefined || currentTextComment4Question?.length === 0) &&
+                (currentHybridGradedComment4Question === undefined || currentHybridGradedComment4Question?.length === 0))) &&
             currentQuestion &&
             currentQuestion?.typeAlgoName !== 'QCM'
           "
