@@ -33,7 +33,7 @@
     </ng-template>
   </p-confirmDialog>
   <ng-keyboard-shortcuts [shortcuts]="shortcuts"></ng-keyboard-shortcuts>
-  <ng-container *ngIf="testdisableAndEnableKeyBoardShortCut">
+  <ng-container *ngIf="testdisableAndEnableKeyBoardShortCutSignal">
     <jhi-keyboardshortcut
       (toggleTCommentById)="toggleTCommentById($event)"
       (toggleGCommentById)="toggleGCommentById($event)"
@@ -643,7 +643,12 @@
                 </span>
 
                 <div *ngIf="!minimizeComment">
-                  <p-inplace #texttitle [active]="active.get(comment.id!)" [closable]="true" (onDeactivate)="closeEditComment(comment)">
+                  <p-inplace
+                    #texttitle
+                    [active]="active.has(comment.id!) && active.get(comment.id!)!()"
+                    [closable]="true"
+                    (onDeactivate)="closeEditComment(comment)"
+                  >
                     <ng-template pTemplate="display">
                       <h5 class="card-title">{{ comment.text }}</h5>
                     </ng-template>
@@ -661,7 +666,7 @@
                   </p-inplace>
                   <p-inplace
                     #textdescription
-                    [active]="active.get(comment.id!)"
+                    [active]="active.has(comment.id!) && active.get(comment.id!)!()"
                     [closable]="true"
                     (onDeactivate)="closeEditComment(comment)"
                   >
@@ -685,14 +690,14 @@
                   <a
                     *ngIf="!checked(comment)"
                     class="p-button p-button-primary"
-                    (click)="ajouterTComment(comment)"
+                    (click)="toggleTComment(comment)"
                     jhiTranslate="scanexam.add"
                     >Ajouter</a
                   >
                   <a
                     *ngIf="checked(comment)"
                     class="p-button p-button-primary"
-                    (click)="retirerTComment(comment)"
+                    (click)="toggleTComment(comment)"
                     jhiTranslate="scanexam.remove"
                     >Retirer</a
                   >
@@ -794,7 +799,12 @@
                   </div>
 
                   <div *ngIf="currentQuestion?.typeAlgoName !== 'QCM'">
-                    <p-inplace #gradedtitle [closable]="true" [active]="active.get(comment.id!)" (onDeactivate)="closeEditComment(comment)">
+                    <p-inplace
+                      #gradedtitle
+                      [closable]="true"
+                      [active]="active.has(comment.id!) && active.get(comment.id!)!()"
+                      (onDeactivate)="closeEditComment(comment)"
+                    >
                       <ng-template pTemplate="display">
                         <h5 class="card-title">{{ comment.text }}</h5>
                       </ng-template>
@@ -813,7 +823,7 @@
                     <p-inplace
                       #gradeddescription
                       [closable]="true"
-                      [active]="active.get(comment.id!)"
+                      [active]="active.has(comment.id!) && active.get(comment.id!)!()"
                       (onDeactivate)="closeEditComment(comment)"
                     >
                       <ng-template pTemplate="display">
@@ -833,7 +843,11 @@
                         />
                       </ng-template>
                     </p-inplace>
-                    <p-inplace [closable]="true" [active]="active.get(comment.id!)" (onDeactivate)="closeEditComment(comment)">
+                    <p-inplace
+                      [closable]="true"
+                      [active]="active.has(comment.id!) && active.get(comment.id!)!()"
+                      (onDeactivate)="closeEditComment(comment)"
+                    >
                       <ng-template pTemplate="display">
                         <p class="card-text" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
                           <span jhiTranslate="scanexam.noteassociecomment"> Note associée à ce commentaire : </span>
@@ -857,14 +871,14 @@
                   <a
                     *ngIf="!checked(comment)"
                     class="p-button p-button-primary"
-                    (click)="ajouterGComment(comment)"
+                    (click)="toggleGComment(comment)"
                     jhiTranslate="scanexam.add"
                     >Ajouter</a
                   >
                   <a
                     *ngIf="checked(comment)"
                     class="p-button p-button-primary"
-                    (click)="retirerGComment(comment)"
+                    (click)="toggleGComment(comment)"
                     jhiTranslate="scanexam.remove"
                     >Retirer</a
                   >
@@ -880,7 +894,7 @@
                       {{ comment.text }}<span style="font-size: x-small"> ({{ comment.shortcut }}) </span>
                     </p>
                   </div>
-                  <div *ngIf="currentQuestion?.typeAlgoName! !== 'QCM'" (click)="toggleGComment(comment)">
+                  <div *ngIf="currentQuestion?.typeAlgoName! !== 'QCM'">
                     <p
                       [tooltipZIndex]="'3000'"
                       [escape]="false"
@@ -972,7 +986,12 @@
                 </span>
                 <div *ngIf="!minimizeComment">
                   <div>
-                    <p-inplace #hybridtitle [closable]="true" [active]="active.get(comment.id!)" (onDeactivate)="closeEditComment(comment)">
+                    <p-inplace
+                      #hybridtitle
+                      [closable]="true"
+                      [active]="active.has(comment.id!) && active.get(comment.id!)!()"
+                      (onDeactivate)="closeEditComment(comment)"
+                    >
                       <ng-template pTemplate="display">
                         <h5 class="card-title">{{ comment.text }}</h5>
                       </ng-template>
@@ -991,7 +1010,7 @@
                     <p-inplace
                       #hybriddescription
                       [closable]="true"
-                      [active]="active.get(comment.id!)"
+                      [active]="active.has(comment.id!) && active.get(comment.id!)!()"
                       (onDeactivate)="closeEditComment(comment)"
                     >
                       <ng-template pTemplate="display">
@@ -1010,7 +1029,11 @@
                       </ng-template>
                     </p-inplace>
 
-                    <p-inplace [closable]="true" [active]="active.get(comment.id!)" (onDeactivate)="closeEditComment(comment)">
+                    <p-inplace
+                      [closable]="true"
+                      [active]="active.has(comment.id!) && active.get(comment.id!)!()"
+                      (onDeactivate)="closeEditComment(comment)"
+                    >
                       <ng-template pTemplate="display">
                         <span *ngIf="comment.grade !== null && comment.grade !== undefined && comment.grade > 0"> + </span>
                         {{ comment.grade }} <span *ngIf="!comment.relative"> pt</span> <span *ngIf="comment.relative"> %</span>
@@ -1058,7 +1081,11 @@
                       </ng-template>
                     </p-inplace>
 
-                    <p-inplace [closable]="true" [active]="active.get(comment.id!)" (onDeactivate)="closeEditComment(comment)">
+                    <p-inplace
+                      [closable]="true"
+                      [active]="active.has(comment.id!) && active.get(comment.id!)!()"
+                      (onDeactivate)="closeEditComment(comment)"
+                    >
                       <ng-template pTemplate="display">
                         <span jhiTranslate="scanexam.hybridcommentStep"> Nombre de pas:</span>
                         {{ comment.step }}
@@ -1139,7 +1166,8 @@
           *ngIf="
             (!minimizeComment ||
               ((currentGradedComment4Question === undefined || currentGradedComment4Question?.length === 0) &&
-                (currentTextComment4Question === undefined || currentTextComment4Question?.length === 0))) &&
+                (currentTextComment4Question === undefined || currentTextComment4Question?.length === 0) &&
+                (currentHybridGradedComment4Question === undefined || currentHybridGradedComment4Question?.length === 0))) &&
             currentQuestion &&
             currentQuestion?.typeAlgoName !== 'QCM'
           "

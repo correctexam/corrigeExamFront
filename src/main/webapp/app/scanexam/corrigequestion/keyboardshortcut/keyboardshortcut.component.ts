@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, Signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { IKeyBoardShortCutPreferenceEntry, KeyboardShortcutService } from 'app/scanexam/preference-page/keyboardshortcut.service';
@@ -27,12 +27,12 @@ export class KeyboardshortcutComponent implements AfterViewInit {
   questionindex = 0;
 
   @Input()
-  textcomments?: ITextComment[];
+  textcomments?: Signal<ITextComment>[];
   @Input()
-  gradedcomments?: IGradedComment[];
+  gradedcomments?: Signal<IGradedComment>[];
 
   @Input()
-  hybridgradedcomments?: IHybridGradedComment[];
+  hybridgradedcomments?: Signal<IHybridGradedComment>[];
 
   @Output()
   toggleTCommentById: EventEmitter<number> = new EventEmitter();
@@ -59,13 +59,13 @@ export class KeyboardshortcutComponent implements AfterViewInit {
     const toRemove: number[] = [];
     const comments: (IGradedComment | ITextComment | IHybridGradedComment)[] = [];
     if (this.gradedcomments) {
-      comments.push(...this.gradedcomments);
+      comments.push(...this.gradedcomments.map(e => e()));
     }
     if (this.textcomments) {
-      comments.push(...this.textcomments);
+      comments.push(...this.textcomments.map(e => e()));
     }
     if (this.hybridgradedcomments) {
-      comments.push(...this.hybridgradedcomments);
+      comments.push(...this.hybridgradedcomments.map(e => e()));
     }
 
     if (this.keyboardShortcutService.getShortCutPreference().shortcuts.has(this.examId + '_' + this.questionindex)) {
