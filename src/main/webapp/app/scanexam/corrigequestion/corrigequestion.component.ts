@@ -234,6 +234,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     private keyboardShortcutService: KeyboardShortcutService,
     private applicationConfigService: ApplicationConfigService,
     private titleService: Title,
+    private ngZone: NgZone,
   ) {
     effect(() => {
       this.testdisableAndEnableKeyBoardShortCutSignal = this.testdisableAndEnableKeyBoardShortCut();
@@ -456,7 +457,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       } else {
         const c = this.currentStudent + 1;
-        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+        });
       }
       this.testdisableAndEnableKeyBoardShortCut.set(true);
     }
@@ -1463,10 +1466,14 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       const q1 = this.questionindex!;
 
       if (c > 0) {
-        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+        });
       } else if (q1 > 0) {
         const prevSt = this.numberPagesInScan! / this.nbreFeuilleParCopie!;
-        this.router.navigateByUrl('/answer/' + this.examId! + '/' + q1 + '/' + prevSt);
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + q1 + '/' + prevSt);
+        });
       }
     }
   }
@@ -1482,9 +1489,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       const c = this.currentStudent + 2;
       const q1 = this.questionindex! + 2;
       if (c <= this.numberPagesInScan! / this.nbreFeuilleParCopie!) {
-        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+        });
       } else if (q1 <= this.nbreQuestions) {
-        this.router.navigateByUrl('/answer/' + this.examId! + '/' + q1 + '/' + 1);
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + q1 + '/' + 1);
+        });
       }
     }
   }
@@ -1499,9 +1510,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       const c = this.currentStudent + 1;
       const q = this.questionindex;
       if (q! > 0) {
-        this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
+        });
       } else if (c > 1) {
-        this.router.navigateByUrl('/answer/' + this.examId! + '/' + this.nbreQuestions + '/' + (c - 1));
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + this.nbreQuestions + '/' + (c - 1));
+        });
       }
     }
   }
@@ -1516,9 +1531,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       const c = this.currentStudent + 1;
       const q = this.questionindex! + 2;
       if (q <= this.nbreQuestions) {
-        this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + q + '/' + c);
+        });
       } else if (c < this.numberPagesInScan! / this.nbreFeuilleParCopie!) {
-        this.router.navigateByUrl('/answer/' + this.examId! + '/' + 1 + '/' + (c + 1));
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + 1 + '/' + (c + 1));
+        });
       }
     }
   }
@@ -1528,7 +1547,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.cleanCanvassCache();
       this.currentStudent = $event.page;
       const c = this.currentStudent + 1;
-      this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+      this.ngZone.run(() => {
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+      });
     }
   }
   changeQuestion($event: any): void {
@@ -1539,7 +1560,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
       const c = this.currentStudent + 1;
       if ($event.pageCount !== 1) {
-        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+        });
       }
     }
   }
@@ -1555,12 +1578,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   gotoUE(): void {
     this.cleanCanvassCache();
-    this.router.navigateByUrl('/exam/' + this.examId!);
+    this.ngZone.run(() => {
+      this.router.navigateByUrl('/exam/' + this.examId!);
+    });
   }
 
   gotoMarkingSummary(): void {
     this.cleanCanvassCache();
-    this.router.navigateByUrl('/marking-summary/' + this.examId!);
+    this.ngZone.run(() => {
+      this.router.navigateByUrl('/marking-summary/' + this.examId!);
+    });
   }
 
   /*  async refreshStudentList(force: boolean): Promise<void> {
@@ -2534,5 +2561,20 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       m.set(e.id, index);
     });
     this.preferenceService.saveCommentSort4Question(this.examId + '_' + this.currentQuestion!.id!, m);
+  }
+
+  onSwipeMove(event: any) {
+    console.error(`SwipeMove direction: ${event.direction} and distance: ${event.distance}`);
+  }
+  async onSwipeEnd(event: any) {
+    if (event.direction === 'x' && event.distance > 70) {
+      await this.nextStudent();
+    } else if (event.direction === 'x' && event.distance < -70) {
+      await this.previousStudent();
+    } else if (event.direction === 'y' && event.distance > 70) {
+      await this.nextQuestion();
+    } else if (event.direction === 'y' && event.distance < -70) {
+      await this.previousQuestion();
+    }
   }
 }
