@@ -97,6 +97,7 @@ import { AllbindingsComponent } from './associer-copies-etudiants/allbindings/al
 import { FontsizeSliderComponent } from './corrigequestion/toolbar/fontsize-slider/fontsize-slider.component';
 import { CommentSortPipe } from './sortComment';
 import { ArraySortPipe } from './sort';
+import { SwipeDirective } from './swipe.directive';
 
 // set the location of the OpenCV files
 // registerAllModules();
@@ -482,6 +483,7 @@ export const CompareAnswer_ROUTE: Route = {
     FontsizeSliderComponent,
     CommentSortPipe,
     ArraySortPipe,
+    SwipeDirective,
   ],
   imports: [
     CommonModule,
