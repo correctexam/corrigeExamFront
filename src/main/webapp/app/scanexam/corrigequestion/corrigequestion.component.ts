@@ -2567,13 +2567,17 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     console.error(`SwipeMove direction: ${event.direction} and distance: ${event.distance}`);
   }
   async onSwipeEnd(event: any) {
+    let verticalScroll = true;
+    if (document.body.scrollHeight > window.innerHeight) {
+      verticalScroll = false;
+    }
     if (event.direction === 'x' && event.distance > 70) {
       await this.nextStudent();
     } else if (event.direction === 'x' && event.distance < -70) {
       await this.previousStudent();
-    } else if (event.direction === 'y' && event.distance > 70) {
+    } else if (event.direction === 'y' && event.distance > 70 && verticalScroll) {
       await this.nextQuestion();
-    } else if (event.direction === 'y' && event.distance < -70) {
+    } else if (event.direction === 'y' && event.distance < -70 && verticalScroll) {
       await this.previousQuestion();
     }
   }
