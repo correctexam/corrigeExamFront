@@ -453,12 +453,14 @@
         style="overflow-y: auto; overflow-x: hidden; max-height: 85vh; position: sticky; top: 0"
       >
         <div class="grid grid-nogutter">
-          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
-            <div *ngIf="currentQuestion?.libelle !== undefined && currentQuestion?.libelle !== ''">
+          <div style="padding-bottom: 1rem" class="flex col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12 flex flex-column">
+            <div class="flex-item" *ngIf="currentQuestion?.libelle !== undefined && currentQuestion?.libelle !== ''">
               <span [tooltipPosition]="'top'" [pTooltip]="'scanexam.libelle' | translate">{{ currentQuestion?.libelle }}</span>
               <BR />
             </div>
             <div
+              style="width: 100%"
+              class="flex-item"
               *ngIf="
                 currentQuestion !== undefined &&
                 currentQuestion.gradeType === 'DIRECT' &&
@@ -478,74 +480,76 @@
               ></p-rating
               ><BR />
             </div>
+            <div class="flex-item">
+              <span jhiTranslate="scanexam.noteattribuee">Note attribuée : </span>
+              <span
+                *ngIf="
+                  (currentQuestion?.typeAlgoName === 'QCM' || currentQuestion?.gradeType !== 'HYBRID') &&
+                  questionStep > 0 &&
+                  resp?.id &&
+                  currentNote !== undefined
+                "
+                ><b>{{ currentNote! / questionStep | number: '1.0-2' }}</b></span
+              >
+              <span
+                *ngIf="
+                  (currentQuestion?.typeAlgoName === 'QCM' || currentQuestion?.gradeType !== 'HYBRID') && questionStep <= 0 && resp?.id
+                "
+                ><b>{{ currentNote }}</b></span
+              ><span
+                *ngIf="
+                  (currentQuestion?.typeAlgoName === 'QCM' || currentQuestion?.gradeType !== 'HYBRID') &&
+                  resp?.id &&
+                  questions !== undefined &&
+                  questions!.length > 0
+                "
+                ><b> / {{ questions![0].point! }}</b></span
+              >
+              <span
+                *ngIf="
+                  currentQuestion?.typeAlgoName !== 'QCM' &&
+                  currentQuestion?.gradeType === 'HYBRID' &&
+                  resp?.id &&
+                  questions !== undefined &&
+                  questions!.length > 0
+                "
+                ><b> {{ currentNote | number: '1.0-2' }} / {{ questions![0].point! }}</b></span
+              >
+              <span *ngIf="!resp?.id" jhiTranslate="scanexam.noneval">non évalué</span>
+              <span
+                *ngIf="resp?.id"
+                class="float-end"
+                [tooltipPosition]="'left'"
+                [tooltipZIndex]="'3000'"
+                [pTooltip]="'scanexam.tooltipResetAnswer' | translate"
+                (click)="removeAnswer()"
+              >
+                <fa-icon icon="trash"></fa-icon>
+              </span>
+              <span *ngIf="resp?.id" class="float-end"> &nbsp; &nbsp; </span>
 
-            <span jhiTranslate="scanexam.noteattribuee">Note attribuée : </span>
+              <span
+                *ngIf="resp?.id"
+                class="float-end"
+                [tooltipPosition]="'left'"
+                [tooltipZIndex]="'3000'"
+                [pTooltip]="'scanexam.tooltipCompareMark' | translate"
+                (click)="compareMark($event, resp!)"
+              >
+                <fa-icon icon="code-compare"></fa-icon>
+              </span>
+              <span *ngIf="resp?.id" class="float-end"> &nbsp; &nbsp; </span>
 
-            <span
-              *ngIf="
-                (currentQuestion?.typeAlgoName === 'QCM' || currentQuestion?.gradeType !== 'HYBRID') &&
-                questionStep > 0 &&
-                resp?.id &&
-                currentNote !== undefined
-              "
-              ><b>{{ currentNote! / questionStep | number: '1.0-2' }}</b></span
-            >
-            <span
-              *ngIf="(currentQuestion?.typeAlgoName === 'QCM' || currentQuestion?.gradeType !== 'HYBRID') && questionStep <= 0 && resp?.id"
-              ><b>{{ currentNote }}</b></span
-            ><span
-              *ngIf="
-                (currentQuestion?.typeAlgoName === 'QCM' || currentQuestion?.gradeType !== 'HYBRID') &&
-                resp?.id &&
-                questions !== undefined &&
-                questions!.length > 0
-              "
-              ><b> / {{ questions![0].point! }}</b></span
-            >
-            <span
-              *ngIf="
-                currentQuestion?.typeAlgoName !== 'QCM' &&
-                currentQuestion?.gradeType === 'HYBRID' &&
-                resp?.id &&
-                questions !== undefined &&
-                questions!.length > 0
-              "
-              ><b> {{ currentNote | number: '1.0-2' }} / {{ questions![0].point! }}</b></span
-            >
-            <span *ngIf="!resp?.id" jhiTranslate="scanexam.noneval">non évalué</span>
-            <span
-              *ngIf="resp?.id"
-              class="float-end"
-              [tooltipPosition]="'left'"
-              [tooltipZIndex]="'3000'"
-              [pTooltip]="'scanexam.tooltipResetAnswer' | translate"
-              (click)="removeAnswer()"
-            >
-              <fa-icon icon="trash"></fa-icon>
-            </span>
-            <span *ngIf="resp?.id" class="float-end"> &nbsp; &nbsp; </span>
-
-            <span
-              *ngIf="resp?.id"
-              class="float-end"
-              [tooltipPosition]="'left'"
-              [tooltipZIndex]="'3000'"
-              [pTooltip]="'scanexam.tooltipCompareMark' | translate"
-              (click)="compareMark($event, resp!)"
-            >
-              <fa-icon icon="code-compare"></fa-icon>
-            </span>
-            <span *ngIf="resp?.id" class="float-end"> &nbsp; &nbsp; </span>
-
-            <span
-              class="float-end"
-              [tooltipPosition]="'left'"
-              [tooltipZIndex]="'3000'"
-              [pTooltip]="'scanexam.editquestionTooltip' | translate"
-              (click)="editQuestion()"
-            >
-              <fa-icon icon="edit"></fa-icon>
-            </span>
+              <span
+                class="float-end"
+                [tooltipPosition]="'left'"
+                [tooltipZIndex]="'3000'"
+                [pTooltip]="'scanexam.editquestionTooltip' | translate"
+                (click)="editQuestion()"
+              >
+                <fa-icon icon="edit"></fa-icon>
+              </span>
+            </div>
           </div>
           <div *ngIf="resp" style="padding-bottom: 0.4rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <label jhiTranslate="scanexam.excellente">Excellente réponse: </label>
