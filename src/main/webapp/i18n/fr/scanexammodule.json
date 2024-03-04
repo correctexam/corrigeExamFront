@@ -470,6 +470,8 @@
     "exportCsv": "Exporter les notes du module au format CSV",
     "exportExcel": "Exporter les notes du module au format Excel",
     "exportCsvdetail": "Exporter les notes de tous les examens du module au format CSV",
-    "exportExceldetail": "Exporter les notes de tous les examens du module au format Excel (avec les détails pour chaque exam)"
+    "exportExceldetail": "Exporter les notes de tous les examens du module au format Excel (avec les détails pour chaque exam)",
+    "processimpairtitle": "Gestion du scan recto verso quand l'énoncé a un nombre de page impaire",
+    "processimpairmessage": "Avez-vous scanné en recto/verso, si oui, voulez-vous conserver la dernière page de chacune des copies scannées ?"
   }
 }

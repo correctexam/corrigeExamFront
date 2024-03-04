@@ -466,6 +466,8 @@
     "exportCsv": "Export module grades in CSV format",
     "exportExcel": "Export module grades in Excel format",
     "exportCsvdetail": "Export grades for all exams in the module in CSV format",
-    "exportExceldetail": "Export grades for all exams in the module in Excel format (with details for each exam)"
+    "exportExceldetail": "Export grades for all exams in the module in Excel format (with details for each exam)",
+    "processimpairtitle": "Management of double-sided scanning when the exam template has an odd number of pages",
+    "processimpairmessage": "Did you scan as double-sided? If so, do you want to keep the last page of each scanned copy?"
   }
 }

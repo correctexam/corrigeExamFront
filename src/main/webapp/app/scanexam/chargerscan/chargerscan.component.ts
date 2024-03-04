@@ -385,11 +385,32 @@ export class ChargerscanComponent implements OnInit {
     }
   }
   i = 1;
+  processLastPage = true;
+  async doProcessLastPage(): Promise<void> {
+    this.processLastPage = true;
+    await this.process();
+  }
+  async doNotProcessLastPage(): Promise<void> {
+    this.processLastPage = false;
+    await this.process();
+  }
   public async pdfloaded(): Promise<void> {
     if (this.loaded && this.pdfService.numberOfPages() !== 0) {
       if (!this.phase1) {
         this.nbreFeuilleParCopie = this.pdfService.numberOfPages();
-        await this.process();
+        if (this.nbreFeuilleParCopie >= 3 && this.nbreFeuilleParCopie % 2 !== 0) {
+          this.translate.get('scanexam.processimpairtitle').subscribe(tit => {
+            this.confirmationService.confirm({
+              message: this.translate.instant('scanexam.processimpairmessage'),
+              header: tit,
+              icon: 'pi pi-exclamation-triangle',
+              accept: () => this.doProcessLastPage(),
+              reject: () => this.doNotProcessLastPage(),
+            });
+          });
+        } else {
+          await this.process();
+        }
       } else {
         if (this.pdfService.numberOfPages() !== 0 && this.i < 20) {
           // Change if partial update
@@ -536,66 +557,75 @@ export class ChargerscanComponent implements OnInit {
   }
 
   saveImageScan(file: any, pagen: number, template: boolean): Promise<void> {
-    return new Promise(resolve => {
-      //      if (pagen === 1 && !template) console.timeLog('processPage', 'start', pagen);
+    if (!template && !this.processLastPage && pagen % (this.nbreFeuilleParCopie + 1) === 0) {
+      return new Promise(resolve => resolve());
+    } else
+      return new Promise(resolve => {
+        //      if (pagen === 1 && !template) console.timeLog('processPage', 'start', pagen);
 
-      const i = new Image();
-      i.onload = async () => {
-        //        if (pagen === 1 && !template) console.timeLog('processPage', 'image Loaded ', pagen);
-        const editedImage = new OffscreenCanvas(i.width, i.height);
+        const i = new Image();
+        i.onload = async () => {
+          //        if (pagen === 1 && !template) console.timeLog('processPage', 'image Loaded ', pagen);
+          const editedImage = new OffscreenCanvas(i.width, i.height);
 
-        // document.createElement('canvas');
-        // document.createOff
-        // editedImage.width = i.width;
-        // editedImage.height = i.height;
-        const ctx = editedImage.getContext('2d');
-        ctx!.drawImage(i, 0, 0);
-        //        if (pagen === 1 && !template) console.timeLog('processPage', 'draw first canvas ', pagen);
+          // document.createElement('canvas');
+          // document.createOff
+          // editedImage.width = i.width;
+          // editedImage.height = i.height;
+          const ctx = editedImage.getContext('2d');
+          ctx!.drawImage(i, 0, 0);
+          //        if (pagen === 1 && !template) console.timeLog('processPage', 'draw first canvas ', pagen);
 
-        let exportImageType = 'image/webp';
-        let compression = 0.65;
-        if (
-          this.preferenceService.getPreference().exportImageCompression !== undefined &&
-          this.preferenceService.getPreference().exportImageCompression > 0 &&
-          this.preferenceService.getPreference().exportImageCompression <= 1
-        ) {
-          compression = this.preferenceService.getPreference().exportImageCompression;
-        }
+          let exportImageType = 'image/webp';
+          let compression = 0.65;
+          if (
+            this.preferenceService.getPreference().exportImageCompression !== undefined &&
+            this.preferenceService.getPreference().exportImageCompression > 0 &&
+            this.preferenceService.getPreference().exportImageCompression <= 1
+          ) {
+            compression = this.preferenceService.getPreference().exportImageCompression;
+          }
 
-        let paget = pagen % this.nbreFeuilleParCopie;
-        if (paget === 0) {
-          paget = this.nbreFeuilleParCopie;
-        }
+          let paget = !template && !this.processLastPage ? pagen % (this.nbreFeuilleParCopie + 1) : pagen % this.nbreFeuilleParCopie;
+          if (paget === 0) {
+            paget = this.nbreFeuilleParCopie;
+          }
 
-        if (this.pageWithQCM.includes(paget) && compression < 0.95) {
-          compression = 0.95;
-        }
+          if (this.pageWithQCM.includes(paget) && compression < 0.95) {
+            compression = 0.95;
+          }
 
-        if (
-          this.preferenceService.getPreference().imageTypeExport !== undefined &&
-          ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
-        ) {
-          exportImageType = this.preferenceService.getPreference().imageTypeExport;
-        }
+          if (
+            this.preferenceService.getPreference().imageTypeExport !== undefined &&
+            ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
+          ) {
+            exportImageType = this.preferenceService.getPreference().imageTypeExport;
+          }
 
-        const webPImageBlob = await editedImage.convertToBlob({
-          type: exportImageType,
-          quality: compression,
-        });
-        const webPImageURL = await blobToDataURL(webPImageBlob);
-        if (template) {
-          await this.saveTemplateImage(pagen, webPImageURL);
-          resolve();
-        } else {
-          //    if (pagen === 1 && !template) console.timeLog('processPage', 'before save ', pagen);
-          await this.saveNonAligneImage(pagen, webPImageURL);
-          resolve();
+          const webPImageBlob = await editedImage.convertToBlob({
+            type: exportImageType,
+            quality: compression,
+          });
+          const webPImageURL = await blobToDataURL(webPImageBlob);
+          if (template) {
+            await this.saveTemplateImage(pagen, webPImageURL);
+            resolve();
+          } else {
+            //    if (pagen === 1 && !template) console.timeLog('processPage', 'before save ', pagen);
 
-          //          if (pagen === 1 && !template) console.timeLog('processPage', 'after save ', pagen);
-        }
-      };
-      i.src = file;
-    });
+            if (!this.processLastPage) {
+              const pageToremove = Math.floor(pagen / (this.nbreFeuilleParCopie + 1));
+              await this.saveNonAligneImage(pagen - pageToremove, webPImageURL);
+            } else {
+              await this.saveNonAligneImage(pagen, webPImageURL);
+            }
+            resolve();
+
+            //          if (pagen === 1 && !template) console.timeLog('processPage', 'after save ', pagen);
+          }
+        };
+        i.src = file;
+      });
   }
 
   replacer(key: any, value: any): any {
