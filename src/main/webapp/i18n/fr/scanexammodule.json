@@ -436,7 +436,7 @@
     "colourTooltip": "Choix de la couleur pour le texte et les traits",
     "scalefactor": "Mise à l'échelle :",
     "scalefactorTooltip": "Permet de changer le facteur de mise à l'échelle",
-    "gotoCorrection": "Aller à la correction",
+    "gotoCorrection": "Vue correcteur",
     "gotoCorrectionTooltipView": "Permet d'aller à la vue correction quand on est authentifié en tant que prof",
     "editquestionTooltip": "Permet d'éditer les propriétés de la question pour mettre à jour le barème",
     "firsthelpTitle": "Quelques astuces",

@@ -1,5 +1,5 @@
 <div class="flex ml-0 mr-0">
-  <div class="">
+  <div class="" *ngIf="exam !== undefined">
     <jhi-fabric-canvas [exam]="exam" [content]="content" [numeroEvent]="numero"></jhi-fabric-canvas>
   </div>
   <div

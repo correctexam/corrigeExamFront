@@ -61,13 +61,20 @@ export class CreerexamComponent implements OnInit, AfterViewInit {
         this.courseid = id;
         this.courseService.find(+this.courseid).subscribe(c => {
           this.coursName = c.body?.name ?? '';
-          this.activatedRoute.data.subscribe(data => {
-            this.translateService.get(data['pageTitle'], { courseName: c.body?.name }).subscribe(e1 => {
-              this.titleService.setTitle(e1);
-            });
+          this.updateTitle();
+          this.translateService.onLangChange.subscribe(() => {
+            this.updateTitle();
           });
         });
       }
+    });
+  }
+
+  updateTitle(): void {
+    this.activatedRoute.data.subscribe(data => {
+      this.translateService.get(data['pageTitle'], { courseName: this.coursName }).subscribe(e1 => {
+        this.titleService.setTitle(e1);
+      });
     });
   }
 

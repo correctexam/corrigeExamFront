@@ -45,10 +45,9 @@ export class MarkingSummaryComponent implements OnInit {
           .getExamDetails(this.examId)
           .then(dataExam => {
             this.dataExam = dataExam;
-            this.activatedRoute.data.subscribe(e => {
-              this.translateService.get(e['pageTitle'], { examName: this.dataExam.nameExam }).subscribe(e1 => {
-                this.titleService.setTitle(e1);
-              });
+            this.updateTitle();
+            this.translateService.onLangChange.subscribe(() => {
+              this.updateTitle();
             });
             // eslint-disable-next-line no-console
             this.questionNumeros = Array.from(new Set(this.dataExam.questions.map(q => q.numero))).sort((n1, n2) => n1 - n2);
@@ -56,6 +55,14 @@ export class MarkingSummaryComponent implements OnInit {
           .catch(() => {
             this.errorMsg = 'scanexam.error';
           });
+      });
+    });
+  }
+
+  updateTitle(): void {
+    this.activatedRoute.data.subscribe(e => {
+      this.translateService.get(e['pageTitle'], { examName: this.dataExam.nameExam }).subscribe(e1 => {
+        this.titleService.setTitle(e1);
       });
     });
   }

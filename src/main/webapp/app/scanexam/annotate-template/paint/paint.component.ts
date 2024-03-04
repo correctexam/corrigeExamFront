@@ -12,7 +12,7 @@ export class PaintComponent {
   @Input()
   content: any;
   @Input()
-  exam!: IExam;
+  exam?: IExam;
 
   numero = new Subject<string>();
 

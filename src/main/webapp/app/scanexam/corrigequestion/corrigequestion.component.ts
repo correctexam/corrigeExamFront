@@ -252,6 +252,14 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
 
+  updateTitle(): void {
+    this.activatedRoute.data.subscribe(e => {
+      this.translateService.get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
+        this.titleService.setTitle(e1);
+      });
+    });
+  }
+
   async manageParam(params: ParamMap) {
     this.testdisableAndEnableKeyBoardShortCut.set(false);
     this.init = true;
@@ -289,10 +297,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.numberPagesInScan = await this.db.countAlignImage(+this.examId!);
           const data = await firstValueFrom(this.examService.find(+this.examId!));
           this.exam = data.body!;
-          this.activatedRoute.data.subscribe(e => {
-            this.translateService.get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
-              this.titleService.setTitle(e1);
-            });
+          this.updateTitle();
+          this.translateService.onLangChange.subscribe(() => {
+            this.updateTitle();
           });
 
           const b = await firstValueFrom(this.questionService.query({ examId: this.exam!.id }));

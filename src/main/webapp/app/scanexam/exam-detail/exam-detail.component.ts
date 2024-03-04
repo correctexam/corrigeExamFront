@@ -102,6 +102,14 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     }
   }
 
+  updateTitle(): void {
+    this.activatedRoute.data.subscribe(e => {
+      this.translateService.get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
+        this.titleService.setTitle(e1);
+      });
+    });
+  }
+
   ngOnInit(): void {
     this.firsthelpvalue = this.preferenceService.showFirstCorrectMessage();
     this.firsthelp = this.firsthelpvalue;
@@ -111,12 +119,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
         this.examId = params.get('examid')!;
         this.examService.find(+this.examId).subscribe(ex => {
           this.exam = ex.body!;
-          this.activatedRoute.data.subscribe(e => {
-            this.translateService.get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
-              this.titleService.setTitle(e1);
-            });
-          });
-
+          this.updateTitle();
           this.courseService.find(this.exam.courseId!).subscribe(
             e => (this.course = e.body!),
             () => {
@@ -154,6 +157,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
         });
         this.translateService.onLangChange.subscribe(() => {
           this.initCmpt();
+          this.updateTitle();
         });
       }
     });
