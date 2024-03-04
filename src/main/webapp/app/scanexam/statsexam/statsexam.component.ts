@@ -222,6 +222,8 @@ export class StatsExamComponent implements OnInit {
   }
 
   private initStatVariables(): void {
+    this.studentsMarks = [];
+    this.nbStdABI = 0;
     this.sortMarks(this.infosStudents);
     const qn: QuestionNotee[] = [];
     for (const q of this.infosQuestions) {
