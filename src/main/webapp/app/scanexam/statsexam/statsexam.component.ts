@@ -513,7 +513,7 @@ export class StatsExamComponent implements OnInit {
         datasets[indice].data = this.normaliseNotes(ds.data, this.getBaremes(stats));
       });
     }
-    const vue = pourcents ? 'pourcents' : 'brut';
+    const vue = pourcents ? this.translateService.instant('scanexam.pourcents') : this.translateService.instant('scanexam.brut');
     return { labels, datasets, vue };
   }
 
