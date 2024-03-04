@@ -363,11 +363,33 @@
                 <button
                   class="p-button p-button-primary"
                   (click)="addDefault()"
-                  [pTooltip]="'scanexam.commentadddefaulttooltip' | translate"
+                  [pTooltip]="'scanexam.adddefaulttooltip' | translate"
                   [tooltipZIndex]="'3000'"
                   jhiTranslate="scanexam.adddefault"
                 >
                   Add Default
+                </button>
+              </div>
+              <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
+                <button
+                  class="p-button p-button-primary"
+                  (click)="saveDefault()"
+                  [pTooltip]="'scanexam.savedefaultcommenttooltip' | translate"
+                  [tooltipZIndex]="'3000'"
+                  jhiTranslate="scanexam.savedefaultcomment"
+                >
+                  Save as default Default
+                </button>
+              </div>
+              <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
+                <button
+                  class="p-button p-button-primary"
+                  (click)="resetDefault()"
+                  [pTooltip]="'scanexam.resetdefaultcommenttooltip' | translate"
+                  [tooltipZIndex]="'3000'"
+                  jhiTranslate="scanexam.resetdefaultcomment"
+                >
+                  Reset default
                 </button>
               </div>
             </div>
