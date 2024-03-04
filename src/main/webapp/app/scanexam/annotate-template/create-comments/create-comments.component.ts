@@ -12,6 +12,7 @@ import { saveAs } from 'file-saver';
 import { HybridGradedCommentService } from '../../../entities/hybrid-graded-comment/service/hybrid-graded-comment.service';
 import { IHybridGradedComment, NewHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-graded-comment.model';
 import { Inplace } from 'primeng/inplace';
+import { PreferenceService } from '../../preference-page/preference.service';
 @Component({
   selector: 'jhi-create-comments',
 
@@ -82,6 +83,7 @@ export class CreateCommentsComponent implements OnInit {
     public hybridGradedCommentService: HybridGradedCommentService,
     public textCommentService: TextCommentService,
     public translate: TranslateService,
+    public preferenceService: PreferenceService,
   ) {}
   // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
   ngOnInit(): void {}
@@ -326,23 +328,51 @@ export class CreateCommentsComponent implements OnInit {
     this.blocked = false;
   }
 
+  resetDefault(): void {
+    if (this._q !== undefined && this._q.gradeType === GradeType.DIRECT) {
+      this.preferenceService.clearDefaultTextComment();
+    } else if (this._q !== undefined && this._q.gradeType === GradeType.HYBRID) {
+      this.preferenceService.clearDefaultHybridComment();
+    } else if (this._q !== undefined) {
+      this.preferenceService.clearDefaultGradedComment();
+    }
+  }
+  saveDefault(): void {
+    if (this._q !== undefined && this._q.gradeType === GradeType.DIRECT) {
+      if (this.currentTextComment4Question) {
+        this.preferenceService.saveDefaultTextComment(this.currentTextComment4Question);
+      }
+    } else if (this._q !== undefined && this._q.gradeType === GradeType.HYBRID) {
+      if (this.currentHybridGradedComment4Question) {
+        this.preferenceService.saveDefaultHybridComment(this.currentHybridGradedComment4Question);
+      }
+    } else if (this._q !== undefined) {
+      if (this.currentGradedComment4Question) {
+        this.preferenceService.saveDefaultGradedComment(this.currentGradedComment4Question);
+      }
+    }
+  }
+
   addDefault(): void {
     this.translate.get('scanexam.adddefaultexcellent').subscribe(() => {
       if (this._q !== undefined && this._q.gradeType === GradeType.DIRECT) {
-        const comments = [
-          {
-            questionId: this._q.id,
-            text: this.translate.instant('scanexam.adddefaultexcellent'),
-          },
-          {
-            questionId: this._q.id,
-            text: this.translate.instant('scanexam.adddefaultvide'),
-          },
-          {
-            questionId: this._q.id,
-            text: this.translate.instant('scanexam.adddefaultfaux'),
-          },
-        ];
+        const comments =
+          this.preferenceService.getDefaultTextComment() !== null
+            ? this.preferenceService.getDefaultTextComment()!
+            : [
+                {
+                  questionId: this._q.id,
+                  text: this.translate.instant('scanexam.adddefaultexcellent'),
+                },
+                {
+                  questionId: this._q.id,
+                  text: this.translate.instant('scanexam.adddefaultvide'),
+                },
+                {
+                  questionId: this._q.id,
+                  text: this.translate.instant('scanexam.adddefaultfaux'),
+                },
+              ];
         comments.forEach(com => {
           const t: ITextComment = {
             questionId: this._q!.id,
@@ -359,32 +389,35 @@ export class CreateCommentsComponent implements OnInit {
           });
         });
       } else if (this._q !== undefined && this._q.gradeType === GradeType.HYBRID) {
-        const comments: NewHybridGradedComment[] = [
-          {
-            id: null,
-            questionId: this._q.id,
-            text: this.translate.instant('scanexam.adddefaultexcellent'),
-            relative: true,
-            grade: 100,
-            step: 1,
-          },
-          {
-            id: null,
-            questionId: this._q.id,
-            text: this.translate.instant('scanexam.adddefaultvide'),
-            relative: true,
-            grade: -100,
-            step: 1,
-          },
-          {
-            id: null,
-            questionId: this._q.id,
-            text: this.translate.instant('scanexam.adddefaultfaux'),
-            relative: true,
-            grade: -100,
-            step: 1,
-          },
-        ];
+        const comments: NewHybridGradedComment[] =
+          this.preferenceService.getDefaultHybridComment() !== null
+            ? this.preferenceService.getDefaultHybridComment()!
+            : [
+                {
+                  id: null,
+                  questionId: this._q.id,
+                  text: this.translate.instant('scanexam.adddefaultexcellent'),
+                  relative: true,
+                  grade: 100,
+                  step: 1,
+                },
+                {
+                  id: null,
+                  questionId: this._q.id,
+                  text: this.translate.instant('scanexam.adddefaultvide'),
+                  relative: true,
+                  grade: -100,
+                  step: 1,
+                },
+                {
+                  id: null,
+                  questionId: this._q.id,
+                  text: this.translate.instant('scanexam.adddefaultfaux'),
+                  relative: true,
+                  grade: -100,
+                  step: 1,
+                },
+              ];
         comments.forEach(com => {
           this.hybridGradedCommentService.create(com).subscribe(e => {
             const currentComment = e.body!;
@@ -399,28 +432,31 @@ export class CreateCommentsComponent implements OnInit {
           });
         });
       } else if (this._q !== undefined) {
-        const comments = [
-          {
-            questionId: this._q.id,
-            text: this.translate.instant('scanexam.adddefaultexcellent'),
-            grade: this._q.gradeType === GradeType.NEGATIVE ? 0 : this._q.step! * this._q.point!,
-          },
-          {
-            questionId: this._q.id,
-            text: 'ok',
-            grade: this._q.gradeType === GradeType.NEGATIVE ? 0 : this._q.step! * this._q.point!,
-          },
-          {
-            questionId: this._q.id,
-            text: this.translate.instant('scanexam.adddefaultvide'),
-            grade: this._q.gradeType === GradeType.NEGATIVE ? this._q.step! * this._q.point! : 0,
-          },
-          {
-            questionId: this._q.id,
-            text: this.translate.instant('scanexam.adddefaultfaux'),
-            grade: this._q.gradeType === GradeType.NEGATIVE ? this._q.step! * this._q.point! : 0,
-          },
-        ];
+        const comments =
+          this.preferenceService.getDefaultHybridComment() !== null
+            ? this.preferenceService.getDefaultHybridComment()!
+            : [
+                {
+                  questionId: this._q.id,
+                  text: this.translate.instant('scanexam.adddefaultexcellent'),
+                  grade: this._q.gradeType === GradeType.NEGATIVE ? 0 : this._q.step! * this._q.point!,
+                },
+                {
+                  questionId: this._q.id,
+                  text: 'ok',
+                  grade: this._q.gradeType === GradeType.NEGATIVE ? 0 : this._q.step! * this._q.point!,
+                },
+                {
+                  questionId: this._q.id,
+                  text: this.translate.instant('scanexam.adddefaultvide'),
+                  grade: this._q.gradeType === GradeType.NEGATIVE ? this._q.step! * this._q.point! : 0,
+                },
+                {
+                  questionId: this._q.id,
+                  text: this.translate.instant('scanexam.adddefaultfaux'),
+                  grade: this._q.gradeType === GradeType.NEGATIVE ? this._q.step! * this._q.point! : 0,
+                },
+              ];
         comments.forEach(com => {
           const t: IGradedComment = {
             questionId: this._q!.id,

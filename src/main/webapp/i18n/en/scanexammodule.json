@@ -287,8 +287,12 @@
     "importexportcoursetooltip": "Import/Export course's data for reusing them",
     "exportcoursetooltip": "Export course's data for reusing them",
     "importcoursetooltip": "Import course's data for reusing them",
-    "adddefault": "Default comments",
+    "adddefault": "Add default comments",
     "adddefaulttooltip": "Add default comments (Excellent, wrong answer, void, ...)",
+    "resetdefaultcomment": "Reset default comments",
+    "resetdefaultcommenttooltip": "Resets the default comments for this type of question",
+    "savedefaultcomment": "Save current comments as default comments",
+    "savedefaultcommenttooltip": "Saves the current comment(s) as default comment(s) for this type of question (for use in another question using the add default comments button)",
     "adddefaultexcellent": "Excellent",
     "adddefaultvide": "Void",
     "adddefaultfaux": "Wrong",
@@ -462,6 +466,8 @@
     "exportCsv": "Export module grades in CSV format",
     "exportExcel": "Export module grades in Excel format",
     "exportCsvdetail": "Export grades for all exams in the module in CSV format",
-    "exportExceldetail": "Export grades for all exams in the module in Excel format (with details for each exam)"
+    "exportExceldetail": "Export grades for all exams in the module in Excel format (with details for each exam)",
+    "processimpairtitle": "Management of double-sided scanning when the exam template has an odd number of pages",
+    "processimpairmessage": "Did you scan as double-sided? If so, do you want to keep the last page of each scanned copy?"
   }
 }

@@ -4,6 +4,9 @@ import { Injectable } from '@angular/core';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { LocalStorageService } from 'ngx-webstorage';
 import { IPreference } from '../services/align-images.service';
+import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
+import { IHybridGradedComment, NewHybridGradedComment } from '../../entities/hybrid-graded-comment/hybrid-graded-comment.model';
+import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 
 interface IPreferenceForQuestion {
   point: number;
@@ -225,6 +228,67 @@ export class PreferenceService {
     } else {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return JSON.parse(spref, this.reviver);
+    }
+  }
+
+  saveDefaultHybridComment(c: IHybridGradedComment[]): void {
+    const cs = JSON.parse(JSON.stringify(c, this.replacer), this.reviver);
+    cs.forEach((c1: any) => {
+      delete c1.id;
+    });
+
+    this.localStorageService.store('defaultHybridComment', JSON.stringify(cs, this.replacer));
+  }
+  saveDefaultGradedComment(c: IGradedComment[]): void {
+    const cs = JSON.parse(JSON.stringify(c, this.replacer), this.reviver);
+    cs.forEach((c1: any) => {
+      delete c1.id;
+    });
+    this.localStorageService.store('defaultGradedComment', JSON.stringify(cs, this.replacer));
+  }
+  saveDefaultTextComment(c: ITextComment[]): void {
+    const cs = JSON.parse(JSON.stringify(c, this.replacer), this.reviver);
+    cs.forEach((c1: any) => {
+      delete c1.id;
+    });
+    this.localStorageService.store('defaultTextComment', JSON.stringify(cs, this.replacer));
+  }
+
+  clearDefaultHybridComment(): void {
+    this.localStorageService.store('defaultHybridComment', null);
+  }
+  clearDefaultGradedComment(): void {
+    this.localStorageService.store('defaultGradedComment', null);
+  }
+  clearDefaultTextComment(): void {
+    this.localStorageService.store('defaultTextComment', null);
+  }
+
+  getDefaultHybridComment(): NewHybridGradedComment[] | null {
+    const c = this.localStorageService.retrieve('defaultHybridComment');
+    if (c === null) {
+      return null;
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return JSON.parse(c, this.reviver);
+    }
+  }
+  getDefaultGradedComment(): IGradedComment[] | null {
+    const c = this.localStorageService.retrieve('defaultGradedComment');
+    if (c === null) {
+      return null;
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return JSON.parse(c, this.reviver);
+    }
+  }
+  getDefaultTextComment(): ITextComment[] | null {
+    const c = this.localStorageService.retrieve('defaultTextComment');
+    if (c === null) {
+      return null;
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return JSON.parse(c, this.reviver);
     }
   }
 

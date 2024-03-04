@@ -1,5 +1,7 @@
 <div class="grid">
   <p-toast></p-toast>
+  <p-confirmDialog [acceptLabel]="'scanexam.yes' | translate" [rejectLabel]="'scanexam.no' | translate"></p-confirmDialog>
+
   <p-blockUI [blocked]="blocked">
     <div class="grid" style="width: 90vw">
       <div class="col-4"></div>
