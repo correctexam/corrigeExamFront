@@ -33,6 +33,9 @@ const TRANSPARENT = 'rgba(255,255,255,0.0)';
 export class StatsExamComponent implements OnInit {
   // Page related variables
   protected examid = '-1';
+  protected examName: string | undefined = '';
+  protected courseName: string | undefined = '';
+
   protected infosQuestions: IQuestion[] = [];
   questionNumeros: Array<number> = [];
   protected infosStudents: StudentRes[] = [];
@@ -106,11 +109,9 @@ export class StatsExamComponent implements OnInit {
         return;
       }
       this.examService.find(+this.examid).subscribe(ex => {
-        this.activatedRoute.data.subscribe(e => {
-          this.translateService.get(e['pageTitle'], { examName: ex.body?.name, courseName: ex.body?.courseName }).subscribe(e1 => {
-            this.titleService.setTitle(e1);
-          });
-        });
+        this.examName = ex.body?.name;
+        this.courseName = ex.body?.courseName;
+        this.updateTitle();
       });
 
       this.translateService.get('scanexam.noteattribuee').subscribe(() => {
@@ -119,8 +120,17 @@ export class StatsExamComponent implements OnInit {
         });
 
         this.translateService.onLangChange.subscribe(() => {
+          this.updateTitle();
           this.performInfoQuestionsQuery();
         });
+      });
+    });
+  }
+
+  updateTitle(): void {
+    this.activatedRoute.data.subscribe(e => {
+      this.translateService.get(e['pageTitle'], { examName: this.examName, courseName: this.courseName }).subscribe(e1 => {
+        this.titleService.setTitle(e1);
       });
     });
   }

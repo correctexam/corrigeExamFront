@@ -57,10 +57,9 @@ export class ImportStudentComponent implements OnInit {
         this.courseService.find(+params.get('courseid')!).subscribe(
           e => {
             this.course = e.body!;
-            this.activatedRoute.data.subscribe(data => {
-              this.translate.get(data['pageTitle'], { courseName: this.course?.name }).subscribe(e1 => {
-                this.titleService.setTitle(e1);
-              });
+            this.updateTitle();
+            this.translate.onLangChange.subscribe(() => {
+              this.updateTitle();
             });
           },
           () => {
@@ -68,6 +67,14 @@ export class ImportStudentComponent implements OnInit {
           },
         );
       }
+    });
+  }
+
+  updateTitle(): void {
+    this.activatedRoute.data.subscribe(data => {
+      this.translate.get(data['pageTitle'], { courseName: this.course?.name }).subscribe(e1 => {
+        this.titleService.setTitle(e1);
+      });
     });
   }
 

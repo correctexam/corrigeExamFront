@@ -242,12 +242,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
               this.numberPagesInScan = value[1];
               this.exam = value[2].body!;
 
-              this.activatedRoute.data.subscribe(e => {
-                this.translateService
-                  .get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName })
-                  .subscribe(e1 => {
-                    this.titleService.setTitle(e1);
-                  });
+              this.updateTitle();
+              this.translateService.onLangChange.subscribe(() => {
+                this.updateTitle();
               });
 
               console.timeLog('loadpage', 'after countTemplate');
@@ -283,6 +280,15 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       }
     });
   }
+
+  updateTitle(): void {
+    this.activatedRoute.data.subscribe(e => {
+      this.translateService.get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
+        this.titleService.setTitle(e1);
+      });
+    });
+  }
+
   ngAfterViewInit(): void {
     this.shortcuts.push(
       {

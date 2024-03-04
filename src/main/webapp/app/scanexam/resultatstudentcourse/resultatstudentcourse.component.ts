@@ -56,6 +56,14 @@ export class ResultatStudentcourseComponent implements OnInit {
     private titleService: Title,
   ) {}
 
+  updateTitle(): void {
+    this.activatedRoute.data.subscribe(data => {
+      this.translate.get(data['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
+        this.titleService.setTitle(e1);
+      });
+    });
+  }
+
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('examid') !== null) {
@@ -63,11 +71,7 @@ export class ResultatStudentcourseComponent implements OnInit {
 
         this.examService.find(+this.examid).subscribe(e => {
           this.exam = e.body!;
-          this.activatedRoute.data.subscribe(data => {
-            this.translate.get(data['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
-              this.titleService.setTitle(e1);
-            });
-          });
+          this.updateTitle();
 
           this.translate.get('scanexam.mailtemplate').subscribe(data => {
             this.mailSubject = this.translate.instant('scanexam.mailsubjecttemplate') + this.exam?.name;
@@ -78,6 +82,7 @@ export class ResultatStudentcourseComponent implements OnInit {
           // this.loadLibelle();
         });
         this.translate.onLangChange.subscribe(() => {
+          this.updateTitle();
           this.translate.get('scanexam.mailtemplate').subscribe(data => {
             if (this.exam !== undefined) {
               this.mailSubject = this.translate.instant('scanexam.mailsubjecttemplate') + this.exam.name;

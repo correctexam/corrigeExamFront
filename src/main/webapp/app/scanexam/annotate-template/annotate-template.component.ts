@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ICourse } from 'app/entities/course/course.model';
 import { IExam } from 'app/entities/exam/exam.model';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { ConfirmationService } from 'primeng/api';
@@ -16,8 +15,7 @@ import { Title } from '@angular/platform-browser';
 })
 export class AnnotateTemplateComponent implements OnInit {
   examId = '';
-  exam!: IExam;
-  course!: ICourse;
+  exam?: IExam;
   pdf: any;
   dockItems!: any[];
 
@@ -36,18 +34,24 @@ export class AnnotateTemplateComponent implements OnInit {
         this.examService.find(+this.examId).subscribe(data => {
           if (data.body !== null) {
             this.exam = data.body;
-            this.activatedRoute.data.subscribe(e => {
-              this.translateService.get(e['pageTitle'], { examName: this.exam.name, courseName: this.exam.courseName }).subscribe(e1 => {
-                this.titleService.setTitle(e1);
-              });
+            this.updateTitle();
+            this.translateService.onLangChange.subscribe(() => {
+              this.updateTitle();
             });
-
             this.templateService.getPdf(this.exam.templateId!).subscribe(t => {
               this.pdf = t;
             });
           }
         });
       }
+    });
+  }
+
+  updateTitle(): void {
+    this.activatedRoute.data.subscribe(e => {
+      this.translateService.get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
+        this.titleService.setTitle(e1);
+      });
     });
   }
 }

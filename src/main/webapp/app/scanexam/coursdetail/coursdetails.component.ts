@@ -95,6 +95,7 @@ export class CoursdetailsComponent implements OnInit {
         });
         this.translateService.onLangChange.subscribe(() => {
           this.initCmpt();
+          this.updateTitle();
         });
 
         this.examService.query({ courseId: params.get('courseid') }).subscribe(data => {
@@ -103,17 +104,21 @@ export class CoursdetailsComponent implements OnInit {
         this.courseService.find(+params.get('courseid')!).subscribe(
           e => {
             this.course = e.body!;
-            this.activatedRoute.data.subscribe(data => {
-              this.translateService.get(data['pageTitle'], { courseName: this.course?.name }).subscribe(e1 => {
-                this.titleService.setTitle(e1);
-              });
-            });
+            this.updateTitle();
           },
           () => {
             this.router.navigateByUrl('/');
           },
         );
       }
+    });
+  }
+
+  updateTitle(): void {
+    this.activatedRoute.data.subscribe(data => {
+      this.translateService.get(data['pageTitle'], { courseName: this.course?.name }).subscribe(e1 => {
+        this.titleService.setTitle(e1);
+      });
     });
   }
 

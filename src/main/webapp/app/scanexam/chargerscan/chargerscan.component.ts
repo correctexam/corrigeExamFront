@@ -184,13 +184,20 @@ export class ChargerscanComponent implements OnInit {
         this.examService.find(+this.examid).subscribe(c => {
           this.exam = c.body!;
           // this.exam.scanfileId;
-          this.activatedRoute.data.subscribe(e => {
-            this.translateService.get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
-              this.titleService.setTitle(e1);
-            });
+          this.updateTitle();
+          this.translateService.onLangChange.subscribe(() => {
+            this.updateTitle();
           });
         });
       }
+    });
+  }
+
+  updateTitle(): void {
+    this.activatedRoute.data.subscribe(e => {
+      this.translateService.get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
+        this.titleService.setTitle(e1);
+      });
     });
   }
   async init(): Promise<void> {

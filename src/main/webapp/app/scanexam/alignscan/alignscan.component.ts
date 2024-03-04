@@ -157,10 +157,9 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
         this.examService.find(+this.examId).subscribe(data => {
           if (data.body !== null) {
             this.exam = data.body;
-            this.activatedRoute.data.subscribe(e => {
-              this.translateService.get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
-                this.titleService.setTitle(e1);
-              });
+            this.updateTitle();
+            this.translateService.onLangChange.subscribe(() => {
+              this.updateTitle();
             });
 
             this.db.countPageTemplate(+this.examId).then(v => {
@@ -171,6 +170,14 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
           }
         });
       }
+    });
+  }
+
+  updateTitle(): void {
+    this.activatedRoute.data.subscribe(e => {
+      this.translateService.get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
+        this.titleService.setTitle(e1);
+      });
     });
   }
 
