@@ -446,6 +446,13 @@
           >
           </p-paginator>
         </div>
+        <ng-container *ngIf="this.resp?.correctedByInfo && this.resp?.correctedByInfo !== null && this.resp?.correctedByInfo?.length! > 0">
+          <div style="padding-bottom: 1rem"></div>
+          <div class="d-flex justify-content-center">
+            <span jhiTranslate="scanexam.by">by </span> &nbsp; {{ this.resp?.correctedByInfo }}
+            <span jhiTranslate="scanexam.at">at</span> &nbsp; {{ this.resp?.lastModifiedDate | date: 'long' }}
+          </div>
+        </ng-container>
       </div>
 
       <div
