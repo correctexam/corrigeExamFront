@@ -14,6 +14,9 @@ export interface IStudentResponse {
   sheetId?: number;
   textcomments?: ITextComment[] | null;
   gradedcomments?: IGradedComment[] | null;
+  correctedByInfo?: string;
+  correctedByMail?: string;
+  lastModifiedDate?: Date;
 }
 
 export class StudentResponse implements IStudentResponse {

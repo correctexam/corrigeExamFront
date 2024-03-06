@@ -573,10 +573,14 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   async initEmail() {
     if (this.selectionStudents !== undefined && this.exam !== undefined && this.questions !== undefined) {
       const courseid = this.exam.courseId;
-      const emailsObj = await firstValueFrom(
-        this.http.get<any>(this.applicationConfigService.getEndpointFor('api/getAllEmailProfs4course/' + courseid)),
-      );
-      const emails: (string | undefined)[] = emailsObj.emails;
+      const emailsObj =
+        this.resp?.correctedByMail && this.resp.correctedByMail.length > 0
+          ? this.resp.correctedByMail
+          : await firstValueFrom(
+              this.http.get<any>(this.applicationConfigService.getEndpointFor('api/getAllEmailProfs4course/' + courseid)),
+            );
+      const emails: (string | undefined)[] =
+        this.resp?.correctedByMail && this.resp.correctedByMail.length > 0 ? [emailsObj] : emailsObj.emails;
 
       const firsName = this.selectionStudents![0].firstname!;
       const lastName = this.selectionStudents![0].name!;
@@ -630,9 +634,9 @@ ${firsName}
 
   populateBestSolutions(): void {
     this.http
-      .get<string[]>(
-        this.applicationConfigService.getEndpointFor('api/getBestAnswer/' + this.exam?.id + '/' + this.questionNumeros[this.questionindex]),
-      )
+      .get<
+        string[]
+      >(this.applicationConfigService.getEndpointFor('api/getBestAnswer/' + this.exam?.id + '/' + this.questionNumeros[this.questionindex]))
       .subscribe(s => {
         const result: string[] = [];
         s.forEach(s1 => {
