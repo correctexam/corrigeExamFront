@@ -56,7 +56,6 @@ export class MarkingSummaryComponent implements OnInit {
                     const element = r[index1];
                     if (q.unmarkedSheetIndex.indexOf(element - 1) !== -1) {
                       q.firstUnmarkedSheet = element - 1;
-                      console.error(q.firstUnmarkedSheet, q.numero, q.unmarkedSheetIndex, r);
                       break;
                     }
                   }
@@ -64,7 +63,6 @@ export class MarkingSummaryComponent implements OnInit {
               });
             }
 
-            console.error(dataExam);
             this.updateTitle();
             this.translateService.onLangChange.subscribe(() => {
               this.updateTitle();
