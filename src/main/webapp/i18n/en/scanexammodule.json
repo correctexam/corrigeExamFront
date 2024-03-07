@@ -470,6 +470,8 @@
     "processimpairtitle": "Management of double-sided scanning when the exam template has an odd number of pages",
     "processimpairmessage": "Did you scan as double-sided? If so, do you want to keep the last page of each scanned copy?",
     "by": "by ",
-    "at": " at "
+    "at": " at ",
+    "randomcorrection": "Random horizontal correction",
+    "randomcorrectionTooltip": "Allows the marker to propose a random order in which the exam sheets are evaluated for this question."
   }
 }

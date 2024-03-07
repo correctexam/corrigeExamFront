@@ -157,6 +157,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       typeId: [pref.typeId],
       examId: [],
       defaultpoint: [pref.defaultpoint],
+      randomHorizontalCorrection: false,
     });
 
     this.questionTypeService.query().subscribe((res: HttpResponse<IQuestionType[]>) => {
@@ -216,6 +217,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
         gradeType: question.gradeType,
         typeId: question.typeId,
         defaultpoint: question.defaultpoint,
+        randomHorizontalCorrection: question.randomHorizontalCorrection,
       },
       {
         emitEvent: false,
@@ -228,7 +230,6 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
 
   private async save(): Promise<IQuestion[]> {
     this.isSaving = true;
-
     // No 'numero' update here
     this.questions.forEach(q => {
       q.point = this.editForm.get(['point'])!.value;
@@ -238,6 +239,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       q.gradeType = this.editForm.get(['gradeType'])!.value;
       q.typeId = this.editForm.get(['typeId'])!.value;
       q.defaultpoint = this.editForm.get(['defaultpoint'])?.value;
+      q.randomHorizontalCorrection = this.editForm.get(['randomHorizontalCorrection'])?.value;
     });
 
     // Saving the current preferences
@@ -319,7 +321,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
           this.questions[0].typeId = this.questions[1].typeId;
           this.questions[0].libelle = this.questions[1].libelle;
           this.questions[0].defaultpoint = this.questions[1].defaultpoint!;
-
+          this.questions[0].randomHorizontalCorrection = this.questions[1].randomHorizontalCorrection!;
           return firstValueFrom(this.questionService.update(this.questions[0]));
         }
         return Promise.resolve(new HttpResponse<IQuestion>());
@@ -371,6 +373,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
    * When interacting with the point step widget
    */
   public pointChange(input: any): void {
+    input.preventDefault();
     this.updateStepList(input.target.value);
     this.contentChange();
   }
@@ -378,7 +381,9 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   /**
    * When interacting with the point step widget
    */
-  public defaultpointChange(): void {
+  public defaultpointChange(input: any): void {
+    input.preventDefault();
+
     // this.updateStepList(input.target.value);
     this.contentChange();
   }

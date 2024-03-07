@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Title } from '@angular/platform-browser';
+import { PreferenceService } from '../preference-page/preference.service';
 
 @Component({
   selector: 'jhi-marking-summary',
@@ -28,6 +29,7 @@ export class MarkingSummaryComponent implements OnInit {
     private examService: ExamService,
     private router: Router,
     private db: CacheServiceImpl,
+    private preferenceService: PreferenceService,
     protected applicationConfigService: ApplicationConfigService,
     private translateService: TranslateService,
     private titleService: Title,
@@ -45,6 +47,24 @@ export class MarkingSummaryComponent implements OnInit {
           .getExamDetails(this.examId)
           .then(dataExam => {
             this.dataExam = dataExam;
+            const m = this.preferenceService.generateRandomOrderForQuestion(dataExam.questions, dataExam.sheets.length, this.examId);
+            if (m.size > 0) {
+              this.dataExam.questions.forEach((q, index) => {
+                if (q.randomHorizontalCorrection) {
+                  const r = m.get(index + 1)!;
+                  for (let index1 = 0; index1 < r.length; index1++) {
+                    const element = r[index1];
+                    if (q.unmarkedSheetIndex.indexOf(element - 1) !== -1) {
+                      q.firstUnmarkedSheet = element - 1;
+                      console.error(q.firstUnmarkedSheet, q.numero, q.unmarkedSheetIndex, r);
+                      break;
+                    }
+                  }
+                }
+              });
+            }
+
+            console.error(dataExam);
             this.updateTitle();
             this.translateService.onLangChange.subscribe(() => {
               this.updateTitle();

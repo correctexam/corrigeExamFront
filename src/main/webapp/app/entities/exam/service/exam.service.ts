@@ -118,6 +118,8 @@ export interface QuestionStateDTO {
   libelle?: string;
   answeredSheets: number;
   firstUnmarkedSheet: number;
+  unmarkedSheetIndex: number[];
+  randomHorizontalCorrection: boolean;
 }
 
 /**
@@ -125,7 +127,6 @@ export interface QuestionStateDTO {
  */
 export interface SheetStateDTO {
   id: number;
-  numero: number;
   answeredSheets: number;
   firstUnmarkedQuestion: number;
 }
