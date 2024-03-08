@@ -308,14 +308,22 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   goBack() {
     this.location.back();
   }
-  goToCopie(event: any, pageMin: number, pageMax: number) {
+  async goToCopie(event: any, pageMin: number, pageMax: number) {
+    const b = await firstValueFrom(this.questionService.query({ examId: this.examId }));
+    const questionNumeros = Array.from(new Set(b.body!.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
+    const questionIndex =
+      this.zones4comments !== undefined && this.zones4comments.numero > 0 ? questionNumeros.indexOf(this.zones4comments.numero) + 1 : -1;
+
     if (event.ctrlKey || event.metaKey) {
-      if (this.zones4comments !== undefined && this.zones4comments.numero > 0 && Number.isInteger(pageMin / (pageMax + 1 - pageMin) + 1)) {
+      if (
+        this.zones4comments !== undefined &&
+        this.zones4comments.numero > 0 &&
+        questionIndex > 0 &&
+        Number.isInteger(pageMin / (pageMax + 1 - pageMin) + 1)
+      ) {
         this.zone.run(() => {
           const url = this.router.serializeUrl(
-            this.router.createUrlTree([
-              '/answer/' + this.examId + '/' + this.zones4comments!.numero + '/' + (pageMin / (pageMax + 1 - pageMin) + 1),
-            ]),
+            this.router.createUrlTree(['/answer/' + this.examId + '/' + questionIndex + '/' + (pageMin / (pageMax + 1 - pageMin) + 1)]),
           );
           if ('/' !== this.applicationConfigService.getFrontUrl()) {
             if (this.applicationConfigService.getFrontUrl().endsWith('/') && url.startsWith('/')) {
@@ -329,11 +337,14 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
         });
       }
     } else {
-      if (this.zones4comments !== undefined && this.zones4comments.numero > 0 && Number.isInteger(pageMin / (pageMax + 1 - pageMin) + 1)) {
+      if (
+        this.zones4comments !== undefined &&
+        this.zones4comments.numero > 0 &&
+        questionIndex > 0 &&
+        Number.isInteger(pageMin / (pageMax + 1 - pageMin) + 1)
+      ) {
         this.zone.run(() => {
-          this.router.navigate([
-            '/answer/' + this.examId + '/' + this.zones4comments!.numero + '/' + (pageMin / (pageMax + 1 - pageMin) + 1),
-          ]);
+          this.router.navigate(['/answer/' + this.examId + '/' + questionIndex + '/' + (pageMin / (pageMax + 1 - pageMin) + 1)]);
         });
       }
     }
