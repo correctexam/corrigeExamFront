@@ -314,6 +314,10 @@ export class PreferenceService {
     return s;
   }
 
+  cleanRandomOrderForQuestion(examId: number): void {
+    this.localStorageService.store('questionsRandomOrder_' + examId, null);
+  }
+
   generateRandomOrderForQuestion(questions: IQuestion[] | IQuestionMark[], nbreSheet: number, examId: number): Map<number, number[]> {
     const map1 = new Map<number, number[]>();
     const questionNumeros = Array.from(new Set(questions.map(q => q.numero!))).sort((n1, n2) => n1 - n2);

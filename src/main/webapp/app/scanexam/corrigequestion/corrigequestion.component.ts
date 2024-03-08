@@ -294,7 +294,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.currentStudentPaginator = this.studentid - 1;
         } else {
           if (params.get('questionno') !== null) {
-            this.currentStudentPaginator = m.get(+params.get('questionno')!)![this.currentStudent] - 1;
+            this.currentStudentPaginator = m.get(+params.get('questionno')!)!.indexOf(this.currentStudent + 1);
+            //            this.currentStudentPaginator = m.get(+params.get('questionno')!)![this.currentStudent] - 1;
           }
         }
         // Step 1 Query templates
@@ -1611,6 +1612,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.cleanCanvassCache();
       const m = this.preferenceService.getRandomOrderForExam(+this.examId!);
       if (m.size === 0) {
+        this.currentStudentPaginator = $event.page;
         this.currentStudent = $event.page;
         const c = this.currentStudent + 1;
         this.ngZone.run(() => {

@@ -290,6 +290,13 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       this.contentChange();
     }
   }
+  public randomContentChange(): void {
+    if (this.questions.length > 0 && this.questions[0]?.examId) {
+      const question = this.questions[0];
+      this.preferenceService.cleanRandomOrderForQuestion(question.examId!);
+    }
+    this.contentChange();
+  }
 
   public contentChange(): void {
     this.save()
