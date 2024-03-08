@@ -1680,37 +1680,27 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   } */
 
   async getSelectedStudent(currentStudent: number) {
-    const _sheets = await firstValueFrom(
-      this.sheetService.query({
-        scanId: this.exam!.scanfileId,
-        pagemin: currentStudent * this.nbreFeuilleParCopie!,
-        pagemax: (currentStudent + 1) * this.nbreFeuilleParCopie! - 1,
-      }),
-    );
-    if (_sheets.body !== null && _sheets.body.length > 0) {
-      this.sheet = _sheets.body[0];
-      this.studentService.query({ sheetId: this.sheet.id! }).subscribe(e => {
-        if (e.body !== null) {
-          this.studentName = e.body.map(e1 => e1.firstname + ' ' + e1.name).join(', ');
-        } else {
-          this.studentName = undefined;
-        }
-      });
-    }
-
-    /* const filterStudent = this.students!.filter(
-      s => s.examSheets?.some(ex => ex.scanId === this.exam!.scanfileId && ex.pagemin === this.currentStudent * this.nbreFeuilleParCopie!),
-    );
-    this.selectionStudents = filterStudent;
-    if (this.selectionStudents.length === 0) {
-      this.translateService.get('scanexam.copienotassociated').subscribe(() => {
-        this.messageService.add({
-          severity: 'error',
-          summary: this.translateService.instant('scanexam.copienotassociated'),
-          detail: this.translateService.instant('scanexam.copienotassociateddetails'),
+    if ((currentStudent + 1) * this.nbreFeuilleParCopie! - 1 < this.numberPagesInScan!) {
+      const _sheets = await firstValueFrom(
+        this.sheetService.query({
+          scanId: this.exam!.scanfileId,
+          pagemin: currentStudent * this.nbreFeuilleParCopie!,
+          pagemax: (currentStudent + 1) * this.nbreFeuilleParCopie! - 1,
+        }),
+      );
+      if (_sheets.body !== null && _sheets.body.length > 0) {
+        this.sheet = _sheets.body[0];
+        this.studentService.query({ sheetId: this.sheet.id! }).subscribe(e => {
+          if (e.body !== null) {
+            this.studentName = e.body.map(e1 => e1.firstname + ' ' + e1.name).join(', ');
+          } else {
+            this.studentName = undefined;
+          }
         });
-      });
-    }*/
+      }
+    } else {
+      this.gotoMarkingSummary();
+    }
   }
 
   displayImage(
