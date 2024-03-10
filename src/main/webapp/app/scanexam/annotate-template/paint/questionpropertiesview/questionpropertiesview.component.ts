@@ -157,7 +157,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       typeId: [pref.typeId],
       examId: [],
       defaultpoint: [pref.defaultpoint],
-      randomHorizontalCorrection: false,
+      randomHorizontalCorrection: [false],
     });
 
     this.questionTypeService.query().subscribe((res: HttpResponse<IQuestionType[]>) => {

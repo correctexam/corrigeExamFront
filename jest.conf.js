@@ -8,7 +8,7 @@ const {
 const environment = require('./webpack/environment');
 
 module.exports = {
-  transformIgnorePatterns: ['node_modules/(?!.*\\.mjs$|dayjs/esm|export-to-csv/output/)'],
+  transformIgnorePatransformtransformtterns: ['node_modules/(?!.*\\.mjs$|dayjs/esm|export-to-csv/output/)'],
   resolver: 'jest-preset-angular/build/resolvers/ng-jest-resolver.js',
   //  preset: 'jest-preset-angular/presets/defaults-esm',
 
@@ -23,7 +23,12 @@ module.exports = {
   setupFilesAfterEnv: [`<rootDir>/${baseUrl}__tests__/setup.ts`],
   cacheDirectory: '<rootDir>/target/jest-cache',
   coverageDirectory: '<rootDir>/target/test-results/',
-  moduleNameMapper: Object.assign(pathsToModuleNameMapper(paths, { prefix: `<rootDir>/${baseUrl}/` }), { '^uuid$': 'uuid' }),
+  moduleNameMapper: Object.assign(
+    pathsToModuleNameMapper(paths, { prefix: `<rootDir>/${baseUrl}/` }),
+    { '^uuid$': 'uuid' },
+    { '\\.(scss|css|less)$': '<rootDir>/__mocks__/styleMock.js' },
+    { 'export-to-csv': '<rootDir>/__mocks__/exportCsvMock.js' },
+  ),
   reporters: ['default', ['jest-junit', { outputDirectory: '<rootDir>/target/test-results/', outputName: 'TESTS-results-jest.xml' }]],
   testResultsProcessor: 'jest-sonar-reporter',
   testMatch: ['<rootDir>/src/main/webapp/app/**/@(*.)@(spec.ts)'],

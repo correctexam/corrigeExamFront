@@ -292,7 +292,7 @@ export class ExportPdfService {
       if (page < sheet.pagemax! + 1) {
         pdf.addPage('a4', 'portrait');
       }
-      this.canvass.delete(page)!;
+      this.canvass.delete(page);
     }
     if (this.upload) {
       const blob = new Blob([pdf.output('blob')], { type: 'application/pdf' });

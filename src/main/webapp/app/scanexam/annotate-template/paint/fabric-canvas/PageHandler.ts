@@ -102,8 +102,6 @@ export class PageHandler {
   public updateCanvas(pageViewer: any): PagedCanvas {
     // Add the event listeners for mousedown, mousemove, and mouseup
 
-    // console.log(' UPDATE CANVAS ');
-
     //    this.detachPen();
 
     if (this.annotationCanvas?.parentNode) {

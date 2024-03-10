@@ -73,8 +73,8 @@ export class HybridGradedCommentService {
   ): Type[] {
     const hybridGradedComments: Type[] = hybridGradedCommentsToCheck.filter(isPresent);
     if (hybridGradedComments.length > 0) {
-      const hybridGradedCommentCollectionIdentifiers = hybridGradedCommentCollection.map(
-        hybridGradedCommentItem => this.getHybridGradedCommentIdentifier(hybridGradedCommentItem)!,
+      const hybridGradedCommentCollectionIdentifiers = hybridGradedCommentCollection.map(hybridGradedCommentItem =>
+        this.getHybridGradedCommentIdentifier(hybridGradedCommentItem),
       );
       const hybridGradedCommentsToAdd = hybridGradedComments.filter(hybridGradedCommentItem => {
         const hybridGradedCommentIdentifier = this.getHybridGradedCommentIdentifier(hybridGradedCommentItem);

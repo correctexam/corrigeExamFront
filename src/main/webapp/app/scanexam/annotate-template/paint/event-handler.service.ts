@@ -797,14 +797,37 @@ export class EventHandlerService {
       .filter(e => e.id !== notIncludedId);
   }
 
+  cleanCanvassCache(): void {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (this.allcanvas !== undefined) {
+      //   this.selectedTool = DrawingTools.PENCIL;
+      this.currentSelected = undefined;
+      this._elementUnderDrawing = undefined;
+
+      this.allcanvas.forEach(c => {
+        c.getObjects().forEach(o => this.canvas.remove(o));
+        c.clear();
+        c.renderAll();
+      });
+
+      this.modelViewpping.clear();
+      this.zonesRendering = [];
+
+      this.allcanvas.clear();
+      this.questions.clear();
+      this.pages = {};
+    }
+  }
+
   public reinit(exam: IExam, zones: { [page: number]: CustomZone[] }): void {
     // Requires to flush all the cached canvases to compute new ones
-    this.allcanvas = new Map();
+    this.cleanCanvassCache();
+    this._exam = exam;
+    this.zonesRendering = zones;
+    this.allcanvas.clear();
     this.currentSelected = undefined;
     this._elementUnderDrawing = undefined;
     this._selectedTool = DrawingTools.SELECT;
-    this._exam = exam;
-    this.zonesRendering = zones;
     this.questions.clear();
   }
 

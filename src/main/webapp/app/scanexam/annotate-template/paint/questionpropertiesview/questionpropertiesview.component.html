@@ -216,13 +216,14 @@
           >
 
           <p-checkbox
-            type="text"
-            name="randomcorrection"
+            value="randomcorrection"
+            inputId="randomcorrection"
             formControlName="randomHorizontalCorrection"
             [binary]="true"
             [pTooltip]="'scanexam.randomcorrectionTooltip' | translate"
             [tooltipPosition]="'right'"
             (onChange)="randomContentChange()"
+            ngDefaultControl
           >
           </p-checkbox>
         </div>
