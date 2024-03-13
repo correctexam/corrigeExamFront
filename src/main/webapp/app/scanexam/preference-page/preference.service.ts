@@ -330,7 +330,6 @@ export class PreferenceService {
           const array = Array.from({ length: nbreSheet }, (_, i) => i + 1);
           map1.set(index + 1, array);
         } else {
-          console.error('generate random');
           const shuffledArray = Array.from({ length: nbreSheet }, (_, i) => i + 1).sort(() => 0.5 - Math.random());
           map1.set(index + 1, shuffledArray);
         }

@@ -105,13 +105,11 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
         const base64uuid = params.get('base64uuid')!;
         const uuiddecode = atob(base64uuid);
         const param = uuiddecode.split('/');
-        console.error(uuiddecode, param.length);
         if (param.length > 2) {
           this.uuid = param[1];
           this.sheetService.query({ name: this.uuid }).subscribe(s => {
             this.sheet = s.body![0];
             this.currentStudent = this.sheet.pagemin! / (this.sheet.pagemax! - this.sheet.pagemin! + 1);
-            console.error(this.currentStudent, this.sheet);
             this.studentService.query({ sheetId: this.sheet.id }).subscribe(studentsr => {
               this.selectionStudents = studentsr.body!;
               this.examService
@@ -141,13 +139,11 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
 
   finalize(questionNo: number) {
     // Step 4 Query zone 4 questions
-    console.error(questionNo);
     this.blocked = false;
     this.questionService.query({ examId: this.exam!.id }).subscribe(b => {
       this.questionNumeros = Array.from(new Set(b.body!.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
       this.nbreQuestions = this.questionNumeros.length;
       this.questionindex = this.questionNumeros.indexOf(questionNo + 1);
-      console.error(this.questionindex);
       this.questionService.query({ examId: this.exam!.id, numero: this.questionNumeros[this.questionindex] }).subscribe(q1 => {
         this.questions = q1.body!;
         this.showImage = new Array<boolean>(this.questions.length);

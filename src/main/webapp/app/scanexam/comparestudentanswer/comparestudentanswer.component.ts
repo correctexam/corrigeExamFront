@@ -237,7 +237,6 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             )
             .subscribe(res => {
               this.zones4comments = res;
-              console.error(this.zones4comments);
               this.zones4comments.answers!.forEach((_, index) => {
                 this.clusters.get(0)?.push(index);
               });
