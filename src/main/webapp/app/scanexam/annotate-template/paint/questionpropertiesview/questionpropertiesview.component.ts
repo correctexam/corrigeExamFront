@@ -206,7 +206,6 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
 
   private updateForm(): void {
     const question = this.questions[0];
-
     this.editForm.patchValue(
       {
         numero: question.numero,
@@ -322,7 +321,6 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
     const number = this.editForm.get(['numero'])!.value;
 
     question.numero = number;
-
     firstValueFrom(this.questionService.update(question))
       .then(() => this.updateQuestions(question.id!, question.examId!, number))
       .then(() => {
@@ -376,8 +374,10 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
     const currentStep = this.editForm.get(['step'])!.value;
 
     // If the current step does not match the point value, we need to update the step
-    if (this.pasPointResponseOptions.find(pas => pas.value === currentStep) === undefined) {
-      this.editForm.patchValue({ step: this.pasPointResponseOptions[0].value }, { emitEvent: false });
+    if (this.editForm.get(['typeId'])!.value !== this.qcmid) {
+      if (this.pasPointResponseOptions.find(pas => pas.value === currentStep) === undefined) {
+        this.editForm.patchValue({ step: this.pasPointResponseOptions[0].value }, { emitEvent: false });
+      }
     }
   }
 
