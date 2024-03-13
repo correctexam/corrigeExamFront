@@ -312,6 +312,11 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
    * When interacting with the number widget
    */
   public numberChange(): void {
+    if (this.questions.length > 0 && this.questions[0]?.examId) {
+      const question = this.questions[0];
+      this.preferenceService.cleanRandomOrderForQuestion(question.examId!);
+    }
+
     this.isSaving = true;
     const question = this.questions[0];
     const number = this.editForm.get(['numero'])!.value;
