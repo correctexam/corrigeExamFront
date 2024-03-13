@@ -108,8 +108,8 @@
     "zone.js": "^0.14.4"
   },
   "devDependencies": {
-    "@angular-builders/jest": "17.0.2",
     "@angular-builders/custom-webpack": "17.0.1",
+    "@angular-builders/jest": "17.0.2",
     "@angular-devkit/build-angular": "17.2.3",
     "@angular-eslint/eslint-plugin": "17.2.1",
     "@angular/cli": "17.2.3",
@@ -122,8 +122,6 @@
     "@typescript-eslint/eslint-plugin": "7.1.1",
     "@typescript-eslint/parser": "7.1.1",
     "angular-cli-ghpages": "1.0.7",
-    "browser-sync": "3.0.2",
-    "browser-sync-webpack-plugin": "2.3.0",
     "concurrently": "8.2.2",
     "copy-webpack-plugin": "12.0.2",
     "esbuild-loader": "^4.1.0",

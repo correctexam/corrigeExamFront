@@ -3,7 +3,8 @@ const { merge } = require('webpack-merge');
 const path = require('path');
 const { hashElement } = require('folder-hash');
 const MergeJsonWebpackPlugin = require('merge-jsons-webpack-plugin');
-const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
+// const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
+
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const WebpackNotifierPlugin = require('webpack-notifier');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -76,7 +77,7 @@ module.exports = async (config, options, targetOptions) => {
       }),
     );
 
-    config.plugins.push(
+    /* config.plugins.push(
       new BrowserSyncPlugin(
         {
           host: 'localhost',
@@ -101,13 +102,12 @@ module.exports = async (config, options, targetOptions) => {
             forms: false,
             scroll: false,
           },
-          */
         },
         {
           reload: targetOptions.target === 'build', // enabled for build --watch
         },
       ),
-    );
+    );*/
   }
 
   if (config.mode === 'production') {
