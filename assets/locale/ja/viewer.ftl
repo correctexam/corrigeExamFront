@@ -301,6 +301,20 @@ pdfjs-editor-ink-button-label = インク注釈
 pdfjs-editor-stamp-button =
     .title = 画像を追加または編集します
 pdfjs-editor-stamp-button-label = 画像を追加または編集
+pdfjs-editor-remove-button =
+    .title = 削除
+
+## Remove button for the various kind of editor.
+
+pdfjs-editor-remove-ink-button =
+    .title = インク注釈を削除します
+pdfjs-editor-remove-freetext-button =
+    .title = テキストを削除します
+pdfjs-editor-remove-stamp-button =
+    .title = 画像を削除します
+
+##
+
 # Editor Parameters
 pdfjs-editor-free-text-color-input = 色
 pdfjs-editor-free-text-size-input = サイズ
@@ -348,33 +362,28 @@ pdfjs-editor-resizer-label-bottom-middle = 下中央 — サイズ変更
 pdfjs-editor-resizer-label-bottom-left = 左下隅 — サイズ変更
 pdfjs-editor-resizer-label-middle-left = 左中央 — サイズ変更
 
-pdfjs-editor-remove-button =
-    .title = 削除
-pdfjs-editor-remove-ink-button =
-    .title = インク注釈を削除します
-pdfjs-editor-remove-freetext-button =
-    .title = テキストを削除します
-pdfjs-editor-remove-stamp-button =
-    .title = 画像を削除します
 pdfjs-editor-highlight-button =
-    .title = Highlight
-pdfjs-editor-highlight-button-label = Highlight
+    .title = 強調します
+pdfjs-editor-highlight-button-label = 強調
 pdfjs-editor-remove-highlight-button =
-    .title = Remove highlight
-pdfjs-editor-highlight-colorpicker-label = Highlight color
+    .title = 強調を削除します
+pdfjs-editor-free-highlight-thickness-input = 太さ
+pdfjs-editor-free-highlight-thickness-title =
+    .title = テキスト以外のアイテムを強調する時の太さを変更します
+pdfjs-editor-highlight-colorpicker-label = 強調色
 pdfjs-editor-colorpicker-button =
-    .title = Change color
+    .title = 色を変更します
 pdfjs-editor-colorpicker-dropdown =
-    .aria-label = Color choices
+    .aria-label = 色の選択
 pdfjs-editor-colorpicker-yellow =
-    .title = Yellow
+    .title = 黄色
 pdfjs-editor-colorpicker-green =
-    .title = Green
+    .title = 緑色
 pdfjs-editor-colorpicker-blue =
-    .title = Blue
+    .title = 青色
 pdfjs-editor-colorpicker-pink =
-    .title = Pink
+    .title = ピンク色
 pdfjs-editor-colorpicker-red =
-    .title = Red
+    .title = 赤色
 unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
 pdfjs-infinite-scroll-button-label = Infinite scroll

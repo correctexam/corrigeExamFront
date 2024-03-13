@@ -295,6 +295,20 @@ pdfjs-editor-stamp-button =
 pdfjs-editor-stamp-button-label = Thêm hoặc chỉnh sửa hình ảnh
 pdfjs-editor-remove-button =
     .title = Xóa
+
+## Remove button for the various kind of editor.
+
+pdfjs-editor-remove-ink-button =
+    .title = Xóa bản vẽ
+pdfjs-editor-remove-freetext-button =
+    .title = Xóa văn bản
+pdfjs-editor-remove-stamp-button =
+    .title = Xóa ảnh
+pdfjs-editor-remove-highlight-button =
+    .title = Xóa phần đánh dấu
+
+##
+
 # Editor Parameters
 pdfjs-editor-free-text-color-input = Màu
 pdfjs-editor-free-text-size-input = Kích cỡ
@@ -342,14 +356,9 @@ pdfjs-editor-resizer-label-bottom-middle = Ở giữa dưới cùng — thay đ�
 pdfjs-editor-resizer-label-bottom-left = Góc dưới bên trái — thay đổi kích thước
 pdfjs-editor-resizer-label-middle-left = Ở giữa bên trái — thay đổi kích thước
 
-pdfjs-editor-remove-ink-button =
-    .title = Xóa bản vẽ
-pdfjs-editor-remove-freetext-button =
-    .title = Xóa văn bản
-pdfjs-editor-remove-stamp-button =
-    .title = Xóa ảnh
-pdfjs-editor-remove-highlight-button =
-    .title = Xóa phần đánh dấu
+## Color picker
+
+# This means "Color used to highlight text"
 pdfjs-editor-highlight-colorpicker-label = Màu đánh dấu
 pdfjs-editor-colorpicker-button =
     .title = Thay đổi màu
@@ -365,8 +374,12 @@ pdfjs-editor-colorpicker-pink =
     .title = Hồng
 pdfjs-editor-colorpicker-red =
     .title = Đỏ
+
 pdfjs-editor-highlight-button =
-    .title = Highlight
-pdfjs-editor-highlight-button-label = Highlight
+    .title = Đánh dấu
+pdfjs-editor-highlight-button-label = Đánh dấu
+pdfjs-editor-free-highlight-thickness-input = Độ dày
+pdfjs-editor-free-highlight-thickness-title =
+    .title = Thay đổi độ dày khi đánh dấu các mục không phải là văn bản
 unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
 pdfjs-infinite-scroll-button-label = Infinite scroll

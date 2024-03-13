@@ -301,6 +301,20 @@ pdfjs-editor-ink-button-label = Dissen
 pdfjs-editor-stamp-button =
     .title = Zonte o modifiche imagjins
 pdfjs-editor-stamp-button-label = Zonte o modifiche imagjins
+pdfjs-editor-remove-button =
+    .title = Gjave
+
+## Remove button for the various kind of editor.
+
+pdfjs-editor-remove-ink-button =
+    .title = Gjave dissen
+pdfjs-editor-remove-freetext-button =
+    .title = Gjave test
+pdfjs-editor-remove-stamp-button =
+    .title = Gjave imagjin
+
+##
+
 # Editor Parameters
 pdfjs-editor-free-text-color-input = Colôr
 pdfjs-editor-free-text-size-input = Dimension
@@ -348,33 +362,28 @@ pdfjs-editor-resizer-label-bottom-middle = Bande inferiôr tal mieç — ridimen
 pdfjs-editor-resizer-label-bottom-left = Cjanton in bas a çampe — ridimensione
 pdfjs-editor-resizer-label-middle-left = Bande di çampe tal mieç — ridimensione
 
-pdfjs-editor-remove-button =
-    .title = Gjave
-pdfjs-editor-remove-ink-button =
-    .title = Gjave dissen
-pdfjs-editor-remove-freetext-button =
-    .title = Gjave test
-pdfjs-editor-remove-stamp-button =
-    .title = Gjave imagjin
 pdfjs-editor-highlight-button =
-    .title = Highlight
-pdfjs-editor-highlight-button-label = Highlight
+    .title = Evidenzie
+pdfjs-editor-highlight-button-label = Evidenzie
 pdfjs-editor-remove-highlight-button =
-    .title = Remove highlight
-pdfjs-editor-highlight-colorpicker-label = Highlight color
+    .title = Gjave evidenziazion
+pdfjs-editor-free-highlight-thickness-input = Spessôr
+pdfjs-editor-free-highlight-thickness-title =
+    .title = Modifiche il spessôr de selezion pai elements che no son testuâi
+pdfjs-editor-highlight-colorpicker-label = Colôr par evidenziâ
 pdfjs-editor-colorpicker-button =
-    .title = Change color
+    .title = Cambie colôr
 pdfjs-editor-colorpicker-dropdown =
-    .aria-label = Color choices
+    .aria-label = Sieltis di colôr
 pdfjs-editor-colorpicker-yellow =
-    .title = Yellow
+    .title = Zâl
 pdfjs-editor-colorpicker-green =
-    .title = Green
+    .title = Vert
 pdfjs-editor-colorpicker-blue =
-    .title = Blue
+    .title = Blu
 pdfjs-editor-colorpicker-pink =
-    .title = Pink
+    .title = Rose
 pdfjs-editor-colorpicker-red =
-    .title = Red
+    .title = Ros
 unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
 pdfjs-infinite-scroll-button-label = Infinite scroll

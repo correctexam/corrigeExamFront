@@ -301,6 +301,20 @@ pdfjs-editor-ink-button-label = Tegn
 pdfjs-editor-stamp-button =
     .title = Tilføj eller rediger billeder
 pdfjs-editor-stamp-button-label = Tilføj eller rediger billeder
+pdfjs-editor-remove-button =
+    .title = Fjern
+
+## Remove button for the various kind of editor.
+
+pdfjs-editor-remove-ink-button =
+    .title = Fjern tegning
+pdfjs-editor-remove-freetext-button =
+    .title = Fjern tekst
+pdfjs-editor-remove-stamp-button =
+    .title = Fjern billede
+
+##
+
 # Editor Parameters
 pdfjs-editor-free-text-color-input = Farve
 pdfjs-editor-free-text-size-input = Størrelse
@@ -348,33 +362,28 @@ pdfjs-editor-resizer-label-bottom-middle = Nederst i midten - tilpas størrelse
 pdfjs-editor-resizer-label-bottom-left = Nederste venstre hjørne - tilpas størrelse
 pdfjs-editor-resizer-label-middle-left = Midten til venstre — tilpas størrelse
 
-pdfjs-editor-remove-button =
-    .title = Fjern
-pdfjs-editor-remove-ink-button =
-    .title = Fjern tegning
-pdfjs-editor-remove-freetext-button =
-    .title = Fjern tekst
-pdfjs-editor-remove-stamp-button =
-    .title = Fjern billede
 pdfjs-editor-highlight-button =
-    .title = Highlight
-pdfjs-editor-highlight-button-label = Highlight
+    .title = Fremhæv
+pdfjs-editor-highlight-button-label = Fremhæv
 pdfjs-editor-remove-highlight-button =
-    .title = Remove highlight
-pdfjs-editor-highlight-colorpicker-label = Highlight color
+    .title = Fjern fremhævning
+pdfjs-editor-free-highlight-thickness-input = Tykkelse
+pdfjs-editor-free-highlight-thickness-title =
+    .title = Ændr tykkelse, når andre elementer end tekst fremhæves
+pdfjs-editor-highlight-colorpicker-label = Fremhævningsfarve
 pdfjs-editor-colorpicker-button =
-    .title = Change color
+    .title = Skift farve
 pdfjs-editor-colorpicker-dropdown =
-    .aria-label = Color choices
+    .aria-label = Farvevalg
 pdfjs-editor-colorpicker-yellow =
-    .title = Yellow
+    .title = Gul
 pdfjs-editor-colorpicker-green =
-    .title = Green
+    .title = Grøn
 pdfjs-editor-colorpicker-blue =
-    .title = Blue
+    .title = Blå
 pdfjs-editor-colorpicker-pink =
-    .title = Pink
+    .title = Lyserød
 pdfjs-editor-colorpicker-red =
-    .title = Red
+    .title = Rød
 unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
 pdfjs-infinite-scroll-button-label = Infinite scroll
