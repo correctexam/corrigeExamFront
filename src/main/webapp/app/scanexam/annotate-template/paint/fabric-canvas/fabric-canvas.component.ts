@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/member-ordering */
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { NgxExtendedPdfViewerService, PageRenderedEvent, ScrollModeType } from 'ngx-extended-pdf-viewer';
 import { EventHandlerService } from '../event-handler.service';
 import { DrawingTools } from '../models';
@@ -34,9 +34,10 @@ export type CustomZone = IZone & { type: DrawingTools };
     //    },
   ],
 })
-export class FabricCanvasComponent implements OnInit {
+export class FabricCanvasComponent implements OnInit, OnDestroy {
   @Input()
   public content: any;
+
   @Input()
   public exam!: IExam;
   @Input()
@@ -47,6 +48,7 @@ export class FabricCanvasComponent implements OnInit {
   public title = 'gradeScopeFree';
   // For locking the page during the pdf rendering
   protected blocked = false;
+  public processpdf = false;
 
   constructor(
     public eventHandler: EventHandlerService,
@@ -60,6 +62,12 @@ export class FabricCanvasComponent implements OnInit {
     //    pdfDefaultOptions.assetsFolder = 'bleeding-edge';
     pdfDefaultOptions.defaultCacheSize = 100;
   }
+  ngOnDestroy(): void {
+    this.content = null;
+    this.processpdf = false;
+
+    this.eventHandler.cleanCanvassCache();
+  }
 
   public ngOnInit(): void {
     this.eventHandler.reinit(this.exam, this.zones);
@@ -70,40 +78,41 @@ export class FabricCanvasComponent implements OnInit {
       this.numeroEvent.subscribe(numero => {
         this.eventHandler.addQuestion(parseInt(numero, 10));
       });
-    });
 
-    if (this.exam.namezoneId !== undefined) {
-      this.zoneService.find(this.exam.namezoneId).subscribe(z => {
-        const ezone = z.body as CustomZone;
-        ezone.type = DrawingTools.NOMBOX;
-        this.renderZone(ezone);
-      });
-    }
-    if (this.exam.firstnamezoneId !== undefined) {
-      this.zoneService.find(this.exam.firstnamezoneId).subscribe(z => {
-        const ezone = z.body as CustomZone;
-        ezone.type = DrawingTools.PRENOMBOX;
-        this.renderZone(ezone);
-      });
-    }
-    if (this.exam.idzoneId !== undefined) {
-      this.zoneService.find(this.exam.idzoneId).subscribe(z => {
-        const ezone = z.body as CustomZone;
-        ezone.type = DrawingTools.INEBOX;
-        this.renderZone(ezone);
-      });
-    }
-    this.questionService.query({ examId: this.exam.id! }).subscribe(qs => {
-      qs.body?.forEach(q => {
-        if (q.id !== undefined) {
-          this.eventHandler.questions.set(q.id, q);
-        }
-        this.zoneService.find(q.zoneId!).subscribe(z => {
+      if (this.exam.namezoneId !== undefined) {
+        this.zoneService.find(this.exam.namezoneId).subscribe(z => {
           const ezone = z.body as CustomZone;
-          ezone.type = DrawingTools.QUESTIONBOX;
+          ezone.type = DrawingTools.NOMBOX;
           this.renderZone(ezone);
         });
+      }
+      if (this.exam.firstnamezoneId !== undefined) {
+        this.zoneService.find(this.exam.firstnamezoneId).subscribe(z => {
+          const ezone = z.body as CustomZone;
+          ezone.type = DrawingTools.PRENOMBOX;
+          this.renderZone(ezone);
+        });
+      }
+      if (this.exam.idzoneId !== undefined) {
+        this.zoneService.find(this.exam.idzoneId).subscribe(z => {
+          const ezone = z.body as CustomZone;
+          ezone.type = DrawingTools.INEBOX;
+          this.renderZone(ezone);
+        });
+      }
+      this.questionService.query({ examId: this.exam.id! }).subscribe(qs => {
+        qs.body?.forEach(q => {
+          if (q.id !== undefined) {
+            this.eventHandler.questions.set(q.id, q);
+          }
+          this.zoneService.find(q.zoneId!).subscribe(z => {
+            const ezone = z.body as CustomZone;
+            ezone.type = DrawingTools.QUESTIONBOX;
+            this.renderZone(ezone);
+          });
+        });
       });
+      this.processpdf = true;
     });
   }
 
@@ -152,36 +161,38 @@ export class FabricCanvasComponent implements OnInit {
         this.blocked = false;
       }
     } else {
-      this.eventHandler.getCanvasForPage(page);
-      this.eventHandler.pages[page].updateCanvas(evt.source);
+      const c = this.eventHandler.getCanvasForPage(page);
+      if (c === undefined) {
+        this.eventHandler.pages[page].updateCanvas(evt.source);
 
-      if (this.zones[page] !== undefined) {
-        this.zones[page].forEach(z => {
-          switch (z.type) {
-            case DrawingTools.NOMBOX:
-              this.eventHandler.createRedBox('scanexam.nomuc1', z, page);
-              break;
+        if (this.zones[page] !== undefined) {
+          this.zones[page].forEach(z => {
+            switch (z.type) {
+              case DrawingTools.NOMBOX:
+                this.eventHandler.createRedBox('scanexam.nomuc1', z, page);
+                break;
 
-            case DrawingTools.PRENOMBOX: {
-              this.eventHandler.createRedBox('scanexam.prenomuc1', z, page);
-              break;
+              case DrawingTools.PRENOMBOX: {
+                this.eventHandler.createRedBox('scanexam.prenomuc1', z, page);
+                break;
+              }
+              case DrawingTools.INEBOX: {
+                this.eventHandler.createRedBox('scanexam.ineuc1', z, page);
+                break;
+              }
+              case DrawingTools.QUESTIONBOX: {
+                this.eventHandler.createRedQuestionBox(z, page);
+                break;
+              }
             }
-            case DrawingTools.INEBOX: {
-              this.eventHandler.createRedBox('scanexam.ineuc1', z, page);
-              break;
-            }
-            case DrawingTools.QUESTIONBOX: {
-              this.eventHandler.createRedQuestionBox(z, page);
-              break;
-            }
-          }
-        });
-      }
+          });
+        }
 
-      if (this.pdfViewerService.isRenderQueueEmpty()) {
-        this.loadingPdfMetadata(evt.source.scale);
+        if (this.pdfViewerService.isRenderQueueEmpty()) {
+          this.loadingPdfMetadata(evt.source.scale);
 
-        this.blocked = false;
+          this.blocked = false;
+        }
       }
     }
   }

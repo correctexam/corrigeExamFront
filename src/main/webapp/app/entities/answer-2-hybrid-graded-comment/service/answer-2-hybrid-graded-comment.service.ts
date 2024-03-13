@@ -95,8 +95,8 @@ export class Answer2HybridGradedCommentService {
   ): Type[] {
     const answer2HybridGradedComments: Type[] = answer2HybridGradedCommentsToCheck.filter(isPresent);
     if (answer2HybridGradedComments.length > 0) {
-      const answer2HybridGradedCommentCollectionIdentifiers = answer2HybridGradedCommentCollection.map(
-        answer2HybridGradedCommentItem => this.getAnswer2HybridGradedCommentIdentifier(answer2HybridGradedCommentItem)!,
+      const answer2HybridGradedCommentCollectionIdentifiers = answer2HybridGradedCommentCollection.map(answer2HybridGradedCommentItem =>
+        this.getAnswer2HybridGradedCommentIdentifier(answer2HybridGradedCommentItem),
       );
       const answer2HybridGradedCommentsToAdd = answer2HybridGradedComments.filter(answer2HybridGradedCommentItem => {
         const answer2HybridGradedCommentIdentifier = this.getAnswer2HybridGradedCommentIdentifier(answer2HybridGradedCommentItem);

@@ -131,6 +131,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   // course: ICourse | undefined;
   //  students: IStudent[] | undefined;
   currentStudent = 0;
+  currentStudentPaginator = 0;
   //  selectionStudents: IStudent[] | null |undefined;
   studentName: string | undefined;
   numberofzone: number | undefined = 0;
@@ -288,6 +289,15 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       if (params.get('studentid') !== null) {
         this.studentid = +params.get('studentid')!;
         this.currentStudent = this.studentid - 1;
+        const m = this.preferenceService.getRandomOrderForExam(+this.examId);
+        if (m.size === 0) {
+          this.currentStudentPaginator = this.studentid - 1;
+        } else {
+          if (params.get('questionno') !== null) {
+            this.currentStudentPaginator = m.get(+params.get('questionno')!)!.indexOf(this.currentStudent + 1);
+            //            this.currentStudentPaginator = m.get(+params.get('questionno')!)![this.currentStudent] - 1;
+          }
+        }
         // Step 1 Query templates
         if (this.examId !== examId_prev) {
           studentid_prev = -1;
@@ -303,6 +313,15 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           });
 
           const b = await firstValueFrom(this.questionService.query({ examId: this.exam!.id }));
+
+          if (this.numberPagesInScan && this.nbreFeuilleParCopie) {
+            this.preferenceService.generateRandomOrderForQuestion(
+              b.body!,
+              this.numberPagesInScan! / this.nbreFeuilleParCopie!,
+              +this.examId,
+            );
+          }
+
           this.questionNumeros = Array.from(new Set(b.body!.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
           this.nbreQuestions = this.questionNumeros.length;
 
@@ -332,6 +351,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           );
           if (q1.body !== null && q1.body.length > 0) {
             questions = q1.body!;
+
             this.noteSteps = questions[0].point! * questions[0].step!;
             this.questionStep = questions[0].step!;
             this.maxNote = questions[0].point!;
@@ -1469,18 +1489,37 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
     if (!this.blocked) {
       this.cleanCanvassCache();
-      const c = this.currentStudent;
-      const q1 = this.questionindex!;
 
-      if (c > 0) {
-        this.ngZone.run(() => {
-          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
-        });
-      } else if (q1 > 0) {
-        const prevSt = this.numberPagesInScan! / this.nbreFeuilleParCopie!;
-        this.ngZone.run(() => {
-          this.router.navigateByUrl('/answer/' + this.examId! + '/' + q1 + '/' + prevSt);
-        });
+      const m = this.preferenceService.getRandomOrderForExam(+this.examId!);
+      if (m.size > 0) {
+        const orderForCurrentQuestion = m.get(this.questionindex! + 1)!;
+        const currentIndex = orderForCurrentQuestion.indexOf(this.currentStudent + 1);
+        const q1 = this.questionindex!;
+        if (currentIndex > 0) {
+          const previousIndex = orderForCurrentQuestion[currentIndex - 1];
+          this.ngZone.run(() => {
+            this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + previousIndex);
+          });
+        } else if (q1 > 0) {
+          const prevSt = m.get(q1)![m.get(q1)!.length - 1];
+          this.ngZone.run(() => {
+            this.router.navigateByUrl('/answer/' + this.examId! + '/' + q1 + '/' + prevSt);
+          });
+        }
+      } else {
+        const c = this.currentStudent;
+        const q1 = this.questionindex!;
+
+        if (c > 0) {
+          this.ngZone.run(() => {
+            this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+          });
+        } else if (q1 > 0) {
+          const prevSt = this.numberPagesInScan! / this.nbreFeuilleParCopie!;
+          this.ngZone.run(() => {
+            this.router.navigateByUrl('/answer/' + this.examId! + '/' + q1 + '/' + prevSt);
+          });
+        }
       }
     }
   }
@@ -1493,16 +1532,35 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.cleanCanvassCache();
 
       //      event.preventDefault();
-      const c = this.currentStudent + 2;
-      const q1 = this.questionindex! + 2;
-      if (c <= this.numberPagesInScan! / this.nbreFeuilleParCopie!) {
-        this.ngZone.run(() => {
-          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
-        });
-      } else if (q1 <= this.nbreQuestions) {
-        this.ngZone.run(() => {
-          this.router.navigateByUrl('/answer/' + this.examId! + '/' + q1 + '/' + 1);
-        });
+      const m = this.preferenceService.getRandomOrderForExam(+this.examId!);
+      if (m.size > 0) {
+        const orderForCurrentQuestion = m.get(this.questionindex! + 1)!;
+        const currentIndex = orderForCurrentQuestion.indexOf(this.currentStudent + 1);
+        const q1 = this.questionindex! + 2;
+
+        if (currentIndex + 1 < orderForCurrentQuestion.length) {
+          const nextIndex = orderForCurrentQuestion[currentIndex + 1];
+          this.ngZone.run(() => {
+            this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + nextIndex);
+          });
+        } else if (q1 <= this.nbreQuestions) {
+          const nextStudent = m.get(q1)![0];
+          this.ngZone.run(() => {
+            this.router.navigateByUrl('/answer/' + this.examId! + '/' + q1 + '/' + nextStudent);
+          });
+        }
+      } else {
+        const c = this.currentStudent + 2;
+        const q1 = this.questionindex! + 2;
+        if (c <= this.numberPagesInScan! / this.nbreFeuilleParCopie!) {
+          this.ngZone.run(() => {
+            this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+          });
+        } else if (q1 <= this.nbreQuestions) {
+          this.ngZone.run(() => {
+            this.router.navigateByUrl('/answer/' + this.examId! + '/' + q1 + '/' + 1);
+          });
+        }
       }
     }
   }
@@ -1552,11 +1610,22 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   changeStudent($event: any): void {
     if (!this.init) {
       this.cleanCanvassCache();
-      this.currentStudent = $event.page;
-      const c = this.currentStudent + 1;
-      this.ngZone.run(() => {
-        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
-      });
+      const m = this.preferenceService.getRandomOrderForExam(+this.examId!);
+      if (m.size === 0) {
+        this.currentStudentPaginator = $event.page;
+        this.currentStudent = $event.page;
+        const c = this.currentStudent + 1;
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+        });
+      } else {
+        this.currentStudentPaginator = $event.page;
+        this.currentStudent = m.get(this.questionindex! + 1)![this.currentStudentPaginator] - 1;
+        const c = this.currentStudent + 1;
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + c);
+        });
+      }
     }
   }
   changeQuestion($event: any): void {
@@ -1611,37 +1680,27 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   } */
 
   async getSelectedStudent(currentStudent: number) {
-    const _sheets = await firstValueFrom(
-      this.sheetService.query({
-        scanId: this.exam!.scanfileId,
-        pagemin: currentStudent * this.nbreFeuilleParCopie!,
-        pagemax: (currentStudent + 1) * this.nbreFeuilleParCopie! - 1,
-      }),
-    );
-    if (_sheets.body !== null && _sheets.body.length > 0) {
-      this.sheet = _sheets.body[0];
-      this.studentService.query({ sheetId: this.sheet.id! }).subscribe(e => {
-        if (e.body !== null) {
-          this.studentName = e.body.map(e1 => e1.firstname + ' ' + e1.name).join(', ');
-        } else {
-          this.studentName = undefined;
-        }
-      });
-    }
-
-    /* const filterStudent = this.students!.filter(
-      s => s.examSheets?.some(ex => ex.scanId === this.exam!.scanfileId && ex.pagemin === this.currentStudent * this.nbreFeuilleParCopie!),
-    );
-    this.selectionStudents = filterStudent;
-    if (this.selectionStudents.length === 0) {
-      this.translateService.get('scanexam.copienotassociated').subscribe(() => {
-        this.messageService.add({
-          severity: 'error',
-          summary: this.translateService.instant('scanexam.copienotassociated'),
-          detail: this.translateService.instant('scanexam.copienotassociateddetails'),
+    if ((currentStudent + 1) * this.nbreFeuilleParCopie! - 1 < this.numberPagesInScan!) {
+      const _sheets = await firstValueFrom(
+        this.sheetService.query({
+          scanId: this.exam!.scanfileId,
+          pagemin: currentStudent * this.nbreFeuilleParCopie!,
+          pagemax: (currentStudent + 1) * this.nbreFeuilleParCopie! - 1,
+        }),
+      );
+      if (_sheets.body !== null && _sheets.body.length > 0) {
+        this.sheet = _sheets.body[0];
+        this.studentService.query({ sheetId: this.sheet.id! }).subscribe(e => {
+          if (e.body !== null) {
+            this.studentName = e.body.map(e1 => e1.firstname + ' ' + e1.name).join(', ');
+          } else {
+            this.studentName = undefined;
+          }
         });
-      });
-    }*/
+      }
+    } else {
+      this.gotoMarkingSummary();
+    }
   }
 
   displayImage(
@@ -1933,7 +1992,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  updateComment($event: any, l: IGradedComment | ITextComment | IHybridGradedComment, graded: boolean, hybrid: boolean): any {
+  updateComment(event: any, l: IGradedComment | ITextComment | IHybridGradedComment, graded: boolean, hybrid: boolean): any {
+    event.preventDefault();
+
     if (l.id) {
       setTimeout(() => {
         if (this.active.has(l.id!)) {
@@ -2587,5 +2648,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     } else if (event.direction === 'y' && event.distance < -70 && verticalScroll) {
       await this.previousQuestion();
     }
+  }
+
+  cancelEvent(event: Event) {
+    event.preventDefault();
   }
 }

@@ -20,6 +20,32 @@
         "build": {
           "builder": "@angular-builders/custom-webpack:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "dayjs",
+              "file-saver",
+              "jszip",
+              "@supercharge/promise-pool",
+              "fabric",
+              "html2canvas",
+              "dompurify",
+              "rgbcolor",
+              "raf",
+              "core-js/modules/web.dom-collections.iterator.js",
+              "core-js/modules/es.string.trim.js",
+              "core-js/modules/es.string.starts-with.js",
+              "core-js/modules/es.string.split.js",
+              "core-js/modules/es.string.replace.js",
+              "core-js/modules/es.string.match.js",
+              "core-js/modules/es.string.includes.js",
+              "core-js/modules/es.string.ends-with.js",
+              "core-js/modules/es.regexp.to-string.js",
+              "core-js/modules/es.promise.js",
+              "core-js/modules/es.array.reverse.js",
+              "core-js/modules/es.array.reduce.js",
+              "core-js/modules/es.array.iterator.js",
+              "core-js/modules/es.array.index-of.js",
+              "long"
+            ],
             "customWebpackConfig": {
               "path": "./webpack/webpack.custom.js"
             },
@@ -97,8 +123,8 @@
         "serve": {
           "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
-            "browserTarget": "grade-scope-istic:build:development",
-            "port": 4200,
+            "buildTarget": "grade-scope-istic:build:development",
+            "port": 8080,
             "headers": {
               "Cross-Origin-Opener-Policy": "same-origin",
               "Cross-Origin-Embedder-Policy": "require-corp",
@@ -107,10 +133,10 @@
           },
           "configurations": {
             "production": {
-              "browserTarget": "grade-scope-istic:build:production"
+              "buildTarget": "grade-scope-istic:build:production"
             },
             "development": {
-              "browserTarget": "grade-scope-istic:build:development"
+              "buildTarget": "grade-scope-istic:build:development"
             }
           },
           "defaultConfiguration": "development"

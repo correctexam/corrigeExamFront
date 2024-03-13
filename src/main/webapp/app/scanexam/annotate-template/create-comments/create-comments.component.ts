@@ -328,6 +328,10 @@ export class CreateCommentsComponent implements OnInit {
     this.blocked = false;
   }
 
+  cancelEvent(event: any): void {
+    event.preventDefault();
+  }
+
   resetDefault(): void {
     if (this._q !== undefined && this._q.gradeType === GradeType.DIRECT) {
       this.preferenceService.clearDefaultTextComment();

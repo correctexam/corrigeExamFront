@@ -20,6 +20,12 @@ export interface IQuestion {
   examName?: string;
   examId?: number;
   zoneDTO?: Zone;
+  randomHorizontalCorrection?: boolean;
+}
+
+export interface IQuestionMark {
+  numero?: number;
+  randomHorizontalCorrection?: boolean;
 }
 
 export class Question implements IQuestion {
@@ -38,6 +44,7 @@ export class Question implements IQuestion {
     public examName?: string,
     public examId?: number,
     public zoneDTO?: Zone,
+    public randomHorizontalCorrection?: boolean,
   ) {}
 }
 export function getQuestionIdentifier(question: IQuestion): number | undefined {

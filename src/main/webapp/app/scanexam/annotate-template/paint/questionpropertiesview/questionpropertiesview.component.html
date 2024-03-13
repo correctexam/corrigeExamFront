@@ -149,7 +149,7 @@
             [max]="100"
             [step]="10"
             formControlName="defaultpoint"
-            (onChange)="defaultpointChange()"
+            (onChange)="defaultpointChange($event)"
             valueTemplate="{value}%"
             name="defaultpoint"
             id="field_defaultpoint"
@@ -205,9 +205,27 @@
             optionValue="value"
             [pTooltip]="'scanexam.penaltytooltip' | translate"
             [tooltipPosition]="'left'"
+            (onChange)="contentChange()"
+            [tooltipZIndex]="'3000'"
+          ></p-listbox>
+        </div>
+
+        <div *ngIf="editForm.get(['typeId'])!.value !== qcmid" class="row">
+          <label class="form-label" jhiTranslate="scanexam.randomcorrection" for="field_randomcorrection"
+            >Correction en ordre aléatoire</label
           >
-            > (onChange)="contentChange()" [tooltipZIndex]="'3000'" ></p-listbox
+
+          <p-checkbox
+            value="randomcorrection"
+            inputId="randomcorrection"
+            formControlName="randomHorizontalCorrection"
+            [binary]="true"
+            [pTooltip]="'scanexam.randomcorrectionTooltip' | translate"
+            [tooltipPosition]="'right'"
+            (onChange)="randomContentChange()"
+            ngDefaultControl
           >
+          </p-checkbox>
         </div>
       </div>
     </form>

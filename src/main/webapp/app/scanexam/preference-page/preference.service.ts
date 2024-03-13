@@ -7,6 +7,7 @@ import { IPreference } from '../services/align-images.service';
 import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
 import { IHybridGradedComment, NewHybridGradedComment } from '../../entities/hybrid-graded-comment/hybrid-graded-comment.model';
 import { ITextComment } from 'app/entities/text-comment/text-comment.model';
+import { IQuestion, IQuestionMark } from 'app/entities/question/question.model';
 
 interface IPreferenceForQuestion {
   point: number;
@@ -289,6 +290,78 @@ export class PreferenceService {
     } else {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return JSON.parse(c, this.reviver);
+    }
+  }
+
+  getRandomOrderForExam(id: number): Map<number, number[]> {
+    const spref: string | null = this.localStorageService.retrieve('questionsRandomOrder_' + id);
+    if (spref === null) {
+      return new Map();
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return JSON.parse(spref, this.reviver);
+    }
+  }
+
+  shuffle(o: number[]): Map<number, number> {
+    const s = new Map<number, number>();
+    for (let i = o.length; i; ) {
+      let x: number;
+      const j = Math.floor(Math.random() * i);
+      (x = o[--i]), (o[i] = o[j]), (o[j] = x);
+      s.set(i, j);
+    }
+    return s;
+  }
+
+  cleanRandomOrderForQuestion(examId: number): void {
+    this.localStorageService.store('questionsRandomOrder_' + examId, null);
+  }
+
+  generateRandomOrderForQuestion(questions: IQuestion[] | IQuestionMark[], nbreSheet: number, examId: number): Map<number, number[]> {
+    const map1 = new Map<number, number[]>();
+    const questionNumeros = Array.from(new Set(questions.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
+
+    const spref: string | null = this.localStorageService.retrieve('questionsRandomOrder_' + examId);
+    if (spref === null) {
+      questionNumeros.forEach((e: number, index: number) => {
+        const q1 = questions.filter(e1 => e1.numero === e)[0];
+        if (!q1.randomHorizontalCorrection) {
+          const array = Array.from({ length: nbreSheet }, (_, i) => i + 1);
+          map1.set(index + 1, array);
+        } else {
+          const shuffledArray = Array.from({ length: nbreSheet }, (_, i) => i + 1).sort(() => 0.5 - Math.random());
+          map1.set(index + 1, shuffledArray);
+        }
+      });
+      this.localStorageService.store('questionsRandomOrder_' + examId, JSON.stringify(map1, this.replacer));
+      return map1;
+    } else {
+      const map2: Map<number, number[]> = JSON.parse(spref, this.reviver);
+      let nbrePages = 0;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      map2.forEach((v, k) => {
+        nbrePages = nbrePages + v.length;
+      });
+      nbrePages = nbrePages / questionNumeros.length;
+
+      if (map2.size !== questionNumeros.length || nbrePages !== nbreSheet) {
+        questionNumeros.forEach((e: number, index: number) => {
+          const q1 = questions.filter(e1 => e1.numero === e)[0];
+          if (!q1.randomHorizontalCorrection) {
+            const array = Array.from({ length: nbreSheet }, (_, i) => i + 1);
+
+            map1.set(index + 1, array);
+          } else {
+            const shuffledArray = Array.from({ length: nbreSheet }, (_, i) => i + 1).sort(() => 0.5 - Math.random());
+            map1.set(index + 1, shuffledArray);
+          }
+        });
+        this.localStorageService.store('questionsRandomOrder_' + examId, JSON.stringify(map1, this.replacer));
+        return map1;
+      } else {
+        return map2;
+      }
     }
   }
 

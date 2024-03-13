@@ -1,10 +1,11 @@
 <div class="flex-container">
   <jhi-summary-template (gotoQ)="goToQuestion($event)" class="summary" [questions]="eventHandler.questions"></jhi-summary-template>
-  <div class="canvas-wrapper foo">
-    <p-blockUI [blocked]="blocked">
-      <!--<i class="pi pi-lock" style="font-size: 3rem"></i>-->
-      <p-progressSpinner></p-progressSpinner>
-    </p-blockUI>
+  <p-blockUI [blocked]="blocked">
+    <!--<i class="pi pi-lock" style="font-size: 3rem"></i>-->
+    <p-progressSpinner></p-progressSpinner>
+  </p-blockUI>
+
+  <div class="canvas-wrapper foo" *ngIf="processpdf">
     <ngx-extended-pdf-viewer
       [src]="content"
       style="flex: 1 1 90%"
@@ -25,6 +26,7 @@
       [zoom]="'page-width'"
       [minZoom]="0.5"
       [maxZoom]="3"
+      [delayFirstView]="500"
     ></ngx-extended-pdf-viewer>
   </div>
 </div>

@@ -92,6 +92,8 @@ describe('QuestionpropertiesviewComponent', () => {
       step: 4,
       gradeType: GradeType.DIRECT,
       typeId: 2,
+      defaultpoint: undefined,
+      randomHorizontalCorrection: false,
     }));
     mockPrefService.savePref4Question = jest.fn();
 
@@ -136,6 +138,7 @@ describe('QuestionpropertiesviewComponent', () => {
         typeId: undefined,
         zoneId: 100,
         defaultpoint: undefined,
+        randomHorizontalCorrection: false,
       };
 
       otherQ = {
@@ -150,6 +153,7 @@ describe('QuestionpropertiesviewComponent', () => {
         typeId: undefined,
         zoneId: 1002,
         defaultpoint: undefined,
+        randomHorizontalCorrection: false,
       };
 
       jest.spyOn(component.editForm, 'patchValue');
@@ -173,6 +177,7 @@ describe('QuestionpropertiesviewComponent', () => {
           validExpression: selectedQ.validExpression,
           gradeType: selectedQ.gradeType,
           typeId: selectedQ.typeId,
+          randomHorizontalCorrection: false,
         },
         { emitEvent: false },
       );
@@ -240,6 +245,7 @@ describe('QuestionpropertiesviewComponent', () => {
           gradeType: GradeType.POSITIVE,
           zoneId: 1001,
           typeId: 2,
+          randomHorizontalCorrection: false,
         },
         {
           id: 12,
@@ -252,6 +258,7 @@ describe('QuestionpropertiesviewComponent', () => {
           gradeType: GradeType.POSITIVE,
           zoneId: 1002,
           typeId: 2,
+          randomHorizontalCorrection: false,
         },
       ];
 
@@ -275,6 +282,7 @@ describe('QuestionpropertiesviewComponent', () => {
           validExpression: qs[0].validExpression,
           gradeType: qs[0].gradeType,
           typeId: qs[0].typeId,
+          randomHorizontalCorrection: false,
         },
         { emitEvent: false },
       );
