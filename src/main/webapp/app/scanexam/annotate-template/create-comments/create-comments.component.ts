@@ -330,7 +330,6 @@ export class CreateCommentsComponent implements OnInit {
 
   cancelEvent(event: any): void {
     event.preventDefault();
-    console.error(event);
   }
 
   resetDefault(): void {

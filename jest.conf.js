@@ -8,7 +8,7 @@ const {
 const environment = require('./webpack/environment');
 
 module.exports = {
-  transformIgnorePatransformtransformtterns: ['node_modules/(?!.*\\.mjs$|dayjs/esm|export-to-csv/output/)'],
+  transformIgnorePatterns: ['node_modules/(?!.*\\.mjs$|dayjs/esm|export-to-csv/output/)'],
   resolver: 'jest-preset-angular/build/resolvers/ng-jest-resolver.js',
   //  preset: 'jest-preset-angular/presets/defaults-esm',
 
