@@ -6,7 +6,7 @@
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import { HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse } from '@angular/common/http';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Validators, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -20,7 +20,7 @@ import { finalize, firstValueFrom, Observable, scan } from 'rxjs';
 import { ScanService } from '../../entities/scan/service/scan.service';
 import { IExam } from '../../entities/exam/exam.model';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
-import { NgxExtendedPdfViewerService, ScrollModeType } from 'ngx-extended-pdf-viewer';
+import { IPDFViewerApplication, NgxExtendedPdfViewerService, ScrollModeType } from 'ngx-extended-pdf-viewer';
 import { IPage } from '../alignscan/alignscan.component';
 import { TemplateService } from 'app/entities/template/service/template.service';
 import { QuestionService } from 'app/entities/question/service/question.service';
@@ -69,7 +69,7 @@ const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
   styleUrls: ['./chargerscan.component.scss'],
   providers: [MessageService, ConfirmationService],
 })
-export class ChargerscanComponent implements OnInit {
+export class ChargerscanComponent implements OnInit, OnDestroy {
   blocked = false;
   examid: string | undefined = undefined;
   isSaving = false;
@@ -175,8 +175,20 @@ export class ChargerscanComponent implements OnInit {
       contentContentType: [null, [Validators.required]],
     });
   }
+  ngOnDestroy(): void {
+    const PDFViewerApplication: IPDFViewerApplication = (window as any).PDFViewerApplication;
+    if (PDFViewerApplication) {
+      PDFViewerApplication.unbindEvents();
+      PDFViewerApplication.unbindWindowEvents();
+      PDFViewerApplication._cleanup();
+      PDFViewerApplication.close();
+    }
+  }
 
   ngOnInit(): void {
+    this.blob = undefined;
+    this.blob1 = undefined;
+    this.blob2 = undefined;
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('examid') !== null) {
         this.examid = params.get('examid')!;
@@ -432,6 +444,7 @@ export class ChargerscanComponent implements OnInit {
 
   blob: any;
   blob1: any;
+  blob2: any;
 
   async process(): Promise<void> {
     this.translateService.get('scanexam.processingencours').subscribe(res => (this.message = '' + res));

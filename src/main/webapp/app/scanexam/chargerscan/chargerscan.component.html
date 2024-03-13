@@ -114,7 +114,7 @@
     ></jhi-viewandreorderpages>
   </div>
 
-  <div class="canvas-wrapper foo">
+  <div class="canvas-wrapper foo" *ngIf="blob1">
     <ngx-extended-pdf-viewer
       [hidden]="'true'"
       [src]="blob1"
@@ -125,8 +125,8 @@
       [handTool]="false"
       [showHandToolButton]="false"
       [textLayer]="false"
+      [delayFirstView]="500"
       [(scrollMode)]="scrollMode"
-      [handTool]="false"
       [showToolbar]="false"
       [pageViewMode]="'infinite-scroll'"
       [showSecondaryToolbarButton]="false"
