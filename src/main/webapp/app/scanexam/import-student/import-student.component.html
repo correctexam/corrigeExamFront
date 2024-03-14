@@ -12,10 +12,11 @@
     [rejectLabel]="'scanexam.no' | translate"
   ></p-confirmDialog>
 
-  <div class="container">
+  <div class="">
     <div class="grid flex">
       <div class="sm:col-12 md:col-6 lg:col-6 xl:col-6">
         <p-message *ngIf="!canImport()" severity="warn" [text]="'scanexam.listestudentvalid' | translate"></p-message>
+        <p-message *ngIf="!canImport()" severity="warn" [text]="'scanexam.listestudentvaliddetail' | translate"></p-message>
         <p-message *ngIf="!canImportSameColSize()" severity="warn" [text]="'scanexam.liststderrorcolsize' | translate"></p-message>
         <p-message *ngIf="!canImportUniqueMails()" severity="warn" [text]="'scanexam.liststderroremails' | translate"></p-message>
         <p-message *ngIf="!canImportUniqueINE()" severity="warn" [text]="'scanexam.liststderrorINE' | translate"></p-message>
@@ -88,19 +89,19 @@
               <td></td>
 
               <td>
-                <input [(ngModel)]="firstLine.ine" (paste)="data($event)" type="text" />
+                <input [(ngModel)]="firstLine.ine" (paste)="data($event)" type="text" style="width: 90%" />
               </td>
               <td>
-                <input [(ngModel)]="firstLine.nom" type="text" />
+                <input [(ngModel)]="firstLine.nom" type="text" style="width: 90%" />
               </td>
               <td>
-                <input [(ngModel)]="firstLine.prenom" type="text" />
+                <input [(ngModel)]="firstLine.prenom" type="text" style="width: 90%" />
               </td>
               <td>
-                <input [(ngModel)]="firstLine.mail" type="text" />
+                <input [(ngModel)]="firstLine.mail" type="text" style="width: 90%" />
               </td>
               <td>
-                <input [(ngModel)]="firstLine.groupe" type="text" />
+                <input [(ngModel)]="firstLine.groupe" type="text" style="width: 90%" />
               </td>
               <td>
                 <button *ngIf="canAddFirstLine()" class="btn" (click)="addStudentLine()">

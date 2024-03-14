@@ -206,6 +206,7 @@
     "savetemplateencours": "saving cache of template files",
     "exportcacheencours": "export cache to send it to server",
     "listestudentvalid": "Provide a valid list of students and then click on the 'import' button. You can import the list by clicking on the first cell (INE-1) to then paste (ctrl-v) the previously copied list.",
+    "listestudentvaliddetail": "It is essential to copy a list with the 5 required columns filled in. If there is only one group, you can use a fake group name such as 'G1'.",
     "liststderrorcolsize": "Columns must be the same size",
     "liststderroremails": "Emails must be unique",
     "liststderrorINE": "Student numbers must be unique",

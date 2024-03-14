@@ -212,6 +212,7 @@
     "savetemplateencours": "Savegarde du cache du template",
     "exportcacheencours": "export du cache local",
     "listestudentvalid": "Veuillez fournir une liste d'étudiants valide puis cliquez sur le bouton 'Importer'. Vous pouvez importer votre liste en cliquant sur la première cellule (INE-1) puis en collant (ctrl-v) votre liste préalablement copiée depuis un tableur comme excel ou libreoffice.",
+    "listestudentvaliddetail": "Il est important de copier une liste avec les 5 colonnes demandées remplies, si un seul groupe, vous pouvez mettre un nom de groupe bidon comme 'G1'",
     "liststderrorcolsize": "Les colonnes doivent être de même taille",
     "liststderroremails": "Les courriels doivent être uniques",
     "liststderrorINE": "Les INE doivent être uniques",
