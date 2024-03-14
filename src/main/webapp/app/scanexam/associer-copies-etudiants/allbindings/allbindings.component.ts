@@ -82,7 +82,6 @@ export class AllbindingsComponent implements OnInit {
   }
 
   async bindStudentInternal(student: IStudent, currentStudent: number, element: any): Promise<void> {
-    console.error(this.students);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     const examSheet4CurrentStudent1: IExamSheet[] = [
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -128,7 +127,7 @@ export class AllbindingsComponent implements OnInit {
           await this.bindStudentInternal(s.recognizedStudent, s.currentStudent, s);
         }
       } catch (e) {
-        console.error('could not bind ', s.recognizedStudent);
+        console.error('could not bind ', s.recognizedStudent, e);
       }
     }
     this.nobutton = false;
@@ -139,8 +138,6 @@ export class AllbindingsComponent implements OnInit {
     try {
       await this.bindStudentInternal(student, currentStudent, element);
     } catch (e) {
-      console.error(student, currentStudent, element);
-      console.error(e);
       console.error('could not bind ', student);
     }
     this.nobutton = false;
