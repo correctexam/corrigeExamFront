@@ -83,7 +83,10 @@ export class AllbindingsComponent implements OnInit {
 
   async bindStudentInternal(student: IStudent, currentStudent: number, element: any): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    const examSheet4CurrentStudent1: IExamSheet[] = [...new Set(this.students.flatMap(s => s.recognizedStudent.examSheets!))].filter(
+    const examSheet4CurrentStudent1: IExamSheet[] = [
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      ...new Set(this.students.filter(s => s.recognizedStudent !== undefined).flatMap(s => s.recognizedStudent.examSheets!)),
+    ].filter(
       sh =>
         sh.pagemin === currentStudent * this.nbreFeuilleParCopie &&
         sh.pagemax === (currentStudent + 1) * this.nbreFeuilleParCopie - 1 &&
@@ -124,7 +127,7 @@ export class AllbindingsComponent implements OnInit {
           await this.bindStudentInternal(s.recognizedStudent, s.currentStudent, s);
         }
       } catch (e) {
-        console.error('could not bind ', s.recognizedStudent);
+        console.error('could not bind ', s.recognizedStudent, e);
       }
     }
     this.nobutton = false;
