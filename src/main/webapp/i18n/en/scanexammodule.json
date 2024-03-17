@@ -473,6 +473,7 @@
     "by": "by ",
     "at": " at ",
     "randomcorrection": "Random horizontal correction",
-    "randomcorrectionTooltip": "Allows the marker to propose a random order in which the exam sheets are evaluated for this question."
+    "randomcorrectionTooltip": "Allows the marker to propose a random order in which the exam sheets are evaluated for this question.",
+    "defaultpointTooltip": "Default point for this question"
   }
 }
