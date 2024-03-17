@@ -477,6 +477,7 @@
     "by": "Corrigé par ",
     "at": ", le ",
     "randomcorrection": "Correction horizontale aléatoire",
-    "randomcorrectionTooltip": "Permet de proposer au correcteur un tirage aléatoire pour l'ordre de correction des copies pour cette question"
+    "randomcorrectionTooltip": "Permet de proposer au correcteur un tirage aléatoire pour l'ordre de correction des copies pour cette question",
+    "defaultpointTooltip": "Point par défaut pour cette question"
   }
 }
