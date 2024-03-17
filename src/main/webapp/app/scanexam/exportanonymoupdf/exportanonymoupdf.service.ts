@@ -99,7 +99,6 @@ export class ExportPdfService {
     );
 
     const exportPromises: Promise<void>[] = [];
-    console.error('pass par la', this.examExport?.sheetspdf);
     this.examExport?.sheetspdf?.forEach((sheet, index1) => {
       exportPromises.push(this.processPage(sheet, index1));
     });
@@ -130,7 +129,6 @@ export class ExportPdfService {
       if (index1 > -1) {
         const begin = sheet.pagemin! + 1;
         const end = sheet.pagemax! + 1;
-        console.error(begin, end);
         const promises: Promise<number>[] = [];
         const checkPagePromises: Promise<void>[] = [];
         for (let k = begin; k <= end; k++) {
@@ -157,7 +155,6 @@ export class ExportPdfService {
 
   async startProcessingPage(sheet: Sheetspdf): Promise<void> {
     for (let page = sheet.pagemin! + 1; page <= sheet.pagemax! + 1; page++) {
-      console.error(page);
       if (this.anonymous) {
         if (this.nbrPageInTemplate > 1) {
           const paget1 = (page % this.nbrPageInTemplate) % 2;
@@ -280,9 +277,6 @@ export class ExportPdfService {
         compression = this.preferenceService.getPreference().exportImageCompression;
       }
 
-      if (canvas === undefined) {
-        console.error(page);
-      }
       const imgData = canvas.toDataURL('image/jpeg', compression);
       const dimensions = await this.getImageDimensions(imgData);
       pdf.addImage(imgData, 'JPEG', 0, 0, dimensions.width / (dimensions.width / 210), dimensions.height / (dimensions.height / 297));
