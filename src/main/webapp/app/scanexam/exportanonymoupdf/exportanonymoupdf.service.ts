@@ -158,7 +158,6 @@ export class ExportPdfService {
       if (this.anonymous) {
         if (this.nbrPageInTemplate > 1) {
           const paget1 = (page % this.nbrPageInTemplate) % 2;
-
           if (1 === paget1) {
             this.maskNameFirstName(this.canvass.get(page)!);
           }
