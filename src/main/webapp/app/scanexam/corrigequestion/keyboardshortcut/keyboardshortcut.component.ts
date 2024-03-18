@@ -108,7 +108,7 @@ export class KeyboardshortcutComponent implements AfterViewInit {
           this.keyboardShortcuts.push({
             key: ['ctrl + ' + sh, 'cmd + ' + sh],
             label: this.translateService.instant('gradeScopeIsticApp.comments.detail.title'),
-            description: 'toggle ' + comment.description,
+            description: 'toggle ' + comment.text,
             command: () => {
               if ('step' in comment) {
                 this.toggleHCommentById.emit(comment.id);

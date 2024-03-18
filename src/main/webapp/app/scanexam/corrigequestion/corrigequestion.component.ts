@@ -501,12 +501,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.reloadImage();
       this.changeDetector.detectChanges();
     });
-
-    this.shortcuts.push(
+    const shortcuts: ShortcutInput[] = [
       {
         // ArrowRight
         key: ['ctrl + F12', 'cmd + F12'],
-        label: 'View',
+        label: this.translateService.instant('scanexam.togglefocusViewLabel'),
         description: this.translateService.instant('scanexam.togglefocusView'),
         command: () => this.toggleFocusView(),
         preventDefault: true,
@@ -542,37 +541,40 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         command: () => this.nextQuestion(),
         preventDefault: true,
       },
+    ];
 
-      {
-        // ArrowLeft
-        key: [
-          'shift + 1',
-          '1',
-          'shift + 2',
-          '2',
-          'shift + 3',
-          '3',
-          'shift + 4',
-          '4',
-          'shift + 5',
-          '5',
-          'shift + 6',
-          '6',
-          'shift + 7',
-          '7',
-          'shift + 8',
-          '8',
-          'shift + 9',
-          '9',
-          'shift + 0',
-          '0',
-        ],
-        label: this.translateService.instant('scanexam.directevaluation'),
-        description: this.translateService.instant('scanexam.directgradding'),
-        command: (output: ShortcutEventOutput) => this.changeNote1(output),
-        preventDefault: true,
-      },
-    );
+    // TODO Do net set this shortcut if question is not direct
+    shortcuts.push({
+      // ArrowLeft
+      key: [
+        'shift + 1',
+        '1',
+        'shift + 2',
+        '2',
+        'shift + 3',
+        '3',
+        'shift + 4',
+        '4',
+        'shift + 5',
+        '5',
+        'shift + 6',
+        '6',
+        'shift + 7',
+        '7',
+        'shift + 8',
+        '8',
+        'shift + 9',
+        '9',
+        'shift + 0',
+        '0',
+      ],
+      label: this.translateService.instant('scanexam.directevaluation'),
+      description: this.translateService.instant('scanexam.directgradding'),
+      command: (output: ShortcutEventOutput) => this.changeNote1(output),
+      preventDefault: true,
+    });
+
+    this.shortcuts.push(...shortcuts);
   }
 
   toggleFocusView() {
