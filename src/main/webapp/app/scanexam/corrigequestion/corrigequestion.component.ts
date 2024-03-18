@@ -72,6 +72,7 @@ import { OrderList } from 'primeng/orderlist';
 import { Title } from '@angular/platform-browser';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { PromisePool } from '@supercharge/promise-pool';
+import { FocusViewService } from '../../layouts/profiles/focusview.service';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -108,6 +109,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
   minimizeComment = false;
+  focusView = false;
+
   layoutsidebarVisible = false;
   debug = false;
   @ViewChild('qcmcorrect')
@@ -236,6 +239,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     private applicationConfigService: ApplicationConfigService,
     private titleService: Title,
     private ngZone: NgZone,
+    private focusViewService: FocusViewService,
   ) {
     effect(() => {
       this.testdisableAndEnableKeyBoardShortCutSignal = this.testdisableAndEnableKeyBoardShortCut();
@@ -501,6 +505,14 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.shortcuts.push(
       {
         // ArrowRight
+        key: ['ctrl + F12', 'cmd + F12'],
+        label: 'View',
+        description: this.translateService.instant('scanexam.togglefocusView'),
+        command: () => this.toggleFocusView(),
+        preventDefault: true,
+      },
+      {
+        // ArrowRight
         key: ['ctrl + right', 'cmd + right'],
         label: 'Navigation',
         description: this.translateService.instant('scanexam.nextstudent'),
@@ -561,6 +573,18 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         preventDefault: true,
       },
     );
+  }
+
+  toggleFocusView() {
+    if (this.focusView) {
+      this.focusView = false;
+      this.focusViewService.updateFocusView(this.focusView);
+    } else {
+      this.minimizeComment = true;
+      this.preferenceService.setMinimizeComments(this.minimizeComment);
+      this.focusView = true;
+      this.focusViewService.updateFocusView(this.focusView);
+    }
   }
 
   bindKeyBoardShortCut(comment: any) {

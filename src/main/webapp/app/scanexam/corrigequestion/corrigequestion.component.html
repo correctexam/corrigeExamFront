@@ -292,7 +292,7 @@
   <div class="col-12">
     <div class="grid grid-nogutter">
       <div class="col-12 sm:col-12 md:col-12 lg:col-9 xl:col-10">
-        <div class="d-flex justify-content-center">
+        <div class="d-flex justify-content-center" *ngIf="!focusView">
           <div class="col-5">
             <button
               class="sm:text-xs md:text-xs lg:text-base"
@@ -333,7 +333,7 @@
             <button [hidden]="!debug" type="text" pButton [label]="'reset'" (click)="removeAllAnswer()"></button>
           </div>
 
-          <div class="col-2">
+          <div class="col-2" *ngIf="!focusView">
             <button
               class="sm:text-xs md:text-xs lg:text-base"
               pButton
@@ -348,7 +348,7 @@
             <p-progressSpinner *ngIf="blocked" styleClass="w-2rem h-2rem"></p-progressSpinner>
           </div>
 
-          <div class="col-1">
+          <div class="col-1" *ngIf="!focusView">
             <fa-icon
               *ngIf="studentName !== undefined"
               [size]="'2x'"
@@ -359,7 +359,7 @@
             ></fa-icon>
           </div>
 
-          <div class="col-4 flex flex-row-reverse">
+          <div class="col-4 flex flex-row-reverse" *ngIf="!focusView">
             <button
               [disabled]="!this.examId"
               type="submit"
@@ -405,7 +405,7 @@
             </div>
           </div>
           <div class="col-6">
-            <div class="d-flex justify-content-center" ng-if="questionnofirst !== -1">
+            <div class="d-flex justify-content-center" *ngIf="!focusView">
               <p-paginator
                 [currentPageReportTemplate]="'scanexam.currentpage' | translate"
                 [rows]="1"
@@ -431,7 +431,7 @@
           </div>
         </div>
         <div style="padding-bottom: 2rem"></div>
-        <div class="d-flex justify-content-center">
+        <div class="d-flex justify-content-center" *ngIf="!focusView">
           <p-paginator
             [currentPageReportTemplate]="'scanexam.currentstudent' | translate"
             [rows]="1"
@@ -446,7 +446,9 @@
           >
           </p-paginator>
         </div>
-        <ng-container *ngIf="this.resp?.correctedByInfo && this.resp?.correctedByInfo !== null && this.resp?.correctedByInfo?.length! > 0">
+        <ng-container
+          *ngIf="!focusView && this.resp?.correctedByInfo && this.resp?.correctedByInfo !== null && this.resp?.correctedByInfo?.length! > 0"
+        >
           <div style="padding-bottom: 1rem"></div>
           <div class="d-flex justify-content-center">
             <span jhiTranslate="scanexam.by">by </span> &nbsp; {{ this.resp?.correctedByInfo }}

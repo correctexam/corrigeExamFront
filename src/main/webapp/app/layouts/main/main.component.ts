@@ -5,6 +5,7 @@ import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
 import dayjs from 'dayjs';
 
 import { AccountService } from 'app/core/auth/account.service';
+import { FocusViewService } from '../profiles/focusview.service';
 
 @Component({
   selector: 'jhi-main',
@@ -12,7 +13,7 @@ import { AccountService } from 'app/core/auth/account.service';
 })
 export class MainComponent implements OnInit {
   helptitle: string | undefined;
-
+  focusview = false;
   private renderer: Renderer2;
   constructor(
     private accountService: AccountService,
@@ -20,6 +21,7 @@ export class MainComponent implements OnInit {
     private router: Router,
     private translateService: TranslateService,
     rootRenderer: RendererFactory2,
+    private focusViewService: FocusViewService,
   ) {
     this.renderer = rootRenderer.createRenderer(document.querySelector('html'), null);
 
@@ -34,7 +36,9 @@ export class MainComponent implements OnInit {
   ngOnInit(): void {
     // try to log in automatically
     this.accountService.identity().subscribe();
-
+    this.focusViewService.registerFocusView().subscribe((b: boolean) => {
+      this.focusview = b;
+    });
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.updateTitle();

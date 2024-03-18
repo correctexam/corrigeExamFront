@@ -26,6 +26,7 @@ import { PageRibbonComponent } from './layouts/profiles/page-ribbon.component';
 import { ActiveMenuDirective } from './layouts/navbar/active-menu.directive';
 import { ErrorComponent } from './layouts/error/error.component';
 import { KeyboardShortcutsModule } from 'ng-keyboard-shortcuts';
+import { FocusViewService } from './layouts/profiles/focusview.service';
 
 @NgModule({
   imports: [
@@ -48,6 +49,7 @@ import { KeyboardShortcutsModule } from 'ng-keyboard-shortcuts';
     { provide: LOCALE_ID, useValue: 'fr' },
     { provide: NgbDateAdapter, useClass: NgbDateDayjsAdapter },
     httpInterceptorProviders,
+    FocusViewService,
   ],
   declarations: [MainComponent, NavbarComponent, ErrorComponent, PageRibbonComponent, ActiveMenuDirective, FooterComponent],
   bootstrap: [MainComponent],
