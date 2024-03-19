@@ -484,7 +484,7 @@ export class CreateCommentsComponent implements OnInit {
     });
   }
   checkEnterOrEscape($event: any, el: Inplace): void {
-    if ($event.keyCode === 13 || $event.keyCode === 27) {
+    if (/* $event.keyCode === 13 || */ $event.keyCode === 27) {
       el.deactivate();
     }
   }
