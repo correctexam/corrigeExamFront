@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1710854194331,
+  "timestamp": 1710854726554,
   "index": "/corrigeExamFront/index.html",
   "assetGroups": [
     {
@@ -54,7 +54,7 @@
         "/corrigeExamFront/polyfills.0c6ce7915734bdca.js",
         "/corrigeExamFront/runtime.6190c12b31b9378d.js",
         "/corrigeExamFront/scripts.1f525792cccb99f1.js",
-        "/corrigeExamFront/styles.9cb226600678e571.css"
+        "/corrigeExamFront/styles.10864325ae1668bf.css"
       ],
       "patterns": []
     },
@@ -650,7 +650,7 @@
     "/corrigeExamFront/content/opencv/5/opencv.js": "f2b1eb85ce648c0f3d0e32e68b5a2aab1303e344",
     "/corrigeExamFront/content/opencv/howtobuild": "93b832b5f05ad5486d99c859729cd4b16b55656e",
     "/corrigeExamFront/content/scss/_bootstrap-variables.scss": "d4ae52e8d88917653252fa42dc5fc3f320cde121",
-    "/corrigeExamFront/content/scss/global.scss": "c96b1a113935c6193e1d049bc8b75e0ac6975402",
+    "/corrigeExamFront/content/scss/global.scss": "a383bec8df5bbf82e68f06025088df85074f3b0a",
     "/corrigeExamFront/content/scss/vendor.scss": "8325a8a0f4f0e349045d66c5d17c1f0f33da66b3",
     "/corrigeExamFront/content/sqlite/sqlite3-opfs-async-proxy.js": "dab8b663a8cf0a7801a8b67924f4cd6cd2549df0",
     "/corrigeExamFront/content/sqlite/sqlite3-worker1-promiser.js": "d33dfc719e1b11bfbb39eb94baf9b3e16575b94a",
@@ -1041,7 +1041,7 @@
     "/corrigeExamFront/content/tfjs/wasm-out/tfjs-backend-wasm.worker.js": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
     "/corrigeExamFront/favicon.ico": "69547cd4a95b59ac7e6818b6eb82befa061d0c16",
     "/corrigeExamFront/hue.8b1818380241e6ac.png": "f81ae627637a684614aa726e206c73ce099a01fd",
-    "/corrigeExamFront/index.html": "2bd8dc8f4baab4fcba2908f81acb0c546eb2fd2d",
+    "/corrigeExamFront/index.html": "1bfab0a28e6ccf469dc1519a13d6b3ce9a248ca0",
     "/corrigeExamFront/jhipster_family_member_3.87663f884fcea614.svg": "0690f4141a25d739ed9429b0b315cc94196a3644",
     "/corrigeExamFront/logo-jhipster.6125d9b31ded8344.png": "e1e46028ec092ca351425b07707fcdd52146b0b3",
     "/corrigeExamFront/main.1f0def26415ec7e6.js": "76712021eb99e2cc4fa02f4ec646cfc6d0ec2279",
@@ -1055,7 +1055,7 @@
     "/corrigeExamFront/runtime.6190c12b31b9378d.js": "202a0763268c60548c8eb744a388deaa9bd0ee82",
     "/corrigeExamFront/scholar.1dee195c875f84af.svg": "f209bee39d583876623062129b455355884a53d0",
     "/corrigeExamFront/scripts.1f525792cccb99f1.js": "69f70e87395722076c1cec24dd01385baf949fe8",
-    "/corrigeExamFront/styles.9cb226600678e571.css": "276e0ecac5a14b441f3098666d125a4615272baa"
+    "/corrigeExamFront/styles.10864325ae1668bf.css": "d517e801ee5c7ee27d9c4486200c13fff97442d1"
   },
   "navigationUrls": [
     {
