@@ -25,18 +25,18 @@
             </p-inplace>
             <p-inplace #textdescription [closable]="true">
               <ng-template pTemplate="display">
-                <p class="card-text">{{ comment.description }}</p>
+                <p class="card-text formattedbr">{{ comment.description }}</p>
               </ng-template>
               <ng-template pTemplate="content">
-                <input
-                  pInputText
+                <textarea
+                  pInputTextarea
                   type="text"
                   [(ngModel)]="comment.description"
                   (change)="updateComment($event, comment, false, false)"
                   (focusout)="textdescription.deactivate()"
                   (keyup)="checkEnterOrEscape($event, textdescription)"
                   [style]="{ width: '80%' }"
-                />
+                ></textarea>
               </ng-template>
             </p-inplace>
           </div>
@@ -77,18 +77,18 @@
               </p-inplace>
               <p-inplace #gradeddescription [closable]="true">
                 <ng-template pTemplate="display">
-                  <p class="card-text">{{ comment.description }}</p>
+                  <p class="card-text formattedbr">{{ comment.description }}</p>
                 </ng-template>
                 <ng-template pTemplate="content">
-                  <input
-                    pInputText
+                  <textarea
+                    pInputTextarea
                     type="text"
                     [(ngModel)]="comment.description"
                     (change)="updateComment($event, comment, true, false)"
                     (focusout)="gradeddescription.deactivate()"
                     (keyup)="checkEnterOrEscape($event, gradeddescription)"
                     [style]="{ width: '80%' }"
-                  />
+                  ></textarea>
                 </ng-template>
               </p-inplace>
               <p-inplace [closable]="true">
@@ -143,18 +143,18 @@
               </p-inplace>
               <p-inplace #hybriddescription [closable]="true">
                 <ng-template pTemplate="display">
-                  <p class="card-text">{{ comment.description }}</p>
+                  <p class="card-text formattedbr">{{ comment.description }}</p>
                 </ng-template>
                 <ng-template pTemplate="content">
-                  <input
-                    pInputText
+                  <textarea
+                    pInputTextarea
                     type="text"
                     [(ngModel)]="comment.description"
                     (change)="updateComment($event, comment, true, true)"
                     (focusout)="hybriddescription.deactivate()"
                     (keyup)="checkEnterOrEscape($event, hybriddescription)"
                     [style]="{ width: '80%' }"
-                  />
+                  ></textarea>
                 </ng-template>
               </p-inplace>
 

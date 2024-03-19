@@ -199,6 +199,7 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
 
   goToQuestion(q: Question): void {
     if (q.zoneDTO?.pageNumber && q.zoneDTO?.yInit !== undefined && this.eventHandler.pages?.[1]) {
+      this.eventHandler.selectQuestionView(q);
       const p = q.zoneDTO.pageNumber;
       const y = (q.zoneDTO.yInit! * this.eventHandler.pages[1].pageViewer.canvas.clientHeight) / 100000;
       this.scrollPageandTop(p, y);
@@ -211,6 +212,7 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
           this.scrollPageandTop(p, y);
         }
       });
+      this.eventHandler.selectQuestionView(q);
     }
   }
   scrollPageandTop(page: number, top: number): void {

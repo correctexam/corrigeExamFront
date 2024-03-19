@@ -684,20 +684,20 @@
                     (onDeactivate)="closeEditComment(comment)"
                   >
                     <ng-template pTemplate="display">
-                      <p class="card-text">
+                      <p class="card-text formattedbr">
                         {{ comment.description }} <span style="font-size: x-small"> ({{ comment.shortcut }}) </span>
                       </p>
                     </ng-template>
                     <ng-template pTemplate="content">
-                      <input
-                        pInputText
+                      <textarea
+                        pInputTextarea
                         type="text"
                         [(ngModel)]="comment.description"
                         (change)="updateComment($event, comment, false, false)"
                         (focusout)="textdescription.deactivate()"
                         (keyup)="checkEnterOrEscape($event, textdescription)"
                         [style]="{ width: '70%' }"
-                      />
+                      ></textarea>
                     </ng-template>
                   </p-inplace>
                   <a
@@ -806,7 +806,7 @@
                 <div *ngIf="!minimizeComment">
                   <div *ngIf="currentQuestion?.typeAlgoName === 'QCM'">
                     <h5 class="card-title">{{ comment.text }}</h5>
-                    <p class="card-text">
+                    <p class="card-text formattedbr">
                       {{ comment.description }} <span style="font-size: x-small"> ({{ comment.shortcut }}) </span>
                     </p>
                   </div>
@@ -840,20 +840,20 @@
                       (onDeactivate)="closeEditComment(comment)"
                     >
                       <ng-template pTemplate="display">
-                        <p class="card-text">
+                        <p class="card-text formattedbr">
                           {{ comment.description }} <span style="font-size: x-small"> ({{ comment.shortcut }}) </span>
                         </p>
                       </ng-template>
                       <ng-template pTemplate="content">
-                        <input
-                          pInputText
+                        <textarea
+                          pInputTextarea
                           type="text"
                           [(ngModel)]="comment.description"
                           (change)="updateComment($event, comment, true, false)"
                           (focusout)="gradeddescription.deactivate()"
                           (keyup)="checkEnterOrEscape($event, gradeddescription)"
                           [style]="{ width: '70%' }"
-                        />
+                        ></textarea>
                       </ng-template>
                     </p-inplace>
                     <p-inplace
@@ -1027,18 +1027,18 @@
                       (onDeactivate)="closeEditComment(comment)"
                     >
                       <ng-template pTemplate="display">
-                        <p class="card-text">{{ comment.description }}</p>
+                        <p class="card-text formattedbr">{{ comment.description }}</p>
                       </ng-template>
                       <ng-template pTemplate="content">
-                        <input
-                          pInputText
+                        <textarea
+                          pInputTextarea
                           type="text"
                           [(ngModel)]="comment.description"
                           (focusout)="hybriddescription.deactivate()"
                           (keyup)="checkEnterOrEscape($event, hybriddescription)"
                           (change)="updateComment($event, comment, true, true)"
                           [style]="{ width: '70%' }"
-                        />
+                        ></textarea>
                       </ng-template>
                     </p-inplace>
 

@@ -385,7 +385,9 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
    * When interacting with the point step widget
    */
   public pointChange(input: any): void {
-    input.preventDefault();
+    if (input?.preventDefault) {
+      input.preventDefault();
+    }
     this.updateStepList(input.target.value);
     this.contentChange();
   }
@@ -394,7 +396,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
    * When interacting with the point step widget
    */
   public defaultpointChange(input: any): void {
-    if (input.preventDefault) {
+    if (input?.preventDefault) {
       input.preventDefault();
     }
     // this.updateStepList(input.target.value);
