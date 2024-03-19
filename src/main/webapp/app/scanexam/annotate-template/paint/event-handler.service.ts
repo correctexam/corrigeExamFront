@@ -849,4 +849,8 @@ export class EventHandlerService {
   public getSelectedQuestion(): Observable<IQuestion | undefined> {
     return this._selectedQuestion;
   }
+
+  public selectQuestionView(q: IQuestion): void {
+    this._selectedQuestion.next(q);
+  }
 }
