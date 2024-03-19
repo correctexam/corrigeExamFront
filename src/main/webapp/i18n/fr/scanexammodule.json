@@ -480,6 +480,8 @@
     "randomcorrectionTooltip": "Permet de proposer au correcteur un tirage aléatoire pour l'ordre de correction des copies pour cette question",
     "defaultpointTooltip": "Point par défaut pour cette question",
     "togglefocusViewLabel": "Disposition",
-    "togglefocusView": "Masque les widgets non essentiels, pour se focaliser sur la correction"
+    "togglefocusView": "Masque les widgets non essentiels, pour se focaliser sur la correction",
+    "showbar": "Voir le tirroir de paramètre",
+    "hidebar": "Masquer le tirroir de paramètre"
   }
 }

@@ -476,6 +476,8 @@
     "randomcorrectionTooltip": "Allows the marker to propose a random order in which the exam sheets are evaluated for this question.",
     "defaultpointTooltip": "Default point for this question",
     "togglefocusViewLabel": "Layout",
-    "togglefocusView": "Hides non-essential widgets, so you can focus on correcting them"
+    "togglefocusView": "Hides non-essential widgets, so you can focus on correcting them",
+    "showbar": "Show the parameter sidebar",
+    "hidebar": "Hide the parameter sidebar"
   }
 }
