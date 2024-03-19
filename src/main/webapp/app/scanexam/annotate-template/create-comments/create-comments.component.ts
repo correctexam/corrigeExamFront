@@ -329,7 +329,9 @@ export class CreateCommentsComponent implements OnInit {
   }
 
   cancelEvent(event: any): void {
-    event.preventDefault();
+    if (event?.preventDefault) {
+      event.preventDefault();
+    }
   }
 
   resetDefault(): void {
