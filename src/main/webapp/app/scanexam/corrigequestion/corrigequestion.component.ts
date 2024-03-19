@@ -511,6 +511,35 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         preventDefault: true,
       },
       {
+        key: ['shift + right'],
+        label: this.translateService.instant('scanexam.togglefocusViewLabel'),
+        description: this.translateService.instant('scanexam.showbar'),
+        command: () => (this.layoutsidebarVisible = true),
+        preventDefault: true,
+      },
+      {
+        key: ['shift + left'],
+        label: this.translateService.instant('scanexam.togglefocusViewLabel'),
+        description: this.translateService.instant('scanexam.hidebar'),
+        command: () => (this.layoutsidebarVisible = false),
+        preventDefault: true,
+      },
+      {
+        key: ['ctrl + backspace', 'cmd + backspace'],
+        label: this.translateService.instant('scanexam.togglefocusViewLabel'),
+        description: this.translateService.instant('scanexam.gotolistquestion'),
+        command: () => this.gotoMarkingSummary(),
+        preventDefault: true,
+      },
+      {
+        key: ['ctrl + enter', 'cmd + enter'],
+        label: this.translateService.instant('scanexam.togglefocusViewLabel'),
+        description: this.translateService.instant('scanexam.showgalleria'),
+        command: () => this.showGalleria(),
+        preventDefault: true,
+      },
+
+      {
         // ArrowRight
         key: ['ctrl + right', 'cmd + right'],
         label: 'Navigation',
