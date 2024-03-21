@@ -4,7 +4,7 @@ export default defineConfig({
   e2e: {
     experimentalStudio: true,
 
-    setupNodeEvents(on, config) {
+    setupNodeEvents(/* on:any, config */) {
       // implement node event listeners here
     },
   },
