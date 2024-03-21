@@ -135,7 +135,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
                   this.showAlignement = true;
 
                   this.checkIfAlreadyAlign().then(res => {
-                    if (res) {
+                    if (res && this.exam?.scanfileId) {
                       this.showAssociation = true;
                       this.initTemplate();
                     } else {

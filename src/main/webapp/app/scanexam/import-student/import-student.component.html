@@ -1,4 +1,4 @@
-<div class="grid-nogutter flex center-screen">
+<div class="grid-nogutter">
   <p-toast></p-toast>
   <p-blockUI [blocked]="blocked">
     <p-progressSpinner></p-progressSpinner>
@@ -36,16 +36,16 @@
             </button>
           </div>
           <div class="">
-            <button
+            <p-button
+              severity="danger"
               (click)="reset()"
               type="submit"
               id="save-entity"
               data-cy="entityCreateSaveButton"
-              class="btn btn-danger"
               [disabled]="this.students.length === 0"
             >
               <fa-icon icon="times"></fa-icon>&nbsp;<span jhiTranslate="scanexam.vider">Vider</span>
-            </button>
+            </p-button>
           </div>
           <div class="">
             <button
@@ -83,7 +83,7 @@
               <th jhiTranslate="scanexam.prenom">PRENOM</th>
               <th jhiTranslate="scanexam.mail">MAIL</th>
               <th jhiTranslate="scanexam.groupe">GROUPE</th>
-              <th jhiTranslate="scanexam.supprimer">SUPPRIMER</th>
+              <th style="text-align: center; vertical-align: middle" jhiTranslate="scanexam.supprimer">SUPPRIMER</th>
             </tr>
             <tr>
               <td></td>
@@ -103,8 +103,8 @@
               <td>
                 <input [(ngModel)]="firstLine.groupe" type="text" style="width: 90%" />
               </td>
-              <td>
-                <button *ngIf="canAddFirstLine()" class="btn" (click)="addStudentLine()">
+              <td style="text-align: center; vertical-align: middle">
+                <button [disabled]="!canAddFirstLine()" class="btn" (click)="addStudentLine()">
                   <fa-icon icon="plus"></fa-icon>
                 </button>
               </td>
@@ -115,21 +115,51 @@
               </td>
 
               <td>
-                <input [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesaimporte' | translate" [(ngModel)]="st.ine" type="text" />
+                <input
+                  style="width: 90%"
+                  [tooltipZIndex]="'3000'"
+                  [pTooltip]="'scanexam.donneesaimporte' | translate"
+                  [(ngModel)]="st.ine"
+                  type="text"
+                />
               </td>
               <td>
-                <input [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesaimporte' | translate" [(ngModel)]="st.nom" type="text" />
+                <input
+                  style="width: 90%"
+                  [tooltipZIndex]="'3000'"
+                  [pTooltip]="'scanexam.donneesaimporte' | translate"
+                  [(ngModel)]="st.nom"
+                  type="text"
+                />
               </td>
               <td>
-                <input [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesaimporte' | translate" [(ngModel)]="st.prenom" type="text" />
+                <input
+                  style="width: 90%"
+                  [tooltipZIndex]="'3000'"
+                  [pTooltip]="'scanexam.donneesaimporte' | translate"
+                  [(ngModel)]="st.prenom"
+                  type="text"
+                />
               </td>
               <td>
-                <input [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesaimporte' | translate" [(ngModel)]="st.mail" type="text" />
+                <input
+                  style="width: 90%"
+                  [tooltipZIndex]="'3000'"
+                  [pTooltip]="'scanexam.donneesaimporte' | translate"
+                  [(ngModel)]="st.mail"
+                  type="text"
+                />
               </td>
               <td>
-                <input [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesaimporte' | translate" [(ngModel)]="st.groupe" type="text" />
+                <input
+                  style="width: 90%"
+                  [tooltipZIndex]="'3000'"
+                  [pTooltip]="'scanexam.donneesaimporte' | translate"
+                  [(ngModel)]="st.groupe"
+                  type="text"
+                />
               </td>
-              <td>
+              <td style="text-align: center; vertical-align: middle">
                 <button class="btn btn-danger" (click)="removeNonImported(index)">
                   <fa-icon icon="times"></fa-icon>
                 </button>
@@ -147,7 +177,7 @@
                     <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.ine }}</span>
                   </ng-template>
                   <ng-template pTemplate="content">
-                    <input type="text" [(ngModel)]="student.ine" (change)="updateStudentINE(student)" pInputText />
+                    <input style="width: 90%" type="text" [(ngModel)]="student.ine" (change)="updateStudentINE(student)" pInputText />
                   </ng-template>
                 </p-inplace>
               </td>
@@ -157,7 +187,7 @@
                     <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.nom }}</span>
                   </ng-template>
                   <ng-template pTemplate="content">
-                    <input type="text" [(ngModel)]="student.nom" (change)="updateStudent(student)" pInputText />
+                    <input style="width: 90%" type="text" [(ngModel)]="student.nom" (change)="updateStudent(student)" pInputText />
                   </ng-template>
                 </p-inplace>
               </td>
@@ -167,7 +197,7 @@
                     <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.prenom }}</span>
                   </ng-template>
                   <ng-template pTemplate="content">
-                    <input type="text" [(ngModel)]="student.prenom" (change)="updateStudent(student)" pInputText />
+                    <input type="text" style="width: 90%" [(ngModel)]="student.prenom" (change)="updateStudent(student)" pInputText />
                   </ng-template>
                 </p-inplace>
               </td>
@@ -177,7 +207,7 @@
                     <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.mail }}</span>
                   </ng-template>
                   <ng-template pTemplate="content">
-                    <input type="text" [(ngModel)]="student.mail" (change)="updateStudent(student)" pInputText />
+                    <input type="text" style="width: 90%" [(ngModel)]="student.mail" (change)="updateStudent(student)" pInputText />
                   </ng-template>
                 </p-inplace>
               </td>
@@ -187,11 +217,11 @@
                     <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.groupe }}</span>
                   </ng-template>
                   <ng-template pTemplate="content">
-                    <input type="text" [(ngModel)]="student.groupe" (change)="updateStudentgroup(student)" pInputText />
+                    <input type="text" style="width: 90%" [(ngModel)]="student.groupe" (change)="updateStudentgroup(student)" pInputText />
                   </ng-template>
                 </p-inplace>
               </td>
-              <td style="text-align: center">
+              <td style="text-align: center; vertical-align: middle">
                 <button class="btn btn-danger" (click)="removeStudent(student)">
                   <fa-icon icon="times"></fa-icon>
                 </button>
