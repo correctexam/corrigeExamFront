@@ -1,7 +1,11 @@
 describe("Scenario1 : Création examen", () => {
   it("tests Scenario1 : Création examen", () => {
-    cy.viewport(3840, 959);
+    cy.viewport(960, 240);
     cy.visit("http://localhost:8080/");
+    cy.clearLocalStorage() // clear all local storage
+
+    cy.wait(1500)
+
     cy.get("button:nth-of-type(1) > span.p-button-label").click();
     cy.get("[data-cy='username']").type("user");
     cy.get("[data-cy='password']").type("user");
@@ -49,6 +53,13 @@ describe("Scenario1 : Création examen", () => {
 
     // Create exam
     cy.visit("http://localhost:8080/course/1");
+    cy.wait(1500)
+
+    cy.get("div.p-dialog-footer.ng-tns-c566989842-1 button").click();
+//    cy.get("div.p-dialog-footer span").click();
+    cy.wait(1000)
+
+
     cy.get("#\\31  img").click();
     cy.get("[data-cy='name']").click();
     cy.get("[data-cy='name']").type("Test exam");
@@ -57,10 +68,14 @@ describe("Scenario1 : Création examen", () => {
     cy.get("form [data-cy='entityCreateSaveButton'] > span").click();
 
 
+
     // Create exam
     cy.visit("http://localhost:8080/exam/1");
 
+    cy.wait(1000)
 
+    cy.get("div.p-dialog-footer span").click();
+    cy.wait(1000)
     // Annotate exam
 
 

@@ -147,7 +147,9 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
                 }
               });
             } else {
-              this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, false);
+              if (this.exam?.scanfileId) {
+                this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, false);
+              }
             }
           });
         });
