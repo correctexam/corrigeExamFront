@@ -64,6 +64,7 @@
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'NOMBOX' }"
       (click)="select(DrawingTools.NOMBOX)"
+      id="nomBoxBut"
     >
       <fa-icon [icon]="faNom"></fa-icon>
     </div>
@@ -72,6 +73,7 @@
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'PRENOMBOX' }"
       (click)="select(DrawingTools.PRENOMBOX)"
+      id="prenomBoxBut"
     >
       <fa-icon [icon]="faPrenom"></fa-icon>
     </div>
@@ -80,6 +82,7 @@
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'INEBOX' }"
       (click)="select(DrawingTools.INEBOX)"
+      id="ineBoxBut"
     >
       <fa-icon [icon]="faHashtagLock"></fa-icon>
     </div>
@@ -87,6 +90,7 @@
       [title]="'scanexam.question' | translate"
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'QUESTIONBOX' }"
+      id="qBoxBut"
       (click)="select(DrawingTools.QUESTIONBOX)"
     >
       <fa-icon [icon]="faQuestion"></fa-icon>
@@ -131,6 +135,7 @@
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'ERASER' }"
       (click)="select(DrawingTools.ERASER)"
+      id="eraserBoxBut"
     >
       <fa-icon [icon]="faEraser"></fa-icon>
     </div>
@@ -140,6 +145,7 @@
       class="toolbox-item ml-1 mt-1"
       [ngClass]="{ selected: selected === 'GARBAGE' }"
       (click)="select(DrawingTools.GARBAGE)"
+      id="garbageBoxBut"
     >
       <fa-icon [icon]="faTrash"></fa-icon>
     </div>
