@@ -1,8 +1,9 @@
-describe("Scenario1 : Création examen", () => {
-  it("tests Scenario1 : Création examen", () => {
+describe("Step1 : Exam creation", () => {
+  it("tests Step1 : Exam creation", () => {
     cy.viewport(960, 240);
     cy.visit("http://localhost:8080/");
     cy.clearLocalStorage() // clear all local storage
+    cy.visit("http://localhost:8080/");
 
     cy.wait(1500)
 

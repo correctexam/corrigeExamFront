@@ -1,10 +1,15 @@
-describe("Annotation Examen", () => {
-  it("tests Annotation Examen", () => {
-    cy.clearLocalStorage() // clear all local storage
+describe("Step2 : Annotation Exam", () => {
+  it("tests Step2 : Annotation Exam", () => {
 
 
     cy.viewport(1280, 1250);
     cy.visit("http://localhost:8080/");
+    cy.clearLocalStorage() // clear all local storage
+    cy.visit("http://localhost:8080/");
+
+    cy.wait(1500)
+
+
     cy.get("button:nth-of-type(1) > span.p-button-label").click();
     cy.get("[data-cy='username']").type("user");
     cy.get("[data-cy='password']").type("user");
@@ -192,7 +197,7 @@ cy.get('canvas.upper-canvas')
 
     cy.get("div:nth-of-type(4) svg").click();
 //    cy.get("canvas.upper-canvas").click();
-cy.get('canvas.upper-canvas')
+  cy.get('canvas.upper-canvas')
 //  .trigger('keydown', { keyCode: 16 })  // shift
   .trigger('mousedown', 530, 1005)
   .wait(200)
@@ -205,6 +210,6 @@ cy.get('canvas.upper-canvas')
 
     cy.get("[data-cy='entityDetailsBackButton']").click();
 
-    cy.visit("http://localhost:8080/exam/1");
+//    cy.visit("http://localhost:8080/exam/1");
   });
 });
