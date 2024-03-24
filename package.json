@@ -38,7 +38,8 @@
     "webapp:dev-ssl": "ng serve --ssl",
     "webapp:dev-verbose": "ng serve --verbose",
     "webapp:prod": "npm run clean-www && npm run webapp:build:prod",
-    "webapp:test": "npm run test --"
+    "webapp:test": "npm run test --",
+    "cy:run": "cypress run"
   },
   "config": {
     "default_environment": "prod"
@@ -124,6 +125,7 @@
     "angular-cli-ghpages": "1.0.7",
     "concurrently": "8.2.2",
     "copy-webpack-plugin": "12.0.2",
+    "cypress": "^13.7.0",
     "esbuild-loader": "^4.1.0",
     "eslint": "8.57.0",
     "eslint-config-prettier": "9.1.0",
