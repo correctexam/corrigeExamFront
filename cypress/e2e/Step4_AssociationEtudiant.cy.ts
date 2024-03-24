@@ -15,8 +15,17 @@ describe("Step 4: AssociationEtudiant", () => {
     cy.get("[data-cy='submit']").click();
     cy.wait(1000)
 
+
+    cy.visit("http://localhost:8080/exam/1");
+
+    cy.wait(1000)
+
+    cy.get("div.p-dialog-footer span").click();
+    cy.wait(1000)
+
+
     cy.visit("http://localhost:8080/studentbindings/1/1");
-    cy.wait(4000)
+    cy.wait(5000)
     cy.get('body').type("{ctrl+enter}");
     cy.wait(1500)
     cy.get('body').type("{ctrl+enter}");

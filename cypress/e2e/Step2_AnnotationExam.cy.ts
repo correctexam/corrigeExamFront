@@ -25,7 +25,6 @@ describe("Step2 : Annotation Exam", () => {
     cy.wait(1500)
 
 
-    cy.get("p-dialog.ng-tns-c566989842-2 input").click();
     cy.get("div.p-dialog-footer span").click();
     cy.wait(1000)
 //    cy.get("#form-total button:nth-of-type(1) > span").click();

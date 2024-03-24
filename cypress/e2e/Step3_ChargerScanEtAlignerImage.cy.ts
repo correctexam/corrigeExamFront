@@ -24,7 +24,7 @@ describe("ChargerScanEtAlignerImage", () => {
 
     cy.visit("http://localhost:8080/loadscan/1");
     cy.get("div:nth-of-type(2) span > span").click();
-    cy.get("input").selectFile("/home/barais/Téléchargements/esupdays/demo1Copies.pdf",{force:true})
+    cy.get("input").selectFile("cypress/upload/demo1Copies.pdf",{force:true})
 
     cy.wait(2000)
 

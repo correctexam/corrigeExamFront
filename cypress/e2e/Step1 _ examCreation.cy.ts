@@ -65,7 +65,7 @@ describe("Step1 : Exam creation", () => {
     cy.get("[data-cy='name']").click();
     cy.get("[data-cy='name']").type("Test exam");
     cy.get("div:nth-of-type(2) > div > [data-cy='content']").click();
-    cy.get("div:nth-of-type(2) > div > [data-cy='content']").selectFile("/home/barais/Téléchargements/esupdays/demo1Template.pdf")
+    cy.get("div:nth-of-type(2) > div > [data-cy='content']").selectFile("cypress/upload/demo1Template.pdf")
     cy.get("form [data-cy='entityCreateSaveButton'] > span").click();
 
 
