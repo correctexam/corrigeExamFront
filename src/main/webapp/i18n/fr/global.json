@@ -48,8 +48,8 @@
       "language": "Langue"
     },
     "form": {
-      "username.label": "Nom d'utilisateur",
-      "username.placeholder": "Votre nom d'utilisateur",
+      "username.label": "Nom d'utilisateur (⚠️ pas votre email mais votre login)",
+      "username.placeholder": "Votre nom d'utilisateur (⚠️ pas votre email mais votre login)",
       "currentpassword.label": "Mot de passe actuel",
       "currentpassword.placeholder": "Mot de passe actuel",
       "newpassword.label": "Nouveau mot de passe",
