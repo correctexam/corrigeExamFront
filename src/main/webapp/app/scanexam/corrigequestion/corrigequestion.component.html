@@ -289,6 +289,15 @@
     </ng-template>
   </p-galleria>
 
+  <div class="col-12 p-0">
+    <p-progressBar
+      *ngIf="focusView"
+      [value]="((currentStudentPaginator + 1) * 100) / (numberPagesInScan! / nbreFeuilleParCopie!)"
+      [showValue]="false"
+      [pTooltip]="'' + (currentStudentPaginator + 1) + ' / ' + numberPagesInScan! / nbreFeuilleParCopie!"
+      [style]="{ height: '6px' }"
+    ></p-progressBar>
+  </div>
   <div class="col-12">
     <div class="grid grid-nogutter">
       <div class="col-12 sm:col-12 md:col-12 lg:col-9 xl:col-10">
