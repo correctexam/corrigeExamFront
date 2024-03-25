@@ -48,9 +48,11 @@
         >
       </div>
       <div *ngIf="canclean" class="mt-3 alert alert-warning">
-        <a class="alert-link" (click)="cleanCache()" jhiTranslate="scanexam.cleancachesession" data-cy="cleanCacheSelector"
+        <span jhiTranslate="scanexam.cleancachesessionstart"> </span>
+        <a class="alert-link" (click)="cleanCache()" jhiTranslate="scanexam.cleancachesessionhere" data-cy="cleanCacheSelector"
           >Problème pour vous connecter, (un petit nettoyage du cache locale pour cette application)
         </a>
+        <span jhiTranslate="scanexam.cleancachesessionend"> </span>
       </div>
       <div *ngIf="!canclean" class="mt-3 alert alert-warning">
         <span jhiTranslate="scanexam.cleancachesessiondone"></span>
