@@ -240,6 +240,17 @@
         (click)="realign()"
       ></button>
     </div>
+
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <label><span jhiTranslate="scanexam.zenview">Zen view</span></label>
+
+      <p-inputSwitch
+        [ngModel]="focusView"
+        (onChange)="toggleFocusView()"
+        [pTooltip]="'scanexam.zenviewTooltip' | translate"
+        [tooltipZIndex]="'3000'"
+      ></p-inputSwitch>
+    </div>
   </p-sidebar>
 
   <p-dialog [header]="'scanexam.shortcut' | translate" [(visible)]="shortcut" [style]="{ width: '50vw' }">

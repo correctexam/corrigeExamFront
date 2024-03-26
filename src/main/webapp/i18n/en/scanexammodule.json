@@ -480,6 +480,8 @@
     "togglefocusViewLabel": "Layout",
     "togglefocusView": "Hides non-essential widgets, so you can focus on correcting them",
     "showbar": "Show the parameter sidebar",
-    "hidebar": "Hide the parameter sidebar"
+    "hidebar": "Hide the parameter sidebar",
+    "zenview": "Zen view",
+    "zenviewTooltip": "Allows you to have a view with less widgets so that you can focus on the correction (you can use the keyboard shortcuts, the list is available using F1)."
   }
 }
