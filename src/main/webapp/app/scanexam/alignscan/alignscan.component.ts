@@ -205,7 +205,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     }).subscribe({
       next: (e: IImageAlignement) => {
         const im = new ImageData(new Uint8ClampedArray(e.imageAligned!), e.imageAlignedWidth!, e.imageAlignedHeight);
-
         //        this.submessage = '' + this.avancement + this.avancementunit;
         this.processpage.push(e.pageNumber!);
 
@@ -278,9 +277,9 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     if (this.partialAlign) {
       this.currentPageAlignOver = this.startPage;
       this.avancement = this.startPage;
-      this.removeElementForPages(+this.examId, this.startPage, this.endPage);
+      await this.removeElementForPages(+this.examId, this.startPage, this.endPage);
     } else {
-      this.removeElement(+this.examId);
+      await this.removeElement(+this.examId);
       this.currentPageAlignOver = 1;
       this.avancement = 0;
     }
@@ -373,8 +372,8 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
         this.initPool();
       }
       if (this.partialAlign) {
-        this.currentPageAlignOver = this.startPage;
-        this.avancement = this.startPage;
+        this.currentPageAlignOver = +this.startPage;
+        this.avancement = +this.startPage;
         for (let i = 1 + k * stepPage; i <= (k + 1) * stepPage; i++) {
           if (i >= this.startPage) {
             pagesnumber.push(i);
@@ -412,12 +411,12 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
       const pagesnumber: number[] = [];
 
       if (this.partialAlign) {
-        this.currentPageAlignOver = this.startPage;
-        this.avancement = this.startPage;
+        this.currentPageAlignOver = +this.startPage;
+        this.avancement = +this.startPage;
         for (let i = 1 + count1 * stepPage; i <= count1 * stepPage + count2; i++) {
-          if (i >= this.startPage) {
-            pagesnumber.push(i);
-          }
+          // if (i >= this.startPage) {
+          pagesnumber.push(+this.startPage + (i - 1));
+          // }
         }
       } else {
         this.currentPageAlignOver = 1 + count1 * stepPage;
@@ -550,15 +549,15 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
       header: '',
       width: '70%',
       data: {
-        startPage: this.startPage,
-        endPage: this.endPage,
+        startPage: +this.startPage,
+        endPage: +this.endPage,
       },
     });
 
     ref.onClose.subscribe((res: any) => {
       if (res) {
-        this.startPage = res.startPage;
-        this.endPage = res.endPage;
+        this.startPage = +res.startPage;
+        this.endPage = +res.endPage;
         this.partialAlign = true;
         this.process(res.showmapping);
       }
