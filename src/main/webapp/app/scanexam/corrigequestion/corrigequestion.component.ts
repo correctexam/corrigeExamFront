@@ -2695,9 +2695,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       verticalScroll = false;
     }
     if (event.direction === 'x' && event.distance > 70) {
-      await this.nextStudent();
-    } else if (event.direction === 'x' && event.distance < -70) {
       await this.previousStudent();
+    } else if (event.direction === 'x' && event.distance < -70) {
+      await this.nextStudent();
     } else if (event.direction === 'y' && event.distance > 70 && verticalScroll) {
       await this.nextQuestion();
     } else if (event.direction === 'y' && event.distance < -70 && verticalScroll) {
