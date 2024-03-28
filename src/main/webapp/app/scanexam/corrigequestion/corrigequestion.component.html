@@ -309,6 +309,12 @@
       [style]="{ height: '6px' }"
     ></p-progressBar>
   </div>
+  <div *ngIf="focusView">
+    <a (click)="layoutsidebarVisible = true" class="myfloat">
+      <i class="pi pi-cog my-float" style="font-size: 1.5rem"></i>
+    </a>
+  </div>
+
   <div class="col-12 p-0">
     <div class="grid grid-nogutter">
       <div class="col-12 sm:col-12 md:col-12 lg:col-9 xl:col-10">
@@ -443,11 +449,6 @@
           <div class="col-3">
             <div class="d-flex justify-content-end"></div>
           </div>
-        </div>
-        <div *ngIf="focusView">
-          <a (click)="layoutsidebarVisible = true" class="myfloat">
-            <i class="pi pi-cog my-float" style="font-size: 1.5rem"></i>
-          </a>
         </div>
 
         <div class="d-flex justify-content-center" *ngFor="let k of questions; let i = index">
