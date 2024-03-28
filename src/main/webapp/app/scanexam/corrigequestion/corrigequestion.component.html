@@ -309,11 +309,16 @@
       [style]="{ height: '6px' }"
     ></p-progressBar>
   </div>
-  <div class="col-12">
+  <div *ngIf="focusView">
+    <a (click)="layoutsidebarVisible = true" class="float">
+      <i class="pi pi-cog my-float" style="font-size: 1.5rem"></i>
+    </a>
+  </div>
+  <div class="col-12 p-0">
     <div class="grid grid-nogutter">
       <div class="col-12 sm:col-12 md:col-12 lg:col-9 xl:col-10">
         <div class="d-flex justify-content-center" *ngIf="!focusView">
-          <div class="col-5">
+          <div class="col-5 p-0">
             <button
               class="sm:text-xs md:text-xs lg:text-base"
               pButton
@@ -353,7 +358,7 @@
             <button [hidden]="!debug" type="text" pButton [label]="'reset'" (click)="removeAllAnswer()"></button>
           </div>
 
-          <div class="col-2" *ngIf="!focusView">
+          <div class="col-2 p-0" *ngIf="!focusView">
             <button
               class="sm:text-xs md:text-xs lg:text-base"
               pButton
@@ -368,7 +373,7 @@
             <p-progressSpinner *ngIf="blocked" styleClass="w-2rem h-2rem"></p-progressSpinner>
           </div>
 
-          <div class="col-1" *ngIf="!focusView">
+          <div class="col-1 p-0" *ngIf="!focusView">
             <fa-icon
               *ngIf="studentName !== undefined"
               [size]="'2x'"
@@ -379,7 +384,7 @@
             ></fa-icon>
           </div>
 
-          <div class="col-4 flex flex-row-reverse" *ngIf="!focusView">
+          <div class="col-4 p-0 flex flex-row-reverse" *ngIf="!focusView">
             <button
               [disabled]="!this.examId"
               type="submit"
