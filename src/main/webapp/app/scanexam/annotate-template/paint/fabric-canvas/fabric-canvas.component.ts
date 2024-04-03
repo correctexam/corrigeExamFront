@@ -298,7 +298,6 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
               q.point = pref.point;
               q.step = pref.step;
               q.gradeType = pref.gradeType;
-
               this.questionService.create(q).subscribe(resq => {
                 if (resq.body?.id !== undefined) {
                   this.eventHandler.questions.set(resq.body.id, resq.body);

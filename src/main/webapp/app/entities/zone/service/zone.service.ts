@@ -52,6 +52,14 @@ export class ZoneService {
     return this.http.get<IZone[]>(`${this.resourceUrl}/byExam/${examid}`, { observe: 'response' });
   }
 
+  countStudentResponseForZone(id: number): Observable<HttpResponse<number>> {
+    return this.http.get<number>(`${this.resourceUrl}/studentAnswer/${id}`, { observe: 'response' });
+  }
+
+  countStudentResponseForExam(examid: number): Observable<HttpResponse<number>> {
+    return this.http.get<number>(`${this.resourceUrl}/studentAnswer4exam/${examid}`, { observe: 'response' });
+  }
+
   query(req?: any): Observable<EntityArrayResponseType> {
     const options = createRequestOption(req);
     return this.http.get<IZone[]>(this.resourceUrl, { params: options, observe: 'response' });
