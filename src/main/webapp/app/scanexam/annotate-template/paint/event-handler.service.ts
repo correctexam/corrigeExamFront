@@ -132,23 +132,34 @@ export class EventHandlerService {
   }
 
   private removeAll(): void {
-    this.translateService.get('scanexam.removeAllAnnotation').subscribe(name => {
-      this.confService.confirm({
-        message: name,
-        accept: () => {
-          this.allcanvas.forEach(c => {
-            c.getObjects().forEach(o => this.canvas.remove(o));
-            c.clear();
-            c.renderAll();
-          });
+    this.zoneService.countStudentResponseForExam(this._exam.id!).subscribe(e1 => {
+      const nbreStudentResponse = e1.body;
 
-          this.examService.deleteAllZone(this._exam.id!).subscribe();
-          this.modelViewpping.clear();
-          this.questions.clear();
-          this.zonesRendering = [];
-        },
+      this.translateService.get('scanexam.removeAllAnnotation', { nbreStudentResponse }).subscribe(name => {
+        this.confService.confirm({
+          message: name,
+          accept: () => {
+            this.removeAllAction();
+          },
+          reject: () => {
+            this.selectedTool = DrawingTools.SELECT;
+          },
+        });
       });
     });
+  }
+
+  removeAllAction(): void {
+    this.allcanvas.forEach(c => {
+      c.getObjects().forEach(o => this.canvas.remove(o));
+      c.clear();
+      c.renderAll();
+    });
+
+    this.examService.deleteAllZone(this._exam.id!).subscribe();
+    this.modelViewpping.clear();
+    this.questions.clear();
+    this.zonesRendering = [];
   }
 
   public addZoneRendering(page: number, tzones: CustomZone): void {
@@ -434,7 +445,6 @@ export class EventHandlerService {
         q.point = pref.point;
         q.step = pref.step;
         q.gradeType = pref.gradeType;
-
         this.questionService.create(q).subscribe(() => {
           this.selectedTool = DrawingTools.SELECT;
 
@@ -580,29 +590,54 @@ export class EventHandlerService {
   /**
    * Erases the given object from the canvas
    */
-  private eraseObject(object: fabric.Object): void {
+  private async eraseObject(object: fabric.Object): Promise<void> {
     const customObject = object as CustomFabricObject;
     // Getting the zone id
     const zid = this.modelViewpping.get(customObject.id);
 
     if (zid !== undefined) {
       if (this.isAQuestion(object)) {
-        this.eraseAddQuestion(zid, false).then(() => {
-          this.zoneService.delete(zid).subscribe();
+        // TODO check the number of AnswerFor This Question I more than one add a check
+        const nbrAnswer = await firstValueFrom(this.zoneService.countStudentResponseForZone(zid));
+        if (nbrAnswer.body === 0) {
+          await this.eraseAddQuestion(zid, false);
+          await firstValueFrom(this.zoneService.delete(zid));
           this.modelViewpping.delete(customObject.id);
-        });
+          await this.eraseObjectI(object);
+        } else {
+          this.translateService.get('scanexam.removeAnnotationQuestion').subscribe(name => {
+            this.confService.confirm({
+              message: name,
+              accept: () => {
+                this.eraseAddQuestion(zid, false).then(() => {
+                  firstValueFrom(this.zoneService.delete(zid)).then(() => {
+                    this.modelViewpping.delete(customObject.id);
+                    this.eraseObjectI(object);
+                  });
+                });
+              },
+              reject: () => {
+                this.selectedTool = DrawingTools.SELECT;
+              },
+            });
+          });
+        }
       } else {
         this.zoneService.delete(zid).subscribe();
         this.modelViewpping.delete(customObject.id);
+        await this.eraseObjectI(object);
       }
+    } else {
+      await this.eraseObjectI(object);
     }
+  }
 
+  async eraseObjectI(object: fabric.Object): Promise<void> {
     if (object.type === FabricObjectType.GROUP) {
       const custObj = object as CustomFabricGroup;
-
-      custObj.getObjects().forEach(o => {
-        this.eraseObject(o);
-      });
+      for (const o of custObj.getObjects()) {
+        await this.eraseObject(o);
+      }
     }
 
     if (object.type === FabricObjectType.ELLIPSE) {
