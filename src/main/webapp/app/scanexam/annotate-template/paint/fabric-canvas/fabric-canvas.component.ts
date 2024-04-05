@@ -123,6 +123,7 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
   }
 
   public pageRendered(evt: PageRenderedEvent): void {
+    console.error('page rendered');
     const page = evt.pageNumber;
     if (this.eventHandler.pages[page] === undefined) {
       this.eventHandler.initPage(page, evt.source);
