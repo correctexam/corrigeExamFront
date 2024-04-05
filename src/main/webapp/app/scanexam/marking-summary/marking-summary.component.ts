@@ -52,11 +52,13 @@ export class MarkingSummaryComponent implements OnInit {
               this.dataExam.questions.forEach((q, index) => {
                 if (q.randomHorizontalCorrection) {
                   const r = m.get(index + 1)!;
-                  for (let index1 = 0; index1 < r.length; index1++) {
+                  let found = false;
+                  for (let index1 = 0; index1 < r.length && !found; index1++) {
                     const element = r[index1];
+
                     if (q.unmarkedSheetIndex.indexOf(element - 1) !== -1) {
-                      q.firstUnmarkedSheet = element - 1;
-                      break;
+                      q.firstUnmarkedSheet = (element - 1) * pageInTemplate;
+                      found = true;
                     }
                   }
                 }

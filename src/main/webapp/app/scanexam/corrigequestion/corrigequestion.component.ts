@@ -1675,6 +1675,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       } else {
         this.currentStudentPaginator = $event.page;
+
         this.currentStudent = m.get(this.questionindex! + 1)![this.currentStudentPaginator] - 1;
         const c = this.currentStudent + 1;
         this.ngZone.run(() => {

@@ -483,6 +483,8 @@
     "showbar": "Show the parameter sidebar",
     "hidebar": "Hide the parameter sidebar",
     "zenview": "Zen view",
-    "zenviewTooltip": "Allows you to have a view with less widgets so that you can focus on the correction (you can use the keyboard shortcuts, the list is available using F1)."
+    "zenviewTooltip": "Allows you to have a view with less widgets so that you can focus on the correction (you can use the keyboard shortcuts, the list is available using F1).",
+    "forceedit": "Force editing of question properties",
+    "forceeditTooltip": "This allows you to force the editing of the properties of the current question, ⚠️ You have made corrections for this question, it is not recommended to change these properties during correction, it is better to migrate your correction mode to hybrid mode (this offers more flexibility in updating the scale during correction)."
   }
 }

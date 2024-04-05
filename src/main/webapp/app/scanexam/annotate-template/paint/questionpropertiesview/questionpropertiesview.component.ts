@@ -16,6 +16,7 @@ import { OnDestroy } from '@angular/core';
 import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
 import { IHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-graded-comment.model';
+import { ZoneService } from 'app/entities/zone/service/zone.service';
 
 type SelectableEntity = IQuestionType;
 export type EntityResponseType = HttpResponse<IQuestion>;
@@ -58,6 +59,12 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   public manualid = 2;
   public qcmid = 3;
   readonly hybrid = GradeType.HYBRID;
+
+  public disableGradeType: boolean | null = false;
+  public disableNumero: boolean | null = false;
+  public disablePoint: boolean | null = false;
+  public disableStep: boolean | null = false;
+  public forceEdit: boolean = false;
 
   public isSaving = false;
   public questiontypes: IQuestionType[] = [];
@@ -141,6 +148,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
     private fb: UntypedFormBuilder,
     //    private eventHandler: EventHandlerService,
     private preferenceService: PreferenceService,
+    private zoneService: ZoneService,
   ) {}
 
   public ngOnInit(): void {
@@ -172,6 +180,12 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
     });
 
     this.selectionSubscription = this.eventHandler?.getSelectedQuestion().subscribe(selectedQ => {
+      this.disableGradeType = null;
+      this.disableNumero = null;
+      this.disablePoint = null;
+      this.disableStep = null;
+      this.forceEdit = false;
+
       if (selectedQ === undefined) {
         this.questions = [];
       } else {
@@ -206,6 +220,30 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
 
   private updateForm(): void {
     const question = this.questions[0];
+    if (question.zoneId !== undefined) {
+      firstValueFrom(this.zoneService.countStudentResponseForZone(question.zoneId)).then(count => {
+        if (count.body! > 0 && !this.forceEdit) {
+          this.disableGradeType = true;
+          this.disableNumero = true;
+          if (question.typeId !== this.qcmid) {
+            this.disableStep = true;
+            if (question.gradeType === GradeType.DIRECT) {
+              this.disablePoint = true;
+            } else {
+              this.disablePoint = true;
+            }
+          } else {
+            this.disableStep = false;
+          }
+        } else {
+          this.disableGradeType = false;
+          this.disableNumero = false;
+          this.disableStep = false;
+          this.disablePoint = false;
+        }
+      });
+    }
+
     this.editForm.patchValue(
       {
         numero: question.numero,
@@ -412,6 +450,18 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
     } else {
       this.editForm.controls['validExpression'].setValidators(null);
       this.editForm.controls['validExpression'].updateValueAndValidity();
+    }
+  }
+
+  changeForceEdit(): void {
+    console.error(this.forceEdit);
+    if (this.forceEdit) {
+      this.disableGradeType = false;
+      this.disableNumero = false;
+      this.disablePoint = false;
+      this.disableStep = false;
+    } else {
+      this.updateForm();
     }
   }
 }

@@ -487,6 +487,8 @@
     "showbar": "Voir le tirroir de paramètre",
     "hidebar": "Masquer le tirroir de paramètre",
     "zenview": "Vue zen",
-    "zenviewTooltip": "Permet d'avoir une vue avec moins de widget pour se consacrer sur la correction (vous pouvez utiliser les raccourcis clavier pour aller plus vite, la liste est accessible à l'aide de la touche F1)"
+    "zenviewTooltip": "Permet d'avoir une vue avec moins de widget pour se consacrer sur la correction (vous pouvez utiliser les raccourcis clavier pour aller plus vite, la liste est accessible à l'aide de la touche F1)",
+    "forceedit": "Forcer l'édition des propriétés",
+    "forceeditTooltip": "Ceci vous permet de forcer l'édition des propriétés de la question en cours, ⚠️ Vous avez des corrections effectuées pour cette question, changer ces propriétés n'est pas conseillé en cours de correction, il est préférable de migrer votre mode de correction vers le mode hybride (cela offre plus de souplesse dans la mise à jour du barème en cours de correction)."
   }
 }

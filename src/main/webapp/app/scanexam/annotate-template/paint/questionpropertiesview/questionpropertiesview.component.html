@@ -31,6 +31,7 @@
             type="number"
             class="form-control"
             name="numero"
+            [attr.disabled]="disableNumero ? '' : null"
             id="field_numero"
             [pTooltip]="'scanexam.numeroTooltip' | translate"
             [tooltipPosition]="'left'"
@@ -70,6 +71,7 @@
         <div class="row">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.point" for="field_point">Point</label>
           <input
+            [attr.disabled]="disablePoint ? '' : null"
             type="number"
             class="form-control"
             name="point"
@@ -91,6 +93,7 @@
             class="form-control"
             id="field_type"
             name="type"
+            [attr.disabled]="disableGradeType ? '' : null"
             formControlName="typeId"
             (change)="changeQCM()"
             [pTooltip]="'scanexam.typequestionTooltip' | translate"
@@ -109,6 +112,7 @@
             name="gradeType"
             formControlName="gradeType"
             id="field_gradeType"
+            [attr.disabled]="disableGradeType ? '' : null"
             data-cy="gradeType"
             (change)="contentChange()"
             [pTooltip]="'scanexam.manualgradetypequestionTooltip' | translate"
@@ -127,6 +131,7 @@
           <p-listbox
             [options]="pasPointResponseOptions"
             name="step"
+            [disabled]="disableStep ? disableStep : false"
             id="field_step1"
             data-cy="step"
             formControlName="step"
@@ -229,6 +234,17 @@
         </div>
       </div>
     </form>
+    <div *ngIf="disableGradeType" class="row">
+      <label class="form-label" jhiTranslate="scanexam.forceedit" for="field_forceedit"></label>
+
+      <p-inputSwitch
+        [pTooltip]="'scanexam.forceeditTooltip' | translate"
+        [tooltipPosition]="'right'"
+        (onChange)="changeForceEdit()"
+        [(ngModel)]="forceEdit"
+      />
+    </div>
+
     <BR />
     <p-button
       *ngIf="editForm.get(['typeId'])!.value !== qcmid"
