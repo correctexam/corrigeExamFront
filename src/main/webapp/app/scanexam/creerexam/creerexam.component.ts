@@ -144,7 +144,7 @@ export class CreerexamComponent implements OnInit, AfterViewInit {
   }
 
   downloadTemplateLatex(): void {
-    window.open('content/latex-template.zip', '_blank');
+    window.open('https://github.com/correctexam/latextemplate/releases/', '_blank');
   }
 
   public onPdfError(): void {
