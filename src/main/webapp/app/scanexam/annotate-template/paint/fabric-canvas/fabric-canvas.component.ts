@@ -123,7 +123,6 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
   }
 
   public pageRendered(evt: PageRenderedEvent): void {
-    console.error('page rendered');
     const page = evt.pageNumber;
     if (this.eventHandler.pages[page] === undefined) {
       this.eventHandler.initPage(page, evt.source);
@@ -225,16 +224,19 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
     const qs: Record<number, Array<Rect>> = {};
     let qnum = 0;
     const promises: Array<Promise<void>> = [];
+    const zoomRatio = window.devicePixelRatio;
 
     rects.forEach(rect => {
-      switch (rect.type) {
+      const rectFixed = scaleRect(rect, zoomRatio);
+
+      switch (rectFixed.type) {
         case DrawingTools.INEBOX:
           if (this.exam.idzoneId === undefined) {
             promises.push(
-              firstValueFrom(this.zoneService.create(this.createZone(rect, pdfScale))).then(z1 => {
+              firstValueFrom(this.zoneService.create(this.createZone(rectFixed, pdfScale))).then(z1 => {
                 this.exam.idzoneId = z1.body!.id!;
                 this.renderZone(z1.body as CustomZone);
-                this.eventHandler.createRedBox('scanexam.ineuc1', z1.body!, rect.p);
+                this.eventHandler.createRedBox('scanexam.ineuc1', z1.body!, rectFixed.p);
               }),
             );
           }
@@ -243,10 +245,10 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
         case DrawingTools.PRENOMBOX:
           if (this.exam.firstnamezoneId === undefined) {
             promises.push(
-              firstValueFrom(this.zoneService.create(this.createZone(rect, pdfScale))).then(z1 => {
+              firstValueFrom(this.zoneService.create(this.createZone(rectFixed, pdfScale))).then(z1 => {
                 this.exam.firstnamezoneId = z1.body!.id!;
                 this.renderZone(z1.body as CustomZone);
-                this.eventHandler.createRedBox('scanexam.prenomuc1', z1.body!, rect.p);
+                this.eventHandler.createRedBox('scanexam.prenomuc1', z1.body!, rectFixed.p);
               }),
             );
           }
@@ -255,21 +257,21 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
         case DrawingTools.NOMBOX:
           if (this.exam.namezoneId === undefined) {
             promises.push(
-              firstValueFrom(this.zoneService.create(this.createZone(rect, pdfScale))).then(z1 => {
+              firstValueFrom(this.zoneService.create(this.createZone(rectFixed, pdfScale))).then(z1 => {
                 this.exam.namezoneId = z1.body!.id!;
                 this.renderZone(z1.body as CustomZone);
-                this.eventHandler.createRedBox('scanexam.nomuc1', z1.body!, rect.p);
+                this.eventHandler.createRedBox('scanexam.nomuc1', z1.body!, rectFixed.p);
               }),
             );
           }
           break;
 
         case DrawingTools.QUESTIONBOX:
-          qnum = rect.q!;
+          qnum = rectFixed.q!;
           if (qs[qnum] === undefined) {
             qs[qnum] = [];
           }
-          qs[qnum][rect.subq! - 1] = rect;
+          qs[qnum][rectFixed.subq! - 1] = rectFixed;
           break;
       }
     });
@@ -375,6 +377,21 @@ interface Rect {
   type: DrawingTools;
   q: number | undefined;
   subq: number | undefined;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function scaleRect(rect: Rect, ratio: number): Rect {
+  return {
+    x: rect.x,
+    y: rect.y * ratio,
+    w: rect.w,
+    h: rect.h * ratio,
+    p: rect.p,
+    type: rect.type,
+    q: rect.q,
+    subq: rect.subq,
+  };
+  // return rect;
 }
 
 function toRect(key: string, value: unknown): Rect | undefined {
