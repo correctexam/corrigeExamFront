@@ -153,47 +153,66 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
           }
         });
       }
-
-      // Loading the metadata after having rendered all the pages
-      // to have all the canvases up to date.
       if (this.pdfViewerService.isRenderQueueEmpty()) {
         this.loadingPdfMetadata(evt.source.scale);
-        this.blocked = false;
       }
     } else {
+      this.eventHandler.pages[page].updateCanvas(evt.source);
+
+      if (this.zones[page] !== undefined) {
+        this.zones[page].forEach(z => {
+          switch (z.type) {
+            case DrawingTools.NOMBOX:
+              this.eventHandler.createRedBox('scanexam.nomuc1', z, page);
+              break;
+
+            case DrawingTools.PRENOMBOX: {
+              this.eventHandler.createRedBox('scanexam.prenomuc1', z, page);
+              break;
+            }
+            case DrawingTools.INEBOX: {
+              this.eventHandler.createRedBox('scanexam.ineuc1', z, page);
+              break;
+            }
+            case DrawingTools.QUESTIONBOX: {
+              this.eventHandler.createRedQuestionBox(z, page);
+              break;
+            }
+          }
+        });
+      }
       const c = this.eventHandler.getCanvasForPage(page);
       if (c === undefined) {
-        this.eventHandler.pages[page].updateCanvas(evt.source);
-
-        if (this.zones[page] !== undefined) {
-          this.zones[page].forEach(z => {
-            switch (z.type) {
-              case DrawingTools.NOMBOX:
-                this.eventHandler.createRedBox('scanexam.nomuc1', z, page);
-                break;
-
-              case DrawingTools.PRENOMBOX: {
-                this.eventHandler.createRedBox('scanexam.prenomuc1', z, page);
-                break;
-              }
-              case DrawingTools.INEBOX: {
-                this.eventHandler.createRedBox('scanexam.ineuc1', z, page);
-                break;
-              }
-              case DrawingTools.QUESTIONBOX: {
-                this.eventHandler.createRedQuestionBox(z, page);
-                break;
-              }
-            }
-          });
-        }
-
         if (this.pdfViewerService.isRenderQueueEmpty()) {
           this.loadingPdfMetadata(evt.source.scale);
-
-          this.blocked = false;
         }
       }
+    }
+    if (this.pdfViewerService.isRenderQueueEmpty()) {
+      this.blocked = false;
+    }
+  }
+
+  pageRender(): void {
+    this.blocked = true;
+    if (this.runningTimer) {
+      this.stopTimer();
+      this.runningTimer = false;
+    }
+    this.timer = setTimeout(() => {
+      if (this.blocked) {
+        this.blocked = false;
+      }
+      this.runningTimer = false;
+    }, 3000);
+  }
+  timer: any = 0;
+  runningTimer = false;
+
+  stopTimer(): void {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = 0;
     }
   }
 

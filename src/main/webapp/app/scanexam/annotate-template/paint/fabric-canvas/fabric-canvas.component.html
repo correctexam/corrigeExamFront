@@ -20,7 +20,7 @@
       [showToolbar]="false"
       [showSecondaryToolbarButton]="false"
       [sidebarVisible]="false"
-      (pageRender)="blocked = true"
+      (pageRender)="pageRender()"
       (pageRendered)="pageRendered($event)"
       backgroundColor="#ffffff"
       [zoom]="'page-width'"
