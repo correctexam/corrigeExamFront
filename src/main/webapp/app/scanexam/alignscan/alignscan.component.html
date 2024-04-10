@@ -27,7 +27,9 @@
         <!--<i class="pi pi-lock" style="font-size: 3rem"> </i>-->
         <p-progressSpinner></p-progressSpinner>
 
-        <BR /> {{ avancement }}{{ avancementunit }} <BR /> {{ message }} <BR />
+        <BR />
+        {{ percentavancement | number: '1.0-2' }} % <BR /> {{ message }} <BR />
+
         {{ submessage }}
         <span *ngIf="submessage !== undefined && submessage.length > 0">{{ progress }} / 100</span>
         <BR />
@@ -106,7 +108,7 @@
         </button>
 
         <button
-          (click)="process(false)"
+          (click)="processFull(false)"
           class="p-button p-button-primary"
           [disabled]="!loaded"
           [pTooltip]="'scanexam.alignscantooltip' | translate"

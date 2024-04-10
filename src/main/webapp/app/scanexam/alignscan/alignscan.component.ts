@@ -51,22 +51,18 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   faObjectUngroup = faObjectUngroup as IconProp;
   examId = '';
   exam!: IExam;
-  // cvState!: string;
   currentStudent = 0;
   nbreFeuilleParCopie = 2;
   numberPagesInScan = 0;
   // Change if partial update
   currentPageAlign = 1;
-  // Change if partial update
-  currentPageAlignOver = 1;
+
+  percentavancement = 0;
 
   partialAlign = false;
   startPage = 1;
-  endPage = 1;
+  endPage = -1;
 
-  avancement = 0;
-  avancementunit = '';
-  // private editedImage: HTMLCanvasElement | undefined;
   templatePages: Map<number, IPage> = new Map();
   loaded = false;
   alignement = 'marker';
@@ -219,25 +215,16 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
             title: 'Exam',
           });
         }
-        /* this.resolves.get(e.pageNumber!)()
-        this.resolves.delete(e.pageNumber!)
-        this.avancement = this.currentPageAlignOver;
-        this.currentPageAlignOver = this.currentPageAlignOver + 1;
-        im.data.set([]);*/
 
         this.saveEligneImage(e.pageNumber!, im).then(() => {
           im.data.set([]);
           this.resolves.get(e.pageNumber!)();
           this.resolves.delete(e.pageNumber!);
-          this.avancement = this.currentPageAlignOver;
-          this.currentPageAlignOver = this.currentPageAlignOver + 1;
-
-          //          this.progress = ;
         });
       },
       // eslint-disable-next-line object-shorthand
       error: err => {
-        console.log(err);
+        console.error(err);
       },
     });
   }
@@ -263,8 +250,12 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
       } else {
         this.numberPagesInScan = numberPagesInScan;
       }
-      this.avancementunit = ' / ' + this.numberPagesInScan;
     }
+  }
+  async processFull(debug: boolean): Promise<void> {
+    this.startPage = 1;
+    this.endPage = this.numberPagesInScan;
+    await this.process(debug);
   }
 
   async process(debug: boolean): Promise<void> {
@@ -275,13 +266,9 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     this.blocked = true;
     // Change if partial update
     if (this.partialAlign) {
-      this.currentPageAlignOver = this.startPage;
-      this.avancement = this.startPage;
       await this.removeElementForPages(+this.examId, this.startPage, this.endPage);
     } else {
       await this.removeElement(+this.examId);
-      this.currentPageAlignOver = 1;
-      this.avancement = 0;
     }
     await this.load();
     await this.loadTemplatePage();
@@ -333,6 +320,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
         this.startPage = 1;
         this.processpage = [];
         this.currentPageAlign = 1;
+        this.percentavancement = 0;
         this.endPage = value;
         this.numberPagesInScan = value;
         this.db.countAlignImage(+this.examId).then(e => (this.nbPageAlignInCache = e));
@@ -359,38 +347,40 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   }
 
   public async exportAsImage(): Promise<void> {
-    const stepPage = this.stepPage;
-    let nbrePageToProcess = this.numberPagesInScan;
-    if (this.partialAlign) {
-      nbrePageToProcess = this.numberPagesInScan - this.startPage + 1;
-    }
+    const pagesnumber: number[] = [];
 
-    let count = Math.floor(nbrePageToProcess / stepPage);
-    for (let k = 0; k < count; k++) {
-      const pagesnumber: number[] = [];
+    if (this.partialAlign) {
+      for (let i = +this.startPage; i <= +this.endPage; i++) {
+        pagesnumber.push(i);
+      }
+    } else {
+      for (let i = +this.startPage; i <= +this.numberPagesInScan; i++) {
+        pagesnumber.push(i);
+      }
+    }
+    const step =
+      pagesnumber.length % this.stepPage === 0
+        ? Math.floor(pagesnumber.length / this.stepPage)
+        : Math.floor(pagesnumber.length / this.stepPage) + 1;
+    for (let i = 0; i < step; i++) {
       if (this.alignement !== 'off') {
         this.initPool();
       }
-      if (this.partialAlign) {
-        this.currentPageAlignOver = +this.startPage;
-        this.avancement = +this.startPage;
-        for (let i = 1 + k * stepPage; i <= (k + 1) * stepPage; i++) {
-          if (i >= this.startPage) {
-            pagesnumber.push(i);
-          }
-        }
+      // Process jamais plus de 50 images pour éviter la fuite mémoire
+      let numbers: number[] = [];
+      if (i === step - 1) {
+        numbers = pagesnumber.slice(i * this.stepPage);
       } else {
-        this.currentPageAlignOver = 1 + k * stepPage;
-        this.avancement = 1 + k * stepPage;
-        for (let i = 1 + k * stepPage; i <= (k + 1) * stepPage; i++) {
-          pagesnumber.push(i);
-        }
+        numbers = pagesnumber.slice(i * this.stepPage, (i + 1) * this.stepPage);
       }
-      await PromisePool.for(pagesnumber)
+
+      const j = i;
+      await PromisePool.for(numbers)
         .withConcurrency(this.nbreCore)
-        /*      .onTaskFinished((page) => {
-        console.error('end send page to process ', page);
-      })*/
+        .onTaskFinished((user, pool) => {
+          this.percentavancement =
+            (j * this.stepPage * 100) / pagesnumber.length + (pool.processedPercentage() * numbers.length) / pagesnumber.length;
+        })
         .process(
           async page =>
             new Promise<void>(resolve => {
@@ -402,43 +392,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
         this.observer?.complete();
       }
     }
-    if (this.alignement !== 'off') {
-      this.initPool();
-    }
-    const count2 = nbrePageToProcess % stepPage;
-    let count1 = Math.floor(nbrePageToProcess / stepPage);
-    if (count2 > 0) {
-      const pagesnumber: number[] = [];
-
-      if (this.partialAlign) {
-        this.currentPageAlignOver = +this.startPage;
-        this.avancement = +this.startPage;
-        for (let i = 1 + count1 * stepPage; i <= count1 * stepPage + count2; i++) {
-          // if (i >= this.startPage) {
-          pagesnumber.push(+this.startPage + (i - 1));
-          // }
-        }
-      } else {
-        this.currentPageAlignOver = 1 + count1 * stepPage;
-        this.avancement = 1 + count1 * stepPage;
-        for (let i = 1 + count1 * stepPage; i <= count1 * stepPage + count2; i++) {
-          pagesnumber.push(i);
-        }
-      }
-      await PromisePool.for(pagesnumber)
-        .withConcurrency(this.nbreCore)
-        .process(
-          async page =>
-            new Promise<void>(resolve => {
-              this.alignPage(page);
-              this.resolves.set(page, resolve);
-            }),
-        );
-      if (this.alignement !== 'off') {
-        this.observer?.complete();
-      }
-    }
-
     this.saveData();
   }
 
@@ -451,8 +404,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
           pageNumber: page,
           value: dataURL!.value,
         });
-        this.avancement = this.currentPageAlignOver;
-        this.currentPageAlignOver = this.currentPageAlignOver + 1;
         this.resolves.get(page)();
         this.resolves.delete(page);
 
