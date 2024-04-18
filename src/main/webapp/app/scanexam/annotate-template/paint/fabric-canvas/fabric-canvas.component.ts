@@ -320,6 +320,9 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
               q.point = pref.point;
               q.step = pref.step;
               q.gradeType = pref.gradeType;
+              if (subq.t === 'qcm') {
+                q.typeId = 3;
+              }
               this.questionService.create(q).subscribe(resq => {
                 if (resq.body?.id !== undefined) {
                   this.eventHandler.questions.set(resq.body.id, resq.body);
@@ -394,11 +397,11 @@ interface Rect {
   h: number;
   p: number;
   type: DrawingTools;
+  t?: string;
   q: number | undefined;
   subq: number | undefined;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function scaleRect(rect: Rect, ratio: number): Rect {
   return {
     x: rect.x,
@@ -408,6 +411,7 @@ function scaleRect(rect: Rect, ratio: number): Rect {
     p: rect.p,
     type: rect.type,
     q: rect.q,
+    t: rect.t,
     subq: rect.subq,
   };
   // return rect;
