@@ -101,18 +101,23 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
         });
       }
       this.questionService.query({ examId: this.exam.id! }).subscribe(qs => {
-        qs.body?.forEach(q => {
-          if (q.id !== undefined) {
-            this.eventHandler.questions.set(q.id, q);
-          }
-          this.zoneService.find(q.zoneId!).subscribe(z => {
-            const ezone = z.body as CustomZone;
-            ezone.type = DrawingTools.QUESTIONBOX;
-            this.renderZone(ezone);
+        if (qs.body?.length !== undefined && qs.body?.length > 0) {
+          qs.body?.forEach(q => {
+            if (q.id !== undefined) {
+              this.eventHandler.questions.set(q.id, q);
+            }
+
+            this.zoneService.find(q.zoneId!).subscribe(z => {
+              const ezone = z.body as CustomZone;
+              ezone.type = DrawingTools.QUESTIONBOX;
+              this.renderZone(ezone);
+            });
           });
-        });
+          this.processpdf = true;
+        } else {
+          this.processpdf = true;
+        }
       });
-      this.processpdf = true;
     });
   }
 
