@@ -75,14 +75,10 @@ export class ImportStudentComponent implements OnInit {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected loadPegaseFile(event: FileUploadHandlerEvent): void {
-    // const file = (event.target as HTMLInputElement).files?.item(0);
-    // if (file) {
     this.dataService.loadCSVFile(event.files[0], ';', data => {
       this.processPegaseFile(data);
     });
-    // }
   }
 
   private processPegaseFile(content: string[][]): void {
