@@ -51,9 +51,12 @@ export class DataUtils {
    * @param file The file to read
    * @param onLoadCallback The callback called once the file opened.
    */
-  public loadFile(file: File, onLoadCallback: () => void): void {
+  public loadFile(file: File, onLoadCallback: (result: string | ArrayBuffer | null) => void): void {
     const fileReader = new FileReader();
-    fileReader.onload = onLoadCallback;
+    fileReader.onload = () => {
+      onLoadCallback(fileReader.result);
+    };
+    fileReader.result;
     fileReader.readAsText(file);
   }
 
