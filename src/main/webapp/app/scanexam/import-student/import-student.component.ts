@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/member-ordering */
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
