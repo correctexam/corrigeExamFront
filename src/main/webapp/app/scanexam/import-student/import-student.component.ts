@@ -6,11 +6,13 @@ import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { DataUtils } from 'app/core/util/data-util.service';
 import { ICourse } from 'app/entities/course/course.model';
 import { CourseService } from 'app/entities/course/service/course.service';
 import { IStudent } from 'app/entities/student/student.model';
 import FileSaver from 'file-saver';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import type { FileUploadHandlerEvent } from 'primeng/fileupload';
 
 /**
  * Used to type to data spreadsheet
@@ -36,6 +38,9 @@ export class ImportStudentComponent implements OnInit {
   courseid: string | undefined = undefined;
   students: Std[] = [];
   course: ICourse | undefined;
+  protected emailsToAdd: string[][] | undefined = undefined;
+  protected emailDomain: string = '';
+
   constructor(
     protected applicationConfigService: ApplicationConfigService,
     private http: HttpClient,
@@ -46,6 +51,7 @@ export class ImportStudentComponent implements OnInit {
     public confirmationService: ConfirmationService,
     private titleService: Title,
     private courseService: CourseService,
+    private dataService: DataUtils,
   ) {}
 
   ngOnInit(): void {
@@ -70,6 +76,50 @@ export class ImportStudentComponent implements OnInit {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected loadPegaseFile(event: FileUploadHandlerEvent): void {
+    // const file = (event.target as HTMLInputElement).files?.item(0);
+    // if (file) {
+    this.dataService.loadCSVFile(event.files[0], ';', data => {
+      this.processPegaseFile(data);
+    });
+    // }
+  }
+
+  private processPegaseFile(content: string[][]): void {
+    this.emailsToAdd = content;
+  }
+
+  protected closeDialog(confirmed: boolean): void {
+    if (this.emailsToAdd === undefined || !confirmed) {
+      this.emailsToAdd = undefined;
+      return;
+    }
+
+    const colID = this.emailsToAdd[0].indexOf('CODE_APPRENANT');
+    const colNom = this.emailsToAdd[0].indexOf('NOM_FAMILLE');
+    const colPrenom = this.emailsToAdd[0].indexOf('PRENOM');
+
+    if (colID !== -1 && colNom !== -1 && colPrenom !== -1) {
+      const header = this.emailsToAdd.splice(0, 1);
+      const list: string[][] = this.emailsToAdd
+        // Ignoring empty or incomplete row
+        .filter(row => row.length !== header.length)
+        // Building a row for the table
+        .map(std => [
+          std[colID],
+          std[colNom],
+          std[colPrenom],
+          `${std[colPrenom].toLowerCase()}.${std[colNom].toLowerCase()}@${this.emailDomain}`.replaceAll(' ', '-'),
+          '1',
+        ]);
+
+      this.fillTable(list);
+    }
+
+    this.emailsToAdd = undefined;
+  }
+
   updateTitle(): void {
     this.activatedRoute.data.subscribe(data => {
       this.translate.get(data['pageTitle'], { courseName: this.course?.name }).subscribe(e1 => {
@@ -78,38 +128,18 @@ export class ImportStudentComponent implements OnInit {
     });
   }
 
-  data(event: ClipboardEvent): void {
-    event.preventDefault();
+  private fillTable(data: string[][]): void {
+    const stds: Std[] = data
+      .filter(row => row.length === 5 && row.every(elt => elt.length > 0))
+      .map(row => ({
+        ine: row[0],
+        nom: row[1],
+        prenom: row[2],
+        mail: row[3],
+        groupe: row[4],
+      }));
 
-    const clipboardData = event.clipboardData;
-
-    const pastedText = clipboardData?.getData('text');
-    const row_data = pastedText?.split('\n');
-    const data: Std[] = [];
-
-    const column = ['ine', 'nom', 'prenom', 'mail', 'groupe'];
-
-    row_data?.forEach(r => {
-      const row = {};
-      column.forEach((a, index) => {
-        (row as any)[a] = r.split('\t')[index];
-      });
-      data.push(row);
-    });
-    const data1: Std[] = data.filter(
-      d =>
-        typeof d.nom === 'string' &&
-        d.nom.length > 0 &&
-        typeof d.prenom === 'string' &&
-        d.prenom.length > 0 &&
-        typeof d.ine === 'string' &&
-        d.ine.length > 0 &&
-        typeof d.mail === 'string' &&
-        d.mail.length > 0 &&
-        typeof d.groupe === 'string' &&
-        d.groupe.length > 0,
-    );
-    this.dataset.push(...data1);
+    this.dataset.push(...stds);
 
     const selection = window.getSelection();
     if (selection?.rangeCount) {
@@ -118,6 +148,20 @@ export class ImportStudentComponent implements OnInit {
     }
 
     this.firstLine.ine = '';
+  }
+
+  protected pasteData(event: ClipboardEvent): void {
+    event.preventDefault();
+
+    // parsing the cliplboard data
+    const row_data = event.clipboardData
+      ?.getData('text')
+      .split('\n')
+      .map(row => row.split('\t'));
+
+    if (row_data !== undefined) {
+      this.fillTable(row_data);
+    }
   }
 
   canAddFirstLine(): boolean {

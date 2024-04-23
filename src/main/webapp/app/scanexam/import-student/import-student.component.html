@@ -54,12 +54,39 @@
               id="save-entity"
               data-cy="entityCreateSaveButton"
               class="p-button flex-initial flex align-items-center"
+              [pTooltip]="'scanexam.importstudenttooltip' | translate"
               [ngClass]="{ 'p-button-primary': this.courseid && canImport(), 'p-button-secondary': !this.courseid || !canImport() }"
               (click)="envoiEtudiants()"
             >
               <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="scanexam.importfollowingstudent">Importer étudiants ci-dessous</span>
             </button>
           </div>
+          <div class="">
+            <p-fileUpload
+              mode="basic"
+              [auto]="true"
+              chooseIcon="pi pi-upload"
+              uploadIcon="pi pi-arrow-up"
+              [customUpload]="true"
+              [pTooltip]="'scanexam.pegasetooltip' | translate"
+              chooseLabel="Pegase"
+              accept="text/csv"
+              [multiple]="false"
+              (uploadHandler)="loadPegaseFile($event)"
+            ></p-fileUpload>
+          </div>
+          <p-dialog [visible]="emailsToAdd !== undefined" [modal]="true" [closable]="false">
+            <div class="flex flex-column px-8 py-5 gap-4">
+              <div class="inline-flex flex-column gap-2">
+                <label for="domain">Domaine de l'adresse email</label>
+                <input pInputText id="domain" [(ngModel)]="emailDomain" />
+              </div>
+              <div class="flex align-items-center gap-2">
+                <p-button [label]="'scanexam.confirm' | translate" (click)="closeDialog(true)" [text]="true" class="w-full"></p-button>
+                <p-button [label]="'scanexam.cancel' | translate" (click)="closeDialog(false)" [text]="true" class="w-full"></p-button>
+              </div>
+            </div>
+          </p-dialog>
           <div class="">
             <button
               (click)="download()"
@@ -89,7 +116,7 @@
               <td></td>
 
               <td>
-                <input [(ngModel)]="firstLine.ine" (paste)="data($event)" type="text" style="width: 90%" />
+                <input [(ngModel)]="firstLine.ine" (paste)="pasteData($event)" type="text" style="width: 90%" />
               </td>
               <td>
                 <input [(ngModel)]="firstLine.nom" type="text" style="width: 90%" />
