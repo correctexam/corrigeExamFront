@@ -77,13 +77,9 @@ export class ImportStudentComponent implements OnInit {
 
   protected loadPegaseFile(event: FileUploadHandlerEvent, form: FileUpload): void {
     this.dataService.loadCSVFile(event.files[0], ';', data => {
-      this.processPegaseFile(data);
+      this.emailsToAdd = data;
     });
     form.clear();
-  }
-
-  private processPegaseFile(content: string[][]): void {
-    this.emailsToAdd = content;
   }
 
   protected closeDialog(confirmed: boolean): void {
@@ -110,6 +106,7 @@ export class ImportStudentComponent implements OnInit {
           '1',
         ]);
 
+      this.dataset = [];
       this.fillTable(list);
     }
 

@@ -188,7 +188,13 @@
                 />
               </td>
               <td style="text-align: center; vertical-align: middle">
-                <button class="btn btn-danger" (click)="removeNonImported(index)">
+                <button
+                  class="btn btn-danger"
+                  (click)="removeNonImported(index)"
+                  tooltipPosition="left"
+                  tooltipZIndex="3000"
+                  [pTooltip]="'scanexam.deleteRowStdList' | translate"
+                >
                   <fa-icon icon="times"></fa-icon>
                 </button>
               </td>
