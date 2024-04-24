@@ -11,7 +11,7 @@ import { CourseService } from 'app/entities/course/service/course.service';
 import { IStudent } from 'app/entities/student/student.model';
 import FileSaver from 'file-saver';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import type { FileUploadHandlerEvent } from 'primeng/fileupload';
+import type { FileUpload, FileUploadHandlerEvent } from 'primeng/fileupload';
 
 /**
  * Used to type to data spreadsheet
@@ -75,10 +75,11 @@ export class ImportStudentComponent implements OnInit {
     });
   }
 
-  protected loadPegaseFile(event: FileUploadHandlerEvent): void {
+  protected loadPegaseFile(event: FileUploadHandlerEvent, form: FileUpload): void {
     this.dataService.loadCSVFile(event.files[0], ';', data => {
       this.processPegaseFile(data);
     });
+    form.clear();
   }
 
   private processPegaseFile(content: string[][]): void {

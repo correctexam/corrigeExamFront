@@ -63,6 +63,7 @@
           </div>
           <div class="">
             <p-fileUpload
+              #form
               mode="basic"
               [auto]="true"
               chooseIcon="pi pi-upload"
@@ -72,7 +73,7 @@
               chooseLabel="Pegase"
               accept="text/csv"
               [multiple]="false"
-              (uploadHandler)="loadPegaseFile($event)"
+              (uploadHandler)="loadPegaseFile($event, form)"
             ></p-fileUpload>
           </div>
           <p-dialog [visible]="emailsToAdd !== undefined" [modal]="true" [closable]="false">
