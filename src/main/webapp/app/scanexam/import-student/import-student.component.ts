@@ -153,8 +153,6 @@ export class ImportStudentComponent implements OnInit {
         std[3] = `${(std.at(2) ?? '').toLowerCase()}.${(std.at(1) ?? '').toLowerCase()}@${this.emailDomain}`.replaceAll(' ', '-');
       });
 
-    this.dataset = [];
-    this.students = [];
     this.fillTable(this.emailsToAdd);
     this.emailsToAdd = undefined;
   }
