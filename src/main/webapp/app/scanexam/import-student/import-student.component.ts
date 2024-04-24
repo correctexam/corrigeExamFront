@@ -38,14 +38,17 @@ interface MDWStudent {
   providers: [MessageService, ConfirmationService],
 })
 export class ImportStudentComponent implements OnInit {
-  firstLine: Std = { ine: '', nom: '', prenom: '', mail: '', groupe: '' };
-  dataset: Std[] = [];
-  blocked = false;
-  courseid: string | undefined = undefined;
-  students: Std[] = [];
-  course: ICourse | undefined;
+  protected firstLine: Std = this.emptyStd();
+  protected dataset: Std[] = [];
+  protected blocked = false;
+  protected courseid: string | undefined = undefined;
+  protected students: Std[] = [];
+  private course: ICourse | undefined;
+  /** The ongoing list of students to process and add */
   private emailsToAdd: string[][] | undefined = undefined;
+  /** The current email domain used to complete the student list */
   protected emailDomain: string = '';
+  /** A boolean value for showing or hiding a modal popup for editing the email domain */
   protected mustSpecifyDomain: boolean = false;
 
   constructor(
@@ -218,8 +221,12 @@ export class ImportStudentComponent implements OnInit {
   addStudentLine(): void {
     if (this.canAddFirstLine()) {
       this.dataset.push(this.firstLine);
-      this.firstLine = {};
+      this.firstLine = this.emptyStd();
     }
+  }
+
+  private emptyStd(): Std {
+    return { ine: '', nom: '', prenom: '', mail: '', groupe: '' };
   }
 
   removeNonImported(index: number): void {
