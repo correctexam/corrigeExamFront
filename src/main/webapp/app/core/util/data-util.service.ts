@@ -47,7 +47,7 @@ export class DataUtils {
   }
 
   /**
-   * Loads a text file using the FileReader method.
+   * Loads a file as ArrayBuffer using the FileReader method.
    * @param file The file to read
    * @param onLoadCallback The callback called once the file opened.
    */
@@ -57,7 +57,7 @@ export class DataUtils {
       onLoadCallback(fileReader.result);
     };
     fileReader.result;
-    fileReader.readAsText(file);
+    fileReader.readAsArrayBuffer(file);
   }
 
   /**

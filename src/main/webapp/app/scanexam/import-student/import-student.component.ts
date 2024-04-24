@@ -24,6 +24,13 @@ interface Std {
   groupe?: string;
 }
 
+interface MDWStudent {
+  DOSSIER: string;
+  NOM: string;
+  PRÉNOM: string;
+  MESSAGERIE: string;
+}
+
 @Component({
   selector: 'jhi-import-student',
   templateUrl: './import-student.component.html',
@@ -37,8 +44,9 @@ export class ImportStudentComponent implements OnInit {
   courseid: string | undefined = undefined;
   students: Std[] = [];
   course: ICourse | undefined;
-  protected emailsToAdd: string[][] | undefined = undefined;
+  private emailsToAdd: string[][] | undefined = undefined;
   protected emailDomain: string = '';
+  protected mustSpecifyDomain: boolean = false;
 
   constructor(
     protected applicationConfigService: ApplicationConfigService,
@@ -54,7 +62,6 @@ export class ImportStudentComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    //    this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val) as Std[];
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('courseid') !== null) {
         this.courseid = params.get('courseid')!;
@@ -75,41 +82,77 @@ export class ImportStudentComponent implements OnInit {
     });
   }
 
+  /**
+   * Loads an MDW file as a student list.
+   */
+  protected loadMDWFile(event: FileUploadHandlerEvent, form: FileUpload): void {
+    // Loading the file
+    this.dataService.loadFile(event.files[0], result => {
+      if (typeof result === 'object') {
+        // Loading the sheet lib
+        import('xlsx').then((xlsx): void => {
+          // Reading the spreadsheet
+          const workbook = xlsx.read(result, { type: 'binary', cellHTML: false });
+          if (workbook.SheetNames.length > 0) {
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonSheet = xlsx.utils.sheet_to_json(sheet).map(row => row as MDWStudent);
+            const domain = jsonSheet
+              .filter(std => std.MESSAGERIE.includes('@'))
+              .at(0)
+              ?.MESSAGERIE.split('@')
+              .at(1);
+
+            const data = jsonSheet.map((mdwRow): string[] => [mdwRow.DOSSIER, mdwRow.NOM, mdwRow.PRÉNOM, mdwRow.MESSAGERIE, '1']);
+
+            this.emailsToAdd = data;
+            if (domain !== undefined) {
+              this.emailDomain = domain;
+              this.closeDialog(true);
+            }
+          }
+        });
+      }
+    });
+    form.clear();
+  }
+
   protected loadPegaseFile(event: FileUploadHandlerEvent, form: FileUpload): void {
     this.dataService.loadCSVFile(event.files[0], ';', data => {
-      this.emailsToAdd = data;
+      const colID = data[0].indexOf('CODE_APPRENANT');
+      const colNom = data[0].indexOf('NOM_FAMILLE');
+      const colPrenom = data[0].indexOf('PRENOM');
+
+      if (colID !== -1 && colNom !== -1 && colPrenom !== -1) {
+        const header = data.splice(0, 1);
+        const list: string[][] = data
+          // Ignoring empty or incomplete row
+          .filter(row => row.length !== header.length)
+          // Building a row for the table
+          .map((std): string[] => [std[colID], std[colNom], std[colPrenom], '', '1']);
+        this.emailsToAdd = list;
+        this.mustSpecifyDomain = true;
+      }
     });
     form.clear();
   }
 
   protected closeDialog(confirmed: boolean): void {
+    this.mustSpecifyDomain = false;
+
     if (this.emailsToAdd === undefined || !confirmed) {
       this.emailsToAdd = undefined;
       return;
     }
 
-    const colID = this.emailsToAdd[0].indexOf('CODE_APPRENANT');
-    const colNom = this.emailsToAdd[0].indexOf('NOM_FAMILLE');
-    const colPrenom = this.emailsToAdd[0].indexOf('PRENOM');
+    this.emailsToAdd
+      .filter(std => (std.at(3) ?? '').length === 0)
+      .forEach(std => {
+        std[3] = `${(std.at(2) ?? '').toLowerCase()}.${(std.at(1) ?? '').toLowerCase()}@${this.emailDomain}`.replaceAll(' ', '-');
+      });
 
-    if (colID !== -1 && colNom !== -1 && colPrenom !== -1) {
-      const header = this.emailsToAdd.splice(0, 1);
-      const list: string[][] = this.emailsToAdd
-        // Ignoring empty or incomplete row
-        .filter(row => row.length !== header.length)
-        // Building a row for the table
-        .map(std => [
-          std[colID],
-          std[colNom],
-          std[colPrenom],
-          `${std[colPrenom].toLowerCase()}.${std[colNom].toLowerCase()}@${this.emailDomain}`.replaceAll(' ', '-'),
-          '1',
-        ]);
-
-      this.dataset = [];
-      this.fillTable(list);
-    }
-
+    this.dataset = [];
+    this.students = [];
+    this.fillTable(this.emailsToAdd);
     this.emailsToAdd = undefined;
   }
 
@@ -123,7 +166,7 @@ export class ImportStudentComponent implements OnInit {
 
   private fillTable(data: string[][]): void {
     const stds: Std[] = data
-      .filter(row => row.length === 5 && row.every(elt => elt.length > 0))
+      .filter(row => row.length === 5 && row.every(elt => typeof elt === 'string' && elt.length > 0))
       .map(row => ({
         ine: row[0],
         nom: row[1],

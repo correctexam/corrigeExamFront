@@ -63,7 +63,7 @@
           </div>
           <div class="">
             <p-fileUpload
-              #form
+              #uploadpegase
               mode="basic"
               [auto]="true"
               chooseIcon="pi pi-upload"
@@ -73,10 +73,23 @@
               chooseLabel="Pegase"
               accept="text/csv"
               [multiple]="false"
-              (uploadHandler)="loadPegaseFile($event, form)"
+              (uploadHandler)="loadPegaseFile($event, uploadpegase)"
+            ></p-fileUpload>
+            <p-fileUpload
+              #uploadmdw
+              mode="basic"
+              [auto]="true"
+              chooseIcon="pi pi-upload"
+              uploadIcon="pi pi-arrow-up"
+              [customUpload]="true"
+              [pTooltip]="'scanexam.pegasetooltip' | translate"
+              chooseLabel="MDW"
+              accept=".xlsx"
+              [multiple]="false"
+              (uploadHandler)="loadMDWFile($event, uploadmdw)"
             ></p-fileUpload>
           </div>
-          <p-dialog [visible]="emailsToAdd !== undefined" [modal]="true" [closable]="false">
+          <p-dialog [visible]="mustSpecifyDomain" [modal]="true" [closable]="false">
             <div class="flex flex-column px-8 py-5 gap-4">
               <div class="inline-flex flex-column gap-2">
                 <label for="domain">Domaine de l'adresse email</label>
