@@ -201,23 +201,8 @@ export class ImportStudentComponent implements OnInit {
     }
   }
 
-  canAddFirstLine(): boolean {
-    return (
-      typeof this.firstLine.nom === 'string' &&
-      this.firstLine.nom.length > 0 &&
-      typeof this.firstLine.prenom === 'string' &&
-      this.firstLine.prenom.length > 0 &&
-      typeof this.firstLine.ine === 'string' &&
-      this.firstLine.ine.length > 0 &&
-      typeof this.firstLine.mail === 'string' &&
-      this.firstLine.mail.length > 0 &&
-      typeof this.firstLine.groupe === 'string' &&
-      this.firstLine.groupe.length > 0
-    );
-  }
-
-  addStudentLine(): void {
-    if (this.canAddFirstLine()) {
+  protected addStudentLine(): void {
+    if (this.canImport()) {
       this.dataset.push(this.firstLine);
       this.firstLine = this.emptyStd();
     }
@@ -258,7 +243,6 @@ export class ImportStudentComponent implements OnInit {
   }
 
   /**
-   *
    * @returns Checks whether the current data is ok to be imported
    */
   public canImport(): boolean {
@@ -287,19 +271,21 @@ export class ImportStudentComponent implements OnInit {
 
   public canImportUniqueMails(): boolean {
     const mails = this.getNonEmptyPropValues('mail');
-    return mails.length === [...new Set(mails)].length;
+    return mails.length === new Set(mails).size;
   }
 
   public canImportUniqueINE(): boolean {
     const ines = this.getNonEmptyPropValues('ine');
-    return ines.length === [...new Set(ines)].length;
+    return ines.length === new Set(ines).size;
   }
 
   /**
    * Associated to canImport to check columns (their size).
    */
   private getNonEmptyPropValues(prop: keyof Std): string[] {
-    return this.dataset.map(e => e[prop]).filter((str): str is string => typeof str === 'string' && str.length > 0);
+    // Checking all the inputs together
+    const data = [...this.dataset, ...this.students, this.firstLine];
+    return data.map(e => e[prop]).filter((str): str is string => typeof str === 'string' && str.length > 0);
   }
 
   envoiEtudiants(): void {

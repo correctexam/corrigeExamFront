@@ -145,7 +145,7 @@
                 <input [(ngModel)]="firstLine.groupe" type="text" style="width: 90%" />
               </td>
               <td style="text-align: center; vertical-align: middle">
-                <button [disabled]="!canAddFirstLine()" class="btn" (click)="addStudentLine()">
+                <button [disabled]="!canImport()" class="btn" (click)="addStudentLine()">
                   <fa-icon icon="plus"></fa-icon>
                 </button>
               </td>
