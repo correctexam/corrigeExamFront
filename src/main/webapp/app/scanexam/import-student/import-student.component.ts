@@ -320,7 +320,14 @@ export class ImportStudentComponent implements OnInit {
     );
   }
 
-  reset(): void {
+  /**
+   * Resets the local student list (being edited)
+   */
+  protected resetLocal(): void {
+    this.dataset = [];
+  }
+
+  protected reset(): void {
     this.translate.get('scanexam.confirmremovestudents').subscribe(data => {
       this.confirmationService.confirm({
         message: data,

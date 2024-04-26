@@ -38,18 +38,6 @@
         </div>
         <div class="md:flex lg:flex xl:flex md:flex-row-reverse lg:flex-row-reverse">
           <div class="">
-            <p-button
-              severity="danger"
-              (click)="reset()"
-              type="submit"
-              id="save-entity"
-              data-cy="entityCreateSaveButton"
-              [disabled]="this.students.length === 0"
-            >
-              <fa-icon icon="times"></fa-icon>&nbsp;<span jhiTranslate="scanexam.vider">Vider</span>
-            </p-button>
-          </div>
-          <div class="">
             <button
               [disabled]="!this.courseid || !canImport()"
               type="submit"
@@ -115,6 +103,34 @@
             >
               <fa-icon icon="download"></fa-icon>&nbsp;<span jhiTranslate="scanexam.downloadtemplate">Download template</span>
             </button>
+          </div>
+        </div>
+        <div class="md:flex lg:flex xl:flex md:flex-row-reverse lg:flex-row-reverse">
+          <div class="">
+            <p-button
+              severity="danger"
+              (click)="reset()"
+              type="submit"
+              id="save-entity"
+              [pTooltip]="'scanexam.resetStdListTooltip' | translate"
+              data-cy="entityCreateSaveButton"
+              [disabled]="this.students.length === 0"
+            >
+              <fa-icon icon="times"></fa-icon>&nbsp;<span jhiTranslate="scanexam.deleteStdListServer"></span>
+            </p-button>
+          </div>
+          <div class="">
+            <p-button
+              severity="danger"
+              (click)="resetLocal()"
+              type="submit"
+              id="save-entity"
+              [pTooltip]="'scanexam.resetStdListLocalTooltip' | translate"
+              data-cy="entityCreateSaveButton"
+              [disabled]="this.dataset.length === 0"
+            >
+              <fa-icon icon="times"></fa-icon>&nbsp;<span jhiTranslate="scanexam.deleteStdLocalList"></span>
+            </p-button>
           </div>
         </div>
       </div>
