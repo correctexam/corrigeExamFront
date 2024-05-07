@@ -254,6 +254,10 @@ export class ImportStudentComponent implements OnInit {
     );
   }
 
+  public hasDataSet(): boolean {
+    return this.dataset.length > 0;
+  }
+
   public canImportSameColSize(): boolean {
     const mails = this.getNonEmptyPropValues('mail');
     const ines = this.getNonEmptyPropValues('ine');

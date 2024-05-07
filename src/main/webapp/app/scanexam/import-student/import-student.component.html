@@ -20,6 +20,11 @@
         <p-message *ngIf="!canImportSameColSize()" severity="warn" [text]="'scanexam.liststderrorcolsize' | translate"></p-message>
         <p-message *ngIf="!canImportUniqueMails()" severity="warn" [text]="'scanexam.liststderroremails' | translate"></p-message>
         <p-message *ngIf="!canImportUniqueINE()" severity="warn" [text]="'scanexam.liststderrorINE' | translate"></p-message>
+        <p-message
+          *ngIf="canImport() && hasDataSet()"
+          severity="info"
+          [text]="'scanexam.clickbuttonsauveretudiant' | translate"
+        ></p-message>
       </div>
       <div class="sm:col-12 md:col-6 lg:col-6 xl:col-6">
         <div class="md:flex lg:flex xl:flex md:flex-row-reverse lg:flex-row-reverse">
