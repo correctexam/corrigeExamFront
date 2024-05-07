@@ -98,6 +98,7 @@ import { FontsizeSliderComponent } from './corrigequestion/toolbar/fontsize-slid
 import { CommentSortPipe } from './sortComment';
 import { ArraySortPipe } from './sort';
 import { SwipeDirective } from './swipe.directive';
+import { DataUtils } from 'app/core/util/data-util.service';
 
 // set the location of the OpenCV files
 // registerAllModules();
@@ -576,6 +577,6 @@ export const CompareAnswer_ROUTE: Route = {
     SortByDirective,
     ClickDoubleDirective,
   ],
-  providers: [EventHandlerService, FabricShapeService],
+  providers: [EventHandlerService, FabricShapeService, DataUtils],
 })
 export class ScanexamModule {}

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/member-ordering */
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
@@ -6,11 +5,13 @@ import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { DataUtils } from 'app/core/util/data-util.service';
 import { ICourse } from 'app/entities/course/course.model';
 import { CourseService } from 'app/entities/course/service/course.service';
 import { IStudent } from 'app/entities/student/student.model';
 import FileSaver from 'file-saver';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import type { FileUpload, FileUploadHandlerEvent } from 'primeng/fileupload';
 
 /**
  * Used to type to data spreadsheet
@@ -23,6 +24,13 @@ interface Std {
   groupe?: string;
 }
 
+interface MDWStudent {
+  DOSSIER: string;
+  NOM: string;
+  PRÉNOM: string;
+  MESSAGERIE: string;
+}
+
 @Component({
   selector: 'jhi-import-student',
   templateUrl: './import-student.component.html',
@@ -30,12 +38,19 @@ interface Std {
   providers: [MessageService, ConfirmationService],
 })
 export class ImportStudentComponent implements OnInit {
-  firstLine: Std = { ine: '', nom: '', prenom: '', mail: '', groupe: '' };
-  dataset: Std[] = [];
-  blocked = false;
-  courseid: string | undefined = undefined;
-  students: Std[] = [];
-  course: ICourse | undefined;
+  protected firstLine: Std = this.emptyStd();
+  protected dataset: Std[] = [];
+  protected blocked = false;
+  protected courseid: string | undefined = undefined;
+  protected students: Std[] = [];
+  private course: ICourse | undefined;
+  /** The ongoing list of students to process and add */
+  private emailsToAdd: string[][] | undefined = undefined;
+  /** The current email domain used to complete the student list */
+  protected emailDomain: string = '';
+  /** A boolean value for showing or hiding a modal popup for editing the email domain */
+  protected mustSpecifyDomain: boolean = false;
+
   constructor(
     protected applicationConfigService: ApplicationConfigService,
     private http: HttpClient,
@@ -46,10 +61,10 @@ export class ImportStudentComponent implements OnInit {
     public confirmationService: ConfirmationService,
     private titleService: Title,
     private courseService: CourseService,
+    private dataService: DataUtils,
   ) {}
 
   ngOnInit(): void {
-    //    this.dataset = Handsontable.helper.createSpreadsheetObjectData(this.val) as Std[];
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('courseid') !== null) {
         this.courseid = params.get('courseid')!;
@@ -70,6 +85,78 @@ export class ImportStudentComponent implements OnInit {
     });
   }
 
+  /**
+   * Loads an MDW file as a student list.
+   */
+  protected loadMDWFile(event: FileUploadHandlerEvent, form: FileUpload): void {
+    // Loading the file
+    this.dataService.loadFile(event.files[0], result => {
+      if (typeof result === 'object') {
+        // Loading the sheet lib
+        import('xlsx').then((xlsx): void => {
+          // Reading the spreadsheet
+          const workbook = xlsx.read(result, { type: 'binary', cellHTML: false });
+          if (workbook.SheetNames.length > 0) {
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonSheet = xlsx.utils.sheet_to_json(sheet).map(row => row as MDWStudent);
+            const domain = jsonSheet
+              .filter(std => std.MESSAGERIE.includes('@'))
+              .at(0)
+              ?.MESSAGERIE.split('@')
+              .at(1);
+
+            const data = jsonSheet.map((mdwRow): string[] => [mdwRow.DOSSIER, mdwRow.NOM, mdwRow.PRÉNOM, mdwRow.MESSAGERIE, '1']);
+
+            this.emailsToAdd = data;
+            if (domain !== undefined) {
+              this.emailDomain = domain;
+              this.closeDialog(true);
+            }
+          }
+        });
+      }
+    });
+    form.clear();
+  }
+
+  protected loadPegaseFile(event: FileUploadHandlerEvent, form: FileUpload): void {
+    this.dataService.loadCSVFile(event.files[0], ';', data => {
+      const colID = data[0].indexOf('CODE_APPRENANT');
+      const colNom = data[0].indexOf('NOM_FAMILLE');
+      const colPrenom = data[0].indexOf('PRENOM');
+
+      if (colID !== -1 && colNom !== -1 && colPrenom !== -1) {
+        const header = data.splice(0, 1);
+        const list: string[][] = data
+          // Ignoring empty or incomplete row
+          .filter(row => row.length !== header.length)
+          // Building a row for the table
+          .map((std): string[] => [std[colID], std[colNom], std[colPrenom], '', '1']);
+        this.emailsToAdd = list;
+        this.mustSpecifyDomain = true;
+      }
+    });
+    form.clear();
+  }
+
+  protected closeDialog(confirmed: boolean): void {
+    this.mustSpecifyDomain = false;
+
+    if (this.emailsToAdd === undefined || !confirmed) {
+      this.emailsToAdd = undefined;
+      return;
+    }
+
+    this.emailsToAdd
+      .filter(std => (std.at(3) ?? '').length === 0)
+      .forEach(std => {
+        std[3] = `${(std.at(2) ?? '').toLowerCase()}.${(std.at(1) ?? '').toLowerCase()}@${this.emailDomain}`.replaceAll(' ', '-');
+      });
+
+    this.fillTable(this.emailsToAdd);
+    this.emailsToAdd = undefined;
+  }
+
   updateTitle(): void {
     this.activatedRoute.data.subscribe(data => {
       this.translate.get(data['pageTitle'], { courseName: this.course?.name }).subscribe(e1 => {
@@ -78,38 +165,18 @@ export class ImportStudentComponent implements OnInit {
     });
   }
 
-  data(event: ClipboardEvent): void {
-    event.preventDefault();
+  private fillTable(data: string[][]): void {
+    const stds: Std[] = data
+      .filter(row => row.length === 5 && row.every(elt => typeof elt === 'string' && elt.length > 0))
+      .map(row => ({
+        ine: row[0],
+        nom: row[1],
+        prenom: row[2],
+        mail: row[3],
+        groupe: row[4],
+      }));
 
-    const clipboardData = event.clipboardData;
-
-    const pastedText = clipboardData?.getData('text');
-    const row_data = pastedText?.split('\n');
-    const data: Std[] = [];
-
-    const column = ['ine', 'nom', 'prenom', 'mail', 'groupe'];
-
-    row_data?.forEach(r => {
-      const row = {};
-      column.forEach((a, index) => {
-        (row as any)[a] = r.split('\t')[index];
-      });
-      data.push(row);
-    });
-    const data1: Std[] = data.filter(
-      d =>
-        typeof d.nom === 'string' &&
-        d.nom.length > 0 &&
-        typeof d.prenom === 'string' &&
-        d.prenom.length > 0 &&
-        typeof d.ine === 'string' &&
-        d.ine.length > 0 &&
-        typeof d.mail === 'string' &&
-        d.mail.length > 0 &&
-        typeof d.groupe === 'string' &&
-        d.groupe.length > 0,
-    );
-    this.dataset.push(...data1);
+    this.dataset.push(...stds);
 
     const selection = window.getSelection();
     if (selection?.rangeCount) {
@@ -120,26 +187,29 @@ export class ImportStudentComponent implements OnInit {
     this.firstLine.ine = '';
   }
 
-  canAddFirstLine(): boolean {
-    return (
-      typeof this.firstLine.nom === 'string' &&
-      this.firstLine.nom.length > 0 &&
-      typeof this.firstLine.prenom === 'string' &&
-      this.firstLine.prenom.length > 0 &&
-      typeof this.firstLine.ine === 'string' &&
-      this.firstLine.ine.length > 0 &&
-      typeof this.firstLine.mail === 'string' &&
-      this.firstLine.mail.length > 0 &&
-      typeof this.firstLine.groupe === 'string' &&
-      this.firstLine.groupe.length > 0
-    );
+  protected pasteData(event: ClipboardEvent): void {
+    event.preventDefault();
+
+    // parsing the cliplboard data
+    const row_data = event.clipboardData
+      ?.getData('text')
+      .split('\n')
+      .map(row => row.split('\t'));
+
+    if (row_data !== undefined) {
+      this.fillTable(row_data);
+    }
   }
 
-  addStudentLine(): void {
-    if (this.canAddFirstLine()) {
+  protected addStudentLine(): void {
+    if (this.canImport()) {
       this.dataset.push(this.firstLine);
-      this.firstLine = {};
+      this.firstLine = this.emptyStd();
     }
+  }
+
+  private emptyStd(): Std {
+    return { ine: '', nom: '', prenom: '', mail: '', groupe: '' };
   }
 
   removeNonImported(index: number): void {
@@ -173,7 +243,6 @@ export class ImportStudentComponent implements OnInit {
   }
 
   /**
-   *
    * @returns Checks whether the current data is ok to be imported
    */
   public canImport(): boolean {
@@ -183,6 +252,10 @@ export class ImportStudentComponent implements OnInit {
       this.canImportUniqueINE() &&
       this.canImportUniqueMails()
     );
+  }
+
+  public hasDataSet(): boolean {
+    return this.dataset.length > 0;
   }
 
   public canImportSameColSize(): boolean {
@@ -202,19 +275,21 @@ export class ImportStudentComponent implements OnInit {
 
   public canImportUniqueMails(): boolean {
     const mails = this.getNonEmptyPropValues('mail');
-    return mails.length === [...new Set(mails)].length;
+    return mails.length === new Set(mails).size;
   }
 
   public canImportUniqueINE(): boolean {
     const ines = this.getNonEmptyPropValues('ine');
-    return ines.length === [...new Set(ines)].length;
+    return ines.length === new Set(ines).size;
   }
 
   /**
    * Associated to canImport to check columns (their size).
    */
   private getNonEmptyPropValues(prop: keyof Std): string[] {
-    return this.dataset.map(e => e[prop]).filter((str): str is string => typeof str === 'string' && str.length > 0);
+    // Checking all the inputs together
+    const data = [...this.dataset, ...this.students, this.firstLine];
+    return data.map(e => e[prop]).filter((str): str is string => typeof str === 'string' && str.length > 0);
   }
 
   envoiEtudiants(): void {
@@ -249,7 +324,14 @@ export class ImportStudentComponent implements OnInit {
     );
   }
 
-  reset(): void {
+  /**
+   * Resets the local student list (being edited)
+   */
+  protected resetLocal(): void {
+    this.dataset = [];
+  }
+
+  protected reset(): void {
     this.translate.get('scanexam.confirmremovestudents').subscribe(data => {
       this.confirmationService.confirm({
         message: data,

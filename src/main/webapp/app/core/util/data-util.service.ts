@@ -47,6 +47,36 @@ export class DataUtils {
   }
 
   /**
+   * Loads a file as ArrayBuffer using the FileReader method.
+   * @param file The file to read
+   * @param onLoadCallback The callback called once the file opened.
+   */
+  public loadFile(file: File, onLoadCallback: (result: string | ArrayBuffer | null) => void): void {
+    const fileReader = new FileReader();
+    fileReader.onload = () => {
+      onLoadCallback(fileReader.result);
+    };
+    fileReader.result;
+    fileReader.readAsArrayBuffer(file);
+  }
+
+  /**
+   * Loads a CSV file.
+   * @param file The file to read
+   * @param colSeparator The column separator to use
+   * @param onLoadCallback The callback called once the file opened and the CSV content parsed
+   */
+  public loadCSVFile(file: File, colSeparator: '\t' | ',' | ';', onLoadCallback: (content: string[][]) => void): void {
+    const fileReader = new FileReader();
+    fileReader.onload = () => {
+      if (typeof fileReader.result === 'string') {
+        onLoadCallback(fileReader.result.split('\n').map(line => line.split(colSeparator)));
+      }
+    };
+    fileReader.readAsText(file);
+  }
+
+  /**
    * Sets the base 64 data & file type of the 1st file on the event (event.target.files[0]) in the passed entity object
    * and returns an observable.
    *
