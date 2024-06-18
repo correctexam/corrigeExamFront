@@ -1001,8 +1001,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  updateStudentResponsAndComputeNote4QCM(resp: IStudentResponse, numero: number, comment: IGradedComment): Promise<IStudentResponse> {
-    return new Promise<IStudentResponse>(resolve => {
+  updateStudentResponsAndComputeNote4QCM(
+    resp: IStudentResponse,
+    numero: number,
+    comment: IGradedComment,
+  ): Promise<IStudentResponse | undefined> {
+    return new Promise<IStudentResponse | undefined>(resolve => {
       this.updateResponseRequest(resp).subscribe(resp1 => {
         if (this.currentStudent === numero) {
           (comment as any).checked = true;
@@ -1281,16 +1285,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     await self.computeNote(true, self.resp!, self.currentQuestion!);
   }
 
-  updateNote4updateQuestion(update: boolean, resp: IStudentResponse, currentQ: IQuestion[]): Promise<IStudentResponse> {
+  updateNote4updateQuestion(update: boolean, resp: IStudentResponse, currentQ: IQuestion[]): Promise<IStudentResponse | undefined> {
     this.updateQuestion(currentQ);
     return this.computeNote(update, resp, currentQ[0]);
   }
 
-  computeNote(update: boolean, resp: IStudentResponse, currentQ: IQuestion): Promise<IStudentResponse> {
-    return new Promise<IStudentResponse>((resolve, reject) => {
+  computeNote(update: boolean, resp: IStudentResponse | undefined, currentQ: IQuestion): Promise<IStudentResponse | undefined> {
+    return new Promise<IStudentResponse | undefined>((resolve, reject) => {
       if (currentQ.gradeType === GradeType.POSITIVE && currentQ.typeAlgoName !== 'QCM') {
         let currentNote = 0;
-        resp.gradedcomments?.forEach(g => {
+        resp?.gradedcomments?.forEach(g => {
           if (g.grade !== undefined && g.grade !== null) {
             currentNote = currentNote + g.grade;
           }
@@ -1299,8 +1303,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           currentNote = this.noteSteps;
         }
         this.currentNote = currentNote;
-        resp.note = currentNote;
-        if (update) {
+        if (resp) {
+          resp.note = currentNote;
+        }
+        if (update && resp) {
           this.studentResponseService.partialUpdate(resp).subscribe(b => {
             if (b.body !== null) {
               resolve(b.body);
@@ -1313,7 +1319,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       } else if (currentQ.gradeType === GradeType.NEGATIVE && currentQ.typeAlgoName !== 'QCM') {
         let currentNote = this.noteSteps;
-        resp.gradedcomments?.forEach(g => {
+        resp?.gradedcomments?.forEach(g => {
           if (g.grade !== undefined && g.grade !== null) {
             currentNote = currentNote - g.grade;
           }
@@ -1322,7 +1328,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           currentNote = 0;
         }
         this.currentNote = currentNote;
-        resp.note = currentNote;
+        if (resp) {
+          resp.note = currentNote;
+        }
         if (update) {
           this.studentResponseService.partialUpdate(resp!).subscribe(b => {
             if (b.body !== null) {
@@ -1356,10 +1364,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         } else if (currentNote < 0) {
           currentNote = 0;
         }
-        resp.note = currentNote * 100;
-
+        if (resp) {
+          resp.note = currentNote * 100;
+        }
         this.currentNote = currentNote;
-        if (update) {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (update && resp?.id) {
+          console.error(resp);
           this.studentResponseService.partialUpdate(resp).subscribe(b => {
             if (b.body !== null) {
               resolve(b.body);
@@ -1373,7 +1384,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         resolve(resp);
       } else if (currentQ.typeAlgoName === 'QCM' && currentQ.step! > 0) {
         let currentNote = 0;
-        resp.gradedcomments?.forEach(g => {
+        resp?.gradedcomments?.forEach(g => {
           if (g.description?.startsWith('correct')) {
             currentNote = currentNote + currentQ.point! * currentQ.step!;
           } else if (g.description?.startsWith('incorrect')) {
@@ -1383,8 +1394,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (resp === this.resp) {
           this.currentNote = currentNote;
         }
-        resp.note = currentNote;
-        if (update) {
+        if (resp) {
+          resp.note = currentNote;
+        }
+        if (update && resp) {
           this.studentResponseService.partialUpdate(resp).subscribe(b => {
             if (b.body !== null) {
               resolve(b.body);
@@ -1397,7 +1410,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       } else if (currentQ.typeAlgoName === 'QCM' && currentQ.step! <= 0) {
         let currentNote = 0;
-        resp.gradedcomments?.forEach(g => {
+        resp?.gradedcomments?.forEach(g => {
           if (g.description?.startsWith('correct')) {
             currentNote = currentNote + currentQ.point!;
           }
@@ -1405,8 +1418,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (resp === this.resp) {
           this.currentNote = currentNote;
         }
-        resp.note = currentNote;
-        if (update) {
+        if (resp) {
+          resp.note = currentNote;
+        }
+        if (update && resp) {
           this.studentResponseService.partialUpdate(resp).subscribe(b => {
             if (b.body !== null) {
               resolve(b.body);
@@ -2049,7 +2064,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   updateComment(event: any, l: IGradedComment | ITextComment | IHybridGradedComment, graded: boolean, hybrid: boolean): any {
-    event.preventDefault();
+    if (event !== undefined && event.preventDefault) {
+      event.preventDefault();
+    }
 
     if (l.id) {
       setTimeout(() => {
@@ -2069,7 +2086,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         const coms = this.resp?.gradedcomments?.filter(c => c.id === l.id!);
         if (coms !== undefined && coms.length > 0) {
           coms[0].grade = (l as any).grade;
-          this.computeNote(true, this.resp!, this.currentQuestion!);
+          this.computeNote(true, this.resp, this.currentQuestion!);
         }
       });
     } else if (hybrid) {
@@ -2088,7 +2105,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           coms[0]().grade = (l as any).grade;
           coms[0]().step = (l as any).step;
           coms[0]().relative = (l as any).relative;
-          this.computeNote(true, this.resp!, this.currentQuestion!);
+          this.computeNote(true, this.resp, this.currentQuestion!);
         }
       });
     } else {

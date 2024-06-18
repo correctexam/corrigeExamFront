@@ -237,6 +237,7 @@ export class CreateCommentsComponent implements OnInit {
       this.currentTextComment4Question?.forEach(com => {
         const comCopy = { ...com };
         delete comCopy.id;
+        delete comCopy.questionId;
         coms.push(comCopy);
       });
       return saveAs(new Blob([JSON.stringify(coms, null, 2)], { type: 'JSON' }), 'commentsQ' + this._q.numero! + '.json');
@@ -245,6 +246,7 @@ export class CreateCommentsComponent implements OnInit {
       this.currentGradedComment4Question?.forEach(com => {
         const comCopy = { ...com };
         delete comCopy.id;
+        delete comCopy.questionId;
         coms.push(comCopy);
       });
       return saveAs(new Blob([JSON.stringify(coms, null, 2)], { type: 'JSON' }), 'commentsQ' + this._q.numero! + '.json');
@@ -253,6 +255,7 @@ export class CreateCommentsComponent implements OnInit {
       this.currentHybridGradedComment4Question?.forEach(com => {
         const comCopy = { ...com } as any;
         delete comCopy.id;
+        delete comCopy.questionId;
         coms.push(comCopy);
       });
       return saveAs(new Blob([JSON.stringify(coms, null, 2)], { type: 'JSON' }), 'commentsQ' + this._q.numero! + '.json');
@@ -425,6 +428,7 @@ export class CreateCommentsComponent implements OnInit {
                 },
               ];
         comments.forEach(com => {
+          com.questionId = this._q!.id;
           this.hybridGradedCommentService.create(com).subscribe(e => {
             const currentComment = e.body!;
             this.currentHybridGradedComment4Question?.push(currentComment);

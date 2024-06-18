@@ -236,6 +236,7 @@ export class PreferenceService {
     const cs = JSON.parse(JSON.stringify(c, this.replacer), this.reviver);
     cs.forEach((c1: any) => {
       delete c1.id;
+      delete c1.questionId;
     });
 
     this.localStorageService.store('defaultHybridComment', JSON.stringify(cs, this.replacer));
@@ -244,6 +245,7 @@ export class PreferenceService {
     const cs = JSON.parse(JSON.stringify(c, this.replacer), this.reviver);
     cs.forEach((c1: any) => {
       delete c1.id;
+      delete c1.questionId;
     });
     this.localStorageService.store('defaultGradedComment', JSON.stringify(cs, this.replacer));
   }
@@ -251,6 +253,7 @@ export class PreferenceService {
     const cs = JSON.parse(JSON.stringify(c, this.replacer), this.reviver);
     cs.forEach((c1: any) => {
       delete c1.id;
+      delete c1.questionId;
     });
     this.localStorageService.store('defaultTextComment', JSON.stringify(cs, this.replacer));
   }
