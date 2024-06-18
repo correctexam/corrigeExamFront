@@ -1306,7 +1306,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (resp) {
           resp.note = currentNote;
         }
-        if (update && resp) {
+        if (update && resp?.id) {
           this.studentResponseService.partialUpdate(resp).subscribe(b => {
             if (b.body !== null) {
               resolve(b.body);
@@ -1368,9 +1368,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           resp.note = currentNote * 100;
         }
         this.currentNote = currentNote;
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (update && resp?.id) {
-          console.error(resp);
           this.studentResponseService.partialUpdate(resp).subscribe(b => {
             if (b.body !== null) {
               resolve(b.body);
@@ -1397,7 +1395,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (resp) {
           resp.note = currentNote;
         }
-        if (update && resp) {
+        if (update && resp?.id) {
           this.studentResponseService.partialUpdate(resp).subscribe(b => {
             if (b.body !== null) {
               resolve(b.body);
@@ -1421,7 +1419,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (resp) {
           resp.note = currentNote;
         }
-        if (update && resp) {
+        if (update && resp?.id) {
           this.studentResponseService.partialUpdate(resp).subscribe(b => {
             if (b.body !== null) {
               resolve(b.body);
