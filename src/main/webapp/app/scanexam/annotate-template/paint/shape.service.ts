@@ -310,6 +310,7 @@ export class FabricShapeService {
 
   finishPolygon(canvas: fabric.Canvas, polygon: CustomFabricPolygon): CustomFabricPolygon {
     canvas.remove(polygon);
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     const newPolygon = new fabric.Polygon(polygon.points!, {
       strokeWidth: polygon.strokeWidth,
       stroke: polygon.stroke,

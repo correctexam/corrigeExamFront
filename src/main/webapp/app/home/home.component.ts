@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 import { Component, OnInit, OnDestroy, NgZone, ViewChild } from '@angular/core';
 
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 import { scan, takeUntil } from 'rxjs/operators';
 import { AccountService } from 'app/core/auth/account.service';
@@ -10,12 +10,23 @@ import { Account } from 'app/core/auth/account.model';
 
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { ApplicationConfigService } from '../core/config/application-config.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { LoginService } from 'app/login/login.service';
 
 import { CONNECTION_METHOD, CAS_SERVER_URL, SERVICE_URL } from 'app/app.constants';
 import { HttpClient, HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse } from '@angular/common/http';
 import { MesCoursComponent } from 'app/scanexam/mes-cours/mes-cours.component';
+import { MesCoursComponent as MesCoursComponent_1 } from '../scanexam/mes-cours/mes-cours.component';
+import { PrimeTemplate } from 'primeng/api';
+import { DockModule } from 'primeng/dock';
+import { FileUploadModule } from 'primeng/fileupload';
+import { FormsModule } from '@angular/forms';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { TooltipModule } from 'primeng/tooltip';
+import { SidebarModule } from 'primeng/sidebar';
+import { HasAnyAuthorityDirective } from '../shared/auth/has-any-authority.directive';
+import { TranslateDirective } from '../shared/language/translate.directive';
+import { NgIf } from '@angular/common';
 
 interface Upload {
   progress: number;
@@ -54,6 +65,22 @@ const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
   selector: 'jhi-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    TranslateDirective,
+    RouterLink,
+    HasAnyAuthorityDirective,
+    SidebarModule,
+    TooltipModule,
+    InputSwitchModule,
+    FormsModule,
+    FileUploadModule,
+    DockModule,
+    PrimeTemplate,
+    MesCoursComponent_1,
+    TranslateModule,
+  ],
 })
 export class HomeComponent implements OnInit, OnDestroy {
   account: Account | null = null;
@@ -91,7 +118,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private translateService: TranslateService,
     private loginService: LoginService,
     private zone: NgZone,
-    private http: HttpClient
+    private http: HttpClient,
   ) {}
 
   ngOnInit(): void {

@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, NgZone, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, Scroll } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, RouterLinkActive, Scroll } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { SessionStorageService } from 'ngx-webstorage';
 
@@ -12,11 +12,31 @@ import { ProfileService } from 'app/layouts/profiles/profile.service';
 import { EntityNavbarItems } from 'app/entities/entity-navbar-items';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { PreferencePageComponent } from '../../scanexam/preference-page/preference-page.component';
-import { ShortcutInput } from 'ng-keyboard-shortcuts';
+import { KeyboardShortcutsModule, ShortcutInput } from 'ng-keyboard-shortcuts';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { CommonModule, NgIf } from '@angular/common';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ActiveMenuDirective } from './active-menu.directive';
+import { FindLanguageFromKeyPipe } from 'app/shared/language/find-language-from-key.pipe';
+import { HasAnyAuthorityDirective } from 'app/shared/auth/has-any-authority.directive';
 
 @Component({
+  standalone: true,
   selector: 'jhi-navbar',
   templateUrl: './navbar.component.html',
+  imports: [
+    CommonModule,
+    NgIf,
+    RouterLink,
+    KeyboardShortcutsModule,
+    NgbModule,
+    RouterLinkActive,
+    ActiveMenuDirective,
+    FindLanguageFromKeyPipe,
+    HasAnyAuthorityDirective,
+    FontAwesomeModule,
+  ],
+
   styleUrls: ['./navbar.component.scss'],
   providers: [DialogService],
 })

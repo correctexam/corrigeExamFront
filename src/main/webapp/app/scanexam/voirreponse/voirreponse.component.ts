@@ -34,12 +34,32 @@ import { ScanService } from 'app/entities/scan/service/scan.service';
 import { IExamSheet } from '../../entities/exam-sheet/exam-sheet.model';
 import { CacheUploadService } from '../exam-detail/cacheUpload.service';
 import { TranslateService } from '@ngx-translate/core';
+import { SliderModule } from 'primeng/slider';
+import { FormsModule } from '@angular/forms';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { TranslateDirective } from '../../shared/language/translate.directive';
+import { NgIf, NgFor } from '@angular/common';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { BlockUIModule } from 'primeng/blockui';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'jhi-voirreponse',
   templateUrl: './voirreponse.component.html',
   styleUrls: ['./voirreponse.component.scss'],
   providers: [ConfirmationService, MessageService],
+  standalone: true,
+  imports: [
+    ToastModule,
+    BlockUIModule,
+    ProgressSpinnerModule,
+    NgIf,
+    TranslateDirective,
+    NgFor,
+    InputSwitchModule,
+    FormsModule,
+    SliderModule,
+  ],
 })
 export class VoirReponseComponent implements OnInit, AfterViewInit {
   public href = '';

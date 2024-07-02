@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { NgxExtendedPdfViewerService, PageRenderedEvent, ScrollModeType } from 'ngx-extended-pdf-viewer';
+import { NgxExtendedPdfViewerService, PageRenderedEvent, ScrollModeType, NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { EventHandlerService } from '../event-handler.service';
 import { DrawingTools } from '../models';
 // import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
@@ -19,6 +19,10 @@ import { PreferenceService } from 'app/scanexam/preference-page/preference.servi
 //  suppressScrollX: true,
 // };
 import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer';
+import { NgIf } from '@angular/common';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { BlockUIModule } from 'primeng/blockui';
+import { SummaryTemplateComponent } from '../../summary/summary-template.component';
 
 export type CustomZone = IZone & { type: DrawingTools };
 
@@ -33,6 +37,8 @@ export type CustomZone = IZone & { type: DrawingTools };
     //      useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG,
     //    },
   ],
+  standalone: true,
+  imports: [SummaryTemplateComponent, BlockUIModule, ProgressSpinnerModule, NgIf, NgxExtendedPdfViewerModule],
 })
 export class FabricCanvasComponent implements OnInit, OnDestroy {
   @Input()

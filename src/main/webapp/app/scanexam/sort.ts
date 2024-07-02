@@ -3,6 +3,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'sort',
+  standalone: true,
 })
 export class ArraySortPipe implements PipeTransform {
   transform(array: any[] | undefined, field: string): any[] | null {

@@ -1,13 +1,24 @@
 import { Component, OnInit, RendererFactory2, Renderer2 } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { Router, ActivatedRouteSnapshot, NavigationEnd } from '@angular/router';
+import { Router, ActivatedRouteSnapshot, NavigationEnd, RouterOutlet } from '@angular/router';
 import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
 import dayjs from 'dayjs';
 
 import { AccountService } from 'app/core/auth/account.service';
 import { FocusViewService } from '../profiles/focusview.service';
+import { CommonModule, NgIf, registerLocaleData } from '@angular/common';
+import { KeyboardShortcutsModule } from 'ng-keyboard-shortcuts';
+import { FooterComponent } from '../footer/footer.component';
+import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { NgbDatepickerConfig } from '@ng-bootstrap/ng-bootstrap';
+import locale from '@angular/common/locales/fr';
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, NgIf, RouterOutlet, KeyboardShortcutsModule, FooterComponent, FontAwesomeModule],
+
   selector: 'jhi-main',
   templateUrl: './main.component.html',
 })
@@ -22,7 +33,18 @@ export class MainComponent implements OnInit {
     private translateService: TranslateService,
     rootRenderer: RendererFactory2,
     private focusViewService: FocusViewService,
+    private iconLibrary: FaIconLibrary,
+    private applicationConfigService: ApplicationConfigService,
+    private dpConfig: NgbDatepickerConfig,
   ) {
+    this.iconLibrary.addIcons(...(fontAwesomeIcons as any[]));
+
+    applicationConfigService.setEndpointPrefix(SERVER_API_URL);
+    applicationConfigService.setFrontUrl(FRONT_URL);
+    registerLocaleData(locale);
+    iconLibrary.addIcons(...(fontAwesomeIcons as any[]));
+    dpConfig.minDate = { year: dayjs().subtract(100, 'year').year(), month: 1, day: 1 };
+
     this.renderer = rootRenderer.createRenderer(document.querySelector('html'), null);
 
     // Could not use default translate services due to a bug in https://github.com/omridevk/ng-keyboard-shortcuts

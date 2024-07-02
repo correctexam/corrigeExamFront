@@ -1,5 +1,4 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { Answer2HybridGradedCommentComponent } from '../list/answer-2-hybrid-graded-comment.component';
@@ -8,7 +7,7 @@ import { Answer2HybridGradedCommentUpdateComponent } from '../update/answer-2-hy
 import { Answer2HybridGradedCommentRoutingResolveService } from './answer-2-hybrid-graded-comment-routing-resolve.service';
 import { ASC } from 'app/config/pagination.constants';
 
-const answer2HybridGradedCommentRoute: Routes = [
+export const answer2HybridGradedCommentRoute: Routes = [
   {
     path: '',
     component: Answer2HybridGradedCommentComponent,
@@ -42,9 +41,3 @@ const answer2HybridGradedCommentRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
 ];
-
-@NgModule({
-  imports: [RouterModule.forChild(answer2HybridGradedCommentRoute)],
-  exports: [RouterModule],
-})
-export class Answer2HybridGradedCommentRoutingModule {}

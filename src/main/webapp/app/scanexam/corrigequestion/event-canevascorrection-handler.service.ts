@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-duplicate-type-constituents */
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable no-empty */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */

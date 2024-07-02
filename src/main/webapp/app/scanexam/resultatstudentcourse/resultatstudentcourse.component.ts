@@ -4,10 +4,10 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
-import { MessageService } from 'primeng/api';
+import { MessageService, PrimeTemplate } from 'primeng/api';
 import { ConfirmationService } from 'primeng/api';
 import { IExam } from '../../entities/exam/exam.model';
 import { ExamService } from '../../entities/exam/service/exam.service';
@@ -16,12 +16,50 @@ import { ExportPdfService } from '../exportanonymoupdf/exportanonymoupdf.service
 import { firstValueFrom } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { ExportResultService, formatDateTime } from '../exportresult.service';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { TableModule } from 'primeng/table';
+import { ButtonDirective } from 'primeng/button';
+import { NgIf } from '@angular/common';
+import { CheckboxModule } from 'primeng/checkbox';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { TooltipModule } from 'primeng/tooltip';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormsModule } from '@angular/forms';
+import { TranslateDirective } from '../../shared/language/translate.directive';
+import { DialogModule } from 'primeng/dialog';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { BlockUIModule } from 'primeng/blockui';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'jhi-resultatstudentcourse',
   templateUrl: './resultatstudentcourse.component.html',
   styleUrls: ['./resultatstudentcourse.component.scss'],
   providers: [MessageService, ConfirmationService],
+  standalone: true,
+  imports: [
+    ToastModule,
+    BlockUIModule,
+    ProgressSpinnerModule,
+    ConfirmDialogModule,
+    DialogModule,
+    PrimeTemplate,
+    TranslateDirective,
+    FormsModule,
+    InputTextModule,
+    FaIconComponent,
+    TooltipModule,
+    InputTextareaModule,
+    CheckboxModule,
+    NgIf,
+    ButtonDirective,
+    RouterLink,
+    TableModule,
+    InputSwitchModule,
+    TranslateModule,
+  ],
 })
 export class ResultatStudentcourseComponent implements OnInit {
   blocked = false;

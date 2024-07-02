@@ -1,12 +1,18 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { PasswordResetFinishService } from './password-reset-finish.service';
+import { TranslateModule } from '@ngx-translate/core';
+import { PasswordStrengthBarComponent } from '../../password/password-strength-bar/password-strength-bar.component';
+import { NgIf } from '@angular/common';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-password-reset-finish',
   templateUrl: './password-reset-finish.component.html',
+  standalone: true,
+  imports: [TranslateDirective, NgIf, RouterLink, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, TranslateModule],
 })
 export class PasswordResetFinishComponent implements OnInit, AfterViewInit {
   @ViewChild('newPassword', { static: false })
@@ -22,7 +28,7 @@ export class PasswordResetFinishComponent implements OnInit, AfterViewInit {
   constructor(
     private passwordResetFinishService: PasswordResetFinishService,
     private route: ActivatedRoute,
-    private fb: UntypedFormBuilder
+    private fb: UntypedFormBuilder,
   ) {
     this.passwordForm = this.fb.group({
       newPassword: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(50)]],

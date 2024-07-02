@@ -1,11 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { IStudent } from '../student.model';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { AlertComponent } from '../../../shared/alert/alert.component';
+import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
+import { NgIf, NgFor } from '@angular/common';
 
 @Component({
   selector: 'jhi-student-detail',
   templateUrl: './student-detail.component.html',
+  standalone: true,
+  imports: [NgIf, TranslateDirective, AlertErrorComponent, AlertComponent, NgFor, RouterLink, FaIconComponent],
 })
 export class StudentDetailComponent implements OnInit {
   student: IStudent | null = null;

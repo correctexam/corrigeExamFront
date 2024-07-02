@@ -4,7 +4,7 @@
 
     <div class="d-flex justify-content-end">
       <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
-        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <fa-icon icon="sync" [animation]="'spin'"></fa-icon>
         <span jhiTranslate="gradeScopeIsticApp.hybridGradedComment.home.refreshListLabel">Actualiser la liste</span>
       </button>
 

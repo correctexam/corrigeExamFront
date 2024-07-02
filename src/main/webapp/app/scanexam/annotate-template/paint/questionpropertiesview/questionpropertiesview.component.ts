@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { HttpResponse } from '@angular/common/http';
 import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
-import { UntypedFormBuilder, Validators, UntypedFormGroup } from '@angular/forms';
+import { UntypedFormBuilder, Validators, UntypedFormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IQuestionType } from 'app/entities/question-type/question-type.model';
 import { QuestionTypeService } from 'app/entities/question-type/service/question-type.service';
 import { QuestionService } from 'app/entities/question/service/question.service';
@@ -17,6 +17,21 @@ import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
 import { IHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-graded-comment.model';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
+import { TranslateModule } from '@ngx-translate/core';
+import { Button } from 'primeng/button';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { CheckboxModule } from 'primeng/checkbox';
+import { MessageModule } from 'primeng/message';
+import { KeyFilterModule } from 'primeng/keyfilter';
+import { KnobModule } from 'primeng/knob';
+import { ListboxModule } from 'primeng/listbox';
+import { InputTextModule } from 'primeng/inputtext';
+import { TooltipModule } from 'primeng/tooltip';
+import { TranslateDirective } from '../../../../shared/language/translate.directive';
+import { AlertErrorComponent } from '../../../../shared/alert/alert-error.component';
+import { NgIf, NgFor } from '@angular/common';
+import { CreateCommentsComponent } from '../../create-comments/create-comments.component';
+import { SidebarModule } from 'primeng/sidebar';
 
 type SelectableEntity = IQuestionType;
 export type EntityResponseType = HttpResponse<IQuestion>;
@@ -42,6 +57,27 @@ export type EntityResponseType = HttpResponse<IQuestion>;
       transition('visible => hidden', animate('400ms ease-in')),
       transition('hidden => visible', animate('400ms ease-out')),
     ]),
+  ],
+  standalone: true,
+  imports: [
+    SidebarModule,
+    CreateCommentsComponent,
+    NgIf,
+    FormsModule,
+    ReactiveFormsModule,
+    AlertErrorComponent,
+    TranslateDirective,
+    TooltipModule,
+    InputTextModule,
+    NgFor,
+    ListboxModule,
+    KnobModule,
+    KeyFilterModule,
+    MessageModule,
+    CheckboxModule,
+    InputSwitchModule,
+    Button,
+    TranslateModule,
   ],
 })
 export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {

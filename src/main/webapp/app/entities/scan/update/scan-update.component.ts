@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -10,10 +10,16 @@ import { ScanService } from '../service/scan.service';
 import { AlertError } from 'app/shared/alert/alert-error.model';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { NgIf } from '@angular/common';
+import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-scan-update',
   templateUrl: './scan-update.component.html',
+  standalone: true,
+  imports: [FormsModule, ReactiveFormsModule, TranslateDirective, AlertErrorComponent, NgIf, FaIconComponent],
 })
 export class ScanUpdateComponent implements OnInit {
   isSaving = false;
@@ -25,7 +31,7 @@ export class ScanUpdateComponent implements OnInit {
     protected eventManager: EventManager,
     protected scanService: ScanService,
     protected activatedRoute: ActivatedRoute,
-    protected fb: UntypedFormBuilder
+    protected fb: UntypedFormBuilder,
   ) {
     this.editForm = this.fb.group({
       id: [],

@@ -13,18 +13,32 @@ import { CourseService } from '../../entities/course/service/course.service';
 import { ICourse } from '../../entities/course/course.model';
 import { IExam } from '../../entities/exam/exam.model';
 import { ExamService } from '../../entities/exam/service/exam.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmationService } from 'primeng/api';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ConfirmationService, PrimeTemplate } from 'primeng/api';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { ApplicationConfigService } from '../../core/config/application-config.service';
 import { DialogService } from 'primeng/dynamicdialog';
 import { SharecourseComponent } from '../sharecourse/sharecourse.component';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { firstValueFrom, scan } from 'rxjs';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { PreferenceService } from '../preference-page/preference.service';
 import { Title } from '@angular/platform-browser';
 import { ExportResultService, formatDateTime } from '../exportresult.service';
+import { FaStackComponent, FaIconComponent, FaStackItemSizeDirective } from '@fortawesome/angular-fontawesome';
+import { UsableTextInputComponent } from '../../shared/usable-text-input/usable-text-input.component';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { SidebarModule } from 'primeng/sidebar';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { BlockUIModule } from 'primeng/blockui';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TooltipModule } from 'primeng/tooltip';
+import { NgIf, NgFor } from '@angular/common';
+import { DockModule } from 'primeng/dock';
+import { ButtonDirective } from 'primeng/button';
+import { FormsModule } from '@angular/forms';
+import { TranslateDirective } from '../../shared/language/translate.directive';
+import { DialogModule } from 'primeng/dialog';
 
 export interface CacheUploadNotification {
   setMessage(v: string): void;
@@ -47,6 +61,29 @@ export interface CacheDownloadNotification {
   templateUrl: './coursdetails.component.html',
   styleUrls: ['./coursdetails.component.scss'],
   providers: [ConfirmationService, DialogService],
+  standalone: true,
+  imports: [
+    DialogModule,
+    TranslateDirective,
+    FormsModule,
+    PrimeTemplate,
+    ButtonDirective,
+    DockModule,
+    NgIf,
+    RouterLink,
+    TooltipModule,
+    ConfirmDialogModule,
+    BlockUIModule,
+    ProgressSpinnerModule,
+    SidebarModule,
+    InputSwitchModule,
+    NgFor,
+    UsableTextInputComponent,
+    FaStackComponent,
+    FaIconComponent,
+    FaStackItemSizeDirective,
+    TranslateModule,
+  ],
 })
 export class CoursdetailsComponent implements OnInit {
   farCircle = farCircle as IconProp;

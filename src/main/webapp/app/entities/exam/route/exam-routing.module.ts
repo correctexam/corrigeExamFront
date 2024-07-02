@@ -1,13 +1,11 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { ExamComponent } from '../list/exam.component';
 import { ExamDetailComponent } from '../detail/exam-detail.component';
 import { ExamUpdateComponent } from '../update/exam-update.component';
 import { ExamRoutingResolveService } from './exam-routing-resolve.service';
+import { Routes } from '@angular/router';
 
-const examRoute: Routes = [
+export const examRoute: Routes = [
   {
     path: '',
     component: ExamComponent,
@@ -52,9 +50,3 @@ const examRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
 ];
-
-@NgModule({
-  imports: [RouterModule.forChild(examRoute)],
-  exports: [RouterModule],
-})
-export class ExamRoutingModule {}

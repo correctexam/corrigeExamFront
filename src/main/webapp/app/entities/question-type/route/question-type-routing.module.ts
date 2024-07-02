@@ -1,5 +1,4 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { QuestionTypeComponent } from '../list/question-type.component';
@@ -7,7 +6,7 @@ import { QuestionTypeDetailComponent } from '../detail/question-type-detail.comp
 import { QuestionTypeUpdateComponent } from '../update/question-type-update.component';
 import { QuestionTypeRoutingResolveService } from './question-type-routing-resolve.service';
 
-const questionTypeRoute: Routes = [
+export const questionTypeRoute: Routes = [
   {
     path: '',
     component: QuestionTypeComponent,
@@ -52,9 +51,3 @@ const questionTypeRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
 ];
-
-@NgModule({
-  imports: [RouterModule.forChild(questionTypeRoute)],
-  exports: [RouterModule],
-})
-export class QuestionTypeRoutingModule {}

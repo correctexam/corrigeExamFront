@@ -2,7 +2,7 @@
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 import { HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Course, ICourse } from 'app/entities/course/course.model';
 import { CourseService } from 'app/entities/course/service/course.service';
@@ -10,11 +10,17 @@ import { IUser } from 'app/entities/user/user.model';
 import { UserService } from 'app/entities/user/user.service';
 import { finalize, Observable } from 'rxjs';
 import { AccountService } from '../../core/auth/account.service';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { NgIf } from '@angular/common';
+import { AlertErrorComponent } from '../../shared/alert/alert-error.component';
+import { TranslateDirective } from '../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-creercours',
   templateUrl: './creercours.component.html',
   styleUrls: ['./creercours.component.scss'],
+  standalone: true,
+  imports: [FormsModule, ReactiveFormsModule, TranslateDirective, AlertErrorComponent, NgIf, FaIconComponent],
 })
 export class CreercoursComponent implements OnInit {
   isSaving = false;
@@ -30,7 +36,7 @@ export class CreercoursComponent implements OnInit {
     protected accountService: AccountService,
 
     protected activatedRoute: ActivatedRoute,
-    protected fb: UntypedFormBuilder
+    protected fb: UntypedFormBuilder,
   ) {
     this.editForm = this.fb.group({
       id: [],

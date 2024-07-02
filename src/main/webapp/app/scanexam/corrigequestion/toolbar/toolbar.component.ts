@@ -8,11 +8,16 @@ import { faUserGraduate, faHashtag, faEraser, faHandPointer, faTrash, faPencil }
 import { DrawingTools } from 'app/scanexam/annotate-template/paint/models';
 import { EventCanevascorrectionHandlerService } from '../event-canevascorrection-handler.service';
 import { ConfirmationService } from 'primeng/api';
+import { TranslateModule } from '@ngx-translate/core';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'jhi-graphical-toolbarcorrection',
   templateUrl: './toolbar.component.html',
   styleUrls: ['./toolbar.component.scss'],
+  standalone: true,
+  imports: [NgClass, FaIconComponent, TranslateModule],
 })
 export class GraphicalToolbarCorrectionComponent {
   faNote = faUserGraduate;

@@ -18,7 +18,7 @@ import {
   ViewChildren,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 import { ExamService } from 'app/entities/exam/service/exam.service';
@@ -30,11 +30,34 @@ import { CacheUploadService } from '../exam-detail/cacheUpload.service';
 import { PreferenceService } from '../preference-page/preference.service';
 import { EventEmitter } from '@angular/core';
 import { ImageDB } from '../db/db';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { TooltipModule } from 'primeng/tooltip';
+import { DragDropModule } from 'primeng/dragdrop';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { NgIf, NgFor, NgClass, KeyValuePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { TranslateDirective } from '../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-viewandreorderpages',
   templateUrl: './viewandreorderpages.component.html',
   styleUrls: ['./viewandreorderpages.component.scss'],
+  standalone: true,
+  imports: [
+    TranslateDirective,
+    SelectButtonModule,
+    FormsModule,
+    NgIf,
+    ProgressSpinnerModule,
+    NgFor,
+    NgClass,
+    DragDropModule,
+    TooltipModule,
+    FaIconComponent,
+    KeyValuePipe,
+    TranslateModule,
+  ],
 })
 export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
   @Input()

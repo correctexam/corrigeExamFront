@@ -1,104 +1,25 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-
-import { MesCoursComponent } from './mes-cours/mes-cours.component';
 import { CreercoursComponent } from './creercours/creercours.component';
 import { CoursdetailsComponent } from './coursdetail/coursdetails.component';
 import { ImportStudentComponent } from './import-student/import-student.component';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ButtonModule } from 'primeng/button';
-import { BlockUIModule } from 'primeng/blockui';
-import { MenuModule } from 'primeng/menu';
-import { TooltipModule } from 'primeng/tooltip';
-import { DockModule } from 'primeng/dock';
 
-import { SliderModule } from 'primeng/slider';
-import { KeyFilterModule } from 'primeng/keyfilter';
-
-import { ToastModule } from 'primeng/toast';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { TableModule } from 'primeng/table';
-import { SharedModule } from 'app/shared/shared.module';
-import { Route, RouterModule } from '@angular/router';
+import { Route } from '@angular/router';
 import { CreerexamComponent } from './creerexam/creerexam.component';
 import { ExamDetailComponent } from './exam-detail/exam-detail.component';
 import { AnnotateTemplateComponent } from './annotate-template/annotate-template.component';
-import { PaintComponent } from './annotate-template/paint/paint.component';
-import { GraphicalToolbarComponent } from './annotate-template/paint/toolbar/toolbar.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { EventHandlerService } from './annotate-template/paint/event-handler.service';
-import { FabricShapeService } from './annotate-template/paint/shape.service';
-import { ColourPaletteComponent } from './corrigequestion/toolbar/colour-palette/colour-palette.component';
-import { FabricCanvasComponent } from './annotate-template/paint/fabric-canvas/fabric-canvas.component';
-import { ThicknessSliderComponent } from './corrigequestion/toolbar/thickness-slider/thickness-slider.component';
-
-import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
-import { QuestionpropertiesviewComponent } from './annotate-template/paint/questionpropertiesview/questionpropertiesview.component';
 import { ChargerscanComponent } from './chargerscan/chargerscan.component';
 import { AssocierCopiesEtudiantsComponent } from './associer-copies-etudiants/associer-copies-etudiants.component';
-import { SelectButtonModule } from 'primeng/selectbutton';
 import { AlignScanComponent } from './alignscan/alignscan.component';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { PaginatorModule } from 'primeng/paginator';
-import { OrderListModule } from 'primeng/orderlist';
-import { ListboxModule } from 'primeng/listbox';
-import { InputSwitchModule } from 'primeng/inputswitch';
 import { CorrigequestionComponent } from './corrigequestion/corrigequestion.component';
-import { RatingModule } from 'primeng/rating';
-import { GraphicalToolbarCorrectionComponent } from './corrigequestion/toolbar/toolbar.component';
-import { InplaceModule } from 'primeng/inplace';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
-import { SortByDirective } from '../shared/sort/sort-by.directive';
 import { VoirCopieComponent } from './voircopie/voircopie.component';
 import { ResultatStudentcourseComponent } from './resultatstudentcourse/resultatstudentcourse.component';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextareaModule } from 'primeng/inputtextarea';
-import { InputTextModule } from 'primeng/inputtext';
-import { GalleriaModule } from 'primeng/galleria';
 import { StatsExamComponent } from './statsexam/statsexam.component';
-import { CardModule } from 'primeng/card';
-import { ChartModule } from 'primeng/chart';
-import { KnobModule } from 'primeng/knob';
-import { DropdownModule } from 'primeng/dropdown';
-import { ToggleButtonModule } from 'primeng/togglebutton';
 import { VoirReponseComponent } from './voirreponse/voirreponse.component';
 import { VoirReponsesStarUnstarComponent } from './voirreponsesstarunstarexam/voirreponsesstarunstarexam.component';
-import { DynamicDialogModule } from 'primeng/dynamicdialog';
-import { SharecourseComponent } from './sharecourse/sharecourse.component';
-import { PickListModule } from 'primeng/picklist';
-import { MessagesModule } from 'primeng/messages';
-import { MessageModule } from 'primeng/message';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
-import { ProgressBarModule } from 'primeng/progressbar';
-import { PreferencePageComponent } from './preference-page/preference-page.component';
-import { PartialAlignModalComponent } from './alignscan/partial-align-modal/partial-align-modal.component';
 import { MarkingSummaryComponent } from './marking-summary/marking-summary.component';
-import { TabViewModule } from 'primeng/tabview';
-import { SummaryTemplateComponent } from './annotate-template/summary/summary-template.component';
 import { ComparestudentanswerComponent } from './comparestudentanswer/comparestudentanswer.component';
-import { SplitterModule } from 'primeng/splitter';
-import { RadioButtonModule } from 'primeng/radiobutton';
 
-import { FileUploadModule } from 'primeng/fileupload';
-import { KeyboardShortcutsModule } from 'ng-keyboard-shortcuts';
-import { PlatformModule } from '@angular/cdk/platform';
-
-import { SidebarModule } from 'primeng/sidebar';
-import { CreateCommentsComponent } from './annotate-template/create-comments/create-comments.component';
-import { ClickDoubleDirective } from './clickdouble.directive';
-import { KeyboardshortcutComponent } from './corrigequestion/keyboardshortcut/keyboardshortcut.component';
-import { DragDropModule } from 'primeng/dragdrop';
 import { ExportanonymoupdfComponent } from './exportanonymoupdf/exportanonymoupdf.component';
-import { CheckboxModule } from 'primeng/checkbox';
-import { ViewandreorderpagesComponent } from './viewandreorderpages/viewandreorderpages.component';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { AllbindingsComponent } from './associer-copies-etudiants/allbindings/allbindings.component';
-import { FontsizeSliderComponent } from './corrigequestion/toolbar/fontsize-slider/fontsize-slider.component';
-import { CommentSortPipe } from './sortComment';
-import { ArraySortPipe } from './sort';
-import { SwipeDirective } from './swipe.directive';
-import { DataUtils } from 'app/core/util/data-util.service';
 
 // set the location of the OpenCV files
 // registerAllModules();
@@ -443,50 +364,36 @@ export const CompareAnswer_ROUTE: Route = {
   },
 };
 
+export const SCANEXAM_ROUTES = [
+  CREERCOURS_ROUTE,
+  COURSMAIN_ROUTE,
+  REGISTERSTUDENT_ROUTE,
+  CREEREXAM_ROUTE,
+  EXAMDETAIL_ROUTE,
+  ANNOTATETEMPLATE_ROUTE,
+  CHARGERSCAN_ROUTE,
+  AssocierCopiesEtudiants_ROUTE,
+  AlignerCopiesEtudiants_ROUTE,
+  CorrigerCopiesEtudiantsToQuestion_ROUTE,
+  CorrigerCopiesEtudiants_ROUTE,
+  AssocierCopiesEtudiantsToStudent_ROUTE,
+  MarkingSummary_ROUTE,
+  VoirCopieEtudiants_ROUTE,
+  ShowResults_ROUTE,
+  STATS_ROUTE,
+  VoirReponseEtudiants_ROUTE,
+  VoirReponsesstarunstar_ROUTE,
+  CompareTextCommentAnswer_ROUTE,
+  CompareGradedCommentAnswer_ROUTE,
+  CompareMarkAnswer_ROUTE,
+  CompareAnswer_ROUTE,
+  EXPORTPDF_ROUTE,
+  EXPORTPDFBYSHEET_ROUTE,
+  CompareHybridCommentAnswer_ROUTE,
+];
+/*
 @NgModule({
-  declarations: [
-    MesCoursComponent,
-    CreercoursComponent,
-    CoursdetailsComponent,
-    ImportStudentComponent,
-    CreerexamComponent,
-    ExamDetailComponent,
-    AnnotateTemplateComponent,
-    PaintComponent,
-    GraphicalToolbarComponent,
-    ColourPaletteComponent,
-    FabricCanvasComponent,
-    ThicknessSliderComponent,
-    QuestionpropertiesviewComponent,
-    ChargerscanComponent,
-    AssocierCopiesEtudiantsComponent,
-    AlignScanComponent,
-    CorrigequestionComponent,
-    GraphicalToolbarCorrectionComponent,
-    VoirCopieComponent,
-    ResultatStudentcourseComponent,
-    StatsExamComponent,
-    VoirReponseComponent,
-    VoirReponsesStarUnstarComponent,
-    SharecourseComponent,
-    PreferencePageComponent,
-    PartialAlignModalComponent,
-    MarkingSummaryComponent,
-    SummaryTemplateComponent,
-    ComparestudentanswerComponent,
-    CreateCommentsComponent,
-    ClickDoubleDirective,
-    KeyboardshortcutComponent,
-    ExportanonymoupdfComponent,
-    ViewandreorderpagesComponent,
-    AllbindingsComponent,
-    ColourPaletteComponent,
-    FontsizeSliderComponent,
-    CommentSortPipe,
-    ArraySortPipe,
-    SwipeDirective,
-  ],
-  imports: [
+    imports: [
     CommonModule,
     BrowserAnimationsModule,
     CardModule,
@@ -495,7 +402,6 @@ export const CompareAnswer_ROUTE: Route = {
     KnobModule,
     DropdownModule,
     ToggleButtonModule,
-    SharedModule,
     FontAwesomeModule,
     BlockUIModule,
     MenuModule,
@@ -536,47 +442,62 @@ export const CompareAnswer_ROUTE: Route = {
     ProgressBarModule,
     CheckboxModule,
     KeyboardShortcutsModule.forRoot(),
-
-    RouterModule.forChild([
-      CREERCOURS_ROUTE,
-      COURSMAIN_ROUTE,
-      REGISTERSTUDENT_ROUTE,
-      CREEREXAM_ROUTE,
-      EXAMDETAIL_ROUTE,
-      ANNOTATETEMPLATE_ROUTE,
-      CHARGERSCAN_ROUTE,
-      AssocierCopiesEtudiants_ROUTE,
-      AlignerCopiesEtudiants_ROUTE,
-      CorrigerCopiesEtudiantsToQuestion_ROUTE,
-      CorrigerCopiesEtudiants_ROUTE,
-      AssocierCopiesEtudiantsToStudent_ROUTE,
-      MarkingSummary_ROUTE,
-      VoirCopieEtudiants_ROUTE,
-      ShowResults_ROUTE,
-      STATS_ROUTE,
-      VoirReponseEtudiants_ROUTE,
-      VoirReponsesstarunstar_ROUTE,
-      CompareTextCommentAnswer_ROUTE,
-      CompareGradedCommentAnswer_ROUTE,
-      CompareMarkAnswer_ROUTE,
-      CompareAnswer_ROUTE,
-      EXPORTPDF_ROUTE,
-      EXPORTPDFBYSHEET_ROUTE,
-      CompareHybridCommentAnswer_ROUTE,
-    ]),
+    RouterModule.forChild(),
     TabViewModule,
-  ],
-  exports: [
     MesCoursComponent,
     CreercoursComponent,
     CoursdetailsComponent,
     ImportStudentComponent,
-    CorrigequestionComponent,
-    KeyboardshortcutComponent,
+    CreerexamComponent,
+    ExamDetailComponent,
+    AnnotateTemplateComponent,
+    PaintComponent,
+    GraphicalToolbarComponent,
+    ColourPaletteComponent,
+    FabricCanvasComponent,
+    ThicknessSliderComponent,
+    QuestionpropertiesviewComponent,
+    ChargerscanComponent,
     AssocierCopiesEtudiantsComponent,
-    SortByDirective,
+    AlignScanComponent,
+    CorrigequestionComponent,
+    GraphicalToolbarCorrectionComponent,
+    VoirCopieComponent,
+    ResultatStudentcourseComponent,
+    StatsExamComponent,
+    VoirReponseComponent,
+    VoirReponsesStarUnstarComponent,
+    SharecourseComponent,
+    PreferencePageComponent,
+    PartialAlignModalComponent,
+    MarkingSummaryComponent,
+    SummaryTemplateComponent,
+    ComparestudentanswerComponent,
+    CreateCommentsComponent,
     ClickDoubleDirective,
-  ],
-  providers: [EventHandlerService, FabricShapeService, DataUtils],
+    KeyboardshortcutComponent,
+    ExportanonymoupdfComponent,
+    ViewandreorderpagesComponent,
+    AllbindingsComponent,
+    ColourPaletteComponent,
+    FontsizeSliderComponent,
+    CommentSortPipe,
+    ArraySortPipe,
+    SwipeDirective,
+    SortByDirective
+],
+    exports: [
+        MesCoursComponent,
+        CreercoursComponent,
+        CoursdetailsComponent,
+        ImportStudentComponent,
+        CorrigequestionComponent,
+        KeyboardshortcutComponent,
+        AssocierCopiesEtudiantsComponent,
+        SortByDirective,
+        ClickDoubleDirective,
+    ],
+    providers: [EventHandlerService, FabricShapeService, DataUtils],
 })
 export class ScanexamModule {}
+*/

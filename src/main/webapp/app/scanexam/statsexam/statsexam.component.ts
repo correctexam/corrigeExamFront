@@ -2,8 +2,8 @@
 /* eslint-disable guard-for-in */
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Component, HostListener, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { IQuestion } from 'app/entities/question/question.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
@@ -11,6 +11,21 @@ import { Observable, firstValueFrom } from 'rxjs';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { Title } from '@angular/platform-browser';
+import { ToggleButtonModule } from 'primeng/togglebutton';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { DropdownModule } from 'primeng/dropdown';
+import { TableModule } from 'primeng/table';
+import { ButtonDirective } from 'primeng/button';
+import { FormsModule } from '@angular/forms';
+import { KnobModule } from 'primeng/knob';
+import { TooltipModule } from 'primeng/tooltip';
+import { ChartModule } from 'primeng/chart';
+import { CardModule } from 'primeng/card';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { NgIf, NgFor, NgStyle, KeyValuePipe } from '@angular/common';
+import { TranslateDirective } from '../../shared/language/translate.directive';
+import { PrimeTemplate } from 'primeng/api';
+import { GalleriaModule } from 'primeng/galleria';
 
 // Couleurs à utiliser
 const GRIS = 'rgba(179,181,198,1)';
@@ -29,6 +44,29 @@ const TRANSPARENT = 'rgba(255,255,255,0.0)';
   selector: 'jhi-statsexam',
   templateUrl: './statsexam.component.html',
   styleUrls: ['./statsexam.component.scss'],
+  standalone: true,
+  imports: [
+    GalleriaModule,
+    PrimeTemplate,
+    TranslateDirective,
+    NgIf,
+    FaIconComponent,
+    CardModule,
+    ChartModule,
+    NgFor,
+    TooltipModule,
+    KnobModule,
+    FormsModule,
+    ButtonDirective,
+    TableModule,
+    DropdownModule,
+    SelectButtonModule,
+    ToggleButtonModule,
+    NgStyle,
+    RouterLink,
+    KeyValuePipe,
+    TranslateModule,
+  ],
 })
 export class StatsExamComponent implements OnInit {
   // Page related variables

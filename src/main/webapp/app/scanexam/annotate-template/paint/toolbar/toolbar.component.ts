@@ -15,15 +15,22 @@ import {
   faTrash,
   faPencil,
 } from '@fortawesome/free-solid-svg-icons';
-import { TranslateService } from '@ngx-translate/core';
-import { ConfirmationService } from 'primeng/api';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { ConfirmationService, PrimeTemplate } from 'primeng/api';
 import { EventHandlerService } from '../event-handler.service';
 import { DrawingTools } from '../models';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { NgClass } from '@angular/common';
+import { ButtonDirective } from 'primeng/button';
+import { TranslateDirective } from '../../../../shared/language/translate.directive';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'jhi-graphical-toolbar',
   templateUrl: './toolbar.component.html',
   styleUrls: ['./toolbar.component.scss'],
+  standalone: true,
+  imports: [ConfirmDialogModule, PrimeTemplate, TranslateDirective, ButtonDirective, NgClass, FaIconComponent, TranslateModule],
 })
 export class GraphicalToolbarComponent {
   faNom = faFileSignature;
@@ -41,7 +48,7 @@ export class GraphicalToolbarComponent {
   constructor(
     private eventService: EventHandlerService,
     private confirmationService: ConfirmationService,
-    public translateService: TranslateService
+    public translateService: TranslateService,
   ) {
     this.selected = this.eventService.selectedTool;
   }

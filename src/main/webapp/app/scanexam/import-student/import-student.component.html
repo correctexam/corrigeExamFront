@@ -15,11 +15,15 @@
   <div class="">
     <div class="grid flex">
       <div class="sm:col-12 md:col-6 lg:col-6 xl:col-6">
-        <p-message *ngIf="!canImport()" severity="warn" [text]="'scanexam.listestudentvalid' | translate"></p-message>
-        <p-message *ngIf="!canImport()" severity="warn" [text]="'scanexam.listestudentvaliddetail' | translate"></p-message>
-        <p-message *ngIf="!canImportSameColSize()" severity="warn" [text]="'scanexam.liststderrorcolsize' | translate"></p-message>
-        <p-message *ngIf="!canImportUniqueMails()" severity="warn" [text]="'scanexam.liststderroremails' | translate"></p-message>
-        <p-message *ngIf="!canImportUniqueINE()" severity="warn" [text]="'scanexam.liststderrorINE' | translate"></p-message>
+        <p-message *ngIf="!canImport()" [severity]="$any('warn')" [text]="'scanexam.listestudentvalid' | translate"></p-message>
+        <p-message *ngIf="!canImport()" [severity]="$any('warn')" [text]="'scanexam.listestudentvaliddetail' | translate"></p-message>
+        <p-message
+          *ngIf="!canImportSameColSize()"
+          [severity]="$any('warn')"
+          [text]="'scanexam.liststderrorcolsize' | translate"
+        ></p-message>
+        <p-message *ngIf="!canImportUniqueMails()" [severity]="$any('warn')" [text]="'scanexam.liststderroremails' | translate"></p-message>
+        <p-message *ngIf="!canImportUniqueINE()" [severity]="$any('warn')" [text]="'scanexam.liststderrorINE' | translate"></p-message>
         <p-message
           *ngIf="canImport() && hasDataSet()"
           severity="info"
@@ -60,14 +64,14 @@
             <p-fileUpload
               #uploadpegase
               mode="basic"
-              [auto]="true"
+              auto="true"
               chooseIcon="pi pi-upload"
               uploadIcon="pi pi-arrow-up"
-              [customUpload]="true"
+              customUpload="true"
               [pTooltip]="'scanexam.pegasetooltip' | translate"
               chooseLabel="Pegase"
               accept="text/csv"
-              [multiple]="false"
+              multiple="false"
               (uploadHandler)="loadPegaseFile($event, uploadpegase)"
             ></p-fileUpload>
           </div>
@@ -75,14 +79,14 @@
             <p-fileUpload
               #uploadmdw
               mode="basic"
-              [auto]="true"
+              auto="true"
               chooseIcon="pi pi-upload"
               uploadIcon="pi pi-arrow-up"
-              [customUpload]="true"
+              customUpload="true"
               [pTooltip]="'scanexam.pegasetooltip' | translate"
               chooseLabel="MDW"
               accept=".xlsx"
-              [multiple]="false"
+              multiple="false"
               (uploadHandler)="loadMDWFile($event, uploadmdw)"
             ></p-fileUpload>
           </div>

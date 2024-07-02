@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -17,12 +17,19 @@ import { QuestionTypeService } from 'app/entities/question-type/service/question
 import { IExam } from 'app/entities/exam/exam.model';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
+import { TranslateModule } from '@ngx-translate/core';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { NgIf, NgFor } from '@angular/common';
+import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 type SelectableEntity = IZone | IQuestionType | IExam;
 
 @Component({
   selector: 'jhi-question-update',
   templateUrl: './question-update.component.html',
+  standalone: true,
+  imports: [FormsModule, ReactiveFormsModule, TranslateDirective, AlertErrorComponent, NgIf, NgFor, FaIconComponent, TranslateModule],
 })
 export class QuestionUpdateComponent implements OnInit {
   isSaving = false;

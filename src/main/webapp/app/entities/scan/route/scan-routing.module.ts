@@ -1,5 +1,4 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { ScanComponent } from '../list/scan.component';
@@ -7,7 +6,7 @@ import { ScanDetailComponent } from '../detail/scan-detail.component';
 import { ScanUpdateComponent } from '../update/scan-update.component';
 import { ScanRoutingResolveService } from './scan-routing-resolve.service';
 
-const scanRoute: Routes = [
+export const scanRoute: Routes = [
   {
     path: '',
     component: ScanComponent,
@@ -51,9 +50,3 @@ const scanRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
 ];
-
-@NgModule({
-  imports: [RouterModule.forChild(scanRoute)],
-  exports: [RouterModule],
-})
-export class ScanRoutingModule {}

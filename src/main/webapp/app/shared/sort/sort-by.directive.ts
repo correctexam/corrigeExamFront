@@ -9,6 +9,7 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 @Directive({
   selector: '[jhiSortBy]',
+  standalone: true,
 })
 export class SortByDirective<T> implements AfterContentInit, OnDestroy {
   @Input() jhiSortBy!: T;

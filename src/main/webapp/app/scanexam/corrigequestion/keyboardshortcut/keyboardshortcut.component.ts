@@ -7,7 +7,7 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, Sign
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { IKeyBoardShortCutPreferenceEntry, KeyboardShortcutService } from 'app/scanexam/preference-page/keyboardshortcut.service';
-import { KeyboardShortcutsComponent, ShortcutInput } from 'ng-keyboard-shortcuts';
+import { KeyboardShortcutsComponent, ShortcutInput, KeyboardShortcutsModule } from 'ng-keyboard-shortcuts';
 import { IGradedComment } from '../../../entities/graded-comment/graded-comment.model';
 import { ITextComment } from '../../../entities/text-comment/text-comment.model';
 import { IHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-graded-comment.model';
@@ -16,6 +16,8 @@ import { IHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-
   selector: 'jhi-keyboardshortcut',
   templateUrl: './keyboardshortcut.component.html',
   styleUrls: ['./keyboardshortcut.component.scss'],
+  standalone: true,
+  imports: [KeyboardShortcutsModule],
 })
 export class KeyboardshortcutComponent implements AfterViewInit {
   @ViewChild('input') input: ElementRef | undefined;

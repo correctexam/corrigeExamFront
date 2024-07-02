@@ -5,6 +5,7 @@ import { debounceTime } from 'rxjs/operators';
 @Directive({
   // eslint-disable-next-line @angular-eslint/directive-selector
   selector: '[click.single],[click.double]',
+  standalone: true,
 })
 export class ClickDoubleDirective implements OnInit, OnDestroy {
   @Input() debounceTime = 300;

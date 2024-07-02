@@ -1,11 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { IFinalResult } from '../final-result.model';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { AlertComponent } from '../../../shared/alert/alert.component';
+import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'jhi-final-result-detail',
   templateUrl: './final-result-detail.component.html',
+  standalone: true,
+  imports: [NgIf, TranslateDirective, AlertErrorComponent, AlertComponent, RouterLink, FaIconComponent],
 })
 export class FinalResultDetailComponent implements OnInit {
   finalResult: IFinalResult | null = null;

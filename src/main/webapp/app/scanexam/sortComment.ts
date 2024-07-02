@@ -8,6 +8,7 @@ import { IHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-
 @Pipe({
   name: 'commentsort',
   pure: false,
+  standalone: true,
 })
 export class CommentSortPipe implements PipeTransform {
   constructor(public preferenceService: PreferenceService) {}

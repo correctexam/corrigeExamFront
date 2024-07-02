@@ -1,13 +1,18 @@
 import { Component, ViewChild, OnInit, AfterViewInit, ElementRef, NgZone } from '@angular/core';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { UntypedFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 
 import { LoginService } from 'app/login/login.service';
 import { AccountService } from 'app/core/auth/account.service';
+import { TranslateModule } from '@ngx-translate/core';
+import { NgIf } from '@angular/common';
+import { TranslateDirective } from '../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-login',
   templateUrl: './login.component.html',
+  standalone: true,
+  imports: [TranslateDirective, NgIf, FormsModule, ReactiveFormsModule, RouterLink, TranslateModule],
 })
 export class LoginComponent implements OnInit, AfterViewInit {
   @ViewChild('username', { static: false })

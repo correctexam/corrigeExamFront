@@ -1,18 +1,40 @@
 import { Component, NgZone, OnInit } from '@angular/core';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { combineLatest } from 'rxjs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 
 import { ICourseGroup } from '../course-group.model';
 
 import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/config/pagination.constants';
 import { CourseGroupService } from '../service/course-group.service';
 import { CourseGroupDeleteDialogComponent } from '../delete/course-group-delete-dialog.component';
+import { ItemCountComponent } from '../../../shared/pagination/item-count.component';
+import { SortByDirective } from '../../../shared/sort/sort-by.directive';
+import { SortDirective } from '../../../shared/sort/sort.directive';
+import { NgIf, NgFor } from '@angular/common';
+import { AlertComponent } from '../../../shared/alert/alert.component';
+import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-course-group',
   templateUrl: './course-group.component.html',
+  standalone: true,
+  imports: [
+    TranslateDirective,
+    FaIconComponent,
+    RouterLink,
+    AlertErrorComponent,
+    AlertComponent,
+    NgIf,
+    SortDirective,
+    SortByDirective,
+    NgFor,
+    ItemCountComponent,
+    NgbPagination,
+  ],
 })
 export class CourseGroupComponent implements OnInit {
   courseGroups?: ICourseGroup[];
@@ -29,7 +51,7 @@ export class CourseGroupComponent implements OnInit {
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
     protected modalService: NgbModal,
-    private zone: NgZone
+    private zone: NgZone,
   ) {}
 
   loadPage(page?: number, dontNavigate?: boolean): void {

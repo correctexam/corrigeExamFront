@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 
@@ -10,10 +10,16 @@ import { IComments, Comments } from '../comments.model';
 import { CommentsService } from '../service/comments.service';
 import { IStudentResponse } from 'app/entities/student-response/student-response.model';
 import { StudentResponseService } from 'app/entities/student-response/service/student-response.service';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { NgFor } from '@angular/common';
+import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-comments-update',
   templateUrl: './comments-update.component.html',
+  standalone: true,
+  imports: [FormsModule, ReactiveFormsModule, TranslateDirective, AlertErrorComponent, NgFor, FaIconComponent],
 })
 export class CommentsUpdateComponent implements OnInit {
   isSaving = false;
@@ -25,7 +31,7 @@ export class CommentsUpdateComponent implements OnInit {
     protected commentsService: CommentsService,
     protected studentResponseService: StudentResponseService,
     protected activatedRoute: ActivatedRoute,
-    private fb: UntypedFormBuilder
+    private fb: UntypedFormBuilder,
   ) {
     this.editForm = this.fb.group({
       id: [],
@@ -79,7 +85,7 @@ export class CommentsUpdateComponent implements OnInit {
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IComments>>): void {
     result.subscribe(
       () => this.onSaveSuccess(),
-      () => this.onSaveError()
+      () => this.onSaveError(),
     );
   }
 

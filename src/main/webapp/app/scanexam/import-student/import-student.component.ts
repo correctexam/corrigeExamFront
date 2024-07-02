@@ -3,15 +3,30 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { DataUtils } from 'app/core/util/data-util.service';
 import { ICourse } from 'app/entities/course/course.model';
 import { CourseService } from 'app/entities/course/service/course.service';
 import { IStudent } from 'app/entities/student/student.model';
 import FileSaver from 'file-saver';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService, PrimeTemplate } from 'primeng/api';
 import type { FileUpload, FileUploadHandlerEvent } from 'primeng/fileupload';
+import { InplaceModule } from 'primeng/inplace';
+import { TableModule } from 'primeng/table';
+import { Button } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormsModule } from '@angular/forms';
+import { DialogModule } from 'primeng/dialog';
+import { TooltipModule } from 'primeng/tooltip';
+import { TranslateDirective } from '../../shared/language/translate.directive';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { MessageModule } from 'primeng/message';
+import { NgIf, NgClass, NgFor } from '@angular/common';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { BlockUIModule } from 'primeng/blockui';
+import { ToastModule } from 'primeng/toast';
 
 /**
  * Used to type to data spreadsheet
@@ -36,6 +51,28 @@ interface MDWStudent {
   templateUrl: './import-student.component.html',
   styleUrls: ['./import-student.component.scss'],
   providers: [MessageService, ConfirmationService],
+  standalone: true,
+  imports: [
+    ToastModule,
+    BlockUIModule,
+    ProgressSpinnerModule,
+    ConfirmDialogModule,
+    NgIf,
+    MessageModule,
+    FaIconComponent,
+    TranslateDirective,
+    TooltipModule,
+    NgClass,
+    DialogModule,
+    FormsModule,
+    InputTextModule,
+    Button,
+    TableModule,
+    PrimeTemplate,
+    NgFor,
+    InplaceModule,
+    TranslateModule,
+  ],
 })
 export class ImportStudentComponent implements OnInit {
   protected firstLine: Std = this.emptyStd();
@@ -88,8 +125,12 @@ export class ImportStudentComponent implements OnInit {
   /**
    * Loads an MDW file as a student list.
    */
-  protected loadMDWFile(event: FileUploadHandlerEvent, form: FileUpload): void {
+  protected loadMDWFile(_event: unknown, _form: unknown): void {
     // Loading the file
+
+    const event = _event as FileUploadHandlerEvent;
+    const form = _form as FileUpload;
+
     this.dataService.loadFile(event.files[0], result => {
       if (typeof result === 'object') {
         // Loading the sheet lib
@@ -119,7 +160,10 @@ export class ImportStudentComponent implements OnInit {
     form.clear();
   }
 
-  protected loadPegaseFile(event: FileUploadHandlerEvent, form: FileUpload): void {
+  protected loadPegaseFile(_event: unknown, _form: unknown): void {
+    const event = _event as FileUploadHandlerEvent;
+    const form = _form as FileUpload;
+
     this.dataService.loadCSVFile(event.files[0], ';', data => {
       const colID = data[0].indexOf('CODE_APPRENANT');
       const colNom = data[0].indexOf('NOM_FAMILLE');

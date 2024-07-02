@@ -1,8 +1,8 @@
 import { Component, NgZone, OnInit } from '@angular/core';
 import { HttpHeaders } from '@angular/common/http';
-import { ActivatedRoute, Data, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, Data, ParamMap, Router, RouterLink } from '@angular/router';
 import { combineLatest, filter, Observable, switchMap, tap } from 'rxjs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 
 import { IHybridGradedComment } from '../hybrid-graded-comment.model';
 
@@ -11,6 +11,13 @@ import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { EntityArrayResponseType, HybridGradedCommentService } from '../service/hybrid-graded-comment.service';
 import { HybridGradedCommentDeleteDialogComponent } from '../delete/hybrid-graded-comment-delete-dialog.component';
 import { DataUtils } from 'app/core/util/data-util.service';
+import { NgFor, NgIf } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertErrorComponent } from 'app/shared/alert/alert-error.component';
+import { ItemCountComponent } from 'app/shared/pagination/item-count.component';
+import { AlertComponent } from 'app/shared/alert/alert.component';
+import { SortDirective } from 'app/shared/sort/sort.directive';
 
 export const ITEM_DELETED_EVENT = 'deleted';
 export const ASC = 'asc';
@@ -22,6 +29,21 @@ export const TOTAL_COUNT_RESPONSE_HEADER = 'X-Total-Count';
 export const PAGE_HEADER = 'page';
 
 @Component({
+  standalone: true,
+  imports: [
+    FontAwesomeModule,
+    NgFor,
+    AlertErrorComponent,
+    NgIf,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterLink,
+    ItemCountComponent,
+    NgbPagination,
+    AlertComponent,
+    SortDirective,
+  ],
+
   selector: 'jhi-hybrid-graded-comment',
   templateUrl: './hybrid-graded-comment.component.html',
 })

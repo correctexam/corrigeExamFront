@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-duplicate-type-constituents */
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */

@@ -2,11 +2,19 @@
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 import { Component, OnInit } from '@angular/core';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { TranslateModule } from '@ngx-translate/core';
+import { TooltipModule } from 'primeng/tooltip';
+import { CheckboxModule } from 'primeng/checkbox';
+import { FormsModule } from '@angular/forms';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-partial-align-modal',
   templateUrl: './partial-align-modal.component.html',
   styleUrls: ['./partial-align-modal.component.scss'],
+  standalone: true,
+  imports: [TranslateDirective, InputNumberModule, FormsModule, CheckboxModule, TooltipModule, TranslateModule],
 })
 export class PartialAlignModalComponent implements OnInit {
   startPage = 1;

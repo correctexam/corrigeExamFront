@@ -2,10 +2,18 @@ import { Component, OnInit } from '@angular/core';
 
 import { Log, LoggersResponse, Level } from './log.model';
 import { LogsService } from './logs.service';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { SortByDirective } from '../../shared/sort/sort-by.directive';
+import { SortDirective } from '../../shared/sort/sort.directive';
+import { FormsModule } from '@angular/forms';
+import { TranslateDirective } from '../../shared/language/translate.directive';
+import { NgIf, NgFor, NgClass, SlicePipe } from '@angular/common';
 
 @Component({
   selector: 'jhi-logs',
   templateUrl: './logs.component.html',
+  standalone: true,
+  imports: [NgIf, TranslateDirective, FormsModule, SortDirective, SortByDirective, FaIconComponent, NgFor, NgClass, SlicePipe],
 })
 export class LogsComponent implements OnInit {
   loggers?: Log[];
@@ -26,7 +34,7 @@ export class LogsComponent implements OnInit {
 
   filterAndSort(): void {
     this.filteredAndOrderedLoggers = this.loggers!.filter(
-      logger => !this.filter || logger.name.toLowerCase().includes(this.filter.toLowerCase())
+      logger => !this.filter || logger.name.toLowerCase().includes(this.filter.toLowerCase()),
     ).sort((a, b) => {
       if (a[this.orderProp] < b[this.orderProp]) {
         return this.ascending ? -1 : 1;

@@ -5,11 +5,17 @@ import { Component, OnInit } from '@angular/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { UserService } from '../../entities/user/user.service';
+import { TranslateModule } from '@ngx-translate/core';
+import { NgIf } from '@angular/common';
+import { PrimeTemplate } from 'primeng/api';
+import { PickListModule } from 'primeng/picklist';
 
 @Component({
   selector: 'jhi-sharecourse',
   templateUrl: './sharecourse.component.html',
   styleUrls: ['./sharecourse.component.scss'],
+  standalone: true,
+  imports: [PickListModule, PrimeTemplate, NgIf, TranslateModule],
 })
 export class SharecourseComponent implements OnInit {
   courseid = '';
@@ -22,7 +28,7 @@ export class SharecourseComponent implements OnInit {
     public config: DynamicDialogConfig,
     private userService: UserService,
     protected applicationConfigService: ApplicationConfigService,
-    private http: HttpClient
+    private http: HttpClient,
   ) {}
 
   ngOnInit(): void {

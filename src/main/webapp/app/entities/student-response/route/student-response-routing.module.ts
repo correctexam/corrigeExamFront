@@ -1,5 +1,4 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { StudentResponseComponent } from '../list/student-response.component';
@@ -7,7 +6,7 @@ import { StudentResponseDetailComponent } from '../detail/student-response-detai
 import { StudentResponseUpdateComponent } from '../update/student-response-update.component';
 import { StudentResponseRoutingResolveService } from './student-response-routing-resolve.service';
 
-const studentResponseRoute: Routes = [
+export const studentResponseRoute: Routes = [
   {
     path: '',
     component: StudentResponseComponent,
@@ -51,9 +50,3 @@ const studentResponseRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
 ];
-
-@NgModule({
-  imports: [RouterModule.forChild(studentResponseRoute)],
-  exports: [RouterModule],
-})
-export class StudentResponseRoutingModule {}
