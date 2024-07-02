@@ -1018,6 +1018,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
 
+  setNoteZero() {
+    this.currentNote = 0;
+    this.changeNote();
+  }
+
   changeNote(): void {
     if (this.resp !== undefined && !this.blocked) {
       this.blocked = true;
@@ -1086,6 +1091,22 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.blocked = false;
         this.resp = sr1.body!;
       });
+    }
+  }
+  updateWorstStar() {
+    if (this.resp !== undefined) {
+      if (this.resp.worststar) {
+        this.resp.star = false;
+      }
+      this.updateResponse();
+    }
+  }
+  updateStar() {
+    if (this.resp !== undefined) {
+      if (this.resp.star) {
+        this.resp.worststar = false;
+      }
+      this.updateResponse();
     }
   }
 

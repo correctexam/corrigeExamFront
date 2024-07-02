@@ -494,6 +494,11 @@
     "zenviewTooltip": "Allows you to have a view with less widgets so that you can focus on the correction (you can use the keyboard shortcuts, the list is available using F1).",
     "forceedit": "Force editing of question properties",
     "forceeditTooltip": "This allows you to force the editing of the properties of the current question, ⚠️ You have made corrections for this question, it is not recommended to change these properties during correction, it is better to migrate your correction mode to hybrid mode (this offers more flexibility in updating the scale during correction).",
-    "clickbuttonsauveretudiant": "⚠️: Don't forget to click on 'Save student list'."
+    "clickbuttonsauveretudiant": "⚠️: Don't forget to click on 'Save student list'.",
+    "gotonextquestion": "In horizontal correction, switches to the first exam sheet for the next question",
+    "gotonextstudent": "In vertical correction, switches to the first question for the next exam sheet (student)",
+    "gotopreviousquestion": "In horizontal correction, switches to the last exam sheet for the previous question",
+    "gotopreviousstudent": "In vertical correction, switches to the last question for the previous exam sheet (student)",
+    "startcorrect": "Let's go"
   }
 }

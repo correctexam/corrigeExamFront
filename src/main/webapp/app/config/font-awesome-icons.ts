@@ -55,6 +55,11 @@ import {
   faAlignLeft,
   faEdit,
   faLink,
+  faAngleRight,
+  faAngleDoubleRight,
+  faAngleLeft,
+  faAngleDoubleLeft,
+  fa0,
 
   // jhipster-needle-add-icon-import
 } from '@fortawesome/free-solid-svg-icons';
@@ -116,5 +121,11 @@ export const fontAwesomeIcons = [
   faAlignLeft,
   faEdit,
   faLink,
+  faAngleRight,
+  faAngleDoubleRight,
+  faAngleLeft,
+  faAngleDoubleLeft,
+  fa0,
+
   // jhipster-needle-add-icon-import
 ];
