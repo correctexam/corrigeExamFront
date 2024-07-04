@@ -5,22 +5,21 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AlertService } from 'app/core/util/alert.service';
 
 import { AlertComponent } from './alert.component';
+import { describe, expect } from '@jest/globals';
 
 describe('Alert Component', () => {
   let comp: AlertComponent;
   let fixture: ComponentFixture<AlertComponent>;
   let mockAlertService: AlertService;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [AlertComponent],
-        providers: [AlertService],
-      })
-        .overrideTemplate(AlertComponent, '')
-        .compileComponents();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [AlertComponent],
+      providers: [AlertService],
     })
-  );
+      .overrideTemplate(AlertComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(AlertComponent);

@@ -1,10 +1,13 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { ITextComment, TextComment } from '../text-comment.model';
 
 import { TextCommentService } from './text-comment.service';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
 
 describe('TextComment Service', () => {
   let service: TextCommentService;
@@ -14,7 +17,8 @@ describe('TextComment Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     });
     expectedResult = null;
     service = TestBed.inject(TextCommentService);
@@ -36,7 +40,7 @@ describe('TextComment Service', () => {
 
       const req = httpMock.expectOne({ method: 'GET' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(elemDefault);
+      expect(expectedResult).toMatchSnapshot(elemDefault);
     });
 
     it('should create a TextComment', () => {
@@ -44,7 +48,7 @@ describe('TextComment Service', () => {
         {
           id: 0,
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);
@@ -53,7 +57,7 @@ describe('TextComment Service', () => {
 
       const req = httpMock.expectOne({ method: 'POST' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should update a TextComment', () => {
@@ -63,7 +67,7 @@ describe('TextComment Service', () => {
           text: 'BBBBBB',
           zonegeneratedid: 'BBBBBB',
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);
@@ -72,7 +76,7 @@ describe('TextComment Service', () => {
 
       const req = httpMock.expectOne({ method: 'PUT' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should partial update a TextComment', () => {
@@ -81,7 +85,7 @@ describe('TextComment Service', () => {
           text: 'BBBBBB',
           zonegeneratedid: 'BBBBBB',
         },
-        new TextComment()
+        new TextComment(),
       );
 
       const returnedFromService = Object.assign(patchObject, elemDefault);
@@ -92,7 +96,7 @@ describe('TextComment Service', () => {
 
       const req = httpMock.expectOne({ method: 'PATCH' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should return a list of TextComment', () => {
@@ -103,7 +107,7 @@ describe('TextComment Service', () => {
           description: 'BBBBBB',
           zonegeneratedid: 'BBBBBB',
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);

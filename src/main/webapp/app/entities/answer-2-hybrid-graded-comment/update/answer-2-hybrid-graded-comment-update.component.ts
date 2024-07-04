@@ -15,6 +15,7 @@ import { StudentResponseService } from 'app/entities/student-response/service/st
 @Component({
   selector: 'jhi-answer-2-hybrid-graded-comment-update',
   templateUrl: './answer-2-hybrid-graded-comment-update.component.html',
+  standalone: true,
 })
 export class Answer2HybridGradedCommentUpdateComponent implements OnInit {
   isSaving = false;

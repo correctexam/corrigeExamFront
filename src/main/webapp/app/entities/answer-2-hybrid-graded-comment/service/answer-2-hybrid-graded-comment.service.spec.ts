@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { IAnswer2HybridGradedComment } from '../answer-2-hybrid-graded-comment.model';
 import {
@@ -10,6 +11,7 @@ import {
 } from '../answer-2-hybrid-graded-comment.test-samples';
 
 import { Answer2HybridGradedCommentService } from './answer-2-hybrid-graded-comment.service';
+import { provideHttpClient } from '@angular/common/http';
 
 const requireRestSample: IAnswer2HybridGradedComment = {
   ...sampleWithRequiredData,
@@ -22,7 +24,8 @@ describe('Answer2HybridGradedComment Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
     expectedResult = null;
     service = TestBed.inject(Answer2HybridGradedCommentService);
@@ -38,7 +41,7 @@ describe('Answer2HybridGradedComment Service', () => {
 
       const req = httpMock.expectOne({ method: 'GET' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should create a Answer2HybridGradedComment', () => {
@@ -51,7 +54,7 @@ describe('Answer2HybridGradedComment Service', () => {
 
       const req = httpMock.expectOne({ method: 'POST' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should update a Answer2HybridGradedComment', () => {
@@ -63,7 +66,7 @@ describe('Answer2HybridGradedComment Service', () => {
 
       const req = httpMock.expectOne({ method: 'PUT' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should partial update a Answer2HybridGradedComment', () => {
@@ -75,7 +78,7 @@ describe('Answer2HybridGradedComment Service', () => {
 
       const req = httpMock.expectOne({ method: 'PATCH' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should return a list of Answer2HybridGradedComment', () => {
@@ -88,7 +91,7 @@ describe('Answer2HybridGradedComment Service', () => {
       const req = httpMock.expectOne({ method: 'GET' });
       req.flush([returnedFromService]);
       httpMock.verify();
-      expect(expectedResult).toMatchObject([expected]);
+      expect(expectedResult).toMatchSnapshot([expected]);
     });
 
     it('should delete a Answer2HybridGradedComment', () => {

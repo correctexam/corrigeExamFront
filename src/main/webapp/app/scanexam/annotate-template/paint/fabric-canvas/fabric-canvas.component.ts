@@ -1,7 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/member-ordering */
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { NgxExtendedPdfViewerService, PageRenderedEvent, ScrollModeType, NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+import { Component, Inject, Input, OnDestroy, OnInit } from '@angular/core';
+import {
+  NgxExtendedPdfViewerService,
+  PageRenderedEvent,
+  ScrollModeType,
+  NgxExtendedPdfViewerModule,
+  PDFNotificationService,
+  TextLayerRenderedEvent,
+} from 'ngx-extended-pdf-viewer';
 import { EventHandlerService } from '../event-handler.service';
 import { DrawingTools } from '../models';
 // import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
@@ -19,7 +26,7 @@ import { PreferenceService } from 'app/scanexam/preference-page/preference.servi
 //  suppressScrollX: true,
 // };
 import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer';
-import { NgIf } from '@angular/common';
+import { DOCUMENT, NgIf } from '@angular/common';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { SummaryTemplateComponent } from '../../summary/summary-template.component';
@@ -64,9 +71,12 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
     private examService: ExamService,
     private preferenceService: PreferenceService,
     private pdfViewerService: NgxExtendedPdfViewerService,
+    private pdfNotificationService: PDFNotificationService,
+    @Inject(DOCUMENT) private document: Document,
   ) {
     //    pdfDefaultOptions.assetsFolder = 'bleeding-edge';
     pdfDefaultOptions.defaultCacheSize = 100;
+    //    pdfDefaultOptions.textLayerMode = 0;
   }
   ngOnDestroy(): void {
     this.content = null;
@@ -84,47 +94,47 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
       this.numeroEvent.subscribe(numero => {
         this.eventHandler.addQuestion(parseInt(numero, 10));
       });
-
-      if (this.exam.namezoneId !== undefined) {
-        this.zoneService.find(this.exam.namezoneId).subscribe(z => {
-          const ezone = z.body as CustomZone;
-          ezone.type = DrawingTools.NOMBOX;
-          this.renderZone(ezone);
-        });
-      }
-      if (this.exam.firstnamezoneId !== undefined) {
-        this.zoneService.find(this.exam.firstnamezoneId).subscribe(z => {
-          const ezone = z.body as CustomZone;
-          ezone.type = DrawingTools.PRENOMBOX;
-          this.renderZone(ezone);
-        });
-      }
-      if (this.exam.idzoneId !== undefined) {
-        this.zoneService.find(this.exam.idzoneId).subscribe(z => {
-          const ezone = z.body as CustomZone;
-          ezone.type = DrawingTools.INEBOX;
-          this.renderZone(ezone);
-        });
-      }
-      this.questionService.query({ examId: this.exam.id! }).subscribe(qs => {
-        if (qs.body?.length !== undefined && qs.body?.length > 0) {
-          qs.body?.forEach(q => {
-            if (q.id !== undefined) {
-              this.eventHandler.questions.set(q.id, q);
-            }
-
-            this.zoneService.find(q.zoneId!).subscribe(z => {
-              const ezone = z.body as CustomZone;
-              ezone.type = DrawingTools.QUESTIONBOX;
-              this.renderZone(ezone);
-            });
-          });
-          this.processpdf = true;
-        } else {
-          this.processpdf = true;
-        }
+      //      this.pdfNotificationService.onPDFJSInit.subscribe(()=> {
+      this.endInit().then(() => {
+        this.processpdf = true;
+        //      });
       });
     });
+  }
+
+  private async endInit(): Promise<void> {
+    if (this.exam.namezoneId !== undefined) {
+      const z = await firstValueFrom(this.zoneService.find(this.exam.namezoneId));
+      const ezone = z.body as CustomZone;
+      ezone.type = DrawingTools.NOMBOX;
+      this.renderZone(ezone);
+      // });
+    }
+    if (this.exam.firstnamezoneId !== undefined) {
+      const z = await firstValueFrom(this.zoneService.find(this.exam.firstnamezoneId));
+      const ezone = z.body as CustomZone;
+      ezone.type = DrawingTools.PRENOMBOX;
+      this.renderZone(ezone);
+    }
+    if (this.exam.idzoneId !== undefined) {
+      const z = await firstValueFrom(this.zoneService.find(this.exam.idzoneId));
+      const ezone = z.body as CustomZone;
+      ezone.type = DrawingTools.INEBOX;
+      this.renderZone(ezone);
+    }
+    const qs = await firstValueFrom(this.questionService.query({ examId: this.exam.id! }));
+
+    if (qs.body?.length !== undefined && qs.body?.length > 0) {
+      for (const q of qs.body) {
+        if (q.id !== undefined) {
+          this.eventHandler.questions.set(q.id, q);
+        }
+        const z = await firstValueFrom(this.zoneService.find(q.zoneId!));
+        const ezone = z.body as CustomZone;
+        ezone.type = DrawingTools.QUESTIONBOX;
+        this.renderZone(ezone);
+      }
+    }
   }
 
   private renderZone(zone: CustomZone): void {
@@ -140,7 +150,7 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
 
       // Requires to update the canvas for each page if the pdf contains metadata to process
       if (this.eventHandler.getCanvasForPage(page) === undefined) {
-        this.eventHandler.pages[page].updateCanvas(evt.source);
+        this.eventHandler.pages[page].updateCanvas(evt.source, this.document);
       }
       if (this.zones[page] !== undefined) {
         this.zones[page].forEach(z => {
@@ -168,7 +178,7 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
         this.loadingPdfMetadata(evt.source.scale);
       }
     } else {
-      this.eventHandler.pages[page].updateCanvas(evt.source);
+      this.eventHandler.pages[page].updateCanvas(evt.source, this.document);
 
       if (this.zones[page] !== undefined) {
         this.zones[page].forEach(z => {
@@ -202,6 +212,10 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
     if (this.pdfViewerService.isRenderQueueEmpty()) {
       this.blocked = false;
     }
+  }
+
+  foo(e: TextLayerRenderedEvent): void {
+    e.source.textLayer?.div.remove();
   }
 
   pageRender(): void {

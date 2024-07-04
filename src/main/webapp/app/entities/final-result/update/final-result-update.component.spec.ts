@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpResponse, provideHttpClient } from '@angular/common/http';
+import { HttpClientTestingModule, provideHttpClientTesting } from '@angular/common/http/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of, Subject, from } from 'rxjs';
 
@@ -26,9 +27,14 @@ describe('FinalResult Management Update Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule, RouterTestingModule.withRoutes([])],
-      declarations: [FinalResultUpdateComponent],
+      imports: [FinalResultUpdateComponent, ReactiveFormsModule, FormsModule],
+      declarations: [],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+
+        provideRouter([]),
+
         FormBuilder,
         {
           provide: ActivatedRoute,

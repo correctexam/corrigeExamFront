@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { describe, expect } from '@jest/globals';
 
 import { SummaryTemplateComponent } from './summary-template.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('SummaryTemplateComponent', () => {
   let component: SummaryTemplateComponent;
@@ -8,7 +10,7 @@ describe('SummaryTemplateComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [SummaryTemplateComponent],
+      imports: [SummaryTemplateComponent, TranslateModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SummaryTemplateComponent);

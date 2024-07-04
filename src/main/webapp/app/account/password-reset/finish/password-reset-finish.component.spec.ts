@@ -1,12 +1,14 @@
 import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed, inject, tick, fakeAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { describe, expect } from '@jest/globals';
 
 import { PasswordResetFinishComponent } from './password-reset-finish.component';
 import { PasswordResetFinishService } from './password-reset-finish.service';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('PasswordResetFinishComponent', () => {
   let fixture: ComponentFixture<PasswordResetFinishComponent>;
@@ -14,9 +16,12 @@ describe('PasswordResetFinishComponent', () => {
 
   beforeEach(() => {
     fixture = TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
-      declarations: [PasswordResetFinishComponent],
+      imports: [ReactiveFormsModule, FormsModule, PasswordResetFinishComponent],
+      declarations: [],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+
         FormBuilder,
         {
           provide: ActivatedRoute,
@@ -75,7 +80,7 @@ describe('PasswordResetFinishComponent', () => {
 
       expect(service.save).toHaveBeenCalledWith('XYZPDQ', 'password');
       expect(comp.success).toBe(true);
-    })
+    }),
   ));
 
   it('should notify of generic error', inject(
@@ -93,6 +98,6 @@ describe('PasswordResetFinishComponent', () => {
       expect(service.save).toHaveBeenCalledWith('XYZPDQ', 'password');
       expect(comp.success).toBe(false);
       expect(comp.error).toBe(true);
-    })
+    }),
   ));
 });

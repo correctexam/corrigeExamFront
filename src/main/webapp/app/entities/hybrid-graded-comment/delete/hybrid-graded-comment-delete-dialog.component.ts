@@ -31,7 +31,6 @@ export const ITEM_DELETED_EVENT = 'deleted';
     SortDirective,
     TranslateDirective,
   ],
-
   templateUrl: './hybrid-graded-comment-delete-dialog.component.html',
 })
 export class HybridGradedCommentDeleteDialogComponent {

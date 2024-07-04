@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ActivatedRoute } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpHeaders, HttpResponse, provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { ExamService } from '../service/exam.service';
@@ -16,9 +16,13 @@ describe('Exam Management Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule.withRoutes([{ path: 'exam', component: ExamComponent }]), HttpClientTestingModule],
-      declarations: [ExamComponent],
+      imports: [ExamComponent],
+      declarations: [],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+
+        provideRouter([{ path: 'exam', component: ExamComponent }]),
         {
           provide: ActivatedRoute,
           useValue: {
@@ -30,7 +34,7 @@ describe('Exam Management Component', () => {
                 page: '1',
                 size: '1',
                 sort: 'id,desc',
-              })
+              }),
             ),
           },
         },
@@ -49,8 +53,8 @@ describe('Exam Management Component', () => {
         new HttpResponse({
           body: [{ id: 123 }],
           headers,
-        })
-      )
+        }),
+      ),
     );
   });
 

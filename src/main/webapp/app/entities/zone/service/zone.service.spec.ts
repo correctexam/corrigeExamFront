@@ -1,10 +1,13 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { IZone, Zone } from '../zone.model';
 
 import { ZoneService } from './zone.service';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
 
 describe('Zone Service', () => {
   let service: ZoneService;
@@ -14,7 +17,8 @@ describe('Zone Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     });
     expectedResult = null;
     service = TestBed.inject(ZoneService);
@@ -38,7 +42,7 @@ describe('Zone Service', () => {
 
       const req = httpMock.expectOne({ method: 'GET' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(elemDefault);
+      expect(expectedResult).toMatchSnapshot(elemDefault);
     });
 
     it('should create a Zone', () => {
@@ -46,7 +50,7 @@ describe('Zone Service', () => {
         {
           id: 0,
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);
@@ -55,7 +59,7 @@ describe('Zone Service', () => {
 
       const req = httpMock.expectOne({ method: 'POST' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should update a Zone', () => {
@@ -68,7 +72,7 @@ describe('Zone Service', () => {
           width: 1,
           height: 1,
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);
@@ -77,7 +81,7 @@ describe('Zone Service', () => {
 
       const req = httpMock.expectOne({ method: 'PUT' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should partial update a Zone', () => {
@@ -91,7 +95,7 @@ describe('Zone Service', () => {
 
       const req = httpMock.expectOne({ method: 'PATCH' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should return a list of Zone', () => {
@@ -104,7 +108,7 @@ describe('Zone Service', () => {
           width: 1,
           height: 1,
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);

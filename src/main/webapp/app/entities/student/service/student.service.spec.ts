@@ -1,10 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { IStudent, Student } from '../student.model';
 
 import { StudentService } from './student.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('Student Service', () => {
   let service: StudentService;
@@ -14,7 +16,8 @@ describe('Student Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
     expectedResult = null;
     service = TestBed.inject(StudentService);
@@ -38,7 +41,7 @@ describe('Student Service', () => {
 
       const req = httpMock.expectOne({ method: 'GET' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(elemDefault);
+      expect(expectedResult).toMatchSnapshot(elemDefault);
     });
 
     it('should create a Student', () => {
@@ -46,7 +49,7 @@ describe('Student Service', () => {
         {
           id: 0,
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);
@@ -55,7 +58,7 @@ describe('Student Service', () => {
 
       const req = httpMock.expectOne({ method: 'POST' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should update a Student', () => {
@@ -68,7 +71,7 @@ describe('Student Service', () => {
           caslogin: 'BBBBBB',
           mail: 'BBBBBB',
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);
@@ -77,7 +80,7 @@ describe('Student Service', () => {
 
       const req = httpMock.expectOne({ method: 'PUT' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should partial update a Student', () => {
@@ -86,7 +89,7 @@ describe('Student Service', () => {
           name: 'BBBBBB',
           mail: 'BBBBBB',
         },
-        new Student()
+        new Student(),
       );
 
       const returnedFromService = Object.assign(patchObject, elemDefault);
@@ -97,7 +100,7 @@ describe('Student Service', () => {
 
       const req = httpMock.expectOne({ method: 'PATCH' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should return a list of Student', () => {
@@ -110,7 +113,7 @@ describe('Student Service', () => {
           caslogin: 'BBBBBB',
           mail: 'BBBBBB',
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);

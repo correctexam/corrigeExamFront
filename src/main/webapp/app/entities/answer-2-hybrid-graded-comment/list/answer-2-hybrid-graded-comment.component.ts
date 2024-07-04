@@ -20,6 +20,7 @@ import {
 @Component({
   selector: 'jhi-answer-2-hybrid-graded-comment',
   templateUrl: './answer-2-hybrid-graded-comment.component.html',
+  standalone: true,
 })
 export class Answer2HybridGradedCommentComponent implements OnInit {
   answer2HybridGradedComments?: IAnswer2HybridGradedComment[];

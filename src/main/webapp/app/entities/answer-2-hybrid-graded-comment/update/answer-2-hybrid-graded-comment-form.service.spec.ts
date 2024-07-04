@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { describe, expect } from '@jest/globals';
 
 import { sampleWithRequiredData, sampleWithNewData } from '../answer-2-hybrid-graded-comment.test-samples';
 
@@ -48,7 +49,7 @@ describe('Answer2HybridGradedComment Form Service', () => {
 
         const answer2HybridGradedComment = service.getAnswer2HybridGradedComment(formGroup) as any;
 
-        expect(answer2HybridGradedComment).toMatchObject(sampleWithNewData);
+        expect(answer2HybridGradedComment).toMatchSnapshot(sampleWithNewData);
       });
 
       it('should return NewAnswer2HybridGradedComment for empty Answer2HybridGradedComment initial value', () => {
@@ -56,7 +57,7 @@ describe('Answer2HybridGradedComment Form Service', () => {
 
         const answer2HybridGradedComment = service.getAnswer2HybridGradedComment(formGroup) as any;
 
-        expect(answer2HybridGradedComment).toMatchObject({});
+        expect(answer2HybridGradedComment).toMatchSnapshot({});
       });
 
       it('should return IAnswer2HybridGradedComment', () => {
@@ -64,7 +65,7 @@ describe('Answer2HybridGradedComment Form Service', () => {
 
         const answer2HybridGradedComment = service.getAnswer2HybridGradedComment(formGroup) as any;
 
-        expect(answer2HybridGradedComment).toMatchObject(sampleWithRequiredData);
+        expect(answer2HybridGradedComment).toMatchObject(sampleWithRequiredData as any);
       });
     });
 

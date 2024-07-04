@@ -1,17 +1,19 @@
 jest.mock('app/core/auth/account.service');
 jest.mock('app/login/login.service');
+import { describe, expect } from '@jest/globals';
 
 import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Router, Navigation } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import { Router, Navigation, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
 import { AccountService } from 'app/core/auth/account.service';
 
 import { LoginService } from './login.service';
 import { LoginComponent } from './login.component';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('LoginComponent', () => {
   let comp: LoginComponent;
@@ -20,26 +22,27 @@ describe('LoginComponent', () => {
   let mockAccountService: AccountService;
   let mockLoginService: LoginService;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [ReactiveFormsModule, FormsModule, RouterTestingModule.withRoutes([])],
-        declarations: [LoginComponent],
-        providers: [
-          FormBuilder,
-          AccountService,
-          {
-            provide: LoginService,
-            useValue: {
-              login: jest.fn(() => of({})),
-            },
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule, FormsModule, LoginComponent],
+      declarations: [],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([]),
+        FormBuilder,
+        AccountService,
+        {
+          provide: LoginService,
+          useValue: {
+            login: jest.fn(() => of({})),
           },
-        ],
-      })
-        .overrideTemplate(LoginComponent, '')
-        .compileComponents();
+        },
+      ],
     })
-  );
+      .overrideTemplate(LoginComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(LoginComponent);

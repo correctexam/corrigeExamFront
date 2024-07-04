@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { describe, expect } from '@jest/globals';
 
 import { QuestionpropertiesviewComponent } from './questionpropertiesview.component';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FabricShapeService } from '../shape.service';
 import { TranslateModule } from '@ngx-translate/core';
@@ -15,7 +15,7 @@ import { Observable, Subject, of } from 'rxjs';
 import { IQuestion } from 'app/entities/question/question.model';
 import { setImmediate } from 'timers';
 import { QuestionService } from 'app/entities/question/service/question.service';
-import { HttpResponse } from '@angular/common/http';
+import { HttpResponse, provideHttpClient } from '@angular/common/http';
 import { DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { ListboxModule } from 'primeng/listbox';
@@ -29,6 +29,8 @@ import { MessageModule } from 'primeng/message';
 import { InputTextModule } from 'primeng/inputtext';
 import { KeyFilterModule } from 'primeng/keyfilter';
 import { MockComponent, ngMocks, MockProvider } from 'ng-mocks';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
 
 const flushPromises = (): Promise<void> => new Promise(resolve => setImmediate(resolve));
 
@@ -53,9 +55,10 @@ describe('QuestionpropertiesviewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [QuestionpropertiesviewComponent, MockComponent(CreateCommentsComponent), AlertErrorComponent],
+      declarations: [MockComponent(CreateCommentsComponent)],
       imports: [
-        HttpClientTestingModule,
+        QuestionpropertiesviewComponent,
+        AlertErrorComponent,
         ReactiveFormsModule,
         FormsModule,
         TranslateModule.forRoot(),
@@ -69,6 +72,9 @@ describe('QuestionpropertiesviewComponent', () => {
         KeyFilterModule,
       ],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([]),
         FabricShapeService,
         MockProvider(EventHandlerService),
         MockProvider(LocalStorageService),

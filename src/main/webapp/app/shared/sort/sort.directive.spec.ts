@@ -1,5 +1,6 @@
 import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { describe, expect } from '@jest/globals';
 import { By } from '@angular/platform-browser';
 
 import { SortDirective } from './sort.directive';
@@ -12,6 +13,8 @@ import { SortDirective } from './sort.directive';
       </thead>
     </table>
   `,
+  standalone: true,
+  imports: [SortDirective],
 })
 class TestSortDirectiveComponent {
   predicate?: string;
@@ -26,7 +29,7 @@ describe('Directive: SortDirective', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [TestSortDirectiveComponent, SortDirective],
+      imports: [TestSortDirectiveComponent, SortDirective],
     });
     fixture = TestBed.createComponent(TestSortDirectiveComponent);
     component = fixture.componentInstance;

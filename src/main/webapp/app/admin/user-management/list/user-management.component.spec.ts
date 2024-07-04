@@ -1,17 +1,17 @@
 jest.mock('app/core/auth/account.service');
 
 import { ComponentFixture, TestBed, waitForAsync, inject, fakeAsync, tick } from '@angular/core/testing';
-import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ActivatedRoute } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import { HttpHeaders, HttpResponse, provideHttpClient } from '@angular/common/http';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
+import { describe, expect } from '@jest/globals';
 
 import { UserManagementService } from '../service/user-management.service';
 import { User } from '../user-management.model';
 import { AccountService } from 'app/core/auth/account.service';
 
 import { UserManagementComponent } from './user-management.component';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('User Management Component', () => {
   let comp: UserManagementComponent;
@@ -26,20 +26,25 @@ describe('User Management Component', () => {
       page: '1',
       size: '1',
       sort: 'id,desc',
-    })
+    }),
   );
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule, RouterTestingModule.withRoutes([])],
-        declarations: [UserManagementComponent],
-        providers: [{ provide: ActivatedRoute, useValue: { data, queryParamMap } }, AccountService],
-      })
-        .overrideTemplate(UserManagementComponent, '')
-        .compileComponents();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [UserManagementComponent],
+      declarations: [],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+
+        provideRouter([]),
+        { provide: ActivatedRoute, useValue: { data, queryParamMap } },
+        AccountService,
+      ],
     })
-  );
+      .overrideTemplate(UserManagementComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(UserManagementComponent);
@@ -60,8 +65,8 @@ describe('User Management Component', () => {
             new HttpResponse({
               body: [new User(123)],
               headers,
-            })
-          )
+            }),
+          ),
         );
 
         // WHEN
@@ -71,7 +76,7 @@ describe('User Management Component', () => {
         // THEN
         expect(service.query).toHaveBeenCalled();
         expect(comp.users?.[0]).toEqual(expect.objectContaining({ id: 123 }));
-      })
+      }),
     ));
   });
 
@@ -87,8 +92,8 @@ describe('User Management Component', () => {
             new HttpResponse({
               body: [user],
               headers,
-            })
-          )
+            }),
+          ),
         );
         jest.spyOn(service, 'update').mockReturnValue(of(user));
 
@@ -100,7 +105,7 @@ describe('User Management Component', () => {
         expect(service.update).toHaveBeenCalledWith({ ...user, activated: true });
         expect(service.query).toHaveBeenCalled();
         expect(comp.users?.[0]).toEqual(expect.objectContaining({ id: 123 }));
-      })
+      }),
     ));
   });
 });

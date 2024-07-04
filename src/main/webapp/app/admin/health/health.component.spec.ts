@@ -1,28 +1,28 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpErrorResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 
 import { HealthComponent } from './health.component';
 import { HealthService } from './health.service';
 import { Health } from './health.model';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
 
 describe('HealthComponent', () => {
   let comp: HealthComponent;
   let fixture: ComponentFixture<HealthComponent>;
   let service: HealthService;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
-        declarations: [HealthComponent],
-      })
-        .overrideTemplate(HealthComponent, '')
-        .compileComponents();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule, FormsModule, HealthComponent],
+      declarations: [],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     })
-  );
+      .overrideTemplate(HealthComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(HealthComponent);

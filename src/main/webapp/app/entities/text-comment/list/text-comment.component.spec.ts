@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ActivatedRoute } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpHeaders, HttpResponse, provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { TextCommentService } from '../service/text-comment.service';
@@ -16,9 +16,13 @@ describe('TextComment Management Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule.withRoutes([{ path: 'text-comment', component: TextCommentComponent }]), HttpClientTestingModule],
-      declarations: [TextCommentComponent],
+      imports: [TextCommentComponent],
+      declarations: [],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+
+        provideRouter([{ path: 'text-comment', component: TextCommentComponent }]),
         {
           provide: ActivatedRoute,
           useValue: {
@@ -30,7 +34,7 @@ describe('TextComment Management Component', () => {
                 page: '1',
                 size: '1',
                 sort: 'id,desc',
-              })
+              }),
             ),
           },
         },
@@ -49,8 +53,8 @@ describe('TextComment Management Component', () => {
         new HttpResponse({
           body: [{ id: 123 }],
           headers,
-        })
-      )
+        }),
+      ),
     );
   });
 

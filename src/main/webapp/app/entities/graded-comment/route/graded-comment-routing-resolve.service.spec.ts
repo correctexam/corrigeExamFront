@@ -1,14 +1,14 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ActivatedRouteSnapshot, ActivatedRoute, Router, convertToParamMap } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpResponse, provideHttpClient } from '@angular/common/http';
+import { ActivatedRouteSnapshot, ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { IGradedComment, GradedComment } from '../graded-comment.model';
 import { GradedCommentService } from '../service/graded-comment.service';
 
 import { GradedCommentRoutingResolveService } from './graded-comment-routing-resolve.service';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('GradedComment routing resolve service', () => {
   let mockRouter: Router;
@@ -19,8 +19,11 @@ describe('GradedComment routing resolve service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, RouterTestingModule.withRoutes([])],
+      imports: [],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([]),
         {
           provide: ActivatedRoute,
           useValue: {

@@ -1,8 +1,8 @@
 jest.mock('@ng-bootstrap/ng-bootstrap');
 
 import { ComponentFixture, TestBed, inject, fakeAsync, tick } from '@angular/core/testing';
-import { HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpResponse, provideHttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -10,6 +10,7 @@ import { StudentResponseService } from '../service/student-response.service';
 
 import { StudentResponseDeleteDialogComponent } from './student-response-delete-dialog.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('StudentResponse Management Delete Component', () => {
   let comp: StudentResponseDeleteDialogComponent;
@@ -19,9 +20,9 @@ describe('StudentResponse Management Delete Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
-      declarations: [StudentResponseDeleteDialogComponent],
-      providers: [NgbActiveModal],
+      imports: [ReactiveFormsModule, FormsModule, StudentResponseDeleteDialogComponent],
+      declarations: [],
+      providers: [provideHttpClient(), provideHttpClientTesting(), NgbActiveModal],
     })
       .overrideTemplate(StudentResponseDeleteDialogComponent, '')
       .compileComponents();
@@ -45,7 +46,7 @@ describe('StudentResponse Management Delete Component', () => {
         // THEN
         expect(service.delete).toHaveBeenCalledWith(123);
         expect(mockActiveModal.close).toHaveBeenCalledWith('deleted');
-      })
+      }),
     ));
 
     it('Should not call delete service on clear', () => {

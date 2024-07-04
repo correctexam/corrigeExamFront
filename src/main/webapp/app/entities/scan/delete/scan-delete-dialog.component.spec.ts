@@ -1,8 +1,8 @@
 jest.mock('@ng-bootstrap/ng-bootstrap');
 
 import { ComponentFixture, TestBed, inject, fakeAsync, tick } from '@angular/core/testing';
-import { HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpResponse, provideHttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -10,6 +10,7 @@ import { ScanService } from '../service/scan.service';
 
 import { ScanDeleteDialogComponent } from './scan-delete-dialog.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('Scan Management Delete Component', () => {
   let comp: ScanDeleteDialogComponent;
@@ -19,9 +20,9 @@ describe('Scan Management Delete Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
-      declarations: [ScanDeleteDialogComponent],
-      providers: [NgbActiveModal],
+      imports: [ReactiveFormsModule, FormsModule, ScanDeleteDialogComponent],
+      declarations: [],
+      providers: [NgbActiveModal, provideHttpClient(), provideHttpClientTesting()],
     })
       .overrideTemplate(ScanDeleteDialogComponent, '')
       .compileComponents();
@@ -45,7 +46,7 @@ describe('Scan Management Delete Component', () => {
         // THEN
         expect(service.delete).toHaveBeenCalledWith(123);
         expect(mockActiveModal.close).toHaveBeenCalledWith('deleted');
-      })
+      }),
     ));
 
     it('Should not call delete service on clear', () => {

@@ -1,26 +1,25 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { HealthModalComponent } from './health-modal.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('HealthModalComponent', () => {
   let comp: HealthModalComponent;
   let fixture: ComponentFixture<HealthModalComponent>;
   let mockActiveModal: NgbActiveModal;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
-        declarations: [HealthModalComponent],
-        providers: [NgbActiveModal],
-      })
-        .overrideTemplate(HealthModalComponent, '')
-        .compileComponents();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule, FormsModule, HealthModalComponent],
+      declarations: [],
+      providers: [NgbActiveModal, provideHttpClient(), provideHttpClientTesting()],
     })
-  );
+      .overrideTemplate(HealthModalComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(HealthModalComponent);

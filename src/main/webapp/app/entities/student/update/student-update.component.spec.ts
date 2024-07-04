@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpResponse, provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of, Subject, from } from 'rxjs';
 
 import { StudentService } from '../service/student.service';
@@ -22,9 +22,13 @@ describe('Student Management Update Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule, RouterTestingModule.withRoutes([])],
-      declarations: [StudentUpdateComponent],
+      imports: [ReactiveFormsModule, FormsModule, StudentUpdateComponent],
+      declarations: [],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([]),
+
         FormBuilder,
         {
           provide: ActivatedRoute,
@@ -73,7 +77,7 @@ describe('Student Management Update Component', () => {
       activatedRoute.data = of({ student });
       comp.ngOnInit();
 
-      expect(comp.editForm.value).toEqual(expect.objectContaining(student));
+      expect(comp.editForm.value).toEqual(expect.objectContaining(student as any));
       expect(comp.examSheetsSharedCollection).toContain(examSheets);
     });
   });

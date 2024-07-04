@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpResponse, provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of, Subject, from } from 'rxjs';
 
 import { TemplateService } from '../service/template.service';
@@ -19,9 +19,13 @@ describe('Template Management Update Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule, RouterTestingModule.withRoutes([])],
-      declarations: [TemplateUpdateComponent],
+      imports: [ReactiveFormsModule, FormsModule, TemplateUpdateComponent],
+      declarations: [],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+
+        provideRouter([]),
         FormBuilder,
         {
           provide: ActivatedRoute,
@@ -48,7 +52,7 @@ describe('Template Management Update Component', () => {
       activatedRoute.data = of({ template });
       comp.ngOnInit();
 
-      expect(comp.editForm.value).toEqual(expect.objectContaining(template));
+      expect(comp.editForm.value).toEqual(expect.objectContaining(template as any));
     });
   });
 

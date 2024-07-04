@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed, waitForAsync, inject, fakeAsync, tick } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
@@ -9,31 +8,35 @@ import { UserManagementService } from '../service/user-management.service';
 import { User } from '../user-management.model';
 
 import { UserManagementUpdateComponent } from './user-management-update.component';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
 
 describe('User Management Update Component', () => {
   let comp: UserManagementUpdateComponent;
   let fixture: ComponentFixture<UserManagementUpdateComponent>;
   let service: UserManagementService;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
-        declarations: [UserManagementUpdateComponent],
-        providers: [
-          FormBuilder,
-          {
-            provide: ActivatedRoute,
-            useValue: {
-              data: of({ user: new User(123, 'user', 'first', 'last', 'first@last.com', true, 'en', [Authority.USER], 'admin') }),
-            },
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule, FormsModule, UserManagementUpdateComponent],
+      declarations: [],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+
+        FormBuilder,
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            data: of({ user: new User(123, 'user', 'first', 'last', 'first@last.com', true, 'en', [Authority.USER], 'admin') }),
           },
-        ],
-      })
-        .overrideTemplate(UserManagementUpdateComponent, '')
-        .compileComponents();
+        },
+      ],
     })
-  );
+      .overrideTemplate(UserManagementUpdateComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(UserManagementUpdateComponent);
@@ -54,7 +57,7 @@ describe('User Management Update Component', () => {
         // THEN
         expect(service.authorities).toHaveBeenCalled();
         expect(comp.authorities).toEqual(['USER']);
-      })
+      }),
     ));
   });
 
@@ -74,7 +77,7 @@ describe('User Management Update Component', () => {
         // THEN
         expect(service.update).toHaveBeenCalledWith(entity);
         expect(comp.isSaving).toEqual(false);
-      })
+      }),
     ));
 
     it('Should call create service on save for new user', inject(
@@ -91,7 +94,7 @@ describe('User Management Update Component', () => {
         // THEN
         expect(service.create).toHaveBeenCalledWith(entity);
         expect(comp.isSaving).toEqual(false);
-      })
+      }),
     ));
   });
 });

@@ -1,15 +1,15 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpResponse, provideHttpClient } from '@angular/common/http';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of, Subject, from } from 'rxjs';
 
 import { ZoneService } from '../service/zone.service';
 import { IZone, Zone } from '../zone.model';
 
 import { ZoneUpdateComponent } from './zone-update.component';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('Zone Management Update Component', () => {
   let comp: ZoneUpdateComponent;
@@ -19,9 +19,13 @@ describe('Zone Management Update Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule, RouterTestingModule.withRoutes([])],
-      declarations: [ZoneUpdateComponent],
+      imports: [ReactiveFormsModule, FormsModule, ZoneUpdateComponent],
+      declarations: [],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+
+        provideRouter([]),
         FormBuilder,
         {
           provide: ActivatedRoute,
@@ -48,7 +52,7 @@ describe('Zone Management Update Component', () => {
       activatedRoute.data = of({ zone });
       comp.ngOnInit();
 
-      expect(comp.editForm.value).toEqual(expect.objectContaining(zone));
+      expect(comp.editForm.value).toEqual(expect.objectContaining(zone as any));
     });
   });
 

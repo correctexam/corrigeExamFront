@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ActivatedRoute } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpHeaders, HttpResponse, provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { CommentsService } from '../service/comments.service';
@@ -16,9 +16,11 @@ describe('Comments Management Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule.withRoutes([{ path: 'comments', component: CommentsComponent }]), HttpClientTestingModule],
-      declarations: [CommentsComponent],
+      imports: [CommentsComponent],
       providers: [
+        provideRouter([{ path: 'comments', component: CommentsComponent }]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
         {
           provide: ActivatedRoute,
           useValue: {
@@ -30,7 +32,7 @@ describe('Comments Management Component', () => {
                 page: '1',
                 size: '1',
                 sort: 'id,desc',
-              })
+              }),
             ),
           },
         },
@@ -49,8 +51,8 @@ describe('Comments Management Component', () => {
         new HttpResponse({
           body: [{ id: 123 }],
           headers,
-        })
-      )
+        }),
+      ),
     );
   });
 

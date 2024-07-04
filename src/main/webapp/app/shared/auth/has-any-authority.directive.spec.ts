@@ -4,6 +4,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
+import { describe, expect } from '@jest/globals';
 
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
@@ -12,6 +13,8 @@ import { HasAnyAuthorityDirective } from './has-any-authority.directive';
 
 @Component({
   template: ` <div *jhiHasAnyAuthority="'ROLE_ADMIN'" #content></div> `,
+  standalone: true,
+  imports: [HasAnyAuthorityDirective],
 })
 class TestHasAnyAuthorityDirectiveComponent {
   @ViewChild('content', { static: false })
@@ -22,14 +25,12 @@ describe('HasAnyAuthorityDirective tests', () => {
   let mockAccountService: AccountService;
   const authenticationState = new Subject<Account | null>();
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [HasAnyAuthorityDirective, TestHasAnyAuthorityDirectiveComponent],
-        providers: [AccountService],
-      });
-    })
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HasAnyAuthorityDirective, TestHasAnyAuthorityDirectiveComponent],
+      providers: [AccountService],
+    });
+  }));
 
   beforeEach(() => {
     mockAccountService = TestBed.inject(AccountService);

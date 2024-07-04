@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ActivatedRoute } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpHeaders, HttpResponse, provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { StudentResponseService } from '../service/student-response.service';
@@ -16,12 +16,14 @@ describe('StudentResponse Management Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule.withRoutes([{ path: 'student-response', component: StudentResponseComponent }]),
-        HttpClientTestingModule,
-      ],
-      declarations: [StudentResponseComponent],
+      imports: [StudentResponseComponent],
+      declarations: [],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+
+        provideRouter([{ path: 'student-response', component: StudentResponseComponent }]),
+
         {
           provide: ActivatedRoute,
           useValue: {
@@ -33,7 +35,7 @@ describe('StudentResponse Management Component', () => {
                 page: '1',
                 size: '1',
                 sort: 'id,desc',
-              })
+              }),
             ),
           },
         },
@@ -52,8 +54,8 @@ describe('StudentResponse Management Component', () => {
         new HttpResponse({
           body: [{ id: 123 }],
           headers,
-        })
-      )
+        }),
+      ),
     );
   });
 

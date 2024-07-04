@@ -1,7 +1,16 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { AuthServerProvider } from 'app/core/auth/auth-jwt.service';
-import { LocalStorageService, NgxWebstorageModule, SessionStorageService } from 'ngx-webstorage';
+import {
+  LocalStorageService,
+  SessionStorageService,
+  provideNgxWebstorage,
+  withLocalStorage,
+  withNgxWebstorageConfig,
+  withSessionStorage,
+} from 'ngx-webstorage';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('Auth JWT', () => {
   let service: AuthServerProvider;
@@ -11,7 +20,12 @@ describe('Auth JWT', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, NgxWebstorageModule.forRoot()],
+      imports: [],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideNgxWebstorage(withNgxWebstorageConfig({ separator: ':', caseSensitive: true }), withLocalStorage(), withSessionStorage()),
+      ],
     });
 
     httpMock = TestBed.inject(HttpTestingController);

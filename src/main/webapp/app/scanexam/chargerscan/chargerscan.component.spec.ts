@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { TestBed } from '@angular/core/testing';
+import { describe, expect } from '@jest/globals';
 
 import { ChargerscanComponent } from './chargerscan.component';
 
 describe('ChargerscanComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ChargerscanComponent],
+      imports: [ChargerscanComponent],
     }).compileComponents();
   });
 

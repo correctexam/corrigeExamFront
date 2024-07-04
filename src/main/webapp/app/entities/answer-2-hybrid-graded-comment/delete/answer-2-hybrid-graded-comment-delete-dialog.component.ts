@@ -7,6 +7,7 @@ import { ITEM_DELETED_EVENT } from 'app/entities/hybrid-graded-comment/list/hybr
 
 @Component({
   templateUrl: './answer-2-hybrid-graded-comment-delete-dialog.component.html',
+  standalone: true,
 })
 export class Answer2HybridGradedCommentDeleteDialogComponent {
   answer2HybridGradedComment?: IAnswer2HybridGradedComment;

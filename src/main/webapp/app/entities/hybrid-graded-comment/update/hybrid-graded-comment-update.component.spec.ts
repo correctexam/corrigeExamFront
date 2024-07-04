@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpResponse, provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { FormBuilder } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of, Subject, from } from 'rxjs';
 
 import { HybridGradedCommentFormService } from './hybrid-graded-comment-form.service';
@@ -21,9 +21,12 @@ describe('HybridGradedComment Management Update Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, RouterTestingModule.withRoutes([])],
-      declarations: [HybridGradedCommentUpdateComponent],
+      imports: [HybridGradedCommentUpdateComponent],
+      declarations: [],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([]),
         FormBuilder,
         {
           provide: ActivatedRoute,
@@ -35,7 +38,6 @@ describe('HybridGradedComment Management Update Component', () => {
     })
       .overrideTemplate(HybridGradedCommentUpdateComponent, '')
       .compileComponents();
-
     fixture = TestBed.createComponent(HybridGradedCommentUpdateComponent);
     activatedRoute = TestBed.inject(ActivatedRoute);
     hybridGradedCommentFormService = TestBed.inject(HybridGradedCommentFormService);

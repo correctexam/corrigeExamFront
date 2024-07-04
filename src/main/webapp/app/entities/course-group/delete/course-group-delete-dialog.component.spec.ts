@@ -1,8 +1,8 @@
 jest.mock('@ng-bootstrap/ng-bootstrap');
 
 import { ComponentFixture, TestBed, inject, fakeAsync, tick } from '@angular/core/testing';
-import { HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpResponse, provideHttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -10,6 +10,7 @@ import { CourseGroupService } from '../service/course-group.service';
 
 import { CourseGroupDeleteDialogComponent } from './course-group-delete-dialog.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('CourseGroup Management Delete Component', () => {
   let comp: CourseGroupDeleteDialogComponent;
@@ -19,9 +20,9 @@ describe('CourseGroup Management Delete Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
-      declarations: [CourseGroupDeleteDialogComponent],
-      providers: [NgbActiveModal],
+      imports: [ReactiveFormsModule, FormsModule, CourseGroupDeleteDialogComponent],
+      declarations: [],
+      providers: [NgbActiveModal, provideHttpClient(), provideHttpClientTesting()],
     })
       .overrideTemplate(CourseGroupDeleteDialogComponent, '')
       .compileComponents();
@@ -45,7 +46,7 @@ describe('CourseGroup Management Delete Component', () => {
         // THEN
         expect(service.delete).toHaveBeenCalledWith(123);
         expect(mockActiveModal.close).toHaveBeenCalledWith('deleted');
-      })
+      }),
     ));
 
     it('Should not call delete service on clear', () => {

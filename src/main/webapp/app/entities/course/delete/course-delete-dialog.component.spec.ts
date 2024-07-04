@@ -1,8 +1,9 @@
 jest.mock('@ng-bootstrap/ng-bootstrap');
 
 import { ComponentFixture, TestBed, inject, fakeAsync, tick } from '@angular/core/testing';
-import { HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpResponse, provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { of } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -19,9 +20,9 @@ describe('Course Management Delete Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
-      declarations: [CourseDeleteDialogComponent],
-      providers: [NgbActiveModal],
+      imports: [ReactiveFormsModule, FormsModule, CourseDeleteDialogComponent],
+      declarations: [],
+      providers: [provideHttpClient(), provideHttpClientTesting(), NgbActiveModal],
     })
       .overrideTemplate(CourseDeleteDialogComponent, '')
       .compileComponents();
@@ -45,7 +46,7 @@ describe('Course Management Delete Component', () => {
         // THEN
         expect(service.delete).toHaveBeenCalledWith(123);
         expect(mockActiveModal.close).toHaveBeenCalledWith('deleted');
-      })
+      }),
     ));
 
     it('Should not call delete service on clear', () => {

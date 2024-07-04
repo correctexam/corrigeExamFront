@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* tslint:disable:no-unused-variable */
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PaintComponent } from './paint.component';
 
@@ -9,11 +9,11 @@ describe('PaintComponent', () => {
   let component: PaintComponent;
   let fixture: ComponentFixture<PaintComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [PaintComponent],
+      imports: [PaintComponent],
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {});
 
