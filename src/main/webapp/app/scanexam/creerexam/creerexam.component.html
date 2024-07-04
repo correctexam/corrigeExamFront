@@ -134,19 +134,6 @@
           />
         </div>
 
-        <div class="row err" *ngIf="errorParsingPdf" jhiTranslate="scanexam.pdferror"></div>
-
-        <div class="row" *ngIf="editForm.get(['content'])?.value !== null">
-          <ngx-extended-pdf-viewer
-            [base64Src]="editForm.get(['content'])!.value"
-            [textLayer]="true"
-            [height]="'95%'"
-            [showToolbar]="false"
-            (pdfLoadingFailed)="onPdfError()"
-            (pdfLoaded)="onPdfLoaded()"
-          ></ngx-extended-pdf-viewer>
-        </div>
-
         <div class="row">
           <label class="form-label col-4" jhiTranslate="gradeScopeIsticApp.template.mark" for="field_mark">Mark</label>
           <input type="checkbox" class="form-check col-1" name="mark" id="field_mark" data-cy="mark" formControlName="mark" />
@@ -167,6 +154,18 @@
         </button>
       </div>
     </form>
+    <div class="row err" *ngIf="errorParsingPdf" jhiTranslate="scanexam.pdferror"></div>
+
+    <div class="row" *ngIf="editForm.get(['content'])?.value !== null">
+      <ngx-extended-pdf-viewer
+        [base64Src]="editForm.get(['content'])!.value"
+        [textLayer]="true"
+        [height]="'95%'"
+        [showToolbar]="false"
+        (pdfLoadingFailed)="onPdfError()"
+        (pdfLoaded)="onPdfLoaded()"
+      ></ngx-extended-pdf-viewer>
+    </div>
   </div>
   <div class="lg:col-4 xl:col-4 overflow-hidden sm:hidden md:hidden lg:flex xl:flex">
     <img
