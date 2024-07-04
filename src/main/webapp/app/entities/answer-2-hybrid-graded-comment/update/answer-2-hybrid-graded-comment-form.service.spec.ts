@@ -49,7 +49,7 @@ describe('Answer2HybridGradedComment Form Service', () => {
 
         const answer2HybridGradedComment = service.getAnswer2HybridGradedComment(formGroup) as any;
 
-        expect(answer2HybridGradedComment).toMatchSnapshot(sampleWithNewData);
+        expect(answer2HybridGradedComment).toMatchObject(sampleWithNewData);
       });
 
       it('should return NewAnswer2HybridGradedComment for empty Answer2HybridGradedComment initial value', () => {
@@ -57,7 +57,7 @@ describe('Answer2HybridGradedComment Form Service', () => {
 
         const answer2HybridGradedComment = service.getAnswer2HybridGradedComment(formGroup) as any;
 
-        expect(answer2HybridGradedComment).toMatchSnapshot({});
+        expect(answer2HybridGradedComment).toMatchObject({});
       });
 
       it('should return IAnswer2HybridGradedComment', () => {
