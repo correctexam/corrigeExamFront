@@ -58,7 +58,7 @@ describe('Template Service', () => {
 
       const req = httpMock.expectOne({ method: 'POST' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchSnapshot(expected);
+      expect(expectedResult).toMatchObject(expected as any);
     });
 
     it('should update a Template', () => {
@@ -79,7 +79,7 @@ describe('Template Service', () => {
 
       const req = httpMock.expectOne({ method: 'PUT' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchSnapshot(expected);
+      expect(expectedResult).toMatchObject(expected as any);
     });
 
     it('should partial update a Template', () => {
@@ -99,7 +99,7 @@ describe('Template Service', () => {
 
       const req = httpMock.expectOne({ method: 'PATCH' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchSnapshot(expected);
+      expect(expectedResult).toMatchObject(expected as any);
     });
 
     it('should return a list of Template', () => {
