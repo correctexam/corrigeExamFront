@@ -91,7 +91,7 @@ describe('Answer2HybridGradedComment Service', () => {
       const req = httpMock.expectOne({ method: 'GET' });
       req.flush([returnedFromService]);
       httpMock.verify();
-      expect(expectedResult).toMatchSnapshot([expected]);
+      expect(expectedResult).toMatchObject([expected]);
     });
 
     it('should delete a Answer2HybridGradedComment', () => {

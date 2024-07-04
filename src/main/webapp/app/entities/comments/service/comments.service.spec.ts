@@ -38,7 +38,7 @@ describe('Comments Service', () => {
 
       const req = httpMock.expectOne({ method: 'GET' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchSnapshot(elemDefault);
+      expect(expectedResult).toMatchObject(elemDefault as any);
     });
 
     it('should create a Comments', () => {

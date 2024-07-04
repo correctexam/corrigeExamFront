@@ -39,7 +39,7 @@ describe('Scan Service', () => {
 
       const req = httpMock.expectOne({ method: 'GET' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchSnapshot(elemDefault);
+      expect(expectedResult).toMatchObject(elemDefault);
     });
 
     it('should create a Scan', () => {

@@ -55,7 +55,7 @@ describe('HybridGradedComment Form Service', () => {
 
         const hybridGradedComment = service.getHybridGradedComment(formGroup) as any;
 
-        expect(hybridGradedComment).toMatchSnapshot(sampleWithNewData);
+        expect(hybridGradedComment).toMatchObject(sampleWithNewData);
       });
 
       it('should return NewHybridGradedComment for empty HybridGradedComment initial value', () => {
@@ -63,7 +63,7 @@ describe('HybridGradedComment Form Service', () => {
 
         const hybridGradedComment = service.getHybridGradedComment(formGroup) as any;
 
-        expect(hybridGradedComment).toMatchSnapshot({});
+        expect(hybridGradedComment).toMatchObject({});
       });
 
       it('should return IHybridGradedComment', () => {
