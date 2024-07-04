@@ -301,8 +301,12 @@ pdfjs-editor-ink-button-label = Teikne
 pdfjs-editor-stamp-button =
     .title = Legg til eller rediger bilde
 pdfjs-editor-stamp-button-label = Legg til eller rediger bilde
-pdfjs-editor-remove-button =
-    .title = Fjern
+
+## Remove button for the various kind of editor.
+
+
+##
+
 # Editor Parameters
 pdfjs-editor-free-text-color-input = Farge
 pdfjs-editor-free-text-size-input = Storleik
@@ -342,42 +346,50 @@ pdfjs-editor-alt-text-textarea =
 ## This is used in an aria label to help to understand the role of the resizer.
 
 
-pdfjs-editor-highlight-button =
-    .title = Highlight
-pdfjs-editor-highlight-button-label = Highlight
-pdfjs-editor-remove-ink-button =
-    .title = Remove drawing
-pdfjs-editor-remove-freetext-button =
-    .title = Remove text
-pdfjs-editor-remove-stamp-button =
-    .title = Remove image
-pdfjs-editor-remove-highlight-button =
-    .title = Remove highlight
-pdfjs-editor-free-highlight-thickness-input = Thickness
-pdfjs-editor-free-highlight-thickness-title =
-    .title = Change thickness when highlighting items other than text
-pdfjs-editor-resizer-label-top-left = Top left corner — resize
-pdfjs-editor-resizer-label-top-middle = Top middle — resize
-pdfjs-editor-resizer-label-top-right = Top right corner — resize
-pdfjs-editor-resizer-label-middle-right = Middle right — resize
-pdfjs-editor-resizer-label-bottom-right = Bottom right corner — resize
-pdfjs-editor-resizer-label-bottom-middle = Bottom middle — resize
-pdfjs-editor-resizer-label-bottom-left = Bottom left corner — resize
-pdfjs-editor-resizer-label-middle-left = Middle left — resize
-pdfjs-editor-highlight-colorpicker-label = Highlight color
-pdfjs-editor-colorpicker-button =
-    .title = Change color
-pdfjs-editor-colorpicker-dropdown =
-    .aria-label = Color choices
+## Color picker
+
 pdfjs-editor-colorpicker-yellow =
-    .title = Yellow
+    .title = Gul
 pdfjs-editor-colorpicker-green =
-    .title = Green
+    .title = Grøn
 pdfjs-editor-colorpicker-blue =
-    .title = Blue
+    .title = Blå
 pdfjs-editor-colorpicker-pink =
-    .title = Pink
+    .title = Rosa
 pdfjs-editor-colorpicker-red =
-    .title = Red
+    .title = Raud
+
+pdfjs-editor-highlight-button =
+    .title = Markere
+pdfjs-editor-highlight-button-label = Markere
+pdfjs-highlight-floating-button1 =
+    .title = Markere
+    .aria-label = Markere
+pdfjs-highlight-floating-button-label = Markere
+pdfjs-editor-remove-ink-button =
+    .title = Fjern teikninga
+pdfjs-editor-remove-freetext-button =
+    .title = Fjern tekst
+pdfjs-editor-remove-stamp-button =
+    .title = Fjern bildet
+pdfjs-editor-remove-highlight-button =
+    .title = Fjern utheving
+pdfjs-editor-free-highlight-thickness-input = Tjukkleik
+pdfjs-editor-free-highlight-thickness-title =
+    .title = Endre tjukn når du markerer andre element enn tekst
+pdfjs-editor-resizer-label-top-left = Øvste venstre hjørne – endre størrelse
+pdfjs-editor-resizer-label-top-middle = Øvst i midten — endre størrelse
+pdfjs-editor-resizer-label-top-right = Øvste høgre hjørne – endre størrelse
+pdfjs-editor-resizer-label-middle-right = Midt til høgre – endre størrelse
+pdfjs-editor-resizer-label-bottom-right = Nedste høgre hjørne – endre størrelse
+pdfjs-editor-resizer-label-bottom-middle = Nedst i midten — endre størrelse
+pdfjs-editor-resizer-label-bottom-left = Nedste venstre hjørne – endre størrelse
+pdfjs-editor-resizer-label-middle-left = Midt til venstre — endre størrelse
+pdfjs-editor-highlight-colorpicker-label = Uthevingsfarge
+pdfjs-editor-colorpicker-button =
+    .title = Endre farge
+pdfjs-editor-colorpicker-dropdown =
+    .aria-label = Fargeval
+pdfjs-editor-highlight-show-all-button-label = Vis alle
 unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
 pdfjs-infinite-scroll-button-label = Infinite scroll

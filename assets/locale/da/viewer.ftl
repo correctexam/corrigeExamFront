@@ -301,8 +301,15 @@ pdfjs-editor-ink-button-label = Tegn
 pdfjs-editor-stamp-button =
     .title = Tilføj eller rediger billeder
 pdfjs-editor-stamp-button-label = Tilføj eller rediger billeder
-pdfjs-editor-remove-button =
-    .title = Fjern
+pdfjs-editor-highlight-button =
+    .title = Fremhæv
+pdfjs-editor-highlight-button-label = Fremhæv
+pdfjs-highlight-floating-button =
+    .title = Fremhæv
+pdfjs-highlight-floating-button1 =
+    .title = Fremhæv
+    .aria-label = Fremhæv
+pdfjs-highlight-floating-button-label = Fremhæv
 
 ## Remove button for the various kind of editor.
 
@@ -312,6 +319,8 @@ pdfjs-editor-remove-freetext-button =
     .title = Fjern tekst
 pdfjs-editor-remove-stamp-button =
     .title = Fjern billede
+pdfjs-editor-remove-highlight-button =
+    .title = Fjern fremhævning
 
 ##
 
@@ -324,6 +333,10 @@ pdfjs-editor-ink-opacity-input = Uigennemsigtighed
 pdfjs-editor-stamp-add-image-button =
     .title = Tilføj billede
 pdfjs-editor-stamp-add-image-button-label = Tilføj billede
+# This refers to the thickness of the line used for free highlighting (not bound to text)
+pdfjs-editor-free-highlight-thickness-input = Tykkelse
+pdfjs-editor-free-highlight-thickness-title =
+    .title = Ændr tykkelse, når andre elementer end tekst fremhæves
 pdfjs-free-text =
     .aria-label = Teksteditor
 pdfjs-free-text-default-content = Begynd at skrive…
@@ -362,14 +375,9 @@ pdfjs-editor-resizer-label-bottom-middle = Nederst i midten - tilpas størrelse
 pdfjs-editor-resizer-label-bottom-left = Nederste venstre hjørne - tilpas størrelse
 pdfjs-editor-resizer-label-middle-left = Midten til venstre — tilpas størrelse
 
-pdfjs-editor-highlight-button =
-    .title = Fremhæv
-pdfjs-editor-highlight-button-label = Fremhæv
-pdfjs-editor-remove-highlight-button =
-    .title = Fjern fremhævning
-pdfjs-editor-free-highlight-thickness-input = Tykkelse
-pdfjs-editor-free-highlight-thickness-title =
-    .title = Ændr tykkelse, når andre elementer end tekst fremhæves
+## Color picker
+
+# This means "Color used to highlight text"
 pdfjs-editor-highlight-colorpicker-label = Fremhævningsfarve
 pdfjs-editor-colorpicker-button =
     .title = Skift farve
@@ -385,5 +393,13 @@ pdfjs-editor-colorpicker-pink =
     .title = Lyserød
 pdfjs-editor-colorpicker-red =
     .title = Rød
+
+## Show all highlights
+## This is a toggle button to show/hide all the highlights.
+
+pdfjs-editor-highlight-show-all-button-label = Vis alle
+pdfjs-editor-highlight-show-all-button =
+    .title = Vis alle
+
 unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
 pdfjs-infinite-scroll-button-label = Infinite scroll
