@@ -48,6 +48,13 @@ pdfjs-download-button =
 # Used in Firefox for Android as a label for the download button (“download” is a verb).
 # Length of the translation matters since we are in a mobile context, with limited screen estate.
 pdfjs-download-button-label = Pellgargañ
+pdfjs-bookmark-button-label = Pajenn a-vremañ
+# Used in Firefox for Android.
+pdfjs-open-in-app-button =
+    .title = Digeriñ en arload
+# Used in Firefox for Android.
+# Length of the translation matters since we are in a mobile context, with limited screen estate.
+pdfjs-open-in-app-button-label = Digeriñ en arload
 
 ##  Secondary toolbar and context menu
 
@@ -267,6 +274,9 @@ pdfjs-editor-free-text-button-label = Testenn
 pdfjs-editor-ink-button =
     .title = Tresañ
 pdfjs-editor-ink-button-label = Tresañ
+pdfjs-editor-stamp-button =
+    .title = Ouzhpennañ pe aozañ skeudennoù
+pdfjs-editor-stamp-button-label = Ouzhpennañ pe aozañ skeudennoù
 
 ## Remove button for the various kind of editor.
 
@@ -277,9 +287,21 @@ pdfjs-editor-ink-button-label = Tresañ
 pdfjs-editor-free-text-color-input = Liv
 pdfjs-editor-free-text-size-input = Ment
 pdfjs-editor-ink-color-input = Liv
+pdfjs-editor-ink-thickness-input = Tevder
+pdfjs-editor-ink-opacity-input = Boullder
+pdfjs-editor-stamp-add-image-button =
+    .title = Ouzhpennañ ur skeudenn
+pdfjs-editor-stamp-add-image-button-label = Ouzhpennañ ur skeudenn
+pdfjs-free-text =
+    .aria-label = Aozer testennoù
+pdfjs-ink =
+    .aria-label = Aozer tresoù
+pdfjs-ink-canvas =
+    .aria-label = Skeudenn bet krouet gant an implijer·ez
 
 ## Alt-text dialog
 
+pdfjs-editor-alt-text-add-description-label = Ouzhpennañ un deskrivadur
 pdfjs-editor-alt-text-cancel-button = Nullañ
 pdfjs-editor-alt-text-save-button = Enrollañ
 
@@ -290,22 +312,13 @@ pdfjs-editor-alt-text-save-button = Enrollañ
 ## Color picker
 
 
-pdfjs-bookmark-button-label = Pajenn a-vremañ
-pdfjs-open-in-app-button =
-    .title = Digeriñ en arload
-pdfjs-open-in-app-button-label = Digeriñ en arload
-pdfjs-editor-ink-thickness-input = Tevder
-pdfjs-editor-ink-opacity-input = Boullder
-pdfjs-editor-stamp-add-image-button =
-    .title = Ouzhpennañ ur skeudenn
-pdfjs-editor-stamp-add-image-button-label = Ouzhpennañ ur skeudenn
+pdfjs-find-match-diacritics-checkbox-label = Doujañ d’an tiredoù
 pdfjs-scroll-page-button =
     .title = Use Page Scrolling
 pdfjs-scroll-page-button-label = Page Scrolling
 pdfjs-current-outline-item-button =
     .title = Find Current Outline Item
 pdfjs-current-outline-item-button-label = Current Outline Item
-pdfjs-find-match-diacritics-checkbox-label = Match Diacritics
 pdfjs-find-match-count =
     { $total ->
         [one] { $current } of { $total } match
@@ -316,12 +329,13 @@ pdfjs-find-match-count-limit =
         [one] More than { $limit } match
        *[other] More than { $limit } matches
     }
-pdfjs-editor-stamp-button =
-    .title = Add or edit images
-pdfjs-editor-stamp-button-label = Add or edit images
 pdfjs-editor-highlight-button =
     .title = Highlight
 pdfjs-editor-highlight-button-label = Highlight
+pdfjs-highlight-floating-button1 =
+    .title = Highlight
+    .aria-label = Highlight
+pdfjs-highlight-floating-button-label = Highlight
 pdfjs-editor-remove-ink-button =
     .title = Remove drawing
 pdfjs-editor-remove-freetext-button =
@@ -333,18 +347,11 @@ pdfjs-editor-remove-highlight-button =
 pdfjs-editor-free-highlight-thickness-input = Thickness
 pdfjs-editor-free-highlight-thickness-title =
     .title = Change thickness when highlighting items other than text
-pdfjs-free-text =
-    .aria-label = Text Editor
 pdfjs-free-text-default-content = Start typing…
-pdfjs-ink =
-    .aria-label = Draw Editor
-pdfjs-ink-canvas =
-    .aria-label = User-created image
 pdfjs-editor-alt-text-button-label = Alt text
 pdfjs-editor-alt-text-edit-button-label = Edit alt text
 pdfjs-editor-alt-text-dialog-label = Choose an option
 pdfjs-editor-alt-text-dialog-description = Alt text (alternative text) helps when people can’t see the image or when it doesn’t load.
-pdfjs-editor-alt-text-add-description-label = Add a description
 pdfjs-editor-alt-text-add-description-description = Aim for 1-2 sentences that describe the subject, setting, or actions.
 pdfjs-editor-alt-text-mark-decorative-label = Mark as decorative
 pdfjs-editor-alt-text-mark-decorative-description = This is used for ornamental images, like borders or watermarks.
@@ -374,5 +381,6 @@ pdfjs-editor-colorpicker-pink =
     .title = Pink
 pdfjs-editor-colorpicker-red =
     .title = Red
+pdfjs-editor-highlight-show-all-button-label = Show all
 unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
 pdfjs-infinite-scroll-button-label = Infinite scroll
