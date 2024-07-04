@@ -1,6 +1,6 @@
 import { Component, OnInit, RendererFactory2, Renderer2 } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { Router, ActivatedRouteSnapshot, NavigationEnd, RouterOutlet } from '@angular/router';
+import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
 import dayjs from 'dayjs';
 
@@ -63,7 +63,7 @@ export class MainComponent implements OnInit {
     });
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        this.updateTitle();
+        //        this.updateTitle();
       }
     });
 
@@ -72,25 +72,26 @@ export class MainComponent implements OnInit {
     });*/
 
     this.translateService.onLangChange.subscribe((langChangeEvent: LangChangeEvent) => {
-      this.updateTitle();
+      // this.updateTitle();
       dayjs.locale(langChangeEvent.lang);
       this.renderer.setAttribute(document.querySelector('html'), 'lang', langChangeEvent.lang);
     });
   }
-
+  /*
   private getPageTitle(routeSnapshot: ActivatedRouteSnapshot): string {
     const title: string = routeSnapshot.data['pageTitle'] ?? '';
     if (routeSnapshot.firstChild) {
       return this.getPageTitle(routeSnapshot.firstChild) || title;
     }
     return title;
-  }
+}
 
-  private updateTitle(): void {
+    private updateTitle(): void {
     let pageTitle = this.getPageTitle(this.router.routerState.snapshot.root);
     if (!pageTitle) {
       pageTitle = 'global.title';
     }
+//    console.error('set title main')
     this.translateService.get(pageTitle).subscribe(title => this.titleService.setTitle(title));
-  }
+  } */
 }

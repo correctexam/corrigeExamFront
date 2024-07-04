@@ -334,7 +334,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   updateTitle(): void {
     this.activatedRoute.data.subscribe(e => {
+      console.error('title', this.exam);
       this.translateService.get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
+        console.error('settitle', e1);
         this.titleService.setTitle(e1);
       });
     });
@@ -365,6 +367,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
       this.pageOffset = 0;
 
+      this.updateTitle();
+
       if (params.get('studentid') !== null) {
         this.studentid = +params.get('studentid')!;
         this.currentStudent = this.studentid - 1;
@@ -374,6 +378,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         } else {
           if (params.get('questionno') !== null) {
             this.currentStudentPaginator = m.get(+params.get('questionno')!)!.indexOf(this.currentStudent + 1);
+
             //            this.currentStudentPaginator = m.get(+params.get('questionno')!)![this.currentStudent] - 1;
           }
         }

@@ -1,6 +1,6 @@
-import { AfterViewInit, Component, NgZone, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink, RouterLinkActive, Scroll } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { AfterViewInit, Component, NgZone, OnDestroy, OnInit, Renderer2, RendererFactory2 } from '@angular/core';
+import { ActivatedRoute, ActivatedRouteSnapshot, Router, RouterLink, RouterLinkActive, Scroll } from '@angular/router';
+import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { SessionStorageService } from 'ngx-webstorage';
 
 import { VERSION, CAS_SERVER_URL, SERVICE_URL, CONNECTION_METHOD } from 'app/app.constants';
@@ -19,6 +19,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ActiveMenuDirective } from './active-menu.directive';
 import { FindLanguageFromKeyPipe } from 'app/shared/language/find-language-from-key.pipe';
 import { HasAnyAuthorityDirective } from 'app/shared/auth/has-any-authority.directive';
+import { Title } from '@angular/platform-browser';
+import { TranslateDirective } from 'app/shared/language/translate.directive';
 
 @Component({
   standalone: true,
@@ -26,6 +28,7 @@ import { HasAnyAuthorityDirective } from 'app/shared/auth/has-any-authority.dire
   templateUrl: './navbar.component.html',
   imports: [
     CommonModule,
+    TranslateDirective,
     NgIf,
     RouterLink,
     KeyboardShortcutsModule,
@@ -61,6 +64,8 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   protected readonly SERVICE_URL = SERVICE_URL;
   protected readonly CAS_SERVER_URL = CAS_SERVER_URL;
 
+  private renderer: Renderer2;
+
   constructor(
     private loginService: LoginService,
     private translateService: TranslateService,
@@ -71,10 +76,13 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     protected activatedRoute: ActivatedRoute,
     public dialogService: DialogService,
     private zone: NgZone,
+    private titleService: Title,
+    rootRenderer: RendererFactory2,
   ) {
     if (VERSION) {
       this.version = VERSION.toLowerCase().startsWith('v') ? VERSION : `v${VERSION}`;
     }
+    this.renderer = rootRenderer.createRenderer(document.querySelector('html'), null);
   }
 
   ngOnInit(): void {
@@ -88,6 +96,12 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
           });
         }
       }
+    });
+
+    this.translateService.onLangChange.subscribe((langChangeEvent: LangChangeEvent) => {
+      //    this.updateTitle();
+      // dayjs.locale(langChangeEvent.lang);
+      this.renderer.setAttribute(document.querySelector('html'), 'lang', langChangeEvent.lang);
     });
 
     this.entitiesNavbarItems = EntityNavbarItems;
@@ -194,5 +208,22 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.ref) {
       this.ref.close();
     }
+  }
+
+  private getPageTitle(routeSnapshot: ActivatedRouteSnapshot): string {
+    const title: string = routeSnapshot.data['pageTitle'] ?? '';
+    if (routeSnapshot.firstChild) {
+      return this.getPageTitle(routeSnapshot.firstChild) || title;
+    }
+    return title;
+  }
+
+  private updateTitle(): void {
+    let pageTitle = this.getPageTitle(this.router.routerState.snapshot.root);
+    if (!pageTitle) {
+      pageTitle = 'global.title';
+    }
+    //    console.error('set title main')
+    this.translateService.get(pageTitle).subscribe(title => this.titleService.setTitle(title));
   }
 }
