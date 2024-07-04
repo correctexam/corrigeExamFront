@@ -57,7 +57,7 @@ describe('GradedComment Service', () => {
 
       const req = httpMock.expectOne({ method: 'POST' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchSnapshot(expected);
+      expect(expectedResult).toMatchObject(expected as any);
     });
 
     it('should update a GradedComment', () => {
@@ -78,7 +78,7 @@ describe('GradedComment Service', () => {
 
       const req = httpMock.expectOne({ method: 'PUT' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchSnapshot(expected);
+      expect(expectedResult).toMatchObject(expected as any);
     });
 
     it('should partial update a GradedComment', () => {
@@ -98,7 +98,7 @@ describe('GradedComment Service', () => {
 
       const req = httpMock.expectOne({ method: 'PATCH' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchSnapshot(expected);
+      expect(expectedResult).toMatchObject(expected as any);
     });
 
     it('should return a list of GradedComment', () => {

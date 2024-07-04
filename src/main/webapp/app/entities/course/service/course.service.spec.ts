@@ -55,7 +55,7 @@ describe('Course Service', () => {
 
       const req = httpMock.expectOne({ method: 'POST' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchSnapshot(expected);
+      expect(expectedResult).toMatchObject(expected as any);
     });
 
     it('should update a Course', () => {
@@ -73,7 +73,7 @@ describe('Course Service', () => {
 
       const req = httpMock.expectOne({ method: 'PUT' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchSnapshot(expected);
+      expect(expectedResult).toMatchObject(expected as any);
     });
 
     it('should return a list of Course', () => {

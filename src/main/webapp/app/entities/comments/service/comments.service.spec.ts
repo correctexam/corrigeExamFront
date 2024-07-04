@@ -55,7 +55,7 @@ describe('Comments Service', () => {
 
       const req = httpMock.expectOne({ method: 'POST' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchSnapshot(expected);
+      expect(expectedResult).toMatchObject(expected as any);
     });
 
     it('should update a Comments', () => {
@@ -73,7 +73,7 @@ describe('Comments Service', () => {
 
       const req = httpMock.expectOne({ method: 'PUT' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchSnapshot(expected);
+      expect(expectedResult).toMatchObject(expected as any);
     });
 
     it('should partial update a Comments', () => {
@@ -92,7 +92,7 @@ describe('Comments Service', () => {
 
       const req = httpMock.expectOne({ method: 'PATCH' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchSnapshot(expected);
+      expect(expectedResult).toMatchObject(expected as any);
     });
 
     it('should return a list of Comments', () => {
