@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { describe, expect } from '@jest/globals';
 
 import { ApplicationConfigService } from './application-config.service';
 

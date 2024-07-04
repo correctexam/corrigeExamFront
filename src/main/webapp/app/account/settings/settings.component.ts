@@ -1,14 +1,29 @@
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 import { LANGUAGES } from 'app/config/language.constants';
+import { FindLanguageFromKeyPipe } from '../../shared/language/find-language-from-key.pipe';
+import { AlertErrorComponent } from '../../shared/alert/alert-error.component';
+import { TranslateDirective } from '../../shared/language/translate.directive';
+import { NgIf, NgFor } from '@angular/common';
 
 @Component({
   selector: 'jhi-settings',
   templateUrl: './settings.component.html',
+  standalone: true,
+  imports: [
+    NgIf,
+    TranslateDirective,
+    AlertErrorComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    NgFor,
+    TranslateModule,
+    FindLanguageFromKeyPipe,
+  ],
 })
 export class SettingsComponent implements OnInit {
   account!: Account;
@@ -16,7 +31,11 @@ export class SettingsComponent implements OnInit {
   languages = LANGUAGES;
   settingsForm: UntypedFormGroup;
 
-  constructor(private accountService: AccountService, private fb: UntypedFormBuilder, private translateService: TranslateService) {
+  constructor(
+    private accountService: AccountService,
+    private fb: UntypedFormBuilder,
+    private translateService: TranslateService,
+  ) {
     this.settingsForm = this.fb.group({
       firstName: [undefined, [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       lastName: [undefined, [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],

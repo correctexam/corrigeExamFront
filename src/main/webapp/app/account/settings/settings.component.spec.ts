@@ -1,7 +1,8 @@
 jest.mock('app/core/auth/account.service');
+import { describe, expect } from '@jest/globals';
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { throwError, of } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
@@ -10,6 +11,7 @@ import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 
 import { SettingsComponent } from './settings.component';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('SettingsComponent', () => {
   let comp: SettingsComponent;
@@ -26,17 +28,14 @@ describe('SettingsComponent', () => {
     imageUrl: '',
   };
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [ReactiveFormsModule, FormsModule, TranslateModule.forRoot(), HttpClientTestingModule],
-        declarations: [SettingsComponent],
-        providers: [FormBuilder, AccountService],
-      })
-        .overrideTemplate(SettingsComponent, '')
-        .compileComponents();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule, FormsModule, TranslateModule.forRoot(), SettingsComponent],
+      providers: [FormBuilder, AccountService, provideHttpClient(), provideHttpClientTesting()],
     })
-  );
+      .overrideTemplate(SettingsComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SettingsComponent);

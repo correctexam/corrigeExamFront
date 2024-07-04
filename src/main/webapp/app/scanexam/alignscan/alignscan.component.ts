@@ -9,7 +9,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
+import { MessageService, PrimeTemplate } from 'primeng/api';
 import { IExam } from 'app/entities/exam/exam.model';
 import { IImageAlignement, IImageAlignementInput } from '../services/align-images.service';
 import { faObjectGroup } from '@fortawesome/free-solid-svg-icons';
@@ -17,7 +17,7 @@ import { faObjectUngroup } from '@fortawesome/free-solid-svg-icons';
 
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { CacheUploadService, CacheUploadNotification } from '../exam-detail/cacheUpload.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { fromWorkerPool } from 'observable-webworker';
 import { Observable, Subscriber, firstValueFrom } from 'rxjs';
 import { worker1 } from '../services/workerimport';
@@ -32,6 +32,21 @@ import { TemplateService } from 'app/entities/template/service/template.service'
 import { ScanService } from 'app/entities/scan/service/scan.service';
 import PromisePool from '@supercharge/promise-pool';
 import { Title } from '@angular/platform-browser';
+import { ViewandreorderpagesComponent } from '../viewandreorderpages/viewandreorderpages.component';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { Button } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
+import { FormsModule } from '@angular/forms';
+import { SliderModule } from 'primeng/slider';
+import { TranslateDirective } from '../../shared/language/translate.directive';
+import { SidebarModule } from 'primeng/sidebar';
+import { NgIf, DecimalPipe } from '@angular/common';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { BlockUIModule } from 'primeng/blockui';
+import { ToastModule } from 'primeng/toast';
+import { GalleriaModule } from 'primeng/galleria';
 
 export interface IPage {
   image?: ArrayBuffer;
@@ -45,6 +60,27 @@ export interface IPage {
   templateUrl: './alignscan.component.html',
   styleUrls: ['./alignscan.component.scss'],
   providers: [MessageService, DialogService],
+  standalone: true,
+  imports: [
+    GalleriaModule,
+    PrimeTemplate,
+    ToastModule,
+    BlockUIModule,
+    ProgressSpinnerModule,
+    NgIf,
+    SidebarModule,
+    TranslateDirective,
+    SliderModule,
+    FormsModule,
+    TooltipModule,
+    Button,
+    FaIconComponent,
+    SelectButtonModule,
+    InputNumberModule,
+    ViewandreorderpagesComponent,
+    DecimalPipe,
+    TranslateModule,
+  ],
 })
 export class AlignScanComponent implements OnInit, CacheUploadNotification {
   faObjectGroup = faObjectGroup as IconProp;

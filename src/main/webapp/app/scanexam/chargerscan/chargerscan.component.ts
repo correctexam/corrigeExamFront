@@ -7,9 +7,9 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import { HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Validators, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { Validators, UntypedFormBuilder, UntypedFormGroup, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { DataUtils } from 'app/core/util/data-util.service';
 import { EventManager } from 'app/core/util/event-manager.service';
 import { ExamService } from 'app/entities/exam/service/exam.service';
@@ -20,7 +20,7 @@ import { finalize, firstValueFrom, Observable, scan } from 'rxjs';
 import { ScanService } from '../../entities/scan/service/scan.service';
 import { IExam } from '../../entities/exam/exam.model';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
-import { IPDFViewerApplication, NgxExtendedPdfViewerService, ScrollModeType } from 'ngx-extended-pdf-viewer';
+import { IPDFViewerApplication, NgxExtendedPdfViewerService, ScrollModeType, NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { IPage } from '../alignscan/alignscan.component';
 import { TemplateService } from 'app/entities/template/service/template.service';
 import { QuestionService } from 'app/entities/question/service/question.service';
@@ -29,6 +29,17 @@ import { PreferenceService } from '../preference-page/preference.service';
 import { ViewandreorderpagesComponent } from '../viewandreorderpages/viewandreorderpages.component';
 import { PromisePool } from '@supercharge/promise-pool';
 import { Title } from '@angular/platform-browser';
+import { FileUploadModule } from 'primeng/fileupload';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { TooltipModule } from 'primeng/tooltip';
+import { TranslateDirective } from '../../shared/language/translate.directive';
+import { NgIf } from '@angular/common';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { BlockUIModule } from 'primeng/blockui';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ToastModule } from 'primeng/toast';
 
 interface Upload {
   progress: number;
@@ -68,6 +79,24 @@ const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
   templateUrl: './chargerscan.component.html',
   styleUrls: ['./chargerscan.component.scss'],
   providers: [MessageService, ConfirmationService],
+  standalone: true,
+  imports: [
+    ToastModule,
+    ConfirmDialogModule,
+    BlockUIModule,
+    ProgressSpinnerModule,
+    ProgressBarModule,
+    NgIf,
+    TranslateDirective,
+    TooltipModule,
+    FaIconComponent,
+    InputSwitchModule,
+    FormsModule,
+    FileUploadModule,
+    ViewandreorderpagesComponent,
+    NgxExtendedPdfViewerModule,
+    TranslateModule,
+  ],
 })
 export class ChargerscanComponent implements OnInit, OnDestroy {
   blocked = false;

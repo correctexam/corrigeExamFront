@@ -6,12 +6,16 @@ import { ConfirmationService } from 'primeng/api';
 import { TemplateService } from '../../entities/template/service/template.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Title } from '@angular/platform-browser';
+import { PaintComponent } from './paint/paint.component';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'jhi-annotate-template',
   templateUrl: './annotate-template.component.html',
   styleUrls: ['./annotate-template.component.scss'],
   providers: [ConfirmationService],
+  standalone: true,
+  imports: [NgIf, PaintComponent],
 })
 export class AnnotateTemplateComponent implements OnInit {
   examId = '';

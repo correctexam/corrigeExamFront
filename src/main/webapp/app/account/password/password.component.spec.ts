@@ -1,8 +1,8 @@
 jest.mock('app/core/auth/account.service');
+import { describe, expect } from '@jest/globals';
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { HttpResponse, provideHttpClient } from '@angular/common/http';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { of, throwError } from 'rxjs';
 
@@ -10,23 +10,22 @@ import { AccountService } from 'app/core/auth/account.service';
 
 import { PasswordComponent } from './password.component';
 import { PasswordService } from './password.service';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('PasswordComponent', () => {
   let comp: PasswordComponent;
   let fixture: ComponentFixture<PasswordComponent>;
   let service: PasswordService;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
-        declarations: [PasswordComponent],
-        providers: [FormBuilder, AccountService],
-      })
-        .overrideTemplate(PasswordComponent, '')
-        .compileComponents();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule, FormsModule, PasswordComponent],
+      declarations: [],
+      providers: [FormBuilder, AccountService, provideHttpClient(), provideHttpClientTesting()],
     })
-  );
+      .overrideTemplate(PasswordComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(PasswordComponent);

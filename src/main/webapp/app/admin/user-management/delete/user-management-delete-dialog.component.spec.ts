@@ -1,14 +1,16 @@
 jest.mock('@ng-bootstrap/ng-bootstrap');
 
 import { ComponentFixture, TestBed, waitForAsync, inject, fakeAsync, tick } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { of } from 'rxjs';
+import { describe, expect } from '@jest/globals';
 
 import { UserManagementService } from '../service/user-management.service';
 
 import { UserManagementDeleteDialogComponent } from './user-management-delete-dialog.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('User Management Delete Component', () => {
   let comp: UserManagementDeleteDialogComponent;
@@ -16,17 +18,15 @@ describe('User Management Delete Component', () => {
   let service: UserManagementService;
   let mockActiveModal: NgbActiveModal;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
-        declarations: [UserManagementDeleteDialogComponent],
-        providers: [NgbActiveModal],
-      })
-        .overrideTemplate(UserManagementDeleteDialogComponent, '')
-        .compileComponents();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule, FormsModule, UserManagementDeleteDialogComponent],
+      declarations: [],
+      providers: [provideHttpClient(), provideHttpClientTesting(), NgbActiveModal],
     })
-  );
+      .overrideTemplate(UserManagementDeleteDialogComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(UserManagementDeleteDialogComponent);
@@ -49,7 +49,7 @@ describe('User Management Delete Component', () => {
         // THEN
         expect(service.delete).toHaveBeenCalledWith('user');
         expect(mockActiveModal.close).toHaveBeenCalledWith('deleted');
-      })
+      }),
     ));
   });
 });

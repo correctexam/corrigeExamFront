@@ -1,18 +1,40 @@
 import { Component, NgZone, OnInit } from '@angular/core';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { combineLatest } from 'rxjs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 
 import { ITextComment } from '../text-comment.model';
 
 import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/config/pagination.constants';
 import { TextCommentService } from '../service/text-comment.service';
 import { TextCommentDeleteDialogComponent } from '../delete/text-comment-delete-dialog.component';
+import { ItemCountComponent } from '../../../shared/pagination/item-count.component';
+import { SortByDirective } from '../../../shared/sort/sort-by.directive';
+import { SortDirective } from '../../../shared/sort/sort.directive';
+import { NgIf, NgFor } from '@angular/common';
+import { AlertComponent } from '../../../shared/alert/alert.component';
+import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-text-comment',
   templateUrl: './text-comment.component.html',
+  standalone: true,
+  imports: [
+    TranslateDirective,
+    FaIconComponent,
+    RouterLink,
+    AlertErrorComponent,
+    AlertComponent,
+    NgIf,
+    SortDirective,
+    SortByDirective,
+    NgFor,
+    ItemCountComponent,
+    NgbPagination,
+  ],
 })
 export class TextCommentComponent implements OnInit {
   textComments?: ITextComment[];
@@ -29,7 +51,7 @@ export class TextCommentComponent implements OnInit {
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
     protected modalService: NgbModal,
-    private zone: NgZone
+    private zone: NgZone,
   ) {}
 
   loadPage(page?: number, dontNavigate?: boolean): void {

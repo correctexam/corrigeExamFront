@@ -1,17 +1,27 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { ITemplate } from '../template.model';
 import { DataUtils } from 'app/core/util/data-util.service';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { AlertComponent } from '../../../shared/alert/alert.component';
+import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'jhi-template-detail',
   templateUrl: './template-detail.component.html',
+  standalone: true,
+  imports: [NgIf, TranslateDirective, AlertErrorComponent, AlertComponent, FaIconComponent, RouterLink],
 })
 export class TemplateDetailComponent implements OnInit {
   template: ITemplate | null = null;
 
-  constructor(protected dataUtils: DataUtils, protected activatedRoute: ActivatedRoute) {}
+  constructor(
+    protected dataUtils: DataUtils,
+    protected activatedRoute: ActivatedRoute,
+  ) {}
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ template }) => {

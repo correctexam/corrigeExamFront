@@ -26,7 +26,7 @@
       [zoom]="'page-width'"
       [minZoom]="0.5"
       [maxZoom]="3"
-      [delayFirstView]="100"
+      (textLayerRendered)="foo($event)"
     ></ngx-extended-pdf-viewer>
   </div>
 </div>

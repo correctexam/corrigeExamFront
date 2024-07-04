@@ -1,8 +1,10 @@
 jest.mock('@ng-bootstrap/ng-bootstrap');
 
 import { ComponentFixture, TestBed, inject, fakeAsync, tick } from '@angular/core/testing';
+import { describe, expect } from '@jest/globals';
 import { HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { of } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -18,9 +20,9 @@ describe('Answer2HybridGradedComment Management Delete Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      declarations: [Answer2HybridGradedCommentDeleteDialogComponent],
-      providers: [NgbActiveModal],
+      imports: [Answer2HybridGradedCommentDeleteDialogComponent],
+      declarations: [],
+      providers: [NgbActiveModal, provideHttpClient(), provideHttpClientTesting()],
     })
       .overrideTemplate(Answer2HybridGradedCommentDeleteDialogComponent, '')
       .compileComponents();

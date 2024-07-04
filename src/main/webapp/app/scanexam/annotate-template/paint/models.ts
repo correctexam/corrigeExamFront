@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 import { fabric } from 'fabric';
 export enum DrawingColours {
   BLACK = 'rgba(0,0,0,1)',

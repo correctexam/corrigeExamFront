@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { describe, expect } from '@jest/globals';
 
 import { ImportStudentComponent } from './import-student.component';
 
@@ -10,7 +11,7 @@ describe('ImportStudentComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ImportStudentComponent],
+      imports: [ImportStudentComponent],
     }).compileComponents();
   });
 

@@ -3,7 +3,7 @@
 /* eslint-disable arrow-body-style */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -18,12 +18,18 @@ import { IScan } from 'app/entities/scan/scan.model';
 import { ScanService } from 'app/entities/scan/service/scan.service';
 import { ICourse } from 'app/entities/course/course.model';
 import { CourseService } from 'app/entities/course/service/course.service';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { NgIf, NgFor } from '@angular/common';
+import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 type SelectableEntity = ITemplate | IZone | IScan | ICourse;
 
 @Component({
   selector: 'jhi-exam-update',
   templateUrl: './exam-update.component.html',
+  standalone: true,
+  imports: [FormsModule, ReactiveFormsModule, TranslateDirective, AlertErrorComponent, NgIf, NgFor, FaIconComponent],
 })
 export class ExamUpdateComponent implements OnInit {
   isSaving = false;
@@ -44,7 +50,7 @@ export class ExamUpdateComponent implements OnInit {
     protected scanService: ScanService,
     protected courseService: CourseService,
     protected activatedRoute: ActivatedRoute,
-    private fb: UntypedFormBuilder
+    private fb: UntypedFormBuilder,
   ) {
     this.editForm = this.fb.group({
       id: [],
@@ -68,7 +74,7 @@ export class ExamUpdateComponent implements OnInit {
         .pipe(
           map((res: HttpResponse<ITemplate[]>) => {
             return res.body || [];
-          })
+          }),
         )
         .subscribe((resBody: ITemplate[]) => {
           if (!exam.templateId) {
@@ -79,7 +85,7 @@ export class ExamUpdateComponent implements OnInit {
               .pipe(
                 map((subRes: HttpResponse<ITemplate>) => {
                   return subRes.body ? [subRes.body].concat(resBody) : resBody;
-                })
+                }),
               )
               .subscribe((concatRes: ITemplate[]) => (this.templates = concatRes));
           }
@@ -90,7 +96,7 @@ export class ExamUpdateComponent implements OnInit {
         .pipe(
           map((res: HttpResponse<IZone[]>) => {
             return res.body || [];
-          })
+          }),
         )
         .subscribe((resBody: IZone[]) => {
           if (!exam.idzoneId) {
@@ -101,7 +107,7 @@ export class ExamUpdateComponent implements OnInit {
               .pipe(
                 map((subRes: HttpResponse<IZone>) => {
                   return subRes.body ? [subRes.body].concat(resBody) : resBody;
-                })
+                }),
               )
               .subscribe((concatRes: IZone[]) => (this.idzones = concatRes));
           }
@@ -112,7 +118,7 @@ export class ExamUpdateComponent implements OnInit {
         .pipe(
           map((res: HttpResponse<IZone[]>) => {
             return res.body || [];
-          })
+          }),
         )
         .subscribe((resBody: IZone[]) => {
           if (!exam.namezoneId) {
@@ -123,7 +129,7 @@ export class ExamUpdateComponent implements OnInit {
               .pipe(
                 map((subRes: HttpResponse<IZone>) => {
                   return subRes.body ? [subRes.body].concat(resBody) : resBody;
-                })
+                }),
               )
               .subscribe((concatRes: IZone[]) => (this.namezones = concatRes));
           }
@@ -134,7 +140,7 @@ export class ExamUpdateComponent implements OnInit {
         .pipe(
           map((res: HttpResponse<IZone[]>) => {
             return res.body || [];
-          })
+          }),
         )
         .subscribe((resBody: IZone[]) => {
           if (!exam.firstnamezoneId) {
@@ -145,7 +151,7 @@ export class ExamUpdateComponent implements OnInit {
               .pipe(
                 map((subRes: HttpResponse<IZone>) => {
                   return subRes.body ? [subRes.body].concat(resBody) : resBody;
-                })
+                }),
               )
               .subscribe((concatRes: IZone[]) => (this.firstnamezones = concatRes));
           }
@@ -156,7 +162,7 @@ export class ExamUpdateComponent implements OnInit {
         .pipe(
           map((res: HttpResponse<IZone[]>) => {
             return res.body || [];
-          })
+          }),
         )
         .subscribe((resBody: IZone[]) => {
           if (!exam.notezoneId) {
@@ -167,7 +173,7 @@ export class ExamUpdateComponent implements OnInit {
               .pipe(
                 map((subRes: HttpResponse<IZone>) => {
                   return subRes.body ? [subRes.body].concat(resBody) : resBody;
-                })
+                }),
               )
               .subscribe((concatRes: IZone[]) => (this.notezones = concatRes));
           }
@@ -178,7 +184,7 @@ export class ExamUpdateComponent implements OnInit {
         .pipe(
           map((res: HttpResponse<IScan[]>) => {
             return res.body || [];
-          })
+          }),
         )
         .subscribe((resBody: IScan[]) => {
           if (!exam.scanfileId) {
@@ -189,7 +195,7 @@ export class ExamUpdateComponent implements OnInit {
               .pipe(
                 map((subRes: HttpResponse<IScan>) => {
                   return subRes.body ? [subRes.body].concat(resBody) : resBody;
-                })
+                }),
               )
               .subscribe((concatRes: IScan[]) => (this.scanfiles = concatRes));
           }
@@ -245,7 +251,7 @@ export class ExamUpdateComponent implements OnInit {
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IExam>>): void {
     result.subscribe(
       () => this.onSaveSuccess(),
-      () => this.onSaveError()
+      () => this.onSaveError(),
     );
   }
 

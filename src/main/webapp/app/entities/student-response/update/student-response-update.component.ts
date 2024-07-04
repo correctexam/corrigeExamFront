@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 
@@ -17,12 +17,18 @@ import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
 import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
 import { GradedCommentService } from 'app/entities/graded-comment/service/graded-comment.service';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { NgFor } from '@angular/common';
+import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 type SelectableEntity = IQuestion | IExamSheet;
 
 @Component({
   selector: 'jhi-student-response-update',
   templateUrl: './student-response-update.component.html',
+  standalone: true,
+  imports: [FormsModule, ReactiveFormsModule, TranslateDirective, AlertErrorComponent, NgFor, FaIconComponent],
 })
 export class StudentResponseUpdateComponent implements OnInit {
   isSaving = false;
@@ -40,7 +46,7 @@ export class StudentResponseUpdateComponent implements OnInit {
     protected textCommentService: TextCommentService,
     protected gradedCommentService: GradedCommentService,
     protected activatedRoute: ActivatedRoute,
-    protected fb: UntypedFormBuilder
+    protected fb: UntypedFormBuilder,
   ) {
     this.editForm = this.fb.group({
       id: [],
@@ -108,7 +114,7 @@ export class StudentResponseUpdateComponent implements OnInit {
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IStudentResponse>>): void {
     result.subscribe(
       () => this.onSaveSuccess(),
-      () => this.onSaveError()
+      () => this.onSaveError(),
     );
   }
 

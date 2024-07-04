@@ -1,28 +1,29 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+
+import { describe, expect } from '@jest/globals';
 import { of } from 'rxjs';
 
 import { LogsComponent } from './logs.component';
 import { LogsService } from './logs.service';
 import { Log, LoggersResponse } from './log.model';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('LogsComponent', () => {
   let comp: LogsComponent;
   let fixture: ComponentFixture<LogsComponent>;
   let service: LogsService;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
-        declarations: [LogsComponent],
-        providers: [LogsService],
-      })
-        .overrideTemplate(LogsComponent, '')
-        .compileComponents();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule, FormsModule, LogsComponent],
+      declarations: [],
+      providers: [provideHttpClient(), provideHttpClientTesting(), LogsService],
     })
-  );
+      .overrideTemplate(LogsComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(LogsComponent);
@@ -47,7 +48,7 @@ describe('LogsComponent', () => {
               effectiveLevel: 'WARN',
             },
           },
-        } as unknown as LoggersResponse)
+        } as unknown as LoggersResponse),
       );
 
       // WHEN
@@ -55,7 +56,7 @@ describe('LogsComponent', () => {
 
       // THEN
       expect(service.findAll).toHaveBeenCalled();
-      expect(comp.loggers?.[0]).toEqual(expect.objectContaining(log));
+      expect(comp.loggers?.[0]).toEqual(expect.objectContaining(log as any));
     });
   });
 
@@ -71,7 +72,7 @@ describe('LogsComponent', () => {
               effectiveLevel: 'ERROR',
             },
           },
-        } as unknown as LoggersResponse)
+        } as unknown as LoggersResponse),
       );
 
       // WHEN
@@ -80,7 +81,7 @@ describe('LogsComponent', () => {
       // THEN
       expect(service.changeLevel).toHaveBeenCalled();
       expect(service.findAll).toHaveBeenCalled();
-      expect(comp.loggers?.[0]).toEqual(expect.objectContaining(log));
+      expect(comp.loggers?.[0]).toEqual(expect.objectContaining(log as any));
     });
   });
 });

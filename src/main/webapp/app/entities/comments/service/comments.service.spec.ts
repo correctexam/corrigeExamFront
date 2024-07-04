@@ -1,10 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { IComments, Comments } from '../comments.model';
 
 import { CommentsService } from './comments.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('Comments Service', () => {
   let service: CommentsService;
@@ -14,7 +16,8 @@ describe('Comments Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
     expectedResult = null;
     service = TestBed.inject(CommentsService);
@@ -35,7 +38,7 @@ describe('Comments Service', () => {
 
       const req = httpMock.expectOne({ method: 'GET' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(elemDefault);
+      expect(expectedResult).toMatchSnapshot(elemDefault);
     });
 
     it('should create a Comments', () => {
@@ -43,7 +46,7 @@ describe('Comments Service', () => {
         {
           id: 0,
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);
@@ -52,7 +55,7 @@ describe('Comments Service', () => {
 
       const req = httpMock.expectOne({ method: 'POST' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should update a Comments', () => {
@@ -61,7 +64,7 @@ describe('Comments Service', () => {
           id: 1,
           jsonData: 'BBBBBB',
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);
@@ -70,7 +73,7 @@ describe('Comments Service', () => {
 
       const req = httpMock.expectOne({ method: 'PUT' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should partial update a Comments', () => {
@@ -78,7 +81,7 @@ describe('Comments Service', () => {
         {
           jsonData: 'BBBBBB',
         },
-        new Comments()
+        new Comments(),
       );
 
       const returnedFromService = Object.assign(patchObject, elemDefault);
@@ -89,7 +92,7 @@ describe('Comments Service', () => {
 
       const req = httpMock.expectOne({ method: 'PATCH' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should return a list of Comments', () => {
@@ -98,7 +101,7 @@ describe('Comments Service', () => {
           id: 1,
           jsonData: 'BBBBBB',
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);

@@ -1,8 +1,8 @@
 jest.mock('@ng-bootstrap/ng-bootstrap');
 
 import { ComponentFixture, TestBed, inject, fakeAsync, tick } from '@angular/core/testing';
-import { HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpResponse, provideHttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -10,6 +10,8 @@ import { ZoneService } from '../service/zone.service';
 
 import { ZoneDeleteDialogComponent } from './zone-delete-dialog.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
 
 describe('Zone Management Delete Component', () => {
   let comp: ZoneDeleteDialogComponent;
@@ -19,9 +21,9 @@ describe('Zone Management Delete Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
-      declarations: [ZoneDeleteDialogComponent],
-      providers: [NgbActiveModal],
+      imports: [ReactiveFormsModule, FormsModule, ZoneDeleteDialogComponent],
+      declarations: [],
+      providers: [NgbActiveModal, provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     })
       .overrideTemplate(ZoneDeleteDialogComponent, '')
       .compileComponents();
@@ -45,7 +47,7 @@ describe('Zone Management Delete Component', () => {
         // THEN
         expect(service.delete).toHaveBeenCalledWith(123);
         expect(mockActiveModal.close).toHaveBeenCalledWith('deleted');
-      })
+      }),
     ));
 
     it('Should not call delete service on clear', () => {

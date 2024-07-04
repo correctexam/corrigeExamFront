@@ -1,12 +1,12 @@
 jest.mock('app/core/auth/state-storage.service');
 
-import { Router } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { Router, provideRouter } from '@angular/router';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { describe, expect } from '@jest/globals';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
-import { NgxWebstorageModule, SessionStorageService } from 'ngx-webstorage';
+import { SessionStorageService, provideNgxWebstorage, withLocalStorage, withNgxWebstorageConfig, withSessionStorage } from 'ngx-webstorage';
 
 import { Account } from 'app/core/auth/account.model';
 import { Authority } from 'app/config/authority.constants';
@@ -14,6 +14,7 @@ import { StateStorageService } from 'app/core/auth/state-storage.service';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 
 import { AccountService } from './account.service';
+import { provideHttpClient } from '@angular/common/http';
 
 function accountWithAuthorities(authorities: string[]): Account {
   return {
@@ -39,8 +40,15 @@ describe('Account Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, RouterTestingModule.withRoutes([]), TranslateModule.forRoot(), NgxWebstorageModule.forRoot()],
-      providers: [StateStorageService],
+      imports: [TranslateModule.forRoot()],
+      providers: [
+        StateStorageService,
+        provideNgxWebstorage(withNgxWebstorageConfig({ separator: ':', caseSensitive: true }), withLocalStorage(), withSessionStorage()),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+
+        provideRouter([]),
+      ],
     });
 
     service = TestBed.inject(AccountService);

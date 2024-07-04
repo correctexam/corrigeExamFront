@@ -1,14 +1,30 @@
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { LANGUAGES } from 'app/config/language.constants';
 import { User } from '../user-management.model';
 import { UserManagementService } from '../service/user-management.service';
+import { FindLanguageFromKeyPipe } from '../../../shared/language/find-language-from-key.pipe';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
+import { NgIf, NgFor } from '@angular/common';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-user-mgmt-update',
   templateUrl: './user-management-update.component.html',
+  standalone: true,
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    TranslateDirective,
+    NgIf,
+    AlertErrorComponent,
+    NgFor,
+    FaIconComponent,
+    FindLanguageFromKeyPipe,
+  ],
 })
 export class UserManagementUpdateComponent implements OnInit {
   user!: User;
@@ -18,7 +34,11 @@ export class UserManagementUpdateComponent implements OnInit {
 
   editForm: UntypedFormGroup;
 
-  constructor(private userService: UserManagementService, private route: ActivatedRoute, private fb: UntypedFormBuilder) {
+  constructor(
+    private userService: UserManagementService,
+    private route: ActivatedRoute,
+    private fb: UntypedFormBuilder,
+  ) {
     this.editForm = this.fb.group({
       id: [],
       login: [

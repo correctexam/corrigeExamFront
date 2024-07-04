@@ -9,15 +9,22 @@
 // http://localhost:9000/copie/d6680b56-36a5-4488-ac5b-c862096bc311/1
 
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { StudentService } from 'app/entities/student/service/student.service';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService, PrimeTemplate } from 'primeng/api';
 import { AlignImagesService } from '../services/align-images.service';
 import { ScanService } from 'app/entities/scan/service/scan.service';
 import { HttpClient } from '@angular/common/http';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { NgFor, NgIf } from '@angular/common';
+import { TableModule } from 'primeng/table';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { TranslateDirective } from '../../shared/language/translate.directive';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { BlockUIModule } from 'primeng/blockui';
+import { ToastModule } from 'primeng/toast';
 
 export interface WorstAndBestSolution {
   numero: number;
@@ -30,6 +37,19 @@ export interface WorstAndBestSolution {
   templateUrl: './voirreponsesstarunstarexam.component.html',
   styleUrls: ['./voirreponsesstarunstarexam.component.scss'],
   providers: [ConfirmationService, MessageService],
+  standalone: true,
+  imports: [
+    ToastModule,
+    BlockUIModule,
+    ProgressSpinnerModule,
+    TranslateDirective,
+    RouterLink,
+    FaIconComponent,
+    TableModule,
+    PrimeTemplate,
+    NgFor,
+    NgIf,
+  ],
 })
 export class VoirReponsesStarUnstarComponent implements OnInit {
   examid: string | undefined;
@@ -46,7 +66,7 @@ export class VoirReponsesStarUnstarComponent implements OnInit {
     private alignImagesService: AlignImagesService,
     public messageService: MessageService,
     protected applicationConfigService: ApplicationConfigService,
-    private http: HttpClient
+    private http: HttpClient,
   ) {}
 
   ngOnInit(): void {

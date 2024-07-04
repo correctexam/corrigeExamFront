@@ -1,8 +1,8 @@
 jest.mock('app/core/auth/account.service');
+import { describe, expect } from '@jest/globals';
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { Router } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import { Router, provideRouter } from '@angular/router';
 import { of, Subject } from 'rxjs';
 
 import { AccountService } from 'app/core/auth/account.service';
@@ -11,9 +11,9 @@ import { Account } from 'app/core/auth/account.model';
 import { HomeComponent } from './home.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NgxWebstorageModule } from 'ngx-webstorage';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideNgxWebstorage, withNgxWebstorageConfig, withLocalStorage, withSessionStorage } from 'ngx-webstorage';
 
 describe('Home Component', () => {
   let comp: HomeComponent;
@@ -33,24 +33,22 @@ describe('Home Component', () => {
     imageUrl: null,
   };
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [
-          ReactiveFormsModule,
-          FormsModule,
-          RouterTestingModule.withRoutes([]),
-          TranslateModule.forRoot(),
-          HttpClientTestingModule,
-          NgxWebstorageModule.forRoot(),
-        ],
-        declarations: [HomeComponent],
-        providers: [AccountService, TranslateService],
-      })
-        .overrideTemplate(HomeComponent, '')
-        .compileComponents();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule, FormsModule, TranslateModule.forRoot(), HomeComponent],
+      declarations: [],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideNgxWebstorage(withNgxWebstorageConfig({ separator: ':', caseSensitive: true }), withLocalStorage(), withSessionStorage()),
+        provideRouter([]),
+        AccountService,
+        TranslateService,
+      ],
     })
-  );
+      .overrideTemplate(HomeComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(HomeComponent);

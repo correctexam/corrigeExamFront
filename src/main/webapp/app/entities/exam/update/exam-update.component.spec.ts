@@ -1,15 +1,15 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpResponse, provideHttpClient } from '@angular/common/http';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of, Subject, from } from 'rxjs';
 
 import { ExamService } from '../service/exam.service';
 import { Exam } from '../exam.model';
 
 import { ExamUpdateComponent } from './exam-update.component';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('Exam Management Update Component', () => {
   let comp: ExamUpdateComponent;
@@ -19,9 +19,13 @@ describe('Exam Management Update Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule, RouterTestingModule.withRoutes([])],
-      declarations: [ExamUpdateComponent],
+      imports: [ReactiveFormsModule, FormsModule, ExamUpdateComponent],
+      declarations: [],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+
+        provideRouter([]),
         FormBuilder,
         {
           provide: ActivatedRoute,

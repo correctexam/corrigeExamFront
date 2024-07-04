@@ -3,8 +3,14 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { ProfileService } from './profile.service';
+import { CommonModule, NgIf } from '@angular/common';
+import { TranslateDirective } from 'app/shared/language/translate.directive';
+import { RouterLink } from '@angular/router';
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, TranslateDirective, NgIf, RouterLink],
+
   selector: 'jhi-page-ribbon',
   template: `
     <div class="ribbon" *ngIf="ribbonEnv$ | async as ribbonEnv">

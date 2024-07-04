@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { describe, expect } from '@jest/globals';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
@@ -10,7 +11,8 @@ describe('Comments Management Detail Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [CommentsDetailComponent],
+      imports: [CommentsDetailComponent],
+      declarations: [],
       providers: [
         {
           provide: ActivatedRoute,

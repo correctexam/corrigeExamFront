@@ -498,6 +498,11 @@
     "zenviewTooltip": "Permet d'avoir une vue avec moins de widget pour se consacrer sur la correction (vous pouvez utiliser les raccourcis clavier pour aller plus vite, la liste est accessible à l'aide de la touche F1)",
     "forceedit": "Forcer l'édition des propriétés",
     "forceeditTooltip": "Ceci vous permet de forcer l'édition des propriétés de la question en cours, ⚠️ Vous avez des corrections effectuées pour cette question, changer ces propriétés n'est pas conseillé en cours de correction, il est préférable de migrer votre mode de correction vers le mode hybride (cela offre plus de souplesse dans la mise à jour du barème en cours de correction).",
-    "clickbuttonsauveretudiant": "⚠️: N'oubliez pas de cliquer sur le bouton 'Enregistrer liste étudiants' pour importer cette liste d'étudiants"
+    "clickbuttonsauveretudiant": "⚠️: N'oubliez pas de cliquer sur le bouton 'Enregistrer liste étudiants' pour importer cette liste d'étudiants",
+    "gotonextquestion": "En correction horizontale, permet de basculer à la première copie pour la prochaine question",
+    "gotonextstudent": "En correction verticale, permet de basculer à la première question pour la prochaine copie (étudiant)",
+    "gotopreviousquestion": "En correction horizontale, permet de basculer à la dernière copie pour la question précédente",
+    "gotopreviousstudent": "En correction verticale, permet de basculer à la dernière question pour la copie précédente (étudiant)",
+    "startcorrect": "Débuter"
   }
 }

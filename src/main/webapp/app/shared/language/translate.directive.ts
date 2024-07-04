@@ -10,6 +10,7 @@ import { translationNotFoundMessage } from 'app/config/translation.config';
  */
 @Directive({
   selector: '[jhiTranslate]',
+  standalone: true,
 })
 export class TranslateDirective implements OnChanges, OnInit, OnDestroy {
   @Input() jhiTranslate!: string;
@@ -17,7 +18,10 @@ export class TranslateDirective implements OnChanges, OnInit, OnDestroy {
 
   private readonly directiveDestroyed = new Subject();
 
-  constructor(private el: ElementRef, private translateService: TranslateService) {}
+  constructor(
+    private el: ElementRef,
+    private translateService: TranslateService,
+  ) {}
 
   ngOnInit(): void {
     this.translateService.onLangChange.pipe(takeUntil(this.directiveDestroyed)).subscribe(() => {

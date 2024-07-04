@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 
@@ -10,10 +10,16 @@ import { IExamSheet, ExamSheet } from '../exam-sheet.model';
 import { ExamSheetService } from '../service/exam-sheet.service';
 import { IScan } from 'app/entities/scan/scan.model';
 import { ScanService } from 'app/entities/scan/service/scan.service';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { NgIf, NgFor } from '@angular/common';
+import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-exam-sheet-update',
   templateUrl: './exam-sheet-update.component.html',
+  standalone: true,
+  imports: [FormsModule, ReactiveFormsModule, TranslateDirective, AlertErrorComponent, NgIf, NgFor, FaIconComponent],
 })
 export class ExamSheetUpdateComponent implements OnInit {
   isSaving = false;
@@ -25,7 +31,7 @@ export class ExamSheetUpdateComponent implements OnInit {
     protected examSheetService: ExamSheetService,
     protected scanService: ScanService,
     protected activatedRoute: ActivatedRoute,
-    private fb: UntypedFormBuilder
+    private fb: UntypedFormBuilder,
   ) {
     this.editForm = this.fb.group({
       id: [],
@@ -82,7 +88,7 @@ export class ExamSheetUpdateComponent implements OnInit {
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IExamSheet>>): void {
     result.subscribe(
       () => this.onSaveSuccess(),
-      () => this.onSaveError()
+      () => this.onSaveError(),
     );
   }
 

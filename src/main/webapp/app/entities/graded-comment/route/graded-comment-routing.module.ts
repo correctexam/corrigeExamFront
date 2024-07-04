@@ -1,5 +1,4 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { GradedCommentComponent } from '../list/graded-comment.component';
@@ -7,7 +6,7 @@ import { GradedCommentDetailComponent } from '../detail/graded-comment-detail.co
 import { GradedCommentUpdateComponent } from '../update/graded-comment-update.component';
 import { GradedCommentRoutingResolveService } from './graded-comment-routing-resolve.service';
 
-const gradedCommentRoute: Routes = [
+export const gradedCommentRoute: Routes = [
   {
     path: '',
     component: GradedCommentComponent,
@@ -54,9 +53,3 @@ const gradedCommentRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
 ];
-
-@NgModule({
-  imports: [RouterModule.forChild(gradedCommentRoute)],
-  exports: [RouterModule],
-})
-export class GradedCommentRoutingModule {}

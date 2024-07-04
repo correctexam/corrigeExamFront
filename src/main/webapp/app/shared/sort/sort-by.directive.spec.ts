@@ -1,5 +1,6 @@
 import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { describe, expect } from '@jest/globals';
 import { By } from '@angular/platform-browser';
 import { FaIconComponent, FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { fas, faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
@@ -17,7 +18,8 @@ import { SortDirective } from './sort.directive';
       </thead>
     </table>
   `,
-  imports: [FaIconLibrary],
+  imports: [FaIconComponent, SortDirective, SortByDirective],
+  standalone: true,
 })
 class TestSortByDirectiveComponent {
   predicate?: string;
@@ -38,8 +40,8 @@ describe('Directive: SortByDirective', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [TestSortByDirectiveComponent, SortDirective, SortByDirective],
-      imports: [FaIconComponent],
+      declarations: [],
+      imports: [FaIconComponent, TestSortByDirectiveComponent],
     });
     fixture = TestBed.createComponent(TestSortByDirectiveComponent);
     component = fixture.componentInstance;

@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faDownload, faLink } from '@fortawesome/free-solid-svg-icons';
 import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
@@ -14,12 +14,31 @@ import { ITemplate, Template } from '../../entities/template/template.model';
 import { HttpResponse } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { Title } from '@angular/platform-browser';
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+import { NgIf } from '@angular/common';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { TranslateDirective } from '../../shared/language/translate.directive';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { BlockUIModule } from 'primeng/blockui';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'jhi-creerexam',
   templateUrl: './creerexam.component.html',
   styleUrls: ['./creerexam.component.scss'],
   providers: [MessageService, ConfirmationService],
+  standalone: true,
+  imports: [
+    ToastModule,
+    BlockUIModule,
+    ProgressSpinnerModule,
+    TranslateDirective,
+    FaIconComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    NgIf,
+    NgxExtendedPdfViewerModule,
+  ],
 })
 export class CreerexamComponent implements OnInit, AfterViewInit {
   blocked = false;

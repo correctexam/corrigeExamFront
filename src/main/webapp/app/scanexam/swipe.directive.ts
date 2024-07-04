@@ -5,6 +5,7 @@ import { createSwipeSubscription, SwipeEvent } from 'ag-swipe-core';
 
 @Directive({
   selector: '[jhiSwipe]',
+  standalone: true,
 })
 export class SwipeDirective implements OnInit, OnDestroy {
   private swipeSubscription: Subscription | undefined;

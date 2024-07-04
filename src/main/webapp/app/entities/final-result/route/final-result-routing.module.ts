@@ -1,5 +1,4 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { FinalResultComponent } from '../list/final-result.component';
@@ -7,7 +6,7 @@ import { FinalResultDetailComponent } from '../detail/final-result-detail.compon
 import { FinalResultUpdateComponent } from '../update/final-result-update.component';
 import { FinalResultRoutingResolveService } from './final-result-routing-resolve.service';
 
-const finalResultRoute: Routes = [
+export const finalResultRoute: Routes = [
   {
     path: '',
     component: FinalResultComponent,
@@ -52,9 +51,3 @@ const finalResultRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
 ];
-
-@NgModule({
-  imports: [RouterModule.forChild(finalResultRoute)],
-  exports: [RouterModule],
-})
-export class FinalResultRoutingModule {}

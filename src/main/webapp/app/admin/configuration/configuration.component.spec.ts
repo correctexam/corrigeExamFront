@@ -1,28 +1,28 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
 import { of } from 'rxjs';
 
 import { ConfigurationComponent } from './configuration.component';
 import { ConfigurationService } from './configuration.service';
 import { Bean, PropertySource } from './configuration.model';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('ConfigurationComponent', () => {
   let comp: ConfigurationComponent;
   let fixture: ComponentFixture<ConfigurationComponent>;
   let service: ConfigurationService;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
-        declarations: [ConfigurationComponent],
-        providers: [ConfigurationService],
-      })
-        .overrideTemplate(ConfigurationComponent, '')
-        .compileComponents();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule, FormsModule, ConfigurationComponent],
+      declarations: [],
+      providers: [ConfigurationService, provideHttpClient(), provideHttpClientTesting()],
     })
-  );
+      .overrideTemplate(ConfigurationComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ConfigurationComponent);

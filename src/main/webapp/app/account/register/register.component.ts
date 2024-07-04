@@ -1,14 +1,20 @@
 import { Component, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 
 import { EMAIL_ALREADY_USED_TYPE, LOGIN_ALREADY_USED_TYPE } from 'app/config/error.constants';
 import { RegisterService } from './register.service';
+import { RouterLink } from '@angular/router';
+import { PasswordStrengthBarComponent } from '../password/password-strength-bar/password-strength-bar.component';
+import { NgIf } from '@angular/common';
+import { TranslateDirective } from '../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-register',
   templateUrl: './register.component.html',
+  standalone: true,
+  imports: [TranslateDirective, NgIf, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, RouterLink, TranslateModule],
 })
 export class RegisterComponent implements AfterViewInit {
   @ViewChild('login', { static: false })
@@ -22,7 +28,11 @@ export class RegisterComponent implements AfterViewInit {
 
   registerForm: UntypedFormGroup;
 
-  constructor(private translateService: TranslateService, private registerService: RegisterService, private fb: UntypedFormBuilder) {
+  constructor(
+    private translateService: TranslateService,
+    private registerService: RegisterService,
+    private fb: UntypedFormBuilder,
+  ) {
     this.registerForm = this.fb.group({
       login: [
         '',

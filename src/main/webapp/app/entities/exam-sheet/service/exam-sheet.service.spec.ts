@@ -1,10 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { IExamSheet, ExamSheet } from '../exam-sheet.model';
 
 import { ExamSheetService } from './exam-sheet.service';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('ExamSheet Service', () => {
   let service: ExamSheetService;
@@ -14,7 +16,8 @@ describe('ExamSheet Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
     expectedResult = null;
     service = TestBed.inject(ExamSheetService);
@@ -36,7 +39,7 @@ describe('ExamSheet Service', () => {
 
       const req = httpMock.expectOne({ method: 'GET' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(elemDefault);
+      expect(expectedResult).toMatchSnapshot(elemDefault);
     });
 
     it('should create a ExamSheet', () => {
@@ -44,7 +47,7 @@ describe('ExamSheet Service', () => {
         {
           id: 0,
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);
@@ -53,7 +56,7 @@ describe('ExamSheet Service', () => {
 
       const req = httpMock.expectOne({ method: 'POST' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should update a ExamSheet', () => {
@@ -64,7 +67,7 @@ describe('ExamSheet Service', () => {
           pagemin: 1,
           pagemax: 1,
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);
@@ -73,7 +76,7 @@ describe('ExamSheet Service', () => {
 
       const req = httpMock.expectOne({ method: 'PUT' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should partial update a ExamSheet', () => {
@@ -82,7 +85,7 @@ describe('ExamSheet Service', () => {
           pagemin: 1,
           pagemax: 1,
         },
-        new ExamSheet()
+        new ExamSheet(),
       );
 
       const returnedFromService = Object.assign(patchObject, elemDefault);
@@ -93,7 +96,7 @@ describe('ExamSheet Service', () => {
 
       const req = httpMock.expectOne({ method: 'PATCH' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should return a list of ExamSheet', () => {
@@ -104,7 +107,7 @@ describe('ExamSheet Service', () => {
           pagemin: 1,
           pagemax: 1,
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);

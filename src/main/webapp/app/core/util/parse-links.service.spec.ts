@@ -1,6 +1,7 @@
 import { inject, TestBed } from '@angular/core/testing';
 
 import { ParseLinks } from './parse-links.service';
+import { describe, expect } from '@jest/globals';
 
 describe('Parse links service test', () => {
   describe('Parse Links Service Test', () => {

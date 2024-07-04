@@ -21,13 +21,14 @@ import {
   signal,
   WritableSignal,
   effect,
+  LOCALE_ID,
 } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { CourseService } from 'app/entities/course/service/course.service';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { StudentService } from 'app/entities/student/service/student.service';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService, PrimeTemplate } from 'primeng/api';
 import {
   AlignImagesService,
   IImageAlignement,
@@ -50,7 +51,7 @@ import { ITextComment } from '../../entities/text-comment/text-comment.model';
 import { IGradedComment } from '../../entities/graded-comment/graded-comment.model';
 import { GradedCommentService } from '../../entities/graded-comment/service/graded-comment.service';
 import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { IQCMSolution } from '../../qcm';
 import { Observable, Subscriber, firstValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
@@ -59,20 +60,51 @@ import { worker1 } from '../services/workerimport';
 import { PreferenceService } from '../preference-page/preference.service';
 import { EntityResponseType } from '../../entities/exam-sheet/service/exam-sheet.service';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
-import { KeyboardShortcutsComponent, ShortcutEventOutput, ShortcutInput } from 'ng-keyboard-shortcuts';
+import { KeyboardShortcutsComponent, ShortcutEventOutput, ShortcutInput, KeyboardShortcutsModule } from 'ng-keyboard-shortcuts';
 import { IKeyBoardShortCutPreferenceEntry, KeyboardShortcutService } from '../preference-page/keyboardshortcut.service';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { DrawingTools } from '../annotate-template/paint/models';
 import { IHybridGradedComment, NewHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-graded-comment.model';
 import { HybridGradedCommentService } from 'app/entities/hybrid-graded-comment/service/hybrid-graded-comment.service';
 import { Answer2HybridGradedCommentService } from '../../entities/answer-2-hybrid-graded-comment/service/answer-2-hybrid-graded-comment.service';
-import { Inplace } from 'primeng/inplace';
+import { Inplace, InplaceModule } from 'primeng/inplace';
 import { IExamSheet } from 'app/entities/exam-sheet/exam-sheet.model';
-import { OrderList } from 'primeng/orderlist';
+import { OrderList, OrderListModule } from 'primeng/orderlist';
 import { Title } from '@angular/platform-browser';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { PromisePool } from '@supercharge/promise-pool';
 import { FocusViewService } from '../../layouts/profiles/focusview.service';
+import { CommentSortPipe } from '../sortComment';
+import { KnobModule } from 'primeng/knob';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { GraphicalToolbarCorrectionComponent } from './toolbar/toolbar.component';
+import { PaginatorModule } from 'primeng/paginator';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { GalleriaModule } from 'primeng/galleria';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { BlockUIModule } from 'primeng/blockui';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { FontsizeSliderComponent } from './toolbar/fontsize-slider/fontsize-slider.component';
+import { ThicknessSliderComponent } from './toolbar/thickness-slider/thickness-slider.component';
+import { ColourPaletteComponent } from './toolbar/colour-palette/colour-palette.component';
+import { SliderModule } from 'primeng/slider';
+import { TooltipModule } from 'primeng/tooltip';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { RatingModule } from 'primeng/rating';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { QuestionpropertiesviewComponent } from '../annotate-template/paint/questionpropertiesview/questionpropertiesview.component';
+import { SidebarModule } from 'primeng/sidebar';
+import { KeyboardshortcutComponent } from './keyboardshortcut/keyboardshortcut.component';
+import { NgIf, NgFor, DecimalPipe, DatePipe } from '@angular/common';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { Button, ButtonDirective } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormsModule } from '@angular/forms';
+import { TranslateDirective } from '../../shared/language/translate.directive';
+import { DialogModule } from 'primeng/dialog';
+import { ToastModule } from 'primeng/toast';
+import { SwipeDirective } from '../swipe.directive';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -93,7 +125,50 @@ interface CommentAction {
   selector: 'jhi-corrigequestion',
   templateUrl: './corrigequestion.component.html',
   styleUrls: ['./corrigequestion.component.scss'],
-  providers: [ConfirmationService, MessageService],
+  providers: [ConfirmationService, MessageService, { provide: LOCALE_ID, useValue: 'fr' }],
+  standalone: true,
+  imports: [
+    SwipeDirective,
+    ToastModule,
+    DialogModule,
+    TranslateDirective,
+    FormsModule,
+    InputTextModule,
+    Button,
+    ConfirmDialogModule,
+    PrimeTemplate,
+    ButtonDirective,
+    KeyboardShortcutsModule,
+    NgIf,
+    KeyboardshortcutComponent,
+    SidebarModule,
+    QuestionpropertiesviewComponent,
+    OrderListModule,
+    FaIconComponent,
+    RatingModule,
+    InputSwitchModule,
+    TooltipModule,
+    SliderModule,
+    ColourPaletteComponent,
+    ThicknessSliderComponent,
+    FontsizeSliderComponent,
+    SelectButtonModule,
+    BlockUIModule,
+    ProgressSpinnerModule,
+    OverlayPanelModule,
+    GalleriaModule,
+    ProgressBarModule,
+    PaginatorModule,
+    NgFor,
+    GraphicalToolbarCorrectionComponent,
+    InplaceModule,
+    InputTextareaModule,
+    KnobModule,
+    DecimalPipe,
+    DatePipe,
+    TranslateModule,
+    CommentSortPipe,
+  ],
 })
 export class CorrigequestionComponent implements OnInit, AfterViewInit {
   getQuestionTooltip(): string | undefined {
@@ -259,7 +334,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   updateTitle(): void {
     this.activatedRoute.data.subscribe(e => {
+      console.error('title', this.exam);
       this.translateService.get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
+        console.error('settitle', e1);
         this.titleService.setTitle(e1);
       });
     });
@@ -290,6 +367,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
       this.pageOffset = 0;
 
+      this.updateTitle();
+
       if (params.get('studentid') !== null) {
         this.studentid = +params.get('studentid')!;
         this.currentStudent = this.studentid - 1;
@@ -299,6 +378,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         } else {
           if (params.get('questionno') !== null) {
             this.currentStudentPaginator = m.get(+params.get('questionno')!)!.indexOf(this.currentStudent + 1);
+
             //            this.currentStudentPaginator = m.get(+params.get('questionno')!)![this.currentStudent] - 1;
           }
         }
@@ -1018,6 +1098,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
 
+  setNoteZero() {
+    this.currentNote = 0;
+    this.changeNote();
+  }
+
   changeNote(): void {
     if (this.resp !== undefined && !this.blocked) {
       this.blocked = true;
@@ -1086,6 +1171,22 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.blocked = false;
         this.resp = sr1.body!;
       });
+    }
+  }
+  updateWorstStar() {
+    if (this.resp !== undefined) {
+      if (this.resp.worststar) {
+        this.resp.star = false;
+      }
+      this.updateResponse();
+    }
+  }
+  updateStar() {
+    if (this.resp !== undefined) {
+      if (this.resp.star) {
+        this.resp.worststar = false;
+      }
+      this.updateResponse();
     }
   }
 

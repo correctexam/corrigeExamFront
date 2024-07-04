@@ -1,13 +1,11 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { CourseGroupComponent } from '../list/course-group.component';
 import { CourseGroupDetailComponent } from '../detail/course-group-detail.component';
 import { CourseGroupUpdateComponent } from '../update/course-group-update.component';
 import { CourseGroupRoutingResolveService } from './course-group-routing-resolve.service';
+import { Routes } from '@angular/router';
 
-const courseGroupRoute: Routes = [
+export const courseGroupRoute: Routes = [
   {
     path: '',
     component: CourseGroupComponent,
@@ -51,9 +49,3 @@ const courseGroupRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
 ];
-
-@NgModule({
-  imports: [RouterModule.forChild(courseGroupRoute)],
-  exports: [RouterModule],
-})
-export class CourseGroupRoutingModule {}

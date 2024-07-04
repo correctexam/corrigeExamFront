@@ -1,11 +1,10 @@
 jest.mock('app/login/login.service');
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { RouterTestingModule } from '@angular/router/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { of } from 'rxjs';
-import { NgxWebstorageModule } from 'ngx-webstorage';
 import { TranslateModule } from '@ngx-translate/core';
+import { describe, expect } from '@jest/globals';
 
 import { ProfileInfo } from 'app/layouts/profiles/profile-info.model';
 import { Account } from 'app/core/auth/account.model';
@@ -15,6 +14,9 @@ import { LoginService } from 'app/login/login.service';
 
 import { NavbarComponent } from './navbar.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { provideNgxWebstorage, withNgxWebstorageConfig, withLocalStorage, withSessionStorage } from 'ngx-webstorage';
+import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
 
 describe('Navbar Component', () => {
   let comp: NavbarComponent;
@@ -32,24 +34,23 @@ describe('Navbar Component', () => {
     imageUrl: '',
   };
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [
-          ReactiveFormsModule,
-          FormsModule,
-          HttpClientTestingModule,
-          RouterTestingModule.withRoutes([]),
-          TranslateModule.forRoot(),
-          NgxWebstorageModule.forRoot(),
-        ],
-        declarations: [NavbarComponent],
-        providers: [LoginService],
-      })
-        .overrideTemplate(NavbarComponent, '')
-        .compileComponents();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule, FormsModule, TranslateModule.forRoot(), NavbarComponent],
+      declarations: [],
+      providers: [
+        LoginService,
+
+        provideNgxWebstorage(withNgxWebstorageConfig({ separator: ':', caseSensitive: true }), withLocalStorage(), withSessionStorage()),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+
+        provideRouter([]),
+      ],
     })
-  );
+      .overrideTemplate(NavbarComponent, '')
+      .compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(NavbarComponent);

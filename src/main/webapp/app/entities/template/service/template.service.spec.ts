@@ -1,10 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { ITemplate, Template } from '../template.model';
 
 import { TemplateService } from './template.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('Template Service', () => {
   let service: TemplateService;
@@ -14,7 +16,8 @@ describe('Template Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
     expectedResult = null;
     service = TestBed.inject(TemplateService);
@@ -38,7 +41,7 @@ describe('Template Service', () => {
 
       const req = httpMock.expectOne({ method: 'GET' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(elemDefault);
+      expect(expectedResult).toMatchSnapshot(elemDefault);
     });
 
     it('should create a Template', () => {
@@ -46,7 +49,7 @@ describe('Template Service', () => {
         {
           id: 0,
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);
@@ -55,7 +58,7 @@ describe('Template Service', () => {
 
       const req = httpMock.expectOne({ method: 'POST' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should update a Template', () => {
@@ -67,7 +70,7 @@ describe('Template Service', () => {
           mark: true,
           autoMapStudentCopyToList: true,
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);
@@ -76,7 +79,7 @@ describe('Template Service', () => {
 
       const req = httpMock.expectOne({ method: 'PUT' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should partial update a Template', () => {
@@ -85,7 +88,7 @@ describe('Template Service', () => {
           mark: true,
           autoMapStudentCopyToList: true,
         },
-        new Template()
+        new Template(),
       );
 
       const returnedFromService = Object.assign(patchObject, elemDefault);
@@ -96,7 +99,7 @@ describe('Template Service', () => {
 
       const req = httpMock.expectOne({ method: 'PATCH' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should return a list of Template', () => {
@@ -108,7 +111,7 @@ describe('Template Service', () => {
           mark: true,
           autoMapStudentCopyToList: true,
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);

@@ -1,8 +1,8 @@
 import { Component, NgZone, OnInit } from '@angular/core';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { combineLatest } from 'rxjs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 
 import { IScan } from '../scan.model';
 
@@ -10,10 +10,32 @@ import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/config/pagination.constants
 import { ScanService } from '../service/scan.service';
 import { ScanDeleteDialogComponent } from '../delete/scan-delete-dialog.component';
 import { DataUtils } from 'app/core/util/data-util.service';
+import { ItemCountComponent } from '../../../shared/pagination/item-count.component';
+import { SortByDirective } from '../../../shared/sort/sort-by.directive';
+import { SortDirective } from '../../../shared/sort/sort.directive';
+import { NgIf, NgFor } from '@angular/common';
+import { AlertComponent } from '../../../shared/alert/alert.component';
+import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-scan',
   templateUrl: './scan.component.html',
+  standalone: true,
+  imports: [
+    TranslateDirective,
+    FaIconComponent,
+    RouterLink,
+    AlertErrorComponent,
+    AlertComponent,
+    NgIf,
+    SortDirective,
+    SortByDirective,
+    NgFor,
+    ItemCountComponent,
+    NgbPagination,
+  ],
 })
 export class ScanComponent implements OnInit {
   scans?: IScan[];
@@ -31,7 +53,7 @@ export class ScanComponent implements OnInit {
     protected dataUtils: DataUtils,
     protected router: Router,
     protected modalService: NgbModal,
-    private zone: NgZone
+    private zone: NgZone,
   ) {}
 
   loadPage(page?: number, dontNavigate?: boolean): void {

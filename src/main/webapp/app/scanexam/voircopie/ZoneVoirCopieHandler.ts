@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 /* eslint-disable @typescript-eslint/prefer-optional-chain */
@@ -13,7 +14,11 @@ export class ZoneVoirCopieHandler {
   private canvasInitialCanvas!: HTMLCanvasElement;
   canvas: fabric.Canvas | undefined;
 
-  constructor(public zoneid: string, public eventHandler: EventCanevasVoirCopieHandlerService, public respid: number | undefined) {}
+  constructor(
+    public zoneid: string,
+    public eventHandler: EventCanevasVoirCopieHandlerService,
+    public respid: number | undefined,
+  ) {}
 
   updateCanvas(canvas1: any): fabric.Canvas {
     if (this.annotationCanvas && this.annotationCanvas.parentNode) {

@@ -1,13 +1,11 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { TextCommentComponent } from '../list/text-comment.component';
 import { TextCommentDetailComponent } from '../detail/text-comment-detail.component';
 import { TextCommentUpdateComponent } from '../update/text-comment-update.component';
 import { TextCommentRoutingResolveService } from './text-comment-routing-resolve.service';
+import { Routes } from '@angular/router';
 
-const textCommentRoute: Routes = [
+export const textCommentRoute: Routes = [
   {
     path: '',
     component: TextCommentComponent,
@@ -51,9 +49,3 @@ const textCommentRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
 ];
-
-@NgModule({
-  imports: [RouterModule.forChild(textCommentRoute)],
-  exports: [RouterModule],
-})
-export class TextCommentRoutingModule {}

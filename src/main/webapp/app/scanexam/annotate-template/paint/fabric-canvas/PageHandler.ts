@@ -99,7 +99,7 @@ export class PageHandler {
     };
   }
 
-  public updateCanvas(pageViewer: any): PagedCanvas {
+  public updateCanvas(pageViewer: any, document: Document): PagedCanvas {
     // Add the event listeners for mousedown, mousemove, and mouseup
 
     //    this.detachPen();
@@ -109,6 +109,8 @@ export class PageHandler {
     }
     this.pageViewer = pageViewer;
     this.pdfCanvas = this.pageViewer.canvas;
+    this.pdfCanvas.parentElement?.childNodes;
+
     this.annotationCanvas = document.createElement('CANVAS') as HTMLCanvasElement;
 
     this.annotationCanvas.width = this.pdfCanvas.width;

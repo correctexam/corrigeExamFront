@@ -2,13 +2,17 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Component, OnInit } from '@angular/core';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PreferenceService } from './preference.service';
+import { TooltipModule } from 'primeng/tooltip';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 @Component({
   selector: 'jhi-preference-page',
   templateUrl: './preference-page.component.html',
   styleUrls: ['./preference-page.component.scss'],
+  standalone: true,
+  imports: [FormsModule, ReactiveFormsModule, SelectButtonModule, TooltipModule],
 })
 export class PreferencePageComponent implements OnInit {
   editForm: UntypedFormGroup;

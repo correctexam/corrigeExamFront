@@ -1,11 +1,12 @@
 import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed, inject } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { of, throwError } from 'rxjs';
 
 import { PasswordResetInitComponent } from './password-reset-init.component';
 import { PasswordResetInitService } from './password-reset-init.service';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('PasswordResetInitComponent', () => {
   let fixture: ComponentFixture<PasswordResetInitComponent>;
@@ -13,9 +14,9 @@ describe('PasswordResetInitComponent', () => {
 
   beforeEach(() => {
     fixture = TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
-      declarations: [PasswordResetInitComponent],
-      providers: [FormBuilder],
+      imports: [ReactiveFormsModule, FormsModule, PasswordResetInitComponent],
+      declarations: [],
+      providers: [provideHttpClient(), provideHttpClientTesting(), FormBuilder],
     })
       .overrideTemplate(PasswordResetInitComponent, '')
       .createComponent(PasswordResetInitComponent);
@@ -50,7 +51,7 @@ describe('PasswordResetInitComponent', () => {
       throwError({
         status: 503,
         data: 'something else',
-      })
+      }),
     );
     comp.resetRequestForm.patchValue({
       email: 'user@domain.com',

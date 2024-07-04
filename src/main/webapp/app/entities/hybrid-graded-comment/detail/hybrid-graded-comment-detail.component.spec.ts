@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { describe, expect } from '@jest/globals';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
@@ -13,7 +14,7 @@ describe('HybridGradedComment Management Detail Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [HybridGradedCommentDetailComponent],
+      imports: [HybridGradedCommentDetailComponent],
       providers: [
         {
           provide: ActivatedRoute,

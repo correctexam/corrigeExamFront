@@ -4,7 +4,7 @@
 
     <div class="d-flex justify-content-end">
       <button class="btn btn-info me-2" (click)="loadPage()" [disabled]="isLoading">
-        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <fa-icon icon="sync" [animation]="'spin'"></fa-icon>
         <span jhiTranslate="gradeScopeIsticApp.template.home.refreshListLabel">Refresh List</span>
       </button>
 

@@ -21,7 +21,7 @@ import {
   ViewChildren,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { CourseService } from 'app/entities/course/service/course.service';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 import { ExamService } from 'app/entities/exam/service/exam.service';
@@ -42,12 +42,24 @@ import { PreferenceService } from '../preference-page/preference.service';
 import { AlignImagesService, IImageCropFromZoneInput } from '../services/align-images.service';
 import { IComments } from '../../entities/comments/comments.model';
 import { HttpClient } from '@angular/common/http';
-import { KeyValue, Location } from '@angular/common';
+import { KeyValue, Location, NgIf, NgFor, NgClass, DecimalPipe, KeyValuePipe } from '@angular/common';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import jszip from 'jszip';
 import * as FileSaver from 'file-saver';
 import { firstValueFrom } from 'rxjs';
 import { IHybridGradedComment } from '../../entities/hybrid-graded-comment/hybrid-graded-comment.model';
+import { DragDropModule } from 'primeng/dragdrop';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { FormsModule } from '@angular/forms';
+import { SliderModule } from 'primeng/slider';
+import { SidebarModule } from 'primeng/sidebar';
+import { TranslateDirective } from '../../shared/language/translate.directive';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { TooltipModule } from 'primeng/tooltip';
+import { Button, ButtonDirective } from 'primeng/button';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { BlockUIModule } from 'primeng/blockui';
 
 export interface Zone4SameCommentOrSameGrade {
   answers: Answer[];
@@ -85,6 +97,28 @@ export interface ClusterDTO {
   templateUrl: './comparestudentanswer.component.html',
   styleUrls: ['./comparestudentanswer.component.scss'],
   providers: [ConfirmationService, MessageService],
+  standalone: true,
+  imports: [
+    BlockUIModule,
+    ProgressSpinnerModule,
+    Button,
+    TooltipModule,
+    ButtonDirective,
+    FaIconComponent,
+    TranslateDirective,
+    NgIf,
+    SidebarModule,
+    SliderModule,
+    FormsModule,
+    NgFor,
+    RadioButtonModule,
+    SelectButtonModule,
+    NgClass,
+    DragDropModule,
+    DecimalPipe,
+    KeyValuePipe,
+    TranslateModule,
+  ],
 })
 export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   selectedAlgo: any = {

@@ -12,3 +12,8 @@
 small {
   font-size: x-large;
 }
+
+disabled-div {
+  opacity: 0.5;
+  pointer-events: none;
+}

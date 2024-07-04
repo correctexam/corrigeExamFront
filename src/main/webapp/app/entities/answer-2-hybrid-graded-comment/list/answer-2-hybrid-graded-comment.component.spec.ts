@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { describe, expect } from '@jest/globals';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ActivatedRoute } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { Answer2HybridGradedCommentService } from '../service/answer-2-hybrid-graded-comment.service';
@@ -18,12 +19,13 @@ describe('Answer2HybridGradedComment Management Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule.withRoutes([{ path: 'answer-2-hybrid-graded-comment', component: Answer2HybridGradedCommentComponent }]),
-        HttpClientTestingModule,
-      ],
-      declarations: [Answer2HybridGradedCommentComponent],
+      imports: [Answer2HybridGradedCommentComponent],
+      declarations: [],
       providers: [
+        provideRouter([{ path: 'answer-2-hybrid-graded-comment', component: Answer2HybridGradedCommentComponent }]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+
         {
           provide: ActivatedRoute,
           useValue: {

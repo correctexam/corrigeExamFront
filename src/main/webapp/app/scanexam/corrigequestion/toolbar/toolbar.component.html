@@ -8,14 +8,6 @@
     >
       <fa-icon [icon]="faHandPointer"></fa-icon>
     </div>
-    <div
-      [title]="'scanexam.erase' | translate"
-      class="toolbox-item ml-1 mt-1"
-      [ngClass]="{ selected: selected === 'ERASER' }"
-      (click)="select(DrawingTools.ERASER)"
-    >
-      <fa-icon [icon]="faEraser"></fa-icon>
-    </div>
     <!--<div
       title="Straight Line"
       class="toolbox-item ml-1 mt-1"
@@ -81,6 +73,17 @@
     >
       <img src="/content/images/toolbar-images/fill.png" />
     </div>-->
+    <div class="ml-1 mt-1" style="width: 30px; height: 30px"></div>
+
+    <div
+      [title]="'scanexam.erase' | translate"
+      class="toolbox-item ml-1 mt-1"
+      [ngClass]="{ selected: selected === 'ERASER' }"
+      (click)="select(DrawingTools.ERASER)"
+    >
+      <fa-icon [icon]="faEraser"></fa-icon>
+    </div>
+
     <div
       [title]="'scanexam.clearcanvas' | translate"
       class="toolbox-item ml-1 mt-1"

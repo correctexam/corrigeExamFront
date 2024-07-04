@@ -1,17 +1,38 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MarkingExamStateDTO, ExamService } from 'app/entities/exam/service/exam.service';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { HttpClient } from '@angular/common/http';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Title } from '@angular/platform-browser';
 import { PreferenceService } from '../preference-page/preference.service';
+import { ButtonDirective } from 'primeng/button';
+import { TabViewModule } from 'primeng/tabview';
+import { TranslateDirective } from '../../shared/language/translate.directive';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { TooltipModule } from 'primeng/tooltip';
+import { HasAnyAuthorityDirective } from '../../shared/auth/has-any-authority.directive';
+import { NgIf, NgFor, PercentPipe } from '@angular/common';
 
 @Component({
   selector: 'jhi-marking-summary',
   templateUrl: './marking-summary.component.html',
   styleUrls: ['./marking-summary.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    HasAnyAuthorityDirective,
+    TooltipModule,
+    FaIconComponent,
+    TranslateDirective,
+    TabViewModule,
+    NgFor,
+    ButtonDirective,
+    RouterLink,
+    PercentPipe,
+    TranslateModule,
+  ],
 })
 export class MarkingSummaryComponent implements OnInit {
   questionNumeros: Array<number> = [];

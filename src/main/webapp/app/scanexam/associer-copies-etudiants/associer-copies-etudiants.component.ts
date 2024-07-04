@@ -12,7 +12,7 @@ import { ExamService } from '../../entities/exam/service/exam.service';
 import { ZoneService } from '../../entities/zone/service/zone.service';
 import { CourseService } from 'app/entities/course/service/course.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmationService, MessageService, SelectItem } from 'primeng/api';
+import { ConfirmationService, MessageService, SelectItem, PrimeTemplate } from 'primeng/api';
 import { IExam } from 'app/entities/exam/exam.model';
 import { IScan } from '../../entities/scan/scan.model';
 import { IZone } from 'app/entities/zone/zone.model';
@@ -24,16 +24,30 @@ import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.ser
 import { IExamSheet } from '../../entities/exam-sheet/exam-sheet.model';
 // import { v4 as uuid } from 'uuid';
 import { faHouseSignal } from '@fortawesome/free-solid-svg-icons';
-import { Listbox } from 'primeng/listbox';
+import { Listbox, ListboxModule } from 'primeng/listbox';
 import { PreferenceService } from '../preference-page/preference.service';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
-import { ShortcutInput } from 'ng-keyboard-shortcuts';
-import { TranslateService } from '@ngx-translate/core';
+import { ShortcutInput, KeyboardShortcutsModule } from 'ng-keyboard-shortcuts';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import { DoPredictionsInputSamePage } from 'app/opencv.worker';
 import { DialogService } from 'primeng/dynamicdialog';
 import { AllbindingsComponent } from './allbindings/allbindings.component';
 import { Title } from '@angular/platform-browser';
+import { PaginatorModule } from 'primeng/paginator';
+import { NgIf, NgClass } from '@angular/common';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { ButtonDirective, Button } from 'primeng/button';
+import { SliderModule } from 'primeng/slider';
+import { TooltipModule } from 'primeng/tooltip';
+import { FormsModule } from '@angular/forms';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { TranslateDirective } from '../../shared/language/translate.directive';
+import { SidebarModule } from 'primeng/sidebar';
+import { GalleriaModule } from 'primeng/galleria';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { BlockUIModule } from 'primeng/blockui';
+import { ToastModule } from 'primeng/toast';
 
 export interface IPage {
   image?: ImageData;
@@ -79,6 +93,29 @@ interface PredictResult {
   templateUrl: './associer-copies-etudiants.component.html',
   styleUrls: ['./associer-copies-etudiants.component.scss'],
   providers: [ConfirmationService, MessageService, DialogService],
+  standalone: true,
+  imports: [
+    ToastModule,
+    BlockUIModule,
+    ProgressSpinnerModule,
+    GalleriaModule,
+    PrimeTemplate,
+    KeyboardShortcutsModule,
+    SidebarModule,
+    TranslateDirective,
+    InputSwitchModule,
+    FormsModule,
+    TooltipModule,
+    SliderModule,
+    ButtonDirective,
+    FaIconComponent,
+    Button,
+    NgIf,
+    PaginatorModule,
+    ListboxModule,
+    NgClass,
+    TranslateModule,
+  ],
 })
 export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   @ViewChild('list')

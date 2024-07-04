@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { TestBed } from '@angular/core/testing';
-
-import { CorrigequestionComponent } from './corrigequestion.component';
+import { describe, expect } from '@jest/globals';
 
 describe('CorrigequestionComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [CorrigequestionComponent],
+      imports: [],
+      providers: [],
     }).compileComponents();
   });
 

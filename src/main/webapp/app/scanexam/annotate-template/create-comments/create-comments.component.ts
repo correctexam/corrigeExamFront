@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
 import { GradedCommentService } from 'app/entities/graded-comment/service/graded-comment.service';
@@ -11,13 +11,42 @@ import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 import { saveAs } from 'file-saver';
 import { HybridGradedCommentService } from '../../../entities/hybrid-graded-comment/service/hybrid-graded-comment.service';
 import { IHybridGradedComment, NewHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-graded-comment.model';
-import { Inplace } from 'primeng/inplace';
+import { Inplace, InplaceModule } from 'primeng/inplace';
 import { PreferenceService } from '../../preference-page/preference.service';
+import { FileUploadModule } from 'primeng/fileupload';
+import { TooltipModule } from 'primeng/tooltip';
+import { KnobModule } from 'primeng/knob';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { RatingModule } from 'primeng/rating';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormsModule } from '@angular/forms';
+import { PrimeTemplate } from 'primeng/api';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { NgIf, NgFor } from '@angular/common';
 @Component({
   selector: 'jhi-create-comments',
-
   templateUrl: './create-comments.component.html',
   styleUrls: ['./create-comments.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    NgFor,
+    FaIconComponent,
+    InplaceModule,
+    PrimeTemplate,
+    FormsModule,
+    InputTextModule,
+    InputTextareaModule,
+    TranslateDirective,
+    RatingModule,
+    SelectButtonModule,
+    KnobModule,
+    TooltipModule,
+    FileUploadModule,
+    TranslateModule,
+  ],
 })
 export class CreateCommentsComponent implements OnInit {
   _q?: Question;

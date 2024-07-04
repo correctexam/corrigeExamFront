@@ -1,11 +1,13 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { IQuestion, Question } from '../question.model';
 
 import { QuestionService } from './question.service';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('Question Service', () => {
   let service: QuestionService;
@@ -15,7 +17,8 @@ describe('Question Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
+      imports: [ReactiveFormsModule, FormsModule],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
     expectedResult = null;
     service = TestBed.inject(QuestionService);
@@ -39,7 +42,7 @@ describe('Question Service', () => {
 
       const req = httpMock.expectOne({ method: 'GET' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(elemDefault);
+      expect(expectedResult).toMatchSnapshot(elemDefault);
     });
 
     it('should create a Question', () => {
@@ -47,7 +50,7 @@ describe('Question Service', () => {
         {
           id: 0,
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);
@@ -56,7 +59,7 @@ describe('Question Service', () => {
 
       const req = httpMock.expectOne({ method: 'POST' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should update a Question', () => {
@@ -69,7 +72,7 @@ describe('Question Service', () => {
           validExpression: 'BBBBBB',
           gradeType: 'BBBBBB',
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);
@@ -78,7 +81,7 @@ describe('Question Service', () => {
 
       const req = httpMock.expectOne({ method: 'PUT' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should partial update a Question', () => {
@@ -87,7 +90,7 @@ describe('Question Service', () => {
           numero: 1,
           step: 1,
         },
-        new Question()
+        new Question(),
       );
 
       const returnedFromService = Object.assign(patchObject, elemDefault);
@@ -98,7 +101,7 @@ describe('Question Service', () => {
 
       const req = httpMock.expectOne({ method: 'PATCH' });
       req.flush(returnedFromService);
-      expect(expectedResult).toMatchObject(expected);
+      expect(expectedResult).toMatchSnapshot(expected);
     });
 
     it('should return a list of Question', () => {
@@ -111,7 +114,7 @@ describe('Question Service', () => {
           validExpression: 'BBBBBB',
           gradeType: 'BBBBBB',
         },
-        elemDefault
+        elemDefault,
       );
 
       const expected = Object.assign({}, returnedFromService);

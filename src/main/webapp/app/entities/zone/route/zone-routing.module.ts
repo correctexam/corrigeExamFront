@@ -1,5 +1,4 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { ZoneComponent } from '../list/zone.component';
@@ -7,7 +6,7 @@ import { ZoneDetailComponent } from '../detail/zone-detail.component';
 import { ZoneUpdateComponent } from '../update/zone-update.component';
 import { ZoneRoutingResolveService } from './zone-routing-resolve.service';
 
-const zoneRoute: Routes = [
+export const zoneRoute: Routes = [
   {
     path: '',
     component: ZoneComponent,
@@ -51,9 +50,3 @@ const zoneRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
 ];
-
-@NgModule({
-  imports: [RouterModule.forChild(zoneRoute)],
-  exports: [RouterModule],
-})
-export class ZoneRoutingModule {}

@@ -1,8 +1,8 @@
 jest.mock('@ng-bootstrap/ng-bootstrap');
 
 import { ComponentFixture, TestBed, inject, fakeAsync, tick } from '@angular/core/testing';
-import { HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpResponse, provideHttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -10,6 +10,7 @@ import { TextCommentService } from '../service/text-comment.service';
 
 import { TextCommentDeleteDialogComponent } from './text-comment-delete-dialog.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('TextComment Management Delete Component', () => {
   let comp: TextCommentDeleteDialogComponent;
@@ -19,9 +20,9 @@ describe('TextComment Management Delete Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, HttpClientTestingModule],
-      declarations: [TextCommentDeleteDialogComponent],
-      providers: [NgbActiveModal],
+      imports: [ReactiveFormsModule, FormsModule, TextCommentDeleteDialogComponent],
+      declarations: [],
+      providers: [provideHttpClient(), provideHttpClientTesting(), NgbActiveModal],
     })
       .overrideTemplate(TextCommentDeleteDialogComponent, '')
       .compileComponents();
@@ -45,7 +46,7 @@ describe('TextComment Management Delete Component', () => {
         // THEN
         expect(service.delete).toHaveBeenCalledWith(123);
         expect(mockActiveModal.close).toHaveBeenCalledWith('deleted');
-      })
+      }),
     ));
 
     it('Should not call delete service on clear', () => {

@@ -23,6 +23,9 @@ import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.ser
 import { ExportPDFDto, Questionspdf, Sheetspdf, StudentResponsepdf } from './exportpdf.model';
 import { IComments } from 'app/entities/comments/comments.model';
 import { ExportPdfService } from './exportanonymoupdf.service';
+import { ToastModule } from 'primeng/toast';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { BlockUIModule } from 'primeng/blockui';
 
 const coefficient = 100000;
 
@@ -36,6 +39,8 @@ interface ImageSize {
   templateUrl: './exportanonymoupdf.component.html',
   styleUrls: ['./exportanonymoupdf.component.scss'],
   providers: [MessageService, DialogService],
+  standalone: true,
+  imports: [BlockUIModule, ProgressSpinnerModule, ToastModule],
 })
 export class ExportanonymoupdfComponent implements OnInit {
   examId = '';

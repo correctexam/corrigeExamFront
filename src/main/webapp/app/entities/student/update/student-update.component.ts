@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
@@ -9,10 +9,16 @@ import { IStudent, Student } from '../student.model';
 import { StudentService } from '../service/student.service';
 import { IExamSheet } from 'app/entities/exam-sheet/exam-sheet.model';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { NgIf, NgFor } from '@angular/common';
+import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-student-update',
   templateUrl: './student-update.component.html',
+  standalone: true,
+  imports: [FormsModule, ReactiveFormsModule, TranslateDirective, AlertErrorComponent, NgIf, NgFor, FaIconComponent],
 })
 export class StudentUpdateComponent implements OnInit {
   isSaving = false;
@@ -25,7 +31,7 @@ export class StudentUpdateComponent implements OnInit {
     protected studentService: StudentService,
     protected examSheetService: ExamSheetService,
     protected activatedRoute: ActivatedRoute,
-    protected fb: UntypedFormBuilder
+    protected fb: UntypedFormBuilder,
   ) {
     this.editForm = this.fb.group({
       id: [],
@@ -107,7 +113,7 @@ export class StudentUpdateComponent implements OnInit {
 
     this.examSheetsSharedCollection = this.examSheetService.addExamSheetToCollectionIfMissing(
       this.examSheetsSharedCollection,
-      ...(student.examSheets ?? [])
+      ...(student.examSheets ?? []),
     );
   }
 
@@ -117,8 +123,8 @@ export class StudentUpdateComponent implements OnInit {
       .pipe(map((res: HttpResponse<IExamSheet[]>) => res.body ?? []))
       .pipe(
         map((examSheets: IExamSheet[]) =>
-          this.examSheetService.addExamSheetToCollectionIfMissing(examSheets, ...(this.editForm.get('examSheets')!.value ?? []))
-        )
+          this.examSheetService.addExamSheetToCollectionIfMissing(examSheets, ...(this.editForm.get('examSheets')!.value ?? [])),
+        ),
       )
       .subscribe((examSheets: IExamSheet[]) => (this.examSheetsSharedCollection = examSheets));
   }

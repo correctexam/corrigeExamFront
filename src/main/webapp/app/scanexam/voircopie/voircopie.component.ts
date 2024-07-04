@@ -9,11 +9,11 @@
 // http://localhost:9000/copie/d6680b56-36a5-4488-ac5b-c862096bc311/1
 
 import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, AfterViewInit, HostListener } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { StudentService } from 'app/entities/student/service/student.service';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService, PrimeTemplate } from 'primeng/api';
 import { AlignImagesService } from '../services/align-images.service';
 import { db } from '../db/dbstudent';
 import { IExam } from '../../entities/exam/exam.model';
@@ -37,17 +37,54 @@ import { IExamSheet } from '../../entities/exam-sheet/exam-sheet.model';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { HttpClient } from '@angular/common/http';
 import { CacheUploadService } from '../exam-detail/cacheUpload.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import { IHybridGradedCommentWithStepValue } from '../../entities/hybrid-graded-comment/hybrid-graded-comment.model';
 import { HybridGradedCommentService } from 'app/entities/hybrid-graded-comment/service/hybrid-graded-comment.service';
 import { Answer2HybridGradedCommentService } from 'app/entities/answer-2-hybrid-graded-comment/service/answer-2-hybrid-graded-comment.service';
+import { ArraySortPipe } from '../sort';
+import { SliderModule } from 'primeng/slider';
+import { FormsModule } from '@angular/forms';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { HasAnyAuthorityDirective } from '../../shared/auth/has-any-authority.directive';
+import { PaginatorModule } from 'primeng/paginator';
+import { TooltipModule } from 'primeng/tooltip';
+import { ButtonDirective } from 'primeng/button';
+import { NgFor, NgIf, AsyncPipe, DecimalPipe } from '@angular/common';
+import { TranslateDirective } from '../../shared/language/translate.directive';
+import { GalleriaModule } from 'primeng/galleria';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { BlockUIModule } from 'primeng/blockui';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'jhi-voircopie',
   templateUrl: './voircopie.component.html',
   styleUrls: ['./voircopie.component.scss'],
   providers: [ConfirmationService, MessageService],
+  standalone: true,
+  imports: [
+    ToastModule,
+    BlockUIModule,
+    ProgressSpinnerModule,
+    GalleriaModule,
+    PrimeTemplate,
+    TranslateDirective,
+    NgFor,
+    ButtonDirective,
+    TooltipModule,
+    PaginatorModule,
+    NgIf,
+    RouterLink,
+    HasAnyAuthorityDirective,
+    InputSwitchModule,
+    FormsModule,
+    SliderModule,
+    AsyncPipe,
+    DecimalPipe,
+    TranslateModule,
+    ArraySortPipe,
+  ],
 })
 export class VoirCopieComponent implements OnInit, AfterViewInit {
   public href = '';

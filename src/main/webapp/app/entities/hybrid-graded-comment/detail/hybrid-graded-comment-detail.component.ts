@@ -1,10 +1,33 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { IHybridGradedComment } from '../hybrid-graded-comment.model';
 import { DataUtils } from 'app/core/util/data-util.service';
+import { NgFor, NgIf } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { AlertErrorComponent } from 'app/shared/alert/alert-error.component';
+import { AlertComponent } from 'app/shared/alert/alert.component';
+import { ItemCountComponent } from 'app/shared/pagination/item-count.component';
+import { SortDirective } from 'app/shared/sort/sort.directive';
 
 @Component({
+  standalone: true,
+  imports: [
+    FontAwesomeModule,
+    NgFor,
+    AlertErrorComponent,
+    NgIf,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterLink,
+    ItemCountComponent,
+    NgbPagination,
+    AlertComponent,
+    SortDirective,
+  ],
+
   selector: 'jhi-hybrid-graded-comment-detail',
   templateUrl: './hybrid-graded-comment-detail.component.html',
 })

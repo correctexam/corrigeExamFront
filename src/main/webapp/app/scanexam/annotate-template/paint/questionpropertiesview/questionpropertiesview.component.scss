@@ -1,3 +1,8 @@
 .p-button-primary {
   margin-top: 10px;
 }
+
+input::placeholder {
+  opacity: 0.5;
+  color: gray;
+}

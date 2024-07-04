@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { TestBed } from '@angular/core/testing';
+import { describe, expect } from '@jest/globals';
 
 import { VoirReponsesStarUnstarComponent } from './voirreponsesstarunstarexam.component';
 
 describe('VoirCopieComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [VoirReponsesStarUnstarComponent],
+      imports: [VoirReponsesStarUnstarComponent],
     }).compileComponents();
   });
 

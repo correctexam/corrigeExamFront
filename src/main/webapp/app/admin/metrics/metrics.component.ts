@@ -3,18 +3,46 @@ import { combineLatest } from 'rxjs';
 
 import { MetricsService } from './metrics.service';
 import { Metrics, Thread } from './metrics.model';
+import { MetricsDatasourceComponent } from './blocks/metrics-datasource/metrics-datasource.component';
+import { MetricsCacheComponent } from './blocks/metrics-cache/metrics-cache.component';
+import { MetricsEndpointsRequestsComponent } from './blocks/metrics-endpoints-requests/metrics-endpoints-requests.component';
+import { MetricsRequestComponent } from './blocks/metrics-request/metrics-request.component';
+import { MetricsGarbageCollectorComponent } from './blocks/metrics-garbagecollector/metrics-garbagecollector.component';
+import { MetricsSystemComponent } from './blocks/metrics-system/metrics-system.component';
+import { JvmThreadsComponent } from './blocks/jvm-threads/jvm-threads.component';
+import { JvmMemoryComponent } from './blocks/jvm-memory/jvm-memory.component';
+import { NgIf } from '@angular/common';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { TranslateDirective } from '../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-metrics',
   templateUrl: './metrics.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [
+    TranslateDirective,
+    FaIconComponent,
+    NgIf,
+    JvmMemoryComponent,
+    JvmThreadsComponent,
+    MetricsSystemComponent,
+    MetricsGarbageCollectorComponent,
+    MetricsRequestComponent,
+    MetricsEndpointsRequestsComponent,
+    MetricsCacheComponent,
+    MetricsDatasourceComponent,
+  ],
 })
 export class MetricsComponent implements OnInit {
   metrics?: Metrics;
   threads?: Thread[];
   updatingMetrics = true;
 
-  constructor(private metricsService: MetricsService, private changeDetector: ChangeDetectorRef) {}
+  constructor(
+    private metricsService: MetricsService,
+    private changeDetector: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
     this.refresh();

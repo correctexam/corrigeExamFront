@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ActivatedRoute } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import { describe, expect } from '@jest/globals';
+import { HttpHeaders, HttpResponse, provideHttpClient } from '@angular/common/http';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { GradedCommentService } from '../service/graded-comment.service';
 
 import { GradedCommentComponent } from './graded-comment.component';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('GradedComment Management Component', () => {
   let comp: GradedCommentComponent;
@@ -16,9 +16,14 @@ describe('GradedComment Management Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule.withRoutes([{ path: 'graded-comment', component: GradedCommentComponent }]), HttpClientTestingModule],
-      declarations: [GradedCommentComponent],
+      imports: [GradedCommentComponent],
+      declarations: [],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+
+        provideRouter([{ path: 'graded-comment', component: GradedCommentComponent }]),
+
         {
           provide: ActivatedRoute,
           useValue: {
@@ -30,7 +35,7 @@ describe('GradedComment Management Component', () => {
                 page: '1',
                 size: '1',
                 sort: 'id,desc',
-              })
+              }),
             ),
           },
         },
@@ -49,8 +54,8 @@ describe('GradedComment Management Component', () => {
         new HttpResponse({
           body: [{ id: 123 }],
           headers,
-        })
-      )
+        }),
+      ),
     );
   });
 

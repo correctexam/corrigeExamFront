@@ -35,12 +35,37 @@
           <div class="col align-self-center">
             {{ q.answeredSheets }} / {{ dataExam.sheets.length }} ({{ q.answeredSheets / dataExam.sheets.length | percent }})
           </div>
-          <div class="col" *ngIf="q.answeredSheets < dataExam.sheets.length">
+          <div class="col" *ngIf="q.answeredSheets === 0">
             <button
               [routerLink]="
                 '/answer/' + this.examId + '/' + (questionNumeros.indexOf(q.numero) + 1) + '/' + (q.firstUnmarkedSheet / pageInTemplate + 1)
               "
-              class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
+              class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3 justify-content-center"
+              pButton
+              type="button"
+              [tooltipZIndex]="'3000'"
+              [pTooltip]="'scanexam.continuetooltip' | translate"
+            >
+              <span jhiTranslate="scanexam.startcorrect"></span>
+            </button>
+            <button
+              [routerLink]="'/compareanswer/' + this.examId + '/' + q.id"
+              class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3 justify-content-center"
+              pButton
+              type="button"
+              [tooltipZIndex]="'3000'"
+              [pTooltip]="'scanexam.voirtoutescopiestooltip' | translate"
+            >
+              <span jhiTranslate="scanexam.voirtoutescopies"></span>
+            </button>
+          </div>
+
+          <div class="col" *ngIf="q.answeredSheets !== 0 && q.answeredSheets < dataExam.sheets.length">
+            <button
+              [routerLink]="
+                '/answer/' + this.examId + '/' + (questionNumeros.indexOf(q.numero) + 1) + '/' + (q.firstUnmarkedSheet / pageInTemplate + 1)
+              "
+              class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3 justify-content-center"
               pButton
               type="button"
               [tooltipZIndex]="'3000'"
@@ -50,7 +75,7 @@
             </button>
             <button
               [routerLink]="'/compareanswer/' + this.examId + '/' + q.id"
-              class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
+              class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3 justify-content-center"
               pButton
               type="button"
               [tooltipZIndex]="'3000'"
@@ -62,7 +87,7 @@
           <div class="col" *ngIf="q.answeredSheets === dataExam.sheets.length">
             <button
               [routerLink]="'/answer/' + this.examId + '/' + (questionNumeros.indexOf(q.numero) + 1) + '/' + '1'"
-              class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
+              class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3 justify-content-center"
               pButton
               type="button"
               [tooltipZIndex]="'3000'"
@@ -72,7 +97,7 @@
             </button>
             <button
               [routerLink]="'/compareanswer/' + this.examId + '/' + q.id"
-              class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
+              class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3 justify-content-center"
               pButton
               type="button"
               [tooltipZIndex]="'3000'"

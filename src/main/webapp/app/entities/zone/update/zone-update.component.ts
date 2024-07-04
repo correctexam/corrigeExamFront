@@ -1,23 +1,32 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
 import { IZone, Zone } from '../zone.model';
 import { ZoneService } from '../service/zone.service';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-zone-update',
   templateUrl: './zone-update.component.html',
+  standalone: true,
+  imports: [FormsModule, ReactiveFormsModule, TranslateDirective, AlertErrorComponent, FaIconComponent],
 })
 export class ZoneUpdateComponent implements OnInit {
   isSaving = false;
 
   editForm: UntypedFormGroup;
 
-  constructor(protected zoneService: ZoneService, protected activatedRoute: ActivatedRoute, protected fb: UntypedFormBuilder) {
+  constructor(
+    protected zoneService: ZoneService,
+    protected activatedRoute: ActivatedRoute,
+    protected fb: UntypedFormBuilder,
+  ) {
     this.editForm = this.fb.group({
       id: [],
       pageNumber: [],

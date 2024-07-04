@@ -53,8 +53,8 @@
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.hybridGradedComment.question" for="field_question">Question</label>
           <select class="form-control" id="field_question" data-cy="question" name="question" formControlName="question">
-            <option [ngValue]="null"></option>
-            <option [ngValue]="questionOption" *ngFor="let questionOption of questionsSharedCollection">{{ questionOption.id }}</option>
+            <option [value]="null"></option>
+            <option [value]="questionOption" *ngFor="let questionOption of questionsSharedCollection">{{ questionOption.id }}</option>
           </select>
         </div>
       </div>
