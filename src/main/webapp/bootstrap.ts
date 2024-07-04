@@ -16,7 +16,7 @@ import { DataUtils } from 'app/core/util/data-util.service';
 import { FabricShapeService } from 'app/scanexam/annotate-template/paint/shape.service';
 import { provideRouter } from '@angular/router';
 import { HOME_ROUTE } from 'app/home/home.route';
-import { SCANEXAM_ROUTES } from 'app/scanexam/scanexam.module';
+import { SCANEXAM_ROUTES } from 'app/scanexam/scanexam.route';
 import { APP_ROUTES } from 'app/app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
