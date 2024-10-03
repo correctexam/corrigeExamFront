@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1727961540381,
+  "timestamp": 1727962365663,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -32,7 +32,7 @@
         "/551.24b7f8e0469c032c.js",
         "/554.a2b3c38c229c8784.js",
         "/568.035ed8696f822057.js",
-        "/599.1117c32ffc2d0170.js",
+        "/599.57bde69fd6aa4a5d.js",
         "/634.7dc7c7adbcc800ae.js",
         "/672.4f20ce4bc744339d.js",
         "/704.3c40f4daabe92e6c.js",
@@ -53,7 +53,7 @@
         "/main.3c43dc968d522a6e.js",
         "/manifest.webapp",
         "/polyfills.8e5070d3db7db305.js",
-        "/runtime.3b726f279fab89e5.js",
+        "/runtime.95c7652d2dac2178.js",
         "/scripts.2e1f9a4ae42016f6.js",
         "/styles.c61cc1529e8e7399.css"
       ],
@@ -564,7 +564,7 @@
     "/551.24b7f8e0469c032c.js": "20a6de1fe7e85438ce8d3795b51abc8fe8756fae",
     "/554.a2b3c38c229c8784.js": "55ab2741c904d2a046930aefc8e08f2aeea2e12b",
     "/568.035ed8696f822057.js": "c7e9171787fb088532a38cf7b6065cb2ecb3f0d6",
-    "/599.1117c32ffc2d0170.js": "bdabc57389fa39315fb269041e27d6020a311a03",
+    "/599.57bde69fd6aa4a5d.js": "f6559b8c15abdf890db32e756cf2837472a4588f",
     "/634.7dc7c7adbcc800ae.js": "fb87d2d0e289c67064af38439cf19a6dde78b507",
     "/672.4f20ce4bc744339d.js": "2e7e09b99b84e7b0f42881cbdce898f2a292de1c",
     "/704.3c40f4daabe92e6c.js": "8993a13ce19f6c5a322fc481d76cb3ab1bfd74cd",
@@ -1043,7 +1043,7 @@
     "/content/tfjs/wasm-out/tfjs-backend-wasm.worker.js": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
     "/favicon.ico": "69547cd4a95b59ac7e6818b6eb82befa061d0c16",
     "/hue.8b1818380241e6ac.png": "f81ae627637a684614aa726e206c73ce099a01fd",
-    "/index.html": "963271b7ba68c8459866cfa98a0fb28510c2c651",
+    "/index.html": "ce212d94b92ac6cbe30d8398e75c46f13496ee6f",
     "/jhipster_family_member_3.87663f884fcea614.svg": "0690f4141a25d739ed9429b0b315cc94196a3644",
     "/logo-jhipster.6125d9b31ded8344.png": "e1e46028ec092ca351425b07707fcdd52146b0b3",
     "/main.3c43dc968d522a6e.js": "94dc62ef9ad9209fef63d1daefb44a87d91abd2b",
@@ -1054,7 +1054,7 @@
     "/primeicons.7f7722745590608a.woff": "361e3af71bb4e515feead2f787348a92a5527158",
     "/primeicons.8ca441e178bfb872.eot": "e24ec13e95366c82ba69a821bf65a0eaef29450c",
     "/primeicons.e1a53edb6ea00325.woff2": "837c1279b6af9d297f34fdb43e6fcc9206a79f32",
-    "/runtime.3b726f279fab89e5.js": "46f0d905d15f2ddac6d0d691b5ddb6790eae10a8",
+    "/runtime.95c7652d2dac2178.js": "248a5d5b6eae8a1733cf9fa62ffb48b39e9db588",
     "/scholar.1dee195c875f84af.svg": "f209bee39d583876623062129b455355884a53d0",
     "/scripts.2e1f9a4ae42016f6.js": "5c6ee413dabe83618d3db40ba0cafe57857ec0d4",
     "/styles.c61cc1529e8e7399.css": "ed5b9c955208ca158c550c8e3475f6bbcf6fb3e2"
