@@ -172,7 +172,7 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
     }
 
     const elevePref = { ...p.payload.preference };
-    elevePref.qcm_differences_avec_case_blanche = Math.max(0.3, elevePref.qcm_differences_avec_case_blanche);
+    elevePref.qcm_differences_avec_case_blanche = Math.max(0.1, elevePref.qcm_differences_avec_case_blanche);
 
     let results = analyseStudentSheet(res, src, dstE, elevePref);
     let e = imageDataFromMat(dstE);
@@ -528,11 +528,11 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
       infos_cases.set(k, { verdict: false, prediction: diff });
       cases_vides.push(case1);
     }
-    if (diff > preference.qcm_differences_avec_case_blanche && diff < preference.qcm_differences_avec_case_blanche * 1.15) {
+    if (diff > preference.qcm_differences_avec_case_blanche) {
       cv.putText(
         studentScanImage,
         '' + diff.toFixed(2),
-        { x: getPosition(case1).x, y: getPosition(case1).y + 10 },
+        { x: getPosition(case1).x + 15, y: getPosition(case1).y + 10 },
         cv.FONT_HERSHEY_COMPLEX,
         0.5,
         new cv.Scalar(255, 0, 0, 128),
@@ -542,7 +542,7 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
       cv.putText(
         studentScanImage,
         '' + diff.toFixed(2),
-        { x: getPosition(case1).x, y: getPosition(case1).y + 10 },
+        { x: getPosition(case1).x + 15, y: getPosition(case1).y + 10 },
         cv.FONT_HERSHEY_COMPLEX,
         0.33,
         new cv.Scalar(255, 0, 0, 128),
