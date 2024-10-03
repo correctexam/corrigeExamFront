@@ -11,7 +11,7 @@ import { CourseService } from 'app/entities/course/service/course.service';
 import { IStudent } from 'app/entities/student/student.model';
 import FileSaver from 'file-saver';
 import { ConfirmationService, MessageService, PrimeTemplate } from 'primeng/api';
-import type { FileUpload, FileUploadHandlerEvent } from 'primeng/fileupload';
+import { FileUploadModule, type FileUpload, type FileUploadHandlerEvent } from 'primeng/fileupload';
 import { InplaceModule } from 'primeng/inplace';
 import { TableModule } from 'primeng/table';
 import { Button } from 'primeng/button';
@@ -71,6 +71,7 @@ interface MDWStudent {
     PrimeTemplate,
     NgFor,
     InplaceModule,
+    FileUploadModule,
     TranslateModule,
   ],
 })
