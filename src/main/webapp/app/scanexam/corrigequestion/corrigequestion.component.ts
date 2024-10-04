@@ -334,9 +334,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   updateTitle(): void {
     this.activatedRoute.data.subscribe(e => {
-      console.error('title', this.exam);
+      // console.error('title', this.exam);
       this.translateService.get(e['pageTitle'], { examName: this.exam?.name, courseName: this.exam?.courseName }).subscribe(e1 => {
-        console.error('settitle', e1);
+        //  console.error('settitle', e1);
         this.titleService.setTitle(e1);
       });
     });
