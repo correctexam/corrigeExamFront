@@ -145,11 +145,11 @@ export class AppDB extends Dexie {
   }
 
   async countNonAlignWithPageNumber(examId: number, pageInscan: number) {
-    return await this.nonAlignImages.where({ examId: examId, pageInscan }).count();
+    return await this.nonAlignImages.where({ examId: examId, pageNumber: pageInscan }).count();
   }
 
   async countAlignWithPageNumber(examId: number, pageInscan: number) {
-    return await this.alignImages.where({ examId: examId, pageInscan }).count();
+    return await this.alignImages.where({ examId: examId, pageNumber: pageInscan }).count();
   }
 }
 

@@ -253,6 +253,7 @@ export class VoirReponseComponent implements OnInit, AfterViewInit {
   }
 
   async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
+    console.error('no align');
     if (this.noalign) {
       return new Promise((resolve, reject) => {
         db.countNonAlignWithPageNumber(+this.exam!.id!, pageInscan).then(count => {

@@ -509,6 +509,7 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
   casesExamTemplate.cases.forEach((case1: any, k: number) => {
     const diff = diffCouleurAvecCaseBlanche(decoupe(thresh, getPosition(case1), getDimensions(case1)));
     imgs_templatediffblank.set(k, diff);
+    console.error(diff, k);
   });
   gray.delete();
   thresh.delete();
@@ -520,6 +521,9 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
     const diff1 = diffCouleurAvecCaseBlanche(img_case_eleve);
     //    img_case_eleve.delete();
     const diff = diff1 - imgs_templatediffblank.get(k)!;
+
+    console.error(diff1, imgs_templatediffblank.get(k), k);
+
     // console.error('diff',k,diff1-imgs_templatediffblank.get(k)!,diff1, imgs_templatediffblank.get(k));
     if (diff > preference.qcm_differences_avec_case_blanche) {
       infos_cases.set(k, { verdict: true, prediction: diff });
