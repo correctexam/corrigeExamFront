@@ -506,15 +506,17 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
   let thresh_st = new cv.Mat();
   cv.threshold(gray_st, thresh_st, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
 
-  casesExamTemplate.cases.forEach((case1: any, k: number) => {
+  for (const [k, case1] of casesExamTemplate.cases.entries()) {
     console.error('position', getPosition(case1), getDimensions(case1));
     const diff = diffCouleurAvecCaseBlanche(decoupe(thresh, getPosition(case1), getDimensions(case1)));
     imgs_templatediffblank.set(k, diff);
     console.error(diff, k);
-  });
+  }
+
   gray.delete();
   thresh.delete();
-  casesExamTemplate.cases.forEach((case1: any, k: number) => {
+  for (const [k, case1] of casesExamTemplate.cases.entries()) {
+    // casesExamTemplate.cases.forEach((case1: any, k: number) => {
     // Pour chaque (x,y) associé à une case du template, on récupère la zone située au même endroit sur la copie
     // et on la compare avec celle du template
 
@@ -555,7 +557,7 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
       );
     }
     img_case_eleve.delete();
-  });
+  }
   gray_st.delete();
   thresh_st.delete();
 
