@@ -507,6 +507,7 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
   cv.threshold(gray_st, thresh_st, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
 
   casesExamTemplate.cases.forEach((case1: any, k: number) => {
+    console.error('position', getPosition(case1), getDimensions(case1));
     const diff = diffCouleurAvecCaseBlanche(decoupe(thresh, getPosition(case1), getDimensions(case1)));
     imgs_templatediffblank.set(k, diff);
     console.error(diff, k);
@@ -625,6 +626,7 @@ function diffCouleurAvecCaseBlanche(img_case: any): number {
   //  cv.cvtColor(img_case, gray, cv.COLOR_RGBA2GRAY, 0);
   //  let thresh = new cv.Mat();
   //  cv.threshold(gray, thresh, 200, 255, cv.THRESH_BINARY);
+  console.error('computetemplate', cv.countNonZero(img_case), img_case.rows, img_case.cols, img_case.rows * img_case.cols);
   const nonzerorationforeleve = 1.0 - cv.countNonZero(img_case) / (img_case.rows * img_case.cols);
   return nonzerorationforeleve;
 }
