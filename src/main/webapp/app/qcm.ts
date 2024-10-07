@@ -151,7 +151,7 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
 
       const elevePref = { ...p.payload.preference };
       elevePref.qcm_epsilon = Math.max(0.05, elevePref.qcm_epsilon);
-      elevePref.qcm_differences_avec_case_blanche = Math.max(0.4, elevePref.qcm_differences_avec_case_blanche);
+      elevePref.qcm_differences_avec_case_blanche = Math.min(0.1, elevePref.qcm_differences_avec_case_blanche);
       casesvideseleves = trouveCases(grayE, elevePref);
 
       dst1.delete();
@@ -257,8 +257,6 @@ function interpretationForme(contour: any, preference: IPreference): any {
   const dims = getDimensions(forme);
 
   if (dims.w >= preference.qcm_min_width_shape && dims.h >= preference.qcm_min_height_shape) {
-    //        console.log(forme)
-    //        console.log(forme.data.length)
     const nbCotes = forme.rows; // len(forme)
     if (nbCotes === 1) {
       nom = 'LIGNE';
@@ -497,45 +495,80 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
   const cases_vides: any[] = [];
   let infos_cases: Map<number, any> = new Map<number, any>();
   const imgs_templatediffblank: Map<number, number> = new Map();
+  const imgs_templatediffblankAdaptive: Map<number, number> = new Map();
   const gray = new cv.Mat();
   cv.cvtColor(templateimage, gray, cv.COLOR_RGBA2GRAY, 0);
   let thresh = new cv.Mat();
+  let threshAdaptive = new cv.Mat();
+
+  cv.adaptiveThreshold(gray, threshAdaptive, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 2);
   cv.threshold(gray, thresh, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
+
   const gray_st = new cv.Mat();
   cv.cvtColor(studentScanImage, gray_st, cv.COLOR_RGBA2GRAY, 0);
   let thresh_st = new cv.Mat();
+  let thresh_stAdaptive = new cv.Mat();
   cv.threshold(gray_st, thresh_st, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
+  cv.adaptiveThreshold(gray_st, thresh_stAdaptive, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 2);
 
   for (const [k, case1] of casesExamTemplate.cases.entries()) {
-    console.error('position', getPosition(case1), getDimensions(case1));
-    const diff = diffCouleurAvecCaseBlanche(decoupe(thresh, getPosition(case1), getDimensions(case1)));
+    const imgTemplate = decoupe(thresh, getPosition(case1), getDimensions(case1));
+    const diff = diffCouleurAvecCaseBlanche(imgTemplate);
     imgs_templatediffblank.set(k, diff);
-    console.error(diff, k);
+    const imgTemplateAdaptative = decoupe(threshAdaptive, getPosition(case1), getDimensions(case1));
+    const diff1 = diffCouleurAvecCaseBlanche(imgTemplateAdaptative);
+    imgs_templatediffblankAdaptive.set(k, diff1);
+    imgTemplate.delete();
+    imgTemplateAdaptative.delete();
   }
 
   gray.delete();
   thresh.delete();
+  threshAdaptive.delete();
   for (const [k, case1] of casesExamTemplate.cases.entries()) {
     // casesExamTemplate.cases.forEach((case1: any, k: number) => {
     // Pour chaque (x,y) associé à une case du template, on récupère la zone située au même endroit sur la copie
     // et on la compare avec celle du template
 
     const img_case_eleve = decoupe(thresh_st, getPosition(case1), getDimensions(case1));
+    const img_case_eleveAdaptive = decoupe(thresh_stAdaptive, getPosition(case1), getDimensions(case1));
+
     const diff1 = diffCouleurAvecCaseBlanche(img_case_eleve);
+    const diff2 = diffCouleurAvecCaseBlanche(img_case_eleveAdaptive);
     //    img_case_eleve.delete();
-    const diff = diff1 - imgs_templatediffblank.get(k)!;
+    let diff = diff1 - imgs_templatediffblank.get(k)!;
+    let diffAdaptive = diff2 - imgs_templatediffblankAdaptive.get(k)!;
 
-    console.error(diff1, imgs_templatediffblank.get(k), k);
-
-    // console.error('diff',k,diff1-imgs_templatediffblank.get(k)!,diff1, imgs_templatediffblank.get(k));
-    if (diff > preference.qcm_differences_avec_case_blanche) {
-      infos_cases.set(k, { verdict: true, prediction: diff });
-      cases_remplies.push(case1);
-    } else {
-      infos_cases.set(k, { verdict: false, prediction: diff });
-      cases_vides.push(case1);
+    if (diff < 0) {
+      diff = 0;
     }
-    if (diff > preference.qcm_differences_avec_case_blanche) {
+    if (diffAdaptive < 0) {
+      diff = 0;
+    }
+    // console.error('diff',k,diff1-imgs_templatediffblank.get(k)!,diff1, imgs_templatediffblank.get(k));
+    infos_cases.set(k, { prediction: diff, predictionAdaptative: diffAdaptive });
+    img_case_eleve.delete();
+    img_case_eleveAdaptive.delete();
+  }
+
+  const diffs = Array.from(infos_cases.values()).map(ee => ee.prediction);
+  const diffsAdaptative = Array.from(infos_cases.values()).map(ee => ee.predictionAdaptative);
+  const km = kMeans(diffs, 100);
+  const kmAdaptative = kMeans(diffsAdaptative, 100);
+
+  preference.qcm_differences_avec_case_blanche;
+
+  const score1 = scoreKmean(km, diffs);
+  const score2 = scoreKmean(kmAdaptative, diffsAdaptative);
+  console.error('score kmean', score1, score2);
+  const maxScore = score1 > score2 ? score1 : score2;
+  for (const [k, case1] of casesExamTemplate.cases.entries()) {
+    const r = infos_cases.get(k);
+    const diff = score1 > score2 ? r.prediction : r.predictionAdaptative;
+    const km1 = score1 > score2 ? km : kmAdaptative;
+    if (km1.clusters[k] === 1 && maxScore > preference.qcm_differences_avec_case_blanche) {
+      infos_cases.set(k, { verdict: true, prediction: diff });
+
       cv.putText(
         studentScanImage,
         '' + diff.toFixed(2),
@@ -545,7 +578,10 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
         new cv.Scalar(255, 0, 0, 128),
         1,
       );
+      cases_remplies.push(case1);
     } else {
+      infos_cases.set(k, { verdict: false, prediction: diff });
+
       cv.putText(
         studentScanImage,
         '' + diff.toFixed(2),
@@ -555,11 +591,12 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
         new cv.Scalar(255, 0, 0, 128),
         1,
       );
+      cases_vides.push(case1);
     }
-    img_case_eleve.delete();
   }
   gray_st.delete();
   thresh_st.delete();
+  thresh_stAdaptive.delete();
 
   drawRectangle(studentScanImage, cases_remplies, new cv.Scalar(0, 255, 0, 128), 2);
   drawRectangle(studentScanImage, cases_vides, new cv.Scalar(0, 0, 255, 128), 2);
@@ -624,11 +661,11 @@ function __dist(case1: any, case2: any): number {
 
 // Renvoie un pourcentage de différences entre une image de case et une considérée comme vide
 function diffCouleurAvecCaseBlanche(img_case: any): number {
-  //  let gray = new cv.Mat();
-  //  cv.cvtColor(img_case, gray, cv.COLOR_RGBA2GRAY, 0);
-  //  let thresh = new cv.Mat();
-  //  cv.threshold(gray, thresh, 200, 255, cv.THRESH_BINARY);
-  console.error('computetemplate', cv.countNonZero(img_case), img_case.rows, img_case.cols, img_case.rows * img_case.cols);
+  // let gray = new cv.Mat();
+  // cv.cvtColor(img_case, gray, cv.COLOR_RGBA2GRAY, 0);
+  // let thresh = new cv.Mat();
+  // cv.threshold(gray, thresh, 200, 255, cv.THRESH_BINARY);
+  // console.error('computetemplate', cv.countNonZero(img_case), img_case.rows, img_case.cols, img_case.rows * img_case.cols);
   const nonzerorationforeleve = 1.0 - cv.countNonZero(img_case) / (img_case.rows * img_case.cols);
   return nonzerorationforeleve;
 }
@@ -666,3 +703,122 @@ export function diffGrayAvecCaseBlanche(img_case: any): number {
     return 0;
   }
 }
+
+// Fonction pour calculer la distance entre deux nombres
+function distance(value1: number, value2: number): number {
+  return Math.abs(value1 - value2);
+}
+
+// Fonction pour initialiser aléatoirement les centroids
+function initializeCentroids(data: number[]): number[] {
+  const centroids = [];
+  // Prends la plus grande et la plus petite valeur
+
+  centroids.push(Math.min(...data));
+  centroids.push(Math.max(...data));
+  return centroids;
+}
+
+// Fonction pour attribuer chaque valeur au cluster le plus proche
+function assignClusters(data: number[], centroids: number[]): number[] {
+  const clusters = new Array(data.length);
+
+  for (let i = 0; i < data.length; i++) {
+    let closestCentroidIndex = 0;
+    let minDistance = 1;
+    for (let j = 0; j < centroids.length; j++) {
+      const dist = distance(data[i], centroids[j]);
+
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestCentroidIndex = j;
+      }
+    }
+    clusters[i] = closestCentroidIndex;
+  }
+
+  return clusters;
+}
+
+// Fonction pour mettre à jour les centroids en fonction des valeurs assignées
+function updateCentroids(data: number[], clusters: number[], k: number): number[] {
+  const newCentroids = new Array(k).fill(0);
+  const counts = new Array(k).fill(0);
+
+  for (let i = 0; i < data.length; i++) {
+    const clusterIndex = clusters[i];
+    counts[clusterIndex]++;
+    newCentroids[clusterIndex] += data[i];
+  }
+
+  for (let i = 0; i < k; i++) {
+    if (counts[i] !== 0) {
+      newCentroids[i] /= counts[i];
+    }
+  }
+
+  return newCentroids;
+}
+
+// Fonction principale de l'algorithme K-means
+function kMeans(data: number[], maxIterations = 100): { clusters: number[]; centroids: number[] } {
+  let centroids = initializeCentroids(data);
+  let clusters: number[] = [];
+  let hasConverged = false;
+  let iterations = 0;
+
+  while (!hasConverged && iterations < maxIterations) {
+    const newClusters = assignClusters(data, centroids);
+    const newCentroids = updateCentroids(data, newClusters, 2);
+
+    hasConverged = JSON.stringify(clusters) === JSON.stringify(newClusters);
+    clusters = newClusters;
+    centroids = newCentroids;
+    iterations++;
+  }
+
+  return { clusters, centroids };
+}
+
+function scoreKmean(km: { clusters: number[]; centroids: number[] }, infos_cases: number[]): number {
+  let centroidmin = km.centroids[0];
+  let centroidmax = km.centroids[1];
+  let diffCentroidsMin: number[] = [];
+  let diffCentroidsMax: number[] = [];
+  km.clusters.forEach((c1, index) => {
+    if (c1 === 0) {
+      diffCentroidsMin.push(Math.abs(centroidmin - infos_cases[index]));
+    } else {
+      diffCentroidsMax.push(Math.abs(centroidmax - infos_cases[index]));
+    }
+  });
+  let sumdiffcentroidMin = 0;
+  for (let i = 0; i < diffCentroidsMin.length; i++) {
+    sumdiffcentroidMin += diffCentroidsMin[i];
+  }
+  if (diffCentroidsMin.length > 0) {
+    sumdiffcentroidMin = sumdiffcentroidMin / diffCentroidsMin.length;
+  }
+  let sumdiffcentroidMax = 0;
+  for (let i = 0; i < diffCentroidsMax.length; i++) {
+    sumdiffcentroidMax += diffCentroidsMax[i];
+  }
+  if (diffCentroidsMax.length > 0) {
+    sumdiffcentroidMax = sumdiffcentroidMax / diffCentroidsMax.length;
+  }
+
+  const score = centroidmax - sumdiffcentroidMax - (centroidmin + sumdiffcentroidMin);
+  return score;
+}
+/*
+// Exemple d'utilisation
+const data = [
+  0.05, 0.04, 0.4,
+  0.01, 0.5,0.6
+];
+const k = 2;
+const result = kMeans(data);
+
+console.log('Clusters:', result.clusters);
+console.log('Centroids:', result.centroids);
+*/
