@@ -6,7 +6,7 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable @typescript-eslint/member-ordering */
-import { fabric } from 'fabric';
+import { TPointerEvent, FabricImage as fImage, FabricObject } from 'fabric';
 import { FabricShapeService } from './shape.service';
 import {
   CustomFabricEllipse,
@@ -48,7 +48,7 @@ export class EventHandlerService {
   public allcanvas: Map<number, PagedCanvas> = new Map();
   public pages: { [page: number]: PageHandler } = {};
   public questions: Map<number, IQuestion> = new Map();
-  private currentSelected: fabric.Object | undefined;
+  private currentSelected: FabricObject | undefined;
   private imageDataUrl!: string;
   private zonesRendering: { [page: number]: CustomZone[] } = {};
   private _elementUnderDrawing:
@@ -204,10 +204,12 @@ export class EventHandlerService {
       const img = new Image();
       // eslint-disable-next-line @typescript-eslint/require-await
       img.onload = async () => {
-        const f_img = new fabric.Image(img);
+        const f_img = new fImage(img);
         this.canvas.setWidth(f_img.width!);
         this.canvas.setHeight(f_img.height!);
-        this.canvas.setBackgroundImage(f_img, resolve);
+        this.canvas.backgroundImage = f_img;
+
+        //        this.canvas.setBackgroundImage(f_img, resolve);
       };
       img.onerror = () => {
         reject();
@@ -216,9 +218,10 @@ export class EventHandlerService {
     });
   }
 
-  public mouseDown(e: Event): void {
+  public mouseDown(e: TPointerEvent): void {
     this._isMouseDown = true;
-    const pointer = this.canvas.getPointer(e);
+    //    const pointer = this.canvas.getPointer(e);
+    const pointer = this.canvas.getScenePoint(e);
     this._initPositionOfElement = { x: pointer.x, y: pointer.y };
 
     switch (this._selectedTool) {
@@ -310,11 +313,11 @@ export class EventHandlerService {
     }
   }
 
-  public mouseMove(e: Event): void {
+  public mouseMove(e: TPointerEvent): void {
     if (!this._isMouseDown) {
       return;
     }
-    const pointer = this.canvas.getPointer(e);
+    const pointer = this.canvas.getScenePoint(e);
     switch (this._selectedTool) {
       case DrawingTools.ELLIPSE:
         this.fabricShapeService.formEllipse(this._elementUnderDrawing as CustomFabricEllipse, this._initPositionOfElement, pointer);
@@ -531,13 +534,11 @@ export class EventHandlerService {
   }
 
   public extendToObjectWithId(): void {
-    fabric.Object.prototype.toObject = (function (toObject) {
-      return function (this: CustomFabricObject): fabric.Object {
-        return fabric.util.object.extend(toObject.call(this), {
-          id: this.id,
-        }) as fabric.Object;
-      };
-    })(fabric.Object.prototype.toObject);
+    const originalToObject = FabricObject.prototype.toObject;
+    const myAdditional: any[] = ['id'];
+    FabricObject.prototype.toObject = function (additionalProperties) {
+      return originalToObject.call(this, myAdditional.concat(additionalProperties));
+    };
   }
 
   /**
@@ -594,7 +595,7 @@ export class EventHandlerService {
   /**
    * Erases the given object from the canvas
    */
-  private async eraseObject(object: fabric.Object): Promise<void> {
+  private async eraseObject(object: FabricObject): Promise<void> {
     const customObject = object as CustomFabricObject;
     // Getting the zone id
     const zid = this.modelViewpping.get(customObject.id);
@@ -636,7 +637,8 @@ export class EventHandlerService {
     }
   }
 
-  async eraseObjectI(object: fabric.Object): Promise<void> {
+  async eraseObjectI(object: FabricObject): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
     if (object.type === FabricObjectType.GROUP) {
       const custObj = object as CustomFabricGroup;
       for (const o of custObj.getObjects()) {
@@ -644,6 +646,7 @@ export class EventHandlerService {
       }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
     if (object.type === FabricObjectType.ELLIPSE) {
       const otherEllipses = this.getOtherEllipses((object as CustomFabricObject).id);
       otherEllipses.forEach(e => this.canvas.remove(e));
@@ -656,8 +659,9 @@ export class EventHandlerService {
    * States whether the given object is a question
    * @returns True if it is a question.
    */
-  private isAQuestion(object: fabric.Object): boolean {
+  private isAQuestion(object: FabricObject): boolean {
     return (
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
       object.type === FabricObjectType.GROUP &&
       (((object as CustomFabricGroup).getObjects()[1] as IText).text?.startsWith('Question') ?? false)
     );

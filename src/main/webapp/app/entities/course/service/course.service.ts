@@ -14,7 +14,10 @@ export type EntityArrayResponseType = HttpResponse<ICourse[]>;
 export class CourseService {
   protected resourceUrl: string;
 
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+  constructor(
+    protected http: HttpClient,
+    protected applicationConfigService: ApplicationConfigService,
+  ) {
     this.resourceUrl = this.applicationConfigService.getEndpointFor('api/courses');
   }
 
@@ -35,7 +38,7 @@ export class CourseService {
     return this.http.get<ICourse[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  delete(id: number): Observable<HttpResponse<{}>> {
+  delete(id: number): Observable<HttpResponse<any>> {
     // eslint-disable-next-line no-console
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }

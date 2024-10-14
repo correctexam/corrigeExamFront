@@ -389,6 +389,7 @@ export class StatsExamComponent implements OnInit {
         const num1 = parseInt(ine1, 10);
         const num2 = parseInt(ine2, 10);
         return num2 - num1;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (_err: unknown) {
         // If not number, falling back to string comparison
         return ine1.localeCompare(ine2);

@@ -38,15 +38,6 @@
       }
     ],
     "@angular-eslint/relative-url-prefix": "error",
-    "@typescript-eslint/ban-types": [
-      "error",
-      {
-        "extendDefaults": true,
-        "types": {
-          "{}": false
-        }
-      }
-    ],
     "@typescript-eslint/explicit-function-return-type": ["error", { "allowExpressions": true }],
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/member-ordering": [
@@ -83,6 +74,7 @@
     "@typescript-eslint/prefer-nullish-coalescing": "error",
     "@typescript-eslint/prefer-optional-chain": "error",
     "@typescript-eslint/unbound-method": "off",
+    "@typescript-eslint/prefer-promise-reject-errors": "off",
     "arrow-body-style": "error",
     "curly": "error",
     "eqeqeq": ["error", "always", { "null": "ignore" }],

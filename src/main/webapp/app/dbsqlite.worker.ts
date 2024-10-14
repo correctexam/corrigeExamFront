@@ -24,7 +24,6 @@ addEventListener('message', e => {
 
   switch (e.data.msg) {
     case 'hello': {
-      portWorkerPool;
       const response = `worker response to ${e.data.msg}`;
       postMessage({ msg: response });
 

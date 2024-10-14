@@ -65,7 +65,7 @@ export class ZoneService {
     return this.http.get<IZone[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  delete(id: number): Observable<HttpResponse<{}>> {
+  delete(id: number): Observable<HttpResponse<any>> {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 

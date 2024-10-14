@@ -10,7 +10,10 @@ import { IUser } from '../user-management.model';
 @Injectable({ providedIn: 'root' })
 export class UserManagementService {
   private resourceUrl: string;
-  constructor(private http: HttpClient, private applicationConfigService: ApplicationConfigService) {
+  constructor(
+    private http: HttpClient,
+    private applicationConfigService: ApplicationConfigService,
+  ) {
     this.resourceUrl = this.applicationConfigService.getEndpointFor('api/users');
   }
 
@@ -31,7 +34,7 @@ export class UserManagementService {
     return this.http.get<IUser[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  delete(login: string): Observable<{}> {
+  delete(login: string): Observable<any> {
     return this.http.delete(`${this.resourceUrl}/${login}`);
   }
 

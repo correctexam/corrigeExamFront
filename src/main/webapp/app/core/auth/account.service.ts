@@ -22,10 +22,10 @@ export class AccountService {
     private http: HttpClient,
     private stateStorageService: StateStorageService,
     private router: Router,
-    private applicationConfigService: ApplicationConfigService
+    private applicationConfigService: ApplicationConfigService,
   ) {}
 
-  save(account: Account): Observable<{}> {
+  save(account: Account): Observable<any> {
     return this.http.post(this.applicationConfigService.getEndpointFor('api/account'), account);
   }
 
@@ -62,7 +62,7 @@ export class AccountService {
 
           this.navigateToStoredUrl();
         }),
-        shareReplay()
+        shareReplay(),
       );
     }
     return this.accountCache$.pipe(catchError(() => of(null)));

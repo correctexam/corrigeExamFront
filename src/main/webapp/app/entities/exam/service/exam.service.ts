@@ -47,27 +47,27 @@ export class ExamService {
     return this.http.get<IExam[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  delete(id: number): Observable<HttpResponse<{}>> {
+  delete(id: number): Observable<HttpResponse<any>> {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
-  deleteAllExamSheets(id: number): Observable<HttpResponse<{}>> {
+  deleteAllExamSheets(id: number): Observable<HttpResponse<any>> {
     return this.http.delete(`${this.resourceUrl}` + '/cleanAllStudentSheet' + `/${id}`, { observe: 'response' });
   }
 
-  deleteAllAnswerAndComment(id: number): Observable<HttpResponse<{}>> {
+  deleteAllAnswerAndComment(id: number): Observable<HttpResponse<any>> {
     return this.http.delete(this.applicationConfigService.getEndpointFor('api') + '/deleteAllAnswerAndComment' + `/${id}`, {
       observe: 'response',
     });
   }
 
-  deleteAnswer(srid: number): Observable<HttpResponse<{}>> {
+  deleteAnswer(srid: number): Observable<HttpResponse<any>> {
     return this.http.delete(this.applicationConfigService.getEndpointFor('api') + '/deleteAnswerAndUnsetComment' + `/${srid}`, {
       observe: 'response',
     });
   }
 
-  deleteAllZone(id: number): Observable<HttpResponse<{}>> {
+  deleteAllZone(id: number): Observable<HttpResponse<any>> {
     return this.http.delete(this.applicationConfigService.getEndpointFor('api') + '/cleanExam' + `/${id}`, {
       observe: 'response',
     });

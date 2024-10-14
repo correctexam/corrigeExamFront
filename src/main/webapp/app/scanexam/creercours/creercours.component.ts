@@ -46,7 +46,6 @@ export class CreercoursComponent implements OnInit {
 
   ngOnInit(): void {
     this.createFromForm();
-    this.userService.query;
     this.accountService.getAuthenticationState().subscribe(e => {
       this.login = e?.login;
     });

@@ -14,7 +14,10 @@ export type EntityArrayResponseType = HttpResponse<IQuestionType[]>;
 export class QuestionTypeService {
   protected resourceUrl;
 
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+  constructor(
+    protected http: HttpClient,
+    protected applicationConfigService: ApplicationConfigService,
+  ) {
     this.resourceUrl = this.applicationConfigService.getEndpointFor('api/question-types');
   }
 
@@ -43,7 +46,7 @@ export class QuestionTypeService {
     return this.http.get<IQuestionType[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  delete(id: number): Observable<HttpResponse<{}>> {
+  delete(id: number): Observable<HttpResponse<any>> {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
@@ -54,7 +57,7 @@ export class QuestionTypeService {
     const questionTypes: IQuestionType[] = questionTypesToCheck.filter(isPresent);
     if (questionTypes.length > 0) {
       const questionTypeCollectionIdentifiers = questionTypeCollection.map(
-        questionTypeItem => getQuestionTypeIdentifier(questionTypeItem)!
+        questionTypeItem => getQuestionTypeIdentifier(questionTypeItem)!,
       );
       const questionTypesToAdd = questionTypes.filter(questionTypeItem => {
         const questionTypeIdentifier = getQuestionTypeIdentifier(questionTypeItem);

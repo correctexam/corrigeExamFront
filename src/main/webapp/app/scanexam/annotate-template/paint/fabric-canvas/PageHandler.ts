@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/member-ordering */
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
+import { TPointerEvent, TPointerEventInfo } from 'fabric';
 import { EventHandlerService } from '../event-handler.service';
-import { IEvent, Transform } from 'fabric/fabric-impl';
+import { TEvent, Transform } from 'fabric/fabric-impl';
 import { Platform } from '@angular/cdk/platform';
 
 type AnnotationPageRect = {
@@ -11,7 +12,7 @@ type AnnotationPageRect = {
   pos2: { x: number; y: number };
 };
 
-interface CanvasModifiedEvent extends IEvent {
+interface CanvasModifiedEvent extends TEvent {
   action: 'drag' | 'scale';
   transform: Transform;
   target: any;
@@ -109,7 +110,6 @@ export class PageHandler {
     }
     this.pageViewer = pageViewer;
     this.pdfCanvas = this.pageViewer.canvas;
-    this.pdfCanvas.parentElement?.childNodes;
 
     this.annotationCanvas = document.createElement('CANVAS') as HTMLCanvasElement;
 
@@ -187,13 +187,13 @@ export class PageHandler {
     });
   }
 
-  private onCanvasMouseDown(event: IEvent<MouseEvent>): void {
+  private onCanvasMouseDown(event: TPointerEventInfo<TPointerEvent>): void {
     this.eventHandler.canvas = this.canvas;
     this.eventHandler.mouseDown(event.e);
     this.avoidDragAndClickEventsOfOtherUILibs(event.e);
   }
 
-  private onCanvasMouseMove(event: IEvent<MouseEvent>): void {
+  private onCanvasMouseMove(event: TPointerEventInfo<TPointerEvent>): void {
     this.eventHandler.canvas = this.canvas;
     this.eventHandler.mouseMove(event.e);
   }

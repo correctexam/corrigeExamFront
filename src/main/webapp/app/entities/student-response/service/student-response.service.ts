@@ -14,7 +14,10 @@ export type EntityArrayResponseType = HttpResponse<IStudentResponse[]>;
 export class StudentResponseService {
   protected resourceUrl: string;
 
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+  constructor(
+    protected http: HttpClient,
+    protected applicationConfigService: ApplicationConfigService,
+  ) {
     this.resourceUrl = this.applicationConfigService.getEndpointFor('api/student-responses');
   }
 
@@ -32,7 +35,7 @@ export class StudentResponseService {
       {
         currentNote: studentResponse.note,
       },
-      { observe: 'response' }
+      { observe: 'response' },
     );
   }
 
@@ -45,7 +48,7 @@ export class StudentResponseService {
     return this.http.get<IStudentResponse[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  delete(id: number): Observable<HttpResponse<{}>> {
+  delete(id: number): Observable<HttpResponse<any>> {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
@@ -56,7 +59,7 @@ export class StudentResponseService {
     const studentResponses: IStudentResponse[] = studentResponsesToCheck.filter(isPresent);
     if (studentResponses.length > 0) {
       const studentResponseCollectionIdentifiers = studentResponseCollection.map(
-        studentResponseItem => getStudentResponseIdentifier(studentResponseItem)!
+        studentResponseItem => getStudentResponseIdentifier(studentResponseItem)!,
       );
       const studentResponsesToAdd = studentResponses.filter(studentResponseItem => {
         const studentResponseIdentifier = getStudentResponseIdentifier(studentResponseItem);

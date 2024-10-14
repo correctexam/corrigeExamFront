@@ -260,6 +260,7 @@ export class CacheUploadService {
         );
       });
       return await p;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e2) {
       messageService.add({
         severity: 'error',

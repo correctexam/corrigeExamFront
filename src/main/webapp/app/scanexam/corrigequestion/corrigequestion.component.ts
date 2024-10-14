@@ -1071,8 +1071,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           //   this.testdisableAndEnableKeyBoardShortCut.set(true);
 
           setTimeout(() => {
-            this.testdisableAndEnableKeyBoardShortCut.set(true), 300;
-          });
+            this.testdisableAndEnableKeyBoardShortCut.set(true);
+          }, 300);
           resolve(e1.body!);
         } else {
           reject(null);
@@ -1559,8 +1559,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               this.populateDefaultShortCut();
               //     this.testdisableAndEnableKeyBoardShortCut.set(true);
               setTimeout(() => {
-                this.testdisableAndEnableKeyBoardShortCut.set(true), 300;
-              });
+                this.testdisableAndEnableKeyBoardShortCut.set(true);
+              }, 300);
 
               this.titreCommentaire = '';
               this.descCommentaire = '';
@@ -1593,8 +1593,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               //   this.testdisableAndEnableKeyBoardShortCut.set(true);
 
               setTimeout(() => {
-                this.testdisableAndEnableKeyBoardShortCut.set(true), 300;
-              });
+                this.testdisableAndEnableKeyBoardShortCut.set(true);
+              }, 300);
 
               this.computeNote(false, this.resp!, this.currentQuestion!);
               this.titreCommentaire = '';

@@ -6,7 +6,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/member-ordering */
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import { EventCanevasVoirCopieHandlerService } from './event-canevasvoircopie-handler.service';
 
 export class ZoneVoirCopieHandler {
@@ -56,7 +56,7 @@ export class ZoneVoirCopieHandler {
     this.canvas = canvas;
 
     this.eventHandler.extendToObjectWithId();
-    fabric.Object.prototype.objectCaching = false;
+    fabric.FabricObject.prototype.objectCaching = false;
     return canvas;
   }
 

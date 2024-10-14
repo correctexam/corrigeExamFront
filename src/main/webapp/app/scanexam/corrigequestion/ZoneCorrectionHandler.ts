@@ -6,7 +6,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/member-ordering */
-import { fabric } from 'fabric';
+import { TPointerEvent, Canvas as fCanvas, FabricObject } from 'fabric';
 import { EventCanevascorrectionHandlerService } from './event-canevascorrection-handler.service';
 
 export type AnnotationPageRect = {
@@ -23,7 +23,7 @@ export class ZoneCorrectionHandler {
   currentAnnotationId!: string;
 
   private annotationCanvas!: HTMLCanvasElement;
-  private canvas: fabric.Canvas | undefined;
+  private canvas: fCanvas | undefined;
   private canvasInitialCanvas!: HTMLCanvasElement;
   noteImg!: HTMLImageElement;
 
@@ -33,7 +33,7 @@ export class ZoneCorrectionHandler {
     public respid: number | undefined,
   ) {}
 
-  updateCanvas(canvas1: any): fabric.Canvas {
+  updateCanvas(canvas1: any): fCanvas {
     if (this.annotationCanvas && this.annotationCanvas.parentNode) {
       this.annotationCanvas.parentNode.removeChild(this.annotationCanvas);
       if (this.canvas !== undefined) {
@@ -58,7 +58,7 @@ export class ZoneCorrectionHandler {
 
     this.canvasInitialCanvas.parentElement!.appendChild(this.annotationCanvas);
 
-    const canvas = new fabric.Canvas(this.annotationCanvas, {
+    const canvas = new fCanvas(this.annotationCanvas, {
       selection: false,
       preserveObjectStacking: true,
     });
@@ -71,7 +71,7 @@ export class ZoneCorrectionHandler {
     this.eventHandler.extendToObjectWithId();
     this.canvas = canvas;
     // this.eventHandler.commentsService.query();
-    fabric.Object.prototype.objectCaching = false;
+    FabricObject.prototype.objectCaching = false;
     this.addEventListeners(canvas);
     return canvas;
   }
@@ -88,12 +88,12 @@ export class ZoneCorrectionHandler {
     canvas.on('object:modified', () => this.onObjectModified());
   }
 
-  private onCanvasMouseDown(event: { e: Event }) {
+  private onCanvasMouseDown(event: { e: TPointerEvent }) {
     this.eventHandler.canvas = this.canvas!;
     this.eventHandler.mouseDown(event.e);
     this.avoidDragAndClickEventsOfOtherUILibs(event.e);
   }
-  private onCanvasMouseMove(event: { e: Event }) {
+  private onCanvasMouseMove(event: { e: TPointerEvent }) {
     this.eventHandler.canvas = this.canvas!;
     this.eventHandler.mouseMove(event.e);
   }

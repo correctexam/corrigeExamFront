@@ -183,6 +183,7 @@ export class ResultatStudentcourseComponent implements OnInit {
           });
         });
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e: any) {
       this.showEmail = false;
       this.currentStudentMail = undefined;

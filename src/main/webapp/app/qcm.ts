@@ -556,7 +556,7 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
   const km = kMeans(diffs, 100);
   const kmAdaptative = kMeans(diffsAdaptative, 100);
 
-  preference.qcm_differences_avec_case_blanche;
+  //  preference.qcm_differences_avec_case_blanche;
 
   const score1 = scoreKmean(km, diffs);
   const score2 = scoreKmean(kmAdaptative, diffsAdaptative);

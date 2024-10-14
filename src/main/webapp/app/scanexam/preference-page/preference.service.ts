@@ -311,6 +311,7 @@ export class PreferenceService {
     for (let i = o.length; i; ) {
       let x: number;
       const j = Math.floor(Math.random() * i);
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       (x = o[--i]), (o[i] = o[j]), (o[j] = x);
       s.set(i, j);
     }

@@ -646,7 +646,7 @@ async function doPredictionsAsync(p: {
     source.target.postMessage({ msg: p.msg, payload: outputs, uid: p.uid }, opts);
   } else {
     // TODO
-    p1.firstnamePagesToAnalyze;
+    //    p1.firstnamePagesToAnalyze;
   }
 }
 
@@ -1165,7 +1165,6 @@ function extractImageNew(
   //  let src = cv.imread(inputid);
   let dst = src.clone();
   let gray = new cv.Mat();
-  false;
   cv.cvtColor(src, gray, cv.COLOR_BGR2GRAY, 0);
   let thresh = new cv.Mat();
   cv.threshold(gray, thresh, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);

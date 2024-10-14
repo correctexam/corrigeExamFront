@@ -146,7 +146,7 @@ export class AllbindingsComponent implements OnInit {
     try {
       await this.bindStudentInternal(student, currentStudent, element);
     } catch (e) {
-      console.error('could not bind ', student);
+      console.error('could not bind ', student, e);
     }
     this.nobutton = false;
   }

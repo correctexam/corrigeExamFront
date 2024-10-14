@@ -14,7 +14,10 @@ export type EntityArrayResponseType = HttpResponse<IComments[]>;
 export class CommentsService {
   protected resourceUrl: string;
 
-  constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {
+  constructor(
+    protected http: HttpClient,
+    protected applicationConfigService: ApplicationConfigService,
+  ) {
     this.resourceUrl = this.applicationConfigService.getEndpointFor('api/comments');
   }
 
@@ -41,7 +44,7 @@ export class CommentsService {
     return this.http.get<IComments[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  delete(id: number): Observable<HttpResponse<{}>> {
+  delete(id: number): Observable<HttpResponse<any>> {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 

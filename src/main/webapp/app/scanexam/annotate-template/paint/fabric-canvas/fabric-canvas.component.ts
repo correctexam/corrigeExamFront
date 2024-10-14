@@ -150,7 +150,7 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
 
       // Requires to update the canvas for each page if the pdf contains metadata to process
       if (this.eventHandler.getCanvasForPage(page) === undefined) {
-        this.eventHandler.pages[page].updateCanvas(evt.source, this.document);
+        (this.eventHandler.pages[page] as any).updateCanvas(evt.source, this.document);
       }
       if (this.zones[page] !== undefined) {
         this.zones[page].forEach(z => {
@@ -379,8 +379,8 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
       };
     }
 
-    const width = canvas.width!;
-    const height = canvas.height!;
+    const width = canvas.width;
+    const height = canvas.height;
 
     return {
       pageNumber: rect.p,
@@ -464,6 +464,7 @@ function toRect(key: string, value: unknown): Rect | undefined {
     ) {
       return { ...r, type, q: Number.isFinite(q) ? q : undefined, subq: Number.isFinite(subq) ? subq : undefined };
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (ignore: unknown) {
     // nothing to do
   }

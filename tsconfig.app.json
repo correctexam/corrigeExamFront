@@ -2,7 +2,8 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./target/classes/static/app",
-    "types": []
+    "types": [],
+    "isolatedModules": true
   },
   "files": ["src/main/webapp/main.ts", "src/main/webapp/polyfills.ts"],
   "include": ["src/main/webapp/**/*.d.ts"]

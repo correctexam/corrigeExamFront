@@ -13,7 +13,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-import { fabric } from 'fabric';
+import { Canvas as fCanvas, TPointerEvent, loadSVGFromString, FabricImage as fImage, FabricObject, IText } from 'fabric';
 import { FabricShapeService } from '../annotate-template/paint/shape.service';
 import {
   CustomFabricEllipse,
@@ -47,13 +47,13 @@ const RANGE_AROUND_CENTER = 20;
 })
 export class EventCanevascorrectionHandlerService {
   public imageDataUrl!: string;
-  public _canvas!: fabric.Canvas;
+  public _canvas!: fCanvas;
   private confService!: ConfirmationService;
 
-  get canvas(): fabric.Canvas {
+  get canvas(): fCanvas {
     return this._canvas;
   }
-  set canvas(c: fabric.Canvas) {
+  set canvas(c: fCanvas) {
     const prev = this._canvas;
     this._canvas = c;
     if (c !== prev && c.getObjects().length === 0) {
@@ -67,17 +67,18 @@ export class EventCanevascorrectionHandlerService {
           }
           draw.scale(this.scale, this.scale, 0, 0);
           const s2 = draw.svg(svgadapter);
-          fabric.loadSVGFromString(s2, (objects, options) => {
+          loadSVGFromString(s2).then(r => {
             // const obj = fabric.util.fabricShapeService(objects, options);
-            c.clear();
-            if (objects.length > 0) {
-              objects.forEach(obj => {
-                if (obj.type === 'text') {
-                  obj = this.convertToIText(obj);
-                  (obj as any).firstText = (obj as any).text;
-                  (obj as any).textState = 'original';
+            if (r.objects.length > 0) {
+              r.objects.forEach(obj => {
+                if (obj !== null) {
+                  if (obj.type === 'text') {
+                    obj = this.convertToIText(obj);
+                    (obj as any).firstText = (obj as any).text;
+                    (obj as any).textState = 'original';
+                  }
+                  c.add(obj);
                 }
-                c.add(obj);
               });
               c.renderAll();
               if (
@@ -100,7 +101,7 @@ export class EventCanevascorrectionHandlerService {
     }
   }
   currentComment: IComments | null = null;
-  public allcanvas: fabric.Canvas[] = [];
+  public allcanvas: fCanvas[] = [];
   private _selectedTool: DrawingTools = DrawingTools.PENCIL;
   private previousTop!: number;
   private previousLeft!: number;
@@ -225,7 +226,7 @@ export class EventCanevascorrectionHandlerService {
     textobj.fontFamily = obj.fontFamily;
     textobj.fontStyle = obj.fontStyle;
     textobj.fontWeight = obj.fontWeight;
-    const itext = new fabric.IText(text, textobj);
+    const itext = new IText(text, textobj);
     itext.styles = {};
     return itext;
   }
@@ -247,10 +248,13 @@ export class EventCanevascorrectionHandlerService {
     return new Promise<void>((resolve, reject) => {
       const img = new Image();
       img.onload = async () => {
-        const f_img = new fabric.Image(img);
+        const f_img = new fImage(img);
         this.canvas.setWidth(f_img.width!);
         this.canvas.setHeight(f_img.height!);
-        this.canvas.setBackgroundImage(f_img, resolve);
+        this.canvas.backgroundImage = f_img;
+        // this.canvas.
+        //        this.canvas.setBackgroundImage(f_img, resolve);
+        resolve();
       };
       img.onerror = () => {
         reject();
@@ -259,9 +263,10 @@ export class EventCanevascorrectionHandlerService {
     });
   }
 
-  mouseDown(e: Event) {
+  mouseDown(e: TPointerEvent) {
     this._isMouseDown = true;
-    const pointer = this.canvas.getPointer(e);
+    // TO check
+    const pointer = this.canvas.getScenePoint(e);
     this._initPositionOfElement = { x: pointer.x, y: pointer.y };
 
     switch (this._selectedTool) {
@@ -363,7 +368,7 @@ export class EventCanevascorrectionHandlerService {
     }
   }
 
-  async updateAllComments(canvas: fabric.Canvas) {
+  async updateAllComments(canvas: fCanvas) {
     if (canvas === this.canvas) {
       return this.updateComments();
     } else {
@@ -384,11 +389,13 @@ export class EventCanevascorrectionHandlerService {
     }
   }
 
-  async mouseMove(e: Event) {
+  async mouseMove(e: TPointerEvent) {
     if (!this._isMouseDown) {
       return;
     }
-    const pointer = this.canvas.getPointer(e);
+    //    const pointer = this.canvas.getPointer(e);
+    // TO check
+    const pointer = this.canvas.getScenePoint(e);
     switch (this._selectedTool) {
       case DrawingTools.ELLIPSE:
         this.fabricShapeService.formEllipse(this._elementUnderDrawing as CustomFabricEllipse, this._initPositionOfElement, pointer);
@@ -441,13 +448,19 @@ export class EventCanevascorrectionHandlerService {
   }
 
   extendToObjectWithId(): void {
-    fabric.Object.prototype.toObject = (function (toObject) {
+    const originalToObject = FabricObject.prototype.toObject;
+    const myAdditional: any[] = ['id'];
+    FabricObject.prototype.toObject = function (additionalProperties) {
+      return originalToObject.call(this, myAdditional.concat(additionalProperties));
+    };
+    /*    fabric.FabricObject.prototype.toObject = (function (toObject) {
       return function (this: CustomFabricObject) {
-        return fabric.util.object.extend(toObject.call(this), {
+
+        return fabric.util..extend(toObject.call(this), {
           id: this.id,
         });
       };
-    })(fabric.Object.prototype.toObject);
+    })(fabric.Object.prototype.toObject);*/
   }
 
   objectSelected(object: CustomFabricObject): void {
@@ -459,6 +472,7 @@ export class EventCanevascorrectionHandlerService {
       case DrawingTools.SELECT:
         break;
       case DrawingTools.ERASER:
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
         if (object.type === FabricObjectType.ELLIPSE) {
           const otherEllipses = this.getOtherEllipses(object.id);
           otherEllipses.forEach(e => this.canvas.remove(e));

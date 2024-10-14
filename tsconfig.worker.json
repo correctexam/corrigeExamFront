@@ -4,6 +4,7 @@
   "compilerOptions": {
     "outDir": "./target/classes/static/app/worker",
     "lib": ["es2018", "webworker"],
+    "isolatedModules": true,
     "types": []
   },
   "include": ["src/**/*.worker.ts"]

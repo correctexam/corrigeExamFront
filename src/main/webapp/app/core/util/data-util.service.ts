@@ -56,7 +56,6 @@ export class DataUtils {
     fileReader.onload = () => {
       onLoadCallback(fileReader.result);
     };
-    fileReader.result;
     fileReader.readAsArrayBuffer(file);
   }
 
