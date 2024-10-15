@@ -300,8 +300,6 @@ pdfjs-editor-stamp-button-label = Додати чи редагувати зоб�
 pdfjs-editor-highlight-button =
     .title = Підсвітити
 pdfjs-editor-highlight-button-label = Підсвітити
-pdfjs-highlight-floating-button =
-    .title = Підсвітити
 pdfjs-highlight-floating-button1 =
     .title = Підсвітити
     .aria-label = Підсвітити
@@ -397,5 +395,76 @@ pdfjs-editor-highlight-show-all-button-label = Показати все
 pdfjs-editor-highlight-show-all-button =
     .title = Показати все
 
+## New alt-text dialog
+## Group note for entire feature: Alternative text (alt text) helps when people can't see the image. This feature includes a tool to create alt text automatically using an AI model that works locally on the user's device to preserve privacy.
+
+# Modal header positioned above a text box where users can edit the alt text.
+pdfjs-editor-new-alt-text-dialog-edit-label = Редагувати альтернативний текст (опис зображення)
+# Modal header positioned above a text box where users can add the alt text.
+pdfjs-editor-new-alt-text-dialog-add-label = Додати альтернативний текст (опис зображення)
+pdfjs-editor-new-alt-text-textarea =
+    .placeholder = Напишіть свій опис тут…
+pdfjs-editor-new-alt-text-disclaimer-learn-more-url = Докладніше
+pdfjs-editor-new-alt-text-create-automatically-button-label = Автоматично створювати альтернативний текст
+pdfjs-editor-new-alt-text-not-now-button = Не зараз
+pdfjs-editor-new-alt-text-error-close-button = Закрити
+# This is a button that users can click to edit the alt text they have already added.
+pdfjs-editor-new-alt-text-added-button-label = Альтернативний текст додано
+# This is a button that users can click to open the alt text editor and add alt text when it is not present.
+pdfjs-editor-new-alt-text-missing-button-label = Відсутній альтернативний текст
+# This is a button that opens up the alt text modal where users should review the alt text that was automatically generated.
+pdfjs-editor-new-alt-text-to-review-button-label = Переглянути альтернативний текст
+# "Created automatically" is a prefix that will be added to the beginning of any alt text that has been automatically generated. After the colon, the user will see/hear the actual alt text description. If the alt text has been edited by a human, this prefix will not appear.
+# Variables:
+#   $generatedAltText (String) - the generated alt-text.
+pdfjs-editor-new-alt-text-generated-alt-text-with-disclaimer = Створено автоматично: { $generatedAltText }
+
+## Image alt-text settings
+
+pdfjs-image-alt-text-settings-button =
+    .title = Налаштування альтернативного тексту зображення
+pdfjs-image-alt-text-settings-button-label = Налаштування альтернативного тексту зображення
+pdfjs-editor-alt-text-settings-dialog-label = Налаштування альтернативного тексту зображення
+pdfjs-editor-alt-text-settings-automatic-title = Автоматичний альтернативний текст
+pdfjs-editor-alt-text-settings-create-model-button-label = Автоматично створювати альтернативний текст
+
+pdfjs-document-properties-size-kb = { NUMBER($kb, maximumSignificantDigits: 3) } кБ ({ $b } байтів)
+pdfjs-document-properties-size-mb = { NUMBER($mb, maximumSignificantDigits: 3) } МБ ({ $b } байтів)
+pdfjs-document-properties-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
+pdfjs-annotation-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
+pdfjs-editor-resizer-top-left =
+    .aria-label = Верхній лівий кут – зміна розміру
+pdfjs-editor-resizer-top-middle =
+    .aria-label = Вгорі посередині – зміна розміру
+pdfjs-editor-resizer-top-right =
+    .aria-label = Верхній правий кут – зміна розміру
+pdfjs-editor-resizer-middle-right =
+    .aria-label = Праворуч посередині – зміна розміру
+pdfjs-editor-resizer-bottom-right =
+    .aria-label = Нижній правий кут – зміна розміру
+pdfjs-editor-resizer-bottom-middle =
+    .aria-label = Внизу посередині – зміна розміру
+pdfjs-editor-resizer-bottom-left =
+    .aria-label = Нижній лівий кут – зміна розміру
+pdfjs-editor-resizer-middle-left =
+    .aria-label = Ліворуч посередині – зміна розміру
+pdfjs-editor-new-alt-text-description = Короткий опис для людей, які не бачать зображення, або якщо зображення не завантажується.
+pdfjs-editor-new-alt-text-disclaimer1 = Цей альтернативний текст створено автоматично, тому він може бути неточним.
+pdfjs-editor-new-alt-text-error-title = Не вдалося автоматично створити альтернативний текст
+pdfjs-editor-new-alt-text-error-description = Напишіть власний альтернативний текст або повторіть спробу пізніше.
+pdfjs-editor-new-alt-text-ai-model-downloading-progress = Завантаження моделі ШІ для альтернативного тексту ({ $downloadedSize } з { $totalSize } МБ)
+    .aria-valuetext = Завантаження моделі ШІ для альтернативного тексту ({ $downloadedSize } з { $totalSize } МБ)
+pdfjs-editor-alt-text-settings-create-model-description = Пропонує описи, щоб допомогти людям, які не бачать зображення, або якщо зображення не завантажується.
+pdfjs-editor-alt-text-settings-download-model-label = Модель ШІ для альтернативного тексту ({ $totalSize } МБ)
+pdfjs-editor-alt-text-settings-ai-model-description = Працює локально на вашому пристрої, тому приватність ваших даних захищена. Призначена для автоматичного створення альтернативного тексту.
+pdfjs-editor-alt-text-settings-delete-model-button = Видалити
+pdfjs-editor-alt-text-settings-download-model-button = Завантажити
+pdfjs-editor-alt-text-settings-downloading-model-button = Завантаження…
+pdfjs-editor-alt-text-settings-editor-title = Редактор альтернативного тексту
+pdfjs-editor-alt-text-settings-show-dialog-button-label = Показувати редактор альтернативного тексту під час додавання зображення
+pdfjs-editor-alt-text-settings-show-dialog-description = Допомагає переконатися, що всі ваші зображення мають альтернативний текст.
+pdfjs-editor-alt-text-settings-close-button = Закрити
 unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
 pdfjs-infinite-scroll-button-label = Infinite scroll
+pdfjs-find-multiple-checkbox-label = match each word
+pdfjs-find-regexp-checkbox-label = regular expression
