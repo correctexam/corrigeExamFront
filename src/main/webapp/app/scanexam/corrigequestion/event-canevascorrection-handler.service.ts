@@ -13,7 +13,16 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-import { Canvas as fCanvas, TPointerEvent, loadSVGFromString, FabricImage as fImage, FabricObject, IText } from 'fabric';
+import {
+  Canvas as fCanvas,
+  TPointerEvent,
+  loadSVGFromString,
+  FabricImage as fImage,
+  FabricObject,
+  IText,
+  BaseBrush,
+  PencilBrush,
+} from 'fabric';
 import { FabricShapeService } from '../annotate-template/paint/shape.service';
 import {
   CustomFabricEllipse,
@@ -126,7 +135,12 @@ export class EventCanevascorrectionHandlerService {
       this._selectedTool === DrawingTools.FILL
     ) {
       this.objectsSelectable(true);
+      this.canvas.isDrawingMode = false;
+    } else if (this._selectedTool === DrawingTools.PENCIL) {
+      this.canvas.isDrawingMode = true;
+      this.objectsSelectable(false);
     } else {
+      this.canvas.isDrawingMode = false;
       this.objectsSelectable(false);
     }
     if (this.selectedTool === DrawingTools.GARBAGE) {
@@ -160,13 +174,27 @@ export class EventCanevascorrectionHandlerService {
   _selectedColour: DrawingColours = DrawingColours.RED;
   public set selectedColour(c: DrawingColours) {
     this._selectedColour = c;
+    if (this.canvas.freeDrawingBrush) {
+      this.canvas.freeDrawingBrush.color = c;
+    }
     this.canvas.discardActiveObject();
+
     this.canvas.renderAll();
   }
   public get selectedColour(): DrawingColours {
     return this._selectedColour;
   }
-  selectedThickness: DrawingThickness = DrawingThickness.MEDIUM;
+  _selectedThickness: DrawingThickness = DrawingThickness.MEDIUM;
+  public get selectedThickness(): DrawingThickness {
+    return this._selectedThickness;
+  }
+  public set selectedThickness(d: DrawingThickness) {
+    this._selectedThickness = d;
+    if (this.canvas.freeDrawingBrush) {
+      this.canvas.freeDrawingBrush.width = d;
+    }
+  }
+
   selectedFontsize: number = 20;
 
   private _isMouseDown = false;
@@ -263,6 +291,49 @@ export class EventCanevascorrectionHandlerService {
     });
   }
 
+  async updateComments() {
+    if (this.currentComment === null) {
+      const e1 = await firstValueFrom(this.commentsService.query({ zonegeneratedid: (this.canvas as any).zoneid }));
+      if (e1!.body === undefined || e1!.body?.length === 0) {
+        const draw = SVG(this.canvas.toSVG().split('\n').splice(2).join('\n'));
+        draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
+        const c = { jsonData: draw.svg(), zonegeneratedid: (this.canvas as any).zoneid };
+        return this.commentsService.create(c);
+      } else {
+        const draw = SVG(this.canvas.toSVG().split('\n').splice(2).join('\n'));
+        draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
+        e1!.body![0].jsonData = draw.svg(); // this.canvas.toSVG();
+        return this.commentsService.update(e1!.body![0]);
+      }
+    } else {
+      const draw = SVG(this.canvas.toSVG().split('\n').splice(2).join('\n'));
+      draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
+      this.currentComment.jsonData = draw.svg();
+      return this.commentsService.update(this.currentComment);
+    }
+  }
+
+  async updateAllComments(canvas: fCanvas) {
+    if (canvas === this.canvas) {
+      return this.updateComments();
+    } else {
+      const e1 = await firstValueFrom(this.commentsService.query({ zonegeneratedid: (canvas as any).zoneid }));
+      //        .pipe()
+      //        .toPromise();
+      if (e1!.body === undefined || e1!.body?.length === 0) {
+        const draw = SVG(canvas.toSVG().split('\n').splice(2).join('\n'));
+        draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
+        const c = { jsonData: draw.svg(), zonegeneratedid: (canvas as any).zoneid };
+        return this.commentsService.create(c);
+      } else {
+        const draw = SVG(canvas.toSVG().split('\n').splice(2).join('\n'));
+        draw.scale(1 / this.scale, 1.0 / this.scale, 0, 0);
+        e1!.body![0].jsonData = draw.svg(); // this.canvas.toSVG();
+        return this.commentsService.update(e1!.body![0]);
+      }
+    }
+  }
+
   mouseDown(e: TPointerEvent) {
     this._isMouseDown = true;
     // TO check
@@ -287,9 +358,10 @@ export class EventCanevascorrectionHandlerService {
           pointer,
         );
         break;
-      case DrawingTools.PENCIL:
+      /*    case DrawingTools.PENCIL:
+        // this.canvas.freeDrawingBrush = new PencilBrush(this.canvas);
         this._elementUnderDrawing = this.fabricShapeService.createPath(this.canvas, this.selectedThickness, this._selectedColour, pointer);
-        break;
+        break;*/
       case DrawingTools.LINE:
         this._elementUnderDrawing = this.fabricShapeService.createLine(
           this.canvas,
@@ -346,47 +418,13 @@ export class EventCanevascorrectionHandlerService {
     }
   }
 
-  async updateComments() {
-    if (this.currentComment === null) {
-      const e1 = await firstValueFrom(this.commentsService.query({ zonegeneratedid: (this.canvas as any).zoneid }));
-      if (e1!.body === undefined || e1!.body?.length === 0) {
-        const draw = SVG(this.canvas.toSVG().split('\n').splice(2).join('\n'));
-        draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
-        const c = { jsonData: draw.svg(), zonegeneratedid: (this.canvas as any).zoneid };
-        return this.commentsService.create(c);
-      } else {
-        const draw = SVG(this.canvas.toSVG().split('\n').splice(2).join('\n'));
-        draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
-        e1!.body![0].jsonData = draw.svg(); // this.canvas.toSVG();
-        return this.commentsService.update(e1!.body![0]);
-      }
-    } else {
-      const draw = SVG(this.canvas.toSVG().split('\n').splice(2).join('\n'));
-      draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
-      this.currentComment.jsonData = draw.svg();
-      return this.commentsService.update(this.currentComment);
-    }
-  }
-
-  async updateAllComments(canvas: fCanvas) {
-    if (canvas === this.canvas) {
-      return this.updateComments();
-    } else {
-      const e1 = await firstValueFrom(this.commentsService.query({ zonegeneratedid: (canvas as any).zoneid }));
-      //        .pipe()
-      //        .toPromise();
-      if (e1!.body === undefined || e1!.body?.length === 0) {
-        const draw = SVG(canvas.toSVG().split('\n').splice(2).join('\n'));
-        draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
-        const c = { jsonData: draw.svg(), zonegeneratedid: (canvas as any).zoneid };
-        return this.commentsService.create(c);
-      } else {
-        const draw = SVG(canvas.toSVG().split('\n').splice(2).join('\n'));
-        draw.scale(1 / this.scale, 1.0 / this.scale, 0, 0);
-        e1!.body![0].jsonData = draw.svg(); // this.canvas.toSVG();
-        return this.commentsService.update(e1!.body![0]);
-      }
-    }
+  onPathCreated(path: any) {
+    //    console.error(path)
+    this.updateComments().then(e2 =>
+      e2.subscribe(e1 => {
+        this.currentComment = e1.body;
+      }),
+    );
   }
 
   async mouseMove(e: TPointerEvent) {
@@ -403,12 +441,13 @@ export class EventCanevascorrectionHandlerService {
       case DrawingTools.RECTANGLE:
         this.fabricShapeService.formRectangle(this._elementUnderDrawing as CustomFabricRect, this._initPositionOfElement, pointer);
         break;
-      case DrawingTools.PENCIL:
+      /*      case DrawingTools.PENCIL:
         this.fabricShapeService.formPath(this._elementUnderDrawing as CustomFabricPath, pointer);
-        break;
+        break;*/
       case DrawingTools.LINE:
       case DrawingTools.DASHED_LINE:
         this.fabricShapeService.formLine(this._elementUnderDrawing as CustomFabricLine, pointer);
+
         break;
       case DrawingTools.POLYGON:
         this.fabricShapeService.formFirstLineOfPolygon(
@@ -418,19 +457,22 @@ export class EventCanevascorrectionHandlerService {
         );
         break;
     }
+
+    //    console.error('will render all')
+
     this.canvas.renderAll();
   }
 
   mouseUp() {
     this._isMouseDown = false;
-    if (this._selectedTool === DrawingTools.PENCIL) {
+    /*    if (this._selectedTool === DrawingTools.PENCIL) {
       this._elementUnderDrawing = this.fabricShapeService.finishPath(this.canvas, this._elementUnderDrawing as CustomFabricPath);
       this.updateComments().then(e2 =>
         e2.subscribe(e1 => {
           this.currentComment = e1.body;
         }),
       );
-    }
+    }*/
     if (this._selectedTool === DrawingTools.TEXT) {
       this.updateComments().then(e2 =>
         e2.subscribe(e1 => {

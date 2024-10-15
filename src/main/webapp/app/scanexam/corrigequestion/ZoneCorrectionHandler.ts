@@ -6,7 +6,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/member-ordering */
-import { TPointerEvent, Canvas as fCanvas, FabricObject } from 'fabric';
+import { TPointerEvent, Canvas as fCanvas, FabricObject, PencilBrush } from 'fabric';
 import { EventCanevascorrectionHandlerService } from './event-canevascorrection-handler.service';
 
 export type AnnotationPageRect = {
@@ -62,6 +62,11 @@ export class ZoneCorrectionHandler {
       selection: false,
       preserveObjectStacking: true,
     });
+    canvas.isDrawingMode = true;
+    canvas.freeDrawingBrush = new PencilBrush(canvas);
+    canvas.freeDrawingBrush.color = 'red';
+    canvas.freeDrawingBrush.width = 3;
+
     (canvas as any).zoneid = this.zoneid;
     (canvas as any).respid = this.respid;
 
@@ -70,7 +75,6 @@ export class ZoneCorrectionHandler {
 
     this.eventHandler.extendToObjectWithId();
     this.canvas = canvas;
-    // this.eventHandler.commentsService.query();
     FabricObject.prototype.objectCaching = false;
     this.addEventListeners(canvas);
     return canvas;
@@ -78,6 +82,7 @@ export class ZoneCorrectionHandler {
 
   private addEventListeners(canvas: any) {
     canvas.on('mouse:down', (e: any) => this.onCanvasMouseDown(e));
+    canvas.on('path:created', (e: any) => this.onPathCreated(e));
 
     canvas.on('mouse:move', (e: any) => this.onCanvasMouseMove(e));
     canvas.on('mouse:up', () => this.onCanvasMouseUp());
@@ -120,6 +125,11 @@ export class ZoneCorrectionHandler {
     this.eventHandler.canvas = this.canvas!;
     this.eventHandler.objectMoving(e.target.id, e.target.type, e.target.left, e.target.top);
   }
+  private onPathCreated(e: any) {
+    this.eventHandler.canvas = this.canvas!;
+    this.eventHandler.onPathCreated(e.path);
+  }
+
   private onObjectScaling(e: any) {
     this.eventHandler.canvas = this.canvas!;
     this.eventHandler.objectScaling(
