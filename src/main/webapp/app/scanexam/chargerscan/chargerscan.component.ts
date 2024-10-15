@@ -20,7 +20,13 @@ import { finalize, firstValueFrom, Observable, scan } from 'rxjs';
 import { ScanService } from '../../entities/scan/service/scan.service';
 import { IExam } from '../../entities/exam/exam.model';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
-import { IPDFViewerApplication, NgxExtendedPdfViewerService, ScrollModeType, NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+import {
+  IPDFViewerApplication,
+  NgxExtendedPdfViewerService,
+  ScrollModeType,
+  NgxExtendedPdfViewerModule,
+  PDFNotificationService,
+} from 'ngx-extended-pdf-viewer';
 import { IPage } from '../alignscan/alignscan.component';
 import { TemplateService } from 'app/entities/template/service/template.service';
 import { QuestionService } from 'app/entities/question/service/question.service';
@@ -198,6 +204,7 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
     protected preferenceService: PreferenceService,
     protected dataUtils: DataUtils,
     private titleService: Title,
+    private pdfNotificationService: PDFNotificationService,
   ) {
     this.editForm = this.fb.group({
       content: [],
@@ -205,7 +212,8 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
     });
   }
   ngOnDestroy(): void {
-    const PDFViewerApplication: IPDFViewerApplication = (window as any).PDFViewerApplication;
+    const PDFViewerApplication: IPDFViewerApplication = this.pdfNotificationService.onPDFJSInitSignal();
+
     if (PDFViewerApplication) {
       PDFViewerApplication.unbindEvents();
       PDFViewerApplication.unbindWindowEvents();

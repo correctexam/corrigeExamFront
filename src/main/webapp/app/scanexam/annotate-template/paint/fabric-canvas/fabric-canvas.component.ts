@@ -402,16 +402,15 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
   }
 
   public async getCustomPdfProperties(): Promise<Array<Rect>> {
-    if ((window as any).PDFViewerApplication) {
-      const md = await (window as any).PDFViewerApplication.pdfDocument.getMetadata();
+    if (this.pdfNotificationService.onPDFJSInitSignal()) {
+      const md = await this.pdfNotificationService.onPDFJSInitSignal().pdfDocument.getMetadata();
       const info = md.info;
-
-      if (info.Custom === undefined) {
+      if ((info as any).Custom === undefined) {
         return Promise.resolve([]);
       }
 
-      return Object.keys(info.Custom)
-        .map(key => toRect(key, info.Custom[key]))
+      return Object.keys((info as any).Custom)
+        .map(key => toRect(key, (info as any).Custom[key]))
         .filter((rect): rect is Rect => rect !== undefined);
     } else {
       // eslint-disable-next-line @typescript-eslint/await-thenable
@@ -447,6 +446,7 @@ function scaleRect(rect: Rect, ratio: number): Rect {
   // return rect;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function toRect(key: string, value: unknown): Rect | undefined {
   if (typeof value !== 'string') {
     return undefined;
