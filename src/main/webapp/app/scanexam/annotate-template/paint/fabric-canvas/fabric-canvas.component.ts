@@ -402,16 +402,21 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
   }
 
   public async getCustomPdfProperties(): Promise<Array<Rect>> {
-    const md = await (window as any).PDFViewerApplication.pdfDocument.getMetadata();
-    const info = md.info;
+    if ((window as any).PDFViewerApplication) {
+      const md = await (window as any).PDFViewerApplication.pdfDocument.getMetadata();
+      const info = md.info;
 
-    if (info.Custom === undefined) {
-      return Promise.resolve([]);
+      if (info.Custom === undefined) {
+        return Promise.resolve([]);
+      }
+
+      return Object.keys(info.Custom)
+        .map(key => toRect(key, info.Custom[key]))
+        .filter((rect): rect is Rect => rect !== undefined);
+    } else {
+      // eslint-disable-next-line @typescript-eslint/await-thenable
+      return await [];
     }
-
-    return Object.keys(info.Custom)
-      .map(key => toRect(key, info.Custom[key]))
-      .filter((rect): rect is Rect => rect !== undefined);
   }
 }
 
