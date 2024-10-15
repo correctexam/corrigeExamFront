@@ -42,7 +42,6 @@ export class ScanService {
   }
 
   updateWithProgress(scan: IScan): Observable<HttpEvent<IScan>> {
-    // eslint-disable-next-line no-console
     return this.http.put<IScan>(`${this.resourceUrl}`, scan, { reportProgress: true, observe: 'events' } /* { observe: 'response' }*/);
   }
 
@@ -75,7 +74,7 @@ export class ScanService {
     return this.http.get<IScan[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  delete(id: number): Observable<HttpResponse<{}>> {
+  delete(id: number): Observable<HttpResponse<any>> {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 

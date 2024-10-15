@@ -6,9 +6,12 @@ import { ApplicationConfigService } from 'app/core/config/application-config.ser
 
 @Injectable({ providedIn: 'root' })
 export class ActivateService {
-  constructor(private http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
+  constructor(
+    private http: HttpClient,
+    private applicationConfigService: ApplicationConfigService,
+  ) {}
 
-  get(key: string): Observable<{}> {
+  get(key: string): Observable<any> {
     return this.http.get(this.applicationConfigService.getEndpointFor('api/activate'), {
       params: new HttpParams().set('key', key),
     });

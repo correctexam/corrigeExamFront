@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable object-shorthand */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
+
 /* eslint-disable no-console */
 /* eslint-disable prefer-const */
 /* eslint-disable spaced-comment */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 import { MLModel } from './scanexam/ml/model';
 import {
@@ -17,7 +16,6 @@ import {
   __comparePositionX,
   detectFormes,
   decoupe,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
 } from './qcm';
 import { IZone } from './entities/zone/zone.model';
 import { AlignImage, AppDB, NonAlignImage, Template } from './scanexam/db/db';
@@ -99,7 +97,7 @@ export interface DoPredictionsInputDifferentPage extends DoPredictionsInput {
  * into the worker. Without this, there would be no communication possible
  * with our project.
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 let source: any;
 let sqliteService: any;
 
@@ -229,7 +227,6 @@ addEventListener('message', e => {
       break;
     }
     case 'shareWorker': {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const port = e.data.port; // (B)
       sqliteService = new SqliteCacheService(port);
       //      port.postMessage(['hello', 'world']);
@@ -286,7 +283,7 @@ addEventListener('message', e => {
 });
 
 let db: AppDB | undefined;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 async function getTemplateImage(page: number, examId: number, indexDb: boolean): Promise<Template | undefined> {
   if (indexDb) {
     if (db === undefined) {
@@ -294,12 +291,10 @@ async function getTemplateImage(page: number, examId: number, indexDb: boolean):
     }
     return await db.getFirstTemplate(examId, page);
   } else {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return await sqliteService.getFirstTemplate(examId, page);
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function getScanImage(
   align: boolean,
   page: number,
@@ -317,10 +312,8 @@ async function getScanImage(
     }
   } else {
     if (align) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return await sqliteService.getFirstAlignImage(examId, page);
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return await sqliteService.getFirstNonAlignImage(examId, page);
     }
   }
@@ -335,7 +328,6 @@ function reviver(key: any, value: any): any {
   return value;
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-unused-vars
 async function loadImage(ii: NonAlignImage | AlignImage): Promise<ImageData> {
   const image = JSON.parse(ii.value, reviver);
   const res = await fetch(image.pages);
@@ -347,7 +339,6 @@ async function loadImage(ii: NonAlignImage | AlignImage): Promise<ImageData> {
   return ctx!.getImageData(0, 0, imageBitmap.width, imageBitmap.height);
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-unused-vars
 function cropZone(i: ImageData, zone: IZone, factor: number): any {
   let finalW1 = (zone.width! * i.width * factor) / 100000;
   let finalH1 = (zone.height! * i.height * factor) / 100000;
@@ -405,7 +396,6 @@ function isDoPredictionsInputSamePage(
   return 'pagesToAnalyze' in obj;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function doPredictions(p: { msg: any; payload: DoPredictionsInputSamePage | DoPredictionsInputDifferentPage; uid: string }): void {
   doPredictionsAsync(p)
     .then(() => {})
@@ -646,7 +636,7 @@ async function doPredictionsAsync(p: {
     source.target.postMessage({ msg: p.msg, payload: outputs, uid: p.uid }, opts);
   } else {
     // TODO
-    p1.firstnamePagesToAnalyze;
+    //    p1.firstnamePagesToAnalyze;
   }
 }
 
@@ -716,7 +706,7 @@ function trouveCases(img: any, preference: IPreference): any {
     cases.push(forme);
     img_cases.push(decoupe(img, pos, dim));
   });
-  // eslint-disable-next-line object-shorthand
+
   return { cases: cases, img_cases: img_cases };
 }
 
@@ -750,7 +740,6 @@ function doPredidction4zone(
     casesTemplate.img_cases[k].delete();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-shadow
   const posX = casePosition.map(p => p.x);
   let distAverageX = [];
 
@@ -764,15 +753,13 @@ function doPredidction4zone(
   posXAverage = distAverageX.reduce((a, b) => a + b, 0) / distAverageX.length;
 
   const dimAverage = {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     w: caseDimension.map(d => d.w).reduce((a, b) => a + b, 0) / caseDimension.length,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
     h: caseDimension.map(d => d.h).reduce((a, b) => a + b, 0) / caseDimension.length,
   };
 
   graynomTemplate.delete();
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return fprediction(src, looking4missing, removeHorizontal, letter, preference, dimAverage, posXAverage, debug);
 
   //  return fprediction(src, candidates, looking4missing, removeHorizontal, letter, preference, dimAverage, posXAverage, debug);
@@ -1096,7 +1083,7 @@ async function fprediction(
     };
   }
 }
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 function levenshteinDistance(a: string, b: string): number {
   // Create a 2D array to store the distances
   let distances = new Array(a.length + 1);
@@ -1124,7 +1111,7 @@ function levenshteinDistance(a: string, b: string): number {
   }
 
   // Return the final distance
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
   return distances[a.length][b.length];
 }
 
@@ -1165,7 +1152,6 @@ function extractImageNew(
   //  let src = cv.imread(inputid);
   let dst = src.clone();
   let gray = new cv.Mat();
-  false;
   cv.cvtColor(src, gray, cv.COLOR_BGR2GRAY, 0);
   let thresh = new cv.Mat();
   cv.threshold(gray, thresh, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
@@ -1303,7 +1289,6 @@ function extractImageNew(
     }
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let merge = mergeRect(rects);
   let kk = 0;
   while (merge !== null && kk < 200) {

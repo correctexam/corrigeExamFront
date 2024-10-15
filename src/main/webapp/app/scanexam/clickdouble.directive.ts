@@ -3,7 +3,6 @@ import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 @Directive({
-  // eslint-disable-next-line @angular-eslint/directive-selector
   selector: '[click.single],[click.double]',
   standalone: true,
 })
@@ -15,7 +14,6 @@ export class ClickDoubleDirective implements OnInit, OnDestroy {
   private clicksSubject = new Subject<MouseEvent>();
   private subscription: Subscription | undefined;
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor() {}
 
   ngOnInit(): void {

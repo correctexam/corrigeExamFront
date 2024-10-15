@@ -389,6 +389,7 @@ export class StatsExamComponent implements OnInit {
         const num1 = parseInt(ine1, 10);
         const num2 = parseInt(ine2, 10);
         return num2 - num1;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (_err: unknown) {
         // If not number, falling back to string comparison
         return ine1.localeCompare(ine2);
@@ -535,7 +536,6 @@ export class StatsExamComponent implements OnInit {
       }
     }
     for (const etudiant of this.infosStudents) {
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
       const note = this.s2f(etudiant.note === undefined ? '0' : etudiant.note)
         .toFixed(2)
         .toString();
@@ -732,7 +732,6 @@ export class StatsExamComponent implements OnInit {
   }
 
   public selectQuestion(idQuestion: number): void {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     /* if (this.etudiantSelec == null || this.etudiantSelec === undefined) {
       return;
     }*/
@@ -750,7 +749,6 @@ export class StatsExamComponent implements OnInit {
       this.questionSelectionnee = false;
       this.idQuestionSelected = 0;
     } else {
-      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
       this.texte_correction = this.translateService.instant('scanexam.correction') + '(' + (idQuestion + 1).toString() + ')';
       const knobCard = document.getElementById('knobquest' + idQuestion.toString());
       knobCard?.setAttribute('class', 'knobQuestion knobSelected');

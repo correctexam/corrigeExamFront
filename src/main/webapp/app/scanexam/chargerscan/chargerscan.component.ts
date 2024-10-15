@@ -1,9 +1,8 @@
 /* eslint-disable curly */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
+
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import { HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
@@ -20,7 +19,13 @@ import { finalize, firstValueFrom, Observable, scan } from 'rxjs';
 import { ScanService } from '../../entities/scan/service/scan.service';
 import { IExam } from '../../entities/exam/exam.model';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
-import { IPDFViewerApplication, NgxExtendedPdfViewerService, ScrollModeType, NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+import {
+  IPDFViewerApplication,
+  NgxExtendedPdfViewerService,
+  ScrollModeType,
+  NgxExtendedPdfViewerModule,
+  PDFNotificationService,
+} from 'ngx-extended-pdf-viewer';
 import { IPage } from '../alignscan/alignscan.component';
 import { TemplateService } from 'app/entities/template/service/template.service';
 import { QuestionService } from 'app/entities/question/service/question.service';
@@ -64,7 +69,6 @@ const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
     };
   }
   if (isHttpResponse(event)) {
-    // eslint-disable-next-line no-console
     return {
       body: event.body as IScan,
       progress: 100,
@@ -198,6 +202,7 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
     protected preferenceService: PreferenceService,
     protected dataUtils: DataUtils,
     private titleService: Title,
+    private pdfNotificationService: PDFNotificationService,
   ) {
     this.editForm = this.fb.group({
       content: [],
@@ -205,7 +210,8 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
     });
   }
   ngOnDestroy(): void {
-    const PDFViewerApplication: IPDFViewerApplication = (window as any).PDFViewerApplication;
+    const PDFViewerApplication: IPDFViewerApplication = this.pdfNotificationService.onPDFJSInitSignal();
+
     if (PDFViewerApplication) {
       PDFViewerApplication.unbindEvents();
       PDFViewerApplication.unbindWindowEvents();

@@ -1,9 +1,6 @@
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/member-ordering */
-import { fabric } from 'fabric';
+
 import {
   CustomFabricEllipse,
   CustomFabricGroup,
@@ -20,13 +17,14 @@ import {
 } from './models';
 import { v4 as uuid } from 'uuid';
 import { Injectable } from '@angular/core';
+import * as fabric from 'fabric';
 
 const DEFAULT_OPACITY = 0.2;
 const FILLED_WITH_COLOUR_OPACITY = 0.4;
 
 @Injectable()
 export class FabricShapeService {
-  fillShape(object: CustomFabricObject, colour: DrawingColours) {
+  fillShape(object: CustomFabricObject, colour: DrawingColours): void {
     switch (object.type) {
       case FabricObjectType.RECT:
       case FabricObjectType.ELLIPSE:
@@ -49,8 +47,8 @@ export class FabricShapeService {
   }
 
   isClickNearPolygonCenter(polygon: CustomFabricPolygon, pointer: Pointer, range: number): boolean {
-    const centerXOfPolygon = (Math.max(...polygon.points!.map(p => p.x)) + Math.min(...polygon.points!.map(p => p.x))) / 2;
-    const centerYOfPolygon = (Math.max(...polygon.points!.map(p => p.y)) + Math.min(...polygon.points!.map(p => p.y))) / 2;
+    const centerXOfPolygon = (Math.max(...polygon.points.map(p => p.x)) + Math.min(...polygon.points.map(p => p.x))) / 2;
+    const centerYOfPolygon = (Math.max(...polygon.points.map(p => p.y)) + Math.min(...polygon.points.map(p => p.y))) / 2;
     return Math.abs(pointer.x - centerXOfPolygon) <= range && Math.abs(pointer.y - centerYOfPolygon) <= range;
   }
 
@@ -125,12 +123,12 @@ export class FabricShapeService {
     objs.push(rect, t);
     // group all the objects
     const alltogetherObj = new fabric.Group(objs, {
-      top: rect.top!,
-      left: rect.left!,
+      top: rect.top,
+      left: rect.left,
       originX: 'left',
       originY: 'top',
       selectable: true,
-      hasRotatingPoint: false,
+      //    hasRotatingPoint: false,
       lockRotation: true,
     }) as CustomFabricGroup;
 
@@ -138,7 +136,7 @@ export class FabricShapeService {
     alltogetherObj.setCoords();
     alltogetherObj.id = uuid();
     canvas.renderAll();
-    // eslint-disable-next-line no-console
+
     return alltogetherObj;
   }
 
@@ -147,7 +145,7 @@ export class FabricShapeService {
       content: text,
       thickness: DrawingThickness.THIN,
       colour: color,
-      pointer: { x: rect.left!, y: rect.top! },
+      pointer: { x: rect.left, y: rect.top },
       fontSize: 18,
     });
     canvas.remove(t);
@@ -156,12 +154,12 @@ export class FabricShapeService {
     objs.push(rect, t);
     // group all the objects
     const alltogetherObj = new fabric.Group(objs, {
-      top: rect.top!,
-      left: rect.left!,
+      top: rect.top,
+      left: rect.left,
       originX: 'left',
       originY: 'top',
       selectable: false,
-      hasRotatingPoint: false,
+      //    hasRotatingPoint: false,
       lockRotation: true,
     }) as CustomFabricGroup;
 
@@ -169,7 +167,7 @@ export class FabricShapeService {
     alltogetherObj.setCoords();
     alltogetherObj.id = uuid();
     canvas.renderAll();
-    // eslint-disable-next-line no-console
+
     return alltogetherObj;
   }
 
@@ -222,7 +220,7 @@ export class FabricShapeService {
       stroke: selectedColour,
       fill: this.setOpacity(DrawingColours.WHITE, DEFAULT_OPACITY),
       selectable: false,
-      hasRotatingPoint: false,
+      //    hasRotatingPoint: false,
     }) as CustomFabricPolygon;
     polygon.id = uuid();
     canvas.add(polygon);
@@ -256,7 +254,7 @@ export class FabricShapeService {
 
   // Formers
 
-  formEllipse(ellipse: CustomFabricEllipse, initPos: Pointer, pointer: Pointer) {
+  formEllipse(ellipse: CustomFabricEllipse, initPos: Pointer, pointer: Pointer): void {
     ellipse.set({
       rx: Math.abs((initPos.x - pointer.x) / 2),
       ry: Math.abs((initPos.y - pointer.y) / 2),
@@ -276,7 +274,7 @@ export class FabricShapeService {
 
   formPath(path: CustomFabricPath, pointer: Pointer) {
     const newLine = ['L', pointer.x, pointer.y];
-    path.path!.push(newLine as any);
+    path.path.push(newLine as any);
   }
 
   formLine(line: CustomFabricLine, pointer: Pointer) {
@@ -289,7 +287,7 @@ export class FabricShapeService {
   }
 
   addPointToPolygon(polygon: CustomFabricPolygon, pointer: Pointer) {
-    polygon.points!.push(new fabric.Point(pointer.x, pointer.y));
+    polygon.points.push(new fabric.Point(pointer.x, pointer.y));
   }
 
   // Finishers
@@ -310,13 +308,13 @@ export class FabricShapeService {
 
   finishPolygon(canvas: fabric.Canvas, polygon: CustomFabricPolygon): CustomFabricPolygon {
     canvas.remove(polygon);
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     const newPolygon = new fabric.Polygon(polygon.points!, {
       strokeWidth: polygon.strokeWidth,
       stroke: polygon.stroke,
       fill: this.setOpacity(DrawingColours.WHITE, DEFAULT_OPACITY),
       selectable: false,
-      hasRotatingPoint: false,
+
+      //   hasRotatingPoint: false,
     }) as CustomFabricPolygon;
     newPolygon.id = polygon.id;
     canvas.add(newPolygon);

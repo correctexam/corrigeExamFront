@@ -1,10 +1,9 @@
 /* eslint-disable object-shorthand */
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
+
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
+
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 import { Observable, Subject } from 'rxjs';
@@ -229,14 +228,14 @@ export class SqliteCacheService implements CacheService {
     return;
   }
 
-  export(examId: number, options?: ExportOptions | undefined): Promise<any> {
+  export(examId: number, options?: ExportOptions): Promise<any> {
     return this._dispatch('export', {
       examId: examId,
       options: options,
     }).toPromise();
     //    return new Promise<any>((resolve, reject) => resolve(null));
   }
-  import(examId: number, blob: Blob, options?: ImportOptions | undefined): Promise<any> {
+  import(examId: number, blob: Blob, options?: ImportOptions): Promise<any> {
     return this._dispatch('import', {
       examId: examId,
       blob: blob,

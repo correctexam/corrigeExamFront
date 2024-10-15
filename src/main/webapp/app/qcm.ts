@@ -1,6 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable prefer-const */
 declare let cv: any;
 export interface IQCMInput {
@@ -69,7 +66,6 @@ function imageDataFromMat(mat: any): any {
   return clampedArray;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function trace(message: any): void {
   postMessage({ msg: { log: message }, uid: '-2' });
 }
@@ -87,7 +83,6 @@ function debugImage(imageData: ImageData): void {
         const reader = new FileReader();
 
         reader.onloadend = function () {
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           const style = `font-size: 300px; background-image: url("${reader.result}"); background-size: contain; background-repeat: no-repeat;`;
           console.error('%c     ', style);
         };
@@ -160,10 +155,8 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
       dst6.delete();
     }
 
-    // eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
     let dstE;
     if (casesvideseleves !== undefined && casesvideseleves.cases !== undefined && casesvideseleves.cases.length > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const decalage = /* { x: 0, y: 0 }; // */ computeDecallage(casesvideseleves, res);
       dstE = applyTranslation(srcE, decalage);
       // dstE = srcE
@@ -556,7 +549,7 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
   const km = kMeans(diffs, 100);
   const kmAdaptative = kMeans(diffsAdaptative, 100);
 
-  preference.qcm_differences_avec_case_blanche;
+  //  preference.qcm_differences_avec_case_blanche;
 
   const score1 = scoreKmean(km, diffs);
   const score2 = scoreKmean(kmAdaptative, diffsAdaptative);
@@ -606,7 +599,6 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
   return infos_cases;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function computeDecallage(casesvideseleves: any, casesvidesexamtemplate: any): any {
   const decalages: any[] = [];
   casesvideseleves.cases.forEach((casevideeleve: any) => {
@@ -619,7 +611,7 @@ function computeDecallage(casesvideseleves: any, casesvidesexamtemplate: any): a
         currentBox = c;
       }
     });
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
     if (currentBox !== undefined) {
       // m.set(casevideeleve, currentBox)
       const poseleve = getPosition(casevideeleve);
@@ -633,7 +625,6 @@ function computeDecallage(casesvideseleves: any, casesvidesexamtemplate: any): a
   return __closest(decalages);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function applyTranslation(src1: any, decalage: any): any {
   let dst = new cv.Mat();
   if (decalage.x !== 0 || decalage.y !== 0) {

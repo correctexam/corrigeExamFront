@@ -47,7 +47,6 @@ export class AppDB extends Dexie {
   /* async populate() {
   } */
 
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   async resetDatabase() {
     await db.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
       this.exams.clear();
@@ -58,30 +57,30 @@ export class AppDB extends Dexie {
       //      this.populate();
     });
   }
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+
   async removeElementForExam(examId: number) {
     await db.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
       db.exams.delete(examId);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
       db.templates
         .where('examId')
         .equals(examId)
         .toArray()
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
         .then(templates => this.templates.bulkDelete(templates.map(t => t.id!)));
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
       db.alignImages
         .where('examId')
         .equals(examId)
         .toArray()
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
         .then(a => this.alignImages.bulkDelete(a.map(t => t.id!)));
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
       db.nonAlignImages
         .where('examId')
         .equals(examId)
         .toArray()
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
         .then(a => this.nonAlignImages.bulkDelete(a.map(t => t.id!)));
       //      this.populate();
     });

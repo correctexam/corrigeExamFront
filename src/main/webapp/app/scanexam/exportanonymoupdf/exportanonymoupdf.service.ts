@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
 
 import { Injectable } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -85,7 +83,6 @@ export class ExportPdfService {
     this.examExport = await firstValueFrom(this.http.get<ExportPDFDto>(this.applicationConfigService.getEndpointFor(uri)));
     this.examExport.questionspdf!.forEach(q => this.questionMap.set(q.ID!, q));
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (this.preferenceService.getPreference().pdfscale !== undefined) {
       this.scale = this.preferenceService.getPreference().pdfscale;
     }

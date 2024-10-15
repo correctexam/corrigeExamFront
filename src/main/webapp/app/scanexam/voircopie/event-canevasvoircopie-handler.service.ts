@@ -1,17 +1,6 @@
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable no-empty */
-/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable no-new */
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/member-ordering */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-import { fabric } from 'fabric';
+
+import { Canvas as fCanvas, loadSVGFromString, FabricObject } from 'fabric';
 import { FabricShapeService } from '../annotate-template/paint/shape.service';
 import { CustomFabricObject } from '../annotate-template/paint/models';
 import { Injectable } from '@angular/core';
@@ -24,11 +13,11 @@ import { svgadapter } from '../svg.util';
   providedIn: 'root',
 })
 export class EventCanevasVoirCopieHandlerService {
-  public _canvas!: fabric.Canvas;
-  get canvas(): fabric.Canvas {
+  public _canvas!: fCanvas;
+  get canvas(): fCanvas {
     return this._canvas;
   }
-  set canvas(c: fabric.Canvas) {
+  set canvas(c: fCanvas) {
     const prev = this._canvas;
     this._canvas = c;
 
@@ -43,12 +32,14 @@ export class EventCanevasVoirCopieHandlerService {
           }
           draw.scale(this.scale, this.scale, 0, 0);
           const s2 = draw.svg(svgadapter);
-          fabric.loadSVGFromString(s2, (objects, options) => {
+          loadSVGFromString(s2).then(obj1 => {
             // const obj = fabric.util.groupSVGElements(objects, options);
-            if (objects.length > 0) {
-              objects.forEach(obj => {
-                obj.selectable = false;
-                c.add(obj);
+            if (obj1.objects.length > 0) {
+              obj1.objects.forEach(obj => {
+                if (obj) {
+                  obj.selectable = false;
+                  c.add(obj);
+                }
               });
               c.renderAll();
             }
@@ -58,7 +49,7 @@ export class EventCanevasVoirCopieHandlerService {
     }
   }
   currentComment: IComments | null = null;
-  public allcanvas: fabric.Canvas[] = [];
+  public allcanvas: fCanvas[] = [];
   public scale = 1;
 
   constructor(
@@ -67,12 +58,10 @@ export class EventCanevasVoirCopieHandlerService {
   ) {}
 
   extendToObjectWithId(): void {
-    fabric.Object.prototype.toObject = (function (toObject) {
-      return function (this: CustomFabricObject) {
-        return fabric.util.object.extend(toObject.call(this), {
-          id: this.id,
-        });
-      };
-    })(fabric.Object.prototype.toObject);
+    const originalToObject = FabricObject.prototype.toObject;
+    const myAdditional: any[] = ['id'];
+    FabricObject.prototype.toObject = function (additionalProperties) {
+      return originalToObject.call(this, myAdditional.concat(additionalProperties));
+    };
   }
 }

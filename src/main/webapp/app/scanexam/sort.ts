@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
@@ -25,7 +24,7 @@ export class ArraySortPipe implements PipeTransform {
         return 0;
       }
     });
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
     return array;
   }
 }

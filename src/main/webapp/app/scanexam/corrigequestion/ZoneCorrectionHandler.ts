@@ -1,12 +1,7 @@
-/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-/* eslint-disable @typescript-eslint/prefer-optional-chain */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
+
 /* eslint-disable @typescript-eslint/member-ordering */
-import { fabric } from 'fabric';
+import { TPointerEvent, Canvas as fCanvas, FabricObject, PencilBrush } from 'fabric';
 import { EventCanevascorrectionHandlerService } from './event-canevascorrection-handler.service';
 
 export type AnnotationPageRect = {
@@ -23,7 +18,7 @@ export class ZoneCorrectionHandler {
   currentAnnotationId!: string;
 
   private annotationCanvas!: HTMLCanvasElement;
-  private canvas: fabric.Canvas | undefined;
+  private canvas: fCanvas | undefined;
   private canvasInitialCanvas!: HTMLCanvasElement;
   noteImg!: HTMLImageElement;
 
@@ -33,7 +28,7 @@ export class ZoneCorrectionHandler {
     public respid: number | undefined,
   ) {}
 
-  updateCanvas(canvas1: any): fabric.Canvas {
+  updateCanvas(canvas1: any): fCanvas {
     if (this.annotationCanvas && this.annotationCanvas.parentNode) {
       this.annotationCanvas.parentNode.removeChild(this.annotationCanvas);
       if (this.canvas !== undefined) {
@@ -58,10 +53,15 @@ export class ZoneCorrectionHandler {
 
     this.canvasInitialCanvas.parentElement!.appendChild(this.annotationCanvas);
 
-    const canvas = new fabric.Canvas(this.annotationCanvas, {
+    const canvas = new fCanvas(this.annotationCanvas, {
       selection: false,
       preserveObjectStacking: true,
     });
+    canvas.isDrawingMode = true;
+    canvas.freeDrawingBrush = new PencilBrush(canvas);
+    canvas.freeDrawingBrush.color = 'red';
+    canvas.freeDrawingBrush.width = 3;
+
     (canvas as any).zoneid = this.zoneid;
     (canvas as any).respid = this.respid;
 
@@ -70,14 +70,14 @@ export class ZoneCorrectionHandler {
 
     this.eventHandler.extendToObjectWithId();
     this.canvas = canvas;
-    // this.eventHandler.commentsService.query();
-    fabric.Object.prototype.objectCaching = false;
+    FabricObject.prototype.objectCaching = false;
     this.addEventListeners(canvas);
     return canvas;
   }
 
   private addEventListeners(canvas: any) {
     canvas.on('mouse:down', (e: any) => this.onCanvasMouseDown(e));
+    canvas.on('path:created', (e: any) => this.onPathCreated(e));
 
     canvas.on('mouse:move', (e: any) => this.onCanvasMouseMove(e));
     canvas.on('mouse:up', () => this.onCanvasMouseUp());
@@ -88,12 +88,12 @@ export class ZoneCorrectionHandler {
     canvas.on('object:modified', () => this.onObjectModified());
   }
 
-  private onCanvasMouseDown(event: { e: Event }) {
+  private onCanvasMouseDown(event: { e: TPointerEvent }) {
     this.eventHandler.canvas = this.canvas!;
     this.eventHandler.mouseDown(event.e);
     this.avoidDragAndClickEventsOfOtherUILibs(event.e);
   }
-  private onCanvasMouseMove(event: { e: Event }) {
+  private onCanvasMouseMove(event: { e: TPointerEvent }) {
     this.eventHandler.canvas = this.canvas!;
     this.eventHandler.mouseMove(event.e);
   }
@@ -120,6 +120,11 @@ export class ZoneCorrectionHandler {
     this.eventHandler.canvas = this.canvas!;
     this.eventHandler.objectMoving(e.target.id, e.target.type, e.target.left, e.target.top);
   }
+  private onPathCreated(e: any) {
+    this.eventHandler.canvas = this.canvas!;
+    this.eventHandler.onPathCreated(e.path);
+  }
+
   private onObjectScaling(e: any) {
     this.eventHandler.canvas = this.canvas!;
     this.eventHandler.objectScaling(

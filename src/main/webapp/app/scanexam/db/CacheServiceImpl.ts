@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Injectable } from '@angular/core';
 import { ExportOptions, ImportOptions } from 'dexie-export-import';
 import { AlignImage, AppDB, CacheService, ImageDB, Template } from './db';
@@ -66,10 +65,10 @@ export class CacheServiceImpl implements CacheService {
   addNonAligneImages(elts: AlignImage[]): Promise<any> {
     return this.service.addNonAligneImages(elts);
   }
-  export(examId: number, options?: ExportOptions | undefined): Promise<Blob> {
+  export(examId: number, options?: ExportOptions): Promise<Blob> {
     return this.service.export(examId, options);
   }
-  import(examId: number, blob: Blob, options?: ImportOptions | undefined): Promise<void> {
+  import(examId: number, blob: Blob, options?: ImportOptions): Promise<void> {
     return this.service.import(examId, blob, options);
   }
   countPageTemplate(examId: number): Promise<number> {

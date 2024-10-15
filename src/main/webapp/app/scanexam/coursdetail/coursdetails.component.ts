@@ -1,8 +1,5 @@
-/* eslint-disable object-shorthand */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-/* eslint-disable @typescript-eslint/no-empty-function */
+
 import { Component, OnInit } from '@angular/core';
 // import { faCoffee } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
@@ -301,10 +298,8 @@ export class CoursdetailsComponent implements OnInit {
       this.confirmationService.confirm({
         message: data,
         accept: () => {
-          // eslint-disable-next-line no-console
           if (this.course !== undefined) {
             this.courseService.delete(this.course.id!).subscribe(e => {
-              // eslint-disable-next-line no-console
               this.router.navigateByUrl('/');
             });
           }
@@ -315,7 +310,6 @@ export class CoursdetailsComponent implements OnInit {
 
   showShare(): void {
     this.translateService.get('scanexam.sharecourse').subscribe(data1 => {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (this.course !== undefined) {
         const ref = this.dialogService.open(SharecourseComponent, {
           data: {

@@ -90,7 +90,7 @@ export class MarkingSummaryComponent implements OnInit {
             this.translateService.onLangChange.subscribe(() => {
               this.updateTitle();
             });
-            // eslint-disable-next-line no-console
+
             this.questionNumeros = Array.from(new Set(this.dataExam.questions.map(q => q.numero))).sort((n1, n2) => n1 - n2);
           })
           .catch(() => {
@@ -117,7 +117,6 @@ export class MarkingSummaryComponent implements OnInit {
   }
 
   cleanSheet(): void {
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
     this.http.delete<any>(this.applicationConfigService.getEndpointFor('api/cleanExamSheet/' + this.examId)).subscribe(() => {
       window.location.reload();
     });

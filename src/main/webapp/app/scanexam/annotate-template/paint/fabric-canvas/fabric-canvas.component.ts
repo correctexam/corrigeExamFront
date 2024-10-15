@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Component, Inject, Input, OnDestroy, OnInit } from '@angular/core';
 import {
@@ -150,7 +149,7 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
 
       // Requires to update the canvas for each page if the pdf contains metadata to process
       if (this.eventHandler.getCanvasForPage(page) === undefined) {
-        this.eventHandler.pages[page].updateCanvas(evt.source, this.document);
+        (this.eventHandler.pages[page] as any).updateCanvas(evt.source, this.document);
       }
       if (this.zones[page] !== undefined) {
         this.zones[page].forEach(z => {
@@ -379,8 +378,8 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
       };
     }
 
-    const width = canvas.width!;
-    const height = canvas.height!;
+    const width = canvas.width;
+    const height = canvas.height;
 
     return {
       pageNumber: rect.p,
@@ -402,16 +401,19 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
   }
 
   public async getCustomPdfProperties(): Promise<Array<Rect>> {
-    const md = await (window as any).PDFViewerApplication.pdfDocument.getMetadata();
-    const info = md.info;
+    if (this.pdfNotificationService.onPDFJSInitSignal()) {
+      const md = await this.pdfNotificationService.onPDFJSInitSignal().pdfDocument.getMetadata();
+      const info = md.info;
+      if ((info as any).Custom === undefined) {
+        return Promise.resolve([]);
+      }
 
-    if (info.Custom === undefined) {
-      return Promise.resolve([]);
+      return Object.keys((info as any).Custom)
+        .map(key => toRect(key, (info as any).Custom[key]))
+        .filter((rect): rect is Rect => rect !== undefined);
+    } else {
+      return await [];
     }
-
-    return Object.keys(info.Custom)
-      .map(key => toRect(key, info.Custom[key]))
-      .filter((rect): rect is Rect => rect !== undefined);
   }
 }
 
@@ -464,6 +466,7 @@ function toRect(key: string, value: unknown): Rect | undefined {
     ) {
       return { ...r, type, q: Number.isFinite(q) ? q : undefined, subq: Number.isFinite(subq) ? subq : undefined };
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (ignore: unknown) {
     // nothing to do
   }

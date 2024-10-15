@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/member-ordering */
-/* eslint-disable no-console */
+
 /* eslint-disable arrow-body-style */
 import { ExportOptions } from 'dexie-export-import';
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse } from '@angular/common/http';
 import { Observable, firstValueFrom, scan } from 'rxjs';
@@ -52,7 +52,6 @@ const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
     };
   }
   if (isHttpResponse(event)) {
-    // eslint-disable-next-line no-console
     return {
       progress: 100,
       state: 'DONE',
@@ -260,6 +259,7 @@ export class CacheUploadService {
         );
       });
       return await p;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e2) {
       messageService.add({
         severity: 'error',
@@ -374,7 +374,6 @@ export class CacheUploadService {
         cacheDownloadNotification.setBlocked(false);
         return;
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         await this.db.import(examId, data, {
           acceptNameDiff: true,
           acceptMissingTables: true,
@@ -477,7 +476,6 @@ export class CacheUploadService {
   }
 
   private getCache(filename: string): Observable<any> {
-    // eslint-disable-next-line no-console
     // console.log(this.applicationConfigService.getEndpointFor('api/getCache/' + filename));
     return this.http.get(this.applicationConfigService.getEndpointFor('api/getCache/' + filename), {
       //  reportProgress: true,
@@ -487,20 +485,16 @@ export class CacheUploadService {
   }
 
   getNoAlignImage(examId: number, pageNumber: number): Observable<any> {
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-
     return this.http.get(this.applicationConfigService.getEndpointFor('api/getCacheNonAlignPage/' + examId + '/' + pageNumber), {
       responseType: 'text',
     });
   }
   getAlignImage(examId: number, pageNumber: number): Observable<any> {
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
     return this.http.get(this.applicationConfigService.getEndpointFor('api/getCacheAlignPage/' + examId + '/' + pageNumber), {
       responseType: 'text',
     });
   }
   getNbrePageInTemplate(examId: number): Observable<any> {
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
     return this.http.get(this.applicationConfigService.getEndpointFor('api/getCachePageInTemplate/' + examId), {
       responseType: 'text',
     });

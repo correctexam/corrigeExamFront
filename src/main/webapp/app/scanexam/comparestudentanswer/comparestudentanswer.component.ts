@@ -1,14 +1,6 @@
-/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 /* eslint-disable object-shorthand */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-/* eslint-disable @typescript-eslint/member-ordering */
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 import {
   AfterViewInit,
   ChangeDetectorRef,
@@ -331,7 +323,6 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   getCurrentNavigationId(): number {
     const s = this.location.getState() as any;
     if (s?.navigationId !== undefined) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return s.navigationId;
     } else {
       return -1;
@@ -541,7 +532,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
           reader.readAsDataURL(blob);
           reader.onload = function () {
             const dataUrl = reader.result;
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+
             const style = `font-size: 300px; background-image: url("${dataUrl}"); background-size: contain; background-repeat: no-repeat;`;
             console.log('%c     ', style);
           };
@@ -623,7 +614,6 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
         let exportImageType = 'image/webp';
         let compression = 0.65;
         if (
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           this.preferenceService.getPreference().exportImageCompression !== undefined &&
           this.preferenceService.getPreference().exportImageCompression > 0 &&
           this.preferenceService.getPreference().exportImageCompression <= 1
@@ -631,7 +621,6 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
           compression = this.preferenceService.getPreference().exportImageCompression;
         }
         if (
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           this.preferenceService.getPreference().imageTypeExport !== undefined &&
           ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
         ) {

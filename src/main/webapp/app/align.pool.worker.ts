@@ -1,9 +1,6 @@
-/* eslint-disable object-shorthand */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable no-console */
 /* eslint-disable prefer-const */
 /* eslint-disable spaced-comment */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 declare let cv: any;
 
@@ -162,7 +159,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     }
     return value;
   }
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-unused-vars
+
   async loadImage(ii: NonAlignImage | AlignImage): Promise<ImageData> {
     const image = JSON.parse(ii.value, this.reviver);
     const res = await fetch(image.pages);
@@ -306,7 +303,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     allimage: boolean,
     numberofpointToMatch: number,
     numberofgoodpointToMatch: number,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     debug: boolean,
   ): any {
     const image_A = new ImageData(new Uint8ClampedArray(image_Aba), widthA, heightA);
@@ -328,7 +325,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     cv.cvtColor(im1, im1Gray, cv.COLOR_BGRA2GRAY);
     cv.cvtColor(im2, im2Gray, cv.COLOR_BGRA2GRAY);
     //  console.log("pass par la 2 ", "page ", pageNumber)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const squareSizeorigin = Math.trunc(im2.size().width / 10);
     let points1: any[] = [];
     let points2: any[] = [];
@@ -388,7 +385,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       res3 = true;
       res4 = true;
     }
-    // eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
+
     if (res1 && res2 && res3 && res4) {
       let mat1 = cv.matFromArray(points1.length / 2, 1, cv.CV_32FC2, points1);
       let mat2 = cv.matFromArray(points2.length / 2, 1, cv.CV_32FC2, points2);
@@ -890,7 +887,6 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       dstTri.delete();
       M.delete();
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return result;
     } else {
       _srcMat.delete();
@@ -902,7 +898,6 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       //    _srcMat2.delete();
       circlesMat1.delete();
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return this.alignImage(
         image_Aba,
         image_Bba,

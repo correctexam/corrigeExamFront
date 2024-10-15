@@ -1,7 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -183,6 +179,7 @@ export class ResultatStudentcourseComponent implements OnInit {
           });
         });
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e: any) {
       this.showEmail = false;
       this.currentStudentMail = undefined;
@@ -202,7 +199,6 @@ export class ResultatStudentcourseComponent implements OnInit {
   loadEtudiants(): void {
     this.blocked = true;
     this.http.get(this.applicationConfigService.getEndpointFor('api/showResult/' + this.examid)).subscribe(s => {
-      // eslint-disable-next-line no-console
       this.studentsresult = s as any;
 
       this.blocked = false;

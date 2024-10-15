@@ -1,6 +1,3 @@
-/* eslint-disable object-shorthand */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import Dexie, { Table } from 'dexie';
 import 'dexie-export-import';
@@ -55,7 +52,6 @@ export class ExamIndexDB extends Dexie {
     //    this.on('populate', () => this.populate());
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   async resetDatabase() {
     await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
       this.exams.clear();
@@ -101,15 +97,12 @@ export class ExamIndexDB extends Dexie {
     await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
       this.exams.delete(this.examId);
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       this.alignImages
         .where('examId')
         .equals(this.examId)
         .toArray()
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
         .then(a => this.alignImages.bulkDelete(a.map(t => t.id!)));
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     });
   }
 
@@ -117,22 +110,19 @@ export class ExamIndexDB extends Dexie {
     await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
       //      this.exams.delete(this.examId);
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       this.alignImages
         .where({ examId: this.examId })
         .filter(e2 => e2.pageNumber >= pageStart && e2.pageNumber <= pageEnd)
         .toArray()
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
         .then(a => this.alignImages.bulkDelete(a.map(t => t.id!)));
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 
       this.nonAlignImages
         .where({ examId: this.examId })
         .filter(e2 => e2.pageNumber >= pageStart && e2.pageNumber <= pageEnd)
         .toArray()
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
         .then(a => this.nonAlignImages.bulkDelete(a.map(t => t.id!)));
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     });
   }
 
@@ -140,9 +130,8 @@ export class ExamIndexDB extends Dexie {
     await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
       //      this.exams.delete(this.examId);
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       this.alignImages.where({ examId: this.examId, pageNumber: page }).delete();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
       // .then(a => this.alignImages.delete(a!.id!));
     });
   }
@@ -151,9 +140,8 @@ export class ExamIndexDB extends Dexie {
     await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
       //      this.exams.delete(this.examId);
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       this.nonAlignImages.where({ examId: this.examId, pageNumber: page }).delete();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
       // .then(a => this.alignImages.delete(a!.id!));
     });
   }
@@ -162,12 +150,11 @@ export class ExamIndexDB extends Dexie {
     await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
       //      this.exams.delete(this.examId);
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       this.alignImages
         .where({ examId: this.examId })
         .filter(e2 => e2.pageNumber >= pageStart && e2.pageNumber <= pageEnd)
         .toArray()
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
         .then(a => this.alignImages.bulkDelete(a.map(t => t.id!)));
     });
   }
@@ -176,12 +163,11 @@ export class ExamIndexDB extends Dexie {
     await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
       //      this.exams.delete(this.examId);
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       this.nonAlignImages
         .where({ examId: this.examId })
         .filter(e2 => e2.pageNumber >= pageStart && e2.pageNumber <= pageEnd)
         .toArray()
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
         .then(a => this.nonAlignImages.bulkDelete(a.map(t => t.id!)));
     });
   }
@@ -359,7 +345,6 @@ export class AppDB implements CacheService {
   /* async populate() {
   } */
 
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   async resetDatabase(examId: number): Promise<void> {
     let db1 = this.dbs.get(examId);
     if (db1 === undefined) {
@@ -368,8 +353,6 @@ export class AppDB implements CacheService {
     }
     return db1.resetDatabase();
   }
-
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 
   async removeExam(examId: number): Promise<void> {
     let db1 = this.dbs.get(examId);
@@ -415,7 +398,7 @@ export class AppDB implements CacheService {
       db1 = new ExamIndexDB(examId);
       this.dbs.set(examId, db1);
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
     return db1.removePageAlignForExamForPage(page);
   }
 
@@ -425,7 +408,7 @@ export class AppDB implements CacheService {
       db1 = new ExamIndexDB(examId);
       this.dbs.set(examId, db1);
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
     return db1.removePageNonAlignForExamForPage(page);
   }
 
@@ -435,7 +418,7 @@ export class AppDB implements CacheService {
       db1 = new ExamIndexDB(examId);
       this.dbs.set(examId, db1);
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
     return db1.removePageAlignForExamForPages(pageStart, pageEnd);
   }
 
@@ -445,7 +428,7 @@ export class AppDB implements CacheService {
       db1 = new ExamIndexDB(examId);
       this.dbs.set(examId, db1);
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
     return db1.removePageNonAlignForExamForPages(pageStart, pageEnd);
   }
 

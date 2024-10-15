@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/member-ordering */
 
 import { Component, OnInit } from '@angular/core';
@@ -47,7 +46,6 @@ export class CourseUpdateComponent implements OnInit {
 
       this.userService.query().subscribe((res: HttpResponse<IUser[]>) => {
         this.users = res.body || [];
-        // eslint-disable-next-line no-console
       });
     });
   }
@@ -83,7 +81,6 @@ export class CourseUpdateComponent implements OnInit {
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/member-ordering
   protected subscribeToSaveResponse(result: Observable<HttpResponse<ICourse>>): void {
     result.subscribe(
       () => this.onSaveSuccess(),
@@ -91,7 +88,6 @@ export class CourseUpdateComponent implements OnInit {
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/member-ordering
   protected onSaveSuccess(): void {
     this.isSaving = false;
     this.previousState();

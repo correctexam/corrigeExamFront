@@ -1,12 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable prefer-const */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable no-console */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { AfterViewInit, Component, HostListener, OnInit, ViewChild, effect } from '@angular/core';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ZoneService } from '../../entities/zone/service/zone.service';
@@ -400,7 +394,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     console.timeLog('loadpagesameexam', 'before loadZone');
     const zones = (await firstValueFrom(this.zoneService.find4ExamId(this.exam.id!)))?.body;
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     if (zones) {
       if (zones[0].id) {
         z1 = zones[0];
@@ -436,14 +429,10 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     if (pageNumber !== undefined && pageNumber !== null && (z1 !== undefined || z2 !== undefined || z3 !== undefined)) {
       const r: DoPredictionsInputSamePage = {
         align: !this.noalign,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         candidates: candidates as IStudent[],
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         examId: +this.examId,
         indexDb: this.preferenceService.getPreference().cacheDb === 'indexdb',
         factor: this.factor,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         pagesToAnalyze: pagesToAnalyze.map(p => p + pageNumber!),
         pageTemplate: pageNumber!,
         nameZone: z1!,

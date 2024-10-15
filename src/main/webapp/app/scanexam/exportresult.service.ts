@@ -20,7 +20,6 @@ export class ExportResultService {
   prepareDataToExport(studentsresult: any[], libelles: any, deleteId: boolean): void {
     let maxQuestion = 0;
     studentsresult.forEach(res => {
-      // eslint-disable-next-line no-console
       for (const key in res.notequestions) {
         // eslint-disable-next-line no-prototype-builtins
         if (res.notequestions.hasOwnProperty(key)) {
@@ -71,7 +70,6 @@ export class ExportResultService {
   }
 
   async loadLibelle(examId: number): Promise<any> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return (await firstValueFrom(this.http.get(this.applicationConfigService.getEndpointFor('api/getLibelleQuestions/' + examId)))) as any;
   }
 

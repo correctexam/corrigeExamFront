@@ -1,12 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-duplicate-type-constituents */
-/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable @typescript-eslint/member-ordering */
-import { fabric } from 'fabric';
+import { TPointerEvent, FabricImage as fImage, FabricObject } from 'fabric';
 import { FabricShapeService } from './shape.service';
 import {
   CustomFabricEllipse,
@@ -48,7 +42,7 @@ export class EventHandlerService {
   public allcanvas: Map<number, PagedCanvas> = new Map();
   public pages: { [page: number]: PageHandler } = {};
   public questions: Map<number, IQuestion> = new Map();
-  private currentSelected: fabric.Object | undefined;
+  private currentSelected: FabricObject | undefined;
   private imageDataUrl!: string;
   private zonesRendering: { [page: number]: CustomZone[] } = {};
   private _elementUnderDrawing:
@@ -68,7 +62,7 @@ export class EventHandlerService {
   private previousScaleY!: number;
   private _isMouseDown = false;
   private _selectedColour: DrawingColours = DrawingColours.BLACK;
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+
   private drawingToolObserver: (d: DrawingTools) => void = () => {};
   private confService!: ConfirmationService;
   private modelViewpping = new Map<string, number>();
@@ -202,12 +196,14 @@ export class EventHandlerService {
     }
     return new Promise<void>((resolve, reject) => {
       const img = new Image();
-      // eslint-disable-next-line @typescript-eslint/require-await
+
       img.onload = async () => {
-        const f_img = new fabric.Image(img);
+        const f_img = new fImage(img);
         this.canvas.setWidth(f_img.width!);
         this.canvas.setHeight(f_img.height!);
-        this.canvas.setBackgroundImage(f_img, resolve);
+        this.canvas.backgroundImage = f_img;
+
+        //        this.canvas.setBackgroundImage(f_img, resolve);
       };
       img.onerror = () => {
         reject();
@@ -216,9 +212,10 @@ export class EventHandlerService {
     });
   }
 
-  public mouseDown(e: Event): void {
+  public mouseDown(e: TPointerEvent): void {
     this._isMouseDown = true;
-    const pointer = this.canvas.getPointer(e);
+    //    const pointer = this.canvas.getPointer(e);
+    const pointer = this.canvas.getScenePoint(e);
     this._initPositionOfElement = { x: pointer.x, y: pointer.y };
 
     switch (this._selectedTool) {
@@ -229,14 +226,6 @@ export class EventHandlerService {
             c.discardActiveObject();
             c.renderAll();
           });
-        break;
-      case DrawingTools.ELLIPSE:
-        this._elementUnderDrawing = this.fabricShapeService.createEllipse(
-          this.canvas,
-          this.selectedThickness,
-          this._selectedColour,
-          pointer,
-        );
         break;
       case DrawingTools.NOMBOX:
       case DrawingTools.PRENOMBOX:
@@ -259,86 +248,21 @@ export class EventHandlerService {
           pointer,
         );
         break;
-      case DrawingTools.PENCIL:
-        this._elementUnderDrawing = this.fabricShapeService.createPath(this.canvas, this.selectedThickness, this._selectedColour, pointer);
-        break;
-      case DrawingTools.LINE:
-        this._elementUnderDrawing = this.fabricShapeService.createLine(
-          this.canvas,
-          this.selectedThickness,
-          this._selectedColour,
-          [5, 0],
-          pointer,
-        );
-        break;
-      case DrawingTools.DASHED_LINE:
-        this._elementUnderDrawing = this.fabricShapeService.createLine(
-          this.canvas,
-          this.selectedThickness,
-          this._selectedColour,
-          [5, 5],
-          pointer,
-        );
-        break;
-      case DrawingTools.POLYGON:
-        if (!this._elementUnderDrawing) {
-          this._elementUnderDrawing = this.fabricShapeService.createPolygon(
-            this.canvas,
-            this.selectedThickness,
-            this._selectedColour,
-            pointer,
-          );
-        } else {
-          if (this.fabricShapeService.isClickNearPolygonCenter(this._elementUnderDrawing as CustomFabricPolygon, pointer, 20)) {
-            this._elementUnderDrawing = this.fabricShapeService.finishPolygon(
-              this.canvas,
-              this._elementUnderDrawing as CustomFabricPolygon,
-            );
-            this._elementUnderDrawing = undefined;
-          } else {
-            this.fabricShapeService.addPointToPolygon(this._elementUnderDrawing as CustomFabricPolygon, pointer);
-          }
-        }
-        break;
-      case DrawingTools.TEXT:
-        this.fabricShapeService.createIText(this.canvas, {
-          thickness: this.selectedThickness / 2,
-          colour: this._selectedColour,
-          pointer,
-        });
-        break;
     }
   }
 
-  public mouseMove(e: Event): void {
+  public mouseMove(e: TPointerEvent): void {
     if (!this._isMouseDown) {
       return;
     }
-    const pointer = this.canvas.getPointer(e);
+    const pointer = this.canvas.getScenePoint(e);
     switch (this._selectedTool) {
-      case DrawingTools.ELLIPSE:
-        this.fabricShapeService.formEllipse(this._elementUnderDrawing as CustomFabricEllipse, this._initPositionOfElement, pointer);
-        break;
       case DrawingTools.NOMBOX:
       case DrawingTools.PRENOMBOX:
       case DrawingTools.INEBOX:
       case DrawingTools.QUESTIONBOX:
       case DrawingTools.RECTANGLE:
         this.fabricShapeService.formRectangle(this._elementUnderDrawing as CustomFabricRect, this._initPositionOfElement, pointer);
-        break;
-      case DrawingTools.PENCIL:
-        this.fabricShapeService.formPath(this._elementUnderDrawing as CustomFabricPath, pointer);
-        break;
-      case DrawingTools.LINE:
-      case DrawingTools.DASHED_LINE:
-        this.fabricShapeService.formLine(this._elementUnderDrawing as CustomFabricLine, pointer);
-        break;
-      case DrawingTools.POLYGON:
-        this.fabricShapeService.formFirstLineOfPolygon(
-          this._elementUnderDrawing as CustomFabricPolygon,
-          this._initPositionOfElement,
-          pointer,
-        );
         break;
     }
     this.canvas.renderAll();
@@ -350,10 +274,6 @@ export class EventHandlerService {
     this._isMouseDown = false;
 
     switch (this._selectedTool) {
-      case DrawingTools.PENCIL:
-        this._elementUnderDrawing = this.fabricShapeService.finishPath(this.canvas, this._elementUnderDrawing as CustomFabricPath);
-        break;
-
       case DrawingTools.NOMBOX:
         this.translateService.get('scanexam.nomuc1').subscribe((name: string) => {
           this.createBlueBox(DrawingTools.NOMBOX, name, num);
@@ -379,20 +299,7 @@ export class EventHandlerService {
         break;
     }
 
-    if (this._selectedTool !== DrawingTools.POLYGON) {
-      this._elementUnderDrawing = undefined;
-    }
-
-    /* if (this._selectedTool === DrawingTools.SELECT) {
-      Array.from(this.allcanvas.values())
-        .filter(c => c !== this.canvas)
-        .forEach(c => {
-          c.discardActiveObject();
-          c.renderAll();
-        });
-    } else {*/
     this.canvas.renderAll();
-    // }
   }
 
   private createZone(obj: CustomFabricObject): IZone {
@@ -531,13 +438,11 @@ export class EventHandlerService {
   }
 
   public extendToObjectWithId(): void {
-    fabric.Object.prototype.toObject = (function (toObject) {
-      return function (this: CustomFabricObject): fabric.Object {
-        return fabric.util.object.extend(toObject.call(this), {
-          id: this.id,
-        }) as fabric.Object;
-      };
-    })(fabric.Object.prototype.toObject);
+    const originalToObject = FabricObject.prototype.toObject;
+    const myAdditional: any[] = ['id'];
+    FabricObject.prototype.toObject = function (additionalProperties) {
+      return originalToObject.call(this, myAdditional.concat(additionalProperties));
+    };
   }
 
   /**
@@ -594,7 +499,7 @@ export class EventHandlerService {
   /**
    * Erases the given object from the canvas
    */
-  private async eraseObject(object: fabric.Object): Promise<void> {
+  private async eraseObject(object: FabricObject): Promise<void> {
     const customObject = object as CustomFabricObject;
     // Getting the zone id
     const zid = this.modelViewpping.get(customObject.id);
@@ -636,7 +541,7 @@ export class EventHandlerService {
     }
   }
 
-  async eraseObjectI(object: fabric.Object): Promise<void> {
+  async eraseObjectI(object: FabricObject): Promise<void> {
     if (object.type === FabricObjectType.GROUP) {
       const custObj = object as CustomFabricGroup;
       for (const o of custObj.getObjects()) {
@@ -656,7 +561,7 @@ export class EventHandlerService {
    * States whether the given object is a question
    * @returns True if it is a question.
    */
-  private isAQuestion(object: fabric.Object): boolean {
+  private isAQuestion(object: FabricObject): boolean {
     return (
       object.type === FabricObjectType.GROUP &&
       (((object as CustomFabricGroup).getObjects()[1] as IText).text?.startsWith('Question') ?? false)
@@ -837,7 +742,6 @@ export class EventHandlerService {
   }
 
   cleanCanvassCache(): void {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (this.allcanvas !== undefined) {
       //   this.selectedTool = DrawingTools.PENCIL;
       this.currentSelected = undefined;

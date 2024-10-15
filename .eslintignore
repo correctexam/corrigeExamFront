@@ -1,9 +1,0 @@
-node_modules/
-src/main/docker/
-src/main/webapp/content/opencv
-jest.conf.js
-webpack/
-target/
-build/
-node/
-postcss.config.js

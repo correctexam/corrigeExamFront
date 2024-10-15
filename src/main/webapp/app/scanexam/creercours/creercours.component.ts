@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 import { HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -46,7 +44,6 @@ export class CreercoursComponent implements OnInit {
 
   ngOnInit(): void {
     this.createFromForm();
-    this.userService.query;
     this.accountService.getAuthenticationState().subscribe(e => {
       this.login = e?.login;
     });
@@ -86,7 +83,6 @@ export class CreercoursComponent implements OnInit {
   }
 
   protected createFromForm(): ICourse {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return {
       ...new Course(),
       id: this.editForm.get(['id'])!.value,

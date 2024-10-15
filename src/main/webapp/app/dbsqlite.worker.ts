@@ -1,11 +1,7 @@
-/* eslint-disable object-shorthand */
-/* eslint-disable no-empty */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable no-console */
 /* eslint-disable spaced-comment */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
+
 /// <reference lib="webworker" />
 
 const dbs = new Map<number, DB>();
@@ -24,14 +20,12 @@ addEventListener('message', e => {
 
   switch (e.data.msg) {
     case 'hello': {
-      portWorkerPool;
       const response = `worker response to ${e.data.msg}`;
       postMessage({ msg: response });
 
       break;
     }
     case 'shareWorker': {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const port = e.data.port; // (C)
       port.onmessage = (e1: any) => {
         switch (e1.data.msg) {
@@ -563,7 +557,6 @@ class DB {
 
   async resetDatabase(sqlite3: any, data: any) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (navigator.storage.getDirectory !== undefined) {
         const root = await navigator.storage.getDirectory();
         const keys = (root as any).keys();
@@ -589,7 +582,6 @@ class DB {
   // removeExam(examId: number) :Promise<void>;
   async removeExam(sqlite3: any, data: any) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (navigator.storage.getDirectory !== undefined) {
         const root = await navigator.storage.getDirectory();
         const keys = (root as any).keys();
@@ -615,7 +607,6 @@ class DB {
   // removeElementForExam(examId: number) :Promise<void>;
   async removeElementForExam(sqlite3: any, data: any) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (navigator.storage.getDirectory !== undefined) {
         const root = await navigator.storage.getDirectory();
         const keys = (root as any).keys();
@@ -758,7 +749,6 @@ class DB {
   // export(examId: number,options?: ExportOptions) :Promise<Blob>;
 
   async export(sqlite3: any, data: any) {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (navigator.storage.getDirectory !== undefined) {
       const root = await navigator.storage.getDirectory();
       const keys = (root as any).keys();
@@ -791,7 +781,7 @@ class DB {
   async import(sqlite3: any, data: any) {
     const payload = data.payload;
     const blob = payload.blob;
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
     if (navigator.storage.getDirectory !== undefined) {
       const root = await navigator.storage.getDirectory();
       const keys = (root as any).keys();
@@ -1009,7 +999,7 @@ class DB {
 
   getNonAlignImagesForPageNumbers(sqlite3: any, data: any) {
     const payload = data.payload;
-    // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
+
     if (payload.pages !== undefined && payload.pages.joins !== undefined) {
       this.initDb(sqlite3);
       try {
@@ -1046,7 +1036,7 @@ class DB {
 
   getAlignImagesForPageNumbers(sqlite3: any, data: any) {
     const payload = data.payload;
-    // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
+
     if (payload.pages !== undefined && payload.pages.joins !== undefined) {
       this.initDb(sqlite3);
       try {

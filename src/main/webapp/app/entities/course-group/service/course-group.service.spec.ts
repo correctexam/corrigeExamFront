@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { TestBed } from '@angular/core/testing';
 import { describe, expect } from '@jest/globals';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
