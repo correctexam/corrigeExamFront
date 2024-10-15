@@ -233,14 +233,6 @@ export class EventHandlerService {
             c.renderAll();
           });
         break;
-      case DrawingTools.ELLIPSE:
-        this._elementUnderDrawing = this.fabricShapeService.createEllipse(
-          this.canvas,
-          this.selectedThickness,
-          this._selectedColour,
-          pointer,
-        );
-        break;
       case DrawingTools.NOMBOX:
       case DrawingTools.PRENOMBOX:
       case DrawingTools.INEBOX:
@@ -262,54 +254,6 @@ export class EventHandlerService {
           pointer,
         );
         break;
-      case DrawingTools.PENCIL:
-        this._elementUnderDrawing = this.fabricShapeService.createPath(this.canvas, this.selectedThickness, this._selectedColour, pointer);
-        break;
-      case DrawingTools.LINE:
-        this._elementUnderDrawing = this.fabricShapeService.createLine(
-          this.canvas,
-          this.selectedThickness,
-          this._selectedColour,
-          [5, 0],
-          pointer,
-        );
-        break;
-      case DrawingTools.DASHED_LINE:
-        this._elementUnderDrawing = this.fabricShapeService.createLine(
-          this.canvas,
-          this.selectedThickness,
-          this._selectedColour,
-          [5, 5],
-          pointer,
-        );
-        break;
-      case DrawingTools.POLYGON:
-        if (!this._elementUnderDrawing) {
-          this._elementUnderDrawing = this.fabricShapeService.createPolygon(
-            this.canvas,
-            this.selectedThickness,
-            this._selectedColour,
-            pointer,
-          );
-        } else {
-          if (this.fabricShapeService.isClickNearPolygonCenter(this._elementUnderDrawing as CustomFabricPolygon, pointer, 20)) {
-            this._elementUnderDrawing = this.fabricShapeService.finishPolygon(
-              this.canvas,
-              this._elementUnderDrawing as CustomFabricPolygon,
-            );
-            this._elementUnderDrawing = undefined;
-          } else {
-            this.fabricShapeService.addPointToPolygon(this._elementUnderDrawing as CustomFabricPolygon, pointer);
-          }
-        }
-        break;
-      case DrawingTools.TEXT:
-        this.fabricShapeService.createIText(this.canvas, {
-          thickness: this.selectedThickness / 2,
-          colour: this._selectedColour,
-          pointer,
-        });
-        break;
     }
   }
 
@@ -319,29 +263,12 @@ export class EventHandlerService {
     }
     const pointer = this.canvas.getScenePoint(e);
     switch (this._selectedTool) {
-      case DrawingTools.ELLIPSE:
-        this.fabricShapeService.formEllipse(this._elementUnderDrawing as CustomFabricEllipse, this._initPositionOfElement, pointer);
-        break;
       case DrawingTools.NOMBOX:
       case DrawingTools.PRENOMBOX:
       case DrawingTools.INEBOX:
       case DrawingTools.QUESTIONBOX:
       case DrawingTools.RECTANGLE:
         this.fabricShapeService.formRectangle(this._elementUnderDrawing as CustomFabricRect, this._initPositionOfElement, pointer);
-        break;
-      case DrawingTools.PENCIL:
-        this.fabricShapeService.formPath(this._elementUnderDrawing as CustomFabricPath, pointer);
-        break;
-      case DrawingTools.LINE:
-      case DrawingTools.DASHED_LINE:
-        this.fabricShapeService.formLine(this._elementUnderDrawing as CustomFabricLine, pointer);
-        break;
-      case DrawingTools.POLYGON:
-        this.fabricShapeService.formFirstLineOfPolygon(
-          this._elementUnderDrawing as CustomFabricPolygon,
-          this._initPositionOfElement,
-          pointer,
-        );
         break;
     }
     this.canvas.renderAll();
@@ -353,10 +280,6 @@ export class EventHandlerService {
     this._isMouseDown = false;
 
     switch (this._selectedTool) {
-      case DrawingTools.PENCIL:
-        this._elementUnderDrawing = this.fabricShapeService.finishPath(this.canvas, this._elementUnderDrawing as CustomFabricPath);
-        break;
-
       case DrawingTools.NOMBOX:
         this.translateService.get('scanexam.nomuc1').subscribe((name: string) => {
           this.createBlueBox(DrawingTools.NOMBOX, name, num);
@@ -382,20 +305,7 @@ export class EventHandlerService {
         break;
     }
 
-    if (this._selectedTool !== DrawingTools.POLYGON) {
-      this._elementUnderDrawing = undefined;
-    }
-
-    /* if (this._selectedTool === DrawingTools.SELECT) {
-      Array.from(this.allcanvas.values())
-        .filter(c => c !== this.canvas)
-        .forEach(c => {
-          c.discardActiveObject();
-          c.renderAll();
-        });
-    } else {*/
     this.canvas.renderAll();
-    // }
   }
 
   private createZone(obj: CustomFabricObject): IZone {
