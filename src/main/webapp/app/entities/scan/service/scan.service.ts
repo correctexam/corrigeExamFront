@@ -42,7 +42,6 @@ export class ScanService {
   }
 
   updateWithProgress(scan: IScan): Observable<HttpEvent<IScan>> {
-    // eslint-disable-next-line no-console
     return this.http.put<IScan>(`${this.resourceUrl}`, scan, { reportProgress: true, observe: 'events' } /* { observe: 'response' }*/);
   }
 

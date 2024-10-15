@@ -1,16 +1,5 @@
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable no-empty */
-/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable no-new */
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/member-ordering */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
+
 import { Canvas as fCanvas, loadSVGFromString, FabricObject } from 'fabric';
 import { FabricShapeService } from '../annotate-template/paint/shape.service';
 import { CustomFabricObject } from '../annotate-template/paint/models';

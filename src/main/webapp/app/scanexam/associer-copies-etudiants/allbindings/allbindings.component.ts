@@ -90,9 +90,7 @@ export class AllbindingsComponent implements OnInit {
   }
 
   async bindStudentInternal(student: IStudent, currentStudent: number, element: any): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     const examSheet4CurrentStudent1: IExamSheet[] = [
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       ...new Set(this.students.filter(s => s.recognizedStudent !== undefined).flatMap(s => s.recognizedStudent.examSheets!)),
     ].filter(
       sh =>

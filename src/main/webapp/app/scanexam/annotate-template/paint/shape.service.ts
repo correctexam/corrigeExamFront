@@ -1,10 +1,5 @@
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/member-ordering */
-/* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
-/* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 
 import {
   CustomFabricEllipse,
@@ -29,7 +24,7 @@ const FILLED_WITH_COLOUR_OPACITY = 0.4;
 
 @Injectable()
 export class FabricShapeService {
-  fillShape(object: CustomFabricObject, colour: DrawingColours) {
+  fillShape(object: CustomFabricObject, colour: DrawingColours): void {
     switch (object.type) {
       case FabricObjectType.RECT:
       case FabricObjectType.ELLIPSE:
@@ -141,7 +136,7 @@ export class FabricShapeService {
     alltogetherObj.setCoords();
     alltogetherObj.id = uuid();
     canvas.renderAll();
-    // eslint-disable-next-line no-console
+
     return alltogetherObj;
   }
 
@@ -172,7 +167,7 @@ export class FabricShapeService {
     alltogetherObj.setCoords();
     alltogetherObj.id = uuid();
     canvas.renderAll();
-    // eslint-disable-next-line no-console
+
     return alltogetherObj;
   }
 
@@ -259,7 +254,7 @@ export class FabricShapeService {
 
   // Formers
 
-  formEllipse(ellipse: CustomFabricEllipse, initPos: Pointer, pointer: Pointer) {
+  formEllipse(ellipse: CustomFabricEllipse, initPos: Pointer, pointer: Pointer): void {
     ellipse.set({
       rx: Math.abs((initPos.x - pointer.x) / 2),
       ry: Math.abs((initPos.y - pointer.y) / 2),
@@ -313,7 +308,6 @@ export class FabricShapeService {
 
   finishPolygon(canvas: fabric.Canvas, polygon: CustomFabricPolygon): CustomFabricPolygon {
     canvas.remove(polygon);
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     const newPolygon = new fabric.Polygon(polygon.points!, {
       strokeWidth: polygon.strokeWidth,
       stroke: polygon.stroke,

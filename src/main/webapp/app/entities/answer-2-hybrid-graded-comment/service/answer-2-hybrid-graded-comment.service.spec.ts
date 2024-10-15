@@ -45,7 +45,6 @@ describe('Answer2HybridGradedComment Service', () => {
     });
 
     it('should create a Answer2HybridGradedComment', () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const answer2HybridGradedComment = { ...sampleWithNewData };
       const returnedFromService = { ...requireRestSample };
       const expected = { ...sampleWithRequiredData };

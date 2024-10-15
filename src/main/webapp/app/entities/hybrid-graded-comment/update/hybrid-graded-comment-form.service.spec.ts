@@ -50,7 +50,6 @@ describe('HybridGradedComment Form Service', () => {
 
     describe('getHybridGradedComment', () => {
       it('should return NewHybridGradedComment for default HybridGradedComment initial value', () => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const formGroup = service.createHybridGradedCommentFormGroup(sampleWithNewData);
 
         const hybridGradedComment = service.getHybridGradedComment(formGroup) as any;

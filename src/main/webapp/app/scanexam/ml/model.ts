@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable no-console */
 /**
  * class Model

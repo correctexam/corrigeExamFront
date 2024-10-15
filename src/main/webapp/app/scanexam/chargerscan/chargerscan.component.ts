@@ -1,9 +1,8 @@
 /* eslint-disable curly */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
+
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import { HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
@@ -70,7 +69,6 @@ const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
     };
   }
   if (isHttpResponse(event)) {
-    // eslint-disable-next-line no-console
     return {
       body: event.body as IScan,
       progress: 100,

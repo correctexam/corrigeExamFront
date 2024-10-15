@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Injectable } from '@angular/core';
 import { ExportOptions, ImportOptions } from 'dexie-export-import';
 import { AlignImage, AppDB, CacheService, ImageDB, Template } from './db';

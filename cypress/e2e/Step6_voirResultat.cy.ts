@@ -28,7 +28,7 @@ describe("Step 6: Voir résultat", () => {
     cy.wait(200)
 
     cy.get("tr:nth-of-type(1) > td:nth-of-type(5)").should(
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+       
       (el) =>
       {
         const t =el.text()
@@ -43,7 +43,7 @@ describe("Step 6: Voir résultat", () => {
     )
 
     cy.get("tr:nth-of-type(2) > td:nth-of-type(5)").should(
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+       
       (el) =>
       {
         const t =el.text()
@@ -58,7 +58,7 @@ describe("Step 6: Voir résultat", () => {
     )
 
     cy.get("tr:nth-of-type(3) > td:nth-of-type(5)").should(
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+       
       (el) =>
       {
         const t =el.text()

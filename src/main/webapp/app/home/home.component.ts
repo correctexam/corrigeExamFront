@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable no-console */
 import { Component, OnInit, OnDestroy, NgZone, ViewChild } from '@angular/core';
 
@@ -51,7 +50,6 @@ const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
     };
   }
   if (isHttpResponse(event)) {
-    // eslint-disable-next-line no-console
     return {
       progress: 100,
       state: 'DONE',

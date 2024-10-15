@@ -1,11 +1,4 @@
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 /* eslint-disable @typescript-eslint/member-ordering */
-/* eslint-disable prefer-const */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-/* eslint-disable no-console */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { Component, OnInit } from '@angular/core';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ActivatedRoute, Router } from '@angular/router';

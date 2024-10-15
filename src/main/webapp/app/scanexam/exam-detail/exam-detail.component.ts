@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
 import { Component, OnInit } from '@angular/core';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 import { faMotorcycle as fasMotorcycle } from '@fortawesome/free-solid-svg-icons';

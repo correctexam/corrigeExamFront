@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { Injectable } from '@angular/core';
 import { LocalStorageService } from 'ngx-webstorage';
 
@@ -39,7 +37,6 @@ export class KeyboardShortcutService {
       this.localStorageService.store('keyboardshortcuts', JSON.stringify(defaultvalue, this.replacer));
       return defaultvalue;
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return JSON.parse(spref, this.reviver);
     }
   }

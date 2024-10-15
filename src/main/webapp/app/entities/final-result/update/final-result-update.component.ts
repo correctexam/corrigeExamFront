@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';

@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, Signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';

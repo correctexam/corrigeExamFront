@@ -1,10 +1,9 @@
 /* eslint-disable object-shorthand */
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
+
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
+
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 import { Observable, Subject } from 'rxjs';

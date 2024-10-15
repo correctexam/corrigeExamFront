@@ -40,7 +40,6 @@ export class ZoneService {
   }
 
   objectScaling(zone: ResizeBoxDTO, id: number): Observable<EntityResponseType> {
-    // eslint-disable-next-line no-console
     return this.http.patch<IZone>(`${this.resourceUrl}/scaling/${id}`, zone, { observe: 'response' });
   }
 

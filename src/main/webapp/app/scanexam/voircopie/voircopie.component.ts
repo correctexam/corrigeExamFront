@@ -1,12 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 /* eslint-disable @typescript-eslint/member-ordering */
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-
-// http://localhost:9000/copie/d6680b56-36a5-4488-ac5b-c862096bc311/1
 
 import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, AfterViewInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -206,7 +199,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
                 ) {
                   this.finalResultService
                     .query({ examId: this.exam.id, studentId: this.selectionStudents![0].id })
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
                     .subscribe(bo => this.resolve(bo.body![0].note! / 100));
                 }
 
@@ -316,12 +309,10 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   }
 
   checked(comment: ITextComment | IGradedComment): boolean {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return (comment as any).checked;
   }
 
   getStyle(comment: ITextComment | IGradedComment): any {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     if ((comment as any).checked) {
       if (comment.description?.startsWith('correct')) {
         return { 'background-color': '#7EED92' };

@@ -200,7 +200,6 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
       baseZIndex: 10000,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     this.ref.onClose.subscribe(() => {});
   }
 

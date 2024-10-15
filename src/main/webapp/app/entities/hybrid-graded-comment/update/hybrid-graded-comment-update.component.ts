@@ -42,7 +42,6 @@ export class HybridGradedCommentUpdateComponent implements OnInit {
     this.editForm = this.hybridGradedCommentFormService.createHybridGradedCommentFormGroup();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   //  compareQuestion = (o1: IQuestion | null, o2: IQuestion | null): boolean => this.questionService.compareQuestion(o1, o2);
 
   ngOnInit(): void {

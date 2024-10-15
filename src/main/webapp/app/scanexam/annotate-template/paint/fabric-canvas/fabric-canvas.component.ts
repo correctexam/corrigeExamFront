@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Component, Inject, Input, OnDestroy, OnInit } from '@angular/core';
 import {
@@ -413,7 +412,6 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
         .map(key => toRect(key, (info as any).Custom[key]))
         .filter((rect): rect is Rect => rect !== undefined);
     } else {
-      // eslint-disable-next-line @typescript-eslint/await-thenable
       return await [];
     }
   }
@@ -446,7 +444,6 @@ function scaleRect(rect: Rect, ratio: number): Rect {
   // return rect;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function toRect(key: string, value: unknown): Rect | undefined {
   if (typeof value !== 'string') {
     return undefined;

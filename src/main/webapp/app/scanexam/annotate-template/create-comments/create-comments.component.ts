@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
@@ -114,7 +112,6 @@ export class CreateCommentsComponent implements OnInit {
     public translate: TranslateService,
     public preferenceService: PreferenceService,
   ) {}
-  // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
   ngOnInit(): void {}
 
   loadComments(): void {

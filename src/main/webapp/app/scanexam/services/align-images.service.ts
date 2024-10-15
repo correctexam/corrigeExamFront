@@ -1,11 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/member-ordering */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable no-var */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable prefer-const */
+
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-empty-function */
+
 import { Injectable } from '@angular/core';
 import { v4 as uuid } from 'uuid';
 import { Subject, Observable } from 'rxjs';

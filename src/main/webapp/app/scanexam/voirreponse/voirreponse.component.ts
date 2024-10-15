@@ -1,13 +1,4 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-/* eslint-disable @typescript-eslint/member-ordering */
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-
-// http://localhost:9000/copie/d6680b56-36a5-4488-ac5b-c862096bc311/1
-
 import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';

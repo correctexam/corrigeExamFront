@@ -1,9 +1,7 @@
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 import { HttpClient } from '@angular/common/http';
 import {
   AfterViewInit,

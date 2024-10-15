@@ -1,18 +1,13 @@
-/* eslint-disable @typescript-eslint/no-duplicate-type-constituents */
-/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable no-empty */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/require-await */
+
 /* eslint-disable no-new */
-/* eslint-disable @typescript-eslint/no-empty-function */
+
 /* eslint-disable @typescript-eslint/member-ordering */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
+
 import {
   Canvas as fCanvas,
   TPointerEvent,
@@ -514,7 +509,6 @@ export class EventCanevascorrectionHandlerService {
       case DrawingTools.SELECT:
         break;
       case DrawingTools.ERASER:
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
         if (object.type === FabricObjectType.ELLIPSE) {
           const otherEllipses = this.getOtherEllipses(object.id);
           otherEllipses.forEach(e => this.canvas.remove(e));

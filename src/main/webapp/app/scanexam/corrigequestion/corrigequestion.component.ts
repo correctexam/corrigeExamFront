@@ -1,11 +1,7 @@
 /* eslint-disable object-shorthand */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 /* eslint-disable @typescript-eslint/member-ordering */
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 import {
   ChangeDetectorRef,
   Component,
@@ -71,7 +67,7 @@ import { Inplace, InplaceModule } from 'primeng/inplace';
 import { IExamSheet } from 'app/entities/exam-sheet/exam-sheet.model';
 import { OrderList, OrderListModule } from 'primeng/orderlist';
 import { Title } from '@angular/platform-browser';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 import { PromisePool } from '@supercharge/promise-pool';
 import { FocusViewService } from '../../layouts/profiles/focusview.service';
 import { CommentSortPipe } from '../sortComment';
@@ -420,7 +416,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (this.questions !== undefined) {
           questions = [...this.questions];
         }
-        // eslint-disable-next-line no-constant-condition, @typescript-eslint/no-unnecessary-condition
+
         if (this.questionindex4shortcut !== questionindex4shortcut_prev) {
           this.currentGradedComment4Question = [];
           this.currentTextComment4Question = [];
@@ -486,7 +482,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.currentHybridGradedComment4Question?.forEach(com2 => ((com2() as any).checked = false));
         //        this.currentHybridGradedComment4Question?.forEach(com2 => ());
 
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (questions !== undefined && questions.length > 0) {
           this.noteSteps = questions[0].point! * questions[0].step!;
 
@@ -758,7 +753,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   editComment(l: any) {
     if (this.active.has(l.id!)) {
       this.active.get(l.id!)!.set(true);
@@ -1191,12 +1185,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   checked(comment: ITextComment | IGradedComment | IHybridGradedComment): boolean {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return (comment as any).checked;
   }
 
   getStyle(comment: ITextComment | IGradedComment | IHybridGradedComment): any {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     if ((comment as any).checked) {
       if (comment.description?.startsWith('correct')) {
         return { 'background-color': '#7EED92' };
@@ -1644,7 +1636,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   cleanCanvassCache() {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (this.eventHandler?.allcanvas !== undefined) {
       this.eventHandler.allcanvas.splice(0);
       this.eventHandler.selectedTool = DrawingTools.PENCIL;
@@ -2508,7 +2499,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     ctx?.putImageData(img, 0, 0);
     let exportImageType = 'image/webp';
     if (
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       this.preferenceService.getPreference().imageTypeExport !== undefined &&
       ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
     ) {
@@ -2746,7 +2736,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   changestepValue($event: any, comment: IHybridGradedComment): void {
     if ($event) {
       this.setStepValueHComment($event, comment);

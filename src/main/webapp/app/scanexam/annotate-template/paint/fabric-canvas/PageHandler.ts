@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/member-ordering */
 import * as fabric from 'fabric';
 import { TPointerEvent, TPointerEventInfo } from 'fabric';

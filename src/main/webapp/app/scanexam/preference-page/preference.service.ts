@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { Injectable } from '@angular/core';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { LocalStorageService } from 'ngx-webstorage';
@@ -214,7 +212,6 @@ export class PreferenceService {
     if (spref === null) {
       return null;
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return JSON.parse(spref, this.reviver);
     }
   }
@@ -227,7 +224,6 @@ export class PreferenceService {
     if (spref === null) {
       return new Map();
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return JSON.parse(spref, this.reviver);
     }
   }
@@ -273,7 +269,6 @@ export class PreferenceService {
     if (c === null) {
       return null;
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return JSON.parse(c, this.reviver);
     }
   }
@@ -282,7 +277,6 @@ export class PreferenceService {
     if (c === null) {
       return null;
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return JSON.parse(c, this.reviver);
     }
   }
@@ -291,7 +285,6 @@ export class PreferenceService {
     if (c === null) {
       return null;
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return JSON.parse(c, this.reviver);
     }
   }
@@ -301,7 +294,6 @@ export class PreferenceService {
     if (spref === null) {
       return new Map();
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return JSON.parse(spref, this.reviver);
     }
   }

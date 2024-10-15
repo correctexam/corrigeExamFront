@@ -43,7 +43,7 @@ export class ExamService {
 
   query(req?: any): Observable<EntityArrayResponseType> {
     const options = createRequestOption(req);
-    // eslint-disable-next-line no-console
+
     return this.http.get<IExam[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 

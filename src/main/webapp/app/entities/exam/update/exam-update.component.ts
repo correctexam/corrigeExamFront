@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/member-ordering */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+
 /* eslint-disable arrow-body-style */
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';

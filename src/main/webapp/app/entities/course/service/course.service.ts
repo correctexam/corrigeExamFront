@@ -39,7 +39,6 @@ export class CourseService {
   }
 
   delete(id: number): Observable<HttpResponse<any>> {
-    // eslint-disable-next-line no-console
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 

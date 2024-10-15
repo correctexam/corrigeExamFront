@@ -1,9 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-duplicate-type-constituents */
-/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable @typescript-eslint/member-ordering */
 import { TPointerEvent, FabricImage as fImage, FabricObject } from 'fabric';
@@ -68,7 +62,7 @@ export class EventHandlerService {
   private previousScaleY!: number;
   private _isMouseDown = false;
   private _selectedColour: DrawingColours = DrawingColours.BLACK;
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+
   private drawingToolObserver: (d: DrawingTools) => void = () => {};
   private confService!: ConfirmationService;
   private modelViewpping = new Map<string, number>();
@@ -202,7 +196,7 @@ export class EventHandlerService {
     }
     return new Promise<void>((resolve, reject) => {
       const img = new Image();
-      // eslint-disable-next-line @typescript-eslint/require-await
+
       img.onload = async () => {
         const f_img = new fImage(img);
         this.canvas.setWidth(f_img.width!);
@@ -548,7 +542,6 @@ export class EventHandlerService {
   }
 
   async eraseObjectI(object: FabricObject): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
     if (object.type === FabricObjectType.GROUP) {
       const custObj = object as CustomFabricGroup;
       for (const o of custObj.getObjects()) {
@@ -556,7 +549,6 @@ export class EventHandlerService {
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
     if (object.type === FabricObjectType.ELLIPSE) {
       const otherEllipses = this.getOtherEllipses((object as CustomFabricObject).id);
       otherEllipses.forEach(e => this.canvas.remove(e));
@@ -571,7 +563,6 @@ export class EventHandlerService {
    */
   private isAQuestion(object: FabricObject): boolean {
     return (
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
       object.type === FabricObjectType.GROUP &&
       (((object as CustomFabricGroup).getObjects()[1] as IText).text?.startsWith('Question') ?? false)
     );
@@ -751,7 +742,6 @@ export class EventHandlerService {
   }
 
   cleanCanvassCache(): void {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (this.allcanvas !== undefined) {
       //   this.selectedTool = DrawingTools.PENCIL;
       this.currentSelected = undefined;

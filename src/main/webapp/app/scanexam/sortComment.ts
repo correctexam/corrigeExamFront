@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { Pipe, PipeTransform, Signal } from '@angular/core';
 import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
 import { ITextComment } from 'app/entities/text-comment/text-comment.model';
@@ -24,7 +23,6 @@ export class CommentSortPipe implements PipeTransform {
     }
     const m = this.preferenceService.getCommentSort4Question(examId_qId);
     if (m.size > 0) {
-      // eslint-disable-next-line arrow-body-style
       const r = array.sort(
         (
           a: Signal<IHybridGradedComment> | Signal<ITextComment> | Signal<IGradedComment>,
