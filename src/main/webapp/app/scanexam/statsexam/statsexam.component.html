@@ -83,7 +83,7 @@
             [tooltipPosition]="'top'"
             id="knobquest{{ note.key }}"
           >
-            <h6>Question {{ note.key + 1 }}</h6>
+            <h6>Question {{ this.q_notees[note.key].numero }}</h6>
             <p-knob
               [ngModel]="this.knobsCourants.get(note.key)"
               [max]="getBaremes(this.q_notees)[note.key]"

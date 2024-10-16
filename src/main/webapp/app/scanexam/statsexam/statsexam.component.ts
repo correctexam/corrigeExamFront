@@ -281,7 +281,7 @@ export class StatsExamComponent implements OnInit {
       }
     }
     this.infosStudents
-      .filter(s => s.ine !== '')
+      //      .filter(s => s.ine !== '')
       .forEach(s => {
         if (s.abi > 0) {
           this.nbStdABI++;
@@ -289,7 +289,7 @@ export class StatsExamComponent implements OnInit {
           for (const key in s.notequestions) {
             // semi-column char instead of decimal dot, so:
             const note = this.s2f(s.notequestions[key]);
-            qn[parseFloat(key) - 1]?.notesAssociees?.push(note);
+            qn.find(q1 => q1.numero === +key)?.notesAssociees?.push(note);
           }
           const note = s.note === undefined ? 0 : this.s2f(s.note);
           this.studentsMarks.push(note);
