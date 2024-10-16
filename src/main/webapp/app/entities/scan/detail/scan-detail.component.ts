@@ -7,20 +7,26 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { AlertComponent } from '../../../shared/alert/alert.component';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
 import { TranslateDirective } from '../../../shared/language/translate.directive';
-import { NgIf } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
+import { ScriptService } from '../service/dan-service.service';
 
 @Component({
+  standalone: true,
   selector: 'jhi-scan-detail',
   templateUrl: './scan-detail.component.html',
-  standalone: true,
-  imports: [NgIf, TranslateDirective, AlertErrorComponent, AlertComponent, FaIconComponent, RouterLink],
+  imports: [CommonModule, NgIf, TranslateDirective, AlertErrorComponent, AlertComponent, FaIconComponent, RouterLink],
 })
 export class ScanDetailComponent implements OnInit {
   scan: IScan | null = null;
 
+  // Variables pour gérer la sortie et l'erreur du script
+  output: string = '';
+  error: string = '';
+
   constructor(
     protected dataUtils: DataUtils,
     protected activatedRoute: ActivatedRoute,
+    private scriptService: ScriptService, // Ajout du service ici
   ) {}
 
   ngOnInit(): void {
@@ -39,5 +45,19 @@ export class ScanDetailComponent implements OnInit {
 
   previousState(): void {
     window.history.back();
+  }
+
+  // Méthode pour exécuter le script
+  executeScript(): void {
+    this.scriptService.runScript().subscribe({
+      next: response => {
+        this.output = response.output; // Utilisez la sortie du script
+        this.error = ''; // Réinitialisation de l'erreur
+      },
+      error: err => {
+        this.output = ''; // Réinitialisation de la sortie
+        this.error = err.error || 'An error occurred'; // Récupération de l'erreur
+      },
+    });
   }
 }
