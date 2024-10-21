@@ -1452,22 +1452,23 @@
               </div>
             </div>
           </div>
-
-          <!-- J'ai ajouté ca mais il faudra ensuite faire un jhi translate je comprend pas trop ce que c'est -->
-          <dt><span> Clicker sur le button pour DAN</span></dt>
-          <dd>
-            <div>
-              <button (click)="executeScript()">Exécuter le script</button>
-              <div *ngIf="output">
-                <h2>Résultat :</h2>
-                <pre>{{ output }}</pre>
-              </div>
-              <div *ngIf="error">
-                <h2>Erreur :</h2>
-                <pre>{{ error }}</pre>
+          <div style="padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 0.8rem" class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
+            <div class="card">
+              <div class="card-body">
+                <dt>Clicker sur le button pour DAN</dt>
+                <a class="p-button p-button-primary" (click)="executeScript()">Ajouter et appliquer</a>
+                <div *ngIf="output">
+                  <h2>Résultat :</h2>
+                  <pre>{{ output }}</pre>
+                </div>
+                <div *ngIf="error">
+                  <h2>Erreur :</h2>
+                  <pre>{{ error }}</pre>
+                </div>
               </div>
             </div>
-          </dd>
+          </div>
+
           <style>
             .content-container {
               padding-left: 0.5rem !important;
