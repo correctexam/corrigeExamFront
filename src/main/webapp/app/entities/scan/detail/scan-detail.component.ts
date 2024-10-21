@@ -31,6 +31,7 @@ export class ScanDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ scan }) => {
+      console.log('Scan data:', scan); // Add this line to verify
       this.scan = scan;
     });
   }
@@ -49,7 +50,7 @@ export class ScanDetailComponent implements OnInit {
 
   // Méthode pour exécuter le script
   executeScript(): void {
-    this.scriptService.runScript().subscribe({
+    this.scriptService.runScript('').subscribe({
       next: response => {
         this.output = response.output; // Utilisez la sortie du script
         this.error = ''; // Réinitialisation de l'erreur

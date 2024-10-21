@@ -10,17 +10,13 @@ export class ScriptService {
 
   constructor(private http: HttpClient) {}
 
-  runScript(): Observable<any> {
-    return this.http.post(
-      this.apiUrl,
-      {},
-      {
-        // Envoi d'une requête vide
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json', // La réponse est en JSON
-      },
-    );
+  runScript(imageSrc: string): Observable<any> {
+    const body = { imagePath: imageSrc }; // Create a request body with the image path
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json', // Set the correct content type
+    });
+
+    // Make a POST request to the backend with the image path
+    return this.http.post(this.apiUrl, body, { headers, responseType: 'json' });
   }
 }

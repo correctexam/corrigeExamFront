@@ -101,6 +101,7 @@ import { TranslateDirective } from '../../shared/language/translate.directive';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { SwipeDirective } from '../swipe.directive';
+import { ScriptService } from 'app/entities/scan/service/dan-service.service';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -194,6 +195,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   showImageQCM = false;
   sortCommentVisible = false;
 
+  @ViewChildren('nomImage') canvass2!: QueryList<ElementRef<HTMLCanvasElement>>;
+
   @ViewChildren('nomImage')
   canvass!: QueryList<ElementRef>;
   showImage: boolean[] = [];
@@ -284,6 +287,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   queriesPool: Array<CommentAction> = [];
 
+  // Variables pour gérer la sortie et l'erreur du script
+  output: string = '';
+  error: string = '';
+  imagepath: string = 'I did not get it';
+
   constructor(
     public examService: ExamService,
     public courseService: CourseService,
@@ -311,6 +319,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     private titleService: Title,
     private ngZone: NgZone,
     private focusViewService: FocusViewService,
+    private scriptService: ScriptService, // Ajout du service ici
   ) {
     effect(() => {
       this.testdisableAndEnableKeyBoardShortCutSignal = this.testdisableAndEnableKeyBoardShortCut();
@@ -1997,6 +2006,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async getTemplateImage4Zone(zone: IZone): Promise<ImageZone> {
+    console.log('I am here getTemplateImage4Zone');
     const imageToCrop: IImageCropFromZoneInput = {
       examId: +this.examId!,
       factor: +this.factor,
@@ -2017,6 +2027,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async getStudentResponse4CurrentStudent(questionsId: number[], currentStudent: number): Promise<StudentResponse> {
+    console.log('I am here getStudentResponse4CurrentStudent');
     const _sheets = await firstValueFrom(
       this.sheetService.query({
         scanId: this.exam!.scanfileId,
@@ -2137,19 +2148,30 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async loadImage(file: any, page1: number): Promise<IPage> {
+    console.log('loadImage called with file:', file);
     return new Promise(resolve => {
       const i = new Image();
+
+      // Add debugging to check when the image is loaded
       i.onload = () => {
+        console.log('Image loaded with dimensions:', i.width, i.height); // Log image dimensions
+
         const editedImage: HTMLCanvasElement = <HTMLCanvasElement>document.createElement('canvas');
         editedImage.width = i.width;
         this.computeScale(i.width, i.height);
         editedImage.height = i.height;
         const ctx = editedImage.getContext('2d');
         ctx!.drawImage(i, 0, 0);
+
         const inputimage = ctx!.getImageData(0, 0, i.width, i.height);
+        console.log('ImageData extracted:', inputimage); // Log extracted image data
+
         resolve({ image: inputimage, page: page1, width: i.width, height: i.height });
       };
+
+      // Set the image source and log it
       i.src = file;
+      console.log('Image source set to:', i.src); // Debugging log for the image source
     });
   }
 
@@ -2813,5 +2835,46 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   cancelEvent(event: Event) {
     event.preventDefault();
+  }
+
+  // This method is to get the image
+  getImageFromCanvas(index: number): string | undefined {
+    const canvasArray = this.canvass2.toArray();
+    if (canvasArray && canvasArray[index]) {
+      const canvas = canvasArray[index].nativeElement;
+      const base64Data = canvas.toDataURL(); // Convert the canvas to a base64-encoded string
+      return base64Data;
+    } else {
+      console.error('Canvas not found or not yet available');
+      return undefined;
+    }
+  }
+
+  // Méthode pour exécuter le script
+  executeScript(): void {
+    // Assuming you need the first visible canvas, or provide logic to determine the correct index
+    if (this.activeIndex < 0) {
+      console.log('Active index wrong');
+    }
+    const index = this.activeIndex; // Update this logic as needed
+    const imageData = this.getImageFromCanvas(index);
+
+    if (!imageData) {
+      console.error('No image data found on the canvas');
+      this.error = 'No image selected';
+      return;
+    }
+    console.log('ImageData:', imageData);
+    console.log('Executing script with image data from canvas');
+    this.scriptService.runScript(imageData).subscribe({
+      next: response => {
+        this.output = response.output;
+        this.error = '';
+      },
+      error: err => {
+        this.output = '';
+        this.error = err.error || 'An error occurred';
+      },
+    });
   }
 }

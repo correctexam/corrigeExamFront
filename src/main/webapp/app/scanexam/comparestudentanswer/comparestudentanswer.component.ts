@@ -400,6 +400,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   }
 
   async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
+    console.log('I am here getAllImage4Zone');
     const imageToCrop: IImageCropFromZoneInput = {
       examId: +this.examId!,
       factor: +this.factor,
@@ -450,6 +451,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   }
 
   displayImage(v: ImageZone, imageRef: ElementRef<any> | undefined, show: (s: boolean) => void): void {
+    console.log('I am here displayImage');
     if (imageRef !== undefined) {
       imageRef!.nativeElement.width = v.w * this.scale;
       imageRef!.nativeElement.height = v.h * this.scale;

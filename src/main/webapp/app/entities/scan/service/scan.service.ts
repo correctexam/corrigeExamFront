@@ -22,6 +22,7 @@ export class ScanService {
   }
 
   create(scan: IScan): Observable<EntityResponseType> {
+    console.log('Scan data:', scan); // Add this line to verify
     return this.http.post<IScan>(this.resourceUrl, scan, { observe: 'response' });
   }
 
