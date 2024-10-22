@@ -536,6 +536,59 @@
             </button>
           </div>
         </div>
+        <div style="padding: 1rem" class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
+          <div class="card">
+            <div class="card-body" style="display: flex; flex-direction: column; align-items: center">
+              <div class="col-2 p-0" *ngIf="!focusView">
+                <button
+                  class="sm:text-xs md:text-xs lg:text-base"
+                  pButton
+                  [disabled]="!examId && blocked"
+                  (click)="executeScript()"
+                  jhiTranslate="scanexam.handwritingrecognition"
+                  [pTooltip]="'scanexam.rundanscript' | translate"
+                  [tooltipPosition]="'bottom'"
+                >
+                  Reconnaissance d'écriture
+                </button>
+                <p-progressSpinner *ngIf="blocked" styleClass="w-2rem h-2rem"></p-progressSpinner>
+              </div>
+
+              <div *ngIf="output" style="margin-top: 1rem; text-align: center">
+                <dd style="font-size: 1.1rem; font-weight: bold; margin: 0">Résultat :</dd>
+                <div
+                  [innerHTML]="output"
+                  style="
+                    font-size: 1rem;
+                    line-height: 1.5;
+                    margin-top: 0.5rem;
+                    padding: 0.5rem;
+                    background-color: #f9f9f9;
+                    border: 1px solid #ddd;
+                    border-radius: 5px;
+                  "
+                ></div>
+                <!-- Utilise innerHTML pour interpréter le HTML -->
+              </div>
+
+              <div *ngIf="error" style="margin-top: 1rem; text-align: center">
+                <dd style="font-size: 1.1rem; font-weight: bold; margin: 0">Erreur :</dd>
+                <pre
+                  style="
+                    font-size: 0.9rem;
+                    line-height: 1.5;
+                    margin-top: 0.5rem;
+                    background-color: #ffefef;
+                    border: 1px solid #f00;
+                    border-radius: 5px;
+                    padding: 0.5rem;
+                  "
+                  >{{ error }}</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
         <ng-container
           *ngIf="!focusView && this.resp?.correctedByInfo && this.resp?.correctedByInfo !== null && this.resp?.correctedByInfo?.length! > 0"
         >
@@ -1449,22 +1502,6 @@
                   [tooltipPosition]="'left'"
                 />
                 <a class="p-button p-button-primary" (click)="addComment()" jhiTranslate="scanexam.commentaddapply">Ajouter et appliquer</a>
-              </div>
-            </div>
-          </div>
-          <div style="padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 0.8rem" class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
-            <div class="card">
-              <div class="card-body">
-                <dt>Clicker sur le button pour DAN</dt>
-                <a class="p-button p-button-primary" (click)="executeScript()">Ajouter et appliquer</a>
-                <div *ngIf="output">
-                  <h2>Résultat :</h2>
-                  <p>{{ output }}</p>
-                </div>
-                <div *ngIf="error">
-                  <h2>Erreur :</h2>
-                  <pre>{{ error }}</pre>
-                </div>
               </div>
             </div>
           </div>
