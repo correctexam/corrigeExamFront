@@ -100,6 +100,10 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   public disableNumero: boolean | null = false;
   public disablePoint: boolean | null = false;
   public disableStep: boolean | null = false;
+  public disableCanExceed: boolean = false;
+  public disableMin0: boolean = false;
+  public disableIgnoreBareme: boolean = false;
+
   public forceEdit: boolean = false;
 
   public isSaving = false;
@@ -202,6 +206,9 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       examId: [],
       defaultpoint: [pref.defaultpoint],
       randomHorizontalCorrection: [false],
+      canBeNegative: [false],
+      canExceedTheMax: [false],
+      mustBeIgnoreInGlobalScale: [false],
     });
 
     this.questionTypeService.query().subscribe((res: HttpResponse<IQuestionType[]>) => {
@@ -220,6 +227,10 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       this.disableNumero = null;
       this.disablePoint = null;
       this.disableStep = null;
+      this.disableCanExceed = false;
+      this.disableMin0 = false;
+      this.disableIgnoreBareme = false;
+
       this.forceEdit = false;
 
       if (selectedQ === undefined) {
@@ -261,10 +272,17 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
         if (count.body! > 0 && !this.forceEdit) {
           this.disableGradeType = true;
           this.disableNumero = true;
+
           if (question.typeId !== this.qcmid) {
             this.disableStep = true;
+
             if (question.gradeType === GradeType.DIRECT) {
               this.disablePoint = true;
+            } else if (question.gradeType === GradeType.HYBRID) {
+              this.disablePoint = true;
+              this.disableCanExceed = true;
+              this.disableMin0 = true;
+              this.disableIgnoreBareme = true;
             } else {
               this.disablePoint = true;
             }
@@ -276,6 +294,9 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
           this.disableNumero = false;
           this.disableStep = false;
           this.disablePoint = false;
+          this.disableCanExceed = false;
+          this.disableMin0 = false;
+          this.disableIgnoreBareme = false;
         }
       });
     }
@@ -291,6 +312,9 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
         typeId: question.typeId,
         defaultpoint: question.defaultpoint,
         randomHorizontalCorrection: question.randomHorizontalCorrection,
+        canExceedTheMax: question.canExceedTheMax,
+        canBeNegative: question.canBeNegative,
+        mustBeIgnoreInGlobalScale: question.mustBeIgnoreInGlobalScale,
       },
       {
         emitEvent: false,
@@ -313,6 +337,9 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       q.typeId = this.editForm.get(['typeId'])!.value;
       q.defaultpoint = this.editForm.get(['defaultpoint'])?.value;
       q.randomHorizontalCorrection = this.editForm.get(['randomHorizontalCorrection'])?.value;
+      q.canExceedTheMax = this.editForm.get(['canExceedTheMax'])?.value;
+      q.canBeNegative = this.editForm.get(['canBeNegative'])?.value;
+      q.mustBeIgnoreInGlobalScale = this.editForm.get(['mustBeIgnoreInGlobalScale'])?.value;
     });
 
     // Saving the current preferences
@@ -406,6 +433,10 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
           this.questions[0].libelle = this.questions[1].libelle;
           this.questions[0].defaultpoint = this.questions[1].defaultpoint!;
           this.questions[0].randomHorizontalCorrection = this.questions[1].randomHorizontalCorrection!;
+          this.questions[0].canBeNegative = this.questions[1].canBeNegative!;
+          this.questions[0].canExceedTheMax = this.questions[1].canExceedTheMax!;
+          this.questions[0].mustBeIgnoreInGlobalScale = this.questions[1].mustBeIgnoreInGlobalScale!;
+
           return firstValueFrom(this.questionService.update(this.questions[0]));
         }
         return Promise.resolve(new HttpResponse<IQuestion>());
@@ -496,6 +527,9 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       this.disableNumero = false;
       this.disablePoint = false;
       this.disableStep = false;
+      this.disableCanExceed = false;
+      this.disableMin0 = false;
+      this.disableIgnoreBareme = false;
     } else {
       this.updateForm();
     }

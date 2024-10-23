@@ -27,6 +27,7 @@ export class SummaryTemplateComponent {
   public sumPoints(): number {
     return this.getSortedQuestions()
       .filter((q, i) => !this.isFollowingQuestion(i, q))
+      .filter(q => !q.mustBeIgnoreInGlobalScale)
       .map(q => q.point ?? 0)
       .reduce((a, b) => a + b, 0);
   }

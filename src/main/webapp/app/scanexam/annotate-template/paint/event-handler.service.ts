@@ -356,6 +356,9 @@ export class EventHandlerService {
         q.point = pref.point;
         q.step = pref.step;
         q.gradeType = pref.gradeType;
+        q.canBeNegative = false;
+        q.canExceedTheMax = false;
+        q.mustBeIgnoreInGlobalScale = false;
         this.questionService.create(q).subscribe(() => {
           this.selectedTool = DrawingTools.SELECT;
 
