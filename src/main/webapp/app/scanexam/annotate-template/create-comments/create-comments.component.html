@@ -165,10 +165,14 @@
                 </ng-template>
                 <ng-template pTemplate="content">
                   <p-selectButton
+                    [required]="true"
+                    [allowEmpty]="false"
+                    [unselectable]="false"
                     [options]="relativeOptions"
                     [(ngModel)]="comment.relative"
                     optionLabel="label"
                     optionValue="value"
+                    (onChange)="updateRelative($event, comment)"
                   ></p-selectButton>
                   <label class="form-label" jhiTranslate="scanexam.hybridcommentGrade" for="field_defaultpoint">Point par défault</label>
                   <p-knob
@@ -259,11 +263,15 @@
             >
 
             <p-selectButton
+              [required]="true"
+              [allowEmpty]="false"
+              [unselectable]="false"
               *ngIf="_q && _q?.gradeType === 'HYBRID'"
               [options]="relativeOptions"
               [(ngModel)]="relative"
               optionLabel="label"
               optionValue="value"
+              (onChange)="updateNewRelative($event)"
             ></p-selectButton>
             <label
               class="form-label"
