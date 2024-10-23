@@ -629,12 +629,18 @@ export class StatsExamComponent implements OnInit {
   }
 
   private radarStudent(etudiant: StudentRes): IRadarDataset {
-    return this.basicDataset(
-      this.translateService.instant('scanexam.notes'),
-      VIOLET,
-      VIOLET_LEGER,
-      Array.from(this.getNotes(etudiant).values()),
-    );
+    console.error(this.questionNumeros, this.getNotes(etudiant));
+    const notes: number[] = [];
+    const notesetu = this.getNotes(etudiant);
+    this.questionNumeros.forEach(n => {
+      if (notesetu.has(n - 1)) {
+        notes.push(notesetu.get(n - 1)!);
+      } else {
+        notes.push(0);
+      }
+    });
+
+    return this.basicDataset(this.translateService.instant('scanexam.notes'), VIOLET, VIOLET_LEGER, notes);
   }
 
   private basicDataset(label: string, couleurForte: string, couleurLegere: string, data: number[]): IRadarDataset {
