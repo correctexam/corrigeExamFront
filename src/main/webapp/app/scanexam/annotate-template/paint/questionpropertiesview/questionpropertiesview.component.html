@@ -232,8 +232,51 @@
           >
           </p-checkbox>
         </div>
+
+        <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value === hybrid" class="row">
+          <label class="form-label" jhiTranslate="scanexam.canexceedthemax" for="field_canexceedthemax"></label>
+
+          <p-inputSwitch
+            [disabled]="disableCanExceed"
+            formControlName="canExceedTheMax"
+            [pTooltip]="'scanexam.canexceedthemaxtooltip' | translate"
+            [tooltipPosition]="'right'"
+            (onChange)="contentChange()"
+          />
+        </div>
+        <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value === hybrid" class="row">
+          <label class="form-label" jhiTranslate="scanexam.canbenegative" for="field_canbenegative"></label>
+
+          <p-inputSwitch
+            [disabled]="disableMin0"
+            formControlName="canBeNegative"
+            [pTooltip]="'scanexam.canbenegativetooltip' | translate"
+            [tooltipPosition]="'right'"
+            (onChange)="contentChange()"
+          />
+        </div>
+
+        <div
+          *ngIf="
+            editForm.get(['typeId'])!.value !== qcmid &&
+            editForm.get(['gradeType'])!.value === hybrid &&
+            (editForm.get(['canBeNegative'])!.value || editForm.get(['canExceedTheMax'])!.value)
+          "
+          class="row"
+        >
+          <label class="form-label" jhiTranslate="scanexam.mustbeignoreinglobalscale" for="field_mustbeignoreinglobalscale"></label>
+
+          <p-inputSwitch
+            [disabled]="disableIgnoreBareme"
+            formControlName="mustBeIgnoreInGlobalScale"
+            [pTooltip]="'scanexam.mustbeignoreinglobalscaletooltip' | translate"
+            [tooltipPosition]="'right'"
+            (onChange)="contentChange()"
+          />
+        </div>
       </div>
     </form>
+
     <div *ngIf="disableGradeType" class="row">
       <label class="form-label" jhiTranslate="scanexam.forceedit" for="field_forceedit"></label>
 

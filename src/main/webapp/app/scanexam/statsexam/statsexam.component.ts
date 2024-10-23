@@ -437,7 +437,10 @@ export class StatsExamComponent implements OnInit {
   }
 
   public getBaremeExam(): number {
-    return this.sum([...this.baremes.values()]);
+    const numeros = [...new Set(this.infosQuestions.map(e => e.numero))];
+    const qs: IQuestion[] = [];
+    numeros.forEach(n => qs.push(this.infosQuestions.find(ind => n === ind.numero)!));
+    return this.sum(qs.filter(q => !q.mustBeIgnoreInGlobalScale).map(q => q.point ?? 0));
   }
 
   private getNotes(etudiant: StudentRes): Map<number, number> {
@@ -594,7 +597,7 @@ export class StatsExamComponent implements OnInit {
   }
 
   private radarMoy(): IRadarDataset {
-    return this.basicDataset(this.translateService.instant('scanexam.avergetMoyeage'), BLEU_AERO, TRANSPARENT, [
+    return this.basicDataset(this.translateService.instant('scanexam.average'), BLEU_AERO, TRANSPARENT, [
       ...this.getMoyennesQuestions().values(),
     ]);
   }

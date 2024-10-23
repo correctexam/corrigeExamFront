@@ -503,6 +503,12 @@
     "gotonextstudent": "En correction verticale, permet de basculer à la première question pour la prochaine copie (étudiant)",
     "gotopreviousquestion": "En correction horizontale, permet de basculer à la dernière copie pour la question précédente",
     "gotopreviousstudent": "En correction verticale, permet de basculer à la dernière question pour la copie précédente (étudiant)",
-    "startcorrect": "Débuter"
+    "startcorrect": "Débuter",
+    "canbenegative": "Autorise une note négative pour cette question",
+    "canbenegativetooltip": "Si l'ensemble des commentaires sélectionnés amène à une note inférieure à zéro, cette question peut baisser la note globale de l'examen pour cette copie",
+    "mustbeignoreinglobalscale": "Ignorer cette question dans le barème global",
+    "mustbeignoreinglobalscaletooltip": "Cela permet d'ignorer le nombre de points de cette question pour le barème global. Par exemple, on crée une question permettant de gérer les absences en cours, cette question sur 3 points permet de retirer jusqu'à trois points à la copie, mais le barème reste sur 20 par exemple)",
+    "canexceedthemaxtooltip": "Si l'ensemble des commentaires  sélectionnés amène à une note supérieure à la note maximale de cette question, cette question peut augmenter la note globale de l'examen pour cette copie",
+    "canexceedthemax": "Autorise une note supérieure au barème de cette question"
   }
 }

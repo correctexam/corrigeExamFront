@@ -21,6 +21,9 @@ export interface IQuestion {
   examId?: number;
   zoneDTO?: Zone;
   randomHorizontalCorrection?: boolean;
+  canExceedTheMax?: boolean;
+  canBeNegative?: boolean;
+  mustBeIgnoreInGlobalScale?: boolean;
 }
 
 export interface IQuestionMark {
@@ -45,6 +48,9 @@ export class Question implements IQuestion {
     public examId?: number,
     public zoneDTO?: Zone,
     public randomHorizontalCorrection?: boolean,
+    public canExceedTheMax?: boolean,
+    public canBeNegative?: boolean,
+    public mustBeIgnoreInGlobalScale?: boolean,
   ) {}
 }
 export function getQuestionIdentifier(question: IQuestion): number | undefined {

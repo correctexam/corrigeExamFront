@@ -344,6 +344,10 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
               q.point = pref.point;
               q.step = pref.step;
               q.gradeType = pref.gradeType;
+              q.canBeNegative = false;
+              q.canExceedTheMax = false;
+              q.mustBeIgnoreInGlobalScale = false;
+
               if (subq.t === 'qcm') {
                 q.typeId = 3;
               }
