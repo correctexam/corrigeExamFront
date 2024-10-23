@@ -516,7 +516,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       this.editForm.controls['validExpression'].updateValueAndValidity();
     } else {
       this.editForm.controls['validExpression'].setValidators(null);
-      this.editForm.controls['valchangeCanBeNegativeidExpression'].updateValueAndValidity();
+      this.editForm.controls['validExpression'].updateValueAndValidity();
     }
   }
 
