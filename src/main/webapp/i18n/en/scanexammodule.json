@@ -506,5 +506,7 @@
     "mustbeignoreinglobalscaletooltip": "This allows the points awarded for this question to be ignored for the overall scale. For example, if you create a question to manage absences from class, this 3-point question can be used to deduct up to three points from the copy, but the grade remains 20, for example.)",
     "canexceedthemaxtooltip": "If all the comments selected lead to a mark higher than the maximum score for this question, this question may increase the overall exam score for this exam sheet.",
     "canexceedthemax": "Permits a mark above the scale for this question"
+    "rundanscript": "Run DAN handwriting recognition script",
+    "handwritingrecognition": "Handwriting recognition"
   }
 }

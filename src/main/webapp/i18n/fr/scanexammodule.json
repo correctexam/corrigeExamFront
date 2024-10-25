@@ -510,5 +510,7 @@
     "mustbeignoreinglobalscaletooltip": "Cela permet d'ignorer le nombre de points de cette question pour le barème global. Par exemple, on crée une question permettant de gérer les absences en cours, cette question sur 3 points permet de retirer jusqu'à trois points à la copie, mais le barème reste sur 20 par exemple)",
     "canexceedthemaxtooltip": "Si l'ensemble des commentaires  sélectionnés amène à une note supérieure à la note maximale de cette question, cette question peut augmenter la note globale de l'examen pour cette copie",
     "canexceedthemax": "Autorise une note supérieure au barème de cette question"
+    "rundanscript": "Lancer le script de reconnaissance d'écriture DAN",
+    "handwritingrecognition": "Reconnaissance d'écriture"
   }
 }
