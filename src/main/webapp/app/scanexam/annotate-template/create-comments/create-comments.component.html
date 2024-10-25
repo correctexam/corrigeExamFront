@@ -165,10 +165,14 @@
                 </ng-template>
                 <ng-template pTemplate="content">
                   <p-selectButton
+                    [required]="true"
+                    [allowEmpty]="false"
+                    [unselectable]="false"
                     [options]="relativeOptions"
                     [(ngModel)]="comment.relative"
                     optionLabel="label"
                     optionValue="value"
+                    (onChange)="updateRelative($event, comment)"
                   ></p-selectButton>
                   <label class="form-label" jhiTranslate="scanexam.hybridcommentGrade" for="field_defaultpoint">Point par défault</label>
                   <p-knob
@@ -219,8 +223,8 @@
                     [step]="1"
                     [min]="1"
                     [max]="12"
-                    [(ngModel)]="comment.step"
-                    (change)="updateComment($event, comment, true, true)"
+                    [ngModel]="comment.step"
+                    (change)="updateCommentStep($event, comment, true, true)"
                     [pTooltip]="'scanexam.hybridcommentStepTooltip' | translate"
                     [tooltipPosition]="'left'"
                   />
@@ -259,11 +263,15 @@
             >
 
             <p-selectButton
+              [required]="true"
+              [allowEmpty]="false"
+              [unselectable]="false"
               *ngIf="_q && _q?.gradeType === 'HYBRID'"
               [options]="relativeOptions"
               [(ngModel)]="relative"
               optionLabel="label"
               optionValue="value"
+              (onChange)="updateNewRelative($event)"
             ></p-selectButton>
             <label
               class="form-label"
@@ -313,7 +321,7 @@
               [min]="1"
               [max]="12"
               (change)="cancelEvent($event)"
-              [(ngModel)]="step"
+              [ngModel]="step"
               [pTooltip]="'scanexam.hybridcommentStepTooltip' | translate"
               [tooltipPosition]="'left'"
             />

@@ -1462,9 +1462,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           }
         });
         currentNote = (currentQ.point! * pourcentage) / 100.0 + absoluteNote2Add;
-        if (currentNote > currentQ.point!) {
+        if (currentNote > currentQ.point! && !currentQ.canExceedTheMax) {
           currentNote = currentQ.point!;
-        } else if (currentNote < 0) {
+        } else if (currentNote < 0 && !currentQ.canBeNegative) {
           currentNote = 0;
         }
         if (resp) {
@@ -2175,6 +2175,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       console.log('Image source set to:', i.src); // Debugging log for the image source
     });
   }
+  updateCommentStep(event: any, l: IHybridGradedComment, graded: boolean, hybrid: boolean): any {
+    l.step = +event.target.value;
+    this.updateComment(event, l, graded, hybrid);
+  }
 
   updateComment(event: any, l: IGradedComment | ITextComment | IHybridGradedComment, graded: boolean, hybrid: boolean): any {
     if (event !== undefined && event.preventDefault) {
@@ -2834,7 +2838,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  cancelEvent(event: Event) {
+  cancelEvent(event: any) {
+    this.step = +event.target.value;
     event.preventDefault();
   }
 

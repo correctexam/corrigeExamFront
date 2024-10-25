@@ -194,6 +194,37 @@ export class CreateCommentsComponent implements OnInit {
     }
   }
 
+  updateNewRelative($event: any): void {
+    if ($event.value) {
+      this.grade = (this.grade! * 100) / this.question!.point!;
+    } else {
+      this.grade = (this.question!.point! * this.grade!) / 100;
+    }
+  }
+
+  updateRelative($event: any, l: IHybridGradedComment): void {
+    if ($event.value) {
+      l.grade = (l.grade! * 100) / this.question!.point!;
+    } else {
+      l.grade = (this.question!.point! * l.grade!) / 100;
+    }
+
+    this.hybridGradedCommentService.update(l).subscribe(() => {
+      this.updateHybridGradedComment.emit(l);
+      const coms = this.currentHybridGradedComment4Question?.filter(c => c.id === l.id!);
+      if (coms !== undefined && coms.length > 0) {
+        coms[0].grade = l.grade;
+        coms[0].step = l.step;
+        coms[0].relative = l.relative;
+      }
+    });
+  }
+
+  updateCommentStep($event: any, l: IHybridGradedComment, graded: boolean, hybrid: boolean): any {
+    l.step = +$event.target.value;
+    this.updateComment($event, l, graded, hybrid);
+  }
+
   updateComment($event: any, l: IGradedComment | ITextComment | IHybridGradedComment, graded: boolean, hybrid: boolean): any {
     if (graded && !hybrid) {
       if ((l as IGradedComment).grade === null) {
@@ -358,6 +389,7 @@ export class CreateCommentsComponent implements OnInit {
   }
 
   cancelEvent(event: any): void {
+    this.step = +event.target.value;
     if (event?.preventDefault) {
       event.preventDefault();
     }

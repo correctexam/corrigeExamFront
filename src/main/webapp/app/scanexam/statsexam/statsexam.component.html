@@ -86,7 +86,7 @@
             <h6>Question {{ note.key + 1 }}</h6>
             <p-knob
               [ngModel]="this.knobsCourants.get(note.key)"
-              [max]="getBaremes(this.q_notees)[note.key]"
+              [max]="baremes.get(note.key)"
               [size]="70"
               [readonly]="true"
               valueColor="{{ COLOR_KNOBS }}"
@@ -226,8 +226,8 @@
         <div *ngIf="etudiantSelec !== null && etudiantSelec !== undefined" class="progbar">
           <div class="avancement-progbar" [ngStyle]="{ width: ((this.getNoteSelect() * 100) / this.getBaremeExam()).toString() + '%' }">
             <div class="progbar-grade">
-              <b>{{ this.getNoteSelect() }}</b
-              >/{{ this.getBaremeExam() }}
+              <b>{{ getNoteSelect() }}</b
+              >/{{ getBaremeExam() }}
             </div>
           </div>
         </div>
