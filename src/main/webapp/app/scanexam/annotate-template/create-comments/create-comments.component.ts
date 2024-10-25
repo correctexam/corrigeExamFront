@@ -389,7 +389,6 @@ export class CreateCommentsComponent implements OnInit {
   }
 
   cancelEvent(event: any): void {
-    console.error(event);
     this.step = +event.target.value;
     if (event?.preventDefault) {
       event.preventDefault();

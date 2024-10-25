@@ -521,7 +521,6 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   }
 
   changeForceEdit(): void {
-    console.error(this.forceEdit);
     if (this.forceEdit) {
       this.disableGradeType = false;
       this.disableNumero = false;
