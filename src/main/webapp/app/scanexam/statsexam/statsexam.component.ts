@@ -97,6 +97,7 @@ export class StatsExamComponent implements OnInit {
   ];
   protected mobileSortChoice: ISortMobile = this.mobileSortChoices[2];
   protected knobsCourants: Map<number, string> = new Map();
+  protected baremes: Map<number, number> = new Map();
   protected COLOR_KNOBS = BLEU_AERO_TIEDE;
   protected idQuestionSelected = 0;
   protected questionSelectionnee = false;
@@ -281,7 +282,7 @@ export class StatsExamComponent implements OnInit {
       }
     }
     this.infosStudents
-      .filter(s => s.ine !== '')
+      //      .filter(s => s.ine !== '')
       .forEach(s => {
         if (s.abi > 0) {
           this.nbStdABI++;
@@ -289,7 +290,7 @@ export class StatsExamComponent implements OnInit {
           for (const key in s.notequestions) {
             // semi-column char instead of decimal dot, so:
             const note = this.s2f(s.notequestions[key]);
-            qn[parseFloat(key) - 1]?.notesAssociees?.push(note);
+            qn.find(q1 => q1.numero === +key)?.notesAssociees?.push(note);
           }
           const note = s.note === undefined ? 0 : this.s2f(s.note);
           this.studentsMarks.push(note);
@@ -426,12 +427,20 @@ export class StatsExamComponent implements OnInit {
   }
 
   /** @return The notation for each question */
-  public getBaremes(stats: ReadonlyArray<QuestionNotee>): number[] {
-    return stats.map(s => s.bareme);
+  public updateBaremes(stats: ReadonlyArray<QuestionNotee>): Map<number, number> {
+    const notes: Map<number, number> = new Map();
+    for (const t of stats) {
+      notes.set(t.numero - 1, t.bareme);
+    }
+    this.baremes = notes;
+    return this.baremes; // stats.map(s => s.bareme);
   }
 
   public getBaremeExam(): number {
-    return this.sum(this.getBaremes(this.q_notees));
+    const numeros = [...new Set(this.infosQuestions.map(e => e.numero))];
+    const qs: IQuestion[] = [];
+    numeros.forEach(n => qs.push(this.infosQuestions.find(ind => n === ind.numero)!));
+    return this.sum(qs.filter(q => !q.mustBeIgnoreInGlobalScale).map(q => q.point ?? 0));
   }
 
   private getNotes(etudiant: StudentRes): Map<number, number> {
@@ -450,12 +459,19 @@ export class StatsExamComponent implements OnInit {
   }
 
   public getNoteSelect(): number {
-    return this.sum(Array.from(this.getNotesSelect().values()));
+    return +this.sum(Array.from(this.getNotesSelect().values())).toFixed(2);
   }
 
   /** @return Average mark for all the questions (ordered) */
-  private getMoyennesQuestions(): number[] {
-    return this.q_notees.map(ns => this.mean(ns.notesAssociees));
+  private getMoyennesQuestions(): Map<number, number> {
+    const notes: Map<number, number> = new Map();
+
+    for (const key of this.q_notees) {
+      notes.set(key.numero - 1, this.s2f('' + this.mean(key.notesAssociees)));
+    }
+    return notes;
+
+    //    return this.q_notees.map(ns => this.mean(ns.notesAssociees));
   }
 
   private updateKnobs(): void {
@@ -555,12 +571,13 @@ export class StatsExamComponent implements OnInit {
 
   /** Initialises radar data to display **/
   private initGlobalRadarData(stats: ReadonlyArray<QuestionNotee>, pourcents = false): IRadar {
+    this.updateBaremes(stats);
     const labels = stats.map(e => e.label);
     const datasets = [this.radarMoy(), this.radarMed(), this.radarMaxNote(), this.radarMinNote()];
 
     if (pourcents) {
       datasets.forEach((ds, indice) => {
-        datasets[indice].data = this.normaliseNotes(ds.data, this.getBaremes(stats));
+        datasets[indice].data = this.normaliseNotes(ds.data, [...this.baremes.values()]);
       });
     }
     const vue = pourcents ? this.translateService.instant('scanexam.pourcents') : this.translateService.instant('scanexam.brut');
@@ -572,7 +589,7 @@ export class StatsExamComponent implements OnInit {
     const datasets = [this.radarStudent(etudiant), this.radarMoy(), this.radarMed()];
     if (pourcents) {
       datasets.forEach((ds, indice) => {
-        datasets[indice].data = this.normaliseNotes(ds.data, this.getBaremes(this.q_notees));
+        datasets[indice].data = this.normaliseNotes(ds.data, [...this.baremes.values()]);
       });
     }
     const vue = pourcents ? this.translateService.instant('scanexam.pourcents') : this.translateService.instant('scanexam.brut');
@@ -580,7 +597,9 @@ export class StatsExamComponent implements OnInit {
   }
 
   private radarMoy(): IRadarDataset {
-    return this.basicDataset(this.translateService.instant('scanexam.average'), BLEU_AERO, TRANSPARENT, this.getMoyennesQuestions());
+    return this.basicDataset(this.translateService.instant('scanexam.average'), BLEU_AERO, TRANSPARENT, [
+      ...this.getMoyennesQuestions().values(),
+    ]);
   }
 
   private radarMed(): IRadarDataset {
@@ -610,12 +629,17 @@ export class StatsExamComponent implements OnInit {
   }
 
   private radarStudent(etudiant: StudentRes): IRadarDataset {
-    return this.basicDataset(
-      this.translateService.instant('scanexam.notes'),
-      VIOLET,
-      VIOLET_LEGER,
-      Array.from(this.getNotes(etudiant).values()),
-    );
+    const notes: number[] = [];
+    const notesetu = this.getNotes(etudiant);
+    this.questionNumeros.forEach(n => {
+      if (notesetu.has(n - 1)) {
+        notes.push(notesetu.get(n - 1)!);
+      } else {
+        notes.push(0);
+      }
+    });
+
+    return this.basicDataset(this.translateService.instant('scanexam.notes'), VIOLET, VIOLET_LEGER, notes);
   }
 
   private basicDataset(label: string, couleurForte: string, couleurLegere: string, data: number[]): IRadarDataset {

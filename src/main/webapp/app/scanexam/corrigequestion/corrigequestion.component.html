@@ -553,11 +553,12 @@
                 </button>
                 <p-progressSpinner *ngIf="blocked" styleClass="w-2rem h-2rem"></p-progressSpinner>
               </div>
+             
 
-              <div *ngIf="output" style="margin-top: 1rem; text-align: center">
+              <div *ngIf="predictions[questionindex]" style="margin-top: 1rem; text-align: center">
                 <dd style="font-size: 1.1rem; font-weight: bold; margin: 0">Résultat :</dd>
                 <div
-                  [innerHTML]="output"
+                  [innerHTML]="predictions[questionindex]"
                   style="
                     font-size: 1rem;
                     line-height: 1.5;
@@ -786,7 +787,7 @@
                   [tooltipZIndex]="'3000'"
                   [pTooltip]="'scanexam.minimizeComment' | translate"
                   (click)="toggleCommentLayout()"
-                >
+                >enables
                   <fa-icon *ngIf="!minimizeComment" icon="minus"></fa-icon>
                   <fa-icon *ngIf="minimizeComment" icon="maximize"></fa-icon>
                 </span>
@@ -1294,8 +1295,8 @@
                           [step]="1"
                           [min]="1"
                           [max]="12"
-                          [(ngModel)]="comment.step"
-                          (change)="updateComment($event, comment, true, true)"
+                          [ngModel]="comment.step"
+                          (change)="updateCommentStep($event, comment, true, true)"
                           [pTooltip]="'scanexam.hybridcommentStepTooltip' | translate"
                           [tooltipPosition]="'left'"
                         />
@@ -1376,7 +1377,7 @@
                           *ngIf="comment?.step !== undefined && comment?.step !== null && comment.step! > 1"
                           [stars]="comment.step!"
                           [cancel]="false"
-                          [disabled]="blocked"
+                          [disabled]="blocked"enables
                           (ngModelChange)="changestepValue($event, comment)"
                           [ngModel]="answer2HybridGradedCommentMap.get(comment.id)"
                         ></p-rating>
@@ -1497,7 +1498,7 @@
                   [min]="1"
                   [max]="12"
                   (change)="cancelEvent($event)"
-                  [(ngModel)]="step"
+                  [ngModel]="step"
                   [pTooltip]="'scanexam.hybridcommentStepTooltip' | translate"
                   [tooltipPosition]="'left'"
                 />

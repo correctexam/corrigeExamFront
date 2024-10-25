@@ -100,6 +100,9 @@ describe('QuestionpropertiesviewComponent', () => {
       typeId: 2,
       defaultpoint: undefined,
       randomHorizontalCorrection: false,
+      canBeNegative: false,
+      canExceedTheMax: false,
+      mustBeIgnoreInGlobalScale: false,
     }));
     mockPrefService.savePref4Question = jest.fn();
 
@@ -145,6 +148,9 @@ describe('QuestionpropertiesviewComponent', () => {
         zoneId: 100,
         defaultpoint: undefined,
         randomHorizontalCorrection: false,
+        canBeNegative: false,
+        canExceedTheMax: false,
+        mustBeIgnoreInGlobalScale: false,
       };
 
       otherQ = {
@@ -160,6 +166,9 @@ describe('QuestionpropertiesviewComponent', () => {
         zoneId: 1002,
         defaultpoint: undefined,
         randomHorizontalCorrection: false,
+        canBeNegative: false,
+        canExceedTheMax: false,
+        mustBeIgnoreInGlobalScale: false,
       };
 
       jest.spyOn(component.editForm, 'patchValue');
@@ -184,6 +193,9 @@ describe('QuestionpropertiesviewComponent', () => {
           gradeType: selectedQ.gradeType,
           typeId: selectedQ.typeId,
           randomHorizontalCorrection: false,
+          canBeNegative: false,
+          canExceedTheMax: false,
+          mustBeIgnoreInGlobalScale: false,
         },
         { emitEvent: false },
       );
@@ -252,6 +264,9 @@ describe('QuestionpropertiesviewComponent', () => {
           zoneId: 1001,
           typeId: 2,
           randomHorizontalCorrection: false,
+          canBeNegative: false,
+          canExceedTheMax: false,
+          mustBeIgnoreInGlobalScale: false,
         },
         {
           id: 12,
@@ -265,6 +280,9 @@ describe('QuestionpropertiesviewComponent', () => {
           zoneId: 1002,
           typeId: 2,
           randomHorizontalCorrection: false,
+          canBeNegative: false,
+          canExceedTheMax: false,
+          mustBeIgnoreInGlobalScale: false,
         },
       ];
 
@@ -289,6 +307,9 @@ describe('QuestionpropertiesviewComponent', () => {
           gradeType: qs[0].gradeType,
           typeId: qs[0].typeId,
           randomHorizontalCorrection: false,
+          canBeNegative: false,
+          canExceedTheMax: false,
+          mustBeIgnoreInGlobalScale: false,
         },
         { emitEvent: false },
       );

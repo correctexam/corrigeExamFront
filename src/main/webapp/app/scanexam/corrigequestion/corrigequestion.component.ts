@@ -291,6 +291,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   output: string = '';
   error: string = '';
   imagepath: string = 'I did not get it';
+  predictions: { [key: number]: string } = {}; // Object to store predictions for each page
 
   constructor(
     public examService: ExamService,
@@ -1461,9 +1462,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           }
         });
         currentNote = (currentQ.point! * pourcentage) / 100.0 + absoluteNote2Add;
-        if (currentNote > currentQ.point!) {
+        if (currentNote > currentQ.point! && !currentQ.canExceedTheMax) {
           currentNote = currentQ.point!;
-        } else if (currentNote < 0) {
+        } else if (currentNote < 0 && !currentQ.canBeNegative) {
           currentNote = 0;
         }
         if (resp) {
@@ -2174,6 +2175,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       console.log('Image source set to:', i.src); // Debugging log for the image source
     });
   }
+  updateCommentStep(event: any, l: IHybridGradedComment, graded: boolean, hybrid: boolean): any {
+    l.step = +event.target.value;
+    this.updateComment(event, l, graded, hybrid);
+  }
 
   updateComment(event: any, l: IGradedComment | ITextComment | IHybridGradedComment, graded: boolean, hybrid: boolean): any {
     if (event !== undefined && event.preventDefault) {
@@ -2833,15 +2838,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  cancelEvent(event: Event) {
+  cancelEvent(event: any) {
+    this.step = +event.target.value;
     event.preventDefault();
   }
 
   // This method is to get the image
-  getImageFromCanvas(index: number): string | undefined {
+  getImageFromCanvas(): string | undefined {
     const canvasArray = this.canvass2.toArray();
-    if (canvasArray && canvasArray[index]) {
-      const canvas = canvasArray[index].nativeElement;
+    if (canvasArray && canvasArray[0]) {
+      const canvas = canvasArray[0].nativeElement;
       const base64Data = canvas.toDataURL(); // Convert the canvas to a base64-encoded string
       return base64Data;
     } else {
@@ -2852,12 +2858,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   // Méthode pour exécuter le script
   executeScript(): void {
-    // Assuming you need the first visible canvas, or provide logic to determine the correct index
-    if (this.activeIndex < 0) {
-      console.log('Active index wrong');
-    }
-    const index = this.activeIndex; // Update this logic as needed
-    const imageData = this.getImageFromCanvas(index);
+    const imageData = this.getImageFromCanvas();
 
     if (!imageData) {
       console.error('No image data found on the canvas');
@@ -2866,8 +2867,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
     console.log('ImageData:', imageData);
     console.log('Executing script with image data from canvas');
+    console.log('Index:', this.questionindex);
     this.scriptService.runScript(imageData).subscribe({
       next: response => {
+        const currentPageIndex = this.questionindex;
+        this.predictions[currentPageIndex] = response.output;
         this.output = response.output;
         this.error = '';
       },

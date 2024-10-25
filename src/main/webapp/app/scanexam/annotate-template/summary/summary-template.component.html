@@ -8,7 +8,8 @@
     <div *ngIf="isFollowingQuestion(i, q); then follow; else nofollow"></div>
     <ng-template #follow>( <span jhiTranslate="scanexam.suite"></span> )</ng-template>
     <ng-template #nofollow
-      >- {{ q.point }} <span jhiTranslate="scanexam.pointincr">points, incr. de </span>{{ 1 / (q.step ?? 1) }}</ng-template
+      >- {{ q.point }} <span jhiTranslate="scanexam.pointincr">points, incr. de </span>{{ 1 / (q.step ?? 1) }}
+      <span *ngIf="q.mustBeIgnoreInGlobalScale"> (ignore)</span></ng-template
     >
   </div>
   <br />
