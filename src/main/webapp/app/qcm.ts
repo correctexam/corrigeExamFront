@@ -553,7 +553,7 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
 
   const score1 = scoreKmean(km, diffs);
   const score2 = scoreKmean(kmAdaptative, diffsAdaptative);
-  console.error('score kmean', score1, score2);
+  //  console.error('score kmean', score1, score2);
   const maxScore = score1 > score2 ? score1 : score2;
   for (const [k, case1] of casesExamTemplate.cases.entries()) {
     const r = infos_cases.get(k);

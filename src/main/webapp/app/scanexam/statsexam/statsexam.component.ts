@@ -629,7 +629,6 @@ export class StatsExamComponent implements OnInit {
   }
 
   private radarStudent(etudiant: StudentRes): IRadarDataset {
-    console.error(this.questionNumeros, this.getNotes(etudiant));
     const notes: number[] = [];
     const notesetu = this.getNotes(etudiant);
     this.questionNumeros.forEach(n => {

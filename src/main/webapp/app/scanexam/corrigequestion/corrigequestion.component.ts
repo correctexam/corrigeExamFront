@@ -2152,6 +2152,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       i.src = file;
     });
   }
+  updateCommentStep(event: any, l: IHybridGradedComment, graded: boolean, hybrid: boolean): any {
+    l.step = +event.target.value;
+    this.updateComment(event, l, graded, hybrid);
+  }
 
   updateComment(event: any, l: IGradedComment | ITextComment | IHybridGradedComment, graded: boolean, hybrid: boolean): any {
     if (event !== undefined && event.preventDefault) {
@@ -2811,7 +2815,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  cancelEvent(event: Event) {
+  cancelEvent(event: any) {
+    this.step = +event.target.value;
     event.preventDefault();
   }
 }

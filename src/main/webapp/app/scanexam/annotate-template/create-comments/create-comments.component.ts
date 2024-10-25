@@ -220,6 +220,11 @@ export class CreateCommentsComponent implements OnInit {
     });
   }
 
+  updateCommentStep($event: any, l: IHybridGradedComment, graded: boolean, hybrid: boolean): any {
+    l.step = +$event.target.value;
+    this.updateComment($event, l, graded, hybrid);
+  }
+
   updateComment($event: any, l: IGradedComment | ITextComment | IHybridGradedComment, graded: boolean, hybrid: boolean): any {
     if (graded && !hybrid) {
       if ((l as IGradedComment).grade === null) {
@@ -384,6 +389,7 @@ export class CreateCommentsComponent implements OnInit {
   }
 
   cancelEvent(event: any): void {
+    this.step = +event.target.value;
     if (event?.preventDefault) {
       event.preventDefault();
     }
