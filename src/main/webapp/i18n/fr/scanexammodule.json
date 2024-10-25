@@ -503,6 +503,8 @@
     "gotonextstudent": "En correction verticale, permet de basculer à la première question pour la prochaine copie (étudiant)",
     "gotopreviousquestion": "En correction horizontale, permet de basculer à la dernière copie pour la question précédente",
     "gotopreviousstudent": "En correction verticale, permet de basculer à la dernière question pour la copie précédente (étudiant)",
-    "startcorrect": "Débuter"
+    "startcorrect": "Débuter",
+    "rundanscript": "Lancer le script de reconnaissance d'écriture DAN",
+    "handwritingrecognition": "Reconnaissance d'écriture"
   }
 }

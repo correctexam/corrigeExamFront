@@ -499,6 +499,8 @@
     "gotonextstudent": "In vertical correction, switches to the first question for the next exam sheet (student)",
     "gotopreviousquestion": "In horizontal correction, switches to the last exam sheet for the previous question",
     "gotopreviousstudent": "In vertical correction, switches to the last question for the previous exam sheet (student)",
-    "startcorrect": "Let's go"
+    "startcorrect": "Let's go",
+    "rundanscript": "Run DAN handwriting recognition script",
+    "handwritingrecognition": "Handwriting recognition"
   }
 }
