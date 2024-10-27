@@ -2819,4 +2819,20 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.step = +event.target.value;
     event.preventDefault();
   }
+
+  updateNewRelative($event: any): void {
+    if ($event.value) {
+      this.grade = (this.grade! * 100) / this.currentQuestion!.point!;
+    } else {
+      this.grade = (this.currentQuestion!.point! * this.grade!) / 100;
+    }
+  }
+
+  updateRelative($event: any, l: IHybridGradedComment): void {
+    if ($event.value) {
+      l.grade = (l.grade! * 100) / this.currentQuestion!.point!;
+    } else {
+      l.grade = (this.currentQuestion!.point! * l.grade!) / 100;
+    }
+  }
 }

@@ -1185,6 +1185,10 @@
                           [(ngModel)]="comment.relative"
                           optionLabel="label"
                           optionValue="value"
+                          (onChange)="updateRelative($event, comment)"
+                          [required]="true"
+                          [allowEmpty]="false"
+                          [unselectable]="false"
                         ></p-selectButton>
                         <label class="form-label" jhiTranslate="scanexam.hybridcommentGrade" for="field_defaultpoint"
                           >Point par défault</label
@@ -1391,6 +1395,10 @@
                   [(ngModel)]="relative"
                   optionLabel="label"
                   optionValue="value"
+                  (onChange)="updateNewRelative($event)"
+                  [required]="true"
+                  [allowEmpty]="false"
+                  [unselectable]="false"
                 ></p-selectButton>
                 <label
                   class="form-label"
