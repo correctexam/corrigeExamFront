@@ -511,6 +511,8 @@
     "canexceedthemaxtooltip": "Si l'ensemble des commentaires  sélectionnés amène à une note supérieure à la note maximale de cette question, cette question peut augmenter la note globale de l'examen pour cette copie",
     "canexceedthemax": "Autorise une note supérieure au barème de cette question",
     "rundanscript": "Lancer le script de reconnaissance d'écriture DAN",
-    "handwritingrecognition": "Reconnaissance d'écriture"
+    "handwritingrecognition": "Reconnaissance d'écriture",
+    "examanswerresearch": "Recherche de réponses",
+    "examanswerresearchdetail": "Permet de rechercher des réponses dans l'ensemble des copies"
   }
 }

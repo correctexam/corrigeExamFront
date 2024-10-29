@@ -2872,6 +2872,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       next: response => {
         const currentPageIndex = this.questionindex;
         this.predictions[currentPageIndex] = response.output;
+        console.log(this.predictions);
         this.output = response.output;
         this.error = '';
       },

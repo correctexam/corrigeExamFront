@@ -553,7 +553,6 @@
                 </button>
                 <p-progressSpinner *ngIf="blocked" styleClass="w-2rem h-2rem"></p-progressSpinner>
               </div>
-             
 
               <div *ngIf="predictions[questionindex]" style="margin-top: 1rem; text-align: center">
                 <dd style="font-size: 1.1rem; font-weight: bold; margin: 0">Résultat :</dd>
@@ -787,7 +786,7 @@
                   [tooltipZIndex]="'3000'"
                   [pTooltip]="'scanexam.minimizeComment' | translate"
                   (click)="toggleCommentLayout()"
-                >enables
+                  >enables
                   <fa-icon *ngIf="!minimizeComment" icon="minus"></fa-icon>
                   <fa-icon *ngIf="minimizeComment" icon="maximize"></fa-icon>
                 </span>
@@ -1296,7 +1295,7 @@
                           [min]="1"
                           [max]="12"
                           [ngModel]="comment.step"
-                          (change)="updateCommentStep($event, comment, true, true)"
+                          (change)="updateComment($event, comment, true, true)"
                           [pTooltip]="'scanexam.hybridcommentStepTooltip' | translate"
                           [tooltipPosition]="'left'"
                         />
@@ -1377,7 +1376,8 @@
                           *ngIf="comment?.step !== undefined && comment?.step !== null && comment.step! > 1"
                           [stars]="comment.step!"
                           [cancel]="false"
-                          [disabled]="blocked"enables
+                          [disabled]="blocked"
+                          enables
                           (ngModelChange)="changestepValue($event, comment)"
                           [ngModel]="answer2HybridGradedCommentMap.get(comment.id)"
                         ></p-rating>

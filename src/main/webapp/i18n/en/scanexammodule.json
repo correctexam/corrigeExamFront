@@ -507,6 +507,8 @@
     "canexceedthemaxtooltip": "If all the comments selected lead to a mark higher than the maximum score for this question, this question may increase the overall exam score for this exam sheet.",
     "canexceedthemax": "Permits a mark above the scale for this question",
     "rundanscript": "Run DAN handwriting recognition script",
-    "handwritingrecognition": "Handwriting recognition"
+    "handwritingrecognition": "Handwriting recognition",
+    "examanswerresearch": "Search answers",
+    "examanswerresearchdetail": "Allows you to search for answers across all copies"
   }
 }
