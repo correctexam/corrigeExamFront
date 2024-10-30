@@ -1,0 +1,15 @@
+<p-confirmDialog #deletePredictionDialog icon="pi pi-exclamation-triangle">
+  <ng-template pTemplate="header">
+    <h3>Delete Prediction</h3>
+  </ng-template>
+  <ng-template pTemplate="message">
+    <p>Are you sure you want to delete this prediction?</p>
+    <p>
+      <strong>{{ predictionText }}</strong>
+    </p>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <button type="button" pButton icon="pi pi-times" label="No" (click)="cancel()"></button>
+    <button type="button" pButton icon="pi pi-check" label="Yes" (click)="confirmDelete()"></button>
+  </ng-template>
+</p-confirmDialog>
