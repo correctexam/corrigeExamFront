@@ -295,6 +295,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   error: string = '';
   imagepath: string = 'I did not get it';
   predictionsDic: { [key: number]: string } = {}; // Object to store predictions for each page
+  currentPrediction: IPrediction | null = null;
 
   constructor(
     public examService: ExamService,
@@ -462,6 +463,24 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 this.active.set(com1().id!, signal(false));
               });
             */
+
+            //Try the same for prediction
+            try {
+              const predictionReponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionindex + 1 }));
+              console.log('response:', predictionReponse);
+              const predictions = predictionReponse.body || [];
+              console.log('2 Predictions fetched from backend:', predictions.length);
+              if (predictions.length > 0 && predictions[0].questionId === this.questionindex + 1) {
+                this.currentPrediction = predictions[0]; // Get the first matching prediction
+                console.log('2 Loaded current prediction:', this.currentPrediction);
+              } else {
+                console.warn('2 No valid predictions found for the current question index.');
+                this.currentPrediction = null; // Set to null if no valid prediction exists
+              }
+            } catch (err) {
+              console.error('2 Error loading prediction:', err);
+            }
+
             if (questions![0].gradeType === GradeType.DIRECT && questions![0].typeAlgoName !== 'QCM') {
               const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
               /*              this.currentTextComment4Question = com.body!;
@@ -2912,52 +2931,28 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // Méthode pour stocker les prédictions dans la base de données via PredictionService
-  storePrediction(prediction: any): void {
+  storePrediction(prediction: string): void {
     if (!this.blocked) {
       this.blocked = true;
+      console.log('I am in storePrediction');
+      // Hardcode a simple prediction entity to test if we can create and store it
+      const predictionData: IPrediction = {
+        questionId: this.questionindex + 1, // Hardcoded Question ID (you can adjust this to any valid ID)
+        text: prediction, // Static text for testing
+        jsonData: '{"key": "value"}', // Static JSON string for testing
+        zonegeneratedid: 'ZoneID123', // Arbitrary zone ID, hardcoded for testing purposes
+      };
 
-      this.updateResponseRequest(this.resp!).subscribe({
-        next: resp => {
-          this.resp = resp.body!;
-          if (this.currentQuestion !== undefined && this.currentQuestion.gradeType === GradeType.DIRECT) {
-            const p: IPrediction = {
-              questionId: this.currentQuestion.id,
-              text: prediction,
-              jsonData: prediction, // Add jsonData here to match the entity's field
-              zonegeneratedid: 'someDefaultZoneId', // Assign any required fields appropriately
-            };
-            this.predictionService.create(p).subscribe({
-              next: e => {
-                this.resp?.predictions?.push(e.body!);
-                const currentPrediction = e.body!;
-                this.updateResponseRequest(this.resp!).subscribe({
-                  next: resp1 => {
-                    this.resp = resp1.body!;
-                    (currentPrediction as any).checked = true;
-                    this.currentPrediction4Question?.push(signal(currentPrediction));
-                    this.testdisableAndEnableKeyBoardShortCut.set(false);
-                    this.populateDefaultShortCut();
-                    setTimeout(() => {
-                      this.testdisableAndEnableKeyBoardShortCut.set(true);
-                    }, 300);
-                    this.blocked = false; // Ensure UI is unblocked
-                  },
-                  error: err => {
-                    console.error('Error updating response after prediction storage:', err);
-                    this.blocked = false; // Ensure UI is unblocked even on error
-                  },
-                });
-              },
-              error: err => {
-                console.error('Error storing prediction:', err);
-                this.blocked = false; // Ensure UI is unblocked even on error
-              },
-            });
-          }
+      // Now, call the create method to see if the backend stores the prediction
+      this.predictionService.create(predictionData).subscribe({
+        next: createdResponse => {
+          console.log('Successfully created hardcoded prediction:', createdResponse.body);
+          // Optionally update the UI or any other state here
+          this.blocked = false; // Unblock UI after successful creation
+          this.currentPrediction = createdResponse.body;
         },
-        error: err => {
-          console.error('Error updating response before storing prediction:', err);
+        error: createError => {
+          console.error('Error storing hardcoded prediction:', createError);
           this.blocked = false; // Ensure UI is unblocked even on error
         },
       });

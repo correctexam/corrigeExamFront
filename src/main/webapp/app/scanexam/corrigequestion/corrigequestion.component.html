@@ -554,7 +554,25 @@
                 <p-progressSpinner *ngIf="blocked" styleClass="w-2rem h-2rem"></p-progressSpinner>
               </div>
 
-              <div *ngIf="predictionsDic[questionindex]" style="margin-top: 1rem; text-align: center">
+              <div
+                *ngIf="currentPrediction && currentPrediction.questionId === questionindex + 1"
+                style="margin-top: 1rem; text-align: center"
+              >
+                <dd style="font-size: 1.1rem; font-weight: bold; margin: 0">Résultat :</dd>
+                <div
+                  [innerHTML]="currentPrediction.text"
+                  style="
+                    font-size: 1rem;
+                    line-height: 1.5;
+                    margin-top: 0.5rem;
+                    padding: 0.5rem;
+                    background-color: #f9f9f9;
+                    border: 1px solid #ddd;
+                    border-radius: 5px;
+                  "
+                ></div>
+
+                <!--div *ngIf="predictionsDic[questionindex]" style="margin-top: 1rem; text-align: center">
                 <dd style="font-size: 1.1rem; font-weight: bold; margin: 0">Résultat :</dd>
                 <div
                   [innerHTML]="predictionsDic[questionindex]"
@@ -567,7 +585,7 @@
                     border: 1px solid #ddd;
                     border-radius: 5px;
                   "
-                ></div>
+                ></div-->
                 <!-- Utilise innerHTML pour interpréter le HTML -->
               </div>
 
