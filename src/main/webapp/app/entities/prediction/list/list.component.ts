@@ -2,11 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { PredictionService } from 'app/entities/prediction/service/prediction.service';
 import { Router } from '@angular/router';
 import { IPrediction } from '../prediction.model';
+import { HttpResponse } from '@angular/common/http'; // Import HttpResponse
 
 @Component({
   selector: 'app-prediction-list',
-  templateUrl: './prediction-list.component.html',
-  styleUrls: ['./prediction-list.component.css'],
+  templateUrl: './list.component.html',
 })
 export class PredictionListComponent implements OnInit {
   predictions: IPrediction[] = []; // Array to store predictions
@@ -22,8 +22,8 @@ export class PredictionListComponent implements OnInit {
 
   // Method to load all predictions
   loadAll(): void {
-    this.predictionService.query().subscribe((response: IPrediction[]) => {
-      this.predictions = response || [];
+    this.predictionService.query().subscribe((response: HttpResponse<IPrediction[]>) => {
+      this.predictions = response.body || [];
     });
   }
 

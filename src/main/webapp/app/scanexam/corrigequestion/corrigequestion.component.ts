@@ -47,6 +47,7 @@ import { ITextComment } from '../../entities/text-comment/text-comment.model';
 import { IGradedComment } from '../../entities/graded-comment/graded-comment.model';
 import { GradedCommentService } from '../../entities/graded-comment/service/graded-comment.service';
 import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
+import { PredictionService } from 'app/entities/prediction/service/prediction.service';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { IQCMSolution } from '../../qcm';
 import { Observable, Subscriber, firstValueFrom } from 'rxjs';
@@ -102,6 +103,7 @@ import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { SwipeDirective } from '../swipe.directive';
 import { ScriptService } from 'app/entities/scan/service/dan-service.service';
+import { IPrediction } from 'app/entities/prediction/prediction.model';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -232,6 +234,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   currentTextComment4Question: Signal<ITextComment>[] | undefined;
   currentGradedComment4Question: Signal<IGradedComment>[] | undefined;
   currentHybridGradedComment4Question: Signal<IHybridGradedComment>[] | undefined;
+  currentPrediction4Question: Signal<IPrediction>[] | undefined;
 
   windowWidth = 0;
   currentZoneCorrectionHandler: Map<string, ZoneCorrectionHandler> = new Map(); // | undefined;
@@ -291,7 +294,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   output: string = '';
   error: string = '';
   imagepath: string = 'I did not get it';
-  predictions: { [key: number]: string } = {}; // Object to store predictions for each page
+  predictionsDic: { [key: number]: string } = {}; // Object to store predictions for each page
 
   constructor(
     public examService: ExamService,
@@ -306,6 +309,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     public questionService: QuestionService,
     public gradedCommentService: GradedCommentService,
     public textCommentService: TextCommentService,
+    public predictionService: PredictionService,
     public hybridGradedCommentService: HybridGradedCommentService,
     public answer2HybridGradedCommentService: Answer2HybridGradedCommentService,
     public studentResponseService: StudentResponseService,
@@ -431,6 +435,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.currentGradedComment4Question = [];
           this.currentTextComment4Question = [];
           this.currentHybridGradedComment4Question = [];
+          this.currentPrediction4Question = [];
 
           if (params.get('questionno') !== null) {
             this.questionindex = +params.get('questionno')! - 1;
@@ -447,6 +452,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             this.maxNote = questions[0].point!;
             this.currentQuestion = questions[0];
 
+            /* Need to be verified
+            const com = await firstValueFrom(this.predictionService.query({ questionId: questions![0].id }));
+              this.currentPrediction4Question = [];
+              com.body!.forEach(prediction => {
+                this.currentPrediction4Question?.push(signal(prediction));
+              });
+              this.currentPrediction4Question.forEach(com1 => {
+                this.active.set(com1().id!, signal(false));
+              });
+            */
             if (questions![0].gradeType === GradeType.DIRECT && questions![0].typeAlgoName !== 'QCM') {
               const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
               /*              this.currentTextComment4Question = com.body!;
@@ -490,6 +505,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.currentGradedComment4Question?.forEach(com2 => ((com2() as any).checked = false));
         this.currentTextComment4Question?.forEach(com2 => ((com2() as any).checked = false));
         this.currentHybridGradedComment4Question?.forEach(com2 => ((com2() as any).checked = false));
+        this.currentPrediction4Question?.forEach(com2 => ((com2() as any).checked = false));
         //        this.currentHybridGradedComment4Question?.forEach(com2 => ());
 
         if (questions !== undefined && questions.length > 0) {
@@ -722,6 +738,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   populateDefaultShortCut(): void {
     const toRemove: number[] = [];
     const comments: (IGradedComment | ITextComment | IHybridGradedComment)[] = [];
+    const predictions: IPrediction[] = [];
     if (this.currentGradedComment4Question && this.currentGradedComment4Question.length > 0) {
       comments.push(...this.currentGradedComment4Question.map(e => e()));
     }
@@ -731,6 +748,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
     if (this.currentHybridGradedComment4Question && this.currentHybridGradedComment4Question.length > 0) {
       comments.push(...this.currentHybridGradedComment4Question.map(e => e()));
+    }
+
+    if (this.currentPrediction4Question && this.currentPrediction4Question.length > 0) {
+      comments.push(...this.currentPrediction4Question.map(e => e()));
     }
 
     if (this.keyboardShortcutService.getShortCutPreference().shortcuts.has(this.examId + '_' + this.questionindex)) {
@@ -2865,21 +2886,81 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.error = 'No image selected';
       return;
     }
+
     console.log('ImageData:', imageData);
     console.log('Executing script with image data from canvas');
     console.log('Index:', this.questionindex);
+
     this.scriptService.runScript(imageData).subscribe({
       next: response => {
         const currentPageIndex = this.questionindex;
-        this.predictions[currentPageIndex] = response.output;
-        console.log(this.predictions);
+        this.predictionsDic[currentPageIndex] = response.output;
+        console.log('Prediction received:', response.output);
+
+        // Storing the prediction using the PredictionService
+        this.storePrediction(response.output);
+
+        // Update the output
         this.output = response.output;
         this.error = '';
       },
       error: err => {
+        console.error('Error executing script:', err);
         this.output = '';
         this.error = err.error || 'An error occurred';
       },
     });
+  }
+
+  // Méthode pour stocker les prédictions dans la base de données via PredictionService
+  storePrediction(prediction: any): void {
+    if (!this.blocked) {
+      this.blocked = true;
+
+      this.updateResponseRequest(this.resp!).subscribe({
+        next: resp => {
+          this.resp = resp.body!;
+          if (this.currentQuestion !== undefined && this.currentQuestion.gradeType === GradeType.DIRECT) {
+            const p: IPrediction = {
+              questionId: this.currentQuestion.id,
+              text: prediction,
+              jsonData: prediction, // Add jsonData here to match the entity's field
+              zonegeneratedid: 'someDefaultZoneId', // Assign any required fields appropriately
+            };
+            this.predictionService.create(p).subscribe({
+              next: e => {
+                this.resp?.predictions?.push(e.body!);
+                const currentPrediction = e.body!;
+                this.updateResponseRequest(this.resp!).subscribe({
+                  next: resp1 => {
+                    this.resp = resp1.body!;
+                    (currentPrediction as any).checked = true;
+                    this.currentPrediction4Question?.push(signal(currentPrediction));
+                    this.testdisableAndEnableKeyBoardShortCut.set(false);
+                    this.populateDefaultShortCut();
+                    setTimeout(() => {
+                      this.testdisableAndEnableKeyBoardShortCut.set(true);
+                    }, 300);
+                    this.blocked = false; // Ensure UI is unblocked
+                  },
+                  error: err => {
+                    console.error('Error updating response after prediction storage:', err);
+                    this.blocked = false; // Ensure UI is unblocked even on error
+                  },
+                });
+              },
+              error: err => {
+                console.error('Error storing prediction:', err);
+                this.blocked = false; // Ensure UI is unblocked even on error
+              },
+            });
+          }
+        },
+        error: err => {
+          console.error('Error updating response before storing prediction:', err);
+          this.blocked = false; // Ensure UI is unblocked even on error
+        },
+      });
+    }
   }
 }

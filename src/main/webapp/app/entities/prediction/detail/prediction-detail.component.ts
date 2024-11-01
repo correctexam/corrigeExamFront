@@ -1,31 +1,31 @@
-import { Component, Input } from '@angular/core';
-import { PredictionService } from 'app/entities/prediction/service/prediction.service';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+
+import { IPrediction } from '../prediction.model';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { AlertComponent } from '../../../shared/alert/alert.component';
+import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
+import { TranslateDirective } from '../../../shared/language/translate.directive';
+import { NgIf } from '@angular/common';
 
 @Component({
-  selector: 'app-prediction-delete-dialog',
-  templateUrl: './prediction-delete-dialog.component.html',
+  selector: 'jhi-text-comment-detail',
+  templateUrl: './prediction-detail.component.html',
+  standalone: true,
+  imports: [NgIf, TranslateDirective, AlertErrorComponent, AlertComponent, RouterLink, FaIconComponent],
 })
-export class PredictionDetailComponent {
-  @Input() predictionId!: number; // The ID of the prediction to delete
-  @Input() predictionText!: string; // Text of the prediction (for display purposes)
+export class PredictionDetailComponent implements OnInit {
+  prediction: IPrediction | null = null;
 
-  constructor(
-    private predictionService: PredictionService,
-    private activeModal: NgbActiveModal,
-  ) {}
+  constructor(protected activatedRoute: ActivatedRoute) {}
 
-  // Method to confirm deletion of a prediction
-  confirmDelete(): void {
-    this.predictionService.delete(this.predictionId).subscribe(() => {
-      // Closes the modal and sends a 'deleted' signal back to the parent component
-      this.activeModal.close('deleted');
+  ngOnInit(): void {
+    this.activatedRoute.data.subscribe(({ prediction }) => {
+      this.prediction = prediction;
     });
   }
 
-  // Method to cancel the deletion action
-  cancel(): void {
-    // Dismisses the modal without any changes
-    this.activeModal.dismiss('cancel');
+  previousState(): void {
+    window.history.back();
   }
 }

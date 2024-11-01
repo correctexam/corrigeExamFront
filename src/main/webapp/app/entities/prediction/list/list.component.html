@@ -1,3 +1,4 @@
+<p>it works</p>
 <div class="entity-list">
   <h2>Prediction List</h2>
   <table class="table table-striped">
@@ -17,7 +18,7 @@
         <td>
           <button type="button" class="btn btn-primary" (click)="view(prediction.id)"><i class="fa fa-eye"></i> View</button>
           <button type="button" class="btn btn-warning" (click)="edit(prediction.id)"><i class="fa fa-pencil"></i> Edit</button>
-          <button type="button" class="btn btn-danger" (click)="confirmDelete(prediction.id)"><i class="fa fa-trash"></i> Delete</button>
+          <button type="button" class="btn btn-danger" (click)="delete(prediction.id)"><i class="fa fa-trash"></i> Delete</button>
         </td>
       </tr>
     </tbody>

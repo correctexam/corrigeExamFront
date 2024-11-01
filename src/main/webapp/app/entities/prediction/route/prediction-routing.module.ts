@@ -5,6 +5,7 @@ import { PredictionDetailComponent } from '../detail/prediction-detail.component
 import { PredictionUpdateComponent } from '../update/prediction-update.component';
 import { PredictionDeleteDialogComponent } from '../delete/prediction-delete-dialog.component';
 import { PredictionRoutingResolveService } from './prediction-routing-resolve.service';
+import { FormsModule } from '@angular/forms';
 
 const predictionRoute: Routes = [
   {
@@ -49,6 +50,6 @@ const predictionRoute: Routes = [
 
 @NgModule({
   imports: [RouterModule.forChild(predictionRoute)],
-  exports: [RouterModule],
+  exports: [RouterModule, FormsModule],
 })
 export class PredictionRoutingModule {}

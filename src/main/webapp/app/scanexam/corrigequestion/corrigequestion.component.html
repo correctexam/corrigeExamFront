@@ -554,10 +554,10 @@
                 <p-progressSpinner *ngIf="blocked" styleClass="w-2rem h-2rem"></p-progressSpinner>
               </div>
 
-              <div *ngIf="predictions[questionindex]" style="margin-top: 1rem; text-align: center">
+              <div *ngIf="predictionsDic[questionindex]" style="margin-top: 1rem; text-align: center">
                 <dd style="font-size: 1.1rem; font-weight: bold; margin: 0">Résultat :</dd>
                 <div
-                  [innerHTML]="predictions[questionindex]"
+                  [innerHTML]="predictionsDic[questionindex]"
                   style="
                     font-size: 1rem;
                     line-height: 1.5;

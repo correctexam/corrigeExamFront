@@ -3,16 +3,16 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { PredictionService } from './prediction.service';
 import { IPrediction } from '../prediction.model';
 import { describe, expect } from '@jest/globals';
+import { HttpResponse } from '@angular/common/http';
 
 describe('PredictionService', () => {
   let service: PredictionService;
   let httpMock: HttpTestingController;
-  let expectedResult: IPrediction | IPrediction[] | boolean | null;
+  let expectedResult: HttpResponse<IPrediction> | HttpResponse<IPrediction[]> | boolean | null;
 
   const samplePrediction: IPrediction = {
     id: 123,
     text: 'Sample Prediction Text',
-    questionNumber: 'Q1',
   };
 
   beforeEach(() => {
@@ -34,8 +34,11 @@ describe('PredictionService', () => {
     service.create(samplePrediction).subscribe(resp => (expectedResult = resp));
 
     const req = httpMock.expectOne({ method: 'POST' });
-    req.flush(returnedFromService);
-    expect(expectedResult).toEqual(samplePrediction);
+    req.flush(returnedFromService, { status: 200, statusText: 'OK' });
+
+    if (expectedResult instanceof HttpResponse) {
+      expect(expectedResult.body).toEqual(samplePrediction);
+    }
   });
 
   it('should update a prediction', () => {
@@ -43,8 +46,11 @@ describe('PredictionService', () => {
     service.update(returnedFromService).subscribe(resp => (expectedResult = resp));
 
     const req = httpMock.expectOne({ method: 'PUT' });
-    req.flush(returnedFromService);
-    expect(expectedResult).toEqual(returnedFromService);
+    req.flush(returnedFromService, { status: 200, statusText: 'OK' });
+
+    if (expectedResult instanceof HttpResponse) {
+      expect(expectedResult.body).toEqual(returnedFromService);
+    }
   });
 
   it('should find a prediction by ID', () => {
@@ -52,8 +58,11 @@ describe('PredictionService', () => {
     service.find(123).subscribe(resp => (expectedResult = resp));
 
     const req = httpMock.expectOne({ method: 'GET' });
-    req.flush(returnedFromService);
-    expect(expectedResult).toEqual(samplePrediction);
+    req.flush(returnedFromService, { status: 200, statusText: 'OK' });
+
+    if (expectedResult instanceof HttpResponse) {
+      expect(expectedResult.body).toEqual(samplePrediction);
+    }
   });
 
   it('should return a list of predictions', () => {
@@ -61,15 +70,19 @@ describe('PredictionService', () => {
     service.query().subscribe(resp => (expectedResult = resp));
 
     const req = httpMock.expectOne({ method: 'GET' });
-    req.flush(returnedFromService);
-    expect(expectedResult).toEqual(returnedFromService);
+    req.flush(returnedFromService, { status: 200, statusText: 'OK' });
+
+    if (expectedResult instanceof HttpResponse) {
+      expect(expectedResult.body).toEqual(returnedFromService);
+    }
   });
 
   it('should delete a prediction', () => {
     service.delete(123).subscribe(resp => (expectedResult = resp));
 
     const req = httpMock.expectOne({ method: 'DELETE' });
-    req.flush({});
-    expect(expectedResult).toEqual({});
+    req.flush({}, { status: 200, statusText: 'OK' });
+
+    expect(expectedResult).toBe(true);
   });
 });

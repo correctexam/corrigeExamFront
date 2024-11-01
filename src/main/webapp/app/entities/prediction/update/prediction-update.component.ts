@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PredictionService } from '../service/prediction.service';
 import { IPrediction } from '../prediction.model';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-prediction-update',
