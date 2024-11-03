@@ -8,7 +8,9 @@ export interface IPrediction {
   studentResponses?: IStudentResponse[];
   shortcut?: string | string[];
   jsonData?: string | null;
-  questionNumber?: string | null; // Add questionNumber to IPrediction
+  questionNumber?: number | null;
+  examId?: string | null;
+  studentId?: number | null;
 }
 
 export class Prediction implements IPrediction {
@@ -20,7 +22,9 @@ export class Prediction implements IPrediction {
     public studentResponses?: IStudentResponse[],
     public shortcut?: string | string[],
     public jsonData?: string | null,
-    public questionNumber?: string | null, // Add questionNumber to Prediction class
+    public questionNumber?: number | null, // Add questionNumber to Prediction class
+    public examId?: string | null,
+    public studentId?: number | null,
   ) {}
 }
 

@@ -296,6 +296,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   imagepath: string = 'I did not get it';
   predictionsDic: { [key: number]: string } = {}; // Object to store predictions for each page
   currentPrediction: IPrediction | null = null;
+  questionId: number | undefined = -1;
 
   constructor(
     public examService: ExamService,
@@ -463,22 +464,28 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 this.active.set(com1().id!, signal(false));
               });
             */
-
+            this.questionId = questions![0].id;
             //Try the same for prediction
             try {
-              const predictionReponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionindex + 1 }));
+              console.log('I am trying to load prediction');
+              console.log('Questionid:', questions![0].id);
+              console.log('ExamId:', this.examId);
+              console.log('StudentId:', this.studentid);
+              const predictionReponse = await firstValueFrom(
+                this.predictionService.query({ questionId: questions![0].id, studentId: this.studentid, examId: this.examId }),
+              );
               console.log('response:', predictionReponse);
               const predictions = predictionReponse.body || [];
-              console.log('2 Predictions fetched from backend:', predictions.length);
-              if (predictions.length > 0 && predictions[0].questionId === this.questionindex + 1) {
+              console.log('Predictions fetched from backend:', predictions.length);
+              if (predictions.length > 0 /*&& predictions[0].questionNumber === this.questionindex + 1*/) {
                 this.currentPrediction = predictions[0]; // Get the first matching prediction
-                console.log('2 Loaded current prediction:', this.currentPrediction);
+                console.log('Loaded current prediction:', this.currentPrediction);
               } else {
-                console.warn('2 No valid predictions found for the current question index.');
+                console.warn('No valid predictions found for the current question index.');
                 this.currentPrediction = null; // Set to null if no valid prediction exists
               }
             } catch (err) {
-              console.error('2 Error loading prediction:', err);
+              console.error('Error loading prediction:', err);
             }
 
             if (questions![0].gradeType === GradeType.DIRECT && questions![0].typeAlgoName !== 'QCM') {
@@ -2935,18 +2942,22 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     if (!this.blocked) {
       this.blocked = true;
       console.log('I am in storePrediction');
+      console.log('QuestionId:', this.questionId);
       // Hardcode a simple prediction entity to test if we can create and store it
       const predictionData: IPrediction = {
-        questionId: this.questionindex + 1, // Hardcoded Question ID (you can adjust this to any valid ID)
+        studentId: this.studentid,
+        examId: this.examId,
+        questionNumber: this.questionindex + 1, // Hardcoded Question ID (you can adjust this to any valid ID)
+        questionId: this.questionId,
         text: prediction, // Static text for testing
         jsonData: '{"key": "value"}', // Static JSON string for testing
         zonegeneratedid: 'ZoneID123', // Arbitrary zone ID, hardcoded for testing purposes
       };
-
+      console.log('This is my prediction data', predictionData);
       // Now, call the create method to see if the backend stores the prediction
       this.predictionService.create(predictionData).subscribe({
         next: createdResponse => {
-          console.log('Successfully created hardcoded prediction:', createdResponse.body);
+          console.log('Successfully created prediction:', createdResponse.body);
           // Optionally update the UI or any other state here
           this.blocked = false; // Unblock UI after successful creation
           this.currentPrediction = createdResponse.body;

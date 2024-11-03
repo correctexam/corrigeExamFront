@@ -9,7 +9,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './prediction-update.component.html',
 })
 export class PredictionUpdateComponent implements OnInit {
-  prediction: IPrediction = { id: undefined, text: '', questionNumber: '' };
+  prediction: IPrediction = { id: undefined, text: '', questionNumber: undefined };
 
   constructor(
     protected predictionService: PredictionService,

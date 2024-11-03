@@ -555,7 +555,12 @@
               </div>
 
               <div
-                *ngIf="currentPrediction && currentPrediction.questionId === questionindex + 1"
+                *ngIf="
+                  currentPrediction &&
+                  currentPrediction.questionId === questionId &&
+                  currentPrediction.studentId === studentid &&
+                  currentPrediction.examId === examId
+                "
                 style="margin-top: 1rem; text-align: center"
               >
                 <dd style="font-size: 1.1rem; font-weight: bold; margin: 0">Résultat :</dd>

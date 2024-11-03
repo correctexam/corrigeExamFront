@@ -5,6 +5,9 @@
     <thead>
       <tr>
         <th>ID</th>
+        <th>Question_Id</th>
+        <th>Student</th>
+        <th>Exam</th>
         <th>Question</th>
         <th>Prediction Text</th>
         <th>Actions</th>
@@ -14,6 +17,9 @@
       <tr *ngFor="let prediction of predictions">
         <td>{{ prediction.id }}</td>
         <td>{{ prediction.questionId }}</td>
+        <td>{{ prediction.studentId }}</td>
+        <td>{{ prediction.examId }}</td>
+        <td>{{ prediction.questionNumber }}</td>
         <td>{{ prediction.text }}</td>
         <td>
           <button *ngIf="prediction.id !== undefined" type="button" class="btn btn-primary" (click)="view(prediction.id)">
