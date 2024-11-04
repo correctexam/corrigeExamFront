@@ -1,0 +1,11 @@
+<div>
+  <!-- Champ de recherche -->
+  <input type="text" [formControl]="searchControl" placeholder="Rechercher..." />
+
+  <!-- Listbox pour afficher les prédictions filtrées -->
+  <ul>
+    <li *ngFor="let prediction of filteredPredictions">
+      {{ prediction }}
+    </li>
+  </ul>
+</div>

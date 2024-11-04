@@ -47,6 +47,7 @@ import { ITextComment } from '../../entities/text-comment/text-comment.model';
 import { IGradedComment } from '../../entities/graded-comment/graded-comment.model';
 import { GradedCommentService } from '../../entities/graded-comment/service/graded-comment.service';
 import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
+import { PredictionService } from 'app/entities/prediction/service/prediction.service';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { IQCMSolution } from '../../qcm';
 import { Observable, Subscriber, firstValueFrom } from 'rxjs';
@@ -102,6 +103,7 @@ import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { SwipeDirective } from '../swipe.directive';
 import { ScriptService } from 'app/entities/scan/service/dan-service.service';
+import { IPrediction } from 'app/entities/prediction/prediction.model';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -232,6 +234,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   currentTextComment4Question: Signal<ITextComment>[] | undefined;
   currentGradedComment4Question: Signal<IGradedComment>[] | undefined;
   currentHybridGradedComment4Question: Signal<IHybridGradedComment>[] | undefined;
+  currentPrediction4Question: Signal<IPrediction>[] | undefined;
 
   windowWidth = 0;
   currentZoneCorrectionHandler: Map<string, ZoneCorrectionHandler> = new Map(); // | undefined;
@@ -291,7 +294,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   output: string = '';
   error: string = '';
   imagepath: string = 'I did not get it';
-  predictions: { [key: number]: string } = {}; // Object to store predictions for each page
+  predictionsDic: { [key: number]: string } = {}; // Object to store predictions for each page
+  currentPrediction: IPrediction | null = null;
+  questionId: number | undefined = -1;
 
   constructor(
     public examService: ExamService,
@@ -306,6 +311,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     public questionService: QuestionService,
     public gradedCommentService: GradedCommentService,
     public textCommentService: TextCommentService,
+    public predictionService: PredictionService,
     public hybridGradedCommentService: HybridGradedCommentService,
     public answer2HybridGradedCommentService: Answer2HybridGradedCommentService,
     public studentResponseService: StudentResponseService,
@@ -431,6 +437,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.currentGradedComment4Question = [];
           this.currentTextComment4Question = [];
           this.currentHybridGradedComment4Question = [];
+          this.currentPrediction4Question = [];
 
           if (params.get('questionno') !== null) {
             this.questionindex = +params.get('questionno')! - 1;
@@ -446,6 +453,40 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             this.questionStep = questions[0].step!;
             this.maxNote = questions[0].point!;
             this.currentQuestion = questions[0];
+
+            /* Need to be verified
+            const com = await firstValueFrom(this.predictionService.query({ questionId: questions![0].id }));
+              this.currentPrediction4Question = [];
+              com.body!.forEach(prediction => {
+                this.currentPrediction4Question?.push(signal(prediction));
+              });
+              this.currentPrediction4Question.forEach(com1 => {
+                this.active.set(com1().id!, signal(false));
+              });
+            */
+            this.questionId = questions![0].id;
+            //Try the same for prediction
+            try {
+              console.log('I am trying to load prediction');
+              console.log('Questionid:', questions![0].id);
+              console.log('ExamId:', this.examId);
+              console.log('StudentId:', this.studentid);
+              const predictionReponse = await firstValueFrom(
+                this.predictionService.query({ questionId: questions![0].id, studentId: this.studentid, examId: this.examId }),
+              );
+              console.log('response:', predictionReponse);
+              const predictions = predictionReponse.body || [];
+              console.log('Predictions fetched from backend:', predictions.length);
+              if (predictions.length > 0 /*&& predictions[0].questionNumber === this.questionindex + 1*/) {
+                this.currentPrediction = predictions[0]; // Get the first matching prediction
+                console.log('Loaded current prediction:', this.currentPrediction);
+              } else {
+                console.warn('No valid predictions found for the current question index.');
+                this.currentPrediction = null; // Set to null if no valid prediction exists
+              }
+            } catch (err) {
+              console.error('Error loading prediction:', err);
+            }
 
             if (questions![0].gradeType === GradeType.DIRECT && questions![0].typeAlgoName !== 'QCM') {
               const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
@@ -490,6 +531,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.currentGradedComment4Question?.forEach(com2 => ((com2() as any).checked = false));
         this.currentTextComment4Question?.forEach(com2 => ((com2() as any).checked = false));
         this.currentHybridGradedComment4Question?.forEach(com2 => ((com2() as any).checked = false));
+        this.currentPrediction4Question?.forEach(com2 => ((com2() as any).checked = false));
         //        this.currentHybridGradedComment4Question?.forEach(com2 => ());
 
         if (questions !== undefined && questions.length > 0) {
@@ -722,6 +764,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   populateDefaultShortCut(): void {
     const toRemove: number[] = [];
     const comments: (IGradedComment | ITextComment | IHybridGradedComment)[] = [];
+    const predictions: IPrediction[] = [];
     if (this.currentGradedComment4Question && this.currentGradedComment4Question.length > 0) {
       comments.push(...this.currentGradedComment4Question.map(e => e()));
     }
@@ -731,6 +774,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
     if (this.currentHybridGradedComment4Question && this.currentHybridGradedComment4Question.length > 0) {
       comments.push(...this.currentHybridGradedComment4Question.map(e => e()));
+    }
+
+    if (this.currentPrediction4Question && this.currentPrediction4Question.length > 0) {
+      comments.push(...this.currentPrediction4Question.map(e => e()));
     }
 
     if (this.keyboardShortcutService.getShortCutPreference().shortcuts.has(this.examId + '_' + this.questionindex)) {
@@ -2865,20 +2912,61 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.error = 'No image selected';
       return;
     }
+
     console.log('ImageData:', imageData);
     console.log('Executing script with image data from canvas');
     console.log('Index:', this.questionindex);
+
     this.scriptService.runScript(imageData).subscribe({
       next: response => {
         const currentPageIndex = this.questionindex;
-        this.predictions[currentPageIndex] = response.output;
+        this.predictionsDic[currentPageIndex] = response.output;
+        console.log('Prediction received:', response.output);
+
+        // Storing the prediction using the PredictionService
+        this.storePrediction(response.output);
+
+        // Update the output
         this.output = response.output;
         this.error = '';
       },
       error: err => {
+        console.error('Error executing script:', err);
         this.output = '';
         this.error = err.error || 'An error occurred';
       },
     });
+  }
+
+  storePrediction(prediction: string): void {
+    if (!this.blocked) {
+      this.blocked = true;
+      console.log('I am in storePrediction');
+      console.log('QuestionId:', this.questionId);
+      // Hardcode a simple prediction entity to test if we can create and store it
+      const predictionData: IPrediction = {
+        studentId: this.studentid,
+        examId: this.examId,
+        questionNumber: this.questionindex + 1, // Hardcoded Question ID (you can adjust this to any valid ID)
+        questionId: this.questionId,
+        text: prediction, // Static text for testing
+        jsonData: '{"key": "value"}', // Static JSON string for testing
+        zonegeneratedid: 'ZoneID123', // Arbitrary zone ID, hardcoded for testing purposes
+      };
+      console.log('This is my prediction data', predictionData);
+      // Now, call the create method to see if the backend stores the prediction
+      this.predictionService.create(predictionData).subscribe({
+        next: createdResponse => {
+          console.log('Successfully created prediction:', createdResponse.body);
+          // Optionally update the UI or any other state here
+          this.blocked = false; // Unblock UI after successful creation
+          this.currentPrediction = createdResponse.body;
+        },
+        error: createError => {
+          console.error('Error storing hardcoded prediction:', createError);
+          this.blocked = false; // Ensure UI is unblocked even on error
+        },
+      });
+    }
   }
 }

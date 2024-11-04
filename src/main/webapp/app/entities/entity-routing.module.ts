@@ -81,5 +81,10 @@ export const ENTITIES_ROUTES: Route[] = [
     data: { pageTitle: 'gradeScopeIsticApp.hybridgradedComment.home.title' },
     loadChildren: () => import('./hybrid-graded-comment/route/hybrid-graded-comment-routing.module').then(m => m.hybridGradedCommentRoute),
   },
+  {
+    path: 'prediction',
+    data: { pageTitle: 'gradeScopeIsticApp.prediction.home.title' },
+    loadChildren: () => import('./prediction/route/prediction-routing.module').then(m => m.PredictionRoutingModule),
+  },
   /* jhipster-needle-add-entity-route - JHipster will add entity modules routes here */
 ];

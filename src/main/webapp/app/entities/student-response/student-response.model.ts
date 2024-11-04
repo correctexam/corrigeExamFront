@@ -1,6 +1,7 @@
 import { IComments } from 'app/entities/comments/comments.model';
 import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
+import { IPrediction } from '../prediction/prediction.model';
 
 export interface IStudentResponse {
   id?: number;
@@ -17,6 +18,7 @@ export interface IStudentResponse {
   correctedByInfo?: string;
   correctedByMail?: string;
   lastModifiedDate?: Date;
+  predictions?: IPrediction[] | null;
 }
 
 export class StudentResponse implements IStudentResponse {

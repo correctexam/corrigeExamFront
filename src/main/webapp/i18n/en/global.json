@@ -22,6 +22,7 @@
         "questionType": "Question Type",
         "textComment": "Text Comment",
         "gradedComment": "Graded Comment",
+        "prediction": "Prediction",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {

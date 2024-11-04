@@ -20,6 +20,7 @@ import { MarkingSummaryComponent } from './marking-summary/marking-summary.compo
 import { ComparestudentanswerComponent } from './comparestudentanswer/comparestudentanswer.component';
 
 import { ExportanonymoupdfComponent } from './exportanonymoupdf/exportanonymoupdf.component';
+import { SearchanswerComponent } from './searchanswer/searchanswer.component';
 
 // set the location of the OpenCV files
 // registerAllModules();
@@ -193,6 +194,20 @@ export const MarkingSummary_ROUTE: Route = {
   path: 'marking-summary/:examid',
   canActivate: [UserRouteAccessService],
   component: MarkingSummaryComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.answer',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-6-correct-copies-question-by-question-or-student-by-student-or-any-other-combination',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-6-corriger-ses-copies-question-par-question-ou-etudiant-par-etudiant-ou-tout-autre-combinaison',
+    },
+  },
+};
+
+export const SearchAnswer_ROUTE: Route = {
+  path: 'search_answear/:examid',
+  canActivate: [UserRouteAccessService],
+  component: SearchanswerComponent,
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.answer',
@@ -390,4 +405,5 @@ export const SCANEXAM_ROUTES = [
   EXPORTPDF_ROUTE,
   EXPORTPDFBYSHEET_ROUTE,
   CompareHybridCommentAnswer_ROUTE,
+  SearchAnswer_ROUTE,
 ];
