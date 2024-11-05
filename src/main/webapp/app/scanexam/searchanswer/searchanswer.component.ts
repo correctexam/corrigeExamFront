@@ -1,39 +1,73 @@
-import { Component, Input } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-
-import { ReactiveFormsModule } from '@angular/forms';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { PredictionService } from '../../entities/prediction/service/prediction.service';
+import { firstValueFrom, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { CommonModule } from '@angular/common';
+import { IPrediction } from 'app/entities/prediction/prediction.model';
 
 @Component({
   selector: 'jhi-searchanswer',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './searchanswer.component.html',
-  styleUrl: './searchanswer.component.scss',
+  styleUrls: ['./searchanswer.component.scss'],
 })
-export class SearchanswerComponent {
-  @Input() predictions: { [key: number]: string[] } = {}; // Objet avec les prédictions par page
-  @Input() pageKey: number = 0; // Clé de la page courante
+export class SearchanswerComponent implements OnInit, OnDestroy {
+  predictions: IPrediction[] = [];
+  searchControl = new FormControl('');
+  filteredPredictions: IPrediction[] = [];
 
-  @Input() searchControl = new FormControl('');
+  private searchSubscription?: Subscription;
 
-  // Méthode pour filtrer les prédictions pour la page courante
-  constructor() {
-    // Pour surveiller les changements dans la valeur de recherche
-    this.searchControl.valueChanges.subscribe(value => {
-      console.log('Valeur de recherche:', value);
+  constructor(private predictionService: PredictionService) {}
+
+  ngOnInit() {
+    this.loadPredictions();
+    this.setupSearchListener();
+  }
+
+  ngOnDestroy() {
+    this.searchSubscription?.unsubscribe();
+  }
+
+  // Récupérer les prédictions dans le back
+  async loadPredictions() {
+    try {
+      const req = {
+        page: 0,
+        size: 500,
+      };
+      const predictionResponse = await firstValueFrom(this.predictionService.query(req));
+      const predictions = predictionResponse.body || [];
+
+      if (predictions.length > 0) {
+        this.predictions = predictions.map(prediction => ({
+          examId: prediction.examId,
+          questionNumber: prediction.questionNumber,
+          studentId: prediction.studentId,
+          text: prediction.text,
+        }));
+        this.filterPredictions();
+      } else {
+        console.warn('No predictions found from backend.');
+      }
+    } catch (err) {
+      console.error('Error fetching predictions from backend:', err);
+    }
+  }
+
+  //On regarde ce qu'on a tapé dans la barre de recherche
+  setupSearchListener() {
+    this.searchSubscription = this.searchControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe(value => {
+      this.filterPredictions(value ?? '');
     });
   }
 
-  ngOnInit() {
-    console.log('Initial predictions:', this.predictions);
-  }
-
-  get filteredPredictions(): string[] {
-    const searchText = this.searchControl.value?.toLowerCase() || '';
-    const pagePredictions = this.predictions[this.pageKey] || [];
-    console.log('pagePredictions:', pagePredictions); // Affiche les prédictions de la page
-
-    return pagePredictions.filter(prediction => prediction.toLowerCase().includes(searchText));
+  // On filtre par rapport à ce qui est écrit dans la barre de recherche
+  filterPredictions(searchTerm: string = '') {
+    this.filteredPredictions = this.predictions.filter(prediction =>
+      (prediction.text ?? '').toLowerCase().includes(searchTerm.toLowerCase()),
+    );
   }
 }
