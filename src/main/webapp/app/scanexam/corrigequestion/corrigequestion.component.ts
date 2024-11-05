@@ -465,28 +465,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               });
             */
             this.questionId = questions![0].id;
-            //Try the same for prediction
-            try {
-              console.log('I am trying to load prediction');
-              console.log('Questionid:', questions![0].id);
-              console.log('ExamId:', this.examId);
-              console.log('StudentId:', this.studentid);
-              const predictionReponse = await firstValueFrom(
-                this.predictionService.query({ questionId: questions![0].id, studentId: this.studentid, examId: this.examId }),
-              );
-              console.log('response:', predictionReponse);
-              const predictions = predictionReponse.body || [];
-              console.log('Predictions fetched from backend:', predictions.length);
-              if (predictions.length > 0 /*&& predictions[0].questionNumber === this.questionindex + 1*/) {
-                this.currentPrediction = predictions[0]; // Get the first matching prediction
-                console.log('Loaded current prediction:', this.currentPrediction);
-              } else {
-                console.warn('No valid predictions found for the current question index.');
-                this.currentPrediction = null; // Set to null if no valid prediction exists
-              }
-            } catch (err) {
-              console.error('Error loading prediction:', err);
-            }
 
             if (questions![0].gradeType === GradeType.DIRECT && questions![0].typeAlgoName !== 'QCM') {
               const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
@@ -1845,6 +1823,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
+    console.log('Next student');
+    this.loadPrediction();
   }
   changeQuestion($event: any): void {
     if (!this.init) {
@@ -1859,6 +1839,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
+    this.loadPrediction();
   }
 
   private reviver(key: any, value: any): any {
@@ -2967,6 +2948,31 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.blocked = false; // Ensure UI is unblocked even on error
         },
       });
+    }
+  }
+
+  async loadPrediction() {
+    //Try the same for prediction
+    try {
+      console.log('I am trying to load prediction');
+      console.log('Questionid:', this.questionId);
+      console.log('ExamId:', this.examId);
+      console.log('StudentId:', this.studentid);
+      const predictionReponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionId }));
+      console.log('response:', predictionReponse);
+      const predictions = predictionReponse.body || [];
+      console.log('Predictions fetched from backend:', predictions.length);
+      if (predictions.length > 0) {
+        for (let i = 0; i < predictions.length; i++) {
+          if (predictions[i].studentId === this.studentid) this.currentPrediction = predictions[i];
+          console.log('Loaded current prediction:', this.currentPrediction);
+        }
+      } else {
+        console.warn('No valid predictions found for the current question index.');
+        this.currentPrediction = null; // Set to null if no valid prediction exists
+      }
+    } catch (err) {
+      console.error('Error loading prediction:', err);
     }
   }
 }
