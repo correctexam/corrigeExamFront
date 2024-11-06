@@ -466,6 +466,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             */
             this.questionId = questions![0].id;
 
+            this.loadPrediction();
+
             if (questions![0].gradeType === GradeType.DIRECT && questions![0].typeAlgoName !== 'QCM') {
               const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
               /*              this.currentTextComment4Question = com.body!;
