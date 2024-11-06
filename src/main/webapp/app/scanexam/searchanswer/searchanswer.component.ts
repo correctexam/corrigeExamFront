@@ -5,6 +5,7 @@ import { firstValueFrom, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { IPrediction } from 'app/entities/prediction/prediction.model';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 
 @Component({
   selector: 'jhi-searchanswer',
@@ -17,13 +18,19 @@ export class SearchanswerComponent implements OnInit, OnDestroy {
   predictions: IPrediction[] = [];
   searchControl = new FormControl('');
   filteredPredictions: IPrediction[] = [];
+  examId: string = '';
 
   private searchSubscription?: Subscription;
 
-  constructor(private predictionService: PredictionService) {}
+  constructor(
+    private predictionService: PredictionService,
+    protected activatedRoute: ActivatedRoute,
+  ) {}
 
   ngOnInit() {
-    this.loadPredictions();
+    this.activatedRoute.paramMap.subscribe(params => {
+      this.loadPredictions(params);
+    });
     this.setupSearchListener();
   }
 
@@ -32,7 +39,10 @@ export class SearchanswerComponent implements OnInit, OnDestroy {
   }
 
   // Récupérer les prédictions dans le back
-  async loadPredictions() {
+  async loadPredictions(params: ParamMap) {
+    if (params.get('examid') !== null) {
+      this.examId = params.get('examid')!;
+    }
     try {
       const req = {
         page: 0,
@@ -42,12 +52,15 @@ export class SearchanswerComponent implements OnInit, OnDestroy {
       const predictions = predictionResponse.body || [];
 
       if (predictions.length > 0) {
-        this.predictions = predictions.map(prediction => ({
-          examId: prediction.examId,
-          questionNumber: prediction.questionNumber,
-          studentId: prediction.studentId,
-          text: prediction.text,
-        }));
+        this.predictions = predictions
+          .filter(prediction => prediction.examId === this.examId) // Add your desired examId here
+          .map(prediction => ({
+            examId: prediction.examId,
+            questionNumber: prediction.questionNumber,
+            studentId: prediction.studentId,
+            text: prediction.text,
+          }));
+
         this.filterPredictions();
       } else {
         console.warn('No predictions found from backend.');
