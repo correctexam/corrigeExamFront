@@ -2926,7 +2926,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       const exam_id = this.examId;
       const student_id = this.studentid;
       const question_number = this.questionindex + 1;
-      this.createPrediction(question_id, exam_id, student_id, question_number);
+      const prediction_id = this.createPrediction(question_id, exam_id, student_id, question_number);
 
       this.scriptService.runScript(imageData).subscribe({
         next: response => {
@@ -2934,7 +2934,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.predictionsDic[currentPageIndex] = response.output;
 
           // Storing the prediction using the PredictionService
-          this.storePrediction(response.output, question_id, exam_id, student_id, question_number);
+          this.storePrediction(response.output, question_id, exam_id, student_id, question_number, prediction_id);
 
           // Update the output
           this.output = response.output;
@@ -2959,6 +2959,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     exam_id: string | undefined,
     student_id: number | undefined,
     question_number: number,
+    prediction_id: number | undefined,
   ): void {
     //this.currentQuestion?.typeAlgoName == 'manuscrit';
     if (!this.blocked) {
@@ -2967,6 +2968,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       console.log('QuestionId:', this.questionId);
       // Hardcode a simple prediction entity to test if we can create and store it
       const predictionData: IPrediction = {
+        id: prediction_id,
         studentId: student_id,
         examId: exam_id,
         questionNumber: question_number, // Hardcoded Question ID (you can adjust this to any valid ID)
@@ -2997,7 +2999,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     exam_id: string | undefined,
     student_id: number | undefined,
     question_number: number,
-  ): void {
+  ): number | undefined {
     //this.currentQuestion?.typeAlgoName == 'manuscrit';
     if (!this.blocked) {
       this.blocked = true;
@@ -3027,7 +3029,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.blocked = false; // Ensure UI is unblocked even on error
         },
       });
+      return predictionData.id;
     }
+    return undefined;
   }
 
   async loadPrediction() {
