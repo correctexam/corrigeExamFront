@@ -134,6 +134,12 @@ cy.get('canvas.upper-canvas')
     cy.get("div.ng-trigger div:nth-of-type(3) > button").click();
     cy.get("div.p-sidebar-header path").click();
 
+    // Select `manuscrit` from the dropdown
+    cy.get("#field_type").select("manuscrit");  // Assuming "manuscrit" is the visible value in the dropdown
+    cy.get("#panel").click();
+    cy.get("span.p-button-label").click();
+    cy.get("div.ng-trigger div:nth-of-type(3) > button").click();
+    cy.get("div.p-sidebar-header path").click();
 
 
     cy.get('#viewerContainer').scrollTo('bottom')
