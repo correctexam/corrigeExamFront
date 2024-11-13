@@ -466,10 +466,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               });
             */
             this.questionId = questions![0].id;
-
+            this.currentPrediction = null;
             this.loadPrediction();
             setTimeout(() => {
-              if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction && !this.isLoading) {
+              if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
                 this.executeScript();
               }
             }, 500);
@@ -1832,9 +1832,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
     }
     console.log('Next student');
+    this.currentPrediction = null;
     this.loadPrediction();
     setTimeout(() => {
-      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction && !this.isLoading) {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
         this.executeScript();
       }
     }, 500);
@@ -1851,9 +1852,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
+    this.currentPrediction = null;
     this.loadPrediction();
     setTimeout(() => {
-      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction && !this.isLoading) {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
         this.executeScript();
       }
     }, 500);
@@ -2974,7 +2976,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         zonegeneratedid: 'ZoneID123', // Arbitrary zone ID, hardcoded for testing purposes
       };
       // Now, call the create method to see if the backend stores the prediction
-      this.predictionService.create(predictionData).subscribe({
+      this.predictionService.update(predictionData).subscribe({
         next: createdResponse => {
           console.log('Successfully stored prediction');
           createdResponse.body;
@@ -3041,8 +3043,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       console.log('Predictions fetched from backend:', predictions.length);
       if (predictions.length > 0) {
         for (let i = 0; i < predictions.length; i++) {
-          if (predictions[i].studentId === this.studentid) this.currentPrediction = predictions[i];
-          console.log('Loaded current prediction');
+          if (predictions[i].studentId === this.studentid) {
+            this.currentPrediction = predictions[i];
+            console.log('Loaded current prediction:', this.currentPrediction);
+          }
         }
       } else {
         console.warn('No valid predictions found for the current question index.');
