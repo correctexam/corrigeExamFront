@@ -104,6 +104,7 @@ import { ToastModule } from 'primeng/toast';
 import { SwipeDirective } from '../swipe.directive';
 import { ScriptService } from 'app/entities/scan/service/dan-service.service';
 import { IPrediction } from 'app/entities/prediction/prediction.model';
+import { delay } from 'cypress/types/bluebird';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -467,6 +468,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             this.questionId = questions![0].id;
 
             this.loadPrediction();
+            setTimeout(() => {
+              if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction && !this.isLoading) {
+                this.executeScript();
+              }
+            }, 500);
 
             if (questions![0].gradeType === GradeType.DIRECT && questions![0].typeAlgoName !== 'QCM') {
               const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
@@ -1827,13 +1833,17 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
     console.log('Next student');
     this.loadPrediction();
+    setTimeout(() => {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction && !this.isLoading) {
+        this.executeScript();
+      }
+    }, 500);
   }
   changeQuestion($event: any): void {
     if (!this.init) {
       this.cleanCanvassCache();
 
       this.questionindex = $event.page;
-
       const c = this.currentStudent + 1;
       if ($event.pageCount !== 1) {
         this.ngZone.run(() => {
@@ -1842,6 +1852,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
     }
     this.loadPrediction();
+    setTimeout(() => {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction && !this.isLoading) {
+        this.executeScript();
+      }
+    }, 500);
   }
 
   private reviver(key: any, value: any): any {
@@ -2886,61 +2901,121 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
+  isLoading = false;
   // Méthode pour exécuter le script
   executeScript(): void {
-    const imageData = this.getImageFromCanvas();
+    if (this.currentQuestion?.typeAlgoName == 'manuscrit') {
+      console.log('Yes I a manuscrit;');
+      this.isLoading = true;
+      this.changeDetector.detectChanges();
+      const imageData = this.getImageFromCanvas();
 
-    if (!imageData) {
-      console.error('No image data found on the canvas');
-      this.error = 'No image selected';
-      return;
+      if (!imageData) {
+        console.error('No image data found on the canvas');
+        this.error = 'No image selected';
+        return;
+      }
+
+      console.log('ImageData:', imageData);
+      console.log('Executing script with image data from canvas');
+      console.log('Index:', this.questionindex);
+      console.log('Question Id:', this.currentQuestion.id);
+      const question_id = this.questionId;
+      const exam_id = this.examId;
+      const student_id = this.studentid;
+      const question_number = this.questionindex + 1;
+      this.createPrediction(question_id, exam_id, student_id, question_number);
+
+      this.scriptService.runScript(imageData).subscribe({
+        next: response => {
+          const currentPageIndex = this.questionindex;
+          this.predictionsDic[currentPageIndex] = response.output;
+
+          // Storing the prediction using the PredictionService
+          this.storePrediction(response.output, question_id, exam_id, student_id, question_number);
+
+          // Update the output
+          this.output = response.output;
+          this.error = '';
+          this.isLoading = false;
+          this.changeDetector.detectChanges();
+        },
+        error: err => {
+          console.error('Error executing script:', err);
+          this.output = '';
+          this.error = err.error || 'An error occurred';
+          this.isLoading = false;
+          this.changeDetector.detectChanges();
+        },
+      });
     }
-
-    console.log('ImageData:', imageData);
-    console.log('Executing script with image data from canvas');
-    console.log('Index:', this.questionindex);
-
-    this.scriptService.runScript(imageData).subscribe({
-      next: response => {
-        const currentPageIndex = this.questionindex;
-        this.predictionsDic[currentPageIndex] = response.output;
-        console.log('Prediction received:', response.output);
-
-        // Storing the prediction using the PredictionService
-        this.storePrediction(response.output);
-
-        // Update the output
-        this.output = response.output;
-        this.error = '';
-      },
-      error: err => {
-        console.error('Error executing script:', err);
-        this.output = '';
-        this.error = err.error || 'An error occurred';
-      },
-    });
   }
 
-  storePrediction(prediction: string): void {
+  storePrediction(
+    prediction: string,
+    question_id: number | undefined,
+    exam_id: string | undefined,
+    student_id: number | undefined,
+    question_number: number,
+  ): void {
+    //this.currentQuestion?.typeAlgoName == 'manuscrit';
     if (!this.blocked) {
       this.blocked = true;
       console.log('I am in storePrediction');
       console.log('QuestionId:', this.questionId);
       // Hardcode a simple prediction entity to test if we can create and store it
       const predictionData: IPrediction = {
-        studentId: this.studentid,
-        examId: this.examId,
-        questionNumber: this.questionindex + 1, // Hardcoded Question ID (you can adjust this to any valid ID)
-        questionId: this.questionId,
+        studentId: student_id,
+        examId: exam_id,
+        questionNumber: question_number, // Hardcoded Question ID (you can adjust this to any valid ID)
+        questionId: question_id,
         text: prediction, // Static text for testing
         jsonData: '{"key": "value"}', // Static JSON string for testing
         zonegeneratedid: 'ZoneID123', // Arbitrary zone ID, hardcoded for testing purposes
       };
-      console.log('This is my prediction data', predictionData);
       // Now, call the create method to see if the backend stores the prediction
       this.predictionService.create(predictionData).subscribe({
         next: createdResponse => {
-          console.log('Successfully created prediction:', createdResponse.body);
+          console.log('Successfully stored prediction');
+          createdResponse.body;
+          // Optionally update the UI or any other state here
+          this.blocked = false; // Unblock UI after successful creation
+          this.currentPrediction = createdResponse.body;
+        },
+        error: createError => {
+          console.error('Error storing hardcoded prediction:', createError);
+          this.blocked = false; // Ensure UI is unblocked even on error
+        },
+      });
+    }
+  }
+
+  createPrediction(
+    question_id: number | undefined,
+    exam_id: string | undefined,
+    student_id: number | undefined,
+    question_number: number,
+  ): void {
+    //this.currentQuestion?.typeAlgoName == 'manuscrit';
+    if (!this.blocked) {
+      this.blocked = true;
+      console.log('I am in createPrediction');
+      console.log('QuestionId:', this.questionId);
+      // Hardcode a simple prediction entity to test if we can create and store it
+      const predictionData: IPrediction = {
+        studentId: student_id,
+        examId: exam_id,
+        questionNumber: question_number, // Hardcoded Question ID (you can adjust this to any valid ID)
+        questionId: question_id,
+        text: 'En attente', // Static text for testing
+        jsonData: '{"key": "value"}', // Static JSON string for testing
+        zonegeneratedid: 'ZoneID123', // Arbitrary zone ID, hardcoded for testing purposes
+      };
+      // Now, call the create method to see if the backend stores the prediction
+      this.predictionService.create(predictionData).subscribe({
+        next: createdResponse => {
+          console.log('Successfully created prediction');
+          createdResponse.body;
           // Optionally update the UI or any other state here
           this.blocked = false; // Unblock UI after successful creation
           this.currentPrediction = createdResponse.body;
@@ -2967,7 +3042,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       if (predictions.length > 0) {
         for (let i = 0; i < predictions.length; i++) {
           if (predictions[i].studentId === this.studentid) this.currentPrediction = predictions[i];
-          console.log('Loaded current prediction:', this.currentPrediction);
+          console.log('Loaded current prediction');
         }
       } else {
         console.warn('No valid predictions found for the current question index.');

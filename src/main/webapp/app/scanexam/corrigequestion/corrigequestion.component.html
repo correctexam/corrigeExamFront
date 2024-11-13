@@ -540,7 +540,11 @@
           <div class="card">
             <div class="card-body" style="display: flex; flex-direction: column; align-items: center">
               <div class="col-2 p-0" *ngIf="!focusView">
-                <button
+                <div *ngIf="currentQuestion?.typeAlgoName === 'manuscrit' && !currentPrediction">
+                  <!-- Show loading indicator when DAN is running -->
+                  <div *ngIf="isLoading" class="loading-indicator">Chargement de la reconnaissance de l'écriture manuscrite ...</div>
+                </div>
+                <!--button
                   class="sm:text-xs md:text-xs lg:text-base"
                   pButton
                   [disabled]="!examId && blocked"
@@ -550,7 +554,7 @@
                   [tooltipPosition]="'bottom'"
                 >
                   Reconnaissance d'écriture
-                </button>
+                </button-->
                 <p-progressSpinner *ngIf="blocked" styleClass="w-2rem h-2rem"></p-progressSpinner>
               </div>
 
