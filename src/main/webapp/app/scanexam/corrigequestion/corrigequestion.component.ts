@@ -2905,9 +2905,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   isLoading = false;
   // Méthode pour exécuter le script
-  executeScript(): void {
+  async executeScript(): Promise<void> {
     if (this.currentQuestion?.typeAlgoName == 'manuscrit') {
-      console.log('Yes I a manuscrit;');
+      console.log('Yes I am manuscrit;');
       this.isLoading = true;
       this.changeDetector.detectChanges();
       const imageData = this.getImageFromCanvas();
@@ -2915,28 +2915,27 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       if (!imageData) {
         console.error('No image data found on the canvas');
         this.error = 'No image selected';
+        this.isLoading = false;
         return;
       }
 
-      console.log('ImageData:', imageData);
       console.log('Executing script with image data from canvas');
-      console.log('Index:', this.questionindex);
-      console.log('Question Id:', this.currentQuestion.id);
       const question_id = this.questionId;
       const exam_id = this.examId;
       const student_id = this.studentid;
       const question_number = this.questionindex + 1;
-      const prediction_id = this.createPrediction(question_id, exam_id, student_id, question_number);
+
+      // Await the ID from createPrediction before proceeding
+      const prediction_id = await this.createPrediction(question_id, exam_id, student_id, question_number);
 
       this.scriptService.runScript(imageData).subscribe({
         next: response => {
           const currentPageIndex = this.questionindex;
           this.predictionsDic[currentPageIndex] = response.output;
 
-          // Storing the prediction using the PredictionService
+          // Now store the prediction with the actual ID
           this.storePrediction(response.output, question_id, exam_id, student_id, question_number, prediction_id);
 
-          // Update the output
           this.output = response.output;
           this.error = '';
           this.isLoading = false;
@@ -2962,10 +2961,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     prediction_id: number | undefined,
   ): void {
     //this.currentQuestion?.typeAlgoName == 'manuscrit';
+    console.log('Stored prediction id', prediction_id);
     if (!this.blocked) {
       this.blocked = true;
       console.log('I am in storePrediction');
-      console.log('QuestionId:', this.questionId);
       // Hardcode a simple prediction entity to test if we can create and store it
       const predictionData: IPrediction = {
         id: prediction_id,
@@ -2985,6 +2984,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           // Optionally update the UI or any other state here
           this.blocked = false; // Unblock UI after successful creation
           this.currentPrediction = createdResponse.body;
+          this.loadPrediction();
         },
         error: createError => {
           console.error('Error storing hardcoded prediction:', createError);
@@ -2999,39 +2999,40 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     exam_id: string | undefined,
     student_id: number | undefined,
     question_number: number,
-  ): number | undefined {
-    //this.currentQuestion?.typeAlgoName == 'manuscrit';
-    if (!this.blocked) {
-      this.blocked = true;
-      console.log('I am in createPrediction');
-      console.log('QuestionId:', this.questionId);
-      // Hardcode a simple prediction entity to test if we can create and store it
-      const predictionData: IPrediction = {
-        studentId: student_id,
-        examId: exam_id,
-        questionNumber: question_number, // Hardcoded Question ID (you can adjust this to any valid ID)
-        questionId: question_id,
-        text: 'En attente', // Static text for testing
-        jsonData: '{"key": "value"}', // Static JSON string for testing
-        zonegeneratedid: 'ZoneID123', // Arbitrary zone ID, hardcoded for testing purposes
-      };
-      // Now, call the create method to see if the backend stores the prediction
-      this.predictionService.create(predictionData).subscribe({
-        next: createdResponse => {
-          console.log('Successfully created prediction');
-          createdResponse.body;
-          // Optionally update the UI or any other state here
-          this.blocked = false; // Unblock UI after successful creation
-          this.currentPrediction = createdResponse.body;
-        },
-        error: createError => {
-          console.error('Error storing hardcoded prediction:', createError);
-          this.blocked = false; // Ensure UI is unblocked even on error
-        },
-      });
-      return predictionData.id;
-    }
-    return undefined;
+  ): Promise<number | undefined> {
+    return new Promise((resolve, reject) => {
+      if (!this.blocked) {
+        this.blocked = true;
+        console.log('I am in createPrediction');
+        const predictionData: IPrediction = {
+          studentId: student_id,
+          examId: exam_id,
+          questionNumber: question_number,
+          questionId: question_id,
+          text: 'En attente',
+          jsonData: '{"key": "value"}',
+          zonegeneratedid: 'ZoneID123',
+        };
+
+        this.predictionService.create(predictionData).subscribe({
+          next: createdResponse => {
+            console.log('Successfully created prediction');
+            this.currentPrediction = createdResponse.body;
+            this.blocked = false;
+            const id = createdResponse.body?.id;
+            console.log('Created prediction id', id);
+            resolve(id); // Resolve the Promise with the created ID
+          },
+          error: createError => {
+            console.error('Error creating prediction:', createError);
+            this.blocked = false;
+            reject(createError); // Reject the Promise on error
+          },
+        });
+      } else {
+        resolve(undefined); // Return undefined if already blocked
+      }
+    });
   }
 
   async loadPrediction() {
