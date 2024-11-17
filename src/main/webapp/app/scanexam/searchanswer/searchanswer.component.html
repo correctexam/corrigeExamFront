@@ -5,7 +5,8 @@
       <div><strong>Exam ID:</strong> {{ prediction.examId }}</div>
       <div><strong>Question Number:</strong> {{ prediction.questionNumber }}</div>
       <div><strong>Student ID:</strong> {{ prediction.studentId }}</div>
-      <div><strong>Text:</strong> {{ prediction.text }}</div>
+      <!--div><strong>Text:</strong> {{ prediction.text }}</div-->
+      <div><strong>Image:</strong><img [src]="prediction.imageData" /></div>
     </li>
   </ul>
 </div>

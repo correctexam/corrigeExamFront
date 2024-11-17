@@ -11,6 +11,7 @@ export interface IPrediction {
   questionNumber?: number | null;
   examId?: string | null;
   studentId?: number | null;
+  imageData?: string | null;
 }
 
 export class Prediction implements IPrediction {
@@ -25,6 +26,7 @@ export class Prediction implements IPrediction {
     public questionNumber?: number | null, // Add questionNumber to Prediction class
     public examId?: string | null,
     public studentId?: number | null,
+    public imageData?: string | null,
   ) {}
 }
 

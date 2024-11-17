@@ -59,6 +59,7 @@ export class SearchanswerComponent implements OnInit, OnDestroy {
             questionNumber: prediction.questionNumber,
             studentId: prediction.studentId,
             text: prediction.text,
+            imageData: prediction.imageData,
           }));
 
         this.filterPredictions();

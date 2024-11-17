@@ -2906,11 +2906,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   isLoading = false;
   // Méthode pour exécuter le script
   async executeScript(): Promise<void> {
-    if (this.currentQuestion?.typeAlgoName == 'manuscrit') {
-      console.log('Yes I am manuscrit;');
+    if (this.currentQuestion?.typeAlgoName === 'manuscrit') {
+      console.log('Yes, I am manuscrit.');
       this.isLoading = true;
       this.changeDetector.detectChanges();
       const imageData = this.getImageFromCanvas();
+      console.log('Image data:', imageData);
 
       if (!imageData) {
         console.error('No image data found on the canvas');
@@ -2926,29 +2927,32 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       const question_number = this.questionindex + 1;
 
       // Await the ID from createPrediction before proceeding
-      const prediction_id = await this.createPrediction(question_id, exam_id, student_id, question_number);
+      const prediction_id = await this.createPrediction(question_id, exam_id, student_id, question_number, imageData);
 
-      this.scriptService.runScript(imageData).subscribe({
-        next: response => {
-          const currentPageIndex = this.questionindex;
-          this.predictionsDic[currentPageIndex] = response.output;
+      // Proceed only if prediction_id is valid
+      if (prediction_id !== undefined) {
+        this.scriptService.runScript(imageData).subscribe({
+          next: response => {
+            const currentPageIndex = this.questionindex;
+            this.predictionsDic[currentPageIndex] = response.output;
 
-          // Now store the prediction with the actual ID
-          this.storePrediction(response.output, question_id, exam_id, student_id, question_number, prediction_id);
+            // Now store the prediction with the actual ID
+            this.storePrediction(response.output, question_id, exam_id, student_id, question_number, prediction_id);
 
-          this.output = response.output;
-          this.error = '';
-          this.isLoading = false;
-          this.changeDetector.detectChanges();
-        },
-        error: err => {
-          console.error('Error executing script:', err);
-          this.output = '';
-          this.error = err.error || 'An error occurred';
-          this.isLoading = false;
-          this.changeDetector.detectChanges();
-        },
-      });
+            this.output = response.output;
+            this.error = '';
+            this.isLoading = false;
+            this.changeDetector.detectChanges();
+          },
+          error: err => {
+            console.error('Error executing script:', err);
+            this.output = '';
+            this.error = err.error || 'An error occurred';
+            this.isLoading = false;
+            this.changeDetector.detectChanges();
+          },
+        });
+      }
     }
   }
 
@@ -2960,38 +2964,33 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     question_number: number,
     prediction_id: number | undefined,
   ): void {
-    //this.currentQuestion?.typeAlgoName == 'manuscrit';
-    console.log('Stored prediction id', prediction_id);
-    if (!this.blocked) {
-      this.blocked = true;
-      console.log('I am in storePrediction');
-      // Hardcode a simple prediction entity to test if we can create and store it
-      const predictionData: IPrediction = {
-        id: prediction_id,
-        studentId: student_id,
-        examId: exam_id,
-        questionNumber: question_number, // Hardcoded Question ID (you can adjust this to any valid ID)
-        questionId: question_id,
-        text: prediction, // Static text for testing
-        jsonData: '{"key": "value"}', // Static JSON string for testing
-        zonegeneratedid: 'ZoneID123', // Arbitrary zone ID, hardcoded for testing purposes
-      };
-      // Now, call the create method to see if the backend stores the prediction
-      this.predictionService.update(predictionData).subscribe({
-        next: createdResponse => {
-          console.log('Successfully stored prediction');
-          createdResponse.body;
-          // Optionally update the UI or any other state here
-          this.blocked = false; // Unblock UI after successful creation
-          this.currentPrediction = createdResponse.body;
-          this.loadPrediction();
-        },
-        error: createError => {
-          console.error('Error storing hardcoded prediction:', createError);
-          this.blocked = false; // Ensure UI is unblocked even on error
-        },
-      });
-    }
+    if (this.blocked) return; // Ensure storePrediction is not called twice
+    this.blocked = true;
+    console.log('I am in storePrediction');
+
+    const predictionData: IPrediction = {
+      id: prediction_id,
+      studentId: student_id,
+      examId: exam_id,
+      questionNumber: question_number,
+      questionId: question_id,
+      text: prediction,
+      jsonData: '{"key": "value"}',
+      zonegeneratedid: 'ZoneID123',
+    };
+
+    this.predictionService.update(predictionData).subscribe({
+      next: createdResponse => {
+        console.log('Successfully stored prediction');
+        this.currentPrediction = createdResponse.body;
+        this.loadPrediction();
+        this.blocked = false; // Unblock after successful creation
+      },
+      error: createError => {
+        console.error('Error storing hardcoded prediction:', createError);
+        this.blocked = false; // Unblock UI even on error
+      },
+    });
   }
 
   createPrediction(
@@ -2999,39 +2998,42 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     exam_id: string | undefined,
     student_id: number | undefined,
     question_number: number,
+    image_data: string,
   ): Promise<number | undefined> {
     return new Promise((resolve, reject) => {
-      if (!this.blocked) {
-        this.blocked = true;
-        console.log('I am in createPrediction');
-        const predictionData: IPrediction = {
-          studentId: student_id,
-          examId: exam_id,
-          questionNumber: question_number,
-          questionId: question_id,
-          text: 'En attente',
-          jsonData: '{"key": "value"}',
-          zonegeneratedid: 'ZoneID123',
-        };
-
-        this.predictionService.create(predictionData).subscribe({
-          next: createdResponse => {
-            console.log('Successfully created prediction');
-            this.currentPrediction = createdResponse.body;
-            this.blocked = false;
-            const id = createdResponse.body?.id;
-            console.log('Created prediction id', id);
-            resolve(id); // Resolve the Promise with the created ID
-          },
-          error: createError => {
-            console.error('Error creating prediction:', createError);
-            this.blocked = false;
-            reject(createError); // Reject the Promise on error
-          },
-        });
-      } else {
-        resolve(undefined); // Return undefined if already blocked
+      if (this.blocked) {
+        resolve(undefined); // Exit if already blocked
+        return;
       }
+
+      this.blocked = true;
+      console.log('I am in createPrediction');
+      const predictionData: IPrediction = {
+        studentId: student_id,
+        examId: exam_id,
+        questionNumber: question_number,
+        questionId: question_id,
+        text: 'En attente',
+        jsonData: '{"key": "value"}',
+        zonegeneratedid: 'ZoneID123',
+        imageData: image_data,
+      };
+
+      this.predictionService.create(predictionData).subscribe({
+        next: createdResponse => {
+          console.log('Successfully created prediction');
+          this.currentPrediction = createdResponse.body;
+          const id = createdResponse.body?.id;
+          console.log('Created prediction id', id);
+          this.blocked = false; // Unblock after prediction creation
+          resolve(id);
+        },
+        error: createError => {
+          console.error('Error creating prediction:', createError);
+          this.blocked = false;
+          reject(createError);
+        },
+      });
     });
   }
 
