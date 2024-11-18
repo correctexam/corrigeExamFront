@@ -2935,12 +2935,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.scriptService.runScript(imageData).subscribe({
           next: response => {
             const currentPageIndex = this.questionindex;
-            this.predictionsDic[currentPageIndex] = response.output;
+
+            // Ensure response.prediction exists and access the first prediction
+            const prediction = response.prediction ? response.prediction[0] : '';
+            this.predictionsDic[currentPageIndex] = prediction;
 
             // Now store the prediction with the actual ID
-            this.storePrediction(response.output, question_id, exam_id, student_id, question_number, prediction_id);
+            this.storePrediction(prediction, question_id, exam_id, student_id, question_number, prediction_id);
 
-            this.output = response.output;
+            // Update the output for display
+            this.output = prediction;
             this.error = '';
             this.isLoading = false;
             this.changeDetector.detectChanges();
