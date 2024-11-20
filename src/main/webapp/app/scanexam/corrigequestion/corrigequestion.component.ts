@@ -2937,7 +2937,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             const currentPageIndex = this.questionindex;
 
             // Ensure response.prediction exists and access the first prediction
-            const prediction = response.prediction ? response.prediction[0] : '';
+            //const prediction = response.prediction ? response.prediction[0] : '';
+            const prediction = response.prediction;
             this.predictionsDic[currentPageIndex] = prediction;
 
             // Now store the prediction with the actual ID
