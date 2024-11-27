@@ -568,6 +568,14 @@
                 style="margin-top: 1rem; text-align: center"
               >
                 <dd style="font-size: 1.1rem; font-weight: bold; margin: 0">Résultat :</dd>
+                <button
+                  *ngIf="currentPrediction.id !== undefined"
+                  type="button"
+                  class="btn btn-danger"
+                  (click)="deletePrediction(currentPrediction.id)"
+                >
+                  <i class="fa fa-trash"></i> Delete
+                </button>
                 <div
                   [innerHTML]="currentPrediction.text"
                   style="

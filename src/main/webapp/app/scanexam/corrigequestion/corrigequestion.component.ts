@@ -3063,4 +3063,19 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.currentPrediction = null; // Explicitly reset on error
     }
   }
+
+  // Method to delete a prediction
+  deletePrediction(id: number): void {
+    if (confirm('Are you sure you want to delete this prediction?')) {
+      this.predictionService.delete(id).subscribe({
+        next: () => {
+          console.log(`Deleted prediction with id: ${id}`);
+        },
+        error: err => {
+          console.error(`Error deleting prediction with id ${id}:`, err);
+          alert(`Failed to delete prediction with id ${id}. Please try again.`);
+        },
+      });
+    }
+  }
 }

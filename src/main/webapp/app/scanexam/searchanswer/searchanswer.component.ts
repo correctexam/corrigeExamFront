@@ -91,6 +91,8 @@ export class SearchanswerComponent implements OnInit, OnDestroy {
       if (!isNaN(questionNumber)) {
         // Filter predictions by question number
         this.filteredPredictions = this.predictions.filter(prediction => prediction.questionNumber == questionNumber);
+      } else if (searchTerm.toLowerCase() === '') {
+        this.filteredPredictions = [];
       } else {
         this.filteredPredictions = this.predictions;
       }

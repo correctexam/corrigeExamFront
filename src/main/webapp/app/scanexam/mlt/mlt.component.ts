@@ -4,11 +4,12 @@ import * as tf from '@tensorflow/tfjs';
 import * as ort from 'onnxruntime-web';
 
 import { Component } from '@angular/core';
+import { NgIf, NgFor } from '@angular/common';
 
 @Component({
   selector: 'jhi-mlt',
   standalone: true,
-  imports: [],
+  imports: [NgFor, NgIf],
   templateUrl: './mlt.component.html',
   styleUrl: './mlt.component.scss',
 })
