@@ -21,6 +21,7 @@ import { ComparestudentanswerComponent } from './comparestudentanswer/comparestu
 
 import { ExportanonymoupdfComponent } from './exportanonymoupdf/exportanonymoupdf.component';
 import { SearchanswerComponent } from './searchanswer/searchanswer.component';
+import { MltComponent } from './mlt/mlt.component';
 
 // set the location of the OpenCV files
 // registerAllModules();
@@ -214,6 +215,19 @@ export const SearchAnswer_ROUTE: Route = {
     documentation: {
       en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-6-correct-copies-question-by-question-or-student-by-student-or-any-other-combination',
       fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-6-corriger-ses-copies-question-par-question-ou-etudiant-par-etudiant-ou-tout-autre-combinaison',
+    },
+  },
+};
+
+export const MLT_ROUTE: Route = {
+  path: 'mlt/:examid',
+  canActivate: [UserRouteAccessService],
+  component: MltComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.answer',
+    documentation: {
+      fr: 'MLT is here',
     },
   },
 };
