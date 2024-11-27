@@ -2,24 +2,16 @@ const { createCanvas, loadImage } = require('canvas');
 import * as tf from '@tensorflow/tfjs';
 import * as ort from 'onnxruntime-web';
 
-<<<<<<< HEAD
-import { Component } from '@angular/core';
 import { NgIf, NgFor } from '@angular/common';
-=======
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
->>>>>>> ed1f0c8 (AJout routes mlt)
 
 @Component({
   selector: 'jhi-mlt',
   standalone: true,
-<<<<<<< HEAD
-  imports: [NgFor, NgIf],
-=======
-  imports: [ReactiveFormsModule, CommonModule],
->>>>>>> ed1f0c8 (AJout routes mlt)
+  imports: [NgFor, NgIf, ReactiveFormsModule, CommonModule],
   templateUrl: './mlt.component.html',
   styleUrl: './mlt.component.scss',
 })
