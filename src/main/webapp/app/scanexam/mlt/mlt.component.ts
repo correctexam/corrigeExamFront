@@ -121,7 +121,7 @@ export class MltComponent implements OnInit {
     'œ',
     '€',
   ];
-  imagePath = 'corrigeExamFrontDAN/src/main/webapp/app/scanexam/mlt/refined_line_2.png';
+  imagePath = 'main/webapp/content/images/refined_line_2.png';
 
   constructor(protected activatedRoute: ActivatedRoute) {}
 
@@ -132,37 +132,41 @@ export class MltComponent implements OnInit {
   }
 
   // Helper function to load image as tensor
-  // async plotPreprocessedImage(tensor: any) {
-  //     const canvas = document.getElementById('imageCanvas');
-  //     const ctx = canvas?.getContext('2d');
+  async plotPreprocessedImage(tensor: any) {
+    const canvas = document.getElementById('imageCanvas') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d');
 
-  //     // Rescale tensor from [0, 1] back to [0, 255] for visualization
-  //     const tensorRescaled = tensor.mul(255).cast('int32');
+    if (!ctx) {
+      throw new Error('Failed to get 2D context');
+    }
 
-  //     // Get the shape of the tensor and prepare the canvas
-  //     const [height, width, channels] = tensorRescaled.shape;
-  //     canvas.width = width;
-  //     canvas.height = height;
+    // Rescale tensor from [0, 1] back to [0, 255] for visualization
+    const tensorRescaled = tensor.mul(255).cast('int32');
 
-  //     // Convert tensor to ImageData format for rendering in the canvas
-  //     const imageData = ctx.createImageData(width, height);
-  //     const data = await tensorRescaled.data();  // Get the data from the tensor
+    // Get the shape of the tensor and prepare the canvas
+    const [height, width, channels] = tensorRescaled.shape;
+    canvas.width = width;
+    canvas.height = height;
 
-  //     // Convert the tensor back into ImageData (RGBA format)
-  //     for (let i = 0; i < height * width; i++) {
-  //         const j = i * 4; // index in ImageData (RGBA, 4 channels)
-  //         const r = data[i * channels];     // Red
-  //         const g = data[i * channels + 1]; // Green
-  //         const b = data[i * channels + 2]; // Blue
-  //         imageData.data[j] = r;            // Set Red
-  //         imageData.data[j + 1] = g;        // Set Green
-  //         imageData.data[j + 2] = b;        // Set Blue
-  //         imageData.data[j + 3] = 255;      // Set Alpha (fully opaque)
-  //     }
+    // Convert tensor to ImageData format for rendering in the canvas
+    const imageData = ctx.createImageData(width, height);
+    const data = await tensorRescaled.data(); // Get the data from the tensor
 
-  //     // Put the imageData back on the canvas
-  //     ctx.putImageData(imageData, 0, 0);
-  // }
+    // Convert the tensor back into ImageData (RGBA format)
+    for (let i = 0; i < height * width; i++) {
+      const j = i * 4; // index in ImageData (RGBA, 4 channels)
+      const r = data[i * channels]; // Red
+      const g = data[i * channels + 1]; // Green
+      const b = data[i * channels + 2]; // Blue
+      imageData.data[j] = r; // Set Red
+      imageData.data[j + 1] = g; // Set Green
+      imageData.data[j + 2] = b; // Set Blue
+      imageData.data[j + 3] = 255; // Set Alpha (fully opaque)
+    }
+
+    // Put the imageData back on the canvas
+    ctx.putImageData(imageData, 0, 0);
+  }
 
   // Decoding function (equivalent to `best_path_common` in Python)
   bestPathDecoding(probabilities: any, charList: any, maxLen: any, blankIndex: any, removeDuplicates = true) {
@@ -248,21 +252,21 @@ export class MltComponent implements OnInit {
   }
 
   // Helper function to load image into tensor
-  async loadImageTensor(imageFile: any): Promise<tf.Tensor> {
-    const img = new Image();
-    img.src = URL.createObjectURL(imageFile);
+  async loadImageTensor(imagePath: string) {
+    // Utilisation de la fonction `loadImage` de `canvas` pour charger l'image
+    const image = await loadImage(imagePath);
 
-    return new Promise(resolve => {
-      const canvas = createCanvas(img.width, img.height);
-      const ctx = canvas?.getContext('2d');
+    // Créer un canvas avec les dimensions de l'image
+    const canvas = createCanvas(image.width, image.height);
+    const context = canvas.getContext('2d');
 
-      const imageData = ctx.getImageData(0, 0, img.width, img.height);
-      const data = tf.tensor(imageData.data, [img.height, img.width, 4], 'float32'); // RGBA
+    // Dessiner l'image sur le canvas
+    context.drawImage(image, 0, 0);
 
-      // Extract the RGB channels
-      const rgb = data.slice([0, 0, 0], [-1, -1, 3]);
-      resolve(rgb);
-    });
+    // Convertir l'image du canvas en un Tensor
+    const tensor = tf.browser.fromPixels(canvas);
+
+    return tensor;
   }
 
   async processTensorData(
@@ -380,22 +384,27 @@ export class MltComponent implements OnInit {
 
   // Event listener for image input
   async realThing() {
-    const imageFile = await loadImage(this.imagePath);
+    try {
+      const imageTensor = await this.loadImageTensor(this.imagePath);
 
-    // Preprocessing parameters (These would normally come from your model or a config)
-    const channelNb = 1; // RGB
-    const padValue = 0.0;
-    const padWidthRight = 64;
-    const padWidthLeft = 64;
-    const mean = 238.6531 / 255;
-    const std = 43.4356 / 255;
-    const targetHeight = 128;
+      // Preprocessing parameters (These would normally come from your model or a config)
+      const channelNb = 1; // RGB
+      const padValue = 0.0;
+      const padWidthRight = 64;
+      const padWidthLeft = 64;
+      const mean = 238.6531 / 255;
+      const std = 43.4356 / 255;
+      const targetHeight = 128;
 
-    // Preprocess the image
-    // const preprocessedImage = await this.preprocessImage(imageFile, channelNb, padValue, padWidthRight, padWidthLeft, mean, std, targetHeight);
+      // Preprocess the image
+      // const preprocessedImage = await this.preprocessImage(imageTensor, channelNb, padValue, padWidthRight, padWidthLeft, mean, std, targetHeight);
 
-    // Run inference using the preprocessed image
-    const modelPath = 'trace_mlt-4modern_hw_rimes_lines-v3+synth-1034184_best_encoder.tar.onnx'; // Specify the ONNX model path
-    this.runInference(imageFile, modelPath);
+      // Run inference using the preprocessed image
+      // Specify the ONNX model path
+      const modelPath = 'trace_mlt-4modern_hw_rimes_lines-v3+synth-1034184_best_encoder.tar.onnx';
+      this.runInference(imageTensor, modelPath);
+    } catch (error) {
+      console.error('Error during inference:', error);
+    }
   }
 }
