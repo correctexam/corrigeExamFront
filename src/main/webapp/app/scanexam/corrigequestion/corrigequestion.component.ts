@@ -298,6 +298,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   predictionsDic: { [key: number]: string } = {}; // Object to store predictions for each page
   currentPrediction: IPrediction | null = null;
   questionId: number | undefined = -1;
+  deleted: boolean = false;
 
   constructor(
     public examService: ExamService,
@@ -2907,6 +2908,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   isLoading = false;
   // Méthode pour exécuter le script
   async executeScript(): Promise<void> {
+    this.deleted = false;
     if (this.currentQuestion?.typeAlgoName === 'manuscrit') {
       console.log('Yes, I am manuscrit.');
       this.isLoading = true;
@@ -3054,6 +3056,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.currentPrediction = predictions.find(pred => pred.studentId === this.studentid) || null;
 
       if (this.currentPrediction) {
+        this.deleted = false;
         console.log('Loaded current prediction:', this.currentPrediction);
       } else {
         console.warn('No valid predictions found for the current question index.');
@@ -3069,6 +3072,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     if (confirm('Are you sure you want to delete this prediction?')) {
       this.predictionService.delete(id).subscribe({
         next: () => {
+          this.deleted = true;
+          this.currentPrediction = null;
           console.log(`Deleted prediction with id: ${id}`);
         },
         error: err => {

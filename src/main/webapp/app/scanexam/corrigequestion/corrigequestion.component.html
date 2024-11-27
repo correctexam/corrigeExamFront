@@ -558,6 +558,16 @@
                 <p-progressSpinner *ngIf="blocked" styleClass="w-2rem h-2rem"></p-progressSpinner>
               </div>
 
+              <button
+                *ngIf="deleted == true"
+                type="button"
+                class="btn"
+                (click)="executeScript()"
+                style="margin-top: 1rem; text-align: center; background-color: #007bff; color: white"
+              >
+                <i class="fa fa-trash"></i> Refaire Reconnaissance d'Ecriture
+              </button>
+
               <div
                 *ngIf="
                   currentPrediction &&
@@ -569,7 +579,7 @@
               >
                 <dd style="font-size: 1.1rem; font-weight: bold; margin: 0">Résultat :</dd>
                 <button
-                  *ngIf="currentPrediction.id !== undefined"
+                  *ngIf="currentPrediction.id !== undefined && deleted == false"
                   type="button"
                   class="btn btn-danger"
                   (click)="deletePrediction(currentPrediction.id)"
