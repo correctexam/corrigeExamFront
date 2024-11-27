@@ -1,19 +1,29 @@
-import { createCanvas, loadImage } from 'canvas';
+const { createCanvas, loadImage } = require('canvas');
 import * as tf from '@tensorflow/tfjs';
-// @ts-ignore
 import * as ort from 'onnxruntime-web';
 
+<<<<<<< HEAD
 import { Component } from '@angular/core';
 import { NgIf, NgFor } from '@angular/common';
+=======
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+>>>>>>> ed1f0c8 (AJout routes mlt)
 
 @Component({
   selector: 'jhi-mlt',
   standalone: true,
+<<<<<<< HEAD
   imports: [NgFor, NgIf],
+=======
+  imports: [ReactiveFormsModule, CommonModule],
+>>>>>>> ed1f0c8 (AJout routes mlt)
   templateUrl: './mlt.component.html',
   styleUrl: './mlt.component.scss',
 })
-export class MltComponent {
+export class MltComponent implements OnInit {
   charList = [
     '<BLANK>',
     ' ',
@@ -121,7 +131,13 @@ export class MltComponent {
   ];
   imagePath = 'corrigeExamFrontDAN/src/main/webapp/app/scanexam/mlt/refined_line_2.png';
 
-  constructor() {}
+  constructor(protected activatedRoute: ActivatedRoute) {}
+
+  ngOnInit() {
+    this.activatedRoute.paramMap.subscribe(params => {
+      this.realThing();
+    });
+  }
 
   // Helper function to load image as tensor
   // async plotPreprocessedImage(tensor: any) {

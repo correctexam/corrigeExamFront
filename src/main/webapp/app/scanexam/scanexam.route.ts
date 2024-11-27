@@ -227,7 +227,8 @@ export const MLT_ROUTE: Route = {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.answer',
     documentation: {
-      fr: 'MLT is here',
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-6-correct-copies-question-by-question-or-student-by-student-or-any-other-combination',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-6-corriger-ses-copies-question-par-question-ou-etudiant-par-etudiant-ou-tout-autre-combinaison',
     },
   },
 };
@@ -420,4 +421,5 @@ export const SCANEXAM_ROUTES = [
   EXPORTPDFBYSHEET_ROUTE,
   CompareHybridCommentAnswer_ROUTE,
   SearchAnswer_ROUTE,
+  MLT_ROUTE,
 ];
