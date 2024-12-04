@@ -2,6 +2,9 @@ const { createCanvas, loadImage } = require('canvas');
 import * as tf from '@tensorflow/tfjs';
 import * as ort from 'onnxruntime-web';
 
+// Set global configuration for WebAssembly paths
+ort.env.wasm.wasmPaths = 'http://localhost:8080/onnxruntime/';
+
 import { NgIf, NgFor } from '@angular/common';
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
@@ -121,7 +124,7 @@ export class MltComponent implements OnInit {
     'œ',
     '€',
   ];
-  imagePath = 'main/webapp/content/images/refined_line_2.png';
+  imagePath = 'http://localhost:8080/content/images/refined_line_2.png';
 
   constructor(protected activatedRoute: ActivatedRoute) {}
 
@@ -318,7 +321,11 @@ export class MltComponent implements OnInit {
   async runInference(imageTensor: any, modelPath: any) {
     try {
       // Load the ONNX model
-      const session = await ort.InferenceSession.create(modelPath);
+      // Create the ONNX Inference Session
+      const modelPath = 'http://localhost:8080/path/to/your/model.onnx'; // Update with your actual model path
+      const session = await ort.InferenceSession.create(modelPath, {
+        executionProviders: ['wasm'], // Use WebAssembly backend for inference
+      });
 
       // Prepare inputs for the model (like the prepare_model_input_f function)
       const inputImage = imageTensor.expandDims(0).transpose([0, 3, 1, 2]); // b c h w format
@@ -385,6 +392,7 @@ export class MltComponent implements OnInit {
   // Event listener for image input
   async realThing() {
     try {
+      console.log('Image Path:', this.imagePath);
       const imageTensor = await this.loadImageTensor(this.imagePath);
 
       // Preprocessing parameters (These would normally come from your model or a config)
