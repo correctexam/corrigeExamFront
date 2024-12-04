@@ -31,3 +31,6 @@ INSERT INTO question_type (algo_name, endpoint, js_function) VALUES ('manuscrit'
 
 ALTER TABLE prediction ADD COLUMN image_data LONGTEXT;
 
+npm install onnxruntime-web
+npm install canvas
+npm install @tensorflow/tfjs
