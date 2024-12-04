@@ -395,7 +395,8 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
           '' +
             this.exam!.id +
             '_' +
-            this.selectionStudents![0].examSheets![0].id! +
+            this.sheet!.id +
+            //            this.selectionStudents![0].examSheets![0].id! +
             '_' +
             this.questionNumeros[this.questionindex] +
             '_' +
@@ -411,7 +412,8 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
           '' +
             this.exam!.id +
             '_' +
-            this.selectionStudents![0].examSheets![0].id! +
+            this.sheet!.id +
+            //            this.selectionStudents![0].examSheets![0].id! +
             '_' +
             this.questionNumeros[this.questionindex] +
             '_' +
@@ -423,7 +425,8 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
             '' +
               this.exam!.id +
               '_' +
-              this.selectionStudents![0].examSheets![0].id! +
+              this.sheet!.id +
+              //            this.selectionStudents![0].examSheets![0].id! +
               '_' +
               this.questionNumeros[this.questionindex] +
               '_' +
