@@ -1,0 +1,33 @@
+ USE gradeScopeIstic;
+
+ CREATE TABLE prediction (
+    ->     id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     json_data TEXT NOT NULL,
+    ->     question_id VARCHAR(255),
+    ->     question_number INT,
+    ->     text TEXT,
+    ->     zonegeneratedid VARCHAR(255)
+    -> );
+
+USE gradeScopeIstic;
+
+ALTER TABLE prediction
+    -> ADD COLUMN student_id VARCHAR(255),
+    -> ADD COLUMN exam_id VARCHAR(255);
+
+
+
+ALTER TABLE prediction MODIFY id BIGINT(20) AUTO_INCREMENT;
+
+CREATE TABLE student_response_predictions (
+    student_response_id BIGINT(20) NOT NULL,
+    predictions_id BIGINT(20) NOT NULL,
+    PRIMARY KEY (student_response_id, predictions_id),
+    FOREIGN KEY (student_response_id) REFERENCES student_response(id),
+    FOREIGN KEY (predictions_id) REFERENCES prediction(id)
+);
+
+INSERT INTO question_type (algo_name, endpoint, js_function) VALUES ('manuscrit', '', '');
+
+ALTER TABLE prediction ADD COLUMN image_data LONGTEXT;
+

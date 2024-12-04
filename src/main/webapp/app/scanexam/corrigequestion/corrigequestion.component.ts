@@ -1726,6 +1726,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       }
     }
+
+    this.loadPrediction();
+    setTimeout(() => {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
+        this.executeScript();
+      }
+    }, 500);
   }
 
   async nextStudent() {
@@ -1767,6 +1774,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       }
     }
+
+    this.loadPrediction();
+    setTimeout(() => {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
+        this.executeScript();
+      }
+    }, 500);
   }
   async previousQuestion(): Promise<void> {
     if (this.queryPoolPromise) {
@@ -1788,6 +1802,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
+
+    this.loadPrediction();
+    setTimeout(() => {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
+        this.executeScript();
+      }
+    }, 500);
   }
 
   async nextQuestion(): Promise<void> {
@@ -1809,6 +1830,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
+    this.loadPrediction();
+    setTimeout(() => {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
+        this.executeScript();
+      }
+    }, 500);
   }
 
   changeStudent($event: any): void {
