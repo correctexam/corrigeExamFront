@@ -145,14 +145,12 @@ async function plotPreprocessedImage(tensor) {
 
 // Decoding function (equivalent to `best_path_common` in Python)
 function bestPathDecoding(probabilities, charList, maxLen, blankIndex, removeDuplicates = true) {
-  console.log('Probabilities:', probabilities);
   // If max_len is -1, use the length of probabilities; otherwise, clip at maxLen
   maxLen = maxLen === -1 ? probabilities.length : Math.min(maxLen, probabilities.length);
 
   // Get the character with the highest probability for each frame (argmax)
   // const sequenceRaw = probabilities.slice(0, maxLen).map(frame => frame.indexOf(Math.max(...frame)));
   const sequenceRaw = probabilities.slice(0, maxLen).map(frame => frame.indexOf(Math.max(...frame)));
-  console.log('raw sequence:', sequenceRaw);
   // Process sequence for removing duplicates and blanks
   let processedSequence = [];
   if (removeDuplicates) {
@@ -168,7 +166,6 @@ function bestPathDecoding(probabilities, charList, maxLen, blankIndex, removeDup
   } else {
     processedSequence = sequenceRaw;
   }
-  console.log('Processed Sequence:', processedSequence);
   // Convert the integer indices to characters
   return convertIntToChars(processedSequence, charList);
 }
@@ -176,16 +173,13 @@ function bestPathDecoding(probabilities, charList, maxLen, blankIndex, removeDup
 // Convert integer sequence to characters
 function convertIntToChars(sequence, charList) {
   const done = sequence.map(index => charList[index]).join('');
-  console.log('Prediction:', done);
   return done;
 }
 
 // Define preprocessing steps (similar to prepare_image_f in C++)
 async function preprocessImage(imageFile, channelNb, padValue, padWidthRight, padWidthLeft, mean, std, targetHeight) {
   // Load the image
-  console.log('I am in preprocessImage');
   const imageTensor = await loadImageTensor(imageFile);
-  console.log('Image came to tensor');
   let processedImage = imageTensor;
 
   // If grayscale conversion is needed
@@ -228,11 +222,8 @@ async function preprocessImage(imageFile, channelNb, padValue, padWidthRight, pa
 // Helper function to load image into tensor
 async function loadImageTensor(imageFile) {
   const imagePath = path.resolve(__dirname, imageFile);
-  console.log('I am in loadImageTensor');
   const img = await loadImage(imagePath);
-  console.log('I got the img', img);
   return new Promise(resolve => {
-    console.log('I loaded the img');
     const canvas = createCanvas(img.width, img.height);
     const ctx = canvas.getContext('2d');
     canvas.width = img.width;
@@ -244,7 +235,6 @@ async function loadImageTensor(imageFile) {
 
     // Extract the RGB channels
     const rgb = data.slice([0, 0, 0], [-1, -1, 3]);
-    console.log('Rgb', rgb);
     resolve(rgb);
   });
 }
@@ -265,30 +255,22 @@ async function runInference(imageTensor, modelPath) {
 
     // Convert tf.Tensor to ort.Tensor
     const inputImageONNX = new ort.Tensor('float32', await inputImage.data(), inputImage.shape);
-    console.log(' inputImage.data():', inputImage.data());
-    console.log('inputImage.shape', inputImage.shape);
-    console.log('inputImageONNX ', inputImageONNX);
     const imageWidthONNX = new ort.Tensor('int32', await imageWidth.dataSync());
     const outputHiddenONNX = new ort.Tensor('int32', await outputHidden.dataSync());
     const prodONNX = new ort.Tensor('int32', await prod.dataSync());
 
-    console.log('imageWidth:', await imageWidth.data());
-    console.log('inputImage:', inputImage.shape);
     // Run inference
     const results = await session.run({
       inputs: inputImageONNX,
       image_widths: imageWidthONNX,
     });
 
-    console.log('Inference Output:', results);
     // Parameters for decoding
     const maxLen = -1; // No specific max length
     const blankIndex = 0; // '<BLANK>' corresponds to index 0
     const removeDuplicates = true;
     const probabilitiesTensor = results.output; // Adjust based on your model's output name
     const probabilities1D = Array.from(probabilitiesTensor.data); // Convert ONNX tensor to flat array
-    console.log('probabilities1D:', probabilities1D);
-    console.log('probabilities1D shape:', probabilities1D.shape);
     const batchSize = probabilitiesTensor.dims[0];
     const numFrames = probabilitiesTensor.dims[1];
     const numChars = probabilitiesTensor.dims[2];
@@ -304,20 +286,19 @@ async function runInference(imageTensor, modelPath) {
       }
       reshapedProbabilities.push(batchFrames);
     }
-    console.log('Reshaped probobilities:', reshapedProbabilities);
     // Perform decoding
     // Decode all sequences in the batch
     const decodedBatch = reshapedProbabilities.map(probabilities =>
       bestPathDecoding(probabilities, charList, maxLen, blankIndex, removeDuplicates),
     );
-    console.log(decodedBatch);
-    document.getElementById('result').textContent = decodedBatch;
+    console.log('Decoded batch:', decodedBatch);
+    return decodedBatch;
   } catch (error) {
     console.error('Error during inference:', error);
   }
 }
 
-async function firstDo() {
+async function executeMLT() {
   const imageFile = 'refined_line_2.png';
 
   // Preprocessing parameters (These would normally come from your model or a config)
@@ -331,11 +312,12 @@ async function firstDo() {
 
   // Preprocess the image
   const preprocessedImage = await preprocessImage(imageFile, channelNb, padValue, padWidthRight, padWidthLeft, mean, std, targetHeight);
-  console.log('I passed here');
   // Run inference using the preprocessed image
   const modelPath = 'trace_mlt-4modern_hw_rimes_lines-v3+synth-1034184_best_encoder.tar.onnx'; // Specify the ONNX model path
-  runInference(preprocessedImage, modelPath);
+  const prediction = await runInference(preprocessedImage, modelPath);
+  console.log('Prediction:', prediction);
+  return prediction;
 }
 
-console.log('Script is running...');
-firstDo();
+const result = executeMLT();
+console.log('Result:', result);
