@@ -1,8 +1,11 @@
 const tf = require('@tensorflow/tfjs');
-const ort = require('onnxruntime-node');
+const ort = require('onnxruntime-web');
 
 const { createCanvas, loadImage } = require('canvas');
-const path = require('path');
+
+let session;
+
+const modelPath = 'trace_mlt-4modern_hw_rimes_lines-v3+synth-1034184_best_encoder.tar.onnx'; // Specify the ONNX model path
 
 const charList = [
   '<BLANK>',
@@ -177,37 +180,30 @@ function convertIntToChars(sequence, charList) {
 }
 
 // Define preprocessing steps (similar to prepare_image_f in C++)
-async function preprocessImage(imageFile, channelNb, padValue, padWidthRight, padWidthLeft, mean, std, targetHeight) {
-  // Load the image
-  const imageTensor = await loadImageTensor(imageFile);
+async function preprocessImageTensor(imageTensor, { channelNb, padValue, padWidthRight, padWidthLeft, mean, std, targetHeight }) {
   let processedImage = imageTensor;
 
-  // If grayscale conversion is needed
   if (channelNb === 1 && imageTensor.shape[2] > 1) {
     processedImage = tf.mean(imageTensor, -1, true); // Convert to grayscale
   }
 
-  // Resize the image to target height, maintaining aspect ratio
   const aspectRatio = imageTensor.shape[1] / imageTensor.shape[0]; // width/height
   const newWidth = Math.round(targetHeight * aspectRatio);
   processedImage = tf.image.resizeBilinear(processedImage, [targetHeight, newWidth]);
 
-  // Normalize the image tensor (normalize_tensor_f equivalent)
-  processedImage = processedImage.div(tf.scalar(255.0)); // Divide by 255 to scale pixel values
-  processedImage = processedImage.sub(tf.scalar(mean)).div(tf.scalar(std)); // Apply mean and std normalization
+  processedImage = processedImage.div(tf.scalar(255.0));
+  processedImage = processedImage.sub(tf.scalar(mean)).div(tf.scalar(std));
 
-  // Pad the image on both sides
-  const padLeft = tf.pad(
-    processedImage,
-    [
-      [0, 0],
-      [padWidthLeft, 0],
-      [0, 0],
-    ],
-    padValue,
-  );
   const paddedImage = tf.pad(
-    padLeft,
+    tf.pad(
+      processedImage,
+      [
+        [0, 0],
+        [padWidthLeft, 0],
+        [0, 0],
+      ],
+      padValue,
+    ),
     [
       [0, 0],
       [0, padWidthRight],
@@ -217,6 +213,27 @@ async function preprocessImage(imageFile, channelNb, padValue, padWidthRight, pa
   );
 
   return paddedImage;
+}
+
+// Modification pour exécuter une session existante
+async function runInference(imageTensor, session) {
+  const inputImage = imageTensor.expandDims(0).transpose([0, 3, 1, 2]); // b c h w format
+
+  const imageWidth = tf.scalar(inputImage.shape[3], 'int32');
+  const outputHidden = tf.scalar(0, 'int32');
+  const prod = tf.scalar(1, 'int32');
+
+  const inputImageONNX = new ort.Tensor('float32', await inputImage.data(), inputImage.shape);
+  const imageWidthONNX = new ort.Tensor('int32', await imageWidth.dataSync());
+  const outputHiddenONNX = new ort.Tensor('int32', await outputHidden.dataSync());
+  const prodONNX = new ort.Tensor('int32', await prod.dataSync());
+
+  const results = await session.run({
+    inputs: inputImageONNX,
+    image_widths: imageWidthONNX,
+  });
+
+  return results; // Transformez selon le besoin pour les outputs
 }
 
 // Helper function to load image into tensor
@@ -296,6 +313,12 @@ async function runInference(imageTensor, modelPath) {
   } catch (error) {
     console.error('Error during inference:', error);
   }
+}
+
+async function loadImageTensorFromBase64(base64Image) {
+  const buffer = Buffer.from(base64Image, 'base64');
+  const imageTensor = await loadImageTensor(buffer);
+  return imageTensor;
 }
 
 async function executeMLT() {

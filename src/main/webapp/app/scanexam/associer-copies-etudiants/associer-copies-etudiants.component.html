@@ -208,6 +208,19 @@
             </button>
           </div>
         </div>
+        <div class="col-3">
+          <div class="d-flex justify-content-end">
+            <button
+              pButton
+              (click)="executeMLT()"
+              jhiTranslate="scanexam.showgalleria"
+              [pTooltip]="'scanexam.showFullPageTooltip' | translate"
+              [tooltipPosition]="'bottom'"
+            >
+              Show full page
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="canvas-wrapper foo">

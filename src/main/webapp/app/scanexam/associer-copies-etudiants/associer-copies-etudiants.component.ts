@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable prefer-const */
 /* eslint-disable no-console */
+
 import { AfterViewInit, Component, HostListener, OnInit, ViewChild, effect } from '@angular/core';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ZoneService } from '../../entities/zone/service/zone.service';
@@ -42,6 +43,7 @@ import { GalleriaModule } from 'primeng/galleria';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { ToastModule } from 'primeng/toast';
+import { loadImageTensor, runInference, preprocessImage, loadImageTensorFromBase64, preprocessImageTensor } from '../mlt/mlt';
 
 export interface IPage {
   image?: ImageData;
@@ -1796,5 +1798,77 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   latinise(s: string | undefined): string | undefined {
     // eslint-disable-next-line no-useless-escape
     return s?.replace(/[^A-Za-z0-9\[\] ]/g, a => this.latinMap().get(a) ?? a);
+  }
+
+  isValidBase64(base64: string): boolean {
+    const base64Pattern = /^[A-Za-z0-9+/=]+$/;
+    return base64Pattern.test(base64);
+  }
+
+  decodeBase64Image(base64Image: string): HTMLImageElement {
+    // Créer un élément Image
+    const img = new Image();
+
+    // Vérifier si l'image est correctement encodée en base64
+    if (!base64Image.startsWith('data:image/')) {
+      throw new Error('Invalid Base64 image format.');
+    }
+
+    // Définir la source de l'image à partir de la chaîne Base64
+    img.src = base64Image;
+
+    // Retourner l'image HTMLImageElement
+    return img;
+  }
+
+  joinPath(...segments: string[]): string {
+    return segments.join('/');
+  }
+
+  async runMLTScript(nameImageBase64: string, firstnameImageBase64: string): Promise<void> {
+    try {
+      // Enregistrer les images localement ou transformer en tensors directement
+      const nameImageTensor = await loadImageTensorFromBase64(nameImageBase64);
+      const firstnameImageTensor = await loadImageTensorFromBase64(firstnameImageBase64);
+
+      // Paramètres de prétraitement
+      const preprocessingParams = {
+        channelNb: 1, // Conversion en niveaux de gris
+        padValue: 0.0,
+        padWidthRight: 64,
+        padWidthLeft: 64,
+        mean: 238.6531 / 255,
+        std: 43.4356 / 255,
+        targetHeight: 128,
+      };
+
+      // Prétraitement des images
+      const preprocessedImages = await Promise.all([
+        preprocessImageTensor(nameImageTensor, preprocessingParams),
+        preprocessImageTensor(firstnameImageTensor, preprocessingParams),
+      ]);
+
+      const [preprocessedNameImage, preprocessedFirstnameImage] = preprocessedImages;
+
+      // Charger le modèle ONNX une seule fois
+      const modelPath = 'trace_mlt-4modern_hw_rimes_lines-v3+synth-1034184_best_encoder.tar.onnx';
+      const session = await ort.InferenceSession.create(modelPath);
+
+      // Exécution des inférences
+      const [namePrediction, firstnamePrediction] = await Promise.all([
+        runInference(preprocessedNameImage, session),
+        runInference(preprocessedFirstnameImage, session),
+      ]);
+
+      console.log('Name Prediction:', namePrediction);
+      console.log('Firstname Prediction:', firstnamePrediction);
+    } catch (error) {
+      console.error('Error during MLT execution:', error);
+    }
+  }
+
+  executeMLT(): void {
+    console.log(this.nameImageImg);
+    this.runMLTScript(this.nameImageImg ?? '', this.firstnameImageImg ?? '');
   }
 }
