@@ -10,7 +10,7 @@ import { InferenceSession, env } from 'onnxruntime-web';
 
 type Tensor = tf.Tensor;
 // Optionnel: Vérifie la compatibilité WASM
-ort.env.wasm.wasmPaths = './node_modules/onnxruntime-web/dist/';
+ort.env.wasm.wasmPaths = '/public/';
 
 @Component({
   selector: 'jhi-mlt',
@@ -153,15 +153,17 @@ export class MltComponent {
 
     ctx.putImageData(imageData, 0, 0);
   }
-
   async initializeOrt() {
     try {
-      await (ort.env.initialize as () => Promise<void>)();
-      console.log('ONNX Runtime initialized successfully');
+      console.log('Manually configuring ONNX Runtime environment...');
+      ort.env.wasm.numThreads = 1; // Set WebAssembly threads
+      ort.env.wasm.proxy = false; // Disable proxy if not required
+      console.log('ONNX Runtime environment configured successfully.');
     } catch (error) {
-      console.error('Error initializing ONNX Runtime:', error);
+      console.error('Error configuring ONNX Runtime:', error);
     }
   }
+
   // Fonction de décodage
   bestPathDecoding(probabilities: number[][], charList: string[], maxLen: number, blankIndex: number, removeDuplicates = true): string {
     maxLen = maxLen === -1 ? probabilities.length : Math.min(maxLen, probabilities.length);
@@ -290,10 +292,12 @@ export class MltComponent {
   // Fonction pour effectuer une inférence avec le modèle ONNX
   async runInference(imageTensor: Tensor, modelPath: string): Promise<string> {
     try {
+      console.log('Just before create in runInference');
       const session = await ort.InferenceSession.create(modelPath, {
         executionProviders: ['wasm'],
       });
       console.log('Inference session created');
+      console.log('Model input names:', session.inputNames);
 
       const inputImage = imageTensor.expandDims(0).transpose([0, 3, 1, 2]);
       const imageWidth = tf.scalar(inputImage.shape[3] ?? 0, 'int32');
@@ -302,7 +306,7 @@ export class MltComponent {
       const imageWidthONNX = new ort.Tensor('int32', await imageWidth.dataSync());
 
       const results = await session.run({
-        inputImage: inputImageONNX,
+        inputs: inputImageONNX,
         image_widths: imageWidthONNX,
       });
 
@@ -324,8 +328,8 @@ export class MltComponent {
       }
 
       const decodedBatch = reshapedProbabilities.map(probabilities => this.bestPathDecoding(probabilities, this.charList, -1, 0, true));
-
-      document.getElementById('result')!.textContent = decodedBatch.join(', ');
+      console.log('DecodedBatch:', decodedBatch);
+      //document.getElementById('result')!.textContent = decodedBatch.join(', ');
       return decodedBatch.join(', ');
     } catch (error) {
       console.error('Error during inference:', error);
