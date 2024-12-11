@@ -1802,6 +1802,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   }
 
   executeMLTScript() {
-    this.mltcomponent.executeMLT();
+    this.mltcomponent.executeMLT(this.nameImageImg);
+    this.mltcomponent.executeMLT(this.firstnameImageImg);
   }
 }

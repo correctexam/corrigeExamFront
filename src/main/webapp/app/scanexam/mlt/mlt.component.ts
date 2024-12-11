@@ -155,10 +155,8 @@ export class MltComponent {
   }
   async initializeOrt() {
     try {
-      console.log('Manually configuring ONNX Runtime environment...');
       ort.env.wasm.numThreads = 1; // Set WebAssembly threads
       ort.env.wasm.proxy = false; // Disable proxy if not required
-      console.log('ONNX Runtime environment configured successfully.');
     } catch (error) {
       console.error('Error configuring ONNX Runtime:', error);
     }
@@ -203,7 +201,6 @@ export class MltComponent {
   ): Promise<Tensor> {
     const imageTensor = await this.loadImageTensor(imageFile);
     let processedImage = imageTensor;
-    console.log('je suis dans le tensor');
     if (channelNb === 1 && imageTensor.shape[2] !== undefined && imageTensor.shape[2] > 1) {
       processedImage = tf.mean(imageTensor, -1, true);
     }
@@ -239,14 +236,12 @@ export class MltComponent {
 
   // Chargement de l'image en tenseur
   async loadImageTensor(imageFile: File): Promise<Tensor> {
-    console.log('File details:', imageFile);
     if (!imageFile.type.startsWith('image/')) {
       throw new Error(`Invalid file type: ${imageFile.type}`);
     }
 
     const img = new Image();
     const objectURL = URL.createObjectURL(imageFile);
-    console.log('Object URL:', objectURL);
     img.src = objectURL;
 
     return new Promise((resolve, reject) => {
@@ -254,13 +249,11 @@ export class MltComponent {
         try {
           let canvas = document.getElementById('imageCanvas') as HTMLCanvasElement;
           if (!canvas) {
-            console.log('Canvas not found, creating dynamically...');
             canvas = document.createElement('canvas');
             canvas.id = 'imageCanvas';
             canvas.style.display = 'none';
             document.body.appendChild(canvas);
           }
-          console.log('Canvas found or created:', canvas);
 
           const ctx = canvas.getContext('2d');
           if (!ctx) {
@@ -292,12 +285,9 @@ export class MltComponent {
   // Fonction pour effectuer une inférence avec le modèle ONNX
   async runInference(imageTensor: Tensor, modelPath: string): Promise<string> {
     try {
-      console.log('Just before create in runInference');
       const session = await ort.InferenceSession.create(modelPath, {
         executionProviders: ['wasm'],
       });
-      console.log('Inference session created');
-      console.log('Model input names:', session.inputNames);
 
       const inputImage = imageTensor.expandDims(0).transpose([0, 3, 1, 2]);
       const imageWidth = tf.scalar(inputImage.shape[3] ?? 0, 'int32');
@@ -328,7 +318,6 @@ export class MltComponent {
       }
 
       const decodedBatch = reshapedProbabilities.map(probabilities => this.bestPathDecoding(probabilities, this.charList, -1, 0, true));
-      console.log('DecodedBatch:', decodedBatch);
       //document.getElementById('result')!.textContent = decodedBatch.join(', ');
       return decodedBatch.join(', ');
     } catch (error) {
@@ -337,7 +326,7 @@ export class MltComponent {
     }
   }
 
-  async executeMLT(): Promise<string | undefined> {
+  async executeMLT(base64: any): Promise<string | undefined> {
     this.initializeOrt();
     // Paramètres de prétraitement (issus de la configuration ou d'un modèle)
     const channelNb: number = 1; // Monochrome
@@ -350,11 +339,11 @@ export class MltComponent {
 
     try {
       // Chargement du fichier image
-      const imageFileUrl = 'content/images/refined_line_2.png'; // Chemin relatif à partir de la racine du serveur web
-      const response = await fetch(imageFileUrl);
+      //const imageFileUrl = 'content/images/refined_line_2.png'; // Chemin relatif à partir de la racine du serveur web
+      //const cleanedBase64 = await this.removeRectangles(base64);
+      const response = await fetch(base64);
       const blob = await response.blob();
-      const imageFile = new File([blob], 'refined_line_2.png', { type: blob.type });
-      console.log(imageFile);
+      const imageFile = new File([blob], 'my_image.png', { type: blob.type });
       // Prétraitement de l'image
       const preprocessedImage = await this.preprocessImage(
         imageFile,
@@ -366,15 +355,12 @@ export class MltComponent {
         std,
         targetHeight,
       );
-      console.log('prout');
       // Spécification du chemin du modèle ONNX
       const modelPath: string = '../../content/classifier/trace_mlt-4modern_hw_rimes_lines-v3+synth-1034184_best_encoder.tar.onnx';
-      console.log('je suis dans le modele');
-      console.log(WebAssembly.validate(new Uint8Array([0x01, 0x00, 0x00, 0x00])));
 
       // Exécution de l'inférence
       const prediction = await this.runInference(preprocessedImage, modelPath);
-      console.log('JE SUIS BIENTOT HAHAH');
+
       console.log('Prediction:', prediction);
       return prediction;
     } catch (error) {
