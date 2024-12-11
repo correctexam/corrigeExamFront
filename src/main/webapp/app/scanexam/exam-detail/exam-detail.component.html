@@ -186,6 +186,40 @@
               <fa-icon [icon]="'database'" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
             ><BR /> <span jhiTranslate="scanexam.examanswerresearch"></span><span *ngIf="correctionFinish">✅</span>
           </button>
+          <!--button
+            [routerLink]="'/mlt/' + this.examId"
+            [style]="{ marginBottom: '1em', margin: '1em' }"
+            [tooltipZIndex]="'3000'"
+            [pTooltip]="'mlt' | translate"
+            tooltipPosition="top"
+            class="p-element p-ripple button80"
+            pButton
+            pRipple
+            type="button"
+            [disabled]="blocked || !showCorrection"
+          >
+            <fa-stack>
+              <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
+              <fa-icon [icon]="'image'" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
+            ><BR /> <span jhiTranslate="MLT is here"></span><span *ngIf="correctionFinish">✅</span>
+          </button>
+          <button
+            [routerLink]="'/image-acces/' + this.examId"
+            [style]="{ marginBottom: '1em', margin: '1em' }"
+            [tooltipZIndex]="'3000'"
+            [pTooltip]="'image-acces' | translate"
+            tooltipPosition="top"
+            class="p-element p-ripple button80"
+            pButton
+            pRipple
+            type="button"
+            [disabled]="blocked || !showCorrection"
+          >
+            <fa-stack>
+              <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
+              <fa-icon [icon]="'image'" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
+            ><BR /> <span jhiTranslate="Image Acces is here"></span><span *ngIf="correctionFinish">✅</span>
+          </button-->
         </div>
       </div>
     </div>

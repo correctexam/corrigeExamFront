@@ -542,7 +542,7 @@
               <div class="col-2 p-0" *ngIf="!focusView">
                 <div *ngIf="currentQuestion?.typeAlgoName === 'manuscrit' && !currentPrediction">
                   <!-- Show loading indicator when DAN is running -->
-                  <div *ngIf="isLoading" class="loading-indicator">Chargement de la reconnaissance de l'écriture manuscrite ...</div>
+                  <!--div *ngIf="isLoading" class="loading-indicator">Chargement de la reconnaissance de l'écriture manuscrite ...</div-->
                 </div>
                 <!--button
                   class="sm:text-xs md:text-xs lg:text-base"
@@ -558,6 +558,16 @@
                 <p-progressSpinner *ngIf="blocked" styleClass="w-2rem h-2rem"></p-progressSpinner>
               </div>
 
+              <button
+                *ngIf="deleted == true"
+                type="button"
+                class="btn"
+                (click)="executeScript()"
+                style="margin-top: 1rem; text-align: center; background-color: #007bff; color: white"
+              >
+                <i class="fa fa-trash"></i> Refaire Reconnaissance d'Ecriture
+              </button>
+
               <div
                 *ngIf="
                   currentPrediction &&
@@ -568,6 +578,14 @@
                 style="margin-top: 1rem; text-align: center"
               >
                 <dd style="font-size: 1.1rem; font-weight: bold; margin: 0">Résultat :</dd>
+                <button
+                  *ngIf="currentPrediction.id !== undefined && deleted == false"
+                  type="button"
+                  class="btn btn-danger"
+                  (click)="deletePrediction(currentPrediction.id)"
+                >
+                  <i class="fa fa-trash"></i> Delete
+                </button>
                 <div
                   [innerHTML]="currentPrediction.text"
                   style="

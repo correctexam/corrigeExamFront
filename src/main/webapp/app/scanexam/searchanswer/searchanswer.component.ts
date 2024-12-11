@@ -19,7 +19,7 @@ export class SearchanswerComponent implements OnInit, OnDestroy {
   searchControl = new FormControl('');
   filteredPredictions: IPrediction[] = [];
   examId: string = '';
-
+  searchMode: 'text' | 'question' = 'text';
   private searchSubscription?: Subscription;
 
   constructor(
@@ -59,6 +59,7 @@ export class SearchanswerComponent implements OnInit, OnDestroy {
             questionNumber: prediction.questionNumber,
             studentId: prediction.studentId,
             text: prediction.text,
+            imageData: prediction.imageData,
           }));
 
         this.filterPredictions();
@@ -77,10 +78,30 @@ export class SearchanswerComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Set the search mode based on button clicked
+  setSearchMode(mode: 'text' | 'question') {
+    this.searchMode = mode;
+  }
+
   // On filtre par rapport à ce qui est écrit dans la barre de recherche
   filterPredictions(searchTerm: string = '') {
-    this.filteredPredictions = this.predictions.filter(prediction =>
-      (prediction.text ?? '').toLowerCase().includes(searchTerm.toLowerCase()),
-    );
+    if (this.searchMode === 'question') {
+      // Regular expression to detect "question X"
+      const questionNumber = parseInt(searchTerm.trim(), 10);
+      if (!isNaN(questionNumber)) {
+        // Filter predictions by question number
+        this.filteredPredictions = this.predictions.filter(prediction => prediction.questionNumber == questionNumber);
+      } else if (searchTerm.toLowerCase() === '') {
+        this.filteredPredictions = [];
+      } else {
+        this.filteredPredictions = this.predictions;
+      }
+    } else {
+      // Default filter by text
+      console.log('Text prediction search', searchTerm);
+      this.filteredPredictions = this.predictions.filter(prediction =>
+        (prediction.text ?? '').toLowerCase().includes(searchTerm.toLowerCase()),
+      );
+    }
   }
 }

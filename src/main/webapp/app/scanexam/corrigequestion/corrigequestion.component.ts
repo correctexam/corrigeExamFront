@@ -298,6 +298,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   predictionsDic: { [key: number]: string } = {}; // Object to store predictions for each page
   currentPrediction: IPrediction | null = null;
   questionId: number | undefined = -1;
+  deleted: boolean = false;
 
   constructor(
     public examService: ExamService,
@@ -469,7 +470,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
             this.loadPrediction();
             setTimeout(() => {
-              if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction && !this.isLoading) {
+              if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
                 this.executeScript();
               }
             }, 500);
@@ -1725,6 +1726,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       }
     }
+
+    this.loadPrediction();
+    setTimeout(() => {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
+        this.executeScript();
+      }
+    }, 500);
   }
 
   async nextStudent() {
@@ -1766,6 +1774,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       }
     }
+
+    this.loadPrediction();
+    setTimeout(() => {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
+        this.executeScript();
+      }
+    }, 500);
   }
   async previousQuestion(): Promise<void> {
     if (this.queryPoolPromise) {
@@ -1787,6 +1802,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
+
+    this.loadPrediction();
+    setTimeout(() => {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
+        this.executeScript();
+      }
+    }, 500);
   }
 
   async nextQuestion(): Promise<void> {
@@ -1808,6 +1830,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
+    this.loadPrediction();
+    setTimeout(() => {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
+        this.executeScript();
+      }
+    }, 500);
   }
 
   changeStudent($event: any): void {
@@ -1831,14 +1859,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
+
     console.log('Next student');
     this.loadPrediction();
     setTimeout(() => {
-      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction && !this.isLoading) {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
         this.executeScript();
       }
     }, 500);
   }
+
   changeQuestion($event: any): void {
     if (!this.init) {
       this.cleanCanvassCache();
@@ -1851,9 +1881,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
+
     this.loadPrediction();
     setTimeout(() => {
-      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction && !this.isLoading) {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
         this.executeScript();
       }
     }, 500);
@@ -2903,51 +2934,60 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   isLoading = false;
   // Méthode pour exécuter le script
-  executeScript(): void {
-    if (this.currentQuestion?.typeAlgoName == 'manuscrit') {
-      console.log('Yes I a manuscrit;');
+  async executeScript(): Promise<void> {
+    this.deleted = false;
+    if (this.currentQuestion?.typeAlgoName === 'manuscrit') {
+      console.log('Yes, I am manuscrit.');
       this.isLoading = true;
       this.changeDetector.detectChanges();
       const imageData = this.getImageFromCanvas();
+      console.log('Image data:', imageData);
 
       if (!imageData) {
         console.error('No image data found on the canvas');
         this.error = 'No image selected';
+        this.isLoading = false;
         return;
       }
 
-      console.log('ImageData:', imageData);
       console.log('Executing script with image data from canvas');
-      console.log('Index:', this.questionindex);
-      console.log('Question Id:', this.currentQuestion.id);
       const question_id = this.questionId;
       const exam_id = this.examId;
       const student_id = this.studentid;
       const question_number = this.questionindex + 1;
-      this.createPrediction(question_id, exam_id, student_id, question_number);
 
-      this.scriptService.runScript(imageData).subscribe({
-        next: response => {
-          const currentPageIndex = this.questionindex;
-          this.predictionsDic[currentPageIndex] = response.output;
+      // Await the ID from createPrediction before proceeding
+      const prediction_id = await this.createPrediction(question_id, exam_id, student_id, question_number, imageData);
 
-          // Storing the prediction using the PredictionService
-          this.storePrediction(response.output, question_id, exam_id, student_id, question_number);
+      // Proceed only if prediction_id is valid
+      if (prediction_id !== undefined) {
+        this.scriptService.runScript(imageData).subscribe({
+          next: response => {
+            const currentPageIndex = this.questionindex;
 
-          // Update the output
-          this.output = response.output;
-          this.error = '';
-          this.isLoading = false;
-          this.changeDetector.detectChanges();
-        },
-        error: err => {
-          console.error('Error executing script:', err);
-          this.output = '';
-          this.error = err.error || 'An error occurred';
-          this.isLoading = false;
-          this.changeDetector.detectChanges();
-        },
-      });
+            // Ensure response.prediction exists and access the first prediction
+            //const prediction = response.prediction ? response.prediction[0] : '';
+            const prediction = response.prediction;
+            this.predictionsDic[currentPageIndex] = prediction;
+
+            // Now store the prediction with the actual ID
+            this.storePrediction(prediction, question_id, exam_id, student_id, question_number, prediction_id);
+
+            // Update the output for display
+            this.output = prediction;
+            this.error = '';
+            this.isLoading = false;
+            this.changeDetector.detectChanges();
+          },
+          error: err => {
+            console.error('Error executing script:', err);
+            this.output = '';
+            this.error = err.error || 'An error occurred';
+            this.isLoading = false;
+            this.changeDetector.detectChanges();
+          },
+        });
+      }
     }
   }
 
@@ -2957,37 +2997,35 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     exam_id: string | undefined,
     student_id: number | undefined,
     question_number: number,
+    prediction_id: number | undefined,
   ): void {
-    //this.currentQuestion?.typeAlgoName == 'manuscrit';
-    if (!this.blocked) {
-      this.blocked = true;
-      console.log('I am in storePrediction');
-      console.log('QuestionId:', this.questionId);
-      // Hardcode a simple prediction entity to test if we can create and store it
-      const predictionData: IPrediction = {
-        studentId: student_id,
-        examId: exam_id,
-        questionNumber: question_number, // Hardcoded Question ID (you can adjust this to any valid ID)
-        questionId: question_id,
-        text: prediction, // Static text for testing
-        jsonData: '{"key": "value"}', // Static JSON string for testing
-        zonegeneratedid: 'ZoneID123', // Arbitrary zone ID, hardcoded for testing purposes
-      };
-      // Now, call the create method to see if the backend stores the prediction
-      this.predictionService.create(predictionData).subscribe({
-        next: createdResponse => {
-          console.log('Successfully stored prediction');
-          createdResponse.body;
-          // Optionally update the UI or any other state here
-          this.blocked = false; // Unblock UI after successful creation
-          this.currentPrediction = createdResponse.body;
-        },
-        error: createError => {
-          console.error('Error storing hardcoded prediction:', createError);
-          this.blocked = false; // Ensure UI is unblocked even on error
-        },
-      });
-    }
+    if (this.blocked) return; // Ensure storePrediction is not called twice
+    this.blocked = true;
+    console.log('I am in storePrediction');
+
+    const predictionData: IPrediction = {
+      id: prediction_id,
+      studentId: student_id,
+      examId: exam_id,
+      questionNumber: question_number,
+      questionId: question_id,
+      text: prediction,
+      jsonData: '{"key": "value"}',
+      zonegeneratedid: 'ZoneID123',
+    };
+
+    this.predictionService.update(predictionData).subscribe({
+      next: createdResponse => {
+        console.log('Successfully stored prediction');
+        this.currentPrediction = createdResponse.body;
+        this.loadPrediction();
+        this.blocked = false; // Unblock after successful creation
+      },
+      error: createError => {
+        console.error('Error storing hardcoded prediction:', createError);
+        this.blocked = false; // Unblock UI even on error
+      },
+    });
   }
 
   createPrediction(
@@ -2995,61 +3033,81 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     exam_id: string | undefined,
     student_id: number | undefined,
     question_number: number,
-  ): void {
-    //this.currentQuestion?.typeAlgoName == 'manuscrit';
-    if (!this.blocked) {
+    image_data: string,
+  ): Promise<number | undefined> {
+    return new Promise((resolve, reject) => {
+      if (this.blocked) {
+        resolve(undefined); // Exit if already blocked
+        return;
+      }
+
       this.blocked = true;
       console.log('I am in createPrediction');
-      console.log('QuestionId:', this.questionId);
-      // Hardcode a simple prediction entity to test if we can create and store it
       const predictionData: IPrediction = {
         studentId: student_id,
         examId: exam_id,
-        questionNumber: question_number, // Hardcoded Question ID (you can adjust this to any valid ID)
+        questionNumber: question_number,
         questionId: question_id,
-        text: 'En attente', // Static text for testing
-        jsonData: '{"key": "value"}', // Static JSON string for testing
-        zonegeneratedid: 'ZoneID123', // Arbitrary zone ID, hardcoded for testing purposes
+        text: 'En attente',
+        jsonData: '{"key": "value"}',
+        zonegeneratedid: 'ZoneID123',
+        imageData: image_data,
       };
-      // Now, call the create method to see if the backend stores the prediction
+
       this.predictionService.create(predictionData).subscribe({
         next: createdResponse => {
           console.log('Successfully created prediction');
-          createdResponse.body;
-          // Optionally update the UI or any other state here
-          this.blocked = false; // Unblock UI after successful creation
           this.currentPrediction = createdResponse.body;
+          const id = createdResponse.body?.id;
+          console.log('Created prediction id', id);
+          this.blocked = false; // Unblock after prediction creation
+          resolve(id);
         },
         error: createError => {
-          console.error('Error storing hardcoded prediction:', createError);
-          this.blocked = false; // Ensure UI is unblocked even on error
+          console.error('Error creating prediction:', createError);
+          this.blocked = false;
+          reject(createError);
         },
       });
-    }
+    });
   }
 
   async loadPrediction() {
-    //Try the same for prediction
     try {
       console.log('I am trying to load prediction');
-      console.log('Questionid:', this.questionId);
-      console.log('ExamId:', this.examId);
-      console.log('StudentId:', this.studentid);
-      const predictionReponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionId }));
-      console.log('response:', predictionReponse);
-      const predictions = predictionReponse.body || [];
+      const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionId }));
+      const predictions = predictionResponse.body || [];
       console.log('Predictions fetched from backend:', predictions.length);
-      if (predictions.length > 0) {
-        for (let i = 0; i < predictions.length; i++) {
-          if (predictions[i].studentId === this.studentid) this.currentPrediction = predictions[i];
-          console.log('Loaded current prediction');
-        }
+
+      // Find the first matching prediction
+      this.currentPrediction = predictions.find(pred => pred.studentId === this.studentid) || null;
+
+      if (this.currentPrediction) {
+        this.deleted = false;
+        console.log('Loaded current prediction:', this.currentPrediction);
       } else {
         console.warn('No valid predictions found for the current question index.');
-        this.currentPrediction = null; // Set to null if no valid prediction exists
       }
     } catch (err) {
       console.error('Error loading prediction:', err);
+      this.currentPrediction = null; // Explicitly reset on error
+    }
+  }
+
+  // Method to delete a prediction
+  deletePrediction(id: number): void {
+    if (confirm('Are you sure you want to delete this prediction?')) {
+      this.predictionService.delete(id).subscribe({
+        next: () => {
+          this.deleted = true;
+          this.currentPrediction = null;
+          console.log(`Deleted prediction with id: ${id}`);
+        },
+        error: err => {
+          console.error(`Error deleting prediction with id ${id}:`, err);
+          alert(`Failed to delete prediction with id ${id}. Please try again.`);
+        },
+      });
     }
   }
 }
