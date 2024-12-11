@@ -1,25 +1,28 @@
-const { createCanvas, loadImage } = require('canvas');
 import * as tf from '@tensorflow/tfjs';
 import * as ort from 'onnxruntime-web';
-
-// Set global configuration for WebAssembly paths
-ort.env.wasm.wasmPaths = 'http://localhost:8080/onnxruntime/';
 
 import { NgIf, NgFor } from '@angular/common';
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { InferenceSession, env } from 'onnxruntime-web';
+
+type Tensor = tf.Tensor;
+// Optionnel: Vérifie la compatibilité WASM
+ort.env.wasm.wasmPaths = './node_modules/onnxruntime-web/dist/';
 
 @Component({
   selector: 'jhi-mlt',
   standalone: true,
-  imports: [NgFor, NgIf, ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './mlt.component.html',
   styleUrl: './mlt.component.scss',
 })
-export class MltComponent implements OnInit {
-  charList = [
+export class MltComponent {
+  constructor(private route: ActivatedRoute) {}
+
+  charList: string[] = [
     '<BLANK>',
     ' ',
     '!',
@@ -124,70 +127,51 @@ export class MltComponent implements OnInit {
     'œ',
     '€',
   ];
-  imagePath = 'http://localhost:8080/content/images/refined_line_2.png';
 
-  constructor(protected activatedRoute: ActivatedRoute) {}
-
-  ngOnInit() {
-    this.activatedRoute.paramMap.subscribe(params => {
-      this.realThing();
-    });
-  }
-
-  // Helper function to load image as tensor
-  async plotPreprocessedImage(tensor: any) {
+  // Fonction pour afficher l'image prétraitée
+  async plotPreprocessedImage(tensor: Tensor): Promise<void> {
     const canvas = document.getElementById('imageCanvas') as HTMLCanvasElement;
-    const ctx = canvas.getContext('2d');
-
-    if (!ctx) {
-      throw new Error('Failed to get 2D context');
-    }
-
-    // Rescale tensor from [0, 1] back to [0, 255] for visualization
+    const ctx = canvas.getContext('2d')!;
     const tensorRescaled = tensor.mul(255).cast('int32');
-
-    // Get the shape of the tensor and prepare the canvas
-    const [height, width, channels] = tensorRescaled.shape;
+    const [height, width, channels] = tensorRescaled.shape as [number, number, number];
     canvas.width = width;
     canvas.height = height;
 
-    // Convert tensor to ImageData format for rendering in the canvas
     const imageData = ctx.createImageData(width, height);
-    const data = await tensorRescaled.data(); // Get the data from the tensor
+    const data = await tensorRescaled.data();
 
-    // Convert the tensor back into ImageData (RGBA format)
     for (let i = 0; i < height * width; i++) {
-      const j = i * 4; // index in ImageData (RGBA, 4 channels)
-      const r = data[i * channels]; // Red
-      const g = data[i * channels + 1]; // Green
-      const b = data[i * channels + 2]; // Blue
-      imageData.data[j] = r; // Set Red
-      imageData.data[j + 1] = g; // Set Green
-      imageData.data[j + 2] = b; // Set Blue
-      imageData.data[j + 3] = 255; // Set Alpha (fully opaque)
+      const j = i * 4;
+      const r = data[i * channels];
+      const g = data[i * channels + 1];
+      const b = data[i * channels + 2];
+      imageData.data[j] = r;
+      imageData.data[j + 1] = g;
+      imageData.data[j + 2] = b;
+      imageData.data[j + 3] = 255;
     }
 
-    // Put the imageData back on the canvas
     ctx.putImageData(imageData, 0, 0);
   }
 
-  // Decoding function (equivalent to `best_path_common` in Python)
-  bestPathDecoding(probabilities: any, charList: any, maxLen: any, blankIndex: any, removeDuplicates = true) {
-    console.log('Probabilities:', probabilities);
-    // If max_len is -1, use the length of probabilities; otherwise, clip at maxLen
+  async initializeOrt() {
+    try {
+      await (ort.env.initialize as () => Promise<void>)();
+      console.log('ONNX Runtime initialized successfully');
+    } catch (error) {
+      console.error('Error initializing ONNX Runtime:', error);
+    }
+  }
+  // Fonction de décodage
+  bestPathDecoding(probabilities: number[][], charList: string[], maxLen: number, blankIndex: number, removeDuplicates = true): string {
     maxLen = maxLen === -1 ? probabilities.length : Math.min(maxLen, probabilities.length);
 
-    // Get the character with the highest probability for each frame (argmax)
-    // const sequenceRaw = probabilities.slice(0, maxLen).map(frame => frame.indexOf(Math.max(...frame)));
-    const sequenceRaw = probabilities.slice(0, maxLen).map((frame: number[]) => frame.indexOf(Math.max(...frame)));
-    console.log('raw sequence:', sequenceRaw);
-    // Process sequence for removing duplicates and blanks
-    let processedSequence = [];
+    const sequenceRaw = probabilities.slice(0, maxLen).map(frame => frame.indexOf(Math.max(...frame)));
+    let processedSequence: number[] = [];
+
     if (removeDuplicates) {
-      let previousChar = null;
-      for (let i = 0; i < sequenceRaw.length; i++) {
-        const char = sequenceRaw[i];
-        // Collapse duplicates and remove blanks
+      let previousChar: number | null = null;
+      for (const char of sequenceRaw) {
         if (char !== previousChar && char !== blankIndex) {
           processedSequence.push(char);
         }
@@ -196,42 +180,39 @@ export class MltComponent implements OnInit {
     } else {
       processedSequence = sequenceRaw;
     }
-    console.log('Processed Sequence:', processedSequence);
-    // Convert the integer indices to characters
+
     return this.convertIntToChars(processedSequence, charList);
   }
 
-  // Convert integer sequence to characters
-  convertIntToChars(sequence: any, charList: any) {
-    return sequence.map((index: string | number) => charList[index]).join('');
+  convertIntToChars(sequence: number[], charList: string[]): string {
+    return sequence.map(index => charList[index]).join('');
   }
 
-  // Define preprocessing steps (similar to prepare_image_f in C++)
+  // Prétraitement de l'image
   async preprocessImage(
-    imageFile: any,
-    channelNb: any,
-    padValue: any,
-    padWidthRight: any,
-    padWidthLeft: any,
-    mean: any,
-    std: any,
-    targetHeight: any,
-  ) {
-    // Load the image
+    imageFile: File,
+    channelNb: number,
+    padValue: number,
+    padWidthRight: number,
+    padWidthLeft: number,
+    mean: number,
+    std: number,
+    targetHeight: number,
+  ): Promise<Tensor> {
     const imageTensor = await this.loadImageTensor(imageFile);
-    let processedImage = imageTensor as tf.Tensor3D;
-    const shape = imageTensor.shape as number[];
+    let processedImage = imageTensor;
+    console.log('je suis dans le tensor');
+    if (channelNb === 1 && imageTensor.shape[2] !== undefined && imageTensor.shape[2] > 1) {
+      processedImage = tf.mean(imageTensor, -1, true);
+    }
 
-    // Resize the image to target height, maintaining aspect ratio
-    const aspectRatio = shape[1] / shape[0]; // width/height
+    const aspectRatio = (imageTensor.shape[1] ?? 1) / (imageTensor.shape[0] ?? 1);
     const newWidth = Math.round(targetHeight * aspectRatio);
-    processedImage = tf.image.resizeBilinear(processedImage, [targetHeight, newWidth]);
+    processedImage = tf.image.resizeBilinear(processedImage as tf.Tensor3D, [targetHeight, newWidth]);
 
-    // Normalize the image tensor (normalize_tensor_f equivalent)
-    processedImage = processedImage.div(tf.scalar(255.0)); // Divide by 255 to scale pixel values
-    processedImage = processedImage.sub(tf.scalar(mean)).div(tf.scalar(std)); // Apply mean and std normalization
+    processedImage = processedImage.div(tf.scalar(255.0));
+    processedImage = processedImage.sub(tf.scalar(mean)).div(tf.scalar(std));
 
-    // Pad the image on both sides
     const padLeft = tf.pad(
       processedImage,
       [
@@ -254,165 +235,147 @@ export class MltComponent implements OnInit {
     return paddedImage;
   }
 
-  // Helper function to load image into tensor
-  async loadImageTensor(imagePath: string) {
-    // Utilisation de la fonction `loadImage` de `canvas` pour charger l'image
-    const image = await loadImage(imagePath);
-
-    // Créer un canvas avec les dimensions de l'image
-    const canvas = createCanvas(image.width, image.height);
-    const context = canvas.getContext('2d');
-
-    // Dessiner l'image sur le canvas
-    context.drawImage(image, 0, 0);
-
-    // Convertir l'image du canvas en un Tensor
-    const tensor = tf.browser.fromPixels(canvas);
-
-    return tensor;
-  }
-
-  async processTensorData(
-    tensorData:
-      | Uint8Array
-      | string[]
-      | Float32Array
-      | Int8Array
-      | Uint16Array
-      | Int16Array
-      | Int32Array
-      | BigInt64Array
-      | Float64Array
-      | Uint32Array
-      | BigUint64Array,
-  ) {
-    let dataAsNumbers: number[] = [];
-
-    if (
-      tensorData instanceof Float32Array ||
-      tensorData instanceof Int32Array ||
-      tensorData instanceof Uint8Array ||
-      tensorData instanceof Int8Array ||
-      tensorData instanceof Uint16Array ||
-      tensorData instanceof Int16Array ||
-      tensorData instanceof Uint32Array ||
-      tensorData instanceof Float64Array
-    ) {
-      // The data is a TypedArray of numbers, so we can convert it directly to a number[]
-      dataAsNumbers = Array.from(tensorData);
-    } else if (tensorData instanceof BigInt64Array || tensorData instanceof BigUint64Array) {
-      // Convert BigInt64Array or BigUint64Array to number[], but with caution about precision loss
-      dataAsNumbers = Array.from(tensorData, value => Number(value));
-    } else if (Array.isArray(tensorData)) {
-      // Handle the case where tensorData is a string[]
-      if (typeof tensorData[0] === 'string') {
-        // Convert string array to number array if possible, using parseFloat or parseInt
-        dataAsNumbers = tensorData.map(str => parseFloat(str));
-      }
-    } else {
-      throw new Error('Unsupported tensor data type.');
+  // Chargement de l'image en tenseur
+  async loadImageTensor(imageFile: File): Promise<Tensor> {
+    console.log('File details:', imageFile);
+    if (!imageFile.type.startsWith('image/')) {
+      throw new Error(`Invalid file type: ${imageFile.type}`);
     }
 
-    console.log('Processed Array of Numbers:', dataAsNumbers);
-    return dataAsNumbers;
+    const img = new Image();
+    const objectURL = URL.createObjectURL(imageFile);
+    console.log('Object URL:', objectURL);
+    img.src = objectURL;
+
+    return new Promise((resolve, reject) => {
+      img.onload = () => {
+        try {
+          let canvas = document.getElementById('imageCanvas') as HTMLCanvasElement;
+          if (!canvas) {
+            console.log('Canvas not found, creating dynamically...');
+            canvas = document.createElement('canvas');
+            canvas.id = 'imageCanvas';
+            canvas.style.display = 'none';
+            document.body.appendChild(canvas);
+          }
+          console.log('Canvas found or created:', canvas);
+
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            throw new Error('Failed to get canvas context');
+          }
+
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          const imageData = ctx.getImageData(0, 0, img.width, img.height);
+          const data = tf.tensor(imageData.data, [img.height, img.width, 4], 'float32');
+          const rgb = data.slice([0, 0, 0], [-1, -1, 3]);
+          resolve(rgb);
+        } catch (error) {
+          console.error('Error processing image:', error);
+          reject(error);
+        } finally {
+          URL.revokeObjectURL(objectURL);
+        }
+      };
+
+      img.onerror = event => {
+        console.error('Image loading error details:', event);
+        reject(new Error('Failed to load image'));
+      };
+    });
   }
 
-  // Function to run ONNX inference
-  async runInference(imageTensor: any, modelPath: any) {
+  // Fonction pour effectuer une inférence avec le modèle ONNX
+  async runInference(imageTensor: Tensor, modelPath: string): Promise<string> {
     try {
-      // Load the ONNX model
-      // Create the ONNX Inference Session
-      const modelPath = 'http://localhost:8080/path/to/your/model.onnx'; // Update with your actual model path
       const session = await ort.InferenceSession.create(modelPath, {
-        executionProviders: ['wasm'], // Use WebAssembly backend for inference
+        executionProviders: ['wasm'],
       });
+      console.log('Inference session created');
 
-      // Prepare inputs for the model (like the prepare_model_input_f function)
-      const inputImage = imageTensor.expandDims(0).transpose([0, 3, 1, 2]); // b c h w format
+      const inputImage = imageTensor.expandDims(0).transpose([0, 3, 1, 2]);
+      const imageWidth = tf.scalar(inputImage.shape[3] ?? 0, 'int32');
 
-      // Assume width is the third dimension (H x W x C)
-      const imageWidth = tf.scalar(inputImage.shape[3], 'int32'); // Width of image
-      const outputHidden = tf.scalar(0, 'int32');
-      const prod = tf.scalar(1, 'int32');
-
-      // Convert tf.Tensor to ort.Tensor
       const inputImageONNX = new ort.Tensor('float32', await inputImage.data(), inputImage.shape);
-      console.log(' inputImage.data():', inputImage.data());
-      console.log('inputImage.shape', inputImage.shape);
-      console.log('inputImageONNX ', inputImageONNX);
       const imageWidthONNX = new ort.Tensor('int32', await imageWidth.dataSync());
-      const outputHiddenONNX = new ort.Tensor('int32', await outputHidden.dataSync());
-      const prodONNX = new ort.Tensor('int32', await prod.dataSync());
 
-      console.log('imageWidth:', await imageWidth.data());
-      console.log('inputImage:', inputImage.shape);
-      // Run inference
       const results = await session.run({
-        inputs: inputImageONNX,
+        inputImage: inputImageONNX,
         image_widths: imageWidthONNX,
       });
 
-      console.log('Inference Output:', results);
-      // Parameters for decoding
-      const maxLen = -1; // No specific max length
-      const blankIndex = 0; // '<BLANK>' corresponds to index 0
-      const removeDuplicates = true;
-      const probabilitiesTensor = results.output; // Adjust based on your model's output name
-      const tensorData = await probabilitiesTensor.data;
-      const probabilities1D = await this.processTensorData(tensorData); // Convert ONNX tensor to flat array
-      console.log('probabilities1D:', probabilities1D);
+      const probabilitiesTensor = results.output;
+      const probabilities1D: number[] = Array.from(probabilitiesTensor.data as Float32Array);
       const batchSize = probabilitiesTensor.dims[0];
       const numFrames = probabilitiesTensor.dims[1];
       const numChars = probabilitiesTensor.dims[2];
 
-      // Reshape the 1D array into a 3D array: [batch_size, numFrames, numChars]
-      const reshapedProbabilities = [];
+      const reshapedProbabilities: number[][][] = [];
       let offset = 0;
       for (let b = 0; b < batchSize; b++) {
-        const batchFrames = [];
+        const batchFrames: number[][] = [];
         for (let i = 0; i < numFrames; i++) {
           batchFrames.push(probabilities1D.slice(offset, offset + numChars));
           offset += numChars;
         }
         reshapedProbabilities.push(batchFrames);
       }
-      console.log('Reshaped probobilities:', reshapedProbabilities);
-      // Perform decoding
-      // Decode all sequences in the batch
-      const decodedBatch = reshapedProbabilities.map(probabilities =>
-        this.bestPathDecoding(probabilities, this.charList, maxLen, blankIndex, removeDuplicates),
-      );
-      console.log(decodedBatch);
-      //document.getElementById("result").textContent=decodedBatch;
+
+      const decodedBatch = reshapedProbabilities.map(probabilities => this.bestPathDecoding(probabilities, this.charList, -1, 0, true));
+
+      document.getElementById('result')!.textContent = decodedBatch.join(', ');
+      return decodedBatch.join(', ');
     } catch (error) {
       console.error('Error during inference:', error);
+      return '';
     }
   }
 
-  // Event listener for image input
-  async realThing() {
+  async executeMLT(): Promise<string | undefined> {
+    this.initializeOrt();
+    // Paramètres de prétraitement (issus de la configuration ou d'un modèle)
+    const channelNb: number = 1; // Monochrome
+    const padValue: number = 0.0;
+    const padWidthRight: number = 64;
+    const padWidthLeft: number = 64;
+    const mean: number = 238.6531 / 255;
+    const std: number = 43.4356 / 255;
+    const targetHeight: number = 128;
+
     try {
-      console.log('Image Path:', this.imagePath);
-      const imageTensor = await this.loadImageTensor(this.imagePath);
+      // Chargement du fichier image
+      const imageFileUrl = 'content/images/refined_line_2.png'; // Chemin relatif à partir de la racine du serveur web
+      const response = await fetch(imageFileUrl);
+      const blob = await response.blob();
+      const imageFile = new File([blob], 'refined_line_2.png', { type: blob.type });
+      console.log(imageFile);
+      // Prétraitement de l'image
+      const preprocessedImage = await this.preprocessImage(
+        imageFile,
+        channelNb,
+        padValue,
+        padWidthRight,
+        padWidthLeft,
+        mean,
+        std,
+        targetHeight,
+      );
+      console.log('prout');
+      // Spécification du chemin du modèle ONNX
+      const modelPath: string = '../../content/classifier/trace_mlt-4modern_hw_rimes_lines-v3+synth-1034184_best_encoder.tar.onnx';
+      console.log('je suis dans le modele');
+      console.log(WebAssembly.validate(new Uint8Array([0x01, 0x00, 0x00, 0x00])));
 
-      // Preprocessing parameters (These would normally come from your model or a config)
-      const channelNb = 1; // RGB
-      const padValue = 0.0;
-      const padWidthRight = 64;
-      const padWidthLeft = 64;
-      const mean = 238.6531 / 255;
-      const std = 43.4356 / 255;
-      const targetHeight = 128;
-
-      // Preprocess the image
-      // const preprocessedImage = await this.preprocessImage(imageTensor, channelNb, padValue, padWidthRight, padWidthLeft, mean, std, targetHeight);
-
-      // Run inference using the preprocessed image
-      // Specify the ONNX model path
-      const modelPath = 'trace_mlt-4modern_hw_rimes_lines-v3+synth-1034184_best_encoder.tar.onnx';
-      this.runInference(imageTensor, modelPath);
+      // Exécution de l'inférence
+      const prediction = await this.runInference(preprocessedImage, modelPath);
+      console.log('JE SUIS BIENTOT HAHAH');
+      console.log('Prediction:', prediction);
+      return prediction;
     } catch (error) {
-      console.error('Error during inference:', error);
+      console.error('Error in executeMLT:', error);
+      return undefined;
     }
   }
 }
