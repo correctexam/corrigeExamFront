@@ -96,6 +96,7 @@
     "ngx-webstorage": "18.0.0",
     "node-polyfill-webpack-plugin": "^4.0.0",
     "observable-webworker": "6.0.1",
+    "onnxruntime-web": "^1.20.1",
     "primeflex": "3.3.1",
     "primeicons": "7.0.0",
     "primeng": "17.18.11",
