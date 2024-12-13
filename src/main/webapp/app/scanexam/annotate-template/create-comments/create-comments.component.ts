@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
@@ -11,7 +11,7 @@ import { HybridGradedCommentService } from '../../../entities/hybrid-graded-comm
 import { IHybridGradedComment, NewHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-graded-comment.model';
 import { Inplace, InplaceModule } from 'primeng/inplace';
 import { PreferenceService } from '../../preference-page/preference.service';
-import { FileUploadModule } from 'primeng/fileupload';
+import { FileUpload, FileUploadModule } from 'primeng/fileupload';
 import { TooltipModule } from 'primeng/tooltip';
 import { KnobModule } from 'primeng/knob';
 import { SelectButtonModule } from 'primeng/selectbutton';
@@ -319,7 +319,7 @@ export class CreateCommentsComponent implements OnInit {
     }
   }
 
-  async onUpload(event: any): Promise<void> {
+  async onUpload(event: any, fileUpload: FileUpload): Promise<void> {
     if (this._q !== undefined && this._q.gradeType === GradeType.DIRECT) {
       const comments = JSON.parse(await event.files[0].text()) as ITextComment[] | undefined | null;
       if (comments !== undefined && comments !== null && comments.length > 0) {
@@ -385,6 +385,7 @@ export class CreateCommentsComponent implements OnInit {
         this.noteCommentaire = 0;
       }
     }
+    fileUpload.clear();
     this.blocked = false;
   }
 

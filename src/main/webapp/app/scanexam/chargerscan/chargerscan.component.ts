@@ -34,7 +34,7 @@ import { PreferenceService } from '../preference-page/preference.service';
 import { ViewandreorderpagesComponent } from '../viewandreorderpages/viewandreorderpages.component';
 import { PromisePool } from '@supercharge/promise-pool';
 import { Title } from '@angular/platform-browser';
-import { FileUploadModule } from 'primeng/fileupload';
+import { FileUpload, FileUploadModule } from 'primeng/fileupload';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TooltipModule } from 'primeng/tooltip';
@@ -269,9 +269,10 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
     });
   } */
 
-  onUpload($event: any): void {
+  onUpload($event: any, fileUpload: FileUpload): void {
     if ($event.files && $event.files.length > 0) {
       this.uploadScan($event.files[0]);
+      fileUpload.clear();
     }
   }
   uploadScan(file: File): void {
