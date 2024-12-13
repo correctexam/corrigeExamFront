@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
