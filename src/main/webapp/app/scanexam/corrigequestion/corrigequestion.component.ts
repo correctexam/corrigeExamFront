@@ -106,6 +106,10 @@ import { ScriptService } from 'app/entities/scan/service/dan-service.service';
 import { IPrediction } from 'app/entities/prediction/prediction.model';
 import { delay } from 'cypress/types/bluebird';
 
+import { HttpClient } from '@angular/common/http';
+import { MltComponent } from '../mlt/mlt.component';
+import { CoupageDimageService } from '../mlt/coupage-dimage.service';
+
 enum ScalePolicy {
   FitWidth = 1,
   FitHeight = 2,
@@ -125,7 +129,7 @@ interface CommentAction {
   selector: 'jhi-corrigequestion',
   templateUrl: './corrigequestion.component.html',
   styleUrls: ['./corrigequestion.component.scss'],
-  providers: [ConfirmationService, MessageService, { provide: LOCALE_ID, useValue: 'fr' }],
+  providers: [ConfirmationService, MessageService, { provide: LOCALE_ID, useValue: 'fr' }, MltComponent],
   standalone: true,
   imports: [
     SwipeDirective,
@@ -328,7 +332,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     private titleService: Title,
     private ngZone: NgZone,
     private focusViewService: FocusViewService,
-    private scriptService: ScriptService, // Ajout du service ici
+    private scriptService: ScriptService,
+    private http: HttpClient,
+    private mltcomponent: MltComponent,
+    private coupageDimageService: CoupageDimageService,
   ) {
     effect(() => {
       this.testdisableAndEnableKeyBoardShortCutSignal = this.testdisableAndEnableKeyBoardShortCut();
@@ -2932,64 +2939,57 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  isLoading = false;
-  // Méthode pour exécuter le script
-  async executeScript(): Promise<void> {
-    this.deleted = false;
-    if (this.currentQuestion?.typeAlgoName === 'manuscrit') {
-      console.log('Yes, I am manuscrit.');
-      this.isLoading = true;
-      this.changeDetector.detectChanges();
-      const imageData = this.getImageFromCanvas();
-      console.log('Image data:', imageData);
+  // // Méthode pour exécuter le script
+  // async executeScript(): Promise<void> {
+  //   this.deleted = false;
+  //   if (this.currentQuestion?.typeAlgoName === 'manuscrit') {
+  //     console.log('Yes, I am manuscrit.');
+  //     this.changeDetector.detectChanges();
+  //     const imageData = this.getImageFromCanvas();
+  //     console.log('Image data:', imageData);
 
-      if (!imageData) {
-        console.error('No image data found on the canvas');
-        this.error = 'No image selected';
-        this.isLoading = false;
-        return;
-      }
+  //     if (!imageData) {
+  //       console.error('No image data found on the canvas');
+  //       this.error = 'No image selected';
+  //       return;
+  //     }
 
-      console.log('Executing script with image data from canvas');
-      const question_id = this.questionId;
-      const exam_id = this.examId;
-      const student_id = this.studentid;
-      const question_number = this.questionindex + 1;
+  //     console.log('Executing script with image data from canvas');
+  //     const question_id = this.questionId;
+  //     const exam_id = this.examId;
+  //     const student_id = this.studentid;
+  //     const question_number = this.questionindex + 1;
 
-      // Await the ID from createPrediction before proceeding
-      const prediction_id = await this.createPrediction(question_id, exam_id, student_id, question_number, imageData);
+  //     // Await the ID from createPrediction before proceeding
+  //     const prediction_id = await this.createPrediction(question_id, exam_id, student_id, question_number, imageData);
 
-      // Proceed only if prediction_id is valid
-      if (prediction_id !== undefined) {
-        this.scriptService.runScript(imageData).subscribe({
-          next: response => {
-            const currentPageIndex = this.questionindex;
+  //     // Proceed only if prediction_id is valid
+  //     if (prediction_id !== undefined) {
+  //       this.scriptService.runScript(imageData).subscribe({
+  //         next: response => {
+  //           const currentPageIndex = this.questionindex;
 
-            // Ensure response.prediction exists and access the first prediction
-            //const prediction = response.prediction ? response.prediction[0] : '';
-            const prediction = response.prediction;
-            this.predictionsDic[currentPageIndex] = prediction;
+  //           // Ensure response.prediction exists and access the first prediction
+  //           //const prediction = response.prediction ? response.prediction[0] : '';
+  //           const prediction = response.prediction;
+  //           this.predictionsDic[currentPageIndex] = prediction;
 
-            // Now store the prediction with the actual ID
-            this.storePrediction(prediction, question_id, exam_id, student_id, question_number, prediction_id);
+  //           // Now store the prediction with the actual ID
+  //           this.storePrediction(prediction, question_id, exam_id, student_id, question_number, prediction_id);
 
-            // Update the output for display
-            this.output = prediction;
-            this.error = '';
-            this.isLoading = false;
-            this.changeDetector.detectChanges();
-          },
-          error: err => {
-            console.error('Error executing script:', err);
-            this.output = '';
-            this.error = err.error || 'An error occurred';
-            this.isLoading = false;
-            this.changeDetector.detectChanges();
-          },
-        });
-      }
-    }
-  }
+  //           // Update the output for display
+  //           this.output = prediction;
+  //           this.error = '';
+  //         },
+  //         error: err => {
+  //           console.error('Error executing script:', err);
+  //           this.output = '';
+  //           this.error = err.error || 'An error occurred';
+  //         },
+  //       });
+  //     }
+  //   }
+  // }
 
   storePrediction(
     prediction: string,
@@ -3108,6 +3108,97 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           alert(`Failed to delete prediction with id ${id}. Please try again.`);
         },
       });
+    }
+  }
+
+  base64Image = '';
+  refinedLines: string[] = [];
+  async callMLT() {
+    const imageData = this.getImageFromCanvas();
+    if (!imageData) {
+      console.error('No image data found on the canvas');
+      this.error = 'No image selected';
+      return;
+    }
+
+    this.coupageDimageService.runScript(imageData).subscribe({
+      next: async response => {
+        this.refinedLines = response.refinedLines || [];
+
+        for (let i = 0; i < this.refinedLines.length; i++) {
+          try {
+            const base64Line = `data:image/png;base64,${this.refinedLines[i]}`;
+
+            // Process the Base64 line directly
+            const result = await this.mltcomponent.executeMLT(base64Line);
+            console.log('Prediction line ', i, ' : ', result);
+          } catch (error) {
+            console.error('Error processing refined line ', i, ':', error);
+          }
+        }
+      },
+      error: error => {
+        console.error('Error refining the image:', error);
+      },
+    });
+  }
+
+  // Méthode pour exécuter le script
+  async executeScript(): Promise<void> {
+    this.deleted = false;
+    if (this.currentQuestion?.typeAlgoName === 'manuscrit') {
+      console.log('Yes, I am manuscrit.');
+      this.changeDetector.detectChanges();
+      const imageData = this.getImageFromCanvas();
+      console.log('Image data:', imageData);
+
+      if (!imageData) {
+        console.error('No image data found on the canvas');
+        this.error = 'No image selected';
+        return;
+      }
+
+      console.log('Executing script with image data from canvas');
+      const question_id = this.questionId;
+      const exam_id = this.examId;
+      const student_id = this.studentid;
+      const question_number = this.questionindex + 1;
+
+      // Await the ID from createPrediction before proceeding
+      const prediction_id = await this.createPrediction(question_id, exam_id, student_id, question_number, imageData);
+
+      // Proceed only if prediction_id is valid
+      if (prediction_id !== undefined) {
+        this.coupageDimageService.runScript(imageData).subscribe({
+          next: async response => {
+            this.refinedLines = response.refinedLines || [];
+            const currentPageIndex = this.questionindex;
+            let prediction: string = '';
+            for (let i = 0; i < this.refinedLines.length; i++) {
+              try {
+                const base64Line = `data:image/png;base64,${this.refinedLines[i]}`;
+                const result = await this.mltcomponent.executeMLT(base64Line);
+                prediction += result + '\n';
+                console.log('Prediction line ', i, ' : ', result);
+              } catch (error) {
+                console.error('Error processing refined line ', i, ':', error);
+              }
+            }
+            console.log('Prediction: ', prediction);
+            this.predictionsDic[currentPageIndex] = prediction;
+
+            // Now store the prediction with the actual ID
+            this.storePrediction(prediction, question_id, exam_id, student_id, question_number, prediction_id);
+
+            // Update the output for display
+            this.output = prediction;
+            this.error = '';
+          },
+          error: error => {
+            console.error('Error refining the image:', error);
+          },
+        });
+      }
     }
   }
 }

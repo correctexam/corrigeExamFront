@@ -548,12 +548,9 @@
                   class="sm:text-xs md:text-xs lg:text-base"
                   pButton
                   [disabled]="!examId && blocked"
-                  (click)="executeScript()"
-                  jhiTranslate="scanexam.handwritingrecognition"
-                  [pTooltip]="'scanexam.rundanscript' | translate"
-                  [tooltipPosition]="'bottom'"
+                  (click)="callMLT()"
                 >
-                  Reconnaissance d'écriture
+                  Execute MLT
                 </button-->
                 <p-progressSpinner *ngIf="blocked" styleClass="w-2rem h-2rem"></p-progressSpinner>
               </div>
