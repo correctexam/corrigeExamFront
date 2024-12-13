@@ -103,7 +103,7 @@ import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { SwipeDirective } from '../swipe.directive';
 import { ScriptService } from 'app/entities/scan/service/dan-service.service';
-import { IPrediction } from 'app/entities/prediction/prediction.model';
+import { IPrediction, Prediction } from 'app/entities/prediction/prediction.model';
 import { delay } from 'cypress/types/bluebird';
 
 import { HttpClient } from '@angular/common/http';
@@ -474,7 +474,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               });
             */
             this.questionId = questions![0].id;
-
+            this.similarPredictions = [];
             this.loadPrediction();
             setTimeout(() => {
               if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
@@ -1733,7 +1733,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       }
     }
-
+    this.similarPredictions = [];
     this.loadPrediction();
     setTimeout(() => {
       if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
@@ -1781,7 +1781,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       }
     }
-
+    this.similarPredictions = [];
     this.loadPrediction();
     setTimeout(() => {
       if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
@@ -1809,7 +1809,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
-
+    this.similarPredictions = [];
     this.loadPrediction();
     setTimeout(() => {
       if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
@@ -1837,6 +1837,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
+    this.similarPredictions = [];
     this.loadPrediction();
     setTimeout(() => {
       if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
@@ -1866,7 +1867,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
-
+    this.similarPredictions = [];
     console.log('Next student');
     this.loadPrediction();
     setTimeout(() => {
@@ -1888,7 +1889,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
-
+    this.similarPredictions = [];
     this.loadPrediction();
     setTimeout(() => {
       if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
@@ -2111,7 +2112,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async getStudentResponse4CurrentStudent(questionsId: number[], currentStudent: number): Promise<StudentResponse> {
-    console.log('I am here getStudentResponse4CurrentStudent');
     const _sheets = await firstValueFrom(
       this.sheetService.query({
         scanId: this.exam!.scanfileId,
@@ -3001,7 +3001,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   ): void {
     if (this.blocked) return; // Ensure storePrediction is not called twice
     this.blocked = true;
-    console.log('I am in storePrediction');
 
     const predictionData: IPrediction = {
       id: prediction_id,
@@ -3016,7 +3015,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
     this.predictionService.update(predictionData).subscribe({
       next: createdResponse => {
-        console.log('Successfully stored prediction');
         this.currentPrediction = createdResponse.body;
         this.loadPrediction();
         this.blocked = false; // Unblock after successful creation
@@ -3042,7 +3040,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
 
       this.blocked = true;
-      console.log('I am in createPrediction');
       const predictionData: IPrediction = {
         studentId: student_id,
         examId: exam_id,
@@ -3056,10 +3053,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
       this.predictionService.create(predictionData).subscribe({
         next: createdResponse => {
-          console.log('Successfully created prediction');
           this.currentPrediction = createdResponse.body;
           const id = createdResponse.body?.id;
-          console.log('Created prediction id', id);
           this.blocked = false; // Unblock after prediction creation
           resolve(id);
         },
@@ -3074,17 +3069,14 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   async loadPrediction() {
     try {
-      console.log('I am trying to load prediction');
       const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionId }));
       const predictions = predictionResponse.body || [];
-      console.log('Predictions fetched from backend:', predictions.length);
 
       // Find the first matching prediction
       this.currentPrediction = predictions.find(pred => pred.studentId === this.studentid) || null;
 
       if (this.currentPrediction) {
         this.deleted = false;
-        console.log('Loaded current prediction:', this.currentPrediction);
       } else {
         console.warn('No valid predictions found for the current question index.');
       }
@@ -3100,6 +3092,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.predictionService.delete(id).subscribe({
         next: () => {
           this.deleted = true;
+          console.log('Deleted:', this.deleted);
           this.currentPrediction = null;
           console.log(`Deleted prediction with id: ${id}`);
         },
@@ -3131,7 +3124,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
             // Process the Base64 line directly
             const result = await this.mltcomponent.executeMLT(base64Line);
-            console.log('Prediction line ', i, ' : ', result);
           } catch (error) {
             console.error('Error processing refined line ', i, ':', error);
           }
@@ -3147,10 +3139,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   async executeScript(): Promise<void> {
     this.deleted = false;
     if (this.currentQuestion?.typeAlgoName === 'manuscrit') {
-      console.log('Yes, I am manuscrit.');
       this.changeDetector.detectChanges();
       const imageData = this.getImageFromCanvas();
-      console.log('Image data:', imageData);
 
       if (!imageData) {
         console.error('No image data found on the canvas');
@@ -3158,7 +3148,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         return;
       }
 
-      console.log('Executing script with image data from canvas');
       const question_id = this.questionId;
       const exam_id = this.examId;
       const student_id = this.studentid;
@@ -3179,12 +3168,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 const base64Line = `data:image/png;base64,${this.refinedLines[i]}`;
                 const result = await this.mltcomponent.executeMLT(base64Line);
                 prediction += result + '\n';
-                console.log('Prediction line ', i, ' : ', result);
               } catch (error) {
                 console.error('Error processing refined line ', i, ':', error);
               }
             }
-            console.log('Prediction: ', prediction);
             this.predictionsDic[currentPageIndex] = prediction;
 
             // Now store the prediction with the actual ID
@@ -3200,5 +3187,85 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
+  }
+
+  similarPredictions: Prediction[] = [];
+  async similarPrediction() {
+    this.similarPredictions = [];
+    try {
+      console.log('I am trying to load similar prediction');
+      const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionId }));
+      const predictions = predictionResponse.body || [];
+      if (this.currentPrediction && predictions.length > 0) {
+        for (let i = 0; i < predictions.length; i++) {
+          const currentWords = new Set(this.currentPrediction.text?.toLowerCase().split(/\s+/)); // Normalize case and split by spaces
+          const predictionWords = new Set(predictions[i].text?.toLowerCase().split(/\s+/));
+
+          // Find the intersection of both sets
+          const commonWords = [...currentWords].filter(word => predictionWords.has(word));
+
+          // Check if there are at least 2 common words
+          if (commonWords.length >= 2) {
+            this.similarPredictions.push(predictions[i]);
+          }
+        }
+
+        // Sort by studentId
+        this.similarPredictions.sort((a, b) => {
+          const studentIdA = a.studentId || 0;
+          const studentIdB = b.studentId || 0;
+          return studentIdA - studentIdB; // Ascending order
+        });
+
+        this.deleted = false;
+      } else {
+        this.executeScript();
+      }
+    } catch (err) {
+      console.error('Error loading prediction:', err);
+      this.currentPrediction = null; // Explicitly reset on error
+    }
+  }
+
+  selectedSimilars: Map<Prediction, number> = new Map();
+
+  async selectSimilarPrediction(similar: Prediction) {
+    if (this.selectedSimilars.has(similar)) {
+      const currentValue = this.selectedSimilars.get(similar);
+      if (currentValue === 1) {
+        // Unselect the prediction
+        this.selectedSimilars.set(similar, 0);
+      } else {
+        // Select the prediction
+        this.selectedSimilars.set(similar, 1);
+        this.sameGrade(similar);
+      }
+    } else {
+      // Add the prediction and set it to selected
+      this.selectedSimilars.set(similar, 1);
+      this.sameGrade(similar);
+    }
+  }
+
+  //Same starts, comments etc
+  async sameGrade(similar: Prediction) {
+    let try1 = await this.getStudentResponse(this.questions!.map(q => q.id!));
+    let response = await this.getStudentResponse4CurrentStudent(
+      this.questions!.map(q => q.id!),
+      similar.studentId! - 1,
+    );
+    console.log('Similar note:', response.note);
+    console.log('Note:', this.resp?.note);
+    response.note = this.resp?.note;
+    response.comments = this.resp?.comments;
+    response.gradedcomments = this.resp?.gradedcomments;
+    response.textcomments = this.resp?.textcomments;
+    response.star = this.resp?.star;
+    response.worststar = this.resp?.worststar;
+    this.updateResponseRequest(response).subscribe(sr1 => {
+      response = sr1.body!;
+      this.blocked = false;
+    });
+    console.log('Similar note:', response.note);
   }
 }

@@ -556,14 +556,31 @@
               </div>
 
               <button
-                *ngIf="deleted == true"
                 type="button"
                 class="btn"
-                (click)="executeScript()"
+                (click)="similarPrediction()"
                 style="margin-top: 1rem; text-align: center; background-color: #007bff; color: white"
               >
-                <i class="fa fa-trash"></i> Refaire Reconnaissance d'Ecriture
+                <i class="fa fa-trash"></i> Recherche des Reponses Similaires
               </button>
+
+              <div *ngIf="similarPredictions.length > 0">
+                <p style="font-weight: bold; margin-bottom: 10px">Resultats Similaires:</p>
+                <ul>
+                  <li
+                    *ngFor="let prediction of similarPredictions"
+                    [style.border]="selectedSimilars.get(prediction) === 1 ? '5px solid green' : '1px solid #ccc'"
+                    style="margin-bottom: 10px; padding: 10px"
+                  >
+                    <button
+                      (click)="selectSimilarPrediction(prediction)"
+                      style="border: none; background: none; padding: 0; cursor: pointer"
+                    >
+                      <img [src]="prediction.imageData" alt="Prediction Image" style="max-width: 100%; height: auto" />
+                    </button>
+                  </li>
+                </ul>
+              </div>
 
               <div
                 *ngIf="
@@ -595,8 +612,18 @@
                     border-radius: 5px;
                   "
                 ></div>
+              </div>
+              <button
+                *ngIf="deleted == true"
+                type="button"
+                class="btn"
+                (click)="executeScript()"
+                style="margin-top: 1rem; text-align: center; background-color: #007bff; color: white"
+              >
+                <i class="fa fa-trash"></i> Refaire Reconnaissance d'Ecriture
+              </button>
 
-                <!--div *ngIf="predictionsDic[questionindex]" style="margin-top: 1rem; text-align: center">
+              <!--div *ngIf="predictionsDic[questionindex]" style="margin-top: 1rem; text-align: center">
                 <dd style="font-size: 1.1rem; font-weight: bold; margin: 0">Résultat :</dd>
                 <div
                   [innerHTML]="predictionsDic[questionindex]"
@@ -609,9 +636,8 @@
                     border: 1px solid #ddd;
                     border-radius: 5px;
                   "
-                ></div-->
-                <!-- Utilise innerHTML pour interpréter le HTML -->
-              </div>
+                ></div>
+                < Utilise innerHTML pour interpréter le HTML-->
 
               <div *ngIf="error" style="margin-top: 1rem; text-align: center">
                 <dd style="font-size: 1.1rem; font-weight: bold; margin: 0">Erreur :</dd>
