@@ -162,6 +162,7 @@
     "lien": "lien",
     "mailsent": "Mails envoyés",
     "mailsentdetails": "Tous les étudiants sont maintenant prévenus de leur résultat",
+    "mailsentdetailsonstudent": "L'étudiant(e) {{firstname}} {{lastname}} est maintenant prévenu(e)s de son résultat",
     "mailnotsent": "Mails non envoyés",
     "mailnotsentdetails": "Une erreur s'est produite pendant l'envoi des emails aux étudiants",
     "mailtemplate": "Bonjour ${firstname},\n\nVoici le lien vers votre copie ${url}.\n\nSincèrement,\n\nL'équipe pédagogique",

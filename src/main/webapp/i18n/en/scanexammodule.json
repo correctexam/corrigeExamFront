@@ -159,6 +159,7 @@
     "lien": "link",
     "mailsent": "Mails sent",
     "mailsentdetails": "All students are now notified of their results",
+    "mailsentdetailsonstudent": "The student {{firstname}} {{lastname}} has now been informed of his/her result",
     "mailnotsent": "Mails not sent",
     "mailnotsentdetails": "An error occurred while sending emails to students",
     "mailtemplate": "Hello ${firstname},\n\nHere is the link to your copy ${url}.\nSincerely,\n\nThe teaching team\n",
