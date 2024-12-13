@@ -18,7 +18,7 @@ import { MesCoursComponent } from 'app/scanexam/mes-cours/mes-cours.component';
 import { MesCoursComponent as MesCoursComponent_1 } from '../scanexam/mes-cours/mes-cours.component';
 import { PrimeTemplate } from 'primeng/api';
 import { DockModule } from 'primeng/dock';
-import { FileUploadModule } from 'primeng/fileupload';
+import { FileUpload, FileUploadModule } from 'primeng/fileupload';
 import { FormsModule } from '@angular/forms';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { TooltipModule } from 'primeng/tooltip';
@@ -193,10 +193,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onUpload($event: any): void {
+  onUpload($event: any, fileUpload: FileUpload): void {
     if ($event.files && $event.files.length > 0) {
       this.uploadCache($event.files[0]).subscribe(response => {
         if (response.state === 'DONE') {
+          fileUpload?.clear();
+
           this.layoutsidebarVisible = false;
           this.blocked = false;
           this.message = '';

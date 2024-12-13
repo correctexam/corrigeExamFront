@@ -89,6 +89,7 @@
           </div>
           <div class="flex align-items-center justify-content-center border-round m-2">
             <p-fileUpload
+              #fileUpload
               [chooseIcon]="''"
               [chooseStyleClass]="'p-button p-button-primary'"
               mode="basic"
@@ -101,7 +102,7 @@
               name="import[]"
               accept="application/pdf"
               [maxFileSize]="2000000000"
-              (uploadHandler)="onUpload($event)"
+              (uploadHandler)="onUpload($event, fileUpload)"
             ></p-fileUpload>
           </div>
         </div>
