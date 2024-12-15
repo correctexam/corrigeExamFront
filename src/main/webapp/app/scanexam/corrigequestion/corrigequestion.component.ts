@@ -109,6 +109,7 @@ import { delay } from 'cypress/types/bluebird';
 import { HttpClient } from '@angular/common/http';
 import { MltComponent } from '../mlt/mlt.component';
 import { CoupageDimageService } from '../mlt/coupage-dimage.service';
+import * as tf from '@tensorflow/tfjs';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -3197,24 +3198,29 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionId }));
       const predictions = predictionResponse.body || [];
       if (this.currentPrediction && predictions.length > 0) {
-        for (let i = 0; i < predictions.length; i++) {
-          const currentWords = new Set(this.currentPrediction.text?.toLowerCase().split(/\s+/)); // Normalize case and split by spaces
-          const predictionWords = new Set(predictions[i].text?.toLowerCase().split(/\s+/));
+        // for (let i = 0; i < predictions.length; i++) {
+        //   const currentWords = new Set(this.currentPrediction.text?.toLowerCase().split(/\s+/));
+        //   const predictionWords = new Set(predictions[i].text?.toLowerCase().split(/\s+/));
 
-          // Find the intersection of both sets
-          const commonWords = [...currentWords].filter(word => predictionWords.has(word));
+        //   // Find the intersection of both sets
+        //   const commonWords = [...currentWords].filter(word => predictionWords.has(word));
 
-          // Check if there are at least 2 common words
-          if (commonWords.length >= 2) {
-            this.similarPredictions.push(predictions[i]);
-          }
-        }
+        //   // Check if there are at least 2 common words
+        //   if (commonWords.length >= 2) {
+        //     this.similarPredictions.push(predictions[i]);
+        //   }
+        // }
+        this.similarPredictions = await this.calculateSimilarities(this.currentPrediction, predictions);
+        this.similarPredictions = this.similarPredictions.filter(
+          (prediction, index, self) =>
+            index === self.findIndex(p => p.questionId === prediction.questionId && p.studentId === prediction.studentId),
+        );
 
         // Sort by studentId
         this.similarPredictions.sort((a, b) => {
           const studentIdA = a.studentId || 0;
           const studentIdB = b.studentId || 0;
-          return studentIdA - studentIdB; // Ascending order
+          return studentIdA - studentIdB;
         });
 
         this.deleted = false;
@@ -3235,6 +3241,22 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       if (currentValue === 1) {
         // Unselect the prediction
         this.selectedSimilars.set(similar, 0);
+
+        //Reset the grade
+        let response = await this.getStudentResponse4CurrentStudent(
+          this.questions!.map(q => q.id!),
+          similar.studentId! - 1,
+        );
+        response.note = 0;
+        response.comments = [];
+        response.gradedcomments = [];
+        response.textcomments = [];
+        response.star = false;
+        response.worststar = false;
+        this.updateResponseRequest(response).subscribe(sr1 => {
+          response = sr1.body!;
+          this.blocked = false;
+        });
       } else {
         // Select the prediction
         this.selectedSimilars.set(similar, 1);
@@ -3267,5 +3289,31 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.blocked = false;
     });
     console.log('Similar note:', response.note);
+  }
+
+  async calculateSimilarities(currentPrediction: Prediction, predictions: Prediction[]): Promise<Prediction[]> {
+    // Normalize and split text into words
+    const normalizeText = (text: string): Set<string> => {
+      return new Set(
+        text
+          .toLowerCase()
+          .replace(/[^\w\s]/g, '')
+          .split(/\s+/),
+      );
+    };
+
+    const currentWords = normalizeText(currentPrediction.text || '');
+    const similarPredictions: Prediction[] = [];
+
+    // Compare current prediction with all others
+    for (let i = 0; i < predictions.length; i++) {
+      const predictionWords = normalizeText(predictions[i].text || '');
+      const commonWords = [...currentWords].filter(word => predictionWords.has(word));
+      if (commonWords.length >= 2 && !similarPredictions.includes(predictions[i])) {
+        similarPredictions.push(predictions[i]);
+      }
+    }
+
+    return similarPredictions;
   }
 }
