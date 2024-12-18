@@ -400,7 +400,6 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   }
 
   async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
-    console.log('I am here getAllImage4Zone');
     const imageToCrop: IImageCropFromZoneInput = {
       examId: +this.examId!,
       factor: +this.factor,

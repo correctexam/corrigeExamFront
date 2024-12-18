@@ -437,5 +437,5 @@ export const SCANEXAM_ROUTES = [
   CompareHybridCommentAnswer_ROUTE,
   SearchAnswer_ROUTE,
   // MLT_ROUTE,
-  // ImageAccess_ROUTE,
+  ImageAccess_ROUTE,
 ];

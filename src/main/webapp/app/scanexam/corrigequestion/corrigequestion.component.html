@@ -555,6 +555,17 @@
                 <p-progressSpinner *ngIf="blocked" styleClass="w-2rem h-2rem"></p-progressSpinner>
               </div>
 
+              <!--div>
+                <button
+                  type="button"
+                  class="btn"
+                  (click)="tryGetAllImages()"
+                  style="margin-top: 1rem; text-align: center; background-color: #007bff; color: white"
+                >
+                  <i class="fa fa-trash"></i> GetAllImages
+                </button>
+              </div-->
+
               <button
                 type="button"
                 class="btn"
@@ -568,15 +579,12 @@
                 <p style="font-weight: bold; margin-bottom: 10px">Resultats Similaires:</p>
                 <ul>
                   <li
-                    *ngFor="let prediction of similarPredictions"
-                    [style.border]="selectedSimilars.get(prediction) === 1 ? '5px solid green' : '1px solid #ccc'"
+                    *ngFor="let similar of similarPredictions"
+                    [style.border]="selectedSimilars.get(similar) === 1 ? '5px solid green' : '1px solid #ccc'"
                     style="margin-bottom: 10px; padding: 10px"
                   >
-                    <button
-                      (click)="selectSimilarPrediction(prediction)"
-                      style="border: none; background: none; padding: 0; cursor: pointer"
-                    >
-                      <img [src]="prediction.imageData" alt="Prediction Image" style="max-width: 100%; height: auto" />
+                    <button (click)="selectSimilarPrediction(similar)" style="border: none; background: none; padding: 0; cursor: pointer">
+                      <img [src]="similar.imageData" alt="Prediction Image" style="max-width: 100%; height: auto" />
                     </button>
                   </li>
                 </ul>

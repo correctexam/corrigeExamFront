@@ -1,1 +1,61 @@
-<p>image-access works!</p>
+<div class="main-container">
+  <div *ngIf="loading" class="loading-container">
+    <p>Loading images... Please wait.</p>
+  </div>
+
+  <div *ngIf="error" class="error-container">
+    <p>{{ error }}</p>
+  </div>
+
+  <div *ngIf="!loading && !error" class="images-container">
+    <div *ngFor="let image of imageList; let i = index" class="image-wrapper">
+      <p class="page-number">Page {{ image.pageNumber }}</p>
+      <canvas #imageCanvas class="image-canvas"></canvas>
+    </div>
+  </div>
+</div>
+
+<style>
+  .main-container {
+    padding: 20px;
+    min-height: 200px;
+  }
+
+  .loading-container {
+    text-align: center;
+    padding: 20px;
+    font-size: 16px;
+  }
+
+  .error-container {
+    color: red;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .images-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 10px;
+  }
+
+  .image-wrapper {
+    border: 1px solid #ddd;
+    padding: 10px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .page-number {
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+
+  .image-canvas {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+</style>

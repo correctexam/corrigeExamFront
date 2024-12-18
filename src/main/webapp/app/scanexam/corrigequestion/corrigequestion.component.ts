@@ -932,7 +932,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           }
         }
         const imagezone = await this.getAllImage4Zone(page, z!);
-
         this.displayImage(
           imagezone,
           this.canvass.get(i),
@@ -3198,19 +3197,18 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionId }));
       const predictions = predictionResponse.body || [];
       if (this.currentPrediction && predictions.length > 0) {
-        // for (let i = 0; i < predictions.length; i++) {
-        //   const currentWords = new Set(this.currentPrediction.text?.toLowerCase().split(/\s+/));
-        //   const predictionWords = new Set(predictions[i].text?.toLowerCase().split(/\s+/));
+        for (let i = 0; i < predictions.length; i++) {
+          const currentWords = new Set(this.currentPrediction.text?.toLowerCase().split(/\s+/));
+          const predictionWords = new Set(predictions[i].text?.toLowerCase().split(/\s+/));
 
-        //   // Find the intersection of both sets
-        //   const commonWords = [...currentWords].filter(word => predictionWords.has(word));
+          // Find the intersection of both sets
+          const commonWords = [...currentWords].filter(word => predictionWords.has(word));
 
-        //   // Check if there are at least 2 common words
-        //   if (commonWords.length >= 2) {
-        //     this.similarPredictions.push(predictions[i]);
-        //   }
-        // }
-        this.similarPredictions = await this.calculateSimilarities(this.currentPrediction, predictions);
+          // Check if there are at least 2 common words
+          if (commonWords.length >= 2) {
+            this.similarPredictions.push(predictions[i]);
+          }
+        }
         this.similarPredictions = this.similarPredictions.filter(
           (prediction, index, self) =>
             index === self.findIndex(p => p.questionId === prediction.questionId && p.studentId === prediction.studentId),
@@ -3291,29 +3289,5 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     console.log('Similar note:', response.note);
   }
 
-  async calculateSimilarities(currentPrediction: Prediction, predictions: Prediction[]): Promise<Prediction[]> {
-    // Normalize and split text into words
-    const normalizeText = (text: string): Set<string> => {
-      return new Set(
-        text
-          .toLowerCase()
-          .replace(/[^\w\s]/g, '')
-          .split(/\s+/),
-      );
-    };
-
-    const currentWords = normalizeText(currentPrediction.text || '');
-    const similarPredictions: Prediction[] = [];
-
-    // Compare current prediction with all others
-    for (let i = 0; i < predictions.length; i++) {
-      const predictionWords = normalizeText(predictions[i].text || '');
-      const commonWords = [...currentWords].filter(word => predictionWords.has(word));
-      if (commonWords.length >= 2 && !similarPredictions.includes(predictions[i])) {
-        similarPredictions.push(predictions[i]);
-      }
-    }
-
-    return similarPredictions;
-  }
+  tryGetAllImages() {}
 }
