@@ -812,6 +812,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.active.set(l.id!, signal(true));
     }
     this.minimizeComment = false;
+
+    this.sameGradeForAlreadySelected();
   }
 
   resetAllShortCut() {
@@ -1159,6 +1161,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.blocked = false;
       });
     }
+    this.sameGradeForAlreadySelected();
   }
 
   isTextInput(ele: any): boolean {
@@ -1199,6 +1202,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.currentNote = +e.event.key;
       this.changeNote();
     }
+
+    this.sameGradeForAlreadySelected();
   }
 
   updateResponseRequest(studentResp: IStudentResponse): Observable<EntityResponseType> {
@@ -1225,6 +1230,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
       this.updateResponse();
     }
+
+    this.sameGradeForAlreadySelected();
   }
   updateStar() {
     if (this.resp !== undefined) {
@@ -1233,6 +1240,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
       this.updateResponse();
     }
+
+    this.sameGradeForAlreadySelected();
   }
 
   checked(comment: ITextComment | IGradedComment | IHybridGradedComment): boolean {
@@ -1262,6 +1271,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     self.resp?.textcomments?.push(comment);
     const resp1 = await firstValueFrom(self.updateResponseRequest(self.resp!));
     self.resp = resp1.body!;
+
+    this.sameGradeForAlreadySelected();
   }
 
   private async retirerTComment(comment: ITextComment, self: CorrigequestionComponent) {
@@ -1273,10 +1284,14 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     const resp1 = await firstValueFrom(self.updateResponseRequest(self.resp!));
     self.resp = resp1.body!;
     (comment as any).checked = false;
+
+    this.sameGradeForAlreadySelected();
   }
 
   incrementHComment(comment: IHybridGradedComment) {
     this.fillorcreateQueryPool(this.incrementHCommentInternal, comment);
+
+    this.sameGradeForAlreadySelected();
   }
 
   private async incrementHCommentInternal(comment: IHybridGradedComment, self: CorrigequestionComponent): Promise<void> {
@@ -1302,6 +1317,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
       await self.computeNote(true, self.resp!, self.currentQuestion!);
     }
+
+    this.sameGradeForAlreadySelected();
   }
 
   toggleTCommentById(commentId: any) {
@@ -1414,6 +1431,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     self.resp = resp1.body!;
     await self.computeNote(true, self.resp!, self.currentQuestion!);
     //    });
+
+    this.sameGradeForAlreadySelected();
   }
 
   private async retirerGComment(comment: IGradedComment, self: CorrigequestionComponent) {
@@ -1427,6 +1446,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     const resp1 = await firstValueFrom(self.updateResponseRequest(self.resp!)); // .subscribe(resp1 => {
     self.resp = resp1.body!;
     await self.computeNote(true, self.resp!, self.currentQuestion!);
+
+    this.sameGradeForAlreadySelected();
   }
 
   updateNote4updateQuestion(update: boolean, resp: IStudentResponse, currentQ: IQuestion[]): Promise<IStudentResponse | undefined> {
@@ -1684,6 +1705,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       });
     }
+
+    this.sameGradeForAlreadySelected();
   }
 
   cleanCanvassCache() {
@@ -2406,6 +2429,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         },
       });
     });
+
+    this.sameGradeForAlreadySelected();
   }
 
   removeGradedComment(comment: IGradedComment): void {
@@ -2436,6 +2461,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       });
     }
+
+    this.sameGradeForAlreadySelected();
   }
 
   checkEnterOrEscape($event: any, el: Inplace): void {
@@ -2474,6 +2501,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       });
     }
+
+    this.sameGradeForAlreadySelected();
   }
 
   // ----------------- code for realign -----------------------
@@ -2776,6 +2805,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.testdisableAndEnableKeyBoardShortCut.set(true);
     }, 30);
+
+    this.sameGradeForAlreadySelected();
   }
   updateTextComment($event: ITextComment): void {
     const c1 = this.currentTextComment4Question?.find(c => (c().id = $event.id));
@@ -2787,6 +2818,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         c1().text = $event.text;
       }
     }
+
+    this.sameGradeForAlreadySelected();
   }
   addGradedComment($event: IGradedComment): void {
     this.currentGradedComment4Question?.push(signal($event));
@@ -2794,6 +2827,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.populateDefaultShortCut();
     // this.testdisableAndEnableKeyBoardShortCut.set(true);
     setTimeout(() => this.testdisableAndEnableKeyBoardShortCut.set(true), 30);
+
+    this.sameGradeForAlreadySelected();
   }
 
   updateGradedComment($event: IGradedComment): void {
@@ -2809,6 +2844,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         c1().grade = $event.grade;
       }
     }
+
+    this.sameGradeForAlreadySelected();
   }
 
   addHybridComment($event: IHybridGradedComment): void {
@@ -2816,6 +2853,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.testdisableAndEnableKeyBoardShortCut.set(false);
     this.populateDefaultShortCut();
     setTimeout(() => this.testdisableAndEnableKeyBoardShortCut.set(true), 300);
+
+    this.sameGradeForAlreadySelected();
   }
 
   updateHybridComment($event: IHybridGradedComment): void {
@@ -2844,6 +2883,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.computeNote(true, this.resp, this.currentQuestion);
       }
     }
+
+    this.sameGradeForAlreadySelected();
   }
 
   changestepValue($event: any, comment: IHybridGradedComment): void {
@@ -3205,7 +3246,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           const commonWords = [...currentWords].filter(word => predictionWords.has(word));
 
           // Check if there are at least 2 common words
-          if (commonWords.length >= 2) {
+          if (commonWords.length >= 2 && predictions[i].id != this.currentPrediction.id) {
             this.similarPredictions.push(predictions[i]);
           }
         }
@@ -3289,5 +3330,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     console.log('Similar note:', response.note);
   }
 
+  sameGradeForAlreadySelected() {
+    const predictions = Array.from(this.selectedSimilars.keys());
+    for (let i = 0; i < predictions.length; i++) {
+      this.sameGrade(predictions[i]);
+    }
+  }
   tryGetAllImages() {}
 }
