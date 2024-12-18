@@ -109,7 +109,8 @@ import { delay } from 'cypress/types/bluebird';
 import { HttpClient } from '@angular/common/http';
 import { MltComponent } from '../mlt/mlt.component';
 import { CoupageDimageService } from '../mlt/coupage-dimage.service';
-import * as tf from '@tensorflow/tfjs';
+
+import Fuse from 'fuse.js';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -3238,18 +3239,19 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionId }));
       const predictions = predictionResponse.body || [];
       if (this.currentPrediction && predictions.length > 0) {
-        for (let i = 0; i < predictions.length; i++) {
-          const currentWords = new Set(this.currentPrediction.text?.toLowerCase().split(/\s+/));
-          const predictionWords = new Set(predictions[i].text?.toLowerCase().split(/\s+/));
+        // for (let i = 0; i < predictions.length; i++) {
+        //   const currentWords = new Set(this.currentPrediction.text?.toLowerCase().split(/\s+/));
+        //   const predictionWords = new Set(predictions[i].text?.toLowerCase().split(/\s+/));
 
-          // Find the intersection of both sets
-          const commonWords = [...currentWords].filter(word => predictionWords.has(word));
+        //   // Find the intersection of both sets
+        //   const commonWords = [...currentWords].filter(word => predictionWords.has(word));
 
-          // Check if there are at least 2 common words
-          if (commonWords.length >= 2 && predictions[i].id != this.currentPrediction.id) {
-            this.similarPredictions.push(predictions[i]);
-          }
-        }
+        //   // Check if there are at least 2 common words
+        //   if (commonWords.length >= 2 && predictions[i].id != this.currentPrediction.id) {
+        //     this.similarPredictions.push(predictions[i]);
+        //   }
+        // }
+        this.similarPredictions = this.findSimilarPredictions(this.currentPrediction, predictions);
         this.similarPredictions = this.similarPredictions.filter(
           (prediction, index, self) =>
             index === self.findIndex(p => p.questionId === prediction.questionId && p.studentId === prediction.studentId),
@@ -3306,6 +3308,35 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.selectedSimilars.set(similar, 1);
       this.sameGrade(similar);
     }
+  }
+
+  //Finding the simlar prediction using fuse.js
+  findSimilarPredictions(currentPrediction: Prediction, predictions: Prediction[]) {
+    // Fuse.js options
+    const fuseOptions = {
+      keys: ['text'],
+      threshold: 0.5, // Adjust for leniency
+      distance: 500, // High value for inaccuracies
+      minMatchCharLength: 3,
+    };
+
+    const fuse = new Fuse(predictions, fuseOptions);
+
+    // Forward search: Check which predictions are similar to the current prediction
+    const forwardResults = fuse.search(currentPrediction.text!);
+
+    // Reverse search: Check if the current prediction is similar to any prediction text
+    const reverseResults = predictions.filter(prediction => {
+      const fuseForReverse = new Fuse([currentPrediction], fuseOptions);
+      const result = fuseForReverse.search(prediction.text!);
+      return result.length > 0;
+    });
+
+    // Combine forward and reverse results, ensuring no duplicates
+    const similarPredictions = new Set([...forwardResults.map(result => result.item), ...reverseResults]);
+
+    // Exclude the current prediction itself
+    return [...similarPredictions].filter(prediction => prediction.id !== currentPrediction.id);
   }
 
   //Same starts, comments etc
