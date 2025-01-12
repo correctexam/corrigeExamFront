@@ -1,116 +1,49 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AlignImagesService, IImageCropFromZoneInput } from '../services/align-images.service';
-import { Subscription, timeout } from 'rxjs';
-import { NgIf } from '@angular/common';
+import { AlignImagesService } from '../services/align-images.service';
+import { firstValueFrom } from 'rxjs';
+import { CacheServiceImpl } from '../db/CacheServiceImpl';
+import { NgIf, NgFor } from '@angular/common';
+
+interface ExamPageImage {
+  pageNumber: number;
+  imageData: ImageData; // Using the built-in ImageData type
+  width: number;
+  height: number;
+}
 
 @Component({
   selector: 'app-image-access',
-  template: `
-    <div class="container">
-      <div *ngIf="loading" class="loading">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">Loading image... Please wait</div>
-      </div>
-
-      <div *ngIf="error" class="error">
-        {{ error }}
-        <button (click)="reloadImage()" class="retry-button">Retry</button>
-      </div>
-
-      <div class="canvas-container" [style.display]="loading ? 'none' : 'block'">
-        <canvas #canvas id="mainCanvas"></canvas>
-      </div>
-    </div>
-
-    <style>
-      .container {
-        padding: 20px;
-        text-align: center;
-      }
-      .loading {
-        padding: 20px;
-      }
-      .loading-spinner {
-        width: 40px;
-        height: 40px;
-        margin: 20px auto;
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #3498db;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-      .loading-text {
-        color: #666;
-        margin-top: 10px;
-      }
-      .error {
-        color: red;
-        margin: 20px 0;
-      }
-      .retry-button {
-        margin-top: 10px;
-        padding: 8px 16px;
-        background: #3498db;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-      .canvas-container {
-        margin-top: 20px;
-      }
-      canvas {
-        max-width: 100%;
-        border: 1px solid #ddd;
-      }
-    </style>
-  `,
+  templateUrl: './image-access.component.html',
   standalone: true,
-  imports: [NgIf],
+  imports: [NgIf, NgFor],
 })
-export class ImageAccessComponent implements OnInit, OnDestroy {
+export class ImageAccessComponent implements OnInit {
+  @ViewChildren('imageCanvas') canvases!: QueryList<ElementRef<HTMLCanvasElement>>;
+
   loading = true;
   error: string | null = null;
   examId: string | null = null;
-  private currentSubscription?: Subscription;
+  imageList: ExamPageImage[] = [];
+  nbreFeuilleParCopie = 0;
+  numberPagesInScan = 0;
 
   constructor(
     private route: ActivatedRoute,
     private alignImagesService: AlignImagesService,
+    private db: CacheServiceImpl,
   ) {}
 
-  ngOnInit() {
-    this.route.params.subscribe(params => {
+  async ngOnInit() {
+    this.route.params.subscribe(async params => {
       this.examId = params['examid'];
       if (this.examId) {
-        console.log('Got exam ID:', this.examId);
-        this.loadImage();
+        await this.loadImages();
       }
     });
   }
 
-  ngOnDestroy() {
-    if (this.currentSubscription) {
-      this.currentSubscription.unsubscribe();
-    }
-  }
-
-  reloadImage() {
-    if (this.examId) {
-      this.loadImage();
-    }
-  }
-
-  async loadImage() {
+  async loadImages() {
     try {
       this.loading = true;
       this.error = null;
@@ -119,76 +52,71 @@ export class ImageAccessComponent implements OnInit, OnDestroy {
         throw new Error('No exam ID provided');
       }
 
-      // Clean up previous subscription if any
-      if (this.currentSubscription) {
-        this.currentSubscription.unsubscribe();
+      // Get page counts first
+      this.nbreFeuilleParCopie = await this.db.countPageTemplate(+this.examId);
+      this.numberPagesInScan = await this.db.countAlignImage(+this.examId);
+
+      // Get all aligned images
+      const alignedImages = await this.db.getAlignSortByPageNumber(+this.examId);
+
+      this.imageList = [];
+
+      for (const imageData of alignedImages) {
+        const image = JSON.parse(imageData.value, this.reviver);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Load image from base64
+        const img = new Image();
+        img.onload = () => {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx?.drawImage(img, 0, 0);
+
+          this.imageList.push({
+            pageNumber: imageData.pageNumber,
+            imageData: ctx!.getImageData(0, 0, img.width, img.height),
+            width: img.width,
+            height: img.height,
+          });
+        };
+        img.src = image.pages;
       }
 
-      const params: IImageCropFromZoneInput = {
-        examId: +this.examId,
-        factor: 1,
-        align: false,
-        template: false,
-        indexDb: false,
-        page: 1,
-        z: {},
-      };
-
-      console.log('Dispatching request to worker...');
-
-      // Set up new subscription with timeout
-      this.currentSubscription = this.alignImagesService
-        .imageCropFromZone(params)
-        .pipe(timeout(30000)) // 30 second timeout
-        .subscribe({
-          next: async response => {
-            console.log('Got worker response:', response);
-
-            if (!response || !response.image) {
-              throw new Error('Invalid response from worker');
-            }
-
-            await this.renderImage(response);
-            this.loading = false;
-          },
-          error: err => {
-            console.error('Worker error:', err);
-            this.error = 'Failed to load image. Please try again.';
-            this.loading = false;
-          },
-        });
+      this.loading = false;
     } catch (error) {
       console.error('Error:', error);
-      this.error = 'Failed to start image loading';
+      this.error = 'Failed to load images';
       this.loading = false;
     }
   }
 
-  private async renderImage(response: any): Promise<void> {
-    return new Promise((resolve, reject) => {
-      try {
-        const canvas = document.getElementById('mainCanvas') as HTMLCanvasElement;
-        if (!canvas) {
-          throw new Error('Canvas not found');
-        }
+  // Helper function to properly revive JSON with Maps
+  private reviver(key: any, value: any): any {
+    if (typeof value === 'object' && value !== null) {
+      if (value.dataType === 'Map') {
+        return new Map(value.value);
+      }
+    }
+    return value;
+  }
 
+  ngAfterViewInit() {
+    this.canvases.changes.subscribe(() => {
+      this.renderImages();
+    });
+  }
+
+  private renderImages() {
+    this.canvases.forEach((canvasRef, index) => {
+      const imageInfo = this.imageList[index];
+      if (imageInfo) {
+        const canvas = canvasRef.nativeElement;
         const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          throw new Error('Could not get canvas context');
-        }
 
-        // Set canvas dimensions
-        canvas.width = response.width;
-        canvas.height = response.height;
-
-        // Create and draw image data
-        const imageData = new ImageData(new Uint8ClampedArray(response.image), response.width, response.height);
-
-        ctx.putImageData(imageData, 0, 0);
-        resolve();
-      } catch (error) {
-        console.error('Render error:', error);
-        reject(error);
+        canvas.width = imageInfo.width;
+        canvas.height = imageInfo.height;
+        ctx?.putImageData(imageInfo.imageData, 0, 0);
       }
     });
   }

@@ -104,7 +104,6 @@ import { ToastModule } from 'primeng/toast';
 import { SwipeDirective } from '../swipe.directive';
 import { ScriptService } from 'app/entities/scan/service/dan-service.service';
 import { IPrediction, Prediction } from 'app/entities/prediction/prediction.model';
-import { delay } from 'cypress/types/bluebird';
 
 import { HttpClient } from '@angular/common/http';
 import { MltComponent } from '../mlt/mlt.component';
@@ -760,7 +759,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   populateDefaultShortCut(): void {
     const toRemove: number[] = [];
     const comments: (IGradedComment | ITextComment | IHybridGradedComment)[] = [];
-    const predictions: IPrediction[] = [];
+    // const predictions: IPrediction[] = [];
     if (this.currentGradedComment4Question && this.currentGradedComment4Question.length > 0) {
       comments.push(...this.currentGradedComment4Question.map(e => e()));
     }
@@ -3041,7 +3040,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     question_number: number,
     prediction_id: number | undefined,
   ): void {
-    if (this.blocked) return; // Ensure storePrediction is not called twice
+    if (this.blocked) {
+      return;
+    } // Ensure storePrediction is not called twice
     this.blocked = true;
 
     const predictionData: IPrediction = {
@@ -3148,34 +3149,34 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   base64Image = '';
   refinedLines: string[] = [];
-  async callMLT() {
-    const imageData = this.getImageFromCanvas();
-    if (!imageData) {
-      console.error('No image data found on the canvas');
-      this.error = 'No image selected';
-      return;
-    }
+  // async callMLT() {
+  //   const imageData = this.getImageFromCanvas();
+  //   if (!imageData) {
+  //     console.error('No image data found on the canvas');
+  //     this.error = 'No image selected';
+  //     return;
+  //   }
 
-    this.coupageDimageService.runScript(imageData).subscribe({
-      next: async response => {
-        this.refinedLines = response.refinedLines || [];
+  //   this.coupageDimageService.runScript(imageData).subscribe({
+  //     next: async response => {
+  //       this.refinedLines = response.refinedLines || [];
 
-        for (let i = 0; i < this.refinedLines.length; i++) {
-          try {
-            const base64Line = `data:image/png;base64,${this.refinedLines[i]}`;
+  //       for (let i = 0; i < this.refinedLines.length; i++) {
+  //         try {
+  //           const base64Line = `data:image/png;base64,${this.refinedLines[i]}`;
 
-            // Process the Base64 line directly
-            const result = await this.mltcomponent.executeMLT(base64Line);
-          } catch (error) {
-            console.error('Error processing refined line ', i, ':', error);
-          }
-        }
-      },
-      error: error => {
-        console.error('Error refining the image:', error);
-      },
-    });
-  }
+  //           // Process the Base64 line directly
+  //           const result = await this.mltcomponent.executeMLT(base64Line);
+  //         } catch (error) {
+  //           console.error('Error processing refined line ', i, ':', error);
+  //         }
+  //       }
+  //     },
+  //     error: error => {
+  //       console.error('Error refining the image:', error);
+  //     },
+  //   });
+  // }
 
   // Méthode pour exécuter le script
   async executeScript(): Promise<void> {
@@ -3283,7 +3284,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         // Unselect the prediction
         this.selectedSimilars.set(similar, 0);
 
-        //Reset the grade
+        // Reset the grade
         let response = await this.getStudentResponse4CurrentStudent(
           this.questions!.map(q => q.id!),
           similar.studentId! - 1,
@@ -3310,13 +3311,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  //Finding the simlar prediction using fuse.js
+  // Finding the simlar prediction using fuse.js
   findSimilarPredictions(currentPrediction: Prediction, predictions: Prediction[]) {
     // Fuse.js options
     const fuseOptions = {
       keys: ['text'],
-      threshold: 0.5, // Adjust for leniency
-      distance: 500, // High value for inaccuracies
+      threshold: 0.3, // Adjust for leniency
+      distance: 300, // High value for inaccuracies
       minMatchCharLength: 3,
     };
 
@@ -3339,9 +3340,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     return [...similarPredictions].filter(prediction => prediction.id !== currentPrediction.id);
   }
 
-  //Same starts, comments etc
+  // Same starts, comments etc
   async sameGrade(similar: Prediction) {
-    let try1 = await this.getStudentResponse(this.questions!.map(q => q.id!));
+    // let try1 = await this.getStudentResponse(this.questions!.map(q => q.id!));
     let response = await this.getStudentResponse4CurrentStudent(
       this.questions!.map(q => q.id!),
       similar.studentId! - 1,
