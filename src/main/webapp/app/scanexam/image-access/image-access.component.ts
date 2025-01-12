@@ -7,6 +7,10 @@ import { QuestionService } from '../../entities/question/service/question.servic
 import { IQuestion } from '../../entities/question/question.model';
 import { IZone } from 'app/entities/zone/zone.model';
 import { NgIf, NgFor } from '@angular/common';
+import { ScriptService } from 'app/entities/scan/service/dan-service.service';
+import { PredictionService } from 'app/entities/prediction/service/prediction.service';
+import { IPrediction } from 'app/entities/prediction/prediction.model';
+import { MltComponent } from '../mlt/mlt.component';
 
 interface ExamPageImage {
   pageNumber: number;
@@ -14,7 +18,8 @@ interface ExamPageImage {
   width: number;
   height: number;
   questionId?: number;
-  studentIndex: number; // Added this as a required field
+  studentIndex: number;
+  prediction?: string | undefined;
 }
 
 @Component({
@@ -22,6 +27,7 @@ interface ExamPageImage {
   templateUrl: './image-access.component.html',
   standalone: true,
   imports: [NgIf, NgFor],
+  providers: [MltComponent],
 })
 export class ImageAccessComponent implements OnInit {
   @ViewChildren('imageCanvas') canvases!: QueryList<ElementRef<HTMLCanvasElement>>;
@@ -39,6 +45,9 @@ export class ImageAccessComponent implements OnInit {
     private alignImagesService: AlignImagesService,
     private db: CacheServiceImpl,
     private questionService: QuestionService,
+    private scriptService: ScriptService,
+    private predictionService: PredictionService,
+    private mltcomponent: MltComponent,
   ) {}
 
   async ngOnInit() {
@@ -81,19 +90,15 @@ export class ImageAccessComponent implements OnInit {
 
       this.imageList = [];
 
-      // Calculate total number of students
       const totalStudents = Math.floor(this.numberPagesInScan / this.nbreFeuilleParCopie);
 
-      // Process each manuscript question for each student
       for (let studentIndex = 0; studentIndex < totalStudents; studentIndex++) {
         for (const question of this.manuscriptQuestions) {
           const zone = question.zoneDTO as IZone;
           if (!zone) continue;
 
-          // Calculate actual page number for this student
           const pageForStudent = studentIndex * this.nbreFeuilleParCopie + zone.pageNumber!;
 
-          // Get image for this question's zone
           const imageToCrop = {
             examId: +this.examId,
             factor: 1,
@@ -107,7 +112,6 @@ export class ImageAccessComponent implements OnInit {
           try {
             const crop = await firstValueFrom(this.alignImagesService.imageCropFromZone(imageToCrop));
 
-            // Create a canvas and draw the image
             const canvas = document.createElement('canvas');
             canvas.width = crop.width;
             canvas.height = crop.height;
@@ -116,14 +120,20 @@ export class ImageAccessComponent implements OnInit {
             if (ctx) {
               const imageData = new ImageData(new Uint8ClampedArray(crop.image), crop.width, crop.height);
 
-              this.imageList.push({
+              // Add image to list
+              const newImage: ExamPageImage = {
                 pageNumber: pageForStudent,
                 imageData: imageData,
                 width: crop.width,
                 height: crop.height,
                 questionId: question.id,
-                studentIndex: studentIndex + 1, // Adding student index for display
-              });
+                studentIndex: studentIndex + 1,
+              };
+
+              this.imageList.push(newImage);
+
+              // Get or create prediction
+              await this.handlePrediction(newImage, studentIndex + 1);
             }
           } catch (error) {
             console.error(`Error processing question ${question.id} for student ${studentIndex + 1}:`, error);
@@ -131,20 +141,79 @@ export class ImageAccessComponent implements OnInit {
         }
       }
 
-      // Sort images by student and question
-      this.imageList.sort((a, b) => {
-        if (a.studentIndex === b.studentIndex) {
-          return (a.questionId || 0) - (b.questionId || 0);
-        }
-        return a.pageNumber - b.pageNumber;
-      });
-
       this.loading = false;
     } catch (error) {
       console.error('Error:', error);
       this.error = 'Failed to load images';
       this.loading = false;
     }
+  }
+
+  private async handlePrediction(image: ExamPageImage, studentId: number) {
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const ctx = canvas.getContext('2d');
+      ctx?.putImageData(image.imageData, 0, 0);
+      const base64Image = canvas.toDataURL();
+
+      // Query predictions for this question
+      const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: image.questionId }));
+
+      // Find prediction specific to this student
+      const studentPrediction = predictionResponse.body?.find(pred => pred.studentId === studentId);
+
+      if (studentPrediction) {
+        image.prediction = studentPrediction.text || '';
+      } else {
+        // Create new prediction
+        const predictionId = await this.createPrediction(image.questionId!, this.examId!, studentId, base64Image);
+
+        if (predictionId) {
+          const mltResult = await this.mltcomponent.executeMLT(base64Image);
+          if (mltResult) {
+            // Check if result exists
+            await this.storePrediction(mltResult, image.questionId!, this.examId!, studentId, predictionId);
+            image.prediction = mltResult;
+          } else {
+            image.prediction = 'No prediction available';
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error handling prediction:', error);
+      image.prediction = 'No prediction available';
+    }
+  }
+
+  private async createPrediction(questionId: number, examId: string, studentId: number, imageData: string): Promise<number | undefined> {
+    const predictionData: IPrediction = {
+      studentId: studentId,
+      examId: examId,
+      questionId: questionId,
+      text: 'En attente',
+      jsonData: '{"key": "value"}',
+      zonegeneratedid: 'ZoneID123',
+      imageData: imageData,
+    };
+
+    const response = await firstValueFrom(this.predictionService.create(predictionData));
+    return response.body?.id;
+  }
+
+  private async storePrediction(prediction: string, questionId: number, examId: string, studentId: number, predictionId: number) {
+    const predictionData: IPrediction = {
+      id: predictionId,
+      studentId: studentId,
+      examId: examId,
+      questionId: questionId,
+      text: prediction,
+      jsonData: '{"key": "value"}',
+      zonegeneratedid: 'ZoneID123',
+    };
+
+    await firstValueFrom(this.predictionService.update(predictionData));
   }
 
   private reviver(key: any, value: any): any {
@@ -177,10 +246,13 @@ export class ImageAccessComponent implements OnInit {
   }
 
   getUniqueStudents(): number[] {
-    return [...new Set(this.imageList.map(img => img.studentIndex))].sort((a, b) => a - b);
+    // Get unique student indices and sort them
+    const students = [...new Set(this.imageList.map(img => img.studentIndex))];
+    return students.sort((a, b) => a - b);
   }
 
   getImagesForStudent(studentIndex: number): ExamPageImage[] {
-    return this.imageList.filter(img => img.studentIndex === studentIndex);
+    // Get all images for a specific student
+    return this.imageList.filter(img => img.studentIndex === studentIndex).sort((a, b) => (a.questionId || 0) - (b.questionId || 0)); // Sort by question ID
   }
 }
