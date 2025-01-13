@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChildren, QueryList, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChildren, QueryList, ElementRef, Injectable } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AlignImagesService } from '../services/align-images.service';
 import { firstValueFrom } from 'rxjs';
@@ -11,6 +11,7 @@ import { ScriptService } from 'app/entities/scan/service/dan-service.service';
 import { PredictionService } from 'app/entities/prediction/service/prediction.service';
 import { IPrediction } from 'app/entities/prediction/prediction.model';
 import { MltComponent } from '../mlt/mlt.component';
+import { CoupageDimageService } from '../mlt/coupage-dimage.service';
 
 interface ExamPageImage {
   pageNumber: number;
@@ -22,12 +23,13 @@ interface ExamPageImage {
   prediction?: string | undefined;
 }
 
+@Injectable()
 @Component({
   selector: 'app-image-access',
   templateUrl: './image-access.component.html',
   standalone: true,
   imports: [NgIf, NgFor],
-  providers: [MltComponent],
+  providers: [MltComponent, CoupageDimageService],
 })
 export class ImageAccessComponent implements OnInit {
   @ViewChildren('imageCanvas') canvases!: QueryList<ElementRef<HTMLCanvasElement>>;
@@ -48,6 +50,7 @@ export class ImageAccessComponent implements OnInit {
     private scriptService: ScriptService,
     private predictionService: PredictionService,
     private mltcomponent: MltComponent,
+    private coupageDimageService: CoupageDimageService,
   ) {}
 
   async ngOnInit() {
@@ -55,7 +58,7 @@ export class ImageAccessComponent implements OnInit {
       this.examId = params['examid'];
       if (this.examId) {
         await this.loadManuscriptQuestions();
-        await this.loadImages();
+        await this.loadImages(this.examId);
       }
     });
   }
@@ -75,13 +78,18 @@ export class ImageAccessComponent implements OnInit {
     }
   }
 
-  async loadImages() {
+  async loadImages(exam_id: string) {
     try {
       this.loading = true;
       this.error = null;
-
-      if (!this.examId || this.manuscriptQuestions.length === 0) {
+      this.examId = exam_id;
+      if (!this.examId) {
         throw new Error('No exam ID or no manuscript questions found');
+      } else {
+        await this.loadManuscriptQuestions();
+      }
+      if (this.manuscriptQuestions.length === 0) {
+        throw new Error('no manuscript questions found');
       }
 
       // Get page counts
@@ -171,11 +179,25 @@ export class ImageAccessComponent implements OnInit {
         const predictionId = await this.createPrediction(image.questionId!, this.examId!, studentId, base64Image);
 
         if (predictionId) {
-          const mltResult = await this.mltcomponent.executeMLT(base64Image);
-          if (mltResult) {
-            // Check if result exists
-            await this.storePrediction(mltResult, image.questionId!, this.examId!, studentId, predictionId);
-            image.prediction = mltResult;
+          // First use CoupageDimageService
+          const coupageResponse = await firstValueFrom(this.coupageDimageService.runScript(base64Image));
+          let prediction = '';
+
+          // Process each refined line
+          if (coupageResponse.refinedLines) {
+            for (const refinedLine of coupageResponse.refinedLines) {
+              const base64Line = `data:image/png;base64,${refinedLine}`;
+              const lineResult = await this.mltcomponent.executeMLT(base64Line);
+              if (lineResult) {
+                prediction += lineResult + '\n';
+              }
+            }
+          }
+
+          // Store and set prediction if we got any results
+          if (prediction) {
+            await this.storePrediction(prediction.trim(), image.questionId!, this.examId!, studentId, predictionId);
+            image.prediction = prediction.trim();
           } else {
             image.prediction = 'No prediction available';
           }
@@ -186,7 +208,6 @@ export class ImageAccessComponent implements OnInit {
       image.prediction = 'No prediction available';
     }
   }
-
   private async createPrediction(questionId: number, examId: string, studentId: number, imageData: string): Promise<number | undefined> {
     const predictionData: IPrediction = {
       studentId: studentId,
