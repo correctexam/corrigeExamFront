@@ -7,23 +7,28 @@ export const svgadapter = (node: any) => {
     //                node.attr("font-size",node.attr("font-size")/this.scale)
     const text = node.node;
     if (text.childNodes.length > 0) {
-      const content = text.childNodes[0].textContent;
-      let x = text.children[0].getAttribute('x');
-      let y = text.children[0].getAttribute('y');
-      if (x === null) {
-        x = '0';
-      }
-      if (y === null) {
-        y = '0';
-      }
+      text.childNodes.forEach(e1 => {
+        if (e1.nodeName === 'tspan') {
+          const tspan = e1 as Element;
+          const x = tspan.getAttribute('x');
+          const y = tspan.getAttribute('y');
+          /* if (x !== null && y !== null) {
+             (node.parent() as G).translate(+x, +y);
+           }*/
+          const t1 = text.cloneNode(false) as any;
+          const content = tspan.textContent;
 
-      (node.parent() as G).translate(+x, +y);
-      text.removeChild(text.childNodes[0]);
-      if (content) {
-        text.innerHTML = content; // text.childNodes[0].textContent
-      } else {
-        text.innerHTML = 'Text';
-      }
+          if (content) {
+            t1.innerHTML = content;
+          } else {
+            t1.innerHTML = 'Text';
+          }
+          t1.setAttribute('x', x);
+          t1.setAttribute('y', y);
+          (node.parent() as G).add(t1);
+        }
+      });
+      text.remove();
     }
   }
 };
