@@ -3316,7 +3316,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     // Fuse.js options
     const fuseOptions = {
       keys: ['text'],
-      threshold: 0.3, // Adjust for leniency
+      threshold: 0.5, // Adjust for leniency
       distance: 300, // High value for inaccuracies
       minMatchCharLength: 3,
     };

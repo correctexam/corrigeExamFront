@@ -566,14 +566,16 @@
                 </button>
               </div-->
 
-              <button
-                type="button"
-                class="btn"
-                (click)="similarPrediction()"
-                style="margin-top: 1rem; text-align: center; background-color: #007bff; color: white"
-              >
-                <i class="fa fa-trash"></i> Recherche des Reponses Similaires
-              </button>
+              <div *ngIf="this.currentQuestion?.typeAlgoName === 'manuscrit'">
+                <button
+                  type="button"
+                  class="btn"
+                  (click)="similarPrediction()"
+                  style="margin-top: 1rem; text-align: center; background-color: #007bff; color: white"
+                >
+                  <i class="fa fa-trash"></i> Recherche des Reponses Similaires
+                </button>
+              </div>
 
               <div *ngIf="similarPredictions.length > 0">
                 <p style="font-weight: bold; margin-bottom: 10px">Resultats Similaires:</p>
