@@ -315,6 +315,9 @@ export class CoursdetailsComponent implements OnInit {
           data: {
             courseid: this.course.id,
           },
+          closable: true,
+          closeOnEscape: true,
+          maximizable: true,
           header: data1,
           width: '70%',
         });

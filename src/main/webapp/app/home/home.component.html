@@ -9,13 +9,13 @@
 
       <ng-template [ngIf]="CONNECTION_METHOD === CONNECTION_METHOD_LOCAL">
         <div>
-          <button (click)="login()" pbutton type="button" class="p-element mr-3 p-button p-component">
+          <p-button (click)="login()" pbutton pRipple class="mr-3">
             <span class="p-button-label" jhiTranslate="home.login">Authentifiez vous</span><span class="p-ink"></span>
-          </button>
+          </p-button>
           <button
             routerLink="account/register"
-            pbutton=""
-            pripple=""
+            pbutton
+            pripple
             type="button"
             class="p-element p-ripple p-button-outlined p-button p-component mr-3"
           >

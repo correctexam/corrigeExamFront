@@ -7,12 +7,13 @@ import { AccountService } from 'app/core/auth/account.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { NgIf } from '@angular/common';
 import { TranslateDirective } from '../shared/language/translate.directive';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'jhi-login',
   templateUrl: './login.component.html',
   standalone: true,
-  imports: [TranslateDirective, NgIf, FormsModule, ReactiveFormsModule, RouterLink, TranslateModule],
+  imports: [TranslateDirective, NgIf, FormsModule, ReactiveFormsModule, RouterLink, TranslateModule, ButtonModule],
 })
 export class LoginComponent implements OnInit, AfterViewInit {
   @ViewChild('username', { static: false })
