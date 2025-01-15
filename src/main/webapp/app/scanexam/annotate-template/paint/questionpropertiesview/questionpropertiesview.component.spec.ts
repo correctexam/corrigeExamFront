@@ -6,7 +6,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FabricShapeService } from '../shape.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { LocalStorageService } from 'ngx-webstorage';
-import { SidebarModule } from 'primeng/sidebar';
+import { DrawerModule } from 'primeng/drawer';
 import { PreferenceService } from 'app/scanexam/preference-page/preference.service';
 import { CreateCommentsComponent } from '../../create-comments/create-comments.component';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
@@ -62,7 +62,7 @@ describe('QuestionpropertiesviewComponent', () => {
         ReactiveFormsModule,
         FormsModule,
         TranslateModule.forRoot(),
-        SidebarModule,
+        DrawerModule,
         ListboxModule,
         TooltipModule,
         ButtonModule,

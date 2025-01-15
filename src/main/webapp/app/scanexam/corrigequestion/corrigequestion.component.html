@@ -28,8 +28,8 @@
       <h3 jhiTranslate="scanexam.confirmation"></h3>
     </ng-template>
     <ng-template pTemplate="footer">
-      <button type="button" pButton icon="pi pi-times" [label]="'scanexam.no' | translate" (click)="cd.reject()"></button>
-      <button type="button" pButton icon="pi pi-check" [label]="'scanexam.yes' | translate" (click)="cd.accept()"></button>
+      <button type="button" pButton icon="pi pi-times" [label]="'scanexam.no' | translate" (click)="onReject(cd)"></button>
+      <button type="button" pButton icon="pi pi-check" [label]="'scanexam.yes' | translate" (click)="onAccept(cd)"></button>
     </ng-template>
   </p-confirmDialog>
   <ng-keyboard-shortcuts [shortcuts]="shortcuts"></ng-keyboard-shortcuts>
@@ -45,9 +45,10 @@
       [hybridgradedcomments]="currentHybridGradedComment4Question"
     ></jhi-keyboardshortcut>
   </ng-container>
-  <p-sidebar [(visible)]="questionpropertiesviewVisible" [modal]="true" position="right">
+  <p-drawer [(visible)]="questionpropertiesviewVisible" [modal]="true" position="right">
     <div *ngIf="questionpropertiesviewVisible">
       <jhi-questionpropertiesview
+        [alreadyInASideBar]="true"
         [canUpdateNumero]="false"
         [questionsInput]="questions!"
         (updatedQuestions)="updateQuestion($event)"
@@ -60,8 +61,8 @@
         (updateHybridGradedComment)="updateHybridComment($event)"
       ></jhi-questionpropertiesview>
     </div>
-  </p-sidebar>
-  <p-sidebar [(visible)]="sortCommentVisible" [modal]="true" position="right">
+  </p-drawer>
+  <p-drawer [(visible)]="sortCommentVisible" [modal]="true" position="right">
     <div
       *ngIf="sortCommentVisible && currentQuestion && currentQuestion?.gradeType === 'DIRECT' && currentQuestion?.typeAlgoName !== 'QCM'"
     >
@@ -149,15 +150,12 @@
               <span *ngIf="!comment.relative"> pt</span> <span *ngIf="comment.relative"> %</span> )
               <div class="flex flex-row flex-wrap" *ngIf="comment?.step !== undefined && comment?.step !== null && comment.step! > 1">
                 <div class="flex">
-                  <div class="p-rating-item ng-star-inserted font-semibold text-red-500 mr-3">
+                  <div class="p-rating-item ng-star-inserted font-semibold text-red-500 mr-2">
                     <fa-icon icon="0" size="lg"></fa-icon>
                   </div>
-                  <p-rating
-                    [stars]="comment.step!"
-                    [cancel]="false"
-                    [disabled]="true"
-                    [ngModel]="answer2HybridGradedCommentMap.get(comment.id)"
-                  ></p-rating>
+                  <!--[cancel]="false"-->
+
+                  <p-rating [stars]="comment.step!" [disabled]="true" [ngModel]="answer2HybridGradedCommentMap.get(comment.id)"></p-rating>
                 </div>
               </div>
             </span>
@@ -165,9 +163,9 @@
         </ng-template>
       </p-orderList>
     </div>
-  </p-sidebar>
+  </p-drawer>
 
-  <p-sidebar [(visible)]="layoutsidebarVisible">
+  <p-drawer [(visible)]="layoutsidebarVisible">
     <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
@@ -258,7 +256,7 @@
         [tooltipZIndex]="'3000'"
       ></p-inputSwitch>
     </div>
-  </p-sidebar>
+  </p-drawer>
 
   <p-dialog [header]="'scanexam.shortcut' | translate" [(visible)]="shortcut" [style]="{ width: '50vw' }">
     <span jhiTranslate="scanexam.shortcutdetail"></span>
@@ -290,10 +288,11 @@
     [responsiveOptions]="responsiveOptions2"
     [circular]="true"
     [fullScreen]="true"
+    [maskClass]="''"
     [showItemNavigators]="true"
     [baseZIndex]="100000"
     [showThumbnails]="false"
-    [containerStyle]="{ 'max-height': '90vh' }"
+    [containerStyle]="{ 'max-height': '90vh', 'border-style': '0px solid black' }"
     [numVisible]="7"
     [(activeIndex)]="activeIndex"
   >
@@ -570,7 +569,7 @@
               <div class="flex flex-row flex-wrap">
                 <div class="flex">
                   <ng-template #enabledrated>
-                    <div class="p-rating-item ng-star-inserted font-semibold text-red-500 mr-3">
+                    <div class="p-rating-item ng-star-inserted font-semibold text-red-500 mr-2">
                       <fa-icon icon="0" size="lg" (click)="setNoteZero()"></fa-icon>
                     </div>
                   </ng-template>
@@ -581,11 +580,12 @@
                         (currentQuestion.gradeType !== 'DIRECT' || currentQuestion.typeAlgoName === 'QCM');
                       else enabledrated
                     "
-                    class="p-rating-item ng-star-inserted font-semibold text-red-500 mr-3"
+                    class="p-rating-item ng-star-inserted font-semibold text-red-500 mr-2"
                     class="disabled-div"
                   >
                     <fa-icon icon="0" size="lg"></fa-icon>
                   </div>
+                  <!--[cancel]="false"-->
 
                   <p-rating
                     [disabled]="
@@ -595,10 +595,10 @@
                     "
                     [stars]="noteSteps"
                     [(ngModel)]="currentNote"
-                    [cancel]="false"
                     (onRate)="changeNote()"
                     (onCancel)="changeNote()"
-                  ></p-rating>
+                  >
+                  </p-rating>
                 </div>
               </div>
               <BR />
@@ -990,16 +990,16 @@
                           *ngIf="noteSteps > 0 && currentQuestion && currentQuestion?.gradeType !== 'DIRECT'"
                         >
                           <div class="flex">
-                            <div class="p-rating-item ng-star-inserted font-semibold text-red-500 mr-3">
+                            <div class="p-rating-item ng-star-inserted font-semibold text-red-500 mr-2">
                               <fa-icon
                                 icon="0"
                                 size="lg"
                                 (click)="comment.grade = 0; updateComment(undefined, comment, true, false)"
                               ></fa-icon>
                             </div>
+                            <!--[cancel]="false"-->
 
                             <p-rating
-                              [cancel]="false"
                               [stars]="noteSteps"
                               [(ngModel)]="comment.grade"
                               (ngModelChange)="updateComment($event, comment, true, false)"
@@ -1256,20 +1256,20 @@
                       <div class="flex" *ngIf="comment?.step !== undefined && comment?.step !== null && comment.step! > 1">
                         <div
                           *ngIf="blocked; else rated0"
-                          class="p-rating-item ng-star-inserted font-semibold text-red-500 mr-3 disabled-div"
+                          class="p-rating-item ng-star-inserted font-semibold text-red-500 mr-2 disabled-div"
                         >
                           <fa-icon icon="0" size="lg"></fa-icon>
                         </div>
                         <ng-template #rated0>
-                          <div class="p-rating-item ng-star-inserted font-semibold text-red-500 mr-3">
+                          <div class="p-rating-item ng-star-inserted font-semibold text-red-500 mr-2">
                             <fa-icon icon="0" size="lg" (click)="changestepValue(undefined, comment)"></fa-icon>
                           </div>
                         </ng-template>
+                        <!--[cancel]="false"-->
 
                         <p-rating
                           *ngIf="comment?.step !== undefined && comment?.step !== null && comment.step! > 1"
                           [stars]="comment.step!"
-                          [cancel]="false"
                           [disabled]="blocked"
                           (ngModelChange)="changestepValue($event, comment)"
                           [ngModel]="answer2HybridGradedCommentMap.get(comment.id)"
@@ -1313,20 +1313,20 @@
                       <div class="flex" *ngIf="comment?.step !== undefined && comment?.step !== null && comment.step! > 1">
                         <div
                           *ngIf="blocked; else rated1"
-                          class="p-rating-item ng-star-inserted font-semibold text-red-500 mr-3 disabled-div"
+                          class="p-rating-item ng-star-inserted font-semibold text-red-500 mr-2 disabled-div"
                         >
                           <fa-icon icon="0" size="lg"></fa-icon>
                         </div>
                         <ng-template #rated1>
-                          <div class="p-rating-item ng-star-inserted font-semibold text-red-500 mr-3">
+                          <div class="p-rating-item ng-star-inserted font-semibold text-red-500 mr-2">
                             <fa-icon icon="0" size="lg" (click)="changestepValue(undefined, comment)"></fa-icon>
                           </div>
                         </ng-template>
+                        <!--[cancel]="false"-->
 
                         <p-rating
                           *ngIf="comment?.step !== undefined && comment?.step !== null && comment.step! > 1"
                           [stars]="comment.step!"
-                          [cancel]="false"
                           [disabled]="blocked"
                           (ngModelChange)="changestepValue($event, comment)"
                           [ngModel]="answer2HybridGradedCommentMap.get(comment.id)"
@@ -1376,10 +1376,12 @@
                   "
                 >
                   <div class="flex">
-                    <div class="p-rating-item ng-star-inserted font-semibold text-red-500 mr-3">
+                    <div class="p-rating-item ng-star-inserted font-semibold text-red-500 mr-2">
                       <fa-icon icon="0" size="lg" (click)="noteCommentaire = 0"></fa-icon>
                     </div>
-                    <p-rating [stars]="noteSteps" [(ngModel)]="noteCommentaire" [style]="{ width: '100%' }" [cancel]="false"></p-rating>
+                    <!--[cancel]="false"-->
+
+                    <p-rating [stars]="noteSteps" [(ngModel)]="noteCommentaire" [style]="{ width: '100%' }"></p-rating>
                   </div>
                 </div>
                 <span *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT' && currentQuestion?.gradeType !== 'HYBRID'">

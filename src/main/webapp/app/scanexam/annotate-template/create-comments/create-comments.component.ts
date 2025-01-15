@@ -17,7 +17,7 @@ import { KnobModule } from 'primeng/knob';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { RatingModule } from 'primeng/rating';
 import { TranslateDirective } from '../../../shared/language/translate.directive';
-import { InputTextareaModule } from 'primeng/inputtextarea';
+import { TextareaModule } from 'primeng/textarea';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { PrimeTemplate } from 'primeng/api';
@@ -36,7 +36,7 @@ import { NgIf, NgFor } from '@angular/common';
     PrimeTemplate,
     FormsModule,
     InputTextModule,
-    InputTextareaModule,
+    TextareaModule,
     TranslateDirective,
     RatingModule,
     SelectButtonModule,

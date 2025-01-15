@@ -17,7 +17,7 @@ import { TableModule } from 'primeng/table';
 import { ButtonDirective } from 'primeng/button';
 import { NgIf } from '@angular/common';
 import { CheckboxModule } from 'primeng/checkbox';
-import { InputTextareaModule } from 'primeng/inputtextarea';
+import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { InputTextModule } from 'primeng/inputtext';
@@ -47,7 +47,7 @@ import { ToastModule } from 'primeng/toast';
     InputTextModule,
     FaIconComponent,
     TooltipModule,
-    InputTextareaModule,
+    TextareaModule,
     CheckboxModule,
     NgIf,
     ButtonDirective,

@@ -34,7 +34,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { SliderModule } from 'primeng/slider';
 import { TranslateDirective } from '../../shared/language/translate.directive';
-import { SidebarModule } from 'primeng/sidebar';
+import { DrawerModule } from 'primeng/drawer';
 import { NgIf, DecimalPipe } from '@angular/common';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
@@ -61,7 +61,7 @@ export interface IPage {
     BlockUIModule,
     ProgressSpinnerModule,
     NgIf,
-    SidebarModule,
+    DrawerModule,
     TranslateDirective,
     SliderModule,
     FormsModule,

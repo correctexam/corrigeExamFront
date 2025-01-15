@@ -25,7 +25,7 @@ import { ExportResultService, formatDateTime } from '../exportresult.service';
 import { FaStackComponent, FaIconComponent, FaStackItemSizeDirective } from '@fortawesome/angular-fontawesome';
 import { UsableTextInputComponent } from '../../shared/usable-text-input/usable-text-input.component';
 import { InputSwitchModule } from 'primeng/inputswitch';
-import { SidebarModule } from 'primeng/sidebar';
+import { DrawerModule } from 'primeng/drawer';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -72,7 +72,7 @@ export interface CacheDownloadNotification {
     ConfirmDialogModule,
     BlockUIModule,
     ProgressSpinnerModule,
-    SidebarModule,
+    DrawerModule,
     InputSwitchModule,
     NgFor,
     UsableTextInputComponent,

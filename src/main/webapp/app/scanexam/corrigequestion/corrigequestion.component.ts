@@ -72,7 +72,7 @@ import { PromisePool } from '@supercharge/promise-pool';
 import { FocusViewService } from '../../layouts/profiles/focusview.service';
 import { CommentSortPipe } from '../sortComment';
 import { KnobModule } from 'primeng/knob';
-import { InputTextareaModule } from 'primeng/inputtextarea';
+import { TextareaModule } from 'primeng/textarea';
 import { GraphicalToolbarCorrectionComponent } from './toolbar/toolbar.component';
 import { PaginatorModule } from 'primeng/paginator';
 import { ProgressBarModule } from 'primeng/progressbar';
@@ -90,7 +90,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { RatingModule } from 'primeng/rating';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { QuestionpropertiesviewComponent } from '../annotate-template/paint/questionpropertiesview/questionpropertiesview.component';
-import { SidebarModule } from 'primeng/sidebar';
+import { DrawerModule } from 'primeng/drawer';
 import { KeyboardshortcutComponent } from './keyboardshortcut/keyboardshortcut.component';
 import { NgIf, NgFor, DecimalPipe, DatePipe } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -137,7 +137,7 @@ interface CommentAction {
     KeyboardShortcutsModule,
     NgIf,
     KeyboardshortcutComponent,
-    SidebarModule,
+    DrawerModule,
     QuestionpropertiesviewComponent,
     OrderListModule,
     FaIconComponent,
@@ -158,7 +158,7 @@ interface CommentAction {
     NgFor,
     GraphicalToolbarCorrectionComponent,
     InplaceModule,
-    InputTextareaModule,
+    TextareaModule,
     KnobModule,
     DecimalPipe,
     DatePipe,
@@ -2371,6 +2371,15 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   // ----------------- code for realign -----------------------
+
+  onAccept(cd: any): void {
+    cd.accept();
+    this.confirmationService.close();
+  }
+  onReject(cd: any): void {
+    cd.reject();
+    this.confirmationService.close();
+  }
 
   realign(): void {
     this.confirmationService.confirm({

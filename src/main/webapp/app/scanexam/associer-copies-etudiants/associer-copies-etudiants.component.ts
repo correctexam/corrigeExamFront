@@ -37,7 +37,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { TranslateDirective } from '../../shared/language/translate.directive';
-import { SidebarModule } from 'primeng/sidebar';
+import { DrawerModule } from 'primeng/drawer';
 import { GalleriaModule } from 'primeng/galleria';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
@@ -95,7 +95,7 @@ interface PredictResult {
     GalleriaModule,
     PrimeTemplate,
     KeyboardShortcutsModule,
-    SidebarModule,
+    DrawerModule,
     TranslateDirective,
     InputSwitchModule,
     FormsModule,

@@ -37,7 +37,7 @@
       <div class="col-4"></div>
     </div>
   </p-blockUI>
-  <p-sidebar [(visible)]="layoutsidebarVisible">
+  <p-drawer [(visible)]="layoutsidebarVisible">
     <h3 jhiTranslate="scanexam.alignoptions">Layout options</h3>
 
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
@@ -75,7 +75,7 @@
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <a (click)="downloadScan()">scan.pdf</a>
     </div>
-  </p-sidebar>
+  </p-drawer>
 
   <div class="sm:col-12 md:col-12 lg:col-12 xl:col-12">
     <div class="grid grid-nogutter">

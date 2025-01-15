@@ -1,11 +1,321 @@
-<p-sidebar
-  [position]="'right'"
-  [(visible)]="layoutsidebarVisible"
-  [blockScroll]="true"
-  [showCloseIcon]="true"
-  styleClass="p-0"
-  appendTo="body"
->
+<div *ngIf="!alreadyInASideBar">
+  <p-drawer
+    [position]="'right'"
+    [(visible)]="layoutsidebarVisible"
+    [blockScroll]="true"
+    [showCloseIcon]="true"
+    styleClass="p-0"
+    appendTo="body"
+  >
+    <jhi-create-comments
+      [question]="questions[0]"
+      (addTextComment)="addTextCommentM($event)"
+      (addGradedComment)="addGradedCommentM($event)"
+      (addHybridGradedComment)="addHybridGradedCommentM($event)"
+      (updateGradedComment)="updateGradedCommentM($event)"
+      (updateHybridGradedComment)="updateHybridGradedCommentM($event)"
+      (updateTextComment)="updateTextCommentM($event)"
+      [couldDelete]="couldDelete"
+    ></jhi-create-comments>
+  </p-drawer>
+</div>
+
+<div *ngIf="!layoutsidebarVisible">
+  <hr *ngIf="questions.length > 0" />
+  <div id="panel" *ngIf="questions.length > 0" class="d-flex justify-content-center">
+    <div class="col-8">
+      <form name="editForm" role="form" novalidate [formGroup]="editForm">
+        <div>
+          <jhi-alert-error></jhi-alert-error>
+
+          <div class="row" *ngIf="canUpdateNumero">
+            <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.numero" for="field_numero">Numero</label>
+            <input
+              type="number"
+              class="form-control"
+              name="numero"
+              [attr.disabled]="disableNumero ? '' : null"
+              id="field_numero"
+              [pTooltip]="'scanexam.numeroTooltip' | translate"
+              [tooltipPosition]="'left'"
+              data-cy="numero"
+              formControlName="numero"
+              min="1"
+              (change)="numberChange()"
+            />
+            <div *ngIf="editForm.get('numero')!.invalid && (editForm.get('numero')!.dirty || editForm.get('numero')!.touched)">
+              <small
+                class="form-text text-danger"
+                *ngIf="editForm.get('numero')?.errors?.required"
+                jhiTranslate="entity.validation.required"
+              >
+                This field is required.
+              </small>
+              <small
+                class="form-text text-danger"
+                [hidden]="!editForm.get('numero')?.errors?.number"
+                jhiTranslate="entity.validation.number"
+              >
+                This field should be a number.
+              </small>
+            </div>
+          </div>
+          <div class="row">
+            <label for="libelle" jhiTranslate="scanexam.libelle" style="display: block; margin-bottom: 4px">libelle</label>
+            <input
+              class="form-control"
+              id="libelle"
+              type="text"
+              name="libelle"
+              formControlName="libelle"
+              pInputText
+              placeholder="Question n° XXX"
+              style="margin-right: 0.5em"
+              [pTooltip]="'scanexam.libelletooltip' | translate"
+              [tooltipPosition]="'left'"
+              (keyup)="contentChange()"
+              (change)="contentChange()"
+              [tooltipZIndex]="'3000'"
+            />
+          </div>
+
+          <div class="row">
+            <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.point" for="field_point">Point</label>
+            <input
+              [attr.disabled]="disablePoint ? '' : null"
+              type="number"
+              class="form-control"
+              name="point"
+              id="field_point"
+              data-cy="point"
+              formControlName="point"
+              [step]="0.25"
+              [min]="0.25"
+              [max]="50"
+              (change)="pointChange($event)"
+              [pTooltip]="'scanexam.questionpointtooltip' | translate"
+              [tooltipPosition]="'left'"
+            />
+          </div>
+
+          <div class="row">
+            <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.type" for="field_type">Type</label>
+            <select
+              class="form-control"
+              id="field_type"
+              name="type"
+              [attr.disabled]="disableGradeType ? '' : null"
+              formControlName="typeId"
+              (change)="changeQCM()"
+              [pTooltip]="'scanexam.typequestionTooltip' | translate"
+              [tooltipPosition]="'left'"
+            >
+              <option [ngValue]="null"></option>
+              <option [ngValue]="questionTypeOption.id" *ngFor="let questionTypeOption of questiontypes; trackBy: trackById">
+                {{ questionTypeOption.algoName }}
+              </option>
+            </select>
+          </div>
+          <div *ngIf="editForm.get(['typeId'])!.value === manualid" class="row">
+            <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.gradeType" for="field_gradeType">Grade Type</label>
+            <select
+              class="form-control"
+              name="gradeType"
+              formControlName="gradeType"
+              id="field_gradeType"
+              [attr.disabled]="disableGradeType ? '' : null"
+              data-cy="gradeType"
+              (change)="contentChange()"
+              [pTooltip]="'scanexam.manualgradetypequestionTooltip' | translate"
+              [tooltipPosition]="'left'"
+            >
+              <option [ngValue]="null">{{ 'gradeScopeIsticApp.GradeType.null' | translate }}</option>
+              <option *ngFor="let gradeType of gradeTypeValues" [value]="gradeType">
+                {{ 'gradeScopeIsticApp.GradeType.' + gradeType | translate }}
+              </option>
+            </select>
+          </div>
+
+          <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value !== hybrid" class="row">
+            <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.step" for="field_reponsefausse">Pas </label>
+
+            <p-listbox
+              [options]="pasPointResponseOptions"
+              name="step"
+              [disabled]="disableStep ? disableStep : false"
+              id="field_step1"
+              data-cy="step"
+              formControlName="step"
+              [multiple]="false"
+              optionLabel="name"
+              optionValue="value"
+              [pTooltip]="'scanexam.steptooltip' | translate"
+              [tooltipPosition]="'left'"
+              (onChange)="contentChange()"
+              [tooltipZIndex]="'3000'"
+            ></p-listbox>
+          </div>
+
+          <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value === hybrid" class="row">
+            <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.defaultpoint" for="field_defaultpoint"
+              >Point par défault</label
+            >
+            <p-knob
+              [min]="0"
+              [max]="100"
+              [step]="10"
+              formControlName="defaultpoint"
+              (onChange)="defaultpointChange($event)"
+              valueTemplate="{value}%"
+              name="defaultpoint"
+              id="field_defaultpoint"
+              data-cy="defaultpoint"
+              [pTooltip]="'scanexam.defaultpointTooltip' | translate"
+              [tooltipPosition]="'left'"
+              [tooltipZIndex]="'3000'"
+            ></p-knob>
+          </div>
+
+          <div *ngIf="editForm.get(['typeId'])!.value === qcmid" class="row">
+            <label for="validexp" jhiTranslate="scanexam.validanswerexpression" style="display: block; margin-bottom: 4px"
+              >Expression valide</label
+            >
+            <input
+              class="form-control"
+              id="validexp"
+              type="text"
+              name="validexp"
+              formControlName="validExpression"
+              pInputText
+              [pKeyFilter]="validexpRegex()"
+              [required]="editForm.get(['typeId'])!.value === qcmid"
+              [pValidateOnly]="editForm.get(['typeId'])!.value === qcmid"
+              placeholder="a&b|a&c"
+              style="margin-right: 0.5em"
+              [pTooltip]="'scanexam.expressiontooltip' | translate"
+              [tooltipPosition]="'left'"
+              (keyup)="contentChangeCheck()"
+              (change)="contentChangeCheck()"
+              [tooltipZIndex]="'3000'"
+            />
+            <p-message
+              severity="danger"
+              [text]="'scanexam.invalidexpression' | translate"
+              [@errorState]="editForm.dirty && !editForm.valid ? 'visible' : 'hidden'"
+            ></p-message>
+          </div>
+
+          <div *ngIf="editForm.get(['typeId'])!.value === qcmid" class="row">
+            <label class="form-label" jhiTranslate="scanexam.invalidanswerpenalty" for="field_reponsefausse"
+              >Pénalité si réponse fausse</label
+            >
+
+            <p-listbox
+              [options]="pointmauvaiseReponeOptions"
+              name="step"
+              id="field_step1"
+              data-cy="step"
+              formControlName="step"
+              [multiple]="false"
+              optionLabel="name"
+              optionValue="value"
+              [pTooltip]="'scanexam.penaltytooltip' | translate"
+              [tooltipPosition]="'left'"
+              (onChange)="contentChange()"
+              [tooltipZIndex]="'3000'"
+            ></p-listbox>
+          </div>
+
+          <div *ngIf="editForm.get(['typeId'])!.value !== qcmid" class="row">
+            <label class="form-label" jhiTranslate="scanexam.randomcorrection" for="field_randomcorrection"
+              >Correction en ordre aléatoire</label
+            >
+
+            <p-checkbox
+              value="randomcorrection"
+              inputId="randomcorrection"
+              formControlName="randomHorizontalCorrection"
+              [binary]="true"
+              [pTooltip]="'scanexam.randomcorrectionTooltip' | translate"
+              [tooltipPosition]="'right'"
+              (onChange)="randomContentChange()"
+              ngDefaultControl
+            >
+            </p-checkbox>
+          </div>
+
+          <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value === hybrid" class="row">
+            <label class="form-label" jhiTranslate="scanexam.canexceedthemax" for="field_canexceedthemax"></label>
+
+            <p-inputSwitch
+              [disabled]="disableCanExceed"
+              formControlName="canExceedTheMax"
+              [pTooltip]="'scanexam.canexceedthemaxtooltip' | translate"
+              [tooltipPosition]="'right'"
+              (onChange)="contentChange()"
+            />
+          </div>
+          <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value === hybrid" class="row">
+            <label class="form-label" jhiTranslate="scanexam.canbenegative" for="field_canbenegative"></label>
+
+            <p-inputSwitch
+              [disabled]="disableMin0"
+              formControlName="canBeNegative"
+              [pTooltip]="'scanexam.canbenegativetooltip' | translate"
+              [tooltipPosition]="'right'"
+              (onChange)="contentChange()"
+            />
+          </div>
+
+          <div
+            *ngIf="
+              editForm.get(['typeId'])!.value !== qcmid &&
+              editForm.get(['gradeType'])!.value === hybrid &&
+              (editForm.get(['canBeNegative'])!.value || editForm.get(['canExceedTheMax'])!.value)
+            "
+            class="row"
+          >
+            <label class="form-label" jhiTranslate="scanexam.mustbeignoreinglobalscale" for="field_mustbeignoreinglobalscale"></label>
+
+            <p-inputSwitch
+              [disabled]="disableIgnoreBareme"
+              formControlName="mustBeIgnoreInGlobalScale"
+              [pTooltip]="'scanexam.mustbeignoreinglobalscaletooltip' | translate"
+              [tooltipPosition]="'right'"
+              (onChange)="contentChange()"
+            />
+          </div>
+        </div>
+      </form>
+
+      <div *ngIf="disableGradeType" class="row">
+        <label class="form-label" jhiTranslate="scanexam.forceedit" for="field_forceedit"></label>
+
+        <p-inputSwitch
+          [pTooltip]="'scanexam.forceeditTooltip' | translate"
+          [tooltipPosition]="'right'"
+          (onChange)="changeForceEdit()"
+          [(ngModel)]="forceEdit"
+        />
+      </div>
+
+      <BR />
+      <p-button
+        *ngIf="editForm.get(['typeId'])!.value !== qcmid"
+        class="sm:text-xs md:text-xs lg:text-base"
+        styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
+        (click)="editComment($event)"
+        icon="pi pi-arrow-left"
+        [label]="'scanexam.commentsmanagement' | translate"
+        [pTooltip]="'scanexam.commentsmanagementtooltip' | translate"
+        [tooltipPosition]="'left'"
+        id="sidebar-show-button"
+        [tooltipZIndex]="'3000'"
+      ></p-button>
+    </div>
+  </div>
+</div>
+<div *ngIf="alreadyInASideBar && layoutsidebarVisible">
   <jhi-create-comments
     [question]="questions[0]"
     (addTextComment)="addTextCommentM($event)"
@@ -16,290 +326,4 @@
     (updateTextComment)="updateTextCommentM($event)"
     [couldDelete]="couldDelete"
   ></jhi-create-comments>
-</p-sidebar>
-
-<hr *ngIf="questions.length > 0" />
-<div id="panel" *ngIf="questions.length > 0" class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" role="form" novalidate [formGroup]="editForm">
-      <div>
-        <jhi-alert-error></jhi-alert-error>
-
-        <div class="row" *ngIf="canUpdateNumero">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.numero" for="field_numero">Numero</label>
-          <input
-            type="number"
-            class="form-control"
-            name="numero"
-            [attr.disabled]="disableNumero ? '' : null"
-            id="field_numero"
-            [pTooltip]="'scanexam.numeroTooltip' | translate"
-            [tooltipPosition]="'left'"
-            data-cy="numero"
-            formControlName="numero"
-            min="1"
-            (change)="numberChange()"
-          />
-          <div *ngIf="editForm.get('numero')!.invalid && (editForm.get('numero')!.dirty || editForm.get('numero')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('numero')?.errors?.required" jhiTranslate="entity.validation.required">
-              This field is required.
-            </small>
-            <small class="form-text text-danger" [hidden]="!editForm.get('numero')?.errors?.number" jhiTranslate="entity.validation.number">
-              This field should be a number.
-            </small>
-          </div>
-        </div>
-        <div class="row">
-          <label for="libelle" jhiTranslate="scanexam.libelle" style="display: block; margin-bottom: 4px">libelle</label>
-          <input
-            class="form-control"
-            id="libelle"
-            type="text"
-            name="libelle"
-            formControlName="libelle"
-            pInputText
-            placeholder="Question n° XXX"
-            style="margin-right: 0.5em"
-            [pTooltip]="'scanexam.libelletooltip' | translate"
-            [tooltipPosition]="'left'"
-            (keyup)="contentChange()"
-            (change)="contentChange()"
-            [tooltipZIndex]="'3000'"
-          />
-        </div>
-
-        <div class="row">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.point" for="field_point">Point</label>
-          <input
-            [attr.disabled]="disablePoint ? '' : null"
-            type="number"
-            class="form-control"
-            name="point"
-            id="field_point"
-            data-cy="point"
-            formControlName="point"
-            [step]="0.25"
-            [min]="0.25"
-            [max]="50"
-            (change)="pointChange($event)"
-            [pTooltip]="'scanexam.questionpointtooltip' | translate"
-            [tooltipPosition]="'left'"
-          />
-        </div>
-
-        <div class="row">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.type" for="field_type">Type</label>
-          <select
-            class="form-control"
-            id="field_type"
-            name="type"
-            [attr.disabled]="disableGradeType ? '' : null"
-            formControlName="typeId"
-            (change)="changeQCM()"
-            [pTooltip]="'scanexam.typequestionTooltip' | translate"
-            [tooltipPosition]="'left'"
-          >
-            <option [ngValue]="null"></option>
-            <option [ngValue]="questionTypeOption.id" *ngFor="let questionTypeOption of questiontypes; trackBy: trackById">
-              {{ questionTypeOption.algoName }}
-            </option>
-          </select>
-        </div>
-        <div *ngIf="editForm.get(['typeId'])!.value === manualid" class="row">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.gradeType" for="field_gradeType">Grade Type</label>
-          <select
-            class="form-control"
-            name="gradeType"
-            formControlName="gradeType"
-            id="field_gradeType"
-            [attr.disabled]="disableGradeType ? '' : null"
-            data-cy="gradeType"
-            (change)="contentChange()"
-            [pTooltip]="'scanexam.manualgradetypequestionTooltip' | translate"
-            [tooltipPosition]="'left'"
-          >
-            <option [ngValue]="null">{{ 'gradeScopeIsticApp.GradeType.null' | translate }}</option>
-            <option *ngFor="let gradeType of gradeTypeValues" [value]="gradeType">
-              {{ 'gradeScopeIsticApp.GradeType.' + gradeType | translate }}
-            </option>
-          </select>
-        </div>
-
-        <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value !== hybrid" class="row">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.step" for="field_reponsefausse">Pas </label>
-
-          <p-listbox
-            [options]="pasPointResponseOptions"
-            name="step"
-            [disabled]="disableStep ? disableStep : false"
-            id="field_step1"
-            data-cy="step"
-            formControlName="step"
-            [multiple]="false"
-            optionLabel="name"
-            optionValue="value"
-            [pTooltip]="'scanexam.steptooltip' | translate"
-            [tooltipPosition]="'left'"
-            (onChange)="contentChange()"
-            [tooltipZIndex]="'3000'"
-          ></p-listbox>
-        </div>
-
-        <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value === hybrid" class="row">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.defaultpoint" for="field_defaultpoint"
-            >Point par défault</label
-          >
-          <p-knob
-            [min]="0"
-            [max]="100"
-            [step]="10"
-            formControlName="defaultpoint"
-            (onChange)="defaultpointChange($event)"
-            valueTemplate="{value}%"
-            name="defaultpoint"
-            id="field_defaultpoint"
-            data-cy="defaultpoint"
-            [pTooltip]="'scanexam.defaultpointTooltip' | translate"
-            [tooltipPosition]="'left'"
-            [tooltipZIndex]="'3000'"
-          ></p-knob>
-        </div>
-
-        <div *ngIf="editForm.get(['typeId'])!.value === qcmid" class="row">
-          <label for="validexp" jhiTranslate="scanexam.validanswerexpression" style="display: block; margin-bottom: 4px"
-            >Expression valide</label
-          >
-          <input
-            class="form-control"
-            id="validexp"
-            type="text"
-            name="validexp"
-            formControlName="validExpression"
-            pInputText
-            [pKeyFilter]="validexpRegex()"
-            [required]="editForm.get(['typeId'])!.value === qcmid"
-            [pValidateOnly]="editForm.get(['typeId'])!.value === qcmid"
-            placeholder="a&b|a&c"
-            style="margin-right: 0.5em"
-            [pTooltip]="'scanexam.expressiontooltip' | translate"
-            [tooltipPosition]="'left'"
-            (keyup)="contentChangeCheck()"
-            (change)="contentChangeCheck()"
-            [tooltipZIndex]="'3000'"
-          />
-          <p-message
-            severity="danger"
-            [text]="'scanexam.invalidexpression' | translate"
-            [@errorState]="editForm.dirty && !editForm.valid ? 'visible' : 'hidden'"
-          ></p-message>
-        </div>
-
-        <div *ngIf="editForm.get(['typeId'])!.value === qcmid" class="row">
-          <label class="form-label" jhiTranslate="scanexam.invalidanswerpenalty" for="field_reponsefausse"
-            >Pénalité si réponse fausse</label
-          >
-
-          <p-listbox
-            [options]="pointmauvaiseReponeOptions"
-            name="step"
-            id="field_step1"
-            data-cy="step"
-            formControlName="step"
-            [multiple]="false"
-            optionLabel="name"
-            optionValue="value"
-            [pTooltip]="'scanexam.penaltytooltip' | translate"
-            [tooltipPosition]="'left'"
-            (onChange)="contentChange()"
-            [tooltipZIndex]="'3000'"
-          ></p-listbox>
-        </div>
-
-        <div *ngIf="editForm.get(['typeId'])!.value !== qcmid" class="row">
-          <label class="form-label" jhiTranslate="scanexam.randomcorrection" for="field_randomcorrection"
-            >Correction en ordre aléatoire</label
-          >
-
-          <p-checkbox
-            value="randomcorrection"
-            inputId="randomcorrection"
-            formControlName="randomHorizontalCorrection"
-            [binary]="true"
-            [pTooltip]="'scanexam.randomcorrectionTooltip' | translate"
-            [tooltipPosition]="'right'"
-            (onChange)="randomContentChange()"
-            ngDefaultControl
-          >
-          </p-checkbox>
-        </div>
-
-        <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value === hybrid" class="row">
-          <label class="form-label" jhiTranslate="scanexam.canexceedthemax" for="field_canexceedthemax"></label>
-
-          <p-inputSwitch
-            [disabled]="disableCanExceed"
-            formControlName="canExceedTheMax"
-            [pTooltip]="'scanexam.canexceedthemaxtooltip' | translate"
-            [tooltipPosition]="'right'"
-            (onChange)="contentChange()"
-          />
-        </div>
-        <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value === hybrid" class="row">
-          <label class="form-label" jhiTranslate="scanexam.canbenegative" for="field_canbenegative"></label>
-
-          <p-inputSwitch
-            [disabled]="disableMin0"
-            formControlName="canBeNegative"
-            [pTooltip]="'scanexam.canbenegativetooltip' | translate"
-            [tooltipPosition]="'right'"
-            (onChange)="contentChange()"
-          />
-        </div>
-
-        <div
-          *ngIf="
-            editForm.get(['typeId'])!.value !== qcmid &&
-            editForm.get(['gradeType'])!.value === hybrid &&
-            (editForm.get(['canBeNegative'])!.value || editForm.get(['canExceedTheMax'])!.value)
-          "
-          class="row"
-        >
-          <label class="form-label" jhiTranslate="scanexam.mustbeignoreinglobalscale" for="field_mustbeignoreinglobalscale"></label>
-
-          <p-inputSwitch
-            [disabled]="disableIgnoreBareme"
-            formControlName="mustBeIgnoreInGlobalScale"
-            [pTooltip]="'scanexam.mustbeignoreinglobalscaletooltip' | translate"
-            [tooltipPosition]="'right'"
-            (onChange)="contentChange()"
-          />
-        </div>
-      </div>
-    </form>
-
-    <div *ngIf="disableGradeType" class="row">
-      <label class="form-label" jhiTranslate="scanexam.forceedit" for="field_forceedit"></label>
-
-      <p-inputSwitch
-        [pTooltip]="'scanexam.forceeditTooltip' | translate"
-        [tooltipPosition]="'right'"
-        (onChange)="changeForceEdit()"
-        [(ngModel)]="forceEdit"
-      />
-    </div>
-
-    <BR />
-    <p-button
-      *ngIf="editForm.get(['typeId'])!.value !== qcmid"
-      class="sm:text-xs md:text-xs lg:text-base"
-      styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
-      (click)="layoutsidebarVisible = true"
-      icon="pi pi-arrow-left"
-      [label]="'scanexam.commentsmanagement' | translate"
-      [pTooltip]="'scanexam.commentsmanagementtooltip' | translate"
-      [tooltipPosition]="'left'"
-      id="sidebar-show-button"
-      [tooltipZIndex]="'3000'"
-    ></p-button>
-  </div>
 </div>

@@ -506,6 +506,17 @@
     "mustbeignoreinglobalscale": "Ignore this question in the global scale",
     "mustbeignoreinglobalscaletooltip": "This allows the points awarded for this question to be ignored for the overall scale. For example, if you create a question to manage absences from class, this 3-point question can be used to deduct up to three points from the copy, but the grade remains 20, for example.)",
     "canexceedthemaxtooltip": "If all the comments selected lead to a mark higher than the maximum score for this question, this question may increase the overall exam score for this exam sheet.",
-    "canexceedthemax": "Permits a mark above the scale for this question"
+    "canexceedthemax": "Permits a mark above the scale for this question",
+    "uploadsvg": "Upload via SVG file",
+    "svgchoosesvg": "Choose SVG file",
+    "svgchoosesvgtooltip": "Allows a new graphic comment to be loaded via an SVG file",
+    "svgsource": "SVG source",
+    "svgload": "Load",
+    "svgloadtooltip": "Allows you to load a new graphical comment via a text file in SVG format as described in the figure above",
+    "svgimporttooltip": "Import the set of SVG images used in correctExam for use on another browser",
+    "svgimport": "Import a backup",
+    "svgexport": "Do a backup",
+    "svgexporttooltip": "Export the set of SVG images used in correctExam for use on another browser",
+    "svgdialogtitle": "Manage graphic comments in SVG format"
   }
 }

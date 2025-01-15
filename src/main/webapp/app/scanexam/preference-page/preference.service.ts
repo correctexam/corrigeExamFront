@@ -6,6 +6,7 @@ import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model
 import { IHybridGradedComment, NewHybridGradedComment } from '../../entities/hybrid-graded-comment/hybrid-graded-comment.model';
 import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 import { IQuestion, IQuestionMark } from 'app/entities/question/question.model';
+import { v4 as uuid } from 'uuid';
 
 interface IPreferenceForQuestion {
   point: number;
@@ -252,6 +253,31 @@ export class PreferenceService {
       delete c1.questionId;
     });
     this.localStorageService.store('defaultTextComment', JSON.stringify(cs, this.replacer));
+  }
+
+  clearDefaultSVGCustomComment(): void {
+    this.localStorageService.store('defaultSVGCustomComment', null);
+  }
+
+  addDefaultSVGCustomComment(comment: string): void {
+    const spref = this.localStorageService.retrieve('defaultSVGCustomComment');
+    const comments: Map<string, string> = spref === null ? new Map<string, string>() : JSON.parse(spref, this.reviver);
+
+    comments.set(uuid(), comment);
+    this.localStorageService.store('defaultSVGCustomComment', JSON.stringify(comments, this.replacer));
+  }
+
+  getAllDefaultSVGCustomComments(): Map<string, string> {
+    const spref = this.localStorageService.retrieve('defaultSVGCustomComment');
+    const comments: Map<string, string> = spref === null ? new Map<string, string>() : JSON.parse(spref, this.reviver);
+    return comments;
+  }
+
+  removeDefaultSVGCustomComment(_uuid: string): void {
+    const spref = this.localStorageService.retrieve('defaultSVGCustomComment');
+    const comments: Map<string, string> = spref === null ? new Map<string, string>() : JSON.parse(spref, this.reviver);
+    comments.delete(_uuid);
+    this.localStorageService.store('defaultSVGCustomComment', JSON.stringify(comments, this.replacer));
   }
 
   clearDefaultHybridComment(): void {

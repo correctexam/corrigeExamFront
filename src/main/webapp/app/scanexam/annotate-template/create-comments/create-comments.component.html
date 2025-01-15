@@ -103,7 +103,6 @@
                 <ng-template pTemplate="content">
                   <p-rating
                     *ngIf="noteSteps > 0 && _q && _q?.gradeType !== 'DIRECT'"
-                    [cancel]="true"
                     [stars]="noteSteps"
                     [(ngModel)]="comment.grade"
                     (ngModelChange)="updateComment($event, comment, true, false)"

@@ -45,7 +45,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { FormsModule } from '@angular/forms';
 import { SliderModule } from 'primeng/slider';
-import { SidebarModule } from 'primeng/sidebar';
+import { DrawerModule } from 'primeng/drawer';
 import { TranslateDirective } from '../../shared/language/translate.directive';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TooltipModule } from 'primeng/tooltip';
@@ -99,7 +99,7 @@ export interface ClusterDTO {
     FaIconComponent,
     TranslateDirective,
     NgIf,
-    SidebarModule,
+    DrawerModule,
     SliderModule,
     FormsModule,
     NgFor,

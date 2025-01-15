@@ -31,7 +31,7 @@ import { TranslateDirective } from '../../../../shared/language/translate.direct
 import { AlertErrorComponent } from '../../../../shared/alert/alert-error.component';
 import { NgIf, NgFor } from '@angular/common';
 import { CreateCommentsComponent } from '../../create-comments/create-comments.component';
-import { SidebarModule } from 'primeng/sidebar';
+import { DrawerModule } from 'primeng/drawer';
 
 type SelectableEntity = IQuestionType;
 export type EntityResponseType = HttpResponse<IQuestion>;
@@ -60,7 +60,7 @@ export type EntityResponseType = HttpResponse<IQuestion>;
   ],
   standalone: true,
   imports: [
-    SidebarModule,
+    DrawerModule,
     CreateCommentsComponent,
     NgIf,
     FormsModule,
@@ -84,6 +84,9 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   /** The selected questions. This is an array since a same question can be divided into several parts.
    * The first question of the array, if not empty, is the truely selected question. An empty array means no selection. */
   public questions: Array<IQuestion> = [];
+
+  @Input()
+  public alreadyInASideBar = false;
 
   @Input()
   public questionsInput: Array<IQuestion> = [];
@@ -532,5 +535,10 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
     } else {
       this.updateForm();
     }
+  }
+
+  editComment($event: MouseEvent): void {
+    $event.preventDefault();
+    this.layoutsidebarVisible = true;
   }
 }
