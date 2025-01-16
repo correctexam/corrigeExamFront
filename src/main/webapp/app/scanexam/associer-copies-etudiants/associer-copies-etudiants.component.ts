@@ -290,6 +290,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
 
               this.refreshStudentList().then(() => {
                 console.timeLog('loadpage', 'after loadstudentList');
+                this.countRemainingFreeSheets();
+
                 this.loadImage().then(() => {
                   this.blocked = false;
                   console.timeEnd('loadpage');
@@ -908,6 +910,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
         listAllFreeSheet.push(i);
       }
     }
+
     return listAllFreeSheet;
   }
 
@@ -962,7 +965,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
 
   gotopreviousnonboundsheet(): void {
     const free = this.computeFreeSheets();
-    console.error(free, this.numberPagesInScan / this.nbreFeuilleParCopie);
 
     const s = free.find(v => v < this.currentStudent);
     if (s !== undefined) {
