@@ -18,7 +18,13 @@ import { provideRouter } from '@angular/router';
 import { HOME_ROUTE } from 'app/home/home.route';
 import { SCANEXAM_ROUTES } from 'app/scanexam/scanexam.route';
 import { APP_ROUTES } from 'app/app-routing.module';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { providePrimeNG } from 'primeng/config';
+// import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+
+// import Aura from '@primeng/themes/aura';
+// import Material from '@primeng/themes/material';
+import Lara from '@primeng/themes/lara';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 // disable debug data on prod profile to improve performance
 if (!DEBUG_INFO_ENABLED) {
@@ -58,7 +64,17 @@ bootstrapApplication(MainComponent, {
       provide: DataUtils,
       useClass: DataUtils,
     },
-    importProvidersFrom([BrowserAnimationsModule]),
+    provideAnimations(),
+    providePrimeNG({
+      theme: {
+        options: {
+          // eslint-disable-next-line no-constant-binary-expression
+          darkModeSelector: false || 'none',
+        },
+        preset: Lara,
+      },
+    }),
+
     provideHttpClient(withInterceptorsFromDi()),
     provideRouter([...HOME_ROUTE, ...SCANEXAM_ROUTES, ...APP_ROUTES]),
     /*

@@ -60,7 +60,7 @@
 
     <div class="wizard-image"></div>
     <div class="wizard-form" style="padding-top: 4rem">
-      <p-sidebar [position]="'right'" [(visible)]="layoutsidebarVisible">
+      <p-drawer [position]="'right'" [(visible)]="layoutsidebarVisible">
         <div class="grid">
           <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
             <div class="card">
@@ -112,7 +112,7 @@
             </div>
           </div>
         </div>
-      </p-sidebar>
+      </p-drawer>
       <div class="wizard-header">
         <jhi-usable-text-input
           [name]="this.course?.name ?? ''"

@@ -43,6 +43,8 @@ import { constants } from 'os';
 import { firstValueFrom } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { TranslateService } from '@ngx-translate/core';
+import { PreferenceService } from '../preference-page/preference.service';
+import * as fabric from 'fabric';
 
 const RANGE_AROUND_CENTER = 20;
 
@@ -53,6 +55,7 @@ export class EventCanevascorrectionHandlerService {
   public imageDataUrl!: string;
   public _canvas!: fCanvas;
   private confService!: ConfirmationService;
+  public svgselect: string = '';
 
   get canvas(): fCanvas {
     return this._canvas;
@@ -210,6 +213,7 @@ export class EventCanevascorrectionHandlerService {
     public commentsService: CommentsService,
     private platform: Platform,
     private translateService: TranslateService,
+    public preferenceService: PreferenceService,
   ) {}
 
   removeAll(): void {
@@ -410,6 +414,72 @@ export class EventCanevascorrectionHandlerService {
         fabicText.enterEditing();
         //      (fabicText as any).hiddenTextarea.focus();
         break;
+
+      case DrawingTools.CUSTOMSVG:
+        if (this.svgselect !== '') {
+          const s = this.preferenceService.getAllDefaultSVGCustomComments().get(this.svgselect);
+          if (s) {
+            loadSVGFromString(s).then(r => {
+              if (r.objects.length > 0) {
+                const objs: any[] = r.objects;
+                if (r.objects.length > 1) {
+                  const group = new fabric.Group(objs, {
+                    top: pointer.y,
+                    left: pointer.y,
+                    originX: 'left',
+                    originY: 'top',
+                    selectable: true,
+                    //    hasRotatingPoint: false,
+                    lockRotation: true,
+                  });
+                  const max = group.width > group.height ? group.width : group.height;
+                  let scale = 40 / max;
+                  if (group.height * scale < 20) {
+                    scale = 20 / group.height;
+                  }
+                  group.scale(scale);
+                  group.setX(pointer.x - (group.width * scale) / 2);
+                  group.setY(pointer.y - (group.height * scale) / 2);
+
+                  this.canvas.add(group);
+                } else {
+                  let obj = r.objects[0];
+                  if (obj !== null) {
+                    if (obj.type === 'text') {
+                      obj = this.convertToIText(obj);
+                      (obj as any).firstText = (obj as any).text;
+                      (obj as any).textState = 'original';
+                    }
+                    const max = obj.width > obj.height ? obj.width : obj.height;
+                    let scale = 40 / max;
+
+                    if (obj.height * scale < 20) {
+                      scale = 20 / obj.height;
+                    }
+
+                    obj.scale(scale);
+                    obj.setX(pointer.x - (obj.width * scale) / 2);
+                    obj.setY(pointer.y - (obj.height * scale) / 2);
+                    this.canvas.add(obj);
+                  }
+                }
+
+                r.objects.forEach(obj => {
+                  if (obj !== null) {
+                    if (obj.type === 'text') {
+                      obj = this.convertToIText(obj);
+                      (obj as any).firstText = (obj as any).text;
+                      (obj as any).textState = 'original';
+                    }
+                  }
+                });
+                this.canvas.renderAll();
+              }
+            });
+          }
+        }
+
+        break;
     }
   }
 
@@ -472,6 +542,15 @@ export class EventCanevascorrectionHandlerService {
       this.updateComments().then(e2 =>
         e2.subscribe(e1 => {
           this.currentComment = e1.body;
+        }),
+      );
+    }
+    if (this._selectedTool === DrawingTools.CUSTOMSVG) {
+      this.updateComments().then(e2 =>
+        e2.subscribe(e1 => {
+          this.currentComment = e1.body;
+          this.selectedTool = DrawingTools.SELECT;
+          this.svgselect = '';
         }),
       );
     }

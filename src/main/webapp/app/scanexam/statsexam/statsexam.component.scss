@@ -1,3 +1,15 @@
+::ng-deep .p-overlay-mask {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+p-galleria ::ng-deep .p-galleria {
+  overflow: hidden;
+  border-style: hidden;
+  border-width: var(--p-galleria-border-width);
+  border-color: var(--p-galleria-border-color);
+  border-radius: var(--p-galleria-border-radius);
+}
+
 .boutons {
   display: flex;
   flex-wrap: wrap;

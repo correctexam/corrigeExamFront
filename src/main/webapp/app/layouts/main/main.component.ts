@@ -14,10 +14,11 @@ import { fontAwesomeIcons } from 'app/config/font-awesome-icons';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { NgbDatepickerConfig } from '@ng-bootstrap/ng-bootstrap';
 import locale from '@angular/common/locales/fr';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, NgIf, RouterOutlet, KeyboardShortcutsModule, FooterComponent, FontAwesomeModule],
+  imports: [CommonModule, NgIf, RouterOutlet, KeyboardShortcutsModule, FooterComponent, FontAwesomeModule, ButtonModule],
 
   selector: 'jhi-main',
   templateUrl: './main.component.html',

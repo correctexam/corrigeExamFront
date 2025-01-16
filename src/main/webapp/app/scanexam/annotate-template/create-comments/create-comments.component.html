@@ -103,7 +103,6 @@
                 <ng-template pTemplate="content">
                   <p-rating
                     *ngIf="noteSteps > 0 && _q && _q?.gradeType !== 'DIRECT'"
-                    [cancel]="true"
                     [stars]="noteSteps"
                     [(ngModel)]="comment.grade"
                     (ngModelChange)="updateComment($event, comment, true, false)"
@@ -179,7 +178,7 @@
                     *ngIf="comment.relative"
                     [min]="-100"
                     [max]="100"
-                    [step]="10"
+                    [step]="5"
                     [valueTemplate]="grade > 0 ? '+{value}%' : '{value}%'"
                     name="hybridgrade"
                     id="field_hybridgrade"
@@ -284,7 +283,7 @@
               *ngIf="_q && _q?.gradeType === 'HYBRID' && relative"
               [min]="-100"
               [max]="100"
-              [step]="10"
+              [step]="5"
               [valueTemplate]="grade > 0 ? '+{value}%' : '{value}%'"
               name="hybridgrade"
               id="field_hybridgrade"

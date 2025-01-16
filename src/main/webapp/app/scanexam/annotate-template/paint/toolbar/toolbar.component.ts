@@ -61,4 +61,12 @@ export class GraphicalToolbarComponent {
     this.eventService.selectedTool = tool;
     this.selected = this.eventService.selectedTool;
   }
+  onAccept(cd: any): void {
+    cd.accept();
+    this.confirmationService.close();
+  }
+  onReject(cd: any): void {
+    cd.reject();
+    this.confirmationService.close();
+  }
 }

@@ -9,13 +9,13 @@
 
       <ng-template [ngIf]="CONNECTION_METHOD === CONNECTION_METHOD_LOCAL">
         <div>
-          <button (click)="login()" pbutton type="button" class="p-element mr-3 p-button p-component">
+          <p-button (click)="login()" pbutton pRipple class="mr-3">
             <span class="p-button-label" jhiTranslate="home.login">Authentifiez vous</span><span class="p-ink"></span>
-          </button>
+          </p-button>
           <button
             routerLink="account/register"
-            pbutton=""
-            pripple=""
+            pbutton
+            pripple
             type="button"
             class="p-element p-ripple p-button-outlined p-button p-component mr-3"
           >
@@ -52,7 +52,7 @@
 </div>
 <div *jhiHasAnyAuthority="'ROLE_USER'">
   <div *ngIf="!this.account?.authorities?.includes('ROLE_ADMIN')">
-    <p-sidebar [position]="'right'" [(visible)]="layoutsidebarVisible">
+    <p-drawer [position]="'right'" [(visible)]="layoutsidebarVisible">
       <div class="grid">
         <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
           <div class="card">
@@ -93,7 +93,7 @@
           </div>
         </div>
       </div>
-    </p-sidebar>
+    </p-drawer>
 
     <p-dock [model]="dockItems" position="top" [styleClass]="'pdock'">
       <ng-template pTemplate="item" let-item>

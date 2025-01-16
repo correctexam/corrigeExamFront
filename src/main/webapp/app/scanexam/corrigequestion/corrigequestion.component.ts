@@ -72,7 +72,7 @@ import { PromisePool } from '@supercharge/promise-pool';
 import { FocusViewService } from '../../layouts/profiles/focusview.service';
 import { CommentSortPipe } from '../sortComment';
 import { KnobModule } from 'primeng/knob';
-import { InputTextareaModule } from 'primeng/inputtextarea';
+import { TextareaModule } from 'primeng/textarea';
 import { GraphicalToolbarCorrectionComponent } from './toolbar/toolbar.component';
 import { PaginatorModule } from 'primeng/paginator';
 import { ProgressBarModule } from 'primeng/progressbar';
@@ -90,7 +90,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { RatingModule } from 'primeng/rating';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { QuestionpropertiesviewComponent } from '../annotate-template/paint/questionpropertiesview/questionpropertiesview.component';
-import { SidebarModule } from 'primeng/sidebar';
+import { DrawerModule } from 'primeng/drawer';
 import { KeyboardshortcutComponent } from './keyboardshortcut/keyboardshortcut.component';
 import { NgIf, NgFor, DecimalPipe, DatePipe } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -101,6 +101,7 @@ import { TranslateDirective } from '../../shared/language/translate.directive';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { SwipeDirective } from '../swipe.directive';
+import { ZoneService } from '../../entities/zone/service/zone.service';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -137,7 +138,7 @@ interface CommentAction {
     KeyboardShortcutsModule,
     NgIf,
     KeyboardshortcutComponent,
-    SidebarModule,
+    DrawerModule,
     QuestionpropertiesviewComponent,
     OrderListModule,
     FaIconComponent,
@@ -158,7 +159,7 @@ interface CommentAction {
     NgFor,
     GraphicalToolbarCorrectionComponent,
     InplaceModule,
-    InputTextareaModule,
+    TextareaModule,
     KnobModule,
     DecimalPipe,
     DatePipe,
@@ -305,11 +306,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     private translateService: TranslateService,
     private preferenceService: PreferenceService,
     private db: CacheServiceImpl,
-    private zone: NgZone,
     private keyboardShortcutService: KeyboardShortcutService,
     private applicationConfigService: ApplicationConfigService,
     private titleService: Title,
     private ngZone: NgZone,
+    private zoneService: ZoneService,
+
     private focusViewService: FocusViewService,
   ) {
     effect(() => {
@@ -1908,73 +1910,138 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  loadAllPages(): Promise<void> {
+  async loadAllPages(): Promise<void> {
     this.images = [];
-    return new Promise<void>(resolve => {
-      this.db.countNonAlignImage(+this.examId!).then(page => {
-        if (page > 30) {
-          this.db.countPageTemplate(+this.examId!).then(page1 => {
-            if (this.noalign) {
-              this.db
-                .getNonAlignImageBetweenAndSortByPageNumber(+this.examId!, this.currentStudent * page1, (this.currentStudent + 1) * page1)
-                .then(e1 => {
-                  e1.forEach(e => {
-                    const image = JSON.parse(e!.value, this.reviver);
-                    this.images.push({
-                      src: image.pages,
-                      alt: 'Description for Image 2',
-                      title: 'Exam',
-                    });
-                  });
 
-                  resolve();
-                });
+    const page = await this.db.countNonAlignImage(+this.examId!);
+    if (page > 30) {
+      const page1 = await this.db.countPageTemplate(+this.examId!);
+      if (this.noalign) {
+        const e1 = await this.db.getNonAlignImageBetweenAndSortByPageNumber(
+          +this.examId!,
+          this.currentStudent * page1 + 1,
+          (this.currentStudent + 1) * page1,
+        );
+
+        // eslint-disable-next-line @typescript-eslint/no-shadow
+        for (const { index, e } of e1.map((e, index) => ({ index, e }))) {
+          const image = JSON.parse(e!.value, this.reviver);
+          let s: string = '';
+          if (this.studentName === undefined || this.studentName === '') {
+            const paget = await this.db.countPageTemplate(+this.examId!);
+            if (paget === 1) {
+              s = await this.loadImageAnonymous(image.pages);
             } else {
-              this.db
-                .getAlignImageBetweenAndSortByPageNumber(+this.examId!, this.currentStudent * page1 + 1, (this.currentStudent + 1) * page1)
-                .then(e1 => {
-                  e1.forEach(e => {
-                    const image = JSON.parse(e!.value, this.reviver);
-                    this.images.push({
-                      src: image.pages,
-                      alt: 'Description for Image 2',
-                      title: 'Exam',
-                    });
-                  });
-                  resolve();
-                });
+              if ((index % paget) % 2 === 0) {
+                s = await this.loadImageAnonymous(image.pages);
+              } else {
+                s = image.pages;
+              }
             }
-          });
-        } else {
-          if (this.noalign) {
-            this.db.getNonAlignSortByPageNumber(+this.examId!).then(e1 => {
-              e1.forEach(e => {
-                const image = JSON.parse(e!.value, this.reviver);
-
-                this.images.push({
-                  src: image.pages,
-                  alt: 'Description for Image 2',
-                  title: 'Exam',
-                });
-              });
-              resolve();
-            });
           } else {
-            this.db.getAlignSortByPageNumber(+this.examId!).then(e1 => {
-              e1.forEach(e => {
-                const image = JSON.parse(e!.value, this.reviver);
-                this.images.push({
-                  src: image.pages,
-                  alt: 'Description for Image 2',
-                  title: 'Exam',
-                });
-              });
-              resolve();
+            s = image.pages;
+          }
+          if (s !== '') {
+            this.images.push({
+              src: s,
+              alt: 'Description for Image 2',
+              title: 'Exam',
             });
           }
         }
-      });
-    });
+      } else {
+        const e1 = await this.db.getAlignImageBetweenAndSortByPageNumber(
+          +this.examId!,
+          this.currentStudent * page1 + 1,
+          (this.currentStudent + 1) * page1,
+        );
+        // eslint-disable-next-line @typescript-eslint/no-shadow
+        for (const { index, e } of e1.map((e, index) => ({ index, e }))) {
+          const image = JSON.parse(e!.value, this.reviver);
+          let s: string = '';
+          if (this.studentName === undefined || this.studentName === '') {
+            const paget = await this.db.countPageTemplate(+this.examId!);
+            if (paget === 1) {
+              s = await this.loadImageAnonymous(image.pages);
+            } else {
+              if ((index % paget) % 2 === 0) {
+                s = await this.loadImageAnonymous(image.pages);
+              } else {
+                s = image.pages;
+              }
+            }
+          } else {
+            s = image.pages;
+          }
+          if (s !== '') {
+            this.images.push({
+              src: s,
+              alt: 'Description for Image 2',
+              title: 'Exam',
+            });
+          }
+        }
+      }
+    } else {
+      if (this.noalign) {
+        const e1 = await this.db.getNonAlignSortByPageNumber(+this.examId!);
+
+        // eslint-disable-next-line @typescript-eslint/no-shadow
+        for (const { index, e } of e1.map((e, index) => ({ index, e }))) {
+          const image = JSON.parse(e!.value, this.reviver);
+          let s: string = '';
+          if (this.studentName === undefined || this.studentName === '') {
+            const paget = await this.db.countPageTemplate(+this.examId!);
+            if (paget === 1) {
+              s = await this.loadImageAnonymous(image.pages);
+            } else {
+              if ((index % paget) % 2 === 0) {
+                s = await this.loadImageAnonymous(image.pages);
+              } else {
+                s = image.pages;
+              }
+            }
+          } else {
+            s = image.pages;
+          }
+          if (s !== '') {
+            this.images.push({
+              src: s,
+              alt: 'Description for Image 2',
+              title: 'Exam',
+            });
+          }
+        }
+      } else {
+        const e1 = await this.db.getAlignSortByPageNumber(+this.examId!);
+        // eslint-disable-next-line @typescript-eslint/no-shadow
+        for (const { index, e } of e1.map((e, index) => ({ index, e }))) {
+          const image = JSON.parse(e!.value, this.reviver);
+          let s: string = '';
+          if (this.studentName === undefined || this.studentName === '') {
+            const paget = await this.db.countPageTemplate(+this.examId!);
+            if (paget === 1) {
+              s = await this.loadImageAnonymous(image.pages);
+            } else {
+              if ((index % paget) % 2 === 0) {
+                s = await this.loadImageAnonymous(image.pages);
+              } else {
+                s = image.pages;
+              }
+            }
+          } else {
+            s = image.pages;
+          }
+          if (s !== '') {
+            this.images.push({
+              src: s,
+              alt: 'Description for Image 2',
+              title: 'Exam',
+            });
+          }
+        }
+      }
+    }
   }
   async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
     const imageToCrop: IImageCropFromZoneInput = {
@@ -2372,6 +2439,15 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   // ----------------- code for realign -----------------------
 
+  onAccept(cd: any): void {
+    cd.accept();
+    this.confirmationService.close();
+  }
+  onReject(cd: any): void {
+    cd.reject();
+    this.confirmationService.close();
+  }
+
   realign(): void {
     this.confirmationService.confirm({
       message: this.translateService.instant('scanexam.contientmarqueur'),
@@ -2550,7 +2626,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   compareGradedComment(event: any, comment: IGradedComment) {
     if (!this.blocked) {
       if (event.ctrlKey || event.metaKey) {
-        this.zone.run(() => {
+        this.ngZone.run(() => {
           const url = this.router.serializeUrl(this.router.createUrlTree(['/comparegradedcomment/' + this.examId + '/' + comment.id]));
           if ('/' !== this.applicationConfigService.getFrontUrl()) {
             if (this.applicationConfigService.getFrontUrl().endsWith('/') && url.startsWith('/')) {
@@ -2563,7 +2639,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           }
         });
       } else {
-        this.zone.run(() => {
+        this.ngZone.run(() => {
           this.router.navigate(['/comparegradedcomment/' + this.examId + '/' + comment.id]);
         });
       }
@@ -2573,7 +2649,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   compareHybridComment(event: any, comment: IHybridGradedComment, stepValue: number) {
     if (!this.blocked) {
       if (event.ctrlKey || event.metaKey) {
-        this.zone.run(() => {
+        this.ngZone.run(() => {
           const url = this.router.serializeUrl(
             this.router.createUrlTree(['/comparehybridcomment/' + this.examId + '/' + comment.id + '/' + stepValue]),
           );
@@ -2588,7 +2664,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           }
         });
       } else {
-        this.zone.run(() => {
+        this.ngZone.run(() => {
           this.router.navigate(['/comparehybridcomment/' + this.examId + '/' + comment.id + '/' + stepValue]);
         });
       }
@@ -2598,7 +2674,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   compareTextComment(event: any, comment: ITextComment) {
     if (!this.blocked) {
       if (event.ctrlKey || event.metaKey) {
-        this.zone.run(() => {
+        this.ngZone.run(() => {
           const url = this.router.serializeUrl(this.router.createUrlTree(['/comparetextcomment/' + this.examId + '/' + comment.id]));
           if ('/' !== this.applicationConfigService.getFrontUrl()) {
             if (this.applicationConfigService.getFrontUrl().endsWith('/') && url.startsWith('/')) {
@@ -2611,7 +2687,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           }
         });
       } else {
-        this.zone.run(() => {
+        this.ngZone.run(() => {
           this.router.navigate(['/comparetextcomment/' + this.examId + '/' + comment.id]);
         });
       }
@@ -2620,7 +2696,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   compareMark(event: any, response: IStudentResponse) {
     if (!this.blocked) {
       if (event.ctrlKey || event.metaKey) {
-        this.zone.run(() => {
+        this.ngZone.run(() => {
           const url = this.router.serializeUrl(this.router.createUrlTree(['/comparemark/' + this.examId + '/' + response.id]));
           if ('/' !== this.applicationConfigService.getFrontUrl()) {
             if (this.applicationConfigService.getFrontUrl().endsWith('/') && url.startsWith('/')) {
@@ -2633,7 +2709,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           }
         });
       } else {
-        this.zone.run(() => {
+        this.ngZone.run(() => {
           this.router.navigate(['/comparemark/' + this.examId + '/' + response.id]);
         });
       }
@@ -2833,6 +2909,77 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       l.grade = (l.grade! * 100) / this.currentQuestion!.point!;
     } else {
       l.grade = (this.currentQuestion!.point! * l.grade!) / 100;
+    }
+  }
+
+  async loadImageAnonymous(file: any): Promise<string> {
+    return new Promise(resolve => {
+      const i = new Image();
+      i.onload = () => {
+        const editedImage: HTMLCanvasElement = <HTMLCanvasElement>document.createElement('canvas');
+        editedImage.width = i.width;
+        this.computeScale(i.width, i.height);
+        editedImage.height = i.height;
+        const ctx = editedImage.getContext('2d');
+        ctx!.drawImage(i, 0, 0);
+        this.maskNameFirstName(editedImage).then(() => {
+          let exportImageType = 'image/webp';
+          if (
+            this.preferenceService.getPreference().imageTypeExport !== undefined &&
+            ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
+          ) {
+            exportImageType = this.preferenceService.getPreference().imageTypeExport;
+          }
+          const s = editedImage.toDataURL(exportImageType);
+          resolve(s);
+        });
+      };
+      i.src = file;
+    });
+  }
+
+  async maskNameFirstName(canvas: HTMLCanvasElement): Promise<void> {
+    if (this.exam!.namezoneId) {
+      const namezone = (await firstValueFrom(this.zoneService.find(this.exam!.namezoneId!))).body;
+
+      if (namezone !== null) {
+        const x = (namezone.xInit! * canvas.width) / 100000;
+        const y = (namezone.yInit! * canvas.height) / 100000;
+        const width = (namezone.width! * canvas.width) / 100000;
+        const height = (namezone.height! * canvas.height) / 100000;
+        const ctx = canvas.getContext('2d');
+        ctx?.beginPath();
+        ctx?.fillRect(x, y, width, height);
+        ctx?.stroke();
+      }
+    }
+    if (this.exam!.firstnamezoneId) {
+      const firstnamezone = (await firstValueFrom(this.zoneService.find(this.exam!.firstnamezoneId!))).body;
+
+      if (firstnamezone !== null) {
+        const x = (firstnamezone.xInit! * canvas.width) / 100000;
+        const y = (firstnamezone.yInit! * canvas.height) / 100000;
+        const width = (firstnamezone.width! * canvas.width) / 100000;
+        const height = (firstnamezone.height! * canvas.height) / 100000;
+        const ctx = canvas.getContext('2d');
+        ctx?.beginPath();
+        ctx?.fillRect(x, y, width, height);
+        ctx?.stroke();
+      }
+    }
+    if (this.exam!.idzoneId) {
+      const inenamezone = (await firstValueFrom(this.zoneService.find(this.exam!.idzoneId!))).body;
+
+      if (inenamezone !== null) {
+        const x = (inenamezone.xInit! * canvas.width) / 100000;
+        const y = (inenamezone.yInit! * canvas.height) / 100000;
+        const width = (inenamezone.width! * canvas.width) / 100000;
+        const height = (inenamezone.height! * canvas.height) / 100000;
+        const ctx = canvas.getContext('2d');
+        ctx?.beginPath();
+        ctx?.fillRect(x, y, width, height);
+        ctx?.stroke();
+      }
     }
   }
 }

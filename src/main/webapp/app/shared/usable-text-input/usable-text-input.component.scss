@@ -22,3 +22,19 @@
 .usable-input-text * {
   padding: 3px !important;
 }
+
+::ng-deep .no-label .p-button-label {
+  display: none !important;
+}
+
+::ng-deep .no-icon .p-button-icon {
+  display: none !important;
+}
+
+::ng-deep .no-label .p-togglebutton-label {
+  display: none !important;
+}
+
+::ng-deep .no-icon .p-togglebutton-icon {
+  display: none !important;
+}

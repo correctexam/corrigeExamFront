@@ -1,4 +1,4 @@
-<div>
+<div class="grid grid-nogutter">
   <div class="d-flex flex-wrap mb-1">
     <div
       [title]="'scanexam.selectmove' | translate"
@@ -65,6 +65,9 @@
     >
       <img src="content/images/toolbar-images/text.png" />
     </div>
+    <div [title]="'scanexam.customsvg' | translate" class="toolbox-item ml-1 mt-1" (click)="showSVGDialog()">
+      <img src="content/images/toolbar-images/fill.png" />
+    </div>
     <!--<div
       title="Fill/paint with colour"
       class="toolbox-item ml-1 mt-1"
@@ -91,6 +94,19 @@
       (click)="select(DrawingTools.GARBAGE)"
     >
       <fa-icon [icon]="faTrash"></fa-icon>
+    </div>
+  </div>
+  <div class="grid grid-nogutter">
+    <div class="d-flex flex-wrap mb-1">
+      <div
+        *ngFor="let item of customcomments | keyvalue"
+        class="toolbox-item ml-1 mt-1"
+        [ngClass]="{ selected: eventService.svgselect === item.key }"
+      >
+        <div class="max-w-1rem max-h-1rem">
+          <img class="" [src]="getSVGImageUrl(item.value)" width="30px" height="30px" (click)="selectSVG(item.key)" />
+        </div>
+      </div>
     </div>
   </div>
 </div>

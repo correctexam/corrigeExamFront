@@ -510,6 +510,18 @@
     "mustbeignoreinglobalscale": "Ignorer cette question dans le barème global",
     "mustbeignoreinglobalscaletooltip": "Cela permet d'ignorer le nombre de points de cette question pour le barème global. Par exemple, on crée une question permettant de gérer les absences en cours, cette question sur 3 points permet de retirer jusqu'à trois points à la copie, mais le barème reste sur 20 par exemple)",
     "canexceedthemaxtooltip": "Si l'ensemble des commentaires  sélectionnés amène à une note supérieure à la note maximale de cette question, cette question peut augmenter la note globale de l'examen pour cette copie",
-    "canexceedthemax": "Autorise une note supérieure au barème de cette question"
+    "canexceedthemax": "Autorise une note supérieure au barème de cette question",
+    "uploadsvg": "Chargement par un fichier SVG",
+    "svgchoosesvg": "Choix fichier SVG",
+    "svgchoosesvgtooltip": "Permet de charger un nouveau commentaire graphique par l'intermédiaire d'un fichier SVG",
+    "svgsource": "Source SVG ",
+    "svgload": "Charger",
+    "svgloadtooltip": "Permet de charger un nouveau commentaire graphique par l'intermédiaire d'un texte au format SVG décrit dans la figure ci ddessus",
+    "svgimporttooltip": "Importer l'ensemble des images SVG utilisé dans correctExam pour une utilisation sur un autre navigateur",
+    "svgimport": "Importer sauvegarde",
+    "svgexport": "Effecuer une sauvegarde",
+    "svgexporttooltip": "Exporte l'ensemble des images SVG utilisé dans correctExam pour une utilisation sur un autre navigateur",
+    "svgdialogtitle": "Gestion des commentaires graphiques au format SVG",
+    "associeretnext": "Associer et passer à la prochaine copie"
   }
 }

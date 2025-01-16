@@ -18,6 +18,7 @@ export enum DrawingTools {
   SELECT = 'SELECT',
   ERASER = 'ERASER',
   ELLIPSE = 'ELLIPSE',
+  CUSTOMSVG = 'CUSTOMSVG',
   RECTANGLE = 'RECTANGLE',
   PENCIL = 'PENCIL',
   NOMBOX = 'NOMBOX',

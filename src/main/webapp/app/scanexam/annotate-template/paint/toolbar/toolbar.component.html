@@ -3,8 +3,8 @@
     <h3 jhiTranslate="scanexam.confirmremove"></h3>
   </ng-template>
   <ng-template pTemplate="footer">
-    <button type="button" pButton icon="pi pi-times" [label]="'scanexam.no' | translate" (click)="cd.reject()"></button>
-    <button type="button" pButton icon="pi pi-check" [label]="'scanexam.yes' | translate" (click)="cd.accept()"></button>
+    <button type="button" pButton icon="pi pi-times" [label]="'scanexam.no' | translate" (click)="onReject(cd)"></button>
+    <button type="button" pButton icon="pi pi-check" [label]="'scanexam.yes' | translate" (click)="onAccept(cd)"></button>
   </ng-template>
 </p-confirmDialog>
 <div>
