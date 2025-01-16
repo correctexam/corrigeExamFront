@@ -517,6 +517,7 @@
     "svgimport": "Import a backup",
     "svgexport": "Do a backup",
     "svgexporttooltip": "Export the set of SVG images used in correctExam for use on another browser",
-    "svgdialogtitle": "Manage graphic comments in SVG format"
+    "svgdialogtitle": "Manage graphic comments in SVG format",
+    "associeretnext": "Bind and go to the next"
   }
 }

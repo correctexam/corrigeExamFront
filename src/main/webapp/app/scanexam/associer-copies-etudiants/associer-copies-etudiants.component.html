@@ -90,6 +90,9 @@
       ></button>
     </div>
   </p-drawer>
+  <div class="col-12 p-0">
+    <p-progressBar [value]="remainingFree()" [showValue]="false" [style]="{ height: '6px' }"></p-progressBar>
+  </div>
 
   <div class="col-12">
     <div class="grid grid-nogutter">
@@ -260,7 +263,7 @@
                   style="padding: '0.0rem'"
                   pButton
                   (click)="selectStudents(table.value)"
-                  jhiTranslate="scanexam.next"
+                  jhiTranslate="scanexam.associeretnext"
                   [pTooltip]="'scanexam.gotonextnonboundsheetTooltip' | translate"
                   [tooltipZIndex]="'3000'"
                   [tooltipPosition]="'left'"

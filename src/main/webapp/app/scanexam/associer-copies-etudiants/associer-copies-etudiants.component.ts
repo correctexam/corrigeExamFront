@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable prefer-const */
 /* eslint-disable no-console */
-import { AfterViewInit, Component, HostListener, OnInit, ViewChild, effect } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnInit, Signal, ViewChild, effect, signal } from '@angular/core';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ZoneService } from '../../entities/zone/service/zone.service';
 import { CourseService } from 'app/entities/course/service/course.service';
@@ -42,6 +42,7 @@ import { GalleriaModule } from 'primeng/galleria';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { ToastModule } from 'primeng/toast';
+import { ProgressBarModule } from 'primeng/progressbar';
 
 export interface IPage {
   image?: ImageData;
@@ -109,6 +110,7 @@ interface PredictResult {
     ListboxModule,
     NgClass,
     TranslateModule,
+    ProgressBarModule,
   ],
 })
 export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
@@ -119,6 +121,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     return this.list;
   }
 
+  remainingFree = signal(0);
   faHouseSignal = faHouseSignal;
   blocked = false;
   examId = '';
@@ -722,6 +725,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       }
     }
     await this.refreshStudentList();
+    this.countRemainingFreeSheets();
   }
 
   async unbindCurrentStudent(): Promise<void> {
@@ -738,6 +742,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       await this.refreshStudentList();
       this.blocked = false;
     }
+    this.countRemainingFreeSheets();
   }
   /*
 
@@ -878,6 +883,20 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       });
     });
   }
+  countRemainingFreeSheets(): void {
+    const examSheet4Exam: IExamSheet[] = (this.students.map(s => s.examSheets) as any)
+      .flat()
+      .filter((ex: any) => ex?.scanId === this.exam.scanfileId);
+    let countAllFreeSheet: number = 0;
+    for (let i = 0; i < Math.floor(this.numberPagesInScan / this.nbreFeuilleParCopie); i++) {
+      if (!examSheet4Exam.map(sheet => sheet.pagemin! / this.nbreFeuilleParCopie).includes(i)) {
+        countAllFreeSheet = countAllFreeSheet + 1;
+      }
+    }
+    let l = Math.floor(this.numberPagesInScan / this.nbreFeuilleParCopie) - countAllFreeSheet;
+    l = (l / (this.numberPagesInScan! / this.nbreFeuilleParCopie!)) * 100;
+    this.remainingFree.set(l);
+  }
 
   computeFreeSheets(): number[] {
     const examSheet4Exam: IExamSheet[] = (this.students.map(s => s.examSheets) as any)
@@ -898,8 +917,10 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     this.examService.deleteAllExamSheets(+this.examId).subscribe(() => {
       this.filterbindstudent = false;
       this.preferenceService.saveFilterStudentPreference(false);
-      this.refreshStudentList();
-      this.blocked = false;
+      this.refreshStudentList().then(() => {
+        this.countRemainingFreeSheets();
+        this.blocked = false;
+      });
     });
   }
 
@@ -913,6 +934,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       const ref = this.dialogService.open(AllbindingsComponent, {
         header: '',
         width: '100%',
+        closable: true,
+        maximizable: true,
         data: {
           students: res1,
           nbreFeuilleParCopie: this.nbreFeuilleParCopie,
@@ -924,6 +947,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
         this.refreshStudentList().then(() => {
           this.loadImage().then(() => {
             this.blocked = false;
+            this.countRemainingFreeSheets();
           });
         });
       });
@@ -938,6 +962,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
 
   gotopreviousnonboundsheet(): void {
     const free = this.computeFreeSheets();
+    console.error(free, this.numberPagesInScan / this.nbreFeuilleParCopie);
+
     const s = free.find(v => v < this.currentStudent);
     if (s !== undefined) {
       this.goToStudent(s);

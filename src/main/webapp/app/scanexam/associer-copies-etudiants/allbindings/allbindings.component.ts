@@ -150,6 +150,7 @@ export class AllbindingsComponent implements OnInit {
   }
 
   selectedColor(item: any): string {
+    console.error(item);
     if (item.bound) {
       return 'text-green-400';
     } else {

@@ -521,6 +521,7 @@
     "svgimport": "Importer sauvegarde",
     "svgexport": "Effecuer une sauvegarde",
     "svgexporttooltip": "Exporte l'ensemble des images SVG utilisé dans correctExam pour une utilisation sur un autre navigateur",
-    "svgdialogtitle": "Gestion des commentaires graphiques au format SVG"
+    "svgdialogtitle": "Gestion des commentaires graphiques au format SVG",
+    "associeretnext": "Associer et passer à la prochaine copie"
   }
 }
