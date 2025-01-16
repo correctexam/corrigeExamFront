@@ -67,6 +67,10 @@ bootstrapApplication(MainComponent, {
     provideAnimations(),
     providePrimeNG({
       theme: {
+        options: {
+          // eslint-disable-next-line no-constant-binary-expression
+          darkModeSelector: false || 'none',
+        },
         preset: Lara,
       },
     }),
