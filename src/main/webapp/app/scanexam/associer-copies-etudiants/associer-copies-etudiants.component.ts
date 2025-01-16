@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable prefer-const */
 /* eslint-disable no-console */
-import { AfterViewInit, Component, HostListener, OnInit, Signal, ViewChild, effect, signal } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnInit, ViewChild, effect, signal } from '@angular/core';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ZoneService } from '../../entities/zone/service/zone.service';
 import { CourseService } from 'app/entities/course/service/course.service';

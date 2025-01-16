@@ -73,9 +73,8 @@ export class CustomSvgIconLoaderComponent implements OnInit {
   }
 
   exportSVG(): void {
-    console.error(this.preferenceService.getAllDefaultSVGCustomComments().values());
     const s: string[] = [];
-    this.preferenceService.getAllDefaultSVGCustomComments().forEach((v, k) => {
+    this.preferenceService.getAllDefaultSVGCustomComments().forEach(v => {
       s.push(v);
     });
 

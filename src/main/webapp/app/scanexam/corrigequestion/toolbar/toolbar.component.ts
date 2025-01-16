@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { faUserGraduate, faHashtag, faEraser, faHandPointer, faTrash, faPencil } from '@fortawesome/free-solid-svg-icons';
 import { DrawingTools } from 'app/scanexam/annotate-template/paint/models';
 import { EventCanevascorrectionHandlerService } from '../event-canevascorrection-handler.service';
