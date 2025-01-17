@@ -32,6 +32,7 @@
             <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.numero" for="field_numero">Numero</label>
             <input
               type="number"
+              (mouseup)="$event.stopPropagation()"
               class="form-control"
               name="numero"
               [attr.disabled]="disableNumero ? '' : null"
@@ -84,6 +85,7 @@
             <input
               [attr.disabled]="disablePoint ? '' : null"
               type="number"
+              (mouseup)="$event.stopPropagation()"
               class="form-control"
               name="point"
               id="field_point"
@@ -165,7 +167,7 @@
               [max]="100"
               [step]="5"
               formControlName="defaultpoint"
-              (onChange)="defaultpointChange($event)"
+              (onChange)="defaultpointChange()"
               valueTemplate="{value}%"
               name="defaultpoint"
               id="field_defaultpoint"
@@ -239,6 +241,7 @@
               [pTooltip]="'scanexam.randomcorrectionTooltip' | translate"
               [tooltipPosition]="'right'"
               (onChange)="randomContentChange()"
+              [tooltipZIndex]="'3000'"
               ngDefaultControl
             >
             </p-checkbox>
@@ -247,23 +250,28 @@
           <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value === hybrid" class="row">
             <label class="form-label" jhiTranslate="scanexam.canexceedthemax" for="field_canexceedthemax"></label>
 
-            <p-inputSwitch
+            <p-toggleSwitch
               [disabled]="disableCanExceed"
               formControlName="canExceedTheMax"
+              name="canExceedTheMax"
               [pTooltip]="'scanexam.canexceedthemaxtooltip' | translate"
               [tooltipPosition]="'right'"
               (onChange)="contentChange()"
+              [tooltipZIndex]="'3000'"
+              ngDefaultControl
             />
           </div>
           <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value === hybrid" class="row">
             <label class="form-label" jhiTranslate="scanexam.canbenegative" for="field_canbenegative"></label>
 
-            <p-inputSwitch
+            <p-toggleSwitch
+              name="canBeNegative"
               [disabled]="disableMin0"
               formControlName="canBeNegative"
               [pTooltip]="'scanexam.canbenegativetooltip' | translate"
               [tooltipPosition]="'right'"
               (onChange)="contentChange()"
+              [tooltipZIndex]="'3000'"
             />
           </div>
 
@@ -277,12 +285,14 @@
           >
             <label class="form-label" jhiTranslate="scanexam.mustbeignoreinglobalscale" for="field_mustbeignoreinglobalscale"></label>
 
-            <p-inputSwitch
+            <p-toggleSwitch
+              name="mustBeIgnoreInGlobalScale"
               [disabled]="disableIgnoreBareme"
               formControlName="mustBeIgnoreInGlobalScale"
               [pTooltip]="'scanexam.mustbeignoreinglobalscaletooltip' | translate"
               [tooltipPosition]="'right'"
               (onChange)="contentChange()"
+              [tooltipZIndex]="'3000'"
             />
           </div>
         </div>
@@ -291,7 +301,7 @@
       <div *ngIf="disableGradeType" class="row">
         <label class="form-label" jhiTranslate="scanexam.forceedit" for="field_forceedit"></label>
 
-        <p-inputSwitch
+        <p-toggleSwitch
           [pTooltip]="'scanexam.forceeditTooltip' | translate"
           [tooltipPosition]="'right'"
           (onChange)="changeForceEdit()"

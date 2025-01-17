@@ -27,7 +27,7 @@ import { CacheUploadService } from '../exam-detail/cacheUpload.service';
 import { TranslateService } from '@ngx-translate/core';
 import { SliderModule } from 'primeng/slider';
 import { FormsModule } from '@angular/forms';
-import { InputSwitchModule } from 'primeng/inputswitch';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TranslateDirective } from '../../shared/language/translate.directive';
 import { NgIf, NgFor } from '@angular/common';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -47,7 +47,7 @@ import { ToastModule } from 'primeng/toast';
     NgIf,
     TranslateDirective,
     NgFor,
-    InputSwitchModule,
+    ToggleSwitchModule,
     FormsModule,
     SliderModule,
   ],

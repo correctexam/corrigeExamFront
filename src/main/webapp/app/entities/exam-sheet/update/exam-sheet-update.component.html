@@ -14,7 +14,16 @@
 
         <div class="row mb-3" [hidden]="editForm.get('id')!.value == null">
           <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
-          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            class="form-control"
+            name="id"
+            id="field_id"
+            data-cy="id"
+            formControlName="id"
+            [readonly]="true"
+          />
         </div>
 
         <div class="row mb-3">
@@ -29,12 +38,28 @@
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.examSheet.pagemin" for="field_pagemin">Pagemin</label>
-          <input type="number" class="form-control" name="pagemin" id="field_pagemin" data-cy="pagemin" formControlName="pagemin" />
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            class="form-control"
+            name="pagemin"
+            id="field_pagemin"
+            data-cy="pagemin"
+            formControlName="pagemin"
+          />
         </div>
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.examSheet.pagemax" for="field_pagemax">Pagemax</label>
-          <input type="number" class="form-control" name="pagemax" id="field_pagemax" data-cy="pagemax" formControlName="pagemax" />
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            class="form-control"
+            name="pagemax"
+            id="field_pagemax"
+            data-cy="pagemax"
+            formControlName="pagemax"
+          />
         </div>
 
         <div class="row mb-3">
@@ -42,7 +67,7 @@
           <select class="form-control" id="field_scan" name="scan" formControlName="scanId">
             <option [ngValue]="null"></option>
             <option [ngValue]="scanOption.id" *ngFor="let scanOption of scans; trackBy: trackById">{{ scanOption.name }}</option>
-        </select>
+          </select>
         </div>
       </div>
 

@@ -14,20 +14,39 @@
 
         <div class="row mb-3" [hidden]="editForm.get('id')!.value == null">
           <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
-          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            class="form-control"
+            name="id"
+            id="field_id"
+            data-cy="id"
+            formControlName="id"
+            [readonly]="true"
+          />
         </div>
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.finalResult.note" for="field_note">Note</label>
-          <input type="number" class="form-control" name="note" id="field_note" data-cy="note" formControlName="note" />
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            class="form-control"
+            name="note"
+            id="field_note"
+            data-cy="note"
+            formControlName="note"
+          />
         </div>
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.finalResult.student" for="field_student">Student</label>
           <select class="form-control" id="field_student" name="student" formControlName="studentId">
             <option [ngValue]="null"></option>
-            <option [ngValue]="studentOption.id" *ngFor="let studentOption of students; trackBy: trackById">{{ studentOption.name }}</option>
-        </select>
+            <option [ngValue]="studentOption.id" *ngFor="let studentOption of students; trackBy: trackById">
+              {{ studentOption.name }}
+            </option>
+          </select>
         </div>
 
         <div class="row mb-3">
@@ -35,7 +54,7 @@
           <select class="form-control" id="field_exam" name="exam" formControlName="examId">
             <option [ngValue]="null"></option>
             <option [ngValue]="examOption.id" *ngFor="let examOption of exams; trackBy: trackById">{{ examOption.name }}</option>
-        </select>
+          </select>
         </div>
       </div>
 

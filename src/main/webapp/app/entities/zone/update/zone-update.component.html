@@ -10,13 +10,23 @@
 
         <div class="row mb-3" [hidden]="editForm.get('id')!.value == null">
           <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
-          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            class="form-control"
+            name="id"
+            id="field_id"
+            data-cy="id"
+            formControlName="id"
+            [readonly]="true"
+          />
         </div>
 
         <div class="row mb-3">
           <label class="form-label" for="field_page">Page</label>
           <input
             type="number"
+            (mouseup)="$event.stopPropagation()"
             class="form-control"
             name="pageNumber"
             id="field_pageNumber"
@@ -27,22 +37,54 @@
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.zone.xInit" for="field_xInit">X Init</label>
-          <input type="number" class="form-control" name="xInit" id="field_xInit" data-cy="xInit" formControlName="xInit" />
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            class="form-control"
+            name="xInit"
+            id="field_xInit"
+            data-cy="xInit"
+            formControlName="xInit"
+          />
         </div>
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.zone.yInit" for="field_yInit">Y Init</label>
-          <input type="number" class="form-control" name="yInit" id="field_yInit" data-cy="yInit" formControlName="yInit" />
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            class="form-control"
+            name="yInit"
+            id="field_yInit"
+            data-cy="yInit"
+            formControlName="yInit"
+          />
         </div>
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.zone.width" for="field_width">Width</label>
-          <input type="number" class="form-control" name="width" id="field_width" data-cy="width" formControlName="width" />
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            class="form-control"
+            name="width"
+            id="field_width"
+            data-cy="width"
+            formControlName="width"
+          />
         </div>
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.zone.height" for="field_height">Height</label>
-          <input type="number" class="form-control" name="height" id="field_height" data-cy="height" formControlName="height" />
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            class="form-control"
+            name="height"
+            id="field_height"
+            data-cy="height"
+            formControlName="height"
+          />
         </div>
       </div>
 

@@ -36,33 +36,33 @@
     <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
-      <p-inputSwitch
+      <p-toggleSwitch
         [(ngModel)]="noalign"
         (onChange)="loadImage()"
         [pTooltip]="'scanexam.removealignementTooltip' | translate"
         [tooltipZIndex]="'3000'"
         [tooltipPosition]="'right'"
-      ></p-inputSwitch>
+      ></p-toggleSwitch>
     </div>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <label jhiTranslate="scanexam.assistance">Assistance</label>
-      <p-inputSwitch
+      <p-toggleSwitch
         [(ngModel)]="assisted"
         (onChange)="loadImage()"
         [pTooltip]="'scanexam.assistanceTooltip' | translate"
         [tooltipZIndex]="'3000'"
         [tooltipPosition]="'right'"
-      ></p-inputSwitch>
+      ></p-toggleSwitch>
     </div>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <label jhiTranslate="scanexam.debug">Debug</label>
-      <p-inputSwitch
+      <p-toggleSwitch
         [(ngModel)]="debug"
         (onChange)="loadImage()"
         [pTooltip]="'scanexam.debugTooltip' | translate"
         [tooltipZIndex]="'3000'"
         [tooltipPosition]="'right'"
-      ></p-inputSwitch>
+      ></p-toggleSwitch>
     </div>
 
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
@@ -230,11 +230,11 @@
       <div class="grid align-items-center">
         <div class="col-3">
           <label jhiTranslate="scanexam.filterboundstudent">Filtrer les étudiants déjà affectées: </label>
-          <p-inputSwitch
+          <p-toggleSwitch
             [(ngModel)]="filterbindstudent"
             (onChange)="refreshLocalStudentList()"
             [pTooltip]="'scanexam.filterboundstudentTooltip' | translate"
-          ></p-inputSwitch>
+          ></p-toggleSwitch>
         </div>
         <div class="col-6"></div>
         <div class="col-3"></div>

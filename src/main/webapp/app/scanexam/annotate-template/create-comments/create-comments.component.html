@@ -216,6 +216,7 @@
                   <label class="form-label" jhiTranslate="scanexam.hybridcommentStep" for="field_point">Pas</label>
                   <input
                     type="number"
+                    (mouseup)="$event.stopPropagation()"
                     name="step"
                     id="field_step"
                     data-cy="step"
@@ -313,6 +314,7 @@
             <input
               *ngIf="_q?.gradeType === 'HYBRID'"
               type="number"
+              (mouseup)="$event.stopPropagation()"
               name="step"
               id="field_step"
               data-cy="step"
