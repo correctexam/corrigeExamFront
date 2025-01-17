@@ -162,7 +162,7 @@
           </div>
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
-            <p-inputSwitch [(ngModel)]="noalign" (onChange)="changeAlign()"></p-inputSwitch>
+            <p-toggleSwitch [(ngModel)]="noalign" (onChange)="changeAlign()"></p-toggleSwitch>
           </div>
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <label jhiTranslate="scanexam.zoomfactor">Facteur agrandissement: </label>
@@ -227,7 +227,7 @@
                       stepValue: comment.stepValue,
                       step: comment.step,
                       grade: comment.grade,
-                      ptsorprcts: comment.relative ? '%' : 'pt'
+                      ptsorprcts: comment.relative ? '%' : 'pt',
                     }"
                   ></span>
                 </p>

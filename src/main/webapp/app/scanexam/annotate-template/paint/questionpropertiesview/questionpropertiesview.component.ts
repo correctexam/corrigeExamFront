@@ -19,7 +19,7 @@ import { IHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { Button } from 'primeng/button';
-import { InputSwitchModule } from 'primeng/inputswitch';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MessageModule } from 'primeng/message';
 import { KeyFilterModule } from 'primeng/keyfilter';
@@ -75,7 +75,7 @@ export type EntityResponseType = HttpResponse<IQuestion>;
     KeyFilterModule,
     MessageModule,
     CheckboxModule,
-    InputSwitchModule,
+    ToggleSwitchModule,
     Button,
     TranslateModule,
   ],
@@ -315,9 +315,9 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
         typeId: question.typeId,
         defaultpoint: question.defaultpoint,
         randomHorizontalCorrection: question.randomHorizontalCorrection,
-        canExceedTheMax: question.canExceedTheMax,
-        canBeNegative: question.canBeNegative,
-        mustBeIgnoreInGlobalScale: question.mustBeIgnoreInGlobalScale,
+        canExceedTheMax: question.canExceedTheMax ? question.canExceedTheMax : false,
+        canBeNegative: question.canBeNegative ? question.canBeNegative : false,
+        mustBeIgnoreInGlobalScale: question.mustBeIgnoreInGlobalScale ? question.mustBeIgnoreInGlobalScale : false,
       },
       {
         emitEvent: false,
@@ -504,6 +504,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
    * When interacting with the point step widget
    */
   public defaultpointChange(input: any): void {
+    console.error(input);
     if (input?.preventDefault) {
       input.preventDefault();
     }

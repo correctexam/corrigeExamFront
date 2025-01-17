@@ -20,13 +20,13 @@ import { PrimeTemplate } from 'primeng/api';
 import { DockModule } from 'primeng/dock';
 import { FileUpload, FileUploadModule } from 'primeng/fileupload';
 import { FormsModule } from '@angular/forms';
-import { InputSwitchModule } from 'primeng/inputswitch';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TooltipModule } from 'primeng/tooltip';
 import { DrawerModule } from 'primeng/drawer';
 import { HasAnyAuthorityDirective } from '../shared/auth/has-any-authority.directive';
 import { TranslateDirective } from '../shared/language/translate.directive';
 import { NgIf } from '@angular/common';
-import { ButtonDirective, ButtonModule } from 'primeng/button';
+import { ButtonModule } from 'primeng/button';
 
 interface Upload {
   progress: number;
@@ -72,11 +72,10 @@ const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
     HasAnyAuthorityDirective,
     DrawerModule,
     TooltipModule,
-    InputSwitchModule,
+    ToggleSwitchModule,
     FormsModule,
     FileUploadModule,
     ButtonModule,
-    ButtonDirective,
     DockModule,
     PrimeTemplate,
     MesCoursComponent_1,

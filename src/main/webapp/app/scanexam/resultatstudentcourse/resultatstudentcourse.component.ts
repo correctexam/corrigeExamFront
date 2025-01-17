@@ -12,7 +12,7 @@ import { ExportPdfService } from '../exportanonymoupdf/exportanonymoupdf.service
 import { firstValueFrom } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { ExportResultService, formatDateTime } from '../exportresult.service';
-import { InputSwitchModule } from 'primeng/inputswitch';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TableModule } from 'primeng/table';
 import { ButtonDirective } from 'primeng/button';
 import { NgIf } from '@angular/common';
@@ -53,7 +53,7 @@ import { ToastModule } from 'primeng/toast';
     ButtonDirective,
     RouterLink,
     TableModule,
-    InputSwitchModule,
+    ToggleSwitchModule,
     TranslateModule,
   ],
 })

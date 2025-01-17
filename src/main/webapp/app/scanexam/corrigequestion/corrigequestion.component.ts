@@ -77,7 +77,7 @@ import { GraphicalToolbarCorrectionComponent } from './toolbar/toolbar.component
 import { PaginatorModule } from 'primeng/paginator';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { GalleriaModule } from 'primeng/galleria';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { PopoverModule } from 'primeng/popover';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { SelectButtonModule } from 'primeng/selectbutton';
@@ -86,7 +86,7 @@ import { ThicknessSliderComponent } from './toolbar/thickness-slider/thickness-s
 import { ColourPaletteComponent } from './toolbar/colour-palette/colour-palette.component';
 import { SliderModule } from 'primeng/slider';
 import { TooltipModule } from 'primeng/tooltip';
-import { InputSwitchModule } from 'primeng/inputswitch';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { RatingModule } from 'primeng/rating';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { QuestionpropertiesviewComponent } from '../annotate-template/paint/questionpropertiesview/questionpropertiesview.component';
@@ -143,7 +143,7 @@ interface CommentAction {
     OrderListModule,
     FaIconComponent,
     RatingModule,
-    InputSwitchModule,
+    ToggleSwitchModule,
     TooltipModule,
     SliderModule,
     ColourPaletteComponent,
@@ -152,7 +152,7 @@ interface CommentAction {
     SelectButtonModule,
     BlockUIModule,
     ProgressSpinnerModule,
-    OverlayPanelModule,
+    PopoverModule,
     GalleriaModule,
     ProgressBarModule,
     PaginatorModule,

@@ -14,7 +14,16 @@
 
         <div class="row mb-3" *ngIf="editForm.controls.id.value !== null">
           <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
-          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            class="form-control"
+            name="id"
+            id="field_id"
+            data-cy="id"
+            formControlName="id"
+            [readonly]="true"
+          />
         </div>
 
         <div class="row mb-3">
@@ -37,7 +46,15 @@
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.hybridGradedComment.grade" for="field_grade">Grade</label>
-          <input type="number" class="form-control" name="grade" id="field_grade" data-cy="grade" formControlName="grade" />
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            class="form-control"
+            name="grade"
+            id="field_grade"
+            data-cy="grade"
+            formControlName="grade"
+          />
         </div>
 
         <div class="row mb-3">
@@ -47,7 +64,15 @@
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.hybridGradedComment.step" for="field_step">Step</label>
-          <input type="number" class="form-control" name="step" id="field_step" data-cy="step" formControlName="step" />
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            class="form-control"
+            name="step"
+            id="field_step"
+            data-cy="step"
+            formControlName="step"
+          />
         </div>
 
         <div class="row mb-3">

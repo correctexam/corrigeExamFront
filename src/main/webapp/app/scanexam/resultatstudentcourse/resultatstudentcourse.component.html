@@ -266,12 +266,12 @@
             <td *ngIf="student.abi > 0"></td>
             <td *ngIf="student.abi === 0"></td>
             <td *ngIf="student.abi > 0">
-              <p-inputSwitch
+              <p-toggleSwitch
                 [trueValue]="2"
                 [falseValue]="1"
                 [(ngModel)]="student.abi"
                 (onChange)="updateStudentABJ(student)"
-              ></p-inputSwitch>
+              ></p-toggleSwitch>
             </td>
           </tr>
         </ng-template>

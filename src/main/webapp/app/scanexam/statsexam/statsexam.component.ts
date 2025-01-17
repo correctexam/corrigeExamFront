@@ -13,7 +13,7 @@ import { ExamService } from 'app/entities/exam/service/exam.service';
 import { Title } from '@angular/platform-browser';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { SelectButtonModule } from 'primeng/selectbutton';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { ButtonDirective } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
@@ -59,7 +59,7 @@ const TRANSPARENT = 'rgba(255,255,255,0.0)';
     FormsModule,
     ButtonDirective,
     TableModule,
-    DropdownModule,
+    SelectModule,
     SelectButtonModule,
     ToggleButtonModule,
     NgStyle,

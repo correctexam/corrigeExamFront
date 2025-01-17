@@ -24,7 +24,7 @@ import { Title } from '@angular/platform-browser';
 import { ExportResultService, formatDateTime } from '../exportresult.service';
 import { FaStackComponent, FaIconComponent, FaStackItemSizeDirective } from '@fortawesome/angular-fontawesome';
 import { UsableTextInputComponent } from '../../shared/usable-text-input/usable-text-input.component';
-import { InputSwitchModule } from 'primeng/inputswitch';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { DrawerModule } from 'primeng/drawer';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
@@ -73,7 +73,7 @@ export interface CacheDownloadNotification {
     BlockUIModule,
     ProgressSpinnerModule,
     DrawerModule,
-    InputSwitchModule,
+    ToggleSwitchModule,
     NgFor,
     UsableTextInputComponent,
     FaStackComponent,

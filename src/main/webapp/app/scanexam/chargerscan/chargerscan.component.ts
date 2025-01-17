@@ -35,7 +35,7 @@ import { ViewandreorderpagesComponent } from '../viewandreorderpages/viewandreor
 import { PromisePool } from '@supercharge/promise-pool';
 import { Title } from '@angular/platform-browser';
 import { FileUpload, FileUploadModule } from 'primeng/fileupload';
-import { InputSwitchModule } from 'primeng/inputswitch';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TooltipModule } from 'primeng/tooltip';
 import { TranslateDirective } from '../../shared/language/translate.directive';
@@ -94,7 +94,7 @@ const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
     TranslateDirective,
     TooltipModule,
     FaIconComponent,
-    InputSwitchModule,
+    ToggleSwitchModule,
     FormsModule,
     FileUploadModule,
     ViewandreorderpagesComponent,

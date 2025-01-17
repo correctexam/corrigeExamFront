@@ -182,7 +182,7 @@
         </p-table>
         <div class="mobile-view">
           <div class="selectstudentmobile">
-            <p-dropdown
+            <p-select
               [options]="this.listeMobileEtudiant"
               [(ngModel)]="etudiantSelec"
               optionValue="value"
@@ -196,7 +196,7 @@
               scrollHeight="150px"
               showTransitionOptions="0.25.4s ease-in-out"
               hideTransitionOptions=".5s ease-in-out"
-            ></p-dropdown>
+            ></p-select>
             <div class="changementTriMobile">
               <p-selectButton
                 (onChange)="changementTriMobile()"

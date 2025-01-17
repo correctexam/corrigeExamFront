@@ -14,7 +14,16 @@
 
         <div class="row mb-3" [hidden]="editForm.get('id')!.value == null">
           <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
-          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            class="form-control"
+            name="id"
+            id="field_id"
+            data-cy="id"
+            formControlName="id"
+            [readonly]="true"
+          />
         </div>
 
         <div class="row mb-3">
@@ -34,8 +43,13 @@
         <div class="row mb-3">
           <label jhiTranslate="gradeScopeIsticApp.courseGroup.students" for="field_students">Students</label>
           <select class="form-control" id="field_students" multiple name="students" formControlName="students">
-            <option [ngValue]="getSelected(editForm.get('students')!.value, studentOption)" *ngFor="let studentOption of students; trackBy: trackById">{{ studentOption.name }}</option>
-        </select>
+            <option
+              [ngValue]="getSelected(editForm.get('students')!.value, studentOption)"
+              *ngFor="let studentOption of students; trackBy: trackById"
+            >
+              {{ studentOption.name }}
+            </option>
+          </select>
         </div>
 
         <div class="row mb-3">
@@ -43,7 +57,7 @@
           <select class="form-control" id="field_course" name="course" formControlName="courseId">
             <option [ngValue]="null"></option>
             <option [ngValue]="courseOption.id" *ngFor="let courseOption of courses; trackBy: trackById">{{ courseOption.name }}</option>
-        </select>
+          </select>
         </div>
       </div>
 

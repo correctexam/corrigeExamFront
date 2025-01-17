@@ -35,7 +35,7 @@ import { ButtonDirective, Button } from 'primeng/button';
 import { SliderModule } from 'primeng/slider';
 import { TooltipModule } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
-import { InputSwitchModule } from 'primeng/inputswitch';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TranslateDirective } from '../../shared/language/translate.directive';
 import { DrawerModule } from 'primeng/drawer';
 import { GalleriaModule } from 'primeng/galleria';
@@ -98,7 +98,7 @@ interface PredictResult {
     KeyboardShortcutsModule,
     DrawerModule,
     TranslateDirective,
-    InputSwitchModule,
+    ToggleSwitchModule,
     FormsModule,
     TooltipModule,
     SliderModule,

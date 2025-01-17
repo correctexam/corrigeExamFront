@@ -10,12 +10,29 @@
 
         <div class="row mb-3" [hidden]="editForm.get('id')!.value == null">
           <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
-          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            class="form-control"
+            name="id"
+            id="field_id"
+            data-cy="id"
+            formControlName="id"
+            [readonly]="true"
+          />
         </div>
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.numero" for="field_numero">Numero</label>
-          <input type="number" class="form-control" name="numero" id="field_numero" data-cy="numero" formControlName="numero" />
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            class="form-control"
+            name="numero"
+            id="field_numero"
+            data-cy="numero"
+            formControlName="numero"
+          />
           <div *ngIf="editForm.get('numero')!.invalid && (editForm.get('numero')!.dirty || editForm.get('numero')!.touched)">
             <small class="form-text text-danger" *ngIf="editForm.get('numero')?.errors?.required" jhiTranslate="entity.validation.required">
               This field is required.
@@ -28,12 +45,28 @@
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.point" for="field_point">Point</label>
-          <input type="number" class="form-control" name="point" id="field_point" data-cy="point" formControlName="point" />
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            class="form-control"
+            name="point"
+            id="field_point"
+            data-cy="point"
+            formControlName="point"
+          />
         </div>
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.step" for="field_step">Step</label>
-          <input type="number" class="form-control" name="step" id="field_step" data-cy="step" formControlName="step" />
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            class="form-control"
+            name="step"
+            id="field_step"
+            data-cy="step"
+            formControlName="step"
+          />
         </div>
 
         <div class="row mb-3">
