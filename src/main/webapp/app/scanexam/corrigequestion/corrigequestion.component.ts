@@ -110,6 +110,7 @@ import { MltComponent } from '../mlt/mlt.component';
 import { CoupageDimageService } from '../mlt/coupage-dimage.service';
 
 import Fuse from 'fuse.js';
+import { CheckboxModule } from 'primeng/checkbox';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -173,6 +174,8 @@ interface CommentAction {
     DatePipe,
     TranslateModule,
     CommentSortPipe,
+    CheckboxModule,
+    SliderModule,
   ],
 })
 export class CorrigequestionComponent implements OnInit, AfterViewInit {
@@ -188,6 +191,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       return 'Question ' + this.questionNumeros[this.questionindex];
     }
   }
+  protected Math = Math;
   minimizeComment = false;
   focusView = false;
 
@@ -812,8 +816,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.active.set(l.id!, signal(true));
     }
     this.minimizeComment = false;
-
-    this.sameGradeForAlreadySelected();
   }
 
   resetAllShortCut() {
@@ -1161,7 +1163,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.blocked = false;
       });
     }
-    this.sameGradeForAlreadySelected();
   }
 
   isTextInput(ele: any): boolean {
@@ -1202,8 +1203,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.currentNote = +e.event.key;
       this.changeNote();
     }
-
-    this.sameGradeForAlreadySelected();
   }
 
   updateResponseRequest(studentResp: IStudentResponse): Observable<EntityResponseType> {
@@ -1230,8 +1229,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
       this.updateResponse();
     }
-
-    this.sameGradeForAlreadySelected();
   }
   updateStar() {
     if (this.resp !== undefined) {
@@ -1240,8 +1237,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
       this.updateResponse();
     }
-
-    this.sameGradeForAlreadySelected();
   }
 
   checked(comment: ITextComment | IGradedComment | IHybridGradedComment): boolean {
@@ -1271,8 +1266,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     self.resp?.textcomments?.push(comment);
     const resp1 = await firstValueFrom(self.updateResponseRequest(self.resp!));
     self.resp = resp1.body!;
-
-    this.sameGradeForAlreadySelected();
   }
 
   private async retirerTComment(comment: ITextComment, self: CorrigequestionComponent) {
@@ -1284,14 +1277,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     const resp1 = await firstValueFrom(self.updateResponseRequest(self.resp!));
     self.resp = resp1.body!;
     (comment as any).checked = false;
-
-    this.sameGradeForAlreadySelected();
   }
 
   incrementHComment(comment: IHybridGradedComment) {
     this.fillorcreateQueryPool(this.incrementHCommentInternal, comment);
-
-    this.sameGradeForAlreadySelected();
   }
 
   private async incrementHCommentInternal(comment: IHybridGradedComment, self: CorrigequestionComponent): Promise<void> {
@@ -1317,8 +1306,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
       await self.computeNote(true, self.resp!, self.currentQuestion!);
     }
-
-    this.sameGradeForAlreadySelected();
   }
 
   toggleTCommentById(commentId: any) {
@@ -1431,8 +1418,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     self.resp = resp1.body!;
     await self.computeNote(true, self.resp!, self.currentQuestion!);
     //    });
-
-    this.sameGradeForAlreadySelected();
   }
 
   private async retirerGComment(comment: IGradedComment, self: CorrigequestionComponent) {
@@ -1446,8 +1431,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     const resp1 = await firstValueFrom(self.updateResponseRequest(self.resp!)); // .subscribe(resp1 => {
     self.resp = resp1.body!;
     await self.computeNote(true, self.resp!, self.currentQuestion!);
-
-    this.sameGradeForAlreadySelected();
   }
 
   updateNote4updateQuestion(update: boolean, resp: IStudentResponse, currentQ: IQuestion[]): Promise<IStudentResponse | undefined> {
@@ -1705,8 +1688,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       });
     }
-
-    this.sameGradeForAlreadySelected();
   }
 
   cleanCanvassCache() {
@@ -1870,6 +1851,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   changeStudent($event: any): void {
+    this.similarPredictionsSearched = false;
     if (!this.init) {
       this.cleanCanvassCache();
       const m = this.preferenceService.getRandomOrderForExam(+this.examId!);
@@ -1901,6 +1883,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   changeQuestion($event: any): void {
+    this.similarPredictionsSearched = false;
     if (!this.init) {
       this.cleanCanvassCache();
 
@@ -2429,8 +2412,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         },
       });
     });
-
-    this.sameGradeForAlreadySelected();
   }
 
   removeGradedComment(comment: IGradedComment): void {
@@ -2461,8 +2442,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       });
     }
-
-    this.sameGradeForAlreadySelected();
   }
 
   checkEnterOrEscape($event: any, el: Inplace): void {
@@ -2501,8 +2480,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       });
     }
-
-    this.sameGradeForAlreadySelected();
   }
 
   // ----------------- code for realign -----------------------
@@ -2805,8 +2782,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.testdisableAndEnableKeyBoardShortCut.set(true);
     }, 30);
-
-    this.sameGradeForAlreadySelected();
   }
   updateTextComment($event: ITextComment): void {
     const c1 = this.currentTextComment4Question?.find(c => (c().id = $event.id));
@@ -2818,8 +2793,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         c1().text = $event.text;
       }
     }
-
-    this.sameGradeForAlreadySelected();
   }
   addGradedComment($event: IGradedComment): void {
     this.currentGradedComment4Question?.push(signal($event));
@@ -2827,8 +2800,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.populateDefaultShortCut();
     // this.testdisableAndEnableKeyBoardShortCut.set(true);
     setTimeout(() => this.testdisableAndEnableKeyBoardShortCut.set(true), 30);
-
-    this.sameGradeForAlreadySelected();
   }
 
   updateGradedComment($event: IGradedComment): void {
@@ -2844,8 +2815,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         c1().grade = $event.grade;
       }
     }
-
-    this.sameGradeForAlreadySelected();
   }
 
   addHybridComment($event: IHybridGradedComment): void {
@@ -2853,8 +2822,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.testdisableAndEnableKeyBoardShortCut.set(false);
     this.populateDefaultShortCut();
     setTimeout(() => this.testdisableAndEnableKeyBoardShortCut.set(true), 300);
-
-    this.sameGradeForAlreadySelected();
   }
 
   updateHybridComment($event: IHybridGradedComment): void {
@@ -2883,8 +2850,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.computeNote(true, this.resp, this.currentQuestion);
       }
     }
-
-    this.sameGradeForAlreadySelected();
   }
 
   changestepValue($event: any, comment: IHybridGradedComment): void {
@@ -3233,6 +3198,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   similarPredictions: Prediction[] = [];
+  similarPredictionsSearched = false;
   async similarPrediction() {
     this.similarPredictions = [];
     try {
@@ -3240,18 +3206,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionId }));
       const predictions = predictionResponse.body || [];
       if (this.currentPrediction && predictions.length > 0) {
-        // for (let i = 0; i < predictions.length; i++) {
-        //   const currentWords = new Set(this.currentPrediction.text?.toLowerCase().split(/\s+/));
-        //   const predictionWords = new Set(predictions[i].text?.toLowerCase().split(/\s+/));
-
-        //   // Find the intersection of both sets
-        //   const commonWords = [...currentWords].filter(word => predictionWords.has(word));
-
-        //   // Check if there are at least 2 common words
-        //   if (commonWords.length >= 2 && predictions[i].id != this.currentPrediction.id) {
-        //     this.similarPredictions.push(predictions[i]);
-        //   }
-        // }
         this.similarPredictions = this.findSimilarPredictions(this.currentPrediction, predictions);
         this.similarPredictions = this.similarPredictions.filter(
           (prediction, index, self) =>
@@ -3269,10 +3223,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       } else {
         this.executeScript();
       }
+      this.similarPredictionsSearched = true;
     } catch (err) {
       console.error('Error loading prediction:', err);
       this.currentPrediction = null; // Explicitly reset on error
     }
+    this.getSameResponses();
+    console.log('Similar responses:', this.sameResponses);
   }
 
   selectedSimilars: Map<Prediction, number> = new Map();
@@ -3283,32 +3240,55 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       if (currentValue === 1) {
         // Unselect the prediction
         this.selectedSimilars.set(similar, 0);
-
-        // Reset the grade
-        let response = await this.getStudentResponse4CurrentStudent(
-          this.questions!.map(q => q.id!),
-          similar.studentId! - 1,
-        );
-        response.note = 0;
-        response.comments = [];
-        response.gradedcomments = [];
-        response.textcomments = [];
-        response.star = false;
-        response.worststar = false;
-        this.updateResponseRequest(response).subscribe(sr1 => {
-          response = sr1.body!;
-          this.blocked = false;
-        });
       } else {
         // Select the prediction
         this.selectedSimilars.set(similar, 1);
-        this.sameGrade(similar);
       }
     } else {
       // Add the prediction and set it to selected
       this.selectedSimilars.set(similar, 1);
-      this.sameGrade(similar);
     }
+    this.getSameResponses();
+  }
+
+  getSelectedCount(): number {
+    return Array.from(this.selectedSimilars.values()).filter(v => v === 1).length;
+  }
+
+  changeSelectedSimilarGrades() {
+    const selectedCount = Array.from(this.selectedSimilars.values()).filter(v => v === 1).length;
+    this.confirmationService.confirm({
+      message: this.translateService.instant('scanexam.confirmSelectedGrades', { count: selectedCount }),
+      accept: () => {
+        for (const similar of this.selectedSimilars) {
+          if (similar[1] === 1) {
+            this.sameGrade(similar[0]);
+          }
+        }
+        this.messageService.add({
+          severity: 'info',
+          detail: this.translateService.instant('scanexam.gradesAppliedSelected'),
+        });
+      },
+    });
+    this.getSameResponses();
+  }
+
+  changeAllSimilarGrades() {
+    const totalCount = this.similarPredictions.length;
+    this.confirmationService.confirm({
+      message: this.translateService.instant('scanexam.confirmAllGrades', { count: totalCount }),
+      accept: () => {
+        for (const similar of this.similarPredictions) {
+          this.sameGrade(similar);
+        }
+        this.messageService.add({
+          severity: 'info',
+          detail: this.translateService.instant('scanexam.gradesAppliedAll'),
+        });
+      },
+    });
+    this.getSameResponses();
   }
 
   // Finding the simlar prediction using fuse.js
@@ -3360,13 +3340,60 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.blocked = false;
     });
     console.log('Similar note:', response.note);
+    this.getSameResponses();
   }
 
-  sameGradeForAlreadySelected() {
-    const predictions = Array.from(this.selectedSimilars.keys());
-    for (let i = 0; i < predictions.length; i++) {
-      this.sameGrade(predictions[i]);
+  sameResponses: Map<number, StudentResponse> = new Map();
+  async getSameResponses() {
+    for (const similar of this.similarPredictions) {
+      // let try1 = await this.getStudentResponse(this.questions!.map(q => q.id!));
+      let response = await this.getStudentResponse4CurrentStudent(
+        this.questions!.map(q => q.id!),
+        similar.studentId! - 1,
+      );
+      this.sameResponses.set(similar.studentId!, response);
     }
   }
+
+  async updateSimilarGrade(studentId: number, newGrade: number) {
+    if (this.blocked) return;
+
+    const response = this.sameResponses.get(studentId);
+    if (response) {
+      response.note = newGrade;
+      this.updateResponseRequest(response).subscribe(sr1 => {
+        this.sameResponses.set(studentId, sr1.body!);
+      });
+    }
+  }
+
+  async updateSimilarComment(studentId: number, comment: any) {
+    if (this.blocked) return;
+
+    const response = this.sameResponses.get(studentId);
+    if (response) {
+      this.updateResponseRequest(response).subscribe(sr1 => {
+        this.sameResponses.set(studentId, sr1.body!);
+      });
+    }
+  }
+
+  async removeSimilarComment(studentId: number, commentToRemove: any) {
+    if (this.blocked) return;
+
+    const response = this.sameResponses.get(studentId);
+    if (response) {
+      response.textcomments = response.textcomments?.filter(c => c.id !== commentToRemove.id);
+      this.updateResponseRequest(response).subscribe(sr1 => {
+        this.sameResponses.set(studentId, sr1.body!);
+      });
+    }
+  }
+
+  // In corrigequestion.component.ts
+  getSimilarGrade(studentId: number): number {
+    return this.sameResponses.get(studentId!)?.note! / 4;
+  }
+
   tryGetAllImages() {}
 }

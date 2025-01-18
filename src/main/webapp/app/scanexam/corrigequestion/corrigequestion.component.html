@@ -578,18 +578,78 @@
               </div>
 
               <div *ngIf="similarPredictions.length > 0">
-                <p style="font-weight: bold; margin-bottom: 10px">Resultats Similaires:</p>
-                <ul>
+                <p style="font-weight: bold; margin-bottom: 10px; color: #666; font-size: 15px">Resultats Similaires</p>
+
+                <div class="flex flex-row gap-2 mb-3">
+                  <button pButton class="p-button-primary" (click)="changeSelectedSimilarGrades()" [disabled]="getSelectedCount() === 0">
+                    <i class="pi pi-check-circle mr-2"></i>
+                    Appliquer la note aux sélectionnés
+                  </button>
+                  <button
+                    pButton
+                    class="p-button-secondary"
+                    (click)="changeAllSimilarGrades()"
+                    [disabled]="similarPredictions.length === 0"
+                  >
+                    <i class="pi pi-check-square mr-2"></i>
+                    Appliquer la note à tous
+                  </button>
+                </div>
+
+                <ul style="list-style: none; padding-left: 25px; position: relative">
                   <li
                     *ngFor="let similar of similarPredictions"
                     [style.border]="selectedSimilars.get(similar) === 1 ? '5px solid green' : '1px solid #ccc'"
-                    style="margin-bottom: 10px; padding: 10px"
+                    style="margin-bottom: 10px; padding: 10px; position: relative"
                   >
-                    <button (click)="selectSimilarPrediction(similar)" style="border: none; background: none; padding: 0; cursor: pointer">
-                      <img [src]="similar.imageData" alt="Prediction Image" style="max-width: 100%; height: auto" />
-                    </button>
+                    <input
+                      type="checkbox"
+                      [checked]="selectedSimilars.get(similar) === 1"
+                      (change)="selectSimilarPrediction(similar)"
+                      style="position: absolute; left: -50px; top: 50%; width: 20px; height: 20px"
+                    />
+
+                    <div class="flex flex-col">
+                      <!-- Image section -->
+                      <img [src]="similar.imageData" alt="Prediction Image" style="max-width: 80%; height: auto" />
+
+                      <div style="text-align: center">
+                        <div class="flex flex-col gap-2">
+                          <!-- Note section with smaller buttons -->
+                          <div class="flex items-center gap-1 justify-center">
+                            Note:
+                            <input
+                              type="number"
+                              pInputText
+                              [ngModel]="getSimilarGrade(similar.studentId!)"
+                              (ngModelChange)="updateSimilarGrade(similar.studentId!, $event * 4)"
+                              [style]="{ height: '30px', width: '70px', 'text-align': 'center' }"
+                              [disabled]="blocked"
+                              step="0.25"
+                              min="0"
+                              max="2"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <!-- Comments section below -->
+                          <div *ngIf="sameResponses.get(similar.studentId!)?.textcomments?.length">
+                            Commentaires:
+                            <div>
+                              <ng-container *ngFor="let comment of sameResponses.get(similar.studentId!)?.textcomments">
+                                <div>-{{ comment.text }}</div>
+                              </ng-container>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </li>
                 </ul>
+              </div>
+
+              <div *ngIf="similarPredictions.length === 0 && similarPredictionsSearched">
+                <p style="font-weight: bold; margin-bottom: 10px; color: #666">Aucune réponse similaire trouvée</p>
               </div>
 
               <div
