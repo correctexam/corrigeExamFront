@@ -578,7 +578,7 @@
               </div>
 
               <div *ngIf="similarPredictions.length > 0">
-                <p style="font-weight: bold; margin-bottom: 10px; color: #666; font-size: 15px">Resultats Similaires</p>
+                <p style="font-weight: bold; margin-bottom: 15px; color: #666; font-size: 20px">Resultats Similaires</p>
 
                 <div class="flex flex-row gap-2 mb-3">
                   <button pButton class="p-button-primary" (click)="changeSelectedSimilarGrades()" [disabled]="getSelectedCount() === 0">
@@ -611,34 +611,95 @@
 
                     <div class="flex flex-col">
                       <!-- Image section -->
-                      <img [src]="similar.imageData" alt="Prediction Image" style="max-width: 80%; height: auto" />
+                      <img [src]="similar.imageData" alt="Prediction Image" [style]="{ height: '100px', width: '700px' }" />
 
-                      <div style="text-align: center">
+                      <div style="padding-left: 50px; padding-right: 30px">
                         <div class="flex flex-col gap-2">
                           <!-- Note section with smaller buttons -->
                           <div class="flex items-center gap-1 justify-center">
                             Note:
-                            <input
-                              type="number"
-                              pInputText
-                              [ngModel]="getSimilarGrade(similar.studentId!)"
-                              (ngModelChange)="updateSimilarGrade(similar.studentId!, $event * 4)"
-                              [style]="{ height: '30px', width: '70px', 'text-align': 'center' }"
-                              [disabled]="blocked"
-                              step="0.25"
-                              min="0"
-                              max="2"
-                            />
+                            <div style="padding-left: 10px">
+                              <input
+                                type="number"
+                                pInputText
+                                [ngModel]="getSimilarGrade(similar.studentId!)"
+                                (ngModelChange)="updateSimilarGrade(similar.studentId!, $event * 4)"
+                                [style]="{ height: '30px', width: '70px', 'text-align': 'center' }"
+                                [disabled]="blocked"
+                                step="0.25"
+                                min="0"
+                                max="2"
+                              />
+                            </div>
                           </div>
                         </div>
                         <div>
                           <!-- Comments section below -->
-                          <div *ngIf="sameResponses.get(similar.studentId!)?.textcomments?.length">
+                          <div *ngIf="sameResponses.get(similar.studentId!)?.textcomments?.length" style="padding-top: 10px">
                             Commentaires:
-                            <div>
-                              <ng-container *ngFor="let comment of sameResponses.get(similar.studentId!)?.textcomments">
-                                <div>-{{ comment.text }}</div>
-                              </ng-container>
+                            <div class="flex flex-col gap-1">
+                              <div>
+                                <div
+                                  *ngFor="let comment of sameResponses.get(similar.studentId!)?.textcomments; let i = index"
+                                  class="flex flex-row items-center gap-2"
+                                >
+                                  <!-- Comment text with edit capability -->
+
+                                  <div class="flex-1 flex flex-row items-center">
+                                    <input
+                                      *ngIf="editingCommentIndex === i"
+                                      type="text"
+                                      [(ngModel)]="editingCommentText"
+                                      (blur)="saveSimilarComment(similar.studentId!, i)"
+                                      (keyup.enter)="saveSimilarComment(similar.studentId!, i)"
+                                      class="flex-1 p-1 border border-gray-300 rounded"
+                                    />
+                                    <span *ngIf="editingCommentIndex !== i">• {{ comment.text }}</span>
+                                  </div>
+
+                                  <!-- Action icons on the right -->
+                                  <div class="flex gap-2" style="padding-left: 10px">
+                                    <fa-icon
+                                      *ngIf="editingCommentIndex !== i"
+                                      [icon]="['fas', 'edit']"
+                                      (click)="editSimilarComment(i, comment.text!)"
+                                      class="cursor-pointer"
+                                    ></fa-icon>
+                                    <fa-icon
+                                      [icon]="['fas', 'trash']"
+                                      (click)="removedSimilarComment(similar.studentId!, i)"
+                                      class="cursor-pointer"
+                                    ></fa-icon>
+                                  </div>
+                                </div>
+                                <div>
+                                  <div style="padding-top: 10px; padding-bottom: 10px">
+                                    <!-- Add existing comment section -->
+                                    <div class="flex items-center gap-2">
+                                      <select
+                                        [ngModel]="getSelectedCommentId(similar.studentId!)"
+                                        (ngModelChange)="setSelectedCommentId(similar.studentId!, $event)"
+                                        class="flex-1 p-1 border border-gray-300 rounded"
+                                      >
+                                        <option value="">Ajouter un commentaire</option>
+                                        <optgroup *ngIf="currentTextComment4Question" label="Commentaires">
+                                          <option *ngFor="let comment of currentTextComment4Question" [value]="comment().id">
+                                            {{ comment().text }}
+                                          </option>
+                                        </optgroup>
+                                      </select>
+                                      <button
+                                        pButton
+                                        (click)="addExistingSimilarComment(similar.studentId!, getSelectedCommentId(similar.studentId!))"
+                                        [disabled]="!getSelectedCommentId(similar.studentId!)"
+                                        class="p-2"
+                                      >
+                                        <fa-icon icon="plus"></fa-icon>
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -649,7 +710,9 @@
               </div>
 
               <div *ngIf="similarPredictions.length === 0 && similarPredictionsSearched">
-                <p style="font-weight: bold; margin-bottom: 10px; color: #666">Aucune réponse similaire trouvée</p>
+                <p style="font-weight: bold; margin-bottom: 10px; color: #666; font-size: 20px; padding-top: 20px">
+                  Aucune réponse similaire trouvée
+                </p>
               </div>
 
               <div
@@ -709,7 +772,7 @@
                 ></div>
                 < Utilise innerHTML pour interpréter le HTML-->
 
-              <div *ngIf="error" style="margin-top: 1rem; text-align: center">
+              <!--div *ngIf="error" style="margin-top: 1rem; text-align: center">
                 <dd style="font-size: 1.1rem; font-weight: bold; margin: 0">Erreur :</dd>
                 <pre
                   style="
@@ -723,7 +786,7 @@
                   "
                   >{{ error }}</pre
                 >
-              </div>
+              </div-->
             </div>
           </div>
         </div>

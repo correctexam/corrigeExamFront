@@ -3395,5 +3395,80 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     return this.sameResponses.get(studentId!)?.note! / 4;
   }
 
+  editingCommentIndex: number = -1;
+  editingCommentText: string = '';
+
+  editSimilarComment(index: number, text: string) {
+    this.editingCommentIndex = index;
+    this.editingCommentText = text;
+  }
+
+  async saveSimilarComment(studentId: number, index: number) {
+    if (this.editingCommentText.trim()) {
+      const response = this.sameResponses.get(studentId);
+      if (response && response.textcomments) {
+        const commentToUpdate = response.textcomments[index];
+
+        const updatedComment: ITextComment = {
+          ...commentToUpdate,
+          text: this.editingCommentText,
+        };
+        await firstValueFrom(this.textCommentService.update(updatedComment));
+
+        response.textcomments[index] = updatedComment;
+        this.updateSimilarComment(studentId, response);
+
+        const commentInPanel = this.currentTextComment4Question?.find(c => c().id === commentToUpdate.id);
+        if (commentInPanel) {
+          commentInPanel().text = this.editingCommentText;
+        }
+      }
+    }
+    this.editingCommentIndex = -1;
+    this.editingCommentText = '';
+  }
+
+  removedSimilarComment(studentId: number, index: number) {
+    const response = this.sameResponses.get(studentId);
+    if (response && response.textcomments) {
+      const commentToRemove = response.textcomments[index];
+      response.textcomments.splice(index, 1);
+      this.removeSimilarComment(studentId, commentToRemove);
+    }
+  }
+
+  selectedCommentIds: Map<number, string> = new Map();
+
+  getSelectedCommentId(studentId: number): string {
+    return this.selectedCommentIds.get(studentId) || '';
+  }
+
+  setSelectedCommentId(studentId: number, value: string) {
+    this.selectedCommentIds.set(studentId, value);
+  }
+
+  async addExistingSimilarComment(studentId: number, commentId: string) {
+    if (!commentId) return;
+
+    const response = this.sameResponses.get(studentId);
+    if (!response) return;
+
+    const commentToAdd = this.currentTextComment4Question?.find(c => c().id?.toString() === commentId);
+    if (!commentToAdd) return;
+
+    if (!response.textcomments) {
+      response.textcomments = [];
+    }
+
+    const commentExists = response.textcomments.some(c => c.id?.toString() === commentId);
+    if (commentExists) {
+      return;
+    }
+
+    response.textcomments.push({ ...commentToAdd() });
+    await this.updateSimilarComment(studentId, response);
+    this.selectedCommentIds.set(studentId, '');
+  }
+
   tryGetAllImages() {}
 }
