@@ -1602,6 +1602,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               this.resp = resp1.body!;
               (currentComment as any).checked = true;
               this.currentTextComment4Question?.push(signal(currentComment));
+
+              // Reset the selectedCommentIds for all similar responses
+              this.similarPredictions.forEach(similar => {
+                this.setSelectedCommentId(similar.studentId!, '');
+                this.addExistingSimilarComment(similar.studentId!, currentComment.id?.toString()!);
+              });
+
               this.testdisableAndEnableKeyBoardShortCut.set(false);
               this.populateDefaultShortCut();
               //     this.testdisableAndEnableKeyBoardShortCut.set(true);
@@ -2393,6 +2400,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         accept: () => {
           this.retirerTComment(comment, this).then(() => {
             this.currentTextComment4Question = this.currentTextComment4Question!.filter(e => e().id !== comment.id);
+
+            // Also remove this comment from all similar responses that have it
+            this.similarPredictions.forEach(similar => {
+              const response = this.sameResponses.get(similar.studentId!);
+              if (response && response.textcomments) {
+                response.textcomments = response.textcomments.filter(c => c.id !== comment.id);
+                this.updateSimilarComment(similar.studentId!, response);
+              }
+            });
+
             this.textCommentService.delete(comment!.id!).subscribe(() => {
               const m = this.preferenceService.getCommentSort4Question(this.examId + '_' + this.currentQuestion!.id!);
               if (m.has(comment!.id!)) {
