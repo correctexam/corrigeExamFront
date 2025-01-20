@@ -596,27 +596,24 @@
                   </button>
                 </div>
 
-                <ul style="list-style: none; padding-left: 25px; position: relative">
+                <ul style="list-style: none; margin: 0; padding: 0; position: relative">
                   <li
                     *ngFor="let similar of similarPredictions"
                     [style.border]="selectedSimilars.get(similar) === 1 ? '5px solid green' : '1px solid #ccc'"
-                    style="margin-bottom: 10px; padding: 10px; position: relative"
+                    style="margin-bottom: 10px; padding: 10px; position: relative; border-radius: 8px"
                   >
-                    <input
-                      type="checkbox"
-                      [checked]="selectedSimilars.get(similar) === 1"
-                      (change)="selectSimilarPrediction(similar)"
-                      style="position: absolute; left: -50px; top: 50%; width: 20px; height: 20px"
-                    />
-
-                    <div class="flex flex-col">
+                    <div
+                      class="flex flex-col"
+                      style="justify-content: space-between; align-items: center; cursor: pointer"
+                      (click)="selectSimilarPrediction(similar)"
+                    >
                       <!-- Image section -->
                       <img [src]="similar.imageData" alt="Prediction Image" [style]="{ height: '100px', width: '700px' }" />
 
-                      <div style="padding-left: 50px; padding-right: 30px">
+                      <div style="padding-left: 20px; padding-right: 30px">
                         <div class="flex flex-col gap-2">
                           <!-- Note section with smaller buttons -->
-                          <div class="flex items-center gap-1 justify-center">
+                          <div class="flex items-center gap-1 justify-center align-items-center">
                             Note:
                             <div style="padding-left: 10px">
                               <input
@@ -624,7 +621,20 @@
                                 pInputText
                                 [ngModel]="getSimilarGrade(similar.studentId!)"
                                 (ngModelChange)="updateSimilarGrade(similar.studentId!, $event * 4)"
-                                [style]="{ height: '30px', width: '70px', 'text-align': 'center' }"
+                                [style]="{
+                                  height: '40px',
+                                  width: '80px',
+                                  'text-align': 'center',
+                                  border: '2px solid #ccc',
+                                  'border-radius': '5px',
+                                  'font-size': '14px',
+                                  padding: '5px',
+                                  outline: 'none',
+                                  transition: 'border-color 0.3s, box-shadow 0.3s',
+                                  'background-color': blocked ? '#f5f5f5' : '#fff',
+                                  color: blocked ? '#aaa' : '#000',
+                                  cursor: blocked ? 'not-allowed' : 'text',
+                                }"
                                 [disabled]="blocked"
                                 step="0.25"
                                 min="0"
