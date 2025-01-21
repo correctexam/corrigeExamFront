@@ -309,6 +309,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   questionId: number | undefined = -1;
   deleted: boolean = false;
 
+  correctionAvailable = true;
+
   constructor(
     public examService: ExamService,
     public courseService: CourseService,
