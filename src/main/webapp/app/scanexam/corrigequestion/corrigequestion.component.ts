@@ -2189,11 +2189,43 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         return _sr[0];
       } else {
         const st: IStudentResponse = {};
-        st.note = undefined;
+        st.note = 0;
         st.questionId = this.questions![0].id;
         st.sheetId = sheet!.id!;
         const sr1 = await firstValueFrom(this.studentResponseService.create(st));
         return sr1.body!;
+      }
+    } else {
+      throw new Error('No sheet for this page, should never happen');
+    }
+  }
+
+  async getStudentResponse4EmptyStudent(questionsId: number[], currentStudent: number): Promise<StudentResponse | undefined> {
+    const _sheets = await firstValueFrom(
+      this.sheetService.query({
+        scanId: this.exam!.scanfileId,
+        pagemin: currentStudent * this.nbreFeuilleParCopie!,
+        pagemax: (currentStudent + 1) * this.nbreFeuilleParCopie! - 1,
+      }),
+    );
+    let sheet: IExamSheet | undefined;
+    if (_sheets.body !== null && _sheets.body.length > 0) {
+      sheet = _sheets.body[0];
+    }
+
+    if (sheet !== undefined) {
+      const _sr = (
+        await firstValueFrom(
+          this.studentResponseService.query({
+            sheetId: sheet!.id!,
+            questionsId: questionsId,
+          }),
+        )
+      ).body;
+      if (_sr !== null && _sr.length > 0) {
+        return _sr[0];
+      } else {
+        return undefined;
       }
     } else {
       throw new Error('No sheet for this page, should never happen');
@@ -3408,11 +3440,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         similar.studentId! - 1,
       );
       this.sameResponses.set(similar.studentId!, response);
-      response.note = 0;
-      this.updateResponseRequest(response).subscribe(sr1 => {
-        response = sr1.body!;
-        this.blocked = false;
-      });
     }
   }
 
@@ -3421,12 +3448,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     console.log('My note', this.resp);
     for (let i = 0; i < nbStudents; i++) {
       if (this.currentStudent < i) {
-        let response = await this.getStudentResponse4WantedStudent(
+        let response = await this.getStudentResponse4EmptyStudent(
           this.questions!.map(q => q.id!),
           i,
         );
         console.log('Student', i + 1, 'Response:', response);
-        if (response.note === undefined) {
+        if (response === undefined) {
           this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
           return;
         }
