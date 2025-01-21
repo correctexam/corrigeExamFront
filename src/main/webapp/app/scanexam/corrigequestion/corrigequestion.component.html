@@ -479,6 +479,17 @@
                 >
                   <fa-icon icon="arrow-right"></fa-icon>
                 </button>
+                <button
+                  type="button"
+                  pripple
+                  class="p-2 border-round-sm p-ripple p-element p-paginator-next p-paginator-element p-link"
+                  [pTooltip]="'scanexam.gotoNextUncorrectedQuestion' | translate"
+                  [tooltipZIndex]="'3000'"
+                  (click)="passToNotGradedQuestion()"
+                >
+                  Prochaine question non corrigée
+                  <fa-icon icon="arrow-right"></fa-icon>
+                </button>
               </div>
             </div>
           </div>
