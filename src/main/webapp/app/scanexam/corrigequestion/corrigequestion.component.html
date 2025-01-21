@@ -913,6 +913,7 @@
                 *ngIf="
                   (currentQuestion?.typeAlgoName === 'QCM' || currentQuestion?.gradeType !== 'HYBRID') &&
                   resp?.id &&
+                  resp?.note &&
                   questions !== undefined &&
                   questions!.length > 0
                 "
@@ -923,12 +924,13 @@
                   currentQuestion?.typeAlgoName !== 'QCM' &&
                   currentQuestion?.gradeType === 'HYBRID' &&
                   resp?.id &&
+                  resp?.note &&
                   questions !== undefined &&
                   questions!.length > 0
                 "
                 ><b> {{ currentNote | number: '1.0-2' }} / {{ questions![0].point! }}</b></span
               >
-              <span *ngIf="!resp?.id" jhiTranslate="scanexam.noneval">non évalué</span>
+              <span *ngIf="!resp?.id || !resp?.note" jhiTranslate="scanexam.noneval">non évalué</span>
               <span
                 *ngIf="resp?.id"
                 class="float-end"

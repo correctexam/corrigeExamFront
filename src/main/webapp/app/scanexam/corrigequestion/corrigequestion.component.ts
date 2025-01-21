@@ -3428,11 +3428,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         console.log('Student', i + 1, 'Response:', response);
         if (response.note === undefined) {
           this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
-          response.note = 0;
-          this.updateResponseRequest(response).subscribe(sr1 => {
-            response = sr1.body!;
-            this.blocked = false;
-          });
           return;
         }
       }
