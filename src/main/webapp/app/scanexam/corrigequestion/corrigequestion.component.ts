@@ -3372,6 +3372,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
+  passToNotGradedQuestion() {}
+
+  // --------------------------------------------------------------------------------------------
+
   async updateSimilarGrade(studentId: number, newGrade: number) {
     if (this.blocked) return;
 
