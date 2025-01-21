@@ -518,6 +518,7 @@
     "confirmSelectedGrades": "Êtes-vous sûr de vouloir appliquer la note aux {{count}} copies sélectionnées ?",
     "confirmAllGrades": "Êtes-vous sûr de vouloir appliquer la note aux {{count}} copies similaires ?",
     "gradesAppliedSelected": "Notes appliquées aux copies sélectionnées",
-    "gradesAppliedAll": "Notes appliquées à toutes les copies similaires"
+    "gradesAppliedAll": "Notes appliquées à toutes les copies similaires",
+    "noUngradedResponses": "Toutes les copies ont été corrigé pour cette question"
   }
 }

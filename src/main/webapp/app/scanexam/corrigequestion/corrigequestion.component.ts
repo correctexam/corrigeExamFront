@@ -2161,6 +2161,43 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
+  async getStudentResponse4WantedStudent(questionsId: number[], currentStudent: number): Promise<StudentResponse> {
+    const _sheets = await firstValueFrom(
+      this.sheetService.query({
+        scanId: this.exam!.scanfileId,
+        pagemin: currentStudent * this.nbreFeuilleParCopie!,
+        pagemax: (currentStudent + 1) * this.nbreFeuilleParCopie! - 1,
+      }),
+    );
+    let sheet: IExamSheet | undefined;
+    if (_sheets.body !== null && _sheets.body.length > 0) {
+      sheet = _sheets.body[0];
+    }
+
+    if (sheet !== undefined) {
+      const _sr = (
+        await firstValueFrom(
+          this.studentResponseService.query({
+            sheetId: sheet!.id!,
+            questionsId: questionsId,
+          }),
+        )
+      ).body;
+      if (_sr !== null && _sr.length > 0) {
+        return _sr[0];
+      } else {
+        const st: IStudentResponse = {};
+        st.note = undefined;
+        st.questionId = this.questions![0].id;
+        st.sheetId = sheet!.id!;
+        const sr1 = await firstValueFrom(this.studentResponseService.create(st));
+        return sr1.body!;
+      }
+    } else {
+      throw new Error('No sheet for this page, should never happen');
+    }
+  }
+
   async getStudentResponse(questionsId: number[]): Promise<StudentResponse> {
     if (this.sheet !== undefined) {
       const _sr = (
@@ -3340,7 +3377,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   // Same starts, comments etc
   async sameGrade(similar: Prediction) {
     // let try1 = await this.getStudentResponse(this.questions!.map(q => q.id!));
-    let response = await this.getStudentResponse4CurrentStudent(
+    let response = await this.getStudentResponse4WantedStudent(
       this.questions!.map(q => q.id!),
       similar.studentId! - 1,
     );
@@ -3364,15 +3401,46 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   async getSameResponses() {
     for (const similar of this.similarPredictions) {
       // let try1 = await this.getStudentResponse(this.questions!.map(q => q.id!));
-      let response = await this.getStudentResponse4CurrentStudent(
+      let response = await this.getStudentResponse4WantedStudent(
         this.questions!.map(q => q.id!),
         similar.studentId! - 1,
       );
       this.sameResponses.set(similar.studentId!, response);
+      response.note = 0;
+      this.updateResponseRequest(response).subscribe(sr1 => {
+        response = sr1.body!;
+        this.blocked = false;
+      });
     }
   }
 
-  passToNotGradedQuestion() {}
+  async passToNotGradedQuestion() {
+    const nbStudents = this.numberPagesInScan! / this.nbreFeuilleParCopie!;
+    console.log('My note', this.resp);
+    for (let i = 0; i < nbStudents; i++) {
+      if (this.currentStudent < i) {
+        let response = await this.getStudentResponse4WantedStudent(
+          this.questions!.map(q => q.id!),
+          i,
+        );
+        console.log('Student', i + 1, 'Response:', response);
+        if (response.note === undefined) {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+          response.note = 0;
+          this.updateResponseRequest(response).subscribe(sr1 => {
+            response = sr1.body!;
+            this.blocked = false;
+          });
+          return;
+        }
+      }
+    }
+    // No ungraded responses were found
+    this.messageService.add({
+      severity: 'info',
+      summary: this.translateService.instant('scanexam.noUngradedResponses'),
+    });
+  }
 
   // --------------------------------------------------------------------------------------------
 
