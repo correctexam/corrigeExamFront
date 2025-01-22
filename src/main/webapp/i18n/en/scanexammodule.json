@@ -119,6 +119,7 @@
     "importstudent": "Import students",
     "importfollowingstudent": "Save student list",
     "importstudenttooltip": "Import the list of students you have just completed into your exam.",
+    "mdwtooltip": "Click to import a file produced by MDW. Will clear the current list.",
     "pegasetooltip": "Click to import a file produced by Pegase. Will clear the current list.",
     "confirm": "Confirm",
     "cancel": "Cancel",
