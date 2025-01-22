@@ -655,36 +655,22 @@
                           <div class="flex items-center gap-1 justify-center">
                             Note:
                             <div style="padding-left: 10px">
-                              <<<<<<< HEAD
-                              <input
-                                type="number"
-                                pInputText
-                                [ngModel]="getSimilarGrade(similar.studentId!)"
-                                (ngModelChange)="updateSimilarGrade(similar.studentId!, $event)"
-                                [style]="{ height: '30px', width: '70px', 'text-align': 'center' }"
-                                [disabled]="blocked"
-                                [step]="noteStep"
-                                [min]="0"
-                                [max]="maximumNote"
-                              />
-                              =======
                               <ng-container *ngIf="getSimilarGrade(similar.studentId!) !== undefined; else noGrade">
                                 <input
                                   type="number"
                                   pInputText
                                   [ngModel]="getSimilarGrade(similar.studentId!)"
-                                  (ngModelChange)="updateSimilarGrade(similar.studentId!, $event * 4)"
+                                  (ngModelChange)="updateSimilarGrade(similar.studentId!, $event)"
                                   [style]="{ height: '30px', width: '70px', 'text-align': 'center' }"
                                   [disabled]="blocked"
-                                  step="0.25"
-                                  min="0"
-                                  max="questions![0].point!"
+                                  [step]="noteStep"
+                                  [min]="0"
+                                  [max]="maximumNote"
                                 />
                               </ng-container>
                               <ng-template #noGrade>
                                 <span style="color: red">Pas de note disponible</span>
                               </ng-template>
-                              >>>>>>> e3533403fde9cf28695c6cdcaebb649adfe8ecb9
                             </div>
                           </div>
                         </div>
