@@ -3435,11 +3435,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   async getSameResponses() {
     for (const similar of this.similarPredictions) {
       // let try1 = await this.getStudentResponse(this.questions!.map(q => q.id!));
-      let response = await this.getStudentResponse4WantedStudent(
+      let response = await this.getStudentResponse4EmptyStudent(
         this.questions!.map(q => q.id!),
         similar.studentId! - 1,
       );
-      this.sameResponses.set(similar.studentId!, response);
+      this.sameResponses.set(similar.studentId!, response!);
     }
   }
 
@@ -3503,7 +3503,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // In corrigequestion.component.ts
   getSimilarGrade(studentId: number): number {
     return this.sameResponses.get(studentId!)?.note! / 4;
   }
