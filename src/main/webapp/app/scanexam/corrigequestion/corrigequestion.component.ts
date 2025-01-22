@@ -1609,12 +1609,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               (currentComment as any).checked = true;
               this.currentTextComment4Question?.push(signal(currentComment));
 
-              // Reset the selectedCommentIds for all similar responses
-              this.similarPredictions.forEach(similar => {
-                this.setSelectedCommentId(similar.studentId!, '');
-                this.addExistingSimilarComment(similar.studentId!, currentComment.id?.toString()!);
-              });
-
               this.testdisableAndEnableKeyBoardShortCut.set(false);
               this.populateDefaultShortCut();
               //     this.testdisableAndEnableKeyBoardShortCut.set(true);
@@ -3556,39 +3550,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     return this.sameResponses.get(studentId!)?.note!;
   }
 
-  editingCommentIndex: number = -1;
-  editingCommentText: string = '';
-
-  editSimilarComment(index: number, text: string) {
-    this.editingCommentIndex = index;
-    this.editingCommentText = text;
-  }
-
-  async saveSimilarComment(studentId: number, index: number) {
-    if (this.editingCommentText.trim()) {
-      const response = this.sameResponses.get(studentId);
-      if (response && response.textcomments) {
-        const commentToUpdate = response.textcomments[index];
-
-        const updatedComment: ITextComment = {
-          ...commentToUpdate,
-          text: this.editingCommentText,
-        };
-        await firstValueFrom(this.textCommentService.update(updatedComment));
-
-        response.textcomments[index] = updatedComment;
-        this.updateSimilarComment(studentId, response);
-
-        const commentInPanel = this.currentTextComment4Question?.find(c => c().id === commentToUpdate.id);
-        if (commentInPanel) {
-          commentInPanel().text = this.editingCommentText;
-        }
-      }
-    }
-    this.editingCommentIndex = -1;
-    this.editingCommentText = '';
-  }
-
   removedSimilarComment(studentId: number, index: number) {
     const response = this.sameResponses.get(studentId);
     if (response && response.textcomments) {
@@ -3596,39 +3557,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       response.textcomments.splice(index, 1);
       this.removeSimilarComment(studentId, commentToRemove);
     }
-  }
-
-  selectedCommentIds: Map<number, string> = new Map();
-
-  getSelectedCommentId(studentId: number): string {
-    return this.selectedCommentIds.get(studentId) || '';
-  }
-
-  setSelectedCommentId(studentId: number, value: string) {
-    this.selectedCommentIds.set(studentId, value);
-  }
-
-  async addExistingSimilarComment(studentId: number, commentId: string) {
-    if (!commentId) return;
-
-    const response = this.sameResponses.get(studentId);
-    if (!response) return;
-
-    const commentToAdd = this.currentTextComment4Question?.find(c => c().id?.toString() === commentId);
-    if (!commentToAdd) return;
-
-    if (!response.textcomments) {
-      response.textcomments = [];
-    }
-
-    const commentExists = response.textcomments.some(c => c.id?.toString() === commentId);
-    if (commentExists) {
-      return;
-    }
-
-    response.textcomments.push({ ...commentToAdd() });
-    await this.updateSimilarComment(studentId, response);
-    this.selectedCommentIds.set(studentId, '');
   }
 
   tryGetAllImages() {}

@@ -684,28 +684,10 @@
                                   *ngFor="let comment of sameResponses.get(similar.studentId!)?.textcomments; let i = index"
                                   class="flex flex-row items-center gap-2"
                                 >
-                                  <!-- Comment text with edit capability -->
-
-                                  <div class="flex-1 flex flex-row items-center">
-                                    <input
-                                      *ngIf="editingCommentIndex === i"
-                                      type="text"
-                                      [(ngModel)]="editingCommentText"
-                                      (blur)="saveSimilarComment(similar.studentId!, i)"
-                                      (keyup.enter)="saveSimilarComment(similar.studentId!, i)"
-                                      class="flex-1 p-1 border border-gray-300 rounded"
-                                    />
-                                    <span *ngIf="editingCommentIndex !== i">• {{ comment.text }}</span>
-                                  </div>
+                                  <span>• {{ comment.text }}</span>
 
                                   <!-- Action icons on the right -->
                                   <div class="flex gap-2" style="padding-left: 10px">
-                                    <fa-icon
-                                      *ngIf="editingCommentIndex !== i"
-                                      [icon]="['fas', 'edit']"
-                                      (click)="editSimilarComment(i, comment.text!)"
-                                      class="cursor-pointer"
-                                    ></fa-icon>
                                     <fa-icon
                                       [icon]="['fas', 'trash']"
                                       (click)="removedSimilarComment(similar.studentId!, i)"
@@ -713,34 +695,8 @@
                                     ></fa-icon>
                                   </div>
                                 </div>
-                                <div>
-                                  <div style="padding-top: 10px; padding-bottom: 10px">
-                                    <!-- Add existing comment section -->
-                                    <div class="flex items-center gap-2">
-                                      <select
-                                        [ngModel]="getSelectedCommentId(similar.studentId!)"
-                                        (ngModelChange)="setSelectedCommentId(similar.studentId!, $event)"
-                                        class="flex-1 p-1 border border-gray-300 rounded"
-                                      >
-                                        <option value="">Ajouter un commentaire</option>
-                                        <optgroup *ngIf="currentTextComment4Question" label="Commentaires">
-                                          <option *ngFor="let comment of currentTextComment4Question" [value]="comment().id">
-                                            {{ comment().text }}
-                                          </option>
-                                        </optgroup>
-                                      </select>
-                                      <button
-                                        pButton
-                                        (click)="addExistingSimilarComment(similar.studentId!, getSelectedCommentId(similar.studentId!))"
-                                        [disabled]="!getSelectedCommentId(similar.studentId!)"
-                                        class="p-2"
-                                      >
-                                        <fa-icon icon="plus"></fa-icon>
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
                               </div>
+                              <div></div>
                             </div>
                           </div>
                         </div>
