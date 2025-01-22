@@ -659,12 +659,12 @@
                                 type="number"
                                 pInputText
                                 [ngModel]="getSimilarGrade(similar.studentId!)"
-                                (ngModelChange)="updateSimilarGrade(similar.studentId!, $event * 4)"
+                                (ngModelChange)="updateSimilarGrade(similar.studentId!, $event)"
                                 [style]="{ height: '30px', width: '70px', 'text-align': 'center' }"
                                 [disabled]="blocked"
-                                step="0.25"
-                                min="0"
-                                max="questions![0].point!"
+                                [step]="noteStep"
+                                [min]="0"
+                                [max]="maximumNote"
                               />
                             </div>
                           </div>

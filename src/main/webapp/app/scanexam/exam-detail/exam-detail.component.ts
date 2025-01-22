@@ -293,7 +293,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
               if (this.showCorrection || this.showAssociation) {
                 this.imageAccessComponent.examId = this.examId;
                 console.log('Hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
-                await this.imageAccessComponent.loadImages(this.examId);
+                //await this.imageAccessComponent.loadImages(this.examId);
               }
 
               this.examService.getExamStatusFinish(+this.examId).then(res => {

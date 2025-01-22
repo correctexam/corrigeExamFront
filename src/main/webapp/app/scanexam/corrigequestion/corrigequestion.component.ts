@@ -310,6 +310,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   deleted: boolean = false;
 
   correctionAvailable = true;
+  maximumNote = 0;
+  noteStep = 0;
 
   constructor(
     public examService: ExamService,
@@ -468,6 +470,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             this.noteSteps = questions[0].point! * questions[0].step!;
             this.questionStep = questions[0].step!;
             this.maxNote = questions[0].point!;
+            this.maximumNote = this.maxNote;
+            this.noteStep = 1 / this.questionStep;
             this.currentQuestion = questions[0];
 
             /* Need to be verified
@@ -3505,7 +3509,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   // In corrigequestion.component.ts
   getSimilarGrade(studentId: number): number {
-    return this.sameResponses.get(studentId!)?.note! / 4;
+    return this.sameResponses.get(studentId!)?.note!;
   }
 
   editingCommentIndex: number = -1;
