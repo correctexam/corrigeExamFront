@@ -23,6 +23,12 @@ interface ExamPageImage {
   prediction?: string | undefined;
 }
 
+interface PredictionQueueItem {
+  image: ExamPageImage;
+  studentId: number;
+  questionId?: number;
+}
+
 @Injectable()
 @Component({
   selector: 'app-image-access',
@@ -41,6 +47,10 @@ export class ImageAccessComponent implements OnInit {
   manuscriptQuestions: IQuestion[] = [];
   nbreFeuilleParCopie = 0;
   numberPagesInScan = 0;
+
+  private predictionQueue: PredictionQueueItem[] = [];
+  private processingCount = 0;
+  private readonly MAX_CONCURRENT_PREDICTIONS = 1;
 
   constructor(
     private route: ActivatedRoute,
@@ -100,8 +110,12 @@ export class ImageAccessComponent implements OnInit {
 
       const totalStudents = Math.floor(this.numberPagesInScan / this.nbreFeuilleParCopie);
 
-      for (let studentIndex = 0; studentIndex < totalStudents; studentIndex++) {
-        for (const question of this.manuscriptQuestions) {
+      //Reset the queue each new time
+      this.predictionQueue = [];
+      this.processingCount = 0;
+
+      for (const question of this.manuscriptQuestions) {
+        for (let studentIndex = 0; studentIndex < totalStudents; studentIndex++) {
           const zone = question.zoneDTO as IZone;
           if (!zone) continue;
 
@@ -140,8 +154,15 @@ export class ImageAccessComponent implements OnInit {
 
               this.imageList.push(newImage);
 
-              // Get or create prediction
-              await this.handlePrediction(newImage, studentIndex + 1);
+              // Add to prediction queue
+              this.predictionQueue.push({
+                image: newImage,
+                studentId: studentIndex + 1,
+                questionId: question.id,
+              });
+
+              // // Get or create prediction
+              // await this.handlePrediction(newImage, studentIndex + 1);
             }
           } catch (error) {
             console.error(`Error processing question ${question.id} for student ${studentIndex + 1}:`, error);
@@ -149,11 +170,34 @@ export class ImageAccessComponent implements OnInit {
         }
       }
 
+      // Start processing the queue
+      await this.processQueue();
+
       this.loading = false;
     } catch (error) {
       console.error('Error:', error);
       this.error = 'Failed to load images';
       this.loading = false;
+    }
+  }
+
+  private async processQueue(): Promise<void> {
+    while (this.predictionQueue.length > 0 || this.processingCount > 0) {
+      while (this.processingCount < this.MAX_CONCURRENT_PREDICTIONS && this.predictionQueue.length > 0) {
+        const item = this.predictionQueue.shift();
+        if (item) {
+          this.processingCount++;
+          console.log('I handle prediction now');
+          this.handlePrediction(item.image, item.studentId).finally(() => {
+            this.processingCount--;
+            this.processQueue();
+          });
+        }
+      }
+      // Wait a bit before checking again if we can't process more items
+      if (this.processingCount >= this.MAX_CONCURRENT_PREDICTIONS) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
     }
   }
 
@@ -208,6 +252,7 @@ export class ImageAccessComponent implements OnInit {
       image.prediction = 'No prediction available';
     }
   }
+
   private async createPrediction(questionId: number, examId: string, studentId: number, imageData: string): Promise<number | undefined> {
     const predictionData: IPrediction = {
       studentId: studentId,
@@ -237,14 +282,14 @@ export class ImageAccessComponent implements OnInit {
     await firstValueFrom(this.predictionService.update(predictionData));
   }
 
-  private reviver(key: any, value: any): any {
-    if (typeof value === 'object' && value !== null) {
-      if (value.dataType === 'Map') {
-        return new Map(value.value);
-      }
-    }
-    return value;
-  }
+  // private reviver(key: any, value: any): any {
+  //   if (typeof value === 'object' && value !== null) {
+  //     if (value.dataType === 'Map') {
+  //       return new Map(value.value);
+  //     }
+  //   }
+  //   return value;
+  // }
 
   ngAfterViewInit() {
     this.canvases.changes.subscribe(() => {

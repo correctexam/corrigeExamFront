@@ -289,11 +289,10 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
               this.showCorrection =
                 this.sheets.length === this.numberPagesInScan / this.nbreFeuilleParCopie && this.showAssociation && this.showAlignement;
 
-              console.log('ShowCorrection2:', this.showCorrection);
               if (this.showCorrection || this.showAssociation) {
                 this.imageAccessComponent.examId = this.examId;
-                console.log('Hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
-                //await this.imageAccessComponent.loadImages(this.examId);
+                console.log('I start creating the predictions');
+                await this.imageAccessComponent.loadImages(this.examId);
               }
 
               this.examService.getExamStatusFinish(+this.examId).then(res => {
