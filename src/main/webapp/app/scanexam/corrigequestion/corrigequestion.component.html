@@ -602,107 +602,116 @@
                 </button>
               </div-->
 
-              <div *ngIf="this.currentQuestion?.typeAlgoName === 'manuscrit'">
-                <button
-                  type="button"
-                  class="btn"
-                  (click)="similarPrediction()"
-                  style="margin-top: 1rem; text-align: center; background-color: #007bff; color: white"
-                >
-                  <i class="fa fa-trash"></i> Recherche des Reponses Similaires
-                </button>
-              </div>
-
-              <div *ngIf="similarPredictions.length > 0">
-                <p style="font-weight: bold; margin-bottom: 15px; color: #666; font-size: 20px">Resultats Similaires</p>
-
-                <div class="flex flex-row gap-2 mb-3">
-                  <button pButton class="p-button-primary" (click)="changeSelectedSimilarGrades()" [disabled]="getSelectedCount() === 0">
-                    <i class="pi pi-check-circle mr-2"></i>
-                    Appliquer la note aux sélectionnés
-                  </button>
+              <div *ngIf="this.currentQuestion?.typeAlgoName === 'manuscrit'" class="w-full">
+                <div class="dropdown-container w-full">
+                  <!-- Bouton principal -->
                   <button
-                    pButton
-                    class="p-button-secondary"
-                    (click)="changeAllSimilarGrades()"
-                    [disabled]="similarPredictions.length === 0"
+                    type="button"
+                    class="btn btn-primary w-full flex justify-between items-center px-4 py-3 text-lg font-medium"
+                    (click)="similarPrediction()"
                   >
-                    <i class="pi pi-check-square mr-2"></i>
-                    Appliquer la note à tous
+                    <span>Afficher les réponses similaires</span>
+                    <i class="fa" [ngClass]="dropdownOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
                   </button>
-                </div>
 
-                <ul style="list-style: none; padding-left: 25px; position: relative">
-                  <li
-                    *ngFor="let similar of similarPredictions"
-                    [style.border]="selectedSimilars.get(similar) === 1 ? '5px solid green' : '1px solid #ccc'"
-                    style="margin-bottom: 10px; padding: 10px; position: relative"
-                  >
-                    <input
-                      type="checkbox"
-                      [checked]="selectedSimilars.get(similar) === 1"
-                      (change)="selectSimilarPrediction(similar)"
-                      style="position: absolute; left: -50px; top: 50%; width: 20px; height: 20px"
-                    />
+                  <!-- Contenu dropdown -->
+                  <div class="dropdown-content w-full mt-4 border border-gray-300 rounded-md shadow-lg" *ngIf="dropdownOpen">
+                    <p class="font-bold text-gray-700 text-xl px-4 py-3 border-b border-gray-300">Résultats Similaires</p>
 
-                    <div class="flex flex-col">
-                      <!-- Image section -->
-                      <img [src]="similar.imageData" alt="Prediction Image" [style]="{ height: '100px', width: '700px' }" />
+                    <!-- Boutons de contrôle -->
+                    <div class="flex flex-row gap-2 mb-3 px-4 py-3">
+                      <button
+                        pButton
+                        class="p-button-primary"
+                        (click)="changeSelectedSimilarGrades()"
+                        [disabled]="getSelectedCount() === 0"
+                      >
+                        <i class="pi pi-check-circle mr-2"></i>
+                        Appliquer la note aux sélectionnés
+                      </button>
+                      <button
+                        pButton
+                        class="p-button-secondary"
+                        (click)="changeAllSimilarGrades()"
+                        [disabled]="similarPredictions.length === 0"
+                      >
+                        <i class="pi pi-check-square mr-2"></i>
+                        Appliquer la note à tous
+                      </button>
+                    </div>
 
-                      <div style="padding-left: 50px; padding-right: 30px">
-                        <div class="flex flex-col gap-2">
-                          <!-- Note section with smaller buttons -->
-                          <div class="flex items-center gap-1 justify-center">
-                            Note:
-                            <div style="padding-left: 10px">
-                              <ng-container *ngIf="getSimilarGrade(similar.studentId!) !== undefined; else noGrade">
-                                <input
-                                  type="number"
-                                  pInputText
-                                  [ngModel]="getSimilarGrade(similar.studentId!)"
-                                  (ngModelChange)="updateSimilarGrade(similar.studentId!, $event)"
-                                  [style]="{ height: '30px', width: '70px', 'text-align': 'center' }"
-                                  [disabled]="blocked"
-                                  [step]="noteStep"
-                                  [min]="0"
-                                  [max]="maximumNote"
-                                />
-                              </ng-container>
-                              <ng-template #noGrade>
-                                <span style="color: red">Pas de note disponible</span>
-                              </ng-template>
-                            </div>
+                    <!-- Liste des prédictions similaires -->
+                    <ul class="list-none p-0 space-y-4">
+                      <li
+                        *ngFor="let similar of similarPredictions"
+                        [style.border]="selectedSimilars.get(similar) === 1 ? '5px solid green' : '1px solid #ccc'"
+                        class="p-4 rounded-md hover:bg-gray-100 transition-colors duration-200"
+                      >
+                        <div class="flex items-start gap-4">
+                          <!-- Colonne 1 : Checkbox et Image -->
+                          <div class="flex flex-col items-center">
+                            <input
+                              type="checkbox"
+                              [checked]="selectedSimilars.get(similar) === 1"
+                              (change)="selectSimilarPrediction(similar)"
+                              class="w-14 h-14 mr-4"
+                            />
+                            <img
+                              [src]="similar.imageData"
+                              alt="Prediction Image"
+                              class="object-cover rounded"
+                              style="width: 1000px; height: auto"
+                            />
                           </div>
-                        </div>
-                        <div>
-                          <!-- Comments section below -->
-                          <div *ngIf="sameResponses.get(similar.studentId!)?.textcomments?.length" style="padding-top: 10px">
-                            Commentaires:
-                            <div class="flex flex-col gap-1">
-                              <div>
-                                <div
-                                  *ngFor="let comment of sameResponses.get(similar.studentId!)?.textcomments; let i = index"
-                                  class="flex flex-row items-center gap-2"
-                                >
-                                  <span>• {{ comment.text }}</span>
 
-                                  <!-- Action icons on the right -->
-                                  <div class="flex gap-2" style="padding-left: 10px">
-                                    <fa-icon
-                                      [icon]="['fas', 'trash']"
-                                      (click)="removedSimilarComment(similar.studentId!, i)"
-                                      class="cursor-pointer"
-                                    ></fa-icon>
+                          <!-- Colonne 2 : Note et Commentaires -->
+                          <div class="flex-1 flex flex-col gap-4">
+                            <!-- Note -->
+                            <div class="flex items-center gap-2">
+                              <span class="text-sm font-medium text-gray-600">Note :</span>
+                              <input
+                                type="number"
+                                pInputText
+                                [ngModel]="getSimilarGrade(similar.studentId!)"
+                                (ngModelChange)="updateSimilarGrade(similar.studentId!, $event * 4)"
+                                class="text-center border border-gray-300 rounded"
+                                [disabled]="blocked"
+                                step="0.25"
+                                min="0"
+                                max="questions![0].point!"
+                                style="width: 75px; height: 40px"
+                              />
+                            </div>
+
+                            <!-- Comments section below -->
+                            <div *ngIf="sameResponses.get(similar.studentId!)?.textcomments?.length" style="padding-top: 10px">
+                              Commentaires:
+                              <div class="flex flex-col gap-1">
+                                <div>
+                                  <div
+                                    *ngFor="let comment of sameResponses.get(similar.studentId!)?.textcomments; let i = index"
+                                    class="flex flex-row items-center gap-2"
+                                  >
+                                    <span>• {{ comment.text }}</span>
+
+                                    <!-- Action icons on the right -->
+                                    <div class="flex gap-2" style="padding-left: 10px">
+                                      <fa-icon
+                                        [icon]="['fas', 'trash']"
+                                        (click)="removedSimilarComment(similar.studentId!, i)"
+                                        class="cursor-pointer"
+                                      ></fa-icon>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </div>
 
               <div *ngIf="similarPredictions.length === 0 && similarPredictionsSearched">

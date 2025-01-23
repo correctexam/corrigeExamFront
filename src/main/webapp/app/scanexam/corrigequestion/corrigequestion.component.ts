@@ -308,7 +308,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   currentPrediction: IPrediction | null = null;
   questionId: number | undefined = -1;
   deleted: boolean = false;
-
+  dropdownOpen: boolean = false;
   correctionAvailable = true;
   maximumNote = 0;
   noteStep = 0;
@@ -352,6 +352,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.dropdownOpen = false;
     this.windowWidth = window.innerWidth;
     this.shortcut = this.preferenceService.showKeyboardShortcuts();
     this.shortcutvalue = this.preferenceService.showKeyboardShortcuts();
@@ -1713,6 +1714,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.cleanCanvassCache();
 
       const m = this.preferenceService.getRandomOrderForExam(+this.examId!);
+      this.dropdownOpen = false;
       if (m.size > 0) {
         const orderForCurrentQuestion = m.get(this.questionindex! + 1)!;
         const currentIndex = orderForCurrentQuestion.indexOf(this.currentStudent + 1);
@@ -1762,6 +1764,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
       //      event.preventDefault();
       const m = this.preferenceService.getRandomOrderForExam(+this.examId!);
+      this.dropdownOpen = false;
       if (m.size > 0) {
         const orderForCurrentQuestion = m.get(this.questionindex! + 1)!;
         const currentIndex = orderForCurrentQuestion.indexOf(this.currentStudent + 1);
@@ -1862,6 +1865,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     if (!this.init) {
       this.cleanCanvassCache();
       const m = this.preferenceService.getRandomOrderForExam(+this.examId!);
+      this.dropdownOpen = false;
       if (m.size === 0) {
         this.currentStudentPaginator = $event.page;
         this.currentStudent = $event.page;
@@ -3287,6 +3291,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   similarPredictionsSearched = false;
   async similarPrediction() {
     this.similarPredictions = [];
+    this.dropdownOpen = !this.dropdownOpen;
     try {
       console.log('I am trying to load similar prediction');
       const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionId }));
