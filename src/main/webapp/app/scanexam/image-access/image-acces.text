@@ -51,10 +51,6 @@ export class ImageAccessComponent implements OnInit {
   private predictionQueue: PredictionQueueItem[] = [];
   private processingCount = 0;
   private readonly MAX_CONCURRENT_PREDICTIONS = 1;
-  private readonly CHUNK_SIZE = 5; // Process 5 items at a time
-  private readonly CHUNK_DELAY = 2000; // 2 second delay between chunks
-  private readonly PREDICTION_DELAY = 1000; // 1 second between predictions
-  private processingChunk = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -186,122 +182,74 @@ export class ImageAccessComponent implements OnInit {
   }
 
   private async processQueue(): Promise<void> {
-    if (this.processingChunk) {
-      return; // Prevent multiple concurrent chunk processing
-    }
-
-    try {
-      this.processingChunk = true;
-
-      while (this.predictionQueue.length > 0) {
-        // Take only CHUNK_SIZE items
-        const currentChunk = this.predictionQueue.splice(0, this.CHUNK_SIZE);
-        console.log(`Processing chunk of ${currentChunk.length} items. Remaining: ${this.predictionQueue.length}`);
-
-        // Process items in chunk sequentially with delays
-        for (const item of currentChunk) {
-          try {
-            await this.handlePrediction(item.image, item.studentId);
-            // Force garbage collection opportunity
-            await new Promise(resolve => setTimeout(resolve, this.PREDICTION_DELAY));
-          } catch (error) {
-            console.error('Error processing prediction:', error);
-          }
-        }
-
-        // Clear any references
-        currentChunk.length = 0;
-
-        // Longer delay between chunks
-        await new Promise(resolve => setTimeout(resolve, this.CHUNK_DELAY));
-
-        // Force garbage collection opportunity
-        if (this.predictionQueue.length % 20 === 0) {
-          this.imageList = this.imageList.filter(img => img.prediction !== undefined);
+    while (this.predictionQueue.length > 0 || this.processingCount > 0) {
+      while (this.processingCount < this.MAX_CONCURRENT_PREDICTIONS && this.predictionQueue.length > 0) {
+        const item = this.predictionQueue.shift();
+        if (item) {
+          this.processingCount++;
+          console.log('I handle prediction now');
+          this.handlePrediction(item.image, item.studentId).finally(() => {
+            this.processingCount--;
+            this.processQueue();
+          });
         }
       }
-    } finally {
-      this.processingChunk = false;
+      // Wait a bit before checking again if we can't process more items
+      if (this.processingCount >= this.MAX_CONCURRENT_PREDICTIONS) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
     }
   }
 
   private async handlePrediction(image: ExamPageImage, studentId: number) {
-    let canvas: HTMLCanvasElement | null = null;
-    let ctx: CanvasRenderingContext2D | null = null;
-    let base64Image: string | null = null;
-
     try {
-      // Check existing prediction first
-      const predictionResponse = await firstValueFrom(
-        this.predictionService.query({
-          questionId: image.questionId,
-          studentId: studentId,
-        }),
-      );
-
-      if (predictionResponse.body?.length) {
-        image.prediction = predictionResponse.body[0].text || '';
-        return;
-      }
-
-      // Create canvas and convert image
-      canvas = document.createElement('canvas');
+      const canvas = document.createElement('canvas');
       canvas.width = image.width;
       canvas.height = image.height;
-      ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext('2d');
+      ctx?.putImageData(image.imageData, 0, 0);
+      const base64Image = canvas.toDataURL();
 
-      if (!ctx) throw new Error('Failed to get canvas context');
+      // Query predictions for this question
+      const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: image.questionId }));
 
-      ctx.putImageData(image.imageData, 0, 0);
-      base64Image = canvas.toDataURL();
+      // Find prediction specific to this student
+      const studentPrediction = predictionResponse.body?.find(pred => pred.studentId === studentId);
 
-      // Clear canvas memory
-      canvas.width = 0;
-      canvas.height = 0;
+      if (studentPrediction) {
+        image.prediction = studentPrediction.text || '';
+      } else {
+        // Create new prediction
+        const predictionId = await this.createPrediction(image.questionId!, this.examId!, studentId, base64Image);
 
-      // Create initial prediction
-      const predictionId = await this.createPrediction(image.questionId!, this.examId!, studentId, base64Image);
+        if (predictionId) {
+          // First use CoupageDimageService
+          const coupageResponse = await firstValueFrom(this.coupageDimageService.runScript(base64Image));
+          let prediction = '';
 
-      if (!predictionId) {
-        throw new Error('Failed to create prediction');
-      }
+          // Process each refined line
+          if (coupageResponse.refinedLines) {
+            for (const refinedLine of coupageResponse.refinedLines) {
+              const base64Line = `data:image/png;base64,${refinedLine}`;
+              const lineResult = await this.mltcomponent.executeMLT(base64Line);
+              if (lineResult) {
+                prediction += lineResult + '\n';
+              }
+            }
+          }
 
-      // Process with coupage service
-      const coupageResponse = await firstValueFrom(this.coupageDimageService.runScript(base64Image));
-
-      // Clear base64 image
-      base64Image = null;
-
-      let prediction = '';
-
-      // Process lines sequentially to avoid memory spikes
-      if (coupageResponse.refinedLines) {
-        for (const refinedLine of coupageResponse.refinedLines) {
-          const lineResult = await this.mltcomponent.executeMLT(`data:image/png;base64,${refinedLine}`);
-          if (lineResult) {
-            prediction += lineResult + '\n';
+          // Store and set prediction if we got any results
+          if (prediction) {
+            await this.storePrediction(prediction.trim(), image.questionId!, this.examId!, studentId, predictionId);
+            image.prediction = prediction.trim();
+          } else {
+            image.prediction = 'No prediction available';
           }
         }
       }
-
-      if (prediction) {
-        await this.storePrediction(prediction.trim(), image.questionId!, this.examId!, studentId, predictionId);
-        image.prediction = prediction.trim();
-      } else {
-        image.prediction = 'No prediction available';
-      }
     } catch (error) {
-      console.error('Error in handlePrediction:', error);
+      console.error('Error handling prediction:', error);
       image.prediction = 'No prediction available';
-    } finally {
-      // Cleanup
-      if (canvas) {
-        canvas.width = 0;
-        canvas.height = 0;
-      }
-      canvas = null;
-      ctx = null;
-      base64Image = null;
     }
   }
 
