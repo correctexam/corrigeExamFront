@@ -677,20 +677,27 @@
                           <div class="flex-1 flex flex-col gap-4">
                             <!-- Note -->
                             <div class="flex items-center gap-2">
-                              <span class="text-sm font-medium text-gray-600">Note :</span>
-                              <input
-                                type="number"
-                                pInputText
-                                [ngModel]="getSimilarGrade(similar.studentId!) * noteStep"
-                                (ngModelChange)="updateSimilarGrade(similar.studentId!, $event / noteStep)"
-                                class="text-center border border-gray-300 rounded"
-                                [disabled]="blocked"
-                                [step]="noteStep"
-                                [min]="0"
-                                [max]="maximumNote"
-                                [style]="{ width: '75px', height: '40px' }"
-                              />
+                              <ng-container *ngIf="getSimilarGrade(similar.studentId!) !== undefined; else noGrade">
+                                <span class="text-sm font-medium text-gray-600">Note :</span>
+                                <input
+                                  type="number"
+                                  pInputText
+                                  [ngModel]="getSimilarGrade(similar.studentId!) * noteStep"
+                                  (ngModelChange)="updateSimilarGrade(similar.studentId!, $event / noteStep)"
+                                  class="text-center border border-gray-300 rounded"
+                                  [disabled]="blocked"
+                                  [step]="noteStep"
+                                  [min]="0"
+                                  [max]="maximumNote"
+                                  [style]="{ width: '75px', height: '40px' }"
+                                />
+                              </ng-container>
                             </div>
+                            <ng-template #noGrade>
+                              <div class="no-grade-container">
+                                <span class="no-grade-message">⚠️ Pas de note disponible</span>
+                              </div>
+                            </ng-template>
 
                             <!-- Comments section below -->
                             <div *ngIf="sameResponses.get(similar.studentId!)?.textcomments?.length" style="padding-top: 10px">
