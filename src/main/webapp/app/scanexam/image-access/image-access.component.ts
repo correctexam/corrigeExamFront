@@ -199,7 +199,6 @@ export class ImageAccessComponent implements OnInit {
             console.error('Error in prediction:', error);
           } finally {
             this.processingCount--;
-            // Add delay between predictions
             (item.image as any) = null;
             await new Promise(resolve => setTimeout(resolve, this.THROTTLE_DELAY));
             this.processQueue();
@@ -227,6 +226,11 @@ export class ImageAccessComponent implements OnInit {
       ctx?.putImageData(image.imageData, 0, 0);
       const base64Image = canvas.toDataURL();
 
+      // Clear canvas reference
+      canvas.width = 0;
+      canvas.height = 0;
+      (ctx as any) = null;
+
       // Query predictions for this question
       const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: image.questionId }));
 
@@ -253,6 +257,8 @@ export class ImageAccessComponent implements OnInit {
                 prediction += lineResult + '\n';
               }
             }
+            // Clear refined lines after processing
+            coupageResponse.refinedLines = [];
           }
 
           // Store and set prediction if we got any results
@@ -263,6 +269,11 @@ export class ImageAccessComponent implements OnInit {
             image.prediction = 'No prediction available';
           }
         }
+      }
+      // Clear large data after processing
+      if (image.imageData) {
+        // @ts-ignore
+        image.imageData = null;
       }
     } catch (error) {
       console.error('Error handling prediction:', error);
