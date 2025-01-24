@@ -673,13 +673,13 @@
                                 type="number"
                                 pInputText
                                 [ngModel]="getSimilarGrade(similar.studentId!)"
-                                (ngModelChange)="updateSimilarGrade(similar.studentId!, $event * 4)"
+                                (ngModelChange)="updateSimilarGrade(similar.studentId!, $event)"
                                 class="text-center border border-gray-300 rounded"
                                 [disabled]="blocked"
-                                step="0.25"
-                                min="0"
-                                max="questions![0].point!"
-                                style="width: 75px; height: 40px"
+                                [step]="noteStep"
+                                [min]="0"
+                                [max]="maximumNote"
+                                [style]="{ width: '75px', height: '40px' }"
                               />
                             </div>
 
