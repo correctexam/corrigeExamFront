@@ -17,3 +17,26 @@ disabled-div {
   opacity: 0.5;
   pointer-events: none;
 }
+.fa-bounce-slow {
+  animation: bounce 10s infinite;
+}
+
+@keyframes bounce {
+  0%,
+  90%,
+  100% {
+    transform: translateY(0);
+  }
+  92% {
+    transform: translateY(-10px);
+  }
+  94% {
+    transform: translateY(-5px);
+  }
+  96% {
+    transform: translateY(-10px);
+  }
+  98% {
+    transform: translateY(-5px);
+  }
+}

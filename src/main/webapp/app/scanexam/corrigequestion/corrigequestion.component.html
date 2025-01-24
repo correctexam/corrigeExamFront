@@ -611,7 +611,11 @@
                     (click)="similarPrediction()"
                   >
                     <span>Afficher les réponses similaires</span>
-                    <i class="fa" [ngClass]="dropdownOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    <fa-icon
+                      [icon]="dropdownOpen ? 'chevron-up' : 'chevron-down'"
+                      class="fa-bounce-slow ml-2"
+                      style="color: #deddda"
+                    ></fa-icon>
                   </button>
 
                   <!-- Contenu dropdown -->
