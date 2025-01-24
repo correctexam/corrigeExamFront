@@ -672,8 +672,8 @@
                               <input
                                 type="number"
                                 pInputText
-                                [ngModel]="getSimilarGrade(similar.studentId!)"
-                                (ngModelChange)="updateSimilarGrade(similar.studentId!, $event)"
+                                [ngModel]="getSimilarGrade(similar.studentId!) * noteStep"
+                                (ngModelChange)="updateSimilarGrade(similar.studentId!, $event / noteStep)"
                                 class="text-center border border-gray-300 rounded"
                                 [disabled]="blocked"
                                 [step]="noteStep"
