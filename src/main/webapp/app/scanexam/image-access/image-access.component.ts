@@ -200,6 +200,7 @@ export class ImageAccessComponent implements OnInit {
           } finally {
             this.processingCount--;
             // Add delay between predictions
+            (item.image as any) = null;
             await new Promise(resolve => setTimeout(resolve, this.THROTTLE_DELAY));
             this.processQueue();
           }
@@ -211,6 +212,10 @@ export class ImageAccessComponent implements OnInit {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
+
+    // Final cleanup
+    this.predictionQueue = [];
+    global.gc && global.gc();
   }
 
   private async handlePrediction(image: ExamPageImage, studentId: number) {
