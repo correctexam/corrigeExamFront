@@ -573,7 +573,7 @@
           </div>
         </div>
         <div style="padding: 1rem" class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
-          <div class="card">
+          <div class="none">
             <div class="card-body" style="display: flex; flex-direction: column; align-items: center">
               <div class="col-2 p-0" *ngIf="!focusView">
                 <div *ngIf="currentQuestion?.typeAlgoName === 'manuscrit' && !currentPrediction">
@@ -620,6 +620,7 @@
 
                   <!-- Contenu dropdown -->
                   <div
+                    style="border-radius: 8px; height: fit-content"
                     class="dropdown-content w-full mt-4 border border-gray-300 rounded-md shadow-lg"
                     *ngIf="dropdownOpen && similarPredictions.length != 0"
                   >
