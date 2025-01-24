@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { IPrediction } from '../prediction.model';
 import { HttpResponse } from '@angular/common/http'; // Import HttpResponse
 import { NgIf, NgFor } from '@angular/common';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-prediction-list',
@@ -52,6 +53,37 @@ export class PredictionListComponent implements OnInit {
         error: err => {
           console.error(`Error deleting prediction with id ${id}:`, err);
           alert(`Failed to delete prediction with id ${id}. Please try again.`);
+        },
+      });
+    }
+  }
+
+  deleteByExam(examId: string): void {
+    const numericExamId = parseInt(examId, 10);
+    if (!numericExamId) {
+      alert('Please enter a valid exam ID');
+      return;
+    }
+
+    const predictionsToDelete = this.predictions.filter(p => p.examId && parseInt(p.examId, 10) === numericExamId);
+
+    if (predictionsToDelete.length === 0) {
+      alert(`No predictions found for exam ${numericExamId}`);
+      return;
+    }
+
+    if (confirm(`Are you sure you want to delete all ${predictionsToDelete.length} predictions for exam ${numericExamId}?`)) {
+      const deleteObservables = predictionsToDelete.filter(p => p.id !== undefined).map(p => this.predictionService.delete(p.id!));
+
+      forkJoin(deleteObservables).subscribe({
+        next: () => {
+          this.loadAll();
+          alert(`Successfully deleted ${predictionsToDelete.length} predictions for exam ${numericExamId}`);
+        },
+        error: err => {
+          console.error(`Error deleting predictions for exam ${numericExamId}:`, err);
+          alert(`Failed to delete some or all predictions for exam ${numericExamId}. Please try again.`);
+          this.loadAll();
         },
       });
     }

@@ -181,7 +181,7 @@ export class ImageAccessComponent implements OnInit {
     }
   }
 
-  private readonly THROTTLE_DELAY = 1000; // Delay between predictions
+  private readonly THROTTLE_DELAY = 200; // Delay between predictions
 
   private async processQueue(): Promise<void> {
     while (this.predictionQueue.length > 0 || this.processingCount > 0) {

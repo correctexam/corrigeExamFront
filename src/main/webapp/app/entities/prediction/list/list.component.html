@@ -1,5 +1,11 @@
 <div class="entity-list">
   <h2>Prediction List</h2>
+  <div class="mb-3">
+    <input #examId type="number" class="form-control w-25 d-inline me-2" placeholder="Enter Exam ID" />
+    <button type="button" class="btn btn-danger" (click)="deleteByExam(examId.value)">
+      <i class="fa fa-trash"></i> Delete All Predictions for Exam
+    </button>
+  </div>
   <table class="table table-striped">
     <thead>
       <tr>
