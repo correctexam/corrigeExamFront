@@ -12,7 +12,7 @@ import { PredictionService } from 'app/entities/prediction/service/prediction.se
 import { IPrediction } from 'app/entities/prediction/prediction.model';
 import { MltComponent } from '../mlt/mlt.component';
 import { CoupageDimageService } from '../mlt/coupage-dimage.service';
-import { CorrigequestionComponent } from '../corrigequestion/corrigequestion.component';
+import { QueueCoordinationService } from './queue-coordination.service';
 
 interface ExamPageImage {
   pageNumber: number;
@@ -52,6 +52,7 @@ export class ImageAccessComponent implements OnInit {
   private predictionQueue: PredictionQueueItem[] = [];
   private processingCount = 0;
   private readonly MAX_CONCURRENT_PREDICTIONS = 1;
+  private externalProcessing = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -62,8 +63,10 @@ export class ImageAccessComponent implements OnInit {
     private predictionService: PredictionService,
     private mltcomponent: MltComponent,
     private coupageDimageService: CoupageDimageService,
-    private corrigequestionComponent: CorrigequestionComponent,
-  ) {}
+    private queueService: QueueCoordinationService,
+  ) {
+    this.queueService.externalProcessing$.subscribe(isPaused => (this.externalProcessing = isPaused));
+  }
 
   async ngOnInit() {
     this.route.params.subscribe(async params => {
@@ -182,6 +185,14 @@ export class ImageAccessComponent implements OnInit {
 
   private async processQueue(): Promise<void> {
     while (this.predictionQueue.length > 0 || this.processingCount > 0) {
+      const isProcessing = await firstValueFrom(this.queueService.externalProcessing$);
+
+      if (isProcessing) {
+        console.log(`Queue paused at ${new Date().toISOString()} - ${this.predictionQueue.length} items waiting`);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        continue;
+      }
+
       while (this.processingCount < this.MAX_CONCURRENT_PREDICTIONS && this.predictionQueue.length > 0) {
         const item = this.predictionQueue.shift();
         if (item) {

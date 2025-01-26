@@ -111,6 +111,7 @@ import { CoupageDimageService } from '../mlt/coupage-dimage.service';
 
 import Fuse from 'fuse.js';
 import { CheckboxModule } from 'primeng/checkbox';
+import { QueueCoordinationService } from '../image-access/queue-coordination.service';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -312,7 +313,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   correctionAvailable = true;
   maximumNote = 0;
   noteStep = 0;
-  queuewait = false;
 
   constructor(
     public examService: ExamService,
@@ -346,6 +346,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     private http: HttpClient,
     private mltcomponent: MltComponent,
     private coupageDimageService: CoupageDimageService,
+    private queueService: QueueCoordinationService,
   ) {
     effect(() => {
       this.testdisableAndEnableKeyBoardShortCutSignal = this.testdisableAndEnableKeyBoardShortCut();
@@ -3236,9 +3237,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   // Méthode pour exécuter le script
   async executeScript(): Promise<void> {
-    this.queuewait = true;
     this.deleted = false;
     if (this.currentQuestion?.typeAlgoName === 'manuscrit') {
+      console.log('Before pause');
+      this.queueService.pauseQueue();
       this.changeDetector.detectChanges();
       const imageData = this.getImageFromCanvas();
 
@@ -3276,7 +3278,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
             // Now store the prediction with the actual ID
             this.storePrediction(prediction, question_id, exam_id, student_id, question_number, prediction_id);
-
+            console.log('Before resume');
+            this.queueService.resumeQueue();
             // Update the output for display
             this.output = prediction;
             this.error = '';
@@ -3287,7 +3290,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
-    this.queuewait = false;
   }
 
   similarPredictions: Prediction[] = [];
