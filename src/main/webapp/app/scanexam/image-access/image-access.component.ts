@@ -12,6 +12,7 @@ import { PredictionService } from 'app/entities/prediction/service/prediction.se
 import { IPrediction } from 'app/entities/prediction/prediction.model';
 import { MltComponent } from '../mlt/mlt.component';
 import { CoupageDimageService } from '../mlt/coupage-dimage.service';
+import { QueueCoordinationService } from './queue-coordination.service';
 
 interface ExamPageImage {
   pageNumber: number;
@@ -51,6 +52,7 @@ export class ImageAccessComponent implements OnInit {
   private predictionQueue: PredictionQueueItem[] = [];
   private processingCount = 0;
   private readonly MAX_CONCURRENT_PREDICTIONS = 1;
+  private externalProcessing = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -61,7 +63,10 @@ export class ImageAccessComponent implements OnInit {
     private predictionService: PredictionService,
     private mltcomponent: MltComponent,
     private coupageDimageService: CoupageDimageService,
-  ) {}
+    private queueService: QueueCoordinationService,
+  ) {
+    this.queueService.externalProcessing$.subscribe(isPaused => (this.externalProcessing = isPaused));
+  }
 
   async ngOnInit() {
     this.route.params.subscribe(async params => {
@@ -75,19 +80,14 @@ export class ImageAccessComponent implements OnInit {
 
   async loadManuscriptQuestions() {
     try {
-      // Get all questions for this exam
       const response = await firstValueFrom(this.questionService.query({ examId: +this.examId! }));
-
-      // Filter only manuscript questions
-      this.manuscriptQuestions = response.body?.filter(q => q.typeAlgoName === 'manuscrit') || [];
-
+      this.manuscriptQuestions = response.body?.filter(q => q.typeAlgoName === 'manuscrit').sort((a, b) => a.numero! - b.numero!) || [];
       console.log('Found manuscript questions:', this.manuscriptQuestions);
     } catch (error) {
       console.error('Error loading manuscript questions:', error);
       this.error = 'Failed to load questions';
     }
   }
-
   async loadImages(exam_id: string) {
     try {
       this.loading = true;
@@ -185,6 +185,14 @@ export class ImageAccessComponent implements OnInit {
 
   private async processQueue(): Promise<void> {
     while (this.predictionQueue.length > 0 || this.processingCount > 0) {
+      const isProcessing = await firstValueFrom(this.queueService.externalProcessing$);
+
+      if (isProcessing) {
+        console.log(`Queue paused at ${new Date().toISOString()} - ${this.predictionQueue.length} items waiting`);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        continue;
+      }
+
       while (this.processingCount < this.MAX_CONCURRENT_PREDICTIONS && this.predictionQueue.length > 0) {
         const item = this.predictionQueue.shift();
         if (item) {
@@ -222,7 +230,7 @@ export class ImageAccessComponent implements OnInit {
       const canvas = document.createElement('canvas');
       canvas.width = image.width;
       canvas.height = image.height;
-      const ctx = canvas.getContext('2d');
+      let ctx = canvas.getContext('2d');
       ctx?.putImageData(image.imageData, 0, 0);
       const base64Image = canvas.toDataURL();
 
