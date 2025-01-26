@@ -4,11 +4,6 @@
     <p>Loading images... Please wait.</p>
   </div>
 
-  <!--div *ngIf="error" class="error-container">
-    <p>{{ error }}</p>
-    <button (click)="loadImages()" class="retry-button">Retry</button>
-  </div-->
-
   <div *ngIf="!loading && !error" class="images-container">
     <!-- Iterate through students -->
     <div *ngFor="let studentIndex of getUniqueStudents()" class="student-section">

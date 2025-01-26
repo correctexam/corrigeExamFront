@@ -519,6 +519,9 @@
     "confirmAllGrades": "Êtes-vous sûr de vouloir appliquer la note aux {{count}} copies similaires ?",
     "gradesAppliedSelected": "Notes appliquées aux copies sélectionnées",
     "gradesAppliedAll": "Notes appliquées à toutes les copies similaires",
-    "noUngradedResponses": "Toutes les copies ont été corrigé pour cette question"
+    "noUngradedResponses": "Toutes les copies ont été corrigé pour cette question",
+    "executeMLT": "Executer MLT",
+    "searchwithword": "Rechercher par mot",
+    "searchwithquestion": "Rechercher par question"
   }
 }

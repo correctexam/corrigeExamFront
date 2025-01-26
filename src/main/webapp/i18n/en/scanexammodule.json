@@ -510,6 +510,9 @@
     "handwritingrecognition": "Handwriting recognition",
     "examanswerresearch": "Search answers",
     "examanswerresearchdetail": "Allows you to search for answers across all copies",
-    "gotoNextUncorrectedQuestion": "Go to the next question that has not yet been corrected"
+    "gotoNextUncorrectedQuestion": "Go to the next question that has not yet been corrected",
+    "executeMLT": "Execute MLT",
+    "searchwithword": "Search with word",
+    "searchwithquestion": "Search with question"
   }
 }
