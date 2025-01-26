@@ -312,6 +312,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   correctionAvailable = true;
   maximumNote = 0;
   noteStep = 0;
+  queuewait = false;
 
   constructor(
     public examService: ExamService,
@@ -3235,6 +3236,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   // Méthode pour exécuter le script
   async executeScript(): Promise<void> {
+    this.queuewait = true;
     this.deleted = false;
     if (this.currentQuestion?.typeAlgoName === 'manuscrit') {
       this.changeDetector.detectChanges();
@@ -3285,6 +3287,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
+    this.queuewait = false;
   }
 
   similarPredictions: Prediction[] = [];

@@ -12,6 +12,7 @@ import { PredictionService } from 'app/entities/prediction/service/prediction.se
 import { IPrediction } from 'app/entities/prediction/prediction.model';
 import { MltComponent } from '../mlt/mlt.component';
 import { CoupageDimageService } from '../mlt/coupage-dimage.service';
+import { CorrigequestionComponent } from '../corrigequestion/corrigequestion.component';
 
 interface ExamPageImage {
   pageNumber: number;
@@ -61,6 +62,7 @@ export class ImageAccessComponent implements OnInit {
     private predictionService: PredictionService,
     private mltcomponent: MltComponent,
     private coupageDimageService: CoupageDimageService,
+    private corrigequestionComponent: CorrigequestionComponent,
   ) {}
 
   async ngOnInit() {
@@ -75,19 +77,14 @@ export class ImageAccessComponent implements OnInit {
 
   async loadManuscriptQuestions() {
     try {
-      // Get all questions for this exam
       const response = await firstValueFrom(this.questionService.query({ examId: +this.examId! }));
-
-      // Filter only manuscript questions
-      this.manuscriptQuestions = response.body?.filter(q => q.typeAlgoName === 'manuscrit') || [];
-
+      this.manuscriptQuestions = response.body?.filter(q => q.typeAlgoName === 'manuscrit').sort((a, b) => a.numero! - b.numero!) || [];
       console.log('Found manuscript questions:', this.manuscriptQuestions);
     } catch (error) {
       console.error('Error loading manuscript questions:', error);
       this.error = 'Failed to load questions';
     }
   }
-
   async loadImages(exam_id: string) {
     try {
       this.loading = true;
@@ -222,7 +219,7 @@ export class ImageAccessComponent implements OnInit {
       const canvas = document.createElement('canvas');
       canvas.width = image.width;
       canvas.height = image.height;
-      const ctx = canvas.getContext('2d');
+      let ctx = canvas.getContext('2d');
       ctx?.putImageData(image.imageData, 0, 0);
       const base64Image = canvas.toDataURL();
 
