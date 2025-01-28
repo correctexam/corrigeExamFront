@@ -520,6 +520,8 @@
     "gradesAppliedSelected": "Notes appliquées aux copies sélectionnées",
     "gradesAppliedAll": "Notes appliquées à toutes les copies similaires",
     "noUngradedResponses": "Toutes les copies ont été corrigé pour cette question",
+    "gotoNextUncorrectedQuestion": "Prochaine question non corrigée",
+    "gotoPreviousUncorrectedQuestion": "Précédente question non corrigée",
     "executeMLT": "Executer MLT",
     "searchwithword": "Rechercher par mot",
     "searchwithquestion": "Rechercher par question"

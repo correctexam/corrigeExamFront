@@ -492,42 +492,6 @@
             <canvas [hidden]="!showImage[i]" #nomImage></canvas>
           </div>
         </div>
-        <div *ngIf="correctionAvailable" style="display: flex; justify-content: center; align-items: center; margin-top: 1rem">
-          <button
-            type="button"
-            pButton
-            class="p-ripple"
-            style="
-              display: flex;
-              align-items: center;
-              gap: 0.5rem;
-              border: 2px #1a801e;
-              background-color: #2de263;
-              color: white;
-              margin-top: 1rem;
-              padding: 0.75rem 1.5rem;
-              font-size: 1rem;
-              font-weight: bold;
-              border-radius: 8px;
-              cursor: pointer;
-              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-              transition:
-                background-color 0.3s ease,
-                transform 0.2s ease,
-                box-shadow 0.3s ease;
-            "
-            pTooltip="{{ 'scanexam.gotoNextUncorrectedQuestion' | translate }}"
-            tooltipZIndex="3000"
-            (click)="passToNotGradedQuestion()"
-            onmouseover="this.style.backgroundColor='#28c957'; this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 8px rgba(0, 0, 0, 0.15)';"
-            onmouseout="this.style.backgroundColor='#2de263'; this.style.transform='scale(1)'; this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.1)';"
-            onmousedown="this.style.backgroundColor='#25b34d'; this.style.transform='scale(1)'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.1)';"
-            onmouseup="this.style.backgroundColor='#28c957'; this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 8px rgba(0, 0, 0, 0.15)';"
-          >
-            Prochaine question non corrigée
-            <fa-icon icon="arrow-right" style="font-size: 1.2rem"></fa-icon>
-          </button>
-        </div>
 
         <div style="padding-bottom: 2rem"></div>
         <div class="d-flex justify-content-center" *ngIf="!focusView">
@@ -543,6 +507,19 @@
               <fa-icon icon="arrow-left"></fa-icon>
             </button>
           </div>
+          <button
+            *ngIf="correctionAvailable"
+            type="button"
+            pButton
+            class="p-ripple"
+            [pTooltip]="'scanexam.gotoPreviousUncorrectedQuestion' | translate"
+            [tooltipZIndex]="'3000'"
+            [tooltipPosition]="'bottom'"
+            (click)="passToPreviousNotGradedQuestion()"
+            [disabled]="blocked"
+          >
+            <fa-icon icon="arrow-left"></fa-icon>
+          </button>
           <p-paginator
             [currentPageReportTemplate]="'scanexam.currentstudent' | translate"
             [rows]="1"
@@ -556,6 +533,21 @@
             [tooltipPosition]="'bottom'"
           >
           </p-paginator>
+
+          <button
+            *ngIf="correctionAvailable"
+            type="button"
+            pButton
+            class="p-ripple"
+            [pTooltip]="'scanexam.gotoNextUncorrectedQuestion' | translate"
+            [tooltipZIndex]="'3000'"
+            [tooltipPosition]="'bottom'"
+            (click)="passToNextNotGradedQuestion()"
+            [disabled]="blocked"
+          >
+            <fa-icon icon="arrow-right"></fa-icon>
+          </button>
+
           <div
             class="p-0 p-paginator p-component ng-star-inserted"
             *ngIf="currentStudentPaginator + 1 === numberPagesInScan! / nbreFeuilleParCopie! && questionindex + 1 !== nbreQuestions!"

@@ -3451,7 +3451,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async passToNotGradedQuestion() {
+  async passToNextNotGradedQuestion() {
     const nbStudents = this.numberPagesInScan! / this.nbreFeuilleParCopie!;
     console.log('My note', this.resp);
     for (let i = 0; i < nbStudents; i++) {
@@ -3488,20 +3488,18 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   async passToPreviousNotGradedQuestion() {
     const nbStudents = this.numberPagesInScan! / this.nbreFeuilleParCopie!;
     console.log('My note', this.resp);
-    for (let i = nbStudents; i > 0; i--) {
-      if (this.currentStudent > i) {
-        let response = await this.getStudentResponse4EmptyStudent(
-          this.questions!.map(q => q.id!),
-          i,
-        );
-        console.log('Student', i + 1, 'Response:', response);
-        if (response === undefined) {
-          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
-          return;
-        }
+    for (let i = this.currentStudent - 1; i >= 0; i--) {
+      let response = await this.getStudentResponse4EmptyStudent(
+        this.questions!.map(q => q.id!),
+        i,
+      );
+      console.log('Student', i + 1, 'Response:', response);
+      if (response === undefined) {
+        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+        return;
       }
     }
-    for (let i = nbStudents; i > 0; i--) {
+    for (let i = nbStudents - 1; i >= 0; i--) {
       let response = await this.getStudentResponse4EmptyStudent(
         this.questions!.map(q => q.id!),
         i,
