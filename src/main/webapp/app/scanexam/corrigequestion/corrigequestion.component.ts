@@ -2802,7 +2802,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   getFilteredSimilarPredictions(): IPrediction[] {
     if (this.filterPredictionsWithNotes) {
-      return this.similarPredictions.filter(prediction => this.getSimilarGrade(prediction.studentId!) !== undefined);
+      return this.similarPredictions.filter(prediction => this.getSimilarGrade(prediction.studentId!) == undefined);
     }
     return this.similarPredictions;
   }

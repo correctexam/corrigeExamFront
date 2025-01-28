@@ -639,17 +639,16 @@
                         <i class="pi pi-check-square mr-2"></i>
                         Appliquer la note à tous
                       </button>
-                      <div class="flex">
-                        <div class="col-3">
-                          <label jhiTranslate="scanexam.filterNoNoteStudents">Filtrer les questions déjà notées :</label>
-                          <p-inputSwitch
-                            [(ngModel)]="filterPredictionsWithNotes"
-                            (onChange)="getFilteredSimilarPredictions()"
-                            [pTooltip]="'scanexam.filterNoNoteStudentsTooltip' | translate"
-                          ></p-inputSwitch>
-                        </div>
-                        <div class="col-6"></div>
-                        <div class="col-3"></div>
+                      <div class="flex items-center p-2">
+                        <label class="text-gray-700 font-medium" jhiTranslate="scanexam.filterNoNoteStudents">
+                          Filtrer les questions déjà notées :
+                        </label>
+                        <p-inputSwitch
+                          [(ngModel)]="filterPredictionsWithNotes"
+                          (onChange)="getFilteredSimilarPredictions()"
+                          [pTooltip]="'scanexam.filterNoNoteStudentsTooltip' | translate"
+                          class="ml-2"
+                        ></p-inputSwitch>
                       </div>
                     </div>
 
