@@ -313,6 +313,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   correctionAvailable = true;
   maximumNote = 0;
   noteStep = 0;
+  filterPredictionsWithNotes: boolean = false;
 
   constructor(
     public examService: ExamService,
@@ -2797,6 +2798,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
+  }
+
+  getFilteredSimilarPredictions(): IPrediction[] {
+    if (this.filterPredictionsWithNotes) {
+      return this.similarPredictions.filter(prediction => this.getSimilarGrade(prediction.studentId!) !== undefined);
+    }
+    return this.similarPredictions;
   }
 
   compareTextComment(event: any, comment: ITextComment) {
