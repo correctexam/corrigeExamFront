@@ -641,11 +641,11 @@
                       </button>
                       <div class="flex">
                         <div class="col-3">
-                          <label jhiTranslate="scanexam.filterboundstudent">Filtrer les questions déjà notées :</label>
+                          <label jhiTranslate="scanexam.filterNoNoteStudents">Filtrer les questions déjà notées :</label>
                           <p-inputSwitch
                             [(ngModel)]="filterPredictionsWithNotes"
                             (onChange)="getFilteredSimilarPredictions()"
-                            [pTooltip]="'scanexam.filterboundstudentTooltip' | translate"
+                            [pTooltip]="'scanexam.filterNoNoteStudentsTooltip' | translate"
                           ></p-inputSwitch>
                         </div>
                         <div class="col-6"></div>

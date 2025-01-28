@@ -514,7 +514,8 @@
     "handwritingrecognition": "Reconnaissance d'écriture",
     "examanswerresearch": "Recherche de réponses",
     "examanswerresearchdetail": "Permet de rechercher des réponses dans l'ensemble des copies",
-
+    "filterNoNoteStudents": "Filtrer les questions déjà notées :",
+    "filterNoNoteStudentsTooltip": "Permet de filtrer les questions déjà notées pour ne voir que les questions restantes à noter",
     "confirmSelectedGrades": "Êtes-vous sûr de vouloir appliquer la note aux {{count}} copies sélectionnées ?",
     "confirmAllGrades": "Êtes-vous sûr de vouloir appliquer la note aux {{count}} copies similaires ?",
     "gradesAppliedSelected": "Notes appliquées aux copies sélectionnées",

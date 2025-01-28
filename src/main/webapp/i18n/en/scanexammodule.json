@@ -514,6 +514,8 @@
     "gotoPreviousUncorrectedQuestion": "Previous question that has not yet been corrected",
     "executeMLT": "Execute MLT",
     "searchwithword": "Search with word",
-    "searchwithquestion": "Search with question"
+    "searchwithquestion": "Search with question",
+    "filterNoNoteStudents": "Filter students with no grade",
+    "filterNoNoteStudentsTooltip": "Filters students who have not yet been graded"
   }
 }
