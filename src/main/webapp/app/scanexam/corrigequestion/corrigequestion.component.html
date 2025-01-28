@@ -639,12 +639,24 @@
                         <i class="pi pi-check-square mr-2"></i>
                         Appliquer la note à tous
                       </button>
+                      <div class="flex">
+                        <div class="col-3">
+                          <label jhiTranslate="scanexam.filterboundstudent">Filtrer les questions déjà notées :</label>
+                          <p-inputSwitch
+                            [(ngModel)]="filterPredictionsWithNotes"
+                            (onChange)="getFilteredSimilarPredictions()"
+                            [pTooltip]="'scanexam.filterboundstudentTooltip' | translate"
+                          ></p-inputSwitch>
+                        </div>
+                        <div class="col-6"></div>
+                        <div class="col-3"></div>
+                      </div>
                     </div>
 
                     <!-- Liste des prédictions similaires -->
                     <ul class="list-none p-0 space-y-4">
                       <li
-                        *ngFor="let similar of similarPredictions"
+                        *ngFor="let similar of getFilteredSimilarPredictions()"
                         [style.border]="selectedSimilars.get(similar) === 1 ? '5px solid green' : '1px solid #ccc'"
                         class="p-4 rounded-md hover:bg-gray-100 transition-colors duration-200"
                       >
