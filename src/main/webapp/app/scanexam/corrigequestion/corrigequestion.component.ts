@@ -3470,6 +3470,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         );
         console.log('Student', i + 1, 'Response:', response);
         if (response === undefined) {
+          this.dropdownOpen = false;
           this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
           return;
         }
@@ -3482,6 +3483,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       );
       console.log('Student', i + 1, 'Response:', response);
       if (response === undefined) {
+        this.dropdownOpen = false;
         this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
         return;
       }
@@ -3503,6 +3505,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       );
       console.log('Student', i + 1, 'Response:', response);
       if (response === undefined) {
+        this.dropdownOpen = false;
         this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
         return;
       }
@@ -3514,6 +3517,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       );
       console.log('Student', i + 1, 'Response:', response);
       if (response === undefined) {
+        this.dropdownOpen = false;
         this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
         return;
       }
