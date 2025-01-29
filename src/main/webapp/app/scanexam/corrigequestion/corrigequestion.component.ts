@@ -3499,15 +3499,17 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     const nbStudents = this.numberPagesInScan! / this.nbreFeuilleParCopie!;
     console.log('My note', this.resp);
     for (let i = this.currentStudent - 1; i >= 0; i--) {
-      let response = await this.getStudentResponse4EmptyStudent(
-        this.questions!.map(q => q.id!),
-        i,
-      );
-      console.log('Student', i + 1, 'Response:', response);
-      if (response === undefined) {
-        this.dropdownOpen = false;
-        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
-        return;
+      if (this.currentStudent > i) {
+        let response = await this.getStudentResponse4EmptyStudent(
+          this.questions!.map(q => q.id!),
+          i,
+        );
+        console.log('Student', i + 1, 'Response:', response);
+        if (response === undefined) {
+          this.dropdownOpen = false;
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+          return;
+        }
       }
     }
     for (let i = nbStudents - 1; i >= 0; i--) {
