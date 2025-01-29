@@ -3427,7 +3427,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   // Same starts, comments etc
   async sameGrade(similar: Prediction) {
     // let try1 = await this.getStudentResponse(this.questions!.map(q => q.id!));
-    let response = await this.getStudentResponse4WantedStudent(
+    let response = await this.getStudentResponse4CurrentStudent(
       this.questions!.map(q => q.id!),
       similar.studentId! - 1,
     );
