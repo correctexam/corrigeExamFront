@@ -305,7 +305,7 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
     this.preferenceService.saveImagePerLine(event.value);
   }
 
-  currentDragAndDrop = 0;
+  currentDragAndDrop = -1;
   dragStart(value: any): void {
     this.currentDragAndDrop = value;
   }
@@ -334,16 +334,18 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
         this.canvass.set(i + 1, canvas1!);
       }
     }
-    this.canvass.set(value, canvas!);
-
-    this.reloadImageClassify();
-    if (this.alignPage) {
-      this.candropordelete = false;
-      await this.db.moveAlignPages(this.examId, currentDragAndDrop, value);
-    } else {
-      this.candropordelete = false;
-      await this.db.moveNonAlignPages(this.examId, currentDragAndDrop, value);
-      this.candropordelete = true;
+    if (currentDragAndDrop !== value) {
+      this.canvass.set(value, canvas!);
+      this.reloadImageClassify();
+      if (this.alignPage) {
+        this.candropordelete = false;
+        await this.db.moveAlignPages(this.examId, currentDragAndDrop, value);
+        this.candropordelete = true;
+      } else {
+        this.candropordelete = false;
+        await this.db.moveNonAlignPages(this.examId, currentDragAndDrop, value);
+        this.candropordelete = true;
+      }
     }
   }
 
