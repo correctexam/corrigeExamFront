@@ -65,32 +65,6 @@ export class ExamIndexDB extends Dexie {
 
   async removeElementForExam() {
     return this.delete();
-    /*  await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
-      this.exams.delete(this.examId);
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      this.templates
-        .where('examId')
-        .equals(this.examId)
-        .toArray()
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        .then(templates => this.templates.bulkDelete(templates.map(t => t.id!)));
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      this.alignImages
-        .where('examId')
-        .equals(this.examId)
-        .toArray()
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        .then(a => this.alignImages.bulkDelete(a.map(t => t.id!)));
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      this.nonAlignImages
-        .where('examId')
-        .equals(this.examId)
-        .toArray()
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        .then(a => this.nonAlignImages.bulkDelete(a.map(t => t.id!)));
-      //      this.populate();
-    });*/
   }
 
   async removePageAlignForExam() {
@@ -108,18 +82,16 @@ export class ExamIndexDB extends Dexie {
 
   async removeElementForExamForPages(pageStart: number, pageEnd: number) {
     await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
-      //      this.exams.delete(this.examId);
-
       this.alignImages
-        .where({ examId: this.examId })
-        .filter(e2 => e2.pageNumber >= pageStart && e2.pageNumber <= pageEnd)
+        .where(['examId', 'pageNumber'])
+        .between([this.examId, pageStart], [this.examId, pageEnd], true, true)
         .toArray()
 
         .then(a => this.alignImages.bulkDelete(a.map(t => t.id!)));
 
       this.nonAlignImages
-        .where({ examId: this.examId })
-        .filter(e2 => e2.pageNumber >= pageStart && e2.pageNumber <= pageEnd)
+        .where(['examId', 'pageNumber'])
+        .between([this.examId, pageStart], [this.examId, pageEnd], true, true)
         .toArray()
 
         .then(a => this.nonAlignImages.bulkDelete(a.map(t => t.id!)));
@@ -128,46 +100,32 @@ export class ExamIndexDB extends Dexie {
 
   async removePageAlignForExamForPage(page: number) {
     await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
-      //      this.exams.delete(this.examId);
-
       this.alignImages.where({ examId: this.examId, pageNumber: page }).delete();
-
-      // .then(a => this.alignImages.delete(a!.id!));
     });
   }
 
   async removePageNonAlignForExamForPage(page: number) {
     await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
-      //      this.exams.delete(this.examId);
-
       this.nonAlignImages.where({ examId: this.examId, pageNumber: page }).delete();
-
-      // .then(a => this.alignImages.delete(a!.id!));
     });
   }
 
   async removePageAlignForExamForPages(pageStart: number, pageEnd: number) {
     await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
-      //      this.exams.delete(this.examId);
-
       this.alignImages
-        .where({ examId: this.examId })
-        .filter(e2 => e2.pageNumber >= pageStart && e2.pageNumber <= pageEnd)
+        .where(['examId', 'pageNumber'])
+        .between([this.examId, pageStart], [this.examId, pageEnd], true, true)
         .toArray()
-
         .then(a => this.alignImages.bulkDelete(a.map(t => t.id!)));
     });
   }
 
   async removePageNonAlignForExamForPages(pageStart: number, pageEnd: number) {
     await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
-      //      this.exams.delete(this.examId);
-
       this.nonAlignImages
-        .where({ examId: this.examId })
-        .filter(e2 => e2.pageNumber >= pageStart && e2.pageNumber <= pageEnd)
+        .where(['examId', 'pageNumber'])
+        .between([this.examId, pageStart], [this.examId, pageEnd], true, true)
         .toArray()
-
         .then(a => this.nonAlignImages.bulkDelete(a.map(t => t.id!)));
     });
   }
@@ -220,28 +178,28 @@ export class ExamIndexDB extends Dexie {
 
   async getNonAlignImageBetweenAndSortByPageNumber(p1: number, p2: number) {
     return await this.nonAlignImages
-      .where({ examId: this.examId })
-      .filter(e2 => e2.pageNumber >= p1 && e2.pageNumber <= p2)
+      .where(['examId', 'pageNumber'])
+      .between([this.examId, p1], [this.examId, p2], true, true)
       .sortBy('pageNumber');
   }
 
   async getAlignImageBetweenAndSortByPageNumber(p1: number, p2: number) {
     return await this.alignImages
-      .where({ examId: this.examId })
-      .filter(e2 => e2.pageNumber >= p1 && e2.pageNumber <= p2)
+      .where(['examId', 'pageNumber'])
+      .between([this.examId, p1], [this.examId, p2], true, true)
       .sortBy('pageNumber');
   }
 
   async getNonAlignImagesForPageNumbers(pages: number[]) {
     return await this.nonAlignImages
-      .where({ examId: this.examId })
-      .filter(e2 => pages.includes(e2.pageNumber))
+      .where(['examId', 'pageNumber'])
+      .anyOf(pages.map(p => [this.examId, p]))
       .sortBy('pageNumber');
   }
   async getAlignImagesForPageNumbers(pages: number[]) {
     return await this.alignImages
-      .where({ examId: this.examId })
-      .filter(e2 => pages.includes(e2.pageNumber))
+      .where(['examId', 'pageNumber'])
+      .anyOf(pages.map(p => [this.examId, p]))
       .sortBy('pageNumber');
   }
 
@@ -251,65 +209,55 @@ export class ExamIndexDB extends Dexie {
 
   async moveNonAlignPages(from: number, to: number) {
     if (from !== to) {
-      await this.nonAlignImages
-        .where({ examId: this.examId })
-        .filter(e2 => e2.pageNumber === from)
-        .modify(i => {
-          i.pageNumber = -1000; // (very approximate formula...., but anyway...)
-        });
+      await this.nonAlignImages.where({ examId: this.examId, pageNumber: from }).modify(i => {
+        i.pageNumber = -1000;
+      });
+
       if (from < to) {
         await this.nonAlignImages
-          .where({ examId: this.examId })
-          .filter(e2 => e2.pageNumber > from && e2.pageNumber <= to)
+          .where(['examId', 'pageNumber'])
+          .between([this.examId, from], [this.examId, to], false, true)
           .modify(i => {
             i.pageNumber = i.pageNumber - 1;
           });
       } else {
         await this.nonAlignImages
-          .where({ examId: this.examId })
-          .filter(e2 => e2.pageNumber < from && e2.pageNumber >= to)
+          .where(['examId', 'pageNumber'])
+          .between([this.examId, to], [this.examId, from], true, false)
           .modify(i => {
             i.pageNumber = i.pageNumber + 1;
           });
       }
-      await this.nonAlignImages
-        .where({ examId: this.examId })
-        .filter(e2 => e2.pageNumber === -1000)
-        .modify(i => {
-          i.pageNumber = to;
-        });
+      await this.nonAlignImages.where({ examId: this.examId, pageNumber: -1000 }).modify(i => {
+        i.pageNumber = to;
+      });
     }
   }
 
   async moveAlignPages(from: number, to: number) {
     if (from !== to) {
-      await this.alignImages
-        .where({ examId: this.examId, pageNumber: from })
-        //        .filter(e2 => e2.pageNumber === from)
-        .modify(i => {
-          i.pageNumber = -1000;
-        });
+      await this.alignImages.where({ examId: this.examId, pageNumber: from }).modify(i => {
+        i.pageNumber = -1000;
+      });
+
       if (from < to) {
         await this.alignImages
-          .where({ examId: this.examId })
-          .filter(e2 => e2.pageNumber > from && e2.pageNumber <= to)
+          .where(['examId', 'pageNumber'])
+          .between([this.examId, from], [this.examId, to], false, true)
           .modify(i => {
             i.pageNumber = i.pageNumber - 1;
           });
       } else {
         await this.alignImages
-          .where({ examId: this.examId })
-          .filter(e2 => e2.pageNumber < from && e2.pageNumber >= to)
+          .where(['examId', 'pageNumber'])
+          .between([this.examId, to], [this.examId, from], true, false)
           .modify(i => {
             i.pageNumber = i.pageNumber + 1;
           });
       }
-      await this.alignImages
-        .where({ examId: this.examId, pageNumber: -1000 })
-        //        .filter(e2 => e2.pageNumber === -1000)
-        .modify(i => {
-          i.pageNumber = to;
-        });
+      await this.alignImages.where({ examId: this.examId, pageNumber: -1000 }).modify(i => {
+        i.pageNumber = to;
+      });
     }
   }
 
