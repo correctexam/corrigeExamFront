@@ -2111,7 +2111,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async getTemplateImage4Zone(zone: IZone): Promise<ImageZone> {
-    console.log('I am here getTemplateImage4Zone');
     const imageToCrop: IImageCropFromZoneInput = {
       examId: +this.examId!,
       factor: +this.factor,
@@ -3045,58 +3044,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // // Méthode pour exécuter le script
-  // async executeScript(): Promise<void> {
-  //   this.deleted = false;
-  //   if (this.currentQuestion?.typeAlgoName === 'manuscrit') {
-  //     console.log('Yes, I am manuscrit.');
-  //     this.changeDetector.detectChanges();
-  //     const imageData = this.getImageFromCanvas();
-  //     console.log('Image data:', imageData);
-
-  //     if (!imageData) {
-  //       console.error('No image data found on the canvas');
-  //       this.error = 'No image selected';
-  //       return;
-  //     }
-
-  //     console.log('Executing script with image data from canvas');
-  //     const question_id = this.questionId;
-  //     const exam_id = this.examId;
-  //     const student_id = this.studentid;
-  //     const question_number = this.questionindex + 1;
-
-  //     // Await the ID from createPrediction before proceeding
-  //     const prediction_id = await this.createPrediction(question_id, exam_id, student_id, question_number, imageData);
-
-  //     // Proceed only if prediction_id is valid
-  //     if (prediction_id !== undefined) {
-  //       this.scriptService.runScript(imageData).subscribe({
-  //         next: response => {
-  //           const currentPageIndex = this.questionindex;
-
-  //           // Ensure response.prediction exists and access the first prediction
-  //           //const prediction = response.prediction ? response.prediction[0] : '';
-  //           const prediction = response.prediction;
-  //           this.predictionsDic[currentPageIndex] = prediction;
-
-  //           // Now store the prediction with the actual ID
-  //           this.storePrediction(prediction, question_id, exam_id, student_id, question_number, prediction_id);
-
-  //           // Update the output for display
-  //           this.output = prediction;
-  //           this.error = '';
-  //         },
-  //         error: err => {
-  //           console.error('Error executing script:', err);
-  //           this.output = '';
-  //           this.error = err.error || 'An error occurred';
-  //         },
-  //       });
-  //     }
-  //   }
-  // }
-
   storePrediction(
     prediction: string,
     question_id: number | undefined,
@@ -3306,7 +3253,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.similarPredictions = [];
     this.dropdownOpen = !this.dropdownOpen;
     try {
-      console.log('I am trying to load similar prediction');
       const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionId }));
       const predictions = predictionResponse.body || [];
       if (this.currentPrediction && predictions.length > 0) {

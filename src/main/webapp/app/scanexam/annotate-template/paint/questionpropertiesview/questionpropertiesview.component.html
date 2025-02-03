@@ -24,7 +24,6 @@
     <form name="editForm" role="form" novalidate [formGroup]="editForm">
       <div>
         <jhi-alert-error></jhi-alert-error>
-
         <div class="row" *ngIf="canUpdateNumero">
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.numero" for="field_numero">Numero</label>
           <input
@@ -127,7 +126,6 @@
 
         <!--Adding manuscrit html-->
         <div *ngIf="editForm.get(['typeId'])!.value === manuscritid" class="row">
-          <p>I am here</p>
           <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.gradeType" for="field_gradeType">Grade Type</label>
           <select
             class="form-control"
