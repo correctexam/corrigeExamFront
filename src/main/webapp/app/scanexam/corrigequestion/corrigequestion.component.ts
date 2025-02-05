@@ -50,7 +50,7 @@ import { TextCommentService } from 'app/entities/text-comment/service/text-comme
 import { PredictionService } from 'app/entities/prediction/service/prediction.service';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { IQCMSolution } from '../../qcm';
-import { Observable, Subscriber, firstValueFrom } from 'rxjs';
+import { Observable, Subscriber, Subscription, debounceTime, distinctUntilChanged, firstValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 import { fromWorkerPool } from 'observable-webworker';
 import { worker1 } from '../services/workerimport';
@@ -97,7 +97,7 @@ import { NgIf, NgFor, DecimalPipe, DatePipe } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Button, ButtonDirective } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule } from '@angular/forms';
 import { TranslateDirective } from '../../shared/language/translate.directive';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
@@ -3496,8 +3496,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // --------------------------------------------------------------------------------------------
-
   async updateSimilarGrade(studentId: number, newGrade: number) {
     if (this.blocked) return;
 
@@ -3546,5 +3544,50 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  tryGetAllImages() {}
+  predictions: IPrediction[] = [];
+  searchControl = new FormControl('');
+  filteredPredictions: IPrediction[] = [];
+  private searchSubscription?: Subscription;
+
+  async loadPredictions(params: ParamMap) {
+    try {
+      const req = {
+        page: 0,
+        size: 500,
+      };
+      const predictionResponse = await firstValueFrom(this.predictionService.query(req));
+      const predictions = predictionResponse.body || [];
+
+      if (predictions.length > 0) {
+        this.predictions = predictions
+          .filter(prediction => prediction.examId === this.examId && prediction.questionId == this.questionId) // Add your desired examId here
+          .map(prediction => ({
+            examId: prediction.examId,
+            questionNumber: prediction.questionNumber,
+            studentId: prediction.studentId,
+            text: prediction.text,
+            imageData: prediction.imageData,
+          }));
+
+        this.filterPredictions();
+      } else {
+        console.warn('No predictions found from backend.');
+      }
+    } catch (err) {
+      console.error('Error fetching predictions from backend:', err);
+    }
+  }
+
+  setupSearchListener() {
+    this.searchSubscription = this.searchControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe(value => {
+      this.filterPredictions(value ?? '');
+    });
+  }
+
+  filterPredictions(searchTerm: string = '') {
+    console.log('Text prediction search', searchTerm);
+    this.filteredPredictions = this.predictions.filter(prediction =>
+      (prediction.text ?? '').toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  }
 }
