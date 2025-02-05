@@ -603,7 +603,7 @@
                     class="btn btn-primary w-full flex justify-between items-center px-4 py-3 text-lg font-medium"
                     (click)="similarPrediction()"
                   >
-                    <span>Afficher les réponses similaires</span>
+                    <span jhiTranslate="scanexam.displaySimilarAnswers">Afficher les réponses similaires</span>
                     <fa-icon
                       [icon]="dropdownOpen ? 'chevron-up' : 'chevron-down'"
                       class="fa-bounce-slow ml-2"
@@ -617,7 +617,9 @@
                     class="dropdown-content w-full mt-4 border border-gray-300 rounded-md shadow-lg"
                     *ngIf="dropdownOpen && similarPredictions.length != 0"
                   >
-                    <p class="font-bold text-gray-700 text-xl px-4 py-3 border-b border-gray-300">Résultats Similaires</p>
+                    <p class="font-bold text-gray-700 text-xl px-4 py-3 border-b border-gray-300" jhiTranslate="scanexam.similarResults">
+                      Résultats Similaires
+                    </p>
 
                     <!-- Boutons de contrôle -->
                     <div class="flex flex-row gap-2 mb-3 px-4 py-3">
@@ -626,6 +628,7 @@
                         class="p-button-primary"
                         (click)="changeSelectedSimilarGrades()"
                         [disabled]="getSelectedCount() === 0"
+                        jhiTranslate="scanexam.applyNoteToSelected"
                       >
                         <i class="pi pi-check-circle mr-2"></i>
                         Appliquer la note aux sélectionnés
@@ -635,6 +638,7 @@
                         class="p-button-secondary"
                         (click)="changeAllSimilarGrades()"
                         [disabled]="similarPredictions.length === 0"
+                        jhiTranslate="scanexam.applyNoteToAll"
                       >
                         <i class="pi pi-check-square mr-2"></i>
                         Appliquer la note à tous
@@ -650,6 +654,17 @@
                           class="ml-2"
                         ></p-inputSwitch>
                       </div>
+                    </div>
+
+                    <!-- Checkbox to select all similar predictions -->
+                    <div class="flex flex-col items-center">
+                      <input
+                        type="checkbox"
+                        [checked]="areAllSimilarPredictionsSelected()"
+                        (change)="toggle_untoggle_AllSimilarPredictions($event)"
+                        class="w-14 h-14 mr-3 ml-3"
+                      />
+                      <label class="font-bold text-gray-700 text-l" jhiTranslate="scanexam.selectAllSimilar">Sélectionner tout</label>
                     </div>
 
                     <!-- Liste des prédictions similaires -->
@@ -698,7 +713,7 @@
                             </div>
                             <ng-template #noGrade>
                               <div class="no-grade-container">
-                                <span class="no-grade-message">⚠️ Pas de note disponible</span>
+                                <span class="no-grade-message" jhiTranslate="scanexam.noGradeAvailable">⚠️ Pas de note disponible</span>
                               </div>
                             </ng-template>
 

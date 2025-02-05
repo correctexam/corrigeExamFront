@@ -516,6 +516,12 @@
     "searchwithword": "Search with word",
     "searchwithquestion": "Search with question",
     "filterNoNoteStudents": "Filter students with no grade",
-    "filterNoNoteStudentsTooltip": "Filters students who have not yet been graded"
+    "filterNoNoteStudentsTooltip": "Filters students who have not yet been graded",
+    "similarResults": "Similar results",
+    "displaySimilarAnswers": "Display similar answers",
+    "noGradeAvailable": "⚠️ No grade available",
+    "applyNoteToSelected": "Apply the note to the selected",
+    "applyNoteToAll": "Apply the note to all",
+    "selectAllSimilar": "Select all"
   }
 }

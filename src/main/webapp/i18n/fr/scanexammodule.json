@@ -525,6 +525,12 @@
     "gotoPreviousUncorrectedQuestion": "Précédente question non corrigée",
     "executeMLT": "Executer MLT",
     "searchwithword": "Rechercher par mot",
-    "searchwithquestion": "Rechercher par question"
+    "searchwithquestion": "Rechercher par question",
+    "similarResults": "Résultats similaires",
+    "displaySimilarAnswers": "Afficher les réponses similaires",
+    "noGradeAvailable": "⚠️ Pas de note disponible",
+    "applyRatingToSelected": "Appliquer la note aux sélectionnés",
+    "applyNoteToAll": "Appliquer la note à tous",
+    "selectAllSimilar": "Sélectionner tout"
   }
 }

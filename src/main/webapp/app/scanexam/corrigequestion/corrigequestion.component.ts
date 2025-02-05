@@ -3301,6 +3301,25 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.getSameResponses();
   }
 
+  areAllSimilarPredictionsSelected(): boolean {
+    return this.similarPredictions.every(prediction => this.selectedSimilars.get(prediction) === 1);
+  }
+
+  toggle_untoggle_AllSimilarPredictions(event: Event): void {
+    const isChecked = (event.target as HTMLInputElement).checked;
+    this.similarPredictions.forEach(prediction => {
+      if (isChecked) {
+        if (this.selectedSimilars.get(prediction) !== 1) {
+          this.selectSimilarPrediction(prediction);
+        }
+      } else {
+        if (this.selectedSimilars.get(prediction) === 1) {
+          this.selectSimilarPrediction(prediction);
+        }
+      }
+    });
+  }
+
   getSelectedCount(): number {
     return Array.from(this.selectedSimilars.values()).filter(v => v === 1).length;
   }
