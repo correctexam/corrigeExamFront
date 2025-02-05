@@ -3242,7 +3242,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   similarPredictions: Prediction[] = [];
-  unfilteredPredictions: Prediction[] = [];
   similarPredictionsSearched = false;
   async similarPrediction() {
     this.similarPredictions = [];
@@ -3263,7 +3262,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           const studentIdB = b.studentId || 0;
           return studentIdA - studentIdB;
         });
-        this.unfilteredPredictions = this.similarPredictions;
         this.deleted = false;
       } else {
         this.executeScript();
@@ -3391,11 +3389,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.selectedSimilars.set(prediction, 0);
         }
       }
-      this.similarPredictions = this.unfilteredPredictions;
-      this.similarPredictions = this.similarPredictions.filter(prediction => this.getSimilarGrade(prediction.studentId!) == undefined);
-      return this.similarPredictions;
+      return this.similarPredictions.filter(prediction => this.getSimilarGrade(prediction.studentId!) == undefined);
     }
-    this.similarPredictions = this.unfilteredPredictions;
     return this.similarPredictions;
   }
 
