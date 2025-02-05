@@ -97,7 +97,7 @@ import { NgIf, NgFor, DecimalPipe, DatePipe } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Button, ButtonDirective } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { FormControl, FormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslateDirective } from '../../shared/language/translate.directive';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
@@ -177,6 +177,7 @@ interface CommentAction {
     CommentSortPipe,
     CheckboxModule,
     SliderModule,
+    ReactiveFormsModule,
   ],
 })
 export class CorrigequestionComponent implements OnInit, AfterViewInit {
@@ -2799,13 +2800,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  getFilteredSimilarPredictions(): IPrediction[] {
-    if (this.filterPredictionsWithNotes) {
-      return this.similarPredictions.filter(prediction => this.getSimilarGrade(prediction.studentId!) == undefined);
-    }
-    return this.similarPredictions;
-  }
-
   compareTextComment(event: any, comment: ITextComment) {
     if (!this.blocked) {
       if (event.ctrlKey || event.metaKey) {
@@ -3248,6 +3242,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   similarPredictions: Prediction[] = [];
+  unfilteredPredictions: Prediction[] = [];
   similarPredictionsSearched = false;
   async similarPrediction() {
     this.similarPredictions = [];
@@ -3268,7 +3263,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           const studentIdB = b.studentId || 0;
           return studentIdA - studentIdB;
         });
-
+        this.unfilteredPredictions = this.similarPredictions;
         this.deleted = false;
       } else {
         this.executeScript();
@@ -3387,6 +3382,21 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
     // Exclude the current prediction itself
     return [...similarPredictions].filter(prediction => prediction.id !== currentPrediction.id);
+  }
+
+  getFilteredSimilarPredictions(): IPrediction[] {
+    if (this.filterPredictionsWithNotes) {
+      for (let prediction of this.selectedSimilars.keys()) {
+        if (this.getSimilarGrade(prediction.studentId!) != undefined) {
+          this.selectedSimilars.set(prediction, 0);
+        }
+      }
+      this.similarPredictions = this.unfilteredPredictions;
+      this.similarPredictions = this.similarPredictions.filter(prediction => this.getSimilarGrade(prediction.studentId!) == undefined);
+      return this.similarPredictions;
+    }
+    this.similarPredictions = this.unfilteredPredictions;
+    return this.similarPredictions;
   }
 
   // Same starts, comments etc
