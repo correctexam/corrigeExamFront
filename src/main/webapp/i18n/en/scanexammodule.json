@@ -391,7 +391,7 @@
     "gotopreviousnonboundsheet": "Go to the previous sheet not associated with a student",
     "numeroTooltip": "Question number for this zone. Several zones can be associated with the same number",
     "questionpointtooltip": "Points associated with this question",
-    "typequestionTooltip": "Type of this question (MCQ for questions which have an answer in the form of a black box or manual for questions which will be marked manually by the marker",
+    "typequestionTooltip": "Type of question (MCQ for questions in the form of a box to be filled in, manual for questions marked manually by the marker and handwritten to take advantage of AI text recognition for handwritten questions).",
     "manualgradetypequestionTooltip": "When a question is marked manually by the marker, the latter can either assign an exact mark for an answer, or make comments which add or subtract points. The advantage of this type of marking is that it is possible to weight the marks assigned to a comment during the marking process and thus dynamically update the mark scheme",
     "nbrepageintemplateTooltip": "Number of pages per student copy. (This figure is calculated automatically from the number of pages in the template). ⚠️ The number of pages in the scan must be exactly equal to the number of copies scanned multiplied by the number of pages in the template.)",
     "showmappingTooltip": "Allows you to see the points of interest used to create the alignment. This often helps you to understand why problems during the scan of the copies caused difficulties during the alignment of the copies.",
@@ -509,6 +509,19 @@
     "rundanscript": "Run DAN handwriting recognition script",
     "handwritingrecognition": "Handwriting recognition",
     "examanswerresearch": "Search answers",
-    "examanswerresearchdetail": "Allows you to search for answers across all copies"
+    "examanswerresearchdetail": "Allows you to search for answers across all copies",
+    "gotoNextUncorrectedQuestion": "Next question that has not yet been corrected",
+    "gotoPreviousUncorrectedQuestion": "Previous question that has not yet been corrected",
+    "executeMLT": "Execute MLT",
+    "searchwithword": "Search with word",
+    "searchwithquestion": "Search with question",
+    "filterNoNoteStudents": "Filter students with no grade",
+    "filterNoNoteStudentsTooltip": "Filters students who have not yet been graded",
+    "similarResults": "Similar results",
+    "displaySimilarAnswers": "Display similar answers",
+    "noGradeAvailable": "⚠️ No grade available",
+    "applyNoteToSelected": "Apply the note to the selected",
+    "applyNoteToAll": "Apply the note to all",
+    "selectAllSimilar": "Select all"
   }
 }

@@ -23,7 +23,19 @@
         "textComment": "Text Comment",
         "gradedComment": "Graded Comment",
         "prediction": "Prediction",
-        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
+        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
+        "list": {
+          "predictionlist": "Prediction List",
+          "delpredictionbyid": "Delete All Predictions for Exam",
+          "delallpredictions": "Delete All Predictions",
+          "id": "ID",
+          "questionid": "Question ID",
+          "studentnumber": "Student Number",
+          "examid": "Exam ID",
+          "questionnumber": "Question Number",
+          "predictiontext": "Prediction Text",
+          "actions": "Actions"
+        }
       },
       "account": {
         "main": "Account",

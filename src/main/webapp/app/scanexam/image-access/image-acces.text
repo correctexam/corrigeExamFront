@@ -12,7 +12,6 @@ import { PredictionService } from 'app/entities/prediction/service/prediction.se
 import { IPrediction } from 'app/entities/prediction/prediction.model';
 import { MltComponent } from '../mlt/mlt.component';
 import { CoupageDimageService } from '../mlt/coupage-dimage.service';
-import { QueueCoordinationService } from './queue-coordination.service';
 
 interface ExamPageImage {
   pageNumber: number;
@@ -52,7 +51,6 @@ export class ImageAccessComponent implements OnInit {
   private predictionQueue: PredictionQueueItem[] = [];
   private processingCount = 0;
   private readonly MAX_CONCURRENT_PREDICTIONS = 1;
-  private externalProcessing = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -63,10 +61,7 @@ export class ImageAccessComponent implements OnInit {
     private predictionService: PredictionService,
     private mltcomponent: MltComponent,
     private coupageDimageService: CoupageDimageService,
-    private queueService: QueueCoordinationService,
-  ) {
-    this.queueService.externalProcessing$.subscribe(isPaused => (this.externalProcessing = isPaused));
-  }
+  ) {}
 
   async ngOnInit() {
     this.route.params.subscribe(async params => {
@@ -80,14 +75,19 @@ export class ImageAccessComponent implements OnInit {
 
   async loadManuscriptQuestions() {
     try {
+      // Get all questions for this exam
       const response = await firstValueFrom(this.questionService.query({ examId: +this.examId! }));
-      this.manuscriptQuestions = response.body?.filter(q => q.typeAlgoName === 'manuscrit').sort((a, b) => a.numero! - b.numero!) || [];
+
+      // Filter only manuscript questions
+      this.manuscriptQuestions = response.body?.filter(q => q.typeAlgoName === 'manuscrit') || [];
+
       console.log('Found manuscript questions:', this.manuscriptQuestions);
     } catch (error) {
       console.error('Error loading manuscript questions:', error);
       this.error = 'Failed to load questions';
     }
   }
+
   async loadImages(exam_id: string) {
     try {
       this.loading = true;
@@ -181,48 +181,24 @@ export class ImageAccessComponent implements OnInit {
     }
   }
 
-  private readonly THROTTLE_DELAY = 200; // Delay between predictions
-
   private async processQueue(): Promise<void> {
     while (this.predictionQueue.length > 0 || this.processingCount > 0) {
-      const isProcessing = await firstValueFrom(this.queueService.externalProcessing$);
-
-      if (isProcessing) {
-        console.log(`Queue paused at ${new Date().toISOString()} - ${this.predictionQueue.length} items waiting`);
-        await new Promise(resolve => setTimeout(resolve, 500));
-        continue;
-      }
-
       while (this.processingCount < this.MAX_CONCURRENT_PREDICTIONS && this.predictionQueue.length > 0) {
         const item = this.predictionQueue.shift();
         if (item) {
           this.processingCount++;
-          console.log(
-            `Processing prediction for student ${item.studentId}, question ${item.questionId}. Remaining in queue: ${this.predictionQueue.length}`,
-          );
-
-          try {
-            await this.handlePrediction(item.image, item.studentId);
-          } catch (error) {
-            console.error('Error in prediction:', error);
-          } finally {
+          console.log('I handle prediction now');
+          this.handlePrediction(item.image, item.studentId).finally(() => {
             this.processingCount--;
-            (item.image as any) = null;
-            await new Promise(resolve => setTimeout(resolve, this.THROTTLE_DELAY));
             this.processQueue();
-          }
+          });
         }
       }
-
       // Wait a bit before checking again if we can't process more items
       if (this.processingCount >= this.MAX_CONCURRENT_PREDICTIONS) {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
-
-    // Final cleanup
-    this.predictionQueue = [];
-    global.gc && global.gc();
   }
 
   private async handlePrediction(image: ExamPageImage, studentId: number) {
@@ -230,14 +206,9 @@ export class ImageAccessComponent implements OnInit {
       const canvas = document.createElement('canvas');
       canvas.width = image.width;
       canvas.height = image.height;
-      let ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext('2d');
       ctx?.putImageData(image.imageData, 0, 0);
       const base64Image = canvas.toDataURL();
-
-      // Clear canvas reference
-      canvas.width = 0;
-      canvas.height = 0;
-      (ctx as any) = null;
 
       // Query predictions for this question
       const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: image.questionId }));
@@ -265,8 +236,6 @@ export class ImageAccessComponent implements OnInit {
                 prediction += lineResult + '\n';
               }
             }
-            // Clear refined lines after processing
-            coupageResponse.refinedLines = [];
           }
 
           // Store and set prediction if we got any results
@@ -277,11 +246,6 @@ export class ImageAccessComponent implements OnInit {
             image.prediction = 'No prediction available';
           }
         }
-      }
-      // Clear large data after processing
-      if (image.imageData) {
-        // @ts-ignore
-        image.imageData = null;
       }
     } catch (error) {
       console.error('Error handling prediction:', error);

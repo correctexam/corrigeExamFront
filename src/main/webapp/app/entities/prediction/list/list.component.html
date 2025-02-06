@@ -1,15 +1,34 @@
 <div class="entity-list">
-  <h2>Prediction List</h2>
+  <h2 jhiTranslate="global.menu.entities.list.predictionlist">Prediction List</h2>
+  <div class="mb-3">
+    <input #examId type="number" class="form-control w-25 d-inline me-2" placeholder="Enter Exam ID" />
+    <button
+      type="button"
+      class="btn btn-danger"
+      jhiTranslate="global.menu.entities.list.delpredictionbyid"
+      (click)="deleteByExam(examId.value)"
+    >
+      <i class="fa fa-trash"></i> Delete All Predictions for Exam
+    </button>
+    <button
+      type="button"
+      class="btn btn-danger"
+      jhiTranslate="global.menu.entities.list.delallpredictions"
+      (click)="deleteAllPredictions()"
+    >
+      <i class="fa fa-trash"></i> Delete All Predictions
+    </button>
+  </div>
   <table class="table table-striped">
     <thead>
       <tr>
-        <th>ID</th>
-        <th>Id de Question</th>
-        <th>Numero d'Etudiant</th>
-        <th>Id d'Exam</th>
-        <th>Numero de Question</th>
-        <th>Prediction Text</th>
-        <th>Actions</th>
+        <th jhiTranslate="global.menu.entities.list.id">ID</th>
+        <th jhiTranslate="global.menu.entities.list.questionid">Id de Question</th>
+        <th jhiTranslate="global.menu.entities.list.studentnumber">Numero d'Etudiant</th>
+        <th jhiTranslate="global.menu.entities.list.examid">Id d'Exam</th>
+        <th jhiTranslate="global.menu.entities.list.questionnumber">Numero de Question</th>
+        <th jhiTranslate="global.menu.entities.list.predictiontext">Prediction Text</th>
+        <th jhiTranslate="global.menu.entities.list.actions">Actions</th>
       </tr>
     </thead>
     <tbody>

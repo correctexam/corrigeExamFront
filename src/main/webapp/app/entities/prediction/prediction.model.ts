@@ -5,7 +5,7 @@ export interface IPrediction {
   text?: string | null;
   zonegeneratedid?: string | null;
   questionId?: number;
-  studentResponses?: IStudentResponse[];
+  studentResponse?: IStudentResponse | undefined;
   shortcut?: string | string[];
   jsonData?: string | null;
   questionNumber?: number | null;
@@ -20,7 +20,7 @@ export class Prediction implements IPrediction {
     public text?: string | null,
     public zonegeneratedid?: string | null,
     public questionId?: number,
-    public studentResponses?: IStudentResponse[],
+    public studentResponse?: IStudentResponse | undefined,
     public shortcut?: string | string[],
     public jsonData?: string | null,
     public questionNumber?: number | null, // Add questionNumber to Prediction class

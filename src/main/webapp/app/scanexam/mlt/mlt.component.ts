@@ -20,6 +20,7 @@ ort.env.wasm.wasmPaths = '/public/';
   styleUrl: './mlt.component.scss',
 })
 export class MltComponent {
+  session: InferenceSession | undefined = undefined;
   constructor(private route: ActivatedRoute) {}
 
   charList: string[] = [
@@ -285,17 +286,18 @@ export class MltComponent {
   // Fonction pour effectuer une inférence avec le modèle ONNX
   async runInference(imageTensor: Tensor, modelPath: string): Promise<string> {
     try {
-      const session = await ort.InferenceSession.create(modelPath, {
-        executionProviders: ['wasm'],
-      });
-
+      if (this.session === undefined) {
+        this.session = await ort.InferenceSession.create(modelPath, {
+          executionProviders: ['wasm'],
+        });
+      }
       const inputImage = imageTensor.expandDims(0).transpose([0, 3, 1, 2]);
       const imageWidth = tf.scalar(inputImage.shape[3] ?? 0, 'int32');
 
       const inputImageONNX = new ort.Tensor('float32', await inputImage.data(), inputImage.shape);
       const imageWidthONNX = new ort.Tensor('int32', await imageWidth.dataSync());
 
-      const results = await session.run({
+      const results = await this.session.run({
         inputs: inputImageONNX,
         image_widths: imageWidthONNX,
       });
