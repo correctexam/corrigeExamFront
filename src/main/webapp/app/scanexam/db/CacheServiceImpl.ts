@@ -89,6 +89,9 @@ export class CacheServiceImpl implements CacheService {
   getFirstTemplate(examId: number, pageInscan: number): Promise<Template | undefined> {
     return this.service.getFirstTemplate(examId, pageInscan);
   }
+  getAllTemplate(examId: number): Promise<Template[] | undefined> {
+    return this.service.getAllTemplate(examId);
+  }
   getNonAlignImageBetweenAndSortByPageNumber(examId: number, p1: number, p2: number): Promise<ImageDB[]> {
     return this.service.getNonAlignImageBetweenAndSortByPageNumber(examId, p1, p2);
   }
@@ -119,5 +122,19 @@ export class CacheServiceImpl implements CacheService {
   }
   moveAlignPages(examId: number, from: number, to: number): Promise<void> {
     return this.service.moveAlignPages(examId, from, to);
+  }
+  removePageAlignForExamForPagesAndReorder(examId: number, pages: number[]): Promise<void> {
+    return this.service.removePageAlignForExamForPagesAndReorder(examId, pages);
+  }
+  removePageNonAlignForExamForPagesAndReorder(examId: number, pages: number[]): Promise<void> {
+    return this.service.removePageNonAlignForExamForPagesAndReorder(examId, pages);
+  }
+
+  moveTemplatePages(examId: number, pageNumber: number, lastPage: number): Promise<void> {
+    return this.service.moveTemplatePages(examId, pageNumber, lastPage);
+  }
+
+  removePageTemplateForExamForPage(examId: number, lastPage: number): Promise<void> {
+    return this.service.removePageTemplateForExamForPage(examId, lastPage);
   }
 }

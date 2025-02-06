@@ -144,7 +144,7 @@
     <div class="col-12 md:col-12">
       <h5 jhiTranslate="scanexam.alignscanalgo">Algorithme d'alignement</h5>
       <p-selectButton [options]="alignementOptions" [(ngModel)]="alignement" optionLabel="label" optionValue="value">
-        <ng-template let-item pTemplate>
+        <ng-template #item let-item>
           <span [tooltipPosition]="'bottom'" [pTooltip]="item.tooltip | translate" [jhiTranslate]="item.label"></span>
         </ng-template>
       </p-selectButton>

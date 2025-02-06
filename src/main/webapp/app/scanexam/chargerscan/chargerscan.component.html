@@ -22,9 +22,30 @@
     </div>
   </p-blockUI>
 
+  <p-drawer [(visible)]="layoutsidebarVisible">
+    <h3 jhiTranslate="scanexam.downloadpdf">Téléchargement pdfs</h3>
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <a (click)="downloadTemplate()">template.pdf</a>
+    </div>
+    <div *ngIf="this.exam?.scanfileId !== undefined" style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <a (click)="downloadScan()">scan.pdf</a>
+    </div>
+  </p-drawer>
+
   <div class="sm:col-12 md:col-12 lg:col-12">
     <div class="grid grid-nogutter">
-      <div class="col-8">
+      <div class="col-12 md:col-1">
+        <p-button
+          class="sm:text-xs md:text-xs lg:text-base"
+          styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
+          (click)="layoutsidebarVisible = true"
+          icon="pi pi-cog"
+          [pTooltip]="'scanexam.showDownloadOptionsTooltip' | translate"
+          [tooltipPosition]="'right'"
+          [disabled]="blocked"
+        ></p-button>
+      </div>
+      <div class="col-7">
         <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">
           <span jhiTranslate="scanexam.chargerscan"> Charger ou mettre à jour un scan de copies pour l'exam : </span> {{ exam.name }}
         </h2>

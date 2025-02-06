@@ -45,6 +45,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
+import { ButtonModule } from 'primeng/button';
+import { DrawerModule } from 'primeng/drawer';
 
 interface Upload {
   progress: number;
@@ -100,6 +102,8 @@ const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
     ViewandreorderpagesComponent,
     NgxExtendedPdfViewerModule,
     TranslateModule,
+    ButtonModule,
+    DrawerModule,
   ],
 })
 export class ChargerscanComponent implements OnInit, OnDestroy {
@@ -183,6 +187,7 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
   images: any[] = [];
   pageWithQCM: number[] = [];
   showVignette = true;
+  layoutsidebarVisible = false;
   constructor(
     private translate: TranslateService,
     private messageService: MessageService,
@@ -693,6 +698,33 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
     } else {
       return value;
     }
+  }
+  async downloadTemplate(): Promise<void> {
+    const e1 = (await firstValueFrom(this.templateService.getPdf(this.exam!.templateId!))) as Blob;
+
+    // this.downLoadFile(s, "application/json")
+    const filename: string = this.exam ? 'template-' + this.exam.id + '.pdf' : 'template.pdf';
+    const downloadLink = document.createElement('a');
+    downloadLink.href = window.URL.createObjectURL(e1);
+    downloadLink.setAttribute('download', filename);
+    document.body.appendChild(downloadLink);
+    this.blocked = false;
+    this.message = '';
+    downloadLink.click();
+  }
+
+  async downloadScan(): Promise<void> {
+    const e1 = (await firstValueFrom(this.scanService.getPdf(this.exam!.scanfileId!))) as Blob;
+
+    // this.downLoadFile(s, "application/json")
+    const filename: string = this.exam ? 'scan-' + this.exam.id + '.pdf' : 'scan.pdf';
+    const downloadLink = document.createElement('a');
+    downloadLink.href = window.URL.createObjectURL(e1);
+    downloadLink.setAttribute('download', filename);
+    document.body.appendChild(downloadLink);
+    this.blocked = false;
+    this.message = '';
+    downloadLink.click();
   }
 }
 

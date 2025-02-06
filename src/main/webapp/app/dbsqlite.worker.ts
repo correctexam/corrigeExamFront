@@ -416,6 +416,48 @@ addEventListener('message', e => {
       db1.moveAlignPages(_sqlite3, e.data);
       break;
     }
+    case 'removePageAlignForExamForPagesAndReorder': {
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.payload.examId);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.payload.examId, db1);
+      }
+      db1.removePageAlignForExamForPagesAndReorder(_sqlite3, e.data);
+      break;
+    }
+    case 'removePageNonAlignForExamForPagesAndReorder': {
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.payload.examId);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.payload.examId, db1);
+      }
+      db1.removePageNonAlignForExamForPagesAndReorder(_sqlite3, e.data);
+      break;
+    }
+
+    case 'moveTemplatePages': {
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.payload.examId);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.payload.examId, db1);
+      }
+      db1.moveTemplatePages(_sqlite3, e.data);
+      break;
+    }
+
+    case 'removePageTemplateForExamForPage': {
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.payload.examId);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.payload.examId, db1);
+      }
+      db1.removePageTemplateForExamForPage(_sqlite3, e.data);
+      break;
+    }
   }
 });
 
@@ -1311,6 +1353,74 @@ class DB {
       } finally {
         this.close();
       }
+    }
+  }
+
+  removePageAlignForExamForPagesAndReorder(sqlite3: any, data: any) {
+    const payload = data.payload;
+    //TODO
+    this.initDb(sqlite3);
+    if (payload.from !== payload.to) {
+      try {
+        const count = this.db.selectValue('update align  set page=-1000 where page=' + payload.from);
+        if (payload.from < payload.to) {
+          this.db.selectValue('update align  set page=page-1 where page>' + payload.from + ' and page<=' + payload.to);
+        } else {
+          this.db.selectValue('update align  set page=page+1 where page<' + payload.from + ' and page>=' + payload.to);
+        }
+        this.db.selectValue('update align set page=' + payload.to + ' where page=-1000');
+        postMessage({
+          msg: data.msg,
+          uid: data.uid,
+          payload: count,
+        });
+      } finally {
+        this.close();
+      }
+    }
+  }
+  removePageNonAlignForExamForPagesAndReorder(sqlite3: any, data: any) {
+    const payload = data.payload;
+
+    this.initDb(sqlite3);
+    if (payload.from !== payload.to) {
+      try {
+        const count = this.db.selectValue('update align  set page=-1000 where page=' + payload.from);
+        if (payload.from < payload.to) {
+          this.db.selectValue('update align  set page=page-1 where page>' + payload.from + ' and page<=' + payload.to);
+        } else {
+          this.db.selectValue('update align  set page=page+1 where page<' + payload.from + ' and page>=' + payload.to);
+        }
+        this.db.selectValue('update align set page=' + payload.to + ' where page=-1000');
+        postMessage({
+          msg: data.msg,
+          uid: data.uid,
+          payload: count,
+        });
+      } finally {
+        this.close();
+      }
+    }
+  }
+
+  moveTemplatePages(sqlite3: any, data: any) {
+    const payload = data.payload;
+    this.initDb(sqlite3);
+    try {
+      console.error(payload);
+    } finally {
+      this.close();
+    }
+
+    //TODO
+  }
+  removePageTemplateForExamForPage(sqlite3: any, data: any) {
+    const payload = data.payload;
+    this.initDb(sqlite3);
+    try {
+      console.error(payload);
+    } finally {
+      this.close();
     }
   }
 }

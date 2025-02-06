@@ -27,7 +27,7 @@ import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { CacheUploadService } from '../exam-detail/cacheUpload.service';
 import { PreferenceService } from '../preference-page/preference.service';
 import { EventEmitter } from '@angular/core';
-import { ImageDB } from '../db/db';
+import { ImageDB, Template } from '../db/db';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TooltipModule } from 'primeng/tooltip';
 import { DragDropModule } from 'primeng/dragdrop';
@@ -36,6 +36,11 @@ import { NgIf, NgFor, NgClass, KeyValuePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { TranslateDirective } from '../../shared/language/translate.directive';
+import { ButtonModule } from 'primeng/button';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { PageToRotateOrDeleteComponent } from './pagetorotateordelete/pagetorotateordelete.component';
+import { ImageModule } from 'primeng/image';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: 'jhi-viewandreorderpages',
@@ -44,6 +49,7 @@ import { TranslateDirective } from '../../shared/language/translate.directive';
   standalone: true,
   imports: [
     TranslateDirective,
+    ButtonModule,
     SelectButtonModule,
     FormsModule,
     NgIf,
@@ -55,7 +61,10 @@ import { TranslateDirective } from '../../shared/language/translate.directive';
     FaIconComponent,
     KeyValuePipe,
     TranslateModule,
+    ImageModule,
+    DialogModule,
   ],
+  providers: [DialogService],
 })
 export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
   @Input()
@@ -66,14 +75,23 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
 
   clusters: Map<number, number[]> = new Map();
   canvass: Map<number, HTMLCanvasElement> = new Map();
+
+  templates: number[] = [];
+  canvassTemplates: Map<number, HTMLCanvasElement> = new Map();
+
   colonneStyle = 'col-2 md:col-2';
   nbreColumn = 2;
   candropordelete = true;
   @ViewChildren('nomImageVisible')
   canvassVisibles: QueryList<ElementRef> | undefined;
 
+  @ViewChildren('nomImageTemplateVisible')
+  canvassTemplateVisibles: QueryList<ElementRef> | undefined;
+
   @Output()
   setblocked: EventEmitter<boolean> = new EventEmitter<boolean>();
+  base64img = '';
+  pageAlt = '';
 
   message = '';
   scale = 1;
@@ -81,6 +99,7 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
   windowWidth = 0;
   pageInScan = 0;
   templatePage = 0;
+  imgVisible = false;
   nbreColumnOptions: any[] = [
     { name: '1', value: 1 },
     { name: '2', value: 2 },
@@ -91,6 +110,7 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
   ];
 
   showProgressBar = true;
+  ref: DynamicDialogRef | undefined;
 
   constructor(
     public examService: ExamService,
@@ -107,6 +127,7 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
     private preferenceService: PreferenceService,
     private db: CacheServiceImpl,
     private changeDetector: ChangeDetectorRef,
+    public dialogService: DialogService,
   ) {}
   ngOnInit(): void {
     this.update();
@@ -135,10 +156,31 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
     const factorscale = this.preferenceService.getImagePerLine();
 
     this.windowWidth = window.innerWidth;
-    this.updateColumn(factorscale);
+    await this.updateColumn(factorscale);
   }
 
   async reloadImage(): Promise<void> {
+    this.canvassTemplates.clear();
+    this.templates = [];
+    const promisestemplates: Promise<number>[] = [];
+    if (this.templatePage > 0) {
+      let images: Template[] | undefined = [];
+
+      for (let i = 0; i < this.templatePage; i++) {
+        images = await this.db.getAllTemplate(this.examId);
+
+        images?.forEach((e, index) => {
+          const image = JSON.parse(e.value, this.reviver);
+          promisestemplates.push(this.loadImage(image.pages, e.pageNumber, this.canvassTemplates));
+        });
+      }
+
+      Promise.all(promisestemplates).then(e => {
+        this.canvassTemplates = new Map([...this.canvassTemplates.entries()].sort((a, b) => a[0] - b[0]));
+        this.templates = Array.from({ length: this.templatePage }, (_, i) => i + 1);
+      });
+    }
+
     this.canvass.clear();
     this.clusters.clear();
     if (this.templatePage > 0 && this.pageInScan > 0) {
@@ -146,7 +188,9 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
 
       const step = 150;
       const quotien = Math.floor(this.pageInScan / step);
+      console.error(quotien);
       const reste = this.pageInScan % step;
+      console.error(reste, this.pageInScan);
       let promises: Promise<number>[] = [];
 
       for (let i = 0; i < quotien; i++) {
@@ -157,7 +201,7 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
         }
         images.forEach((e, index) => {
           const image = JSON.parse(e.value, this.reviver);
-          promises.push(this.loadImage(image.pages, e.pageNumber));
+          promises.push(this.loadImage(image.pages, e.pageNumber, this.canvass));
         });
         await Promise.all(promises);
         promises = [];
@@ -171,14 +215,8 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
 
       images.forEach((e, index) => {
         const image = JSON.parse(e.value, this.reviver);
-        promises.push(this.loadImage(image.pages, e.pageNumber));
+        promises.push(this.loadImage(image.pages, e.pageNumber, this.canvass));
       });
-
-      /* if (this.alignPage) {
-        images = await this.db.getAlignImageBetweenAndSortByPageNumber(this.examId, 1, this.pageInScan);
-      } else {
-        images = await this.db.getNonAlignImageBetweenAndSortByPageNumber(this.examId, 1, this.pageInScan);
-      }*/
 
       Promise.all(promises).then(e => {
         this.canvass = new Map([...this.canvass.entries()].sort((a, b) => a[0] - b[0]));
@@ -199,9 +237,13 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
       this.reloadImageClassify();
       this.changeDetector.detectChanges();
     });
+    this.canvassTemplateVisibles?.changes.subscribe(() => {
+      this.reloadImageClassifyTemplate();
+      this.changeDetector.detectChanges();
+    });
   }
 
-  async loadImage(file1: any, pageNumber: number): Promise<number> {
+  async loadImage(file1: any, pageNumber: number, canvass1: Map<number, HTMLCanvasElement>): Promise<number> {
     return new Promise(resolve => {
       const page1 = pageNumber;
       const file = file1;
@@ -225,7 +267,7 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
             ctx2!.drawImage(i, 0, 0);
             ctx!.scale(this.scale, this.scale);
             ctx!.drawImage(editedImage1, 0, 0);
-            this.canvass.set(page1, editedImage);
+            canvass1.set(page1, editedImage);
             resolve(page1);
           });
         });
@@ -255,6 +297,23 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
       }
     }
     return value;
+  }
+
+  reloadImageClassifyTemplate() {
+    if (this.canvassTemplateVisibles !== undefined && this.canvassTemplateVisibles.length > 0) {
+      console.error('reload1', this.canvassTemplates);
+      this.canvassTemplateVisibles.forEach(e => {
+        if (this.canvassTemplates.get(+e.nativeElement.id) !== undefined) {
+          e.nativeElement.width = this.canvassTemplates.get(+e.nativeElement.id)!.width;
+          e.nativeElement.height = this.canvassTemplates.get(+e.nativeElement.id)!.height;
+          const ctx1 = e.nativeElement.getContext('2d');
+          ctx1.drawImage(this.canvassTemplates.get(+e.nativeElement.id), 0, 0);
+        } else {
+          e.nativeElement.width = 0;
+          e.nativeElement.height = 0;
+        }
+      });
+    }
   }
 
   reloadImageClassify() {
@@ -299,6 +358,93 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
     await this.reloadImage();
   }
 
+  async rotateSheet(key: number) {
+    if (this.clusters.get(key) !== undefined) {
+      this.candropordelete = false;
+      for (const page of this.clusters.get(key)!) {
+        await this.rotateImageWithoutReload(page);
+      }
+      this.reloadImageClassify();
+      this.candropordelete = true;
+    }
+  }
+
+  async rotatePages(pages: number[]) {
+    if (pages.length > 0) {
+      this.candropordelete = false;
+      for (const page of pages) {
+        await this.rotateImageWithoutReload(page);
+      }
+      this.reloadImageClassify();
+      this.candropordelete = true;
+    }
+  }
+
+  async removePages(pages: number[]) {
+    this.candropordelete = false;
+
+    if (pages.length > 0) {
+      const lastPage = Math.max(...this.canvass.keys());
+      if (this.alignPage) {
+        await this.db.removePageAlignForExamForPagesAndReorder(this.examId, pages);
+      } else {
+        await this.db.removePageNonAlignForExamForPagesAndReorder(this.examId, pages);
+      }
+      for (const page of pages.reverse()) {
+        this.canvass.delete(page);
+        for (let i = page + 1; i <= lastPage; i++) {
+          const canvas1 = this.canvass.get(i);
+          if (canvas1 !== undefined) {
+            this.canvass.delete(i);
+            this.canvass.set(i - 1, canvas1);
+          }
+        }
+      }
+      this.reloadImageClassify();
+      this.candropordelete = true;
+    }
+  }
+
+  async removeSheet(key: number) {
+    this.candropordelete = false;
+
+    if (this.clusters.get(key) !== undefined) {
+      const lastPage = Math.max(...this.canvass.keys());
+      if (this.alignPage) {
+        await this.db.removePageAlignForExamForPagesAndReorder(this.examId, this.clusters.get(key)!);
+      } else {
+        await this.db.removePageNonAlignForExamForPagesAndReorder(this.examId, this.clusters.get(key)!);
+      }
+      for (const page of this.clusters.get(key)!) {
+        this.canvass.delete(page);
+      }
+      const nextpage = Math.max(...this.clusters.get(key)!) + 1;
+      const nbrPageToRemove = this.clusters.get(key)!.length;
+      for (let i = nextpage; i <= lastPage; i++) {
+        const canvas1 = this.canvass.get(i);
+        if (canvas1 !== undefined) {
+          this.canvass.delete(i);
+          this.canvass.set(i - nbrPageToRemove, canvas1);
+        }
+      }
+      this.reloadImageClassify();
+      this.candropordelete = true;
+    }
+  }
+
+  showDialog(event: any) {
+    this.ref = this.dialogService.open(PageToRotateOrDeleteComponent, {
+      header: 'Page selection',
+      width: '80vw',
+      modal: true,
+      closable: true,
+      data: {
+        pageInScan: this.pageInScan,
+        pageparexam: this.templatePage,
+        parent: this,
+      },
+    });
+  }
   updateColumnEvent(event: any) {
     this.showProgressBar = true;
     this.updateColumn(event.value);
@@ -349,28 +495,47 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async deleteImage(pageNumber: number) {
-    const lastPage = Math.max(...this.canvass.keys());
-    this.canvass.delete(pageNumber);
+  async deleteImage(pageNumber: number, scan: boolean) {
+    if (scan) {
+      const lastPage = Math.max(...this.canvass.keys());
+      this.canvass.delete(pageNumber);
 
-    for (let i = pageNumber + 1; i <= lastPage; i++) {
-      const canvas1 = this.canvass.get(i);
-      if (canvas1 !== undefined) {
-        this.canvass.delete(i);
-        this.canvass.set(i - 1, canvas1);
+      for (let i = pageNumber + 1; i <= lastPage; i++) {
+        const canvas1 = this.canvass.get(i);
+        if (canvas1 !== undefined) {
+          this.canvass.delete(i);
+          this.canvass.set(i - 1, canvas1);
+        }
       }
-    }
 
-    this.reloadImageClassify();
-    this.candropordelete = false;
-    if (this.alignPage) {
-      await this.db.moveAlignPages(this.examId, pageNumber, lastPage);
-      await this.db.removePageAlignForExamForPage(this.examId, lastPage);
+      this.reloadImageClassify();
+      this.candropordelete = false;
+      if (this.alignPage) {
+        await this.db.moveAlignPages(this.examId, pageNumber, lastPage);
+        await this.db.removePageAlignForExamForPage(this.examId, lastPage);
+      } else {
+        await this.db.moveNonAlignPages(this.examId, pageNumber, lastPage);
+        await this.db.removePageNonAlignForExamForPage(this.examId, lastPage);
+      }
+      this.candropordelete = true;
     } else {
-      await this.db.moveNonAlignPages(this.examId, pageNumber, lastPage);
-      await this.db.removePageNonAlignForExamForPage(this.examId, lastPage);
+      const lastPage = this.templatePage;
+      this.canvassTemplates.delete(pageNumber);
+
+      for (let i = pageNumber + 1; i <= lastPage; i++) {
+        const canvas1 = this.canvassTemplates.get(i);
+        if (canvas1 !== undefined) {
+          this.canvassTemplates.delete(i);
+          this.canvassTemplates.set(i - 1, canvas1);
+        }
+      }
+
+      this.reloadImageClassifyTemplate();
+      this.candropordelete = false;
+      await this.db.moveTemplatePages(this.examId, pageNumber, lastPage);
+      await this.db.removePageTemplateForExamForPage(this.examId, lastPage);
+      this.candropordelete = true;
     }
-    this.candropordelete = true;
   }
 
   async _rotateImage(file: any, page1: number): Promise<number> {
@@ -450,15 +615,14 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
       });
       console.timeLog('replaceImage', 'add image');
 
-      await this.loadImage(JSON.parse(imagesNonAligned.value).pages, pageNumber);
+      await this.loadImage(JSON.parse(imagesNonAligned.value).pages, pageNumber, this.canvass);
       console.timeLog('replaceImage', 'loadImage');
       console.timeEnd('replaceImage');
 
       this.reloadImageClassify();
     }
   }
-
-  async rotateImage(pageNumber: number) {
+  async rotateImageWithoutReload(pageNumber: number) {
     const canvas: HTMLCanvasElement = document.createElement('canvas');
     canvas.width = this.canvass.get(pageNumber)!.width;
     canvas.height = this.canvass.get(pageNumber)!.height;
@@ -474,7 +638,6 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
 
     // updateCache
     let images: ImageDB[] = [];
-    this.candropordelete = false;
     if (this.alignPage) {
       images = await this.db.getAlignImageBetweenAndSortByPageNumber(this.examId, pageNumber, pageNumber);
     } else {
@@ -486,9 +649,14 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
       const image = JSON.parse(e.value, this.reviver);
       promises.push(this._rotateImage(image.pages, e.pageNumber));
     });
-    this.candropordelete = true;
 
     await Promise.all(promises);
+  }
+
+  async rotateImage(pageNumber: number) {
+    this.candropordelete = false;
+    await this.rotateImageWithoutReload(pageNumber);
+    this.candropordelete = true;
     this.reloadImageClassify();
   }
 
@@ -500,6 +668,28 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
       };
     } else {
       return value;
+    }
+  }
+
+  async showImage(value: number, scan: boolean) {
+    this.pageAlt = 'page ' + value;
+
+    if (scan) {
+      const i = this.alignPage
+        ? await this.db.getFirstAlignImage(this.examId, value)
+        : await this.db.getFirstNonAlignImage(this.examId, value);
+      if (i !== undefined) {
+        const image1 = JSON.parse(i.value, this.reviver);
+        this.base64img = image1.pages;
+        this.imgVisible = true;
+      }
+    } else {
+      const i = await this.db.getFirstTemplate(this.examId, value);
+      if (i !== undefined) {
+        const image1 = JSON.parse(i.value, this.reviver);
+        this.base64img = image1.pages;
+        this.imgVisible = true;
+      }
     }
   }
 }
