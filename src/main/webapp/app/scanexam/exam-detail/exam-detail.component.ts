@@ -104,6 +104,8 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
 
   infoExamDetail = { nbrepagenonalign: 0, nbrepagealign: 0, nbrepagetemplate: 0, nbrecopie: 0, cond1: false, cond2: false, cond3: false };
 
+  developementMode: boolean = false;
+
   constructor(
     public courseService: CourseService,
     public examService: ExamService,

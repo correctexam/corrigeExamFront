@@ -600,20 +600,42 @@
                   <button
                     style="background-color: #0d89ec"
                     type="button"
-                    class="btn btn-primary w-full flex justify-between items-center px-4 py-3 text-lg font-medium"
+                    class="btn btn-primary w-full flex justify-between items-center px-4 py-3 text-lg font-medium relative"
                     (click)="similarPrediction()"
                   >
                     <span jhiTranslate="scanexam.displaySimilarAnswers">Afficher les réponses similaires</span>
+
                     <fa-icon
                       [icon]="dropdownOpen ? 'chevron-up' : 'chevron-down'"
                       class="fa-bounce-slow ml-2"
                       style="color: #deddda"
                     ></fa-icon>
+                    <!-- Non-Clickable Area with Input Field -->
+                    <span
+                      *ngIf="dropdownOpen && similarPredictions.length != 0"
+                      class="absolute right-0 top-0 h-full flex items-center"
+                      (click)="$event.stopPropagation()"
+                      style="padding-right: 20px; padding-top: 15px; padding-left: 30px"
+                    >
+                      <!-- Input Field -->
+                      <input
+                        [formControl]="searchControl"
+                        [placeholder]="'scanexam.rechercheParMot' | translate"
+                        class="p-2 border rounded text-black bg-white"
+                        style="height: 30px; width: 200px"
+                      />
+
+                      <style>
+                        input:focus {
+                          border-color: rgb(0, 0, 59);
+                          box-shadow: 0 0 20px rgba(1, 1, 71, 0.5);
+                          outline: none;
+                        }
+                      </style>
+                    </span>
                   </button>
-                  <!--div>
-                    <input [formControl]="searchControl" placeholder="Search predictions" />
-                  </div-->
-                  <!-- Contenu dropdown -->
+
+                  <!--Contenu dropdown -->
                   <div
                     style="border-radius: 8px; height: fit-content"
                     class="dropdown-content w-full mt-4 border border-gray-300 rounded-md shadow-lg"
@@ -761,7 +783,8 @@
                   currentPrediction &&
                   currentPrediction.questionId === questionId &&
                   currentPrediction.studentId === studentid &&
-                  currentPrediction.examId === examId
+                  currentPrediction.examId === examId &&
+                  developementMode
                 "
                 style="margin-top: 1rem; text-align: center"
               >

@@ -316,6 +316,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   noteStep = 0;
   filterPredictionsWithNotes: boolean = false;
 
+  developementMode: boolean = false;
+
   constructor(
     public examService: ExamService,
     public courseService: CourseService,
@@ -3246,6 +3248,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   async similarPrediction() {
     this.similarPredictions = [];
     this.dropdownOpen = !this.dropdownOpen;
+
+    this.setupSearchListener();
     try {
       const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionId }));
       const predictions = predictionResponse.body || [];
@@ -3263,6 +3267,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           return studentIdA - studentIdB;
         });
         this.deleted = false;
+        this.loadPredictionsForSearch();
       } else {
         this.executeScript();
       }
@@ -3294,8 +3299,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.getSameResponses();
   }
 
+  tempPredictions: IPrediction[] = [];
   areAllSimilarPredictionsSelected(): boolean {
-    return this.similarPredictions.every(prediction => this.selectedSimilars.get(prediction) === 1);
+    return this.tempPredictions.every(prediction => this.selectedSimilars.get(prediction) === 1);
   }
 
   toggle_untoggle_AllSimilarPredictions(event: Event): void {
@@ -3383,15 +3389,34 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   getFilteredSimilarPredictions(): IPrediction[] {
-    if (this.filterPredictionsWithNotes) {
+    if (this.searchedTerm != '') {
+      for (let prediction of this.similarPredictions) {
+        if (!this.filteredSearchedPredictions.includes(prediction)) {
+          this.selectedSimilars.set(prediction, 0);
+        }
+      }
+      if (this.filterPredictionsWithNotes) {
+        for (let prediction of this.selectedSimilars.keys()) {
+          if (this.getSimilarGrade(prediction.studentId!) != undefined) {
+            this.selectedSimilars.set(prediction, 0);
+          }
+        }
+        this.tempPredictions = this.filteredSearchedPredictions.filter(
+          prediction => this.getSimilarGrade(prediction.studentId!) == undefined,
+        );
+      }
+      this.tempPredictions = this.filteredSearchedPredictions;
+    } else if (this.filterPredictionsWithNotes) {
       for (let prediction of this.selectedSimilars.keys()) {
         if (this.getSimilarGrade(prediction.studentId!) != undefined) {
           this.selectedSimilars.set(prediction, 0);
         }
       }
-      return this.similarPredictions.filter(prediction => this.getSimilarGrade(prediction.studentId!) == undefined);
+      this.tempPredictions = this.similarPredictions.filter(prediction => this.getSimilarGrade(prediction.studentId!) == undefined);
+    } else {
+      this.tempPredictions = this.similarPredictions;
     }
-    return this.similarPredictions;
+    return this.tempPredictions;
   }
 
   // Same starts, comments etc
@@ -3549,49 +3574,42 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  predictions: IPrediction[] = [];
+  predictionsForSearch: IPrediction[] = [];
   searchControl = new FormControl('');
-  filteredPredictions: IPrediction[] = [];
+  filteredSearchedPredictions: IPrediction[] = [];
   private searchSubscription?: Subscription;
 
-  async loadPredictions(params: ParamMap) {
+  async loadPredictionsForSearch() {
     try {
       const req = {
         page: 0,
         size: 500,
       };
-      const predictionResponse = await firstValueFrom(this.predictionService.query(req));
-      const predictions = predictionResponse.body || [];
 
-      if (predictions.length > 0) {
-        this.predictions = predictions
-          .filter(prediction => prediction.examId === this.examId && prediction.questionId == this.questionId) // Add your desired examId here
-          .map(prediction => ({
-            examId: prediction.examId,
-            questionNumber: prediction.questionNumber,
-            studentId: prediction.studentId,
-            text: prediction.text,
-            imageData: prediction.imageData,
-          }));
-
-        this.filterPredictions();
+      if (this.similarPredictions.length > 0) {
+        this.predictionsForSearch = this.similarPredictions.filter(
+          prediction => prediction.examId === this.examId && prediction.questionId == this.questionId,
+        );
+        console.log('Predictions for search:', this.predictionsForSearch);
+        this.filterSearchedPredictions();
       } else {
-        console.warn('No predictions found from backend.');
+        console.warn('No predictions found for search.');
       }
     } catch (err) {
-      console.error('Error fetching predictions from backend:', err);
+      console.error('Error fetching predictions for search', err);
     }
   }
 
   setupSearchListener() {
     this.searchSubscription = this.searchControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe(value => {
-      this.filterPredictions(value ?? '');
+      this.filterSearchedPredictions(value ?? '');
     });
   }
 
-  filterPredictions(searchTerm: string = '') {
-    console.log('Text prediction search', searchTerm);
-    this.filteredPredictions = this.predictions.filter(prediction =>
+  searchedTerm: string = '';
+  filterSearchedPredictions(searchTerm: string = '') {
+    this.searchedTerm = searchTerm;
+    this.filteredSearchedPredictions = this.predictionsForSearch.filter(prediction =>
       (prediction.text ?? '').toLowerCase().includes(searchTerm.toLowerCase()),
     );
   }

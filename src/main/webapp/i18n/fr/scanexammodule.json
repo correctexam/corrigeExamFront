@@ -531,6 +531,7 @@
     "noGradeAvailable": "⚠️ Pas de note disponible",
     "applyNoteToSelected": "Appliquer la note aux sélectionnés",
     "applyNoteToAll": "Appliquer la note à tous",
-    "selectAllSimilar": "Sélectionner tout"
+    "selectAllSimilar": "Sélectionner tout",
+    "rechercheParMot": "Recherche par mot"
   }
 }

@@ -522,6 +522,7 @@
     "noGradeAvailable": "⚠️ No grade available",
     "applyNoteToSelected": "Apply the note to the selected",
     "applyNoteToAll": "Apply the note to all",
-    "selectAllSimilar": "Select all"
+    "selectAllSimilar": "Select all",
+    "rechercheParMot": "Search by word"
   }
 }
