@@ -59,6 +59,16 @@ addEventListener('message', e => {
             db1.getFirstTemplate(_sqlite3, e1.data, port);
             break;
           }
+          case 'getAllTemplate': {
+            let db1 = dbs.get(e1.data.payload.examId);
+            if (db1 === undefined) {
+              db1 = new DB(e1.data.payload.examId);
+              db1.initemptyDb(_sqlite3);
+              dbs.set(e1.data.payload.examId, db1);
+            }
+            db1.getAllTemplate(_sqlite3, e1.data, port);
+            break;
+          }
         }
         // (A)
         //        console.error(e1.data);
@@ -290,7 +300,16 @@ addEventListener('message', e => {
       db1.getFirstTemplate(_sqlite3, e.data);
       break;
     }
-
+    case 'getAllTemplate': {
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.payload.examId);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.payload.examId, db1);
+      }
+      db1.getAllTemplate(_sqlite3, e.data);
+      break;
+    }
     case 'getNonAlignImageBetweenAndSortByPageNumber': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
@@ -701,28 +720,6 @@ class DB {
     } finally {
       this.close();
     }
-
-    /* await this.transaction('rw', 'exams', 'templates', 'alignImages', 'nonAlignImages', () => {
-//      this.exams.delete(this.examId);
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      this.alignImages
-      .where({ examId: this.examId })
-      .filter(e2 => e2.pageNumber >= pageStart && e2.pageNumber <= pageEnd)
-      .toArray()
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        .then(a => this.alignImages.bulkDelete(a.map(t => t.id!)));
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-
-      this.nonAlignImages
-      .where({ examId: this.examId })
-      .filter(e2 => e2.pageNumber >= pageStart && e2.pageNumber <= pageEnd)
-      .toArray()
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        .then(a => this.nonAlignImages.bulkDelete(a.map(t => t.id!)));
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-
-    });*/
   }
 
   removePageAlignForExamForPages(sqlite3: any, data: any) {
@@ -1037,6 +1034,49 @@ class DB {
     }
   }
 
+  getAllTemplate(sqlite3: any, data: any, port?: any) {
+    //    const payload = data.payload;
+    this.initDb(sqlite3);
+    try {
+      const value = this.db.selectArrays('select page,imageData from template order by page asc');
+      const res: any[] = [];
+      const enc = new TextEncoder(); // always utf-8
+      const transfarable: any[] = [];
+
+      value.forEach((e: any) => {
+        const v = enc.encode(e[1]).buffer;
+        transfarable.push(v);
+        res.push({
+          pageNumber: e[0],
+          examId: this.examName,
+          value: v,
+        });
+      });
+
+      if (port) {
+        port.postMessage(
+          {
+            msg: data.msg,
+            uid: data.uid,
+            payload: res,
+          },
+          transfarable,
+        );
+      } else {
+        postMessage(
+          {
+            msg: data.msg,
+            uid: data.uid,
+            payload: res,
+          },
+          transfarable,
+        );
+      }
+    } finally {
+      this.close();
+    }
+  }
+
   // getNonAlignImageBetweenAndSortByPageNumber(examId:number,p1:number, p2:number ):Promise<ImageDB[]>;
 
   getNonAlignImagesForPageNumbers(sqlite3: any, data: any) {
@@ -1073,6 +1113,11 @@ class DB {
       } finally {
         this.close();
       }
+    } else {
+      postMessage({
+        msg: data.msg,
+        uid: data.uid,
+      });
     }
   }
 
@@ -1111,6 +1156,11 @@ class DB {
       } finally {
         this.close();
       }
+    } else {
+      postMessage({
+        msg: data.msg,
+        uid: data.uid,
+      });
     }
   }
 
@@ -1304,10 +1354,8 @@ class DB {
     }
   }
 
-  //TODO
   moveNonAlignPages(sqlite3: any, data: any) {
     const payload = data.payload;
-
     this.initDb(sqlite3);
     if (payload.from !== payload.to) {
       try {
@@ -1329,9 +1377,14 @@ class DB {
       } finally {
         this.close();
       }
+    } else {
+      postMessage({
+        msg: data.msg,
+        uid: data.uid,
+        payload: 0,
+      });
     }
   }
-  // TODO
   moveAlignPages(sqlite3: any, data: any) {
     const payload = data.payload;
 
@@ -1353,72 +1406,123 @@ class DB {
       } finally {
         this.close();
       }
+    } else {
+      postMessage({
+        msg: data.msg,
+        uid: data.uid,
+        payload: 0,
+      });
     }
   }
 
   removePageAlignForExamForPagesAndReorder(sqlite3: any, data: any) {
     const payload = data.payload;
-    //TODO
     this.initDb(sqlite3);
-    if (payload.from !== payload.to) {
-      try {
-        const count = this.db.selectValue('update align  set page=-1000 where page=' + payload.from);
-        if (payload.from < payload.to) {
-          this.db.selectValue('update align  set page=page-1 where page>' + payload.from + ' and page<=' + payload.to);
-        } else {
-          this.db.selectValue('update align  set page=page+1 where page<' + payload.from + ' and page>=' + payload.to);
+    const pages = payload.pages;
+    try {
+      const totalpage = this.db.selectValue('select count(*) from align');
+
+      this.db.exec('delete from align where page IN (' + pages.join(',') + ')');
+
+      const pagesorder = pages.sort((a: number, b: number) => a - b);
+      for (let i = 0; i < pages.length; i++) {
+        let max = totalpage;
+        let keepuper = true;
+        if (i < pagesorder.length - 1) {
+          max = pagesorder[i + 1];
+          keepuper = false;
         }
-        this.db.selectValue('update align set page=' + payload.to + ' where page=-1000');
-        postMessage({
-          msg: data.msg,
-          uid: data.uid,
-          payload: count,
-        });
-      } finally {
-        this.close();
+        const min = pagesorder[i];
+        if (min !== max) {
+          if (keepuper) {
+            this.db.selectValue('update align  set page=page-' + (i + 1) + ' where page>' + min + ' and page<=' + max);
+          } else {
+            this.db.selectValue('update align  set page=page-' + (i + 1) + ' where page>' + min + ' and page<' + max);
+          }
+        }
       }
+      postMessage({
+        msg: data.msg,
+        uid: data.uid,
+      });
+    } finally {
+      this.close();
     }
   }
   removePageNonAlignForExamForPagesAndReorder(sqlite3: any, data: any) {
     const payload = data.payload;
-
     this.initDb(sqlite3);
-    if (payload.from !== payload.to) {
-      try {
-        const count = this.db.selectValue('update align  set page=-1000 where page=' + payload.from);
-        if (payload.from < payload.to) {
-          this.db.selectValue('update align  set page=page-1 where page>' + payload.from + ' and page<=' + payload.to);
-        } else {
-          this.db.selectValue('update align  set page=page+1 where page<' + payload.from + ' and page>=' + payload.to);
+    const pages = payload.pages;
+    try {
+      const totalpage = this.db.selectValue('select count(*) from nonalign');
+
+      this.db.exec('delete from nonalign where page IN (' + pages.join(',') + ')');
+
+      const pagesorder = pages.sort((a: number, b: number) => a - b);
+      for (let i = 0; i < pages.length; i++) {
+        let max = totalpage;
+        let keepuper = true;
+        if (i < pagesorder.length - 1) {
+          max = pagesorder[i + 1];
+          keepuper = false;
         }
-        this.db.selectValue('update align set page=' + payload.to + ' where page=-1000');
-        postMessage({
-          msg: data.msg,
-          uid: data.uid,
-          payload: count,
-        });
-      } finally {
-        this.close();
+        const min = pagesorder[i];
+        if (min !== max) {
+          if (keepuper) {
+            this.db.selectValue('update nonalign  set page=page-' + (i + 1) + ' where page>' + min + ' and page<=' + max);
+          } else {
+            this.db.selectValue('update nonalign  set page=page-' + (i + 1) + ' where page>' + min + ' and page<' + max);
+          }
+        }
       }
+      postMessage({
+        msg: data.msg,
+        uid: data.uid,
+      });
+    } finally {
+      this.close();
     }
   }
 
   moveTemplatePages(sqlite3: any, data: any) {
     const payload = data.payload;
-    this.initDb(sqlite3);
-    try {
-      console.error(payload);
-    } finally {
-      this.close();
-    }
 
-    //TODO
+    this.initDb(sqlite3);
+    if (payload.from !== payload.to) {
+      try {
+        const count = this.db.selectValue('update template  set page=-1000 where page=' + payload.from);
+        if (payload.from < payload.to) {
+          this.db.selectValue('update template  set page=page-1 where page>' + payload.from + ' and page<=' + payload.to);
+        } else {
+          this.db.selectValue('update template  set page=page+1 where page<' + payload.from + ' and page>=' + payload.to);
+        }
+        this.db.selectValue('update template set page=' + payload.to + ' where page=-1000');
+        postMessage({
+          msg: data.msg,
+          uid: data.uid,
+          payload: count,
+        });
+      } finally {
+        this.close();
+      }
+    } else {
+      postMessage({
+        msg: data.msg,
+        uid: data.uid,
+      });
+    }
   }
   removePageTemplateForExamForPage(sqlite3: any, data: any) {
     const payload = data.payload;
+
     this.initDb(sqlite3);
     try {
-      console.error(payload);
+      this.db.exec('delete from template where page>=' + payload.pageStart + ' and page <= ' + payload.pageEnd + '');
+      postMessage({
+        msg: data.msg,
+        uid: data.uid,
+        payload: {},
+      });
     } finally {
       this.close();
     }

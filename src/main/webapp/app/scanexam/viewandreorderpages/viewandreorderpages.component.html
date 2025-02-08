@@ -1,5 +1,5 @@
 <div #pnl class="grid justify-center">
-  <p-dialog [(visible)]="imgVisible" [header]="pageAlt">
+  <p-dialog [(visible)]="imgVisible" [header]="pageAlt" [modal]="true">
     <img [src]="base64img" [alt]="pageAlt" />
   </p-dialog>
 
@@ -30,7 +30,7 @@
 
   <!-- template-->
 
-  <div *ngIf="templates.length > 1" class="md:col-12 col-12">
+  <div *ngIf="templates.length > 0" class="md:col-12 col-12">
     <h1>Template</h1>
   </div>
   <ng-container *ngFor="let value of templates">
@@ -38,11 +38,14 @@
       <div class="card" [style]="'width: 100%;height: 100%;position: static;'">
         <div class="card-container yellow-container overflow-hidden">
           <div class="flex flex-column">
-            <canvas [id]="'' + value" #nomImageTemplateVisible (click)="showImage(value, false)"></canvas>
+            <canvas [style]="{ cursor: 'pointer' }" [id]="'' + value" #nomImageTemplateVisible (click)="showImage(value, false)"></canvas>
           </div>
           <div class="flex card-content">
             <div *ngIf="!alignPage && candropordelete" class="flex-none flex align-items-end justify-content-end">
-              <span (click)="deleteImage(value, false)" [pTooltip]="'scanexam.deleteImageTooltip' | translate"
+              <span
+                [style]="{ cursor: 'pointer' }"
+                (click)="deleteImage(value, false)"
+                [pTooltip]="'scanexam.deleteImageTooltip' | translate"
                 ><fa-icon icon="trash"
               /></span>
             </div>
@@ -55,7 +58,7 @@
   <!-- scan-->
 
   <ng-container *ngFor="let k of clusters | keyvalue">
-    <div *ngIf="clusters.size > 1" class="md:col-12 col-12">
+    <div *ngIf="clusters.size > 0" class="md:col-12 col-12">
       <h1>Copie {{ k.key }}</h1>
       <p-button
         *ngIf="!alignPage"
@@ -107,16 +110,17 @@
         >
           <div class="card-container yellow-container overflow-hidden">
             <div class="flex flex-column">
-              <canvas [id]="'' + value" #nomImageVisible (click)="showImage(value, true)"></canvas>
+              <canvas [style]="{ cursor: 'pointer' }" [id]="'' + value" #nomImageVisible (click)="showImage(value, true)"></canvas>
             </div>
             <div class="flex card-content">
               <div *ngIf="!alignPage && candropordelete" class="flex-none flex align-items-left justify-content-left">
-                <span (click)="rotateImage(value)" [pTooltip]="'scanexam.rotateImageTooltip' | translate"
+                <span [style]="{ cursor: 'pointer' }" (click)="rotateImage(value)" [pTooltip]="'scanexam.rotateImageTooltip' | translate"
                   ><fa-icon icon="rotate-right"
                 /></span>
               </div>
               <div class="flex-grow-1 flex align-items-center justify-content-center">
                 <span
+                  [style]="{ cursor: 'pointer' }"
                   *ngIf="alignPage"
                   (click)="replaceImageWithNonAlign(value)"
                   [pTooltip]="'scanexam.replacealignementWithNonAlignTooltip' | translate"
@@ -124,7 +128,10 @@
                 /></span>
               </div>
               <div *ngIf="!alignPage && candropordelete" class="flex-none flex align-items-end justify-content-end">
-                <span (click)="deleteImage(value, true)" [pTooltip]="'scanexam.deleteImageTooltip' | translate"
+                <span
+                  [style]="{ cursor: 'pointer' }"
+                  (click)="deleteImage(value, true)"
+                  [pTooltip]="'scanexam.deleteImageTooltip' | translate"
                   ><fa-icon icon="trash"
                 /></span>
               </div>
@@ -134,4 +141,26 @@
       </div>
     </ng-container>
   </ng-container>
+  <div class="canvas-wrapper foo" *ngIf="blob1">
+    <ngx-extended-pdf-viewer
+      [hidden]="'true'"
+      [src]="blob1"
+      style="flex: 1 1 100%"
+      #viewer
+      [height]="'90vh'"
+      [page]="1"
+      [handTool]="false"
+      [showHandToolButton]="false"
+      [textLayer]="false"
+      [(scrollMode)]="scrollMode"
+      [showToolbar]="false"
+      [pageViewMode]="'infinite-scroll'"
+      [showSecondaryToolbarButton]="false"
+      backgroundColor="#ffffff"
+      [zoom]="'100%'"
+      [minZoom]="1"
+      [maxZoom]="1"
+      (pdfLoaded)="pdfloaded()"
+    ></ngx-extended-pdf-viewer>
+  </div>
 </div>

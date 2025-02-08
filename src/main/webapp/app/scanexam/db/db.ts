@@ -288,7 +288,6 @@ export class ExamIndexDB extends Dexie {
         keepuper = false;
       }
       const min = pagesorder[i];
-      console.error('min', min, 'max', max);
       if (min !== max) {
         await this.alignImages
           .where(['examId', 'pageNumber'])
@@ -308,7 +307,6 @@ export class ExamIndexDB extends Dexie {
         .anyOf(pages.map(p => [this.examId, p]))
         .toArray();
       await this.nonAlignImages.bulkDelete(arr.map(t => t.id!));
-      console.error('delete all image');
     });
 
     const pagesorder = pages.sort(this.compareNumbers);

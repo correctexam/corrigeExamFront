@@ -608,13 +608,8 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
   //  imagesP: Promise<void>[] = [];
   public async processPage(page: number, template: boolean): Promise<void> {
     const scale = { scale: this.scale };
-    //    if (page < 10 && !template) console.time('processPage' + page);
-    //    if (page < 10 && !template) console.timeLog('processPage' + page, 'before getDataURL ', page);
     const dataURL = await this.pdfService.getPageAsImage(page, scale);
-    //    this.pdfService.getP
-    //    if (page < 10 && !template) console.timeLog('processPage' + page, 'getDataURL ', page);
     await this.saveImageScan(dataURL, page, template);
-    //    if (page < 10 && !template) console.timeLog('processPage' + page, 'saveImageScan ', page);
   }
 
   saveImageScan(file: any, pagen: number, template: boolean): Promise<void> {
@@ -622,17 +617,9 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
       return new Promise(resolve => resolve());
     } else
       return new Promise(resolve => {
-        //      if (pagen === 1 && !template) console.timeLog('processPage', 'start', pagen);
-
         const i = new Image();
         i.onload = async () => {
-          //        if (pagen === 1 && !template) console.timeLog('processPage', 'image Loaded ', pagen);
           const editedImage = new OffscreenCanvas(i.width, i.height);
-
-          // document.createElement('canvas');
-          // document.createOff
-          // editedImage.width = i.width;
-          // editedImage.height = i.height;
           const ctx = editedImage.getContext('2d');
           ctx!.drawImage(i, 0, 0);
           //        if (pagen === 1 && !template) console.timeLog('processPage', 'draw first canvas ', pagen);
@@ -681,8 +668,6 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
               await this.saveNonAligneImage(pagen, webPImageURL);
             }
             resolve();
-
-            //          if (pagen === 1 && !template) console.timeLog('processPage', 'after save ', pagen);
           }
         };
         i.src = file;

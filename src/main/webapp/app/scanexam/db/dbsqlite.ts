@@ -53,8 +53,13 @@ export class SqliteCacheService implements CacheService {
             }
             case 'getAllTemplate': {
               const enc = new TextDecoder('utf-8');
-              const arr = new Uint8Array(data.payload.value);
-              data.payload.value = enc.decode(arr);
+              data.payload.forEach((res: any) => {
+                const arr = new Uint8Array(res.value);
+                res.value = enc.decode(arr);
+                // console.error(res.value)
+              });
+
+              //              data.payload.value = res;
               this.subjects.get(data.uid)?.next(data.payload);
               this.subjects.get(data.uid)?.complete();
 

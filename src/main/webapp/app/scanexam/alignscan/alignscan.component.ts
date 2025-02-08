@@ -269,7 +269,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     const numberPagesInScan = await this.db.countNonAlignImage(+this.examId);
 
     if (numberPagesInScan !== 0) {
-      // Change ipdfloadedf partial update
       if (this.partialAlign) {
         if (this.endPage < numberPagesInScan) {
           this.numberPagesInScan = this.endPage;

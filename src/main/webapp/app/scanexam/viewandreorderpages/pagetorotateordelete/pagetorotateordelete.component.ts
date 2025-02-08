@@ -63,6 +63,8 @@ export class PageToRotateOrDeleteComponent implements OnInit {
   numeropagerotation = '';
   numeropagedeletion = '';
   parent?: ViewandreorderpagesComponent;
+  numeropageinsertion: number = 0;
+  numeropagedestination: number = 0;
 
   constructor(
     public examService: ExamService,
@@ -153,6 +155,20 @@ export class PageToRotateOrDeleteComponent implements OnInit {
     if (Array.isArray(s) && s.every(e => typeof e === 'number' && !Number.isNaN(e))) {
       this.numeropagerotation = '';
       this.parent?.rotatePages(s);
+      this.ref.close();
+    }
+  }
+  insertpage() {
+    if (
+      !Number.isNaN(this.numeropagedestination) &&
+      !Number.isNaN(this.numeropageinsertion) &&
+      this.numeropagedestination > 0 &&
+      this.numeropageinsertion > 0 &&
+      this.numeropageinsertion <= this.pageInScan &&
+      this.numeropagedestination <= this.pageInScan + 1
+    ) {
+      this.numeropagerotation = '';
+      this.parent?.insertpage(this.numeropageinsertion, this.numeropagedestination);
       this.ref.close();
     }
   }

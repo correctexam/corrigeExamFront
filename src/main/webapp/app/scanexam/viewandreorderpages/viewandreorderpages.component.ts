@@ -27,7 +27,7 @@ import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { CacheUploadService } from '../exam-detail/cacheUpload.service';
 import { PreferenceService } from '../preference-page/preference.service';
 import { EventEmitter } from '@angular/core';
-import { ImageDB, Template } from '../db/db';
+import { AlignImage, ImageDB, Template } from '../db/db';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TooltipModule } from 'primeng/tooltip';
 import { DragDropModule } from 'primeng/dragdrop';
@@ -41,6 +41,9 @@ import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { PageToRotateOrDeleteComponent } from './pagetorotateordelete/pagetorotateordelete.component';
 import { ImageModule } from 'primeng/image';
 import { DialogModule } from 'primeng/dialog';
+import { NgxExtendedPdfViewerModule, NgxExtendedPdfViewerService, ScrollModeType } from 'ngx-extended-pdf-viewer';
+import { firstValueFrom } from 'rxjs';
+import { Exam, IExam } from 'app/entities/exam/exam.model';
 
 @Component({
   selector: 'jhi-viewandreorderpages',
@@ -63,6 +66,7 @@ import { DialogModule } from 'primeng/dialog';
     TranslateModule,
     ImageModule,
     DialogModule,
+    NgxExtendedPdfViewerModule,
   ],
   providers: [DialogService],
 })
@@ -108,9 +112,11 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
     { name: '6', value: 6 },
     { name: '12', value: 12 },
   ];
+  public scrollMode: ScrollModeType = ScrollModeType.vertical;
 
   showProgressBar = true;
   ref: DynamicDialogRef | undefined;
+  blob1: any;
 
   constructor(
     public examService: ExamService,
@@ -128,6 +134,7 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
     private db: CacheServiceImpl,
     private changeDetector: ChangeDetectorRef,
     public dialogService: DialogService,
+    public pdfService: NgxExtendedPdfViewerService,
   ) {}
   ngOnInit(): void {
     this.update();
@@ -188,9 +195,7 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
 
       const step = 150;
       const quotien = Math.floor(this.pageInScan / step);
-      console.error(quotien);
       const reste = this.pageInScan % step;
-      console.error(reste, this.pageInScan);
       let promises: Promise<number>[] = [];
 
       for (let i = 0; i < quotien; i++) {
@@ -301,7 +306,6 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
 
   reloadImageClassifyTemplate() {
     if (this.canvassTemplateVisibles !== undefined && this.canvassTemplateVisibles.length > 0) {
-      console.error('reload1', this.canvassTemplates);
       this.canvassTemplateVisibles.forEach(e => {
         if (this.canvassTemplates.get(+e.nativeElement.id) !== undefined) {
           e.nativeElement.width = this.canvassTemplates.get(+e.nativeElement.id)!.width;
@@ -401,6 +405,8 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
         }
       }
       this.reloadImageClassify();
+      this.ngOnInit();
+
       this.candropordelete = true;
     }
   }
@@ -511,10 +517,14 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
       this.reloadImageClassify();
       this.candropordelete = false;
       if (this.alignPage) {
-        await this.db.moveAlignPages(this.examId, pageNumber, lastPage);
+        if (pageNumber !== lastPage) {
+          await this.db.moveAlignPages(this.examId, pageNumber, lastPage);
+        }
         await this.db.removePageAlignForExamForPage(this.examId, lastPage);
       } else {
-        await this.db.moveNonAlignPages(this.examId, pageNumber, lastPage);
+        if (pageNumber !== lastPage) {
+          await this.db.moveNonAlignPages(this.examId, pageNumber, lastPage);
+        }
         await this.db.removePageNonAlignForExamForPage(this.examId, lastPage);
       }
       this.candropordelete = true;
@@ -692,4 +702,99 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
       }
     }
   }
+
+  currentPage = 0;
+  destinationpage = 0;
+
+  async insertpage(pdfpagenumber: number, numeroinsertion: number) {
+    if (!this.alignPage) {
+      this.setblocked.emit(true);
+      this.candropordelete = false;
+      this.showProgressBar = true;
+      this.destinationpage = numeroinsertion;
+      const exam = (await firstValueFrom(this.examService.find(this.examId))).body;
+      if (exam !== null) {
+        this.currentPage = pdfpagenumber;
+        this.blob1 = await firstValueFrom(this.scanService.getPdf(exam.scanfileId!));
+      }
+    }
+  }
+
+  async pdfloaded() {
+    const scale = { scale: this.preferenceService.getPreference().pdfscale };
+    const dataURL = await this.pdfService.getPageAsImage(this.currentPage, scale);
+    await this.saveImageScan(dataURL);
+  }
+
+  saveImageScan(file: any): Promise<void> {
+    return new Promise(resolve => {
+      const i = new Image();
+      i.onload = async () => {
+        const editedImage = new OffscreenCanvas(i.width, i.height);
+        const ctx = editedImage.getContext('2d');
+        ctx!.drawImage(i, 0, 0);
+        //        if (pagen === 1 && !template) console.timeLog('processPage', 'draw first canvas ', pagen);
+
+        let exportImageType = 'image/webp';
+        let compression = 0.65;
+        if (
+          this.preferenceService.getPreference().exportImageCompression !== undefined &&
+          this.preferenceService.getPreference().exportImageCompression > 0 &&
+          this.preferenceService.getPreference().exportImageCompression <= 1
+        ) {
+          compression = this.preferenceService.getPreference().exportImageCompression;
+        }
+
+        if (
+          this.preferenceService.getPreference().imageTypeExport !== undefined &&
+          ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
+        ) {
+          exportImageType = this.preferenceService.getPreference().imageTypeExport;
+        }
+
+        const webPImageBlob = await editedImage.convertToBlob({
+          type: exportImageType,
+          quality: compression,
+        });
+        const webPImageURL = await blobToDataURL(webPImageBlob);
+        const numberPage = await this.db.countNonAlignImage(this.examId);
+        const i1: AlignImage = {
+          examId: this.examId,
+          pageNumber: numberPage + 1,
+          value: JSON.stringify(
+            {
+              pages: webPImageURL,
+            },
+            this.replacer,
+          ),
+        };
+        await this.db.addNonAligneImage(i1);
+        if (this.destinationpage < i1.pageNumber) {
+          await this.db.moveNonAlignPages(this.examId, numberPage + 1, this.destinationpage);
+        }
+        this.setblocked.emit(false);
+        this.candropordelete = true;
+        this.showProgressBar = false;
+        this.currentPage = 0;
+        this.destinationpage = 0;
+        resolve();
+        this.ngOnInit();
+      };
+      i.src = file;
+    });
+  }
+}
+
+function blobToDataURL(blob: Blob): Promise<string | ArrayBuffer | null> {
+  return new Promise<string | ArrayBuffer | null>((resolve, reject) => {
+    const a = new FileReader();
+    a.onload = e => {
+      if (e.target !== null) {
+        resolve(e.target.result);
+      } else {
+        reject();
+      }
+    };
+    a.readAsDataURL(blob);
+  });
 }
