@@ -113,6 +113,9 @@ export class AppDB extends Dexie {
   async getFirstTemplate(examId: number, pageInscan: number) {
     return await this.templates.where({ examId: examId, pageNumber: pageInscan }).first();
   }
+  async getAllTemplate(examId: number) {
+    return await this.templates.where({ examId: examId }).sortBy('pageNumber');
+  }
 
   async getNonAlignImageBetweenAndSortByPageNumber(examId: number, p1: number, p2: number) {
     return await this.nonAlignImages

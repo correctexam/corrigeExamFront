@@ -45,6 +45,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
+import { ButtonModule } from 'primeng/button';
+import { DrawerModule } from 'primeng/drawer';
 
 interface Upload {
   progress: number;
@@ -100,6 +102,8 @@ const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
     ViewandreorderpagesComponent,
     NgxExtendedPdfViewerModule,
     TranslateModule,
+    ButtonModule,
+    DrawerModule,
   ],
 })
 export class ChargerscanComponent implements OnInit, OnDestroy {
@@ -183,6 +187,7 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
   images: any[] = [];
   pageWithQCM: number[] = [];
   showVignette = true;
+  layoutsidebarVisible = false;
   constructor(
     private translate: TranslateService,
     private messageService: MessageService,
@@ -603,13 +608,8 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
   //  imagesP: Promise<void>[] = [];
   public async processPage(page: number, template: boolean): Promise<void> {
     const scale = { scale: this.scale };
-    //    if (page < 10 && !template) console.time('processPage' + page);
-    //    if (page < 10 && !template) console.timeLog('processPage' + page, 'before getDataURL ', page);
     const dataURL = await this.pdfService.getPageAsImage(page, scale);
-    //    this.pdfService.getP
-    //    if (page < 10 && !template) console.timeLog('processPage' + page, 'getDataURL ', page);
     await this.saveImageScan(dataURL, page, template);
-    //    if (page < 10 && !template) console.timeLog('processPage' + page, 'saveImageScan ', page);
   }
 
   saveImageScan(file: any, pagen: number, template: boolean): Promise<void> {
@@ -617,17 +617,9 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
       return new Promise(resolve => resolve());
     } else
       return new Promise(resolve => {
-        //      if (pagen === 1 && !template) console.timeLog('processPage', 'start', pagen);
-
         const i = new Image();
         i.onload = async () => {
-          //        if (pagen === 1 && !template) console.timeLog('processPage', 'image Loaded ', pagen);
           const editedImage = new OffscreenCanvas(i.width, i.height);
-
-          // document.createElement('canvas');
-          // document.createOff
-          // editedImage.width = i.width;
-          // editedImage.height = i.height;
           const ctx = editedImage.getContext('2d');
           ctx!.drawImage(i, 0, 0);
           //        if (pagen === 1 && !template) console.timeLog('processPage', 'draw first canvas ', pagen);
@@ -676,8 +668,6 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
               await this.saveNonAligneImage(pagen, webPImageURL);
             }
             resolve();
-
-            //          if (pagen === 1 && !template) console.timeLog('processPage', 'after save ', pagen);
           }
         };
         i.src = file;
@@ -693,6 +683,33 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
     } else {
       return value;
     }
+  }
+  async downloadTemplate(): Promise<void> {
+    const e1 = (await firstValueFrom(this.templateService.getPdf(this.exam!.templateId!))) as Blob;
+
+    // this.downLoadFile(s, "application/json")
+    const filename: string = this.exam ? 'template-' + this.exam.id + '.pdf' : 'template.pdf';
+    const downloadLink = document.createElement('a');
+    downloadLink.href = window.URL.createObjectURL(e1);
+    downloadLink.setAttribute('download', filename);
+    document.body.appendChild(downloadLink);
+    this.blocked = false;
+    this.message = '';
+    downloadLink.click();
+  }
+
+  async downloadScan(): Promise<void> {
+    const e1 = (await firstValueFrom(this.scanService.getPdf(this.exam!.scanfileId!))) as Blob;
+
+    // this.downLoadFile(s, "application/json")
+    const filename: string = this.exam ? 'scan-' + this.exam.id + '.pdf' : 'scan.pdf';
+    const downloadLink = document.createElement('a');
+    downloadLink.href = window.URL.createObjectURL(e1);
+    downloadLink.setAttribute('download', filename);
+    document.body.appendChild(downloadLink);
+    this.blocked = false;
+    this.message = '';
+    downloadLink.click();
   }
 }
 

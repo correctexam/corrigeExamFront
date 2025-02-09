@@ -51,6 +51,20 @@ export class SqliteCacheService implements CacheService {
 
               break;
             }
+            case 'getAllTemplate': {
+              const enc = new TextDecoder('utf-8');
+              data.payload.forEach((res: any) => {
+                const arr = new Uint8Array(res.value);
+                res.value = enc.decode(arr);
+                // console.error(res.value)
+              });
+
+              //              data.payload.value = res;
+              this.subjects.get(data.uid)?.next(data.payload);
+              this.subjects.get(data.uid)?.complete();
+
+              break;
+            }
             case 'getNonAlignImageBetweenAndSortByPageNumber': {
               const enc = new TextDecoder('utf-8');
               data.payload.forEach((res: any) => {
@@ -276,6 +290,11 @@ export class SqliteCacheService implements CacheService {
       pageInscan: pageInscan,
     }).toPromise();
   }
+  getAllTemplate(examId: number): Promise<any> {
+    return this._dispatch('getAllTemplate', {
+      examId: examId,
+    }).toPromise();
+  }
   getNonAlignImageBetweenAndSortByPageNumber(examId: number, p1: number, p2: number): Promise<any> {
     return this._dispatch('getNonAlignImageBetweenAndSortByPageNumber', {
       examId: examId,
@@ -417,6 +436,33 @@ export class SqliteCacheService implements CacheService {
       examId: examId,
       from: from,
       to: to,
+    }).toPromise();
+  }
+
+  removePageAlignForExamForPagesAndReorder(examId: number, pages: number[]): Promise<any> {
+    return this._dispatch('removePageAlignForExamForPagesAndReorder', {
+      examId: examId,
+      pages: pages,
+    }).toPromise();
+  }
+  removePageNonAlignForExamForPagesAndReorder(examId: number, pages: number[]): Promise<any> {
+    return this._dispatch('removePageNonAlignForExamForPagesAndReorder', {
+      examId: examId,
+      pages: pages,
+    }).toPromise();
+  }
+
+  moveTemplatePages(examId: number, from: number, to: number): Promise<any> {
+    return this._dispatch('moveTemplatePages', {
+      examId: examId,
+      from: from,
+      to: to,
+    }).toPromise();
+  }
+  removePageTemplateForExamForPage(examId: number, pages: number): Promise<any> {
+    return this._dispatch('removePageTemplateForExamForPage', {
+      examId: examId,
+      pages: pages,
     }).toPromise();
   }
 }

@@ -1,5 +1,10 @@
 <div #pnl class="grid justify-center">
-  <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+  <p-dialog [(visible)]="imgVisible" [header]="pageAlt" [modal]="true">
+    <img [src]="base64img" [alt]="pageAlt" />
+  </p-dialog>
+  <p-toast></p-toast>
+
+  <div style="padding-bottom: 1rem" class="col-10 sm:col-10 md:col-10 lg:col-10 xl:col-10">
     <label><span jhiTranslate="scanexam.nbreImagePerLigne"> Nombre de tuile affichée par ligne : </span>({{ nbreColumn }})</label>
     <p-selectButton
       [options]="nbreColumnOptions"
@@ -11,10 +16,66 @@
     >
     </p-selectButton>
   </div>
+  <div style="padding-bottom: 1rem" class="col-1 sm:col-1 md:col-1 lg:col-1 xl:col-1">
+    <p-button
+      *ngIf="!alignPage"
+      [label]="'scanexam.moreoperation' | translate"
+      [pTooltip]="'scanexam.moreoperationTooltip' | translate"
+      [disabled]="showProgressBar || !candropordelete"
+      (onClick)="showDialog($event)"
+    >
+    </p-button>
+  </div>
+
   <p-progressSpinner *ngIf="showProgressBar"></p-progressSpinner>
+
+  <!-- template-->
+
+  <div *ngIf="templates.length > 0" class="md:col-12 col-12">
+    <h1>Template</h1>
+  </div>
+  <ng-container *ngFor="let value of templates">
+    <div [ngClass]="colonneStyle">
+      <div class="card" [style]="'width: 100%;height: 100%;position: static;'">
+        <div class="card-container yellow-container overflow-hidden">
+          <div class="flex flex-column">
+            <canvas [style]="{ cursor: 'pointer' }" [id]="'' + value" #nomImageTemplateVisible (click)="showImage(value, false)"></canvas>
+          </div>
+          <div class="flex card-content">
+            <div *ngIf="!alignPage && candropordelete" class="flex-none flex align-items-end justify-content-end">
+              <span
+                [style]="{ cursor: 'pointer' }"
+                (click)="deleteImage(value, false)"
+                [pTooltip]="'scanexam.deleteImageTooltip' | translate"
+                ><fa-icon icon="trash"
+              /></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- scan-->
+
   <ng-container *ngFor="let k of clusters | keyvalue">
-    <div *ngIf="clusters.size > 1" class="md:col-12 col-12">
+    <div *ngIf="clusters.size > 0" class="md:col-12 col-12">
       <h1>Copie {{ k.key }}</h1>
+      <p-button
+        *ngIf="!alignPage && k.value.length > 1"
+        [disabled]="!candropordelete"
+        [pTooltip]="'scanexam.suppressioncopieTooltip' | translate"
+        [label]="'scanexam.suppressioncopie' | translate: { page: k.key }"
+        (onClick)="removeSheet(k.key)"
+      ></p-button>
+      <p-button
+        *ngIf="!alignPage && k.value.length > 1"
+        [pTooltip]="'scanexam.rotationcopieTooltip' | translate"
+        [label]="'scanexam.rotationcopie' | translate: { page: k.key }"
+        [disabled]="!candropordelete"
+        (onClick)="rotateSheet(k.key)"
+      >
+      </p-button>
     </div>
 
     <ng-container *ngIf="k.value.length === 0">
@@ -50,24 +111,30 @@
         >
           <div class="card-container yellow-container overflow-hidden">
             <div class="flex flex-column">
-              <canvas [id]="'' + value" #nomImageVisible></canvas>
+              <canvas [style]="{ cursor: 'pointer' }" [id]="'' + value" #nomImageVisible (click)="showImage(value, true)"></canvas>
             </div>
             <div class="flex card-content">
-              <div *ngIf="candropordelete" class="flex-none flex align-items-left justify-content-left">
-                <span (click)="rotateImage(value)" [pTooltip]="'scanexam.rotateImageTooltip' | translate"
+              <div *ngIf="!alignPage && candropordelete" class="flex-none flex align-items-left justify-content-left">
+                <span [style]="{ cursor: 'pointer' }" (click)="rotateImage(value)" [pTooltip]="'scanexam.rotateImageTooltip' | translate"
                   ><fa-icon icon="rotate-right"
                 /></span>
               </div>
               <div class="flex-grow-1 flex align-items-center justify-content-center">
                 <span
+                  [style]="{ cursor: 'pointer' }"
                   *ngIf="alignPage"
                   (click)="replaceImageWithNonAlign(value)"
                   [pTooltip]="'scanexam.replacealignementWithNonAlignTooltip' | translate"
                   ><fa-icon icon="align-left"
                 /></span>
               </div>
-              <div *ngIf="candropordelete" class="flex-none flex align-items-end justify-content-end">
-                <span (click)="deleteImage(value)" [pTooltip]="'scanexam.deleteImageTooltip' | translate"><fa-icon icon="trash" /></span>
+              <div *ngIf="!alignPage && candropordelete" class="flex-none flex align-items-end justify-content-end">
+                <span
+                  [style]="{ cursor: 'pointer' }"
+                  (click)="deleteImage(value, true)"
+                  [pTooltip]="'scanexam.deleteImageTooltip' | translate"
+                  ><fa-icon icon="trash"
+                /></span>
               </div>
             </div>
           </div>
@@ -75,4 +142,26 @@
       </div>
     </ng-container>
   </ng-container>
+  <div class="canvas-wrapper foo" *ngIf="blob1">
+    <ngx-extended-pdf-viewer
+      [hidden]="'true'"
+      [src]="blob1"
+      style="flex: 1 1 100%"
+      #viewer
+      [height]="'90vh'"
+      [page]="1"
+      [handTool]="false"
+      [showHandToolButton]="false"
+      [textLayer]="false"
+      [(scrollMode)]="scrollMode"
+      [showToolbar]="false"
+      [pageViewMode]="'infinite-scroll'"
+      [showSecondaryToolbarButton]="false"
+      backgroundColor="#ffffff"
+      [zoom]="'100%'"
+      [minZoom]="1"
+      [maxZoom]="1"
+      (pdfLoaded)="pdfloaded()"
+    ></ngx-extended-pdf-viewer>
+  </div>
 </div>
