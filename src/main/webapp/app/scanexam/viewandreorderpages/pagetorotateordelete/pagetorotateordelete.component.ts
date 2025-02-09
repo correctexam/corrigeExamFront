@@ -1,6 +1,4 @@
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { HttpClient } from '@angular/common/http';
 import {
