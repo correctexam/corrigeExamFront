@@ -164,7 +164,7 @@ export class PageToRotateOrDeleteComponent implements OnInit {
       !Number.isNaN(this.numeropageinsertion) &&
       this.numeropagedestination > 0 &&
       this.numeropageinsertion > 0 &&
-      this.numeropageinsertion <= this.pageInScan &&
+      //      this.numeropageinsertion <= this.pageInScan &&
       this.numeropagedestination <= this.pageInScan + 1
     ) {
       this.numeropagerotation = '';

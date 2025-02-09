@@ -44,6 +44,8 @@ import { DialogModule } from 'primeng/dialog';
 import { NgxExtendedPdfViewerModule, NgxExtendedPdfViewerService, ScrollModeType } from 'ngx-extended-pdf-viewer';
 import { firstValueFrom } from 'rxjs';
 import { Exam, IExam } from 'app/entities/exam/exam.model';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'jhi-viewandreorderpages',
@@ -67,8 +69,9 @@ import { Exam, IExam } from 'app/entities/exam/exam.model';
     ImageModule,
     DialogModule,
     NgxExtendedPdfViewerModule,
+    ToastModule,
   ],
-  providers: [DialogService],
+  providers: [DialogService, MessageService],
 })
 export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
   @Input()
@@ -135,6 +138,7 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
     private changeDetector: ChangeDetectorRef,
     public dialogService: DialogService,
     public pdfService: NgxExtendedPdfViewerService,
+    public messageService: MessageService,
   ) {}
   ngOnInit(): void {
     this.update();
@@ -722,8 +726,19 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
 
   async pdfloaded() {
     const scale = { scale: this.preferenceService.getPreference().pdfscale };
-    const dataURL = await this.pdfService.getPageAsImage(this.currentPage, scale);
-    await this.saveImageScan(dataURL);
+    try {
+      const dataURL = await this.pdfService.getPageAsImage(this.currentPage, scale);
+      await this.saveImageScan(dataURL);
+    } catch (e) {
+      const e1 = await firstValueFrom(this.translateService.get('scanexam.pageinpdfdoesnotexit'));
+      const e2 = this.translateService.instant('scanexam.actionimpossible');
+      this.messageService.add({ severity: 'warn', summary: e2, detail: e1 });
+      this.setblocked.emit(false);
+      this.candropordelete = true;
+      this.showProgressBar = false;
+      this.currentPage = 0;
+      this.destinationpage = 0;
+    }
   }
 
   saveImageScan(file: any): Promise<void> {

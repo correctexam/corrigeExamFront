@@ -2,6 +2,7 @@
   <p-dialog [(visible)]="imgVisible" [header]="pageAlt" [modal]="true">
     <img [src]="base64img" [alt]="pageAlt" />
   </p-dialog>
+  <p-toast></p-toast>
 
   <div style="padding-bottom: 1rem" class="col-10 sm:col-10 md:col-10 lg:col-10 xl:col-10">
     <label><span jhiTranslate="scanexam.nbreImagePerLigne"> Nombre de tuile affichée par ligne : </span>({{ nbreColumn }})</label>
@@ -61,14 +62,14 @@
     <div *ngIf="clusters.size > 0" class="md:col-12 col-12">
       <h1>Copie {{ k.key }}</h1>
       <p-button
-        *ngIf="!alignPage"
+        *ngIf="!alignPage && k.value.length > 1"
         [disabled]="!candropordelete"
         [pTooltip]="'scanexam.suppressioncopieTooltip' | translate"
         [label]="'scanexam.suppressioncopie' | translate: { page: k.key }"
         (onClick)="removeSheet(k.key)"
       ></p-button>
       <p-button
-        *ngIf="!alignPage"
+        *ngIf="!alignPage && k.value.length > 1"
         [pTooltip]="'scanexam.rotationcopieTooltip' | translate"
         [label]="'scanexam.rotationcopie' | translate: { page: k.key }"
         [disabled]="!candropordelete"

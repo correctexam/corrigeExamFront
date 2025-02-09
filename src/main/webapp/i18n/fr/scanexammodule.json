@@ -543,6 +543,8 @@
     "insersionpage": "Insertion d'une page depuis le pdf",
     "pdfpagenumber": "Numéro de page à insérer",
     "insertpagenumber": "Numéro de page de destination",
-    "insererpage": "Lancer l'insertion"
+    "insererpage": "Lancer l'insertion",
+    "actionimpossible": "Action impossible",
+    "pageinpdfdoesnotexit": "La page demandée n'existe pas dans le pdf du scan des copies"
   }
 }

@@ -539,6 +539,8 @@
     "insersionpage": "Insert a page from the PDF",
     "pdfpagenumber": "Page number to insert",
     "insertpagenumber": "Destination page number",
-    "insererpage": "Start integration"
+    "insererpage": "Start integration",
+    "actionimpossible": "Action impossible",
+    "pageinpdfdoesnotexit": "The requested page does not exist in the pdf scan file"
   }
 }
