@@ -1868,11 +1868,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   changeStudent($event: any): void {
     this.similarPredictionsSearched = false;
+    this.searchControl.reset();
     this.searchedTerm = '';
     if (!this.init) {
       this.cleanCanvassCache();
       const m = this.preferenceService.getRandomOrderForExam(+this.examId!);
-      this.dropdownOpen = false;
       if (m.size === 0) {
         this.currentStudentPaginator = $event.page;
         this.currentStudent = $event.page;
@@ -1898,10 +1898,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.executeScript();
       }
     }, 500);
+    if (this.dropdownOpen) {
+      this.dropdownOpen = !this.dropdownOpen;
+      this.similarPrediction();
+    }
   }
 
   changeQuestion($event: any): void {
     this.similarPredictionsSearched = false;
+    this.searchControl.reset();
+    this.searchedTerm = '';
     if (!this.init) {
       this.cleanCanvassCache();
 
