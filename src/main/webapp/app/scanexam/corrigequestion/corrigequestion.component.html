@@ -687,79 +687,81 @@
                     </div>
 
                     <!-- Liste des prédictions similaires -->
-                    <ul class="list-none p-0 space-y-4">
-                      <li
-                        *ngFor="let similar of getFilteredSimilarPredictions()"
-                        [style.border]="selectedSimilars.get(similar) === 1 ? '5px solid green' : '1px solid #ccc'"
-                        class="p-4 rounded-md hover:bg-gray-100 transition-colors duration-200"
-                      >
-                        <div class="flex items-start gap-4">
-                          <!-- Colonne 1 : Checkbox et Image -->
-                          <div class="flex flex-col items-center">
-                            <input
-                              type="checkbox"
-                              [checked]="selectedSimilars.get(similar) === 1"
-                              (change)="selectSimilarPrediction(similar)"
-                              class="w-14 h-14 mr-4"
-                            />
-                            <img
-                              [src]="similar.imageData"
-                              alt="Prediction Image"
-                              class="object-cover rounded"
-                              style="width: 1000px; height: auto"
-                            />
-                          </div>
-
-                          <!-- Column 2: Grade and Comments -->
-                          <div>
-                            <!-- Grade Section -->
-                            <div>
-                              <ng-container *ngIf="getSimilarGrade(similar.studentId!) !== undefined; else noGrade">
-                                <div class="flex items-center gap-2">
-                                  <span class="text-sm font-medium text-gray-600">Note :</span>
-                                  <input
-                                    type="number"
-                                    pInputText
-                                    [ngModel]="getSimilarGrade(similar.studentId!) * noteStep"
-                                    (ngModelChange)="updateSimilarGrade(similar.studentId!, $event / noteStep)"
-                                    class="text-center border border-gray-300 rounded"
-                                    [disabled]="blocked"
-                                    [step]="noteStep"
-                                    [min]="0"
-                                    [max]="maximumNote"
-                                    [style]="{ width: '75px', height: '40px' }"
-                                  />
-                                </div>
-                              </ng-container>
-
-                              <ng-template #noGrade>
-                                <div class="no-grade-container">
-                                  <span class="no-grade-message" jhiTranslate="scanexam.noGradeAvailable">⚠️ Pas de note disponible</span>
-                                </div>
-                              </ng-template>
+                    <div class="overflow-y-auto">
+                      <ul class="list-none p-0 space-y-4">
+                        <li
+                          *ngFor="let similar of getFilteredSimilarPredictions()"
+                          [style.border]="selectedSimilars.get(similar) === 1 ? '5px solid green' : '1px solid #ccc'"
+                          class="p-4 rounded-md hover:bg-gray-100 transition-colors duration-200"
+                        >
+                          <div class="flex items-start gap-4">
+                            <!-- Colonne 1 : Checkbox et Image -->
+                            <div class="flex flex-col items-center">
+                              <input
+                                type="checkbox"
+                                [checked]="selectedSimilars.get(similar) === 1"
+                                (change)="selectSimilarPrediction(similar)"
+                                class="w-14 h-14 mr-4"
+                              />
+                              <img
+                                [src]="similar.imageData"
+                                alt="Prediction Image"
+                                class="object-cover rounded"
+                                style="width: 1000px; height: auto"
+                              />
                             </div>
 
-                            <!-- Comments Section -->
-                            <div *ngIf="sameResponses.get(similar.studentId!)?.textcomments?.length" class="mt-4">
-                              <div class="font-medium mb-2">Commentaires:</div>
-                              <div class="space-y-2">
-                                <div
-                                  *ngFor="let comment of sameResponses.get(similar.studentId!)?.textcomments; let i = index"
-                                  class="flex items-center gap-2"
-                                >
-                                  <span>• {{ comment.text }}</span>
-                                  <fa-icon
-                                    [icon]="['fas', 'trash']"
-                                    (click)="removedSimilarComment(similar.studentId!, i)"
-                                    class="cursor-pointer ml-2"
-                                  ></fa-icon>
+                            <!-- Column 2: Grade and Comments -->
+                            <div>
+                              <!-- Grade Section -->
+                              <div>
+                                <ng-container *ngIf="getSimilarGrade(similar.studentId!) !== undefined; else noGrade">
+                                  <div class="flex items-center gap-2">
+                                    <span class="text-sm font-medium text-gray-600">Note :</span>
+                                    <input
+                                      type="number"
+                                      pInputText
+                                      [ngModel]="getSimilarGrade(similar.studentId!) * noteStep"
+                                      (ngModelChange)="updateSimilarGrade(similar.studentId!, $event / noteStep)"
+                                      class="text-center border border-gray-300 rounded"
+                                      [disabled]="blocked"
+                                      [step]="noteStep"
+                                      [min]="0"
+                                      [max]="maximumNote"
+                                      [style]="{ width: '75px', height: '40px' }"
+                                    />
+                                  </div>
+                                </ng-container>
+
+                                <ng-template #noGrade>
+                                  <div class="no-grade-container">
+                                    <span class="no-grade-message" jhiTranslate="scanexam.noGradeAvailable">⚠️ Pas de note disponible</span>
+                                  </div>
+                                </ng-template>
+                              </div>
+
+                              <!-- Comments Section -->
+                              <div *ngIf="sameResponses.get(similar.studentId!)?.textcomments?.length" class="mt-4">
+                                <div class="font-medium mb-2">Commentaires:</div>
+                                <div class="space-y-2">
+                                  <div
+                                    *ngFor="let comment of sameResponses.get(similar.studentId!)?.textcomments; let i = index"
+                                    class="flex items-center gap-2"
+                                  >
+                                    <span>• {{ comment.text }}</span>
+                                    <fa-icon
+                                      [icon]="['fas', 'trash']"
+                                      (click)="removedSimilarComment(similar.studentId!, i)"
+                                      class="cursor-pointer ml-2"
+                                    ></fa-icon>
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </li>
-                    </ul>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
