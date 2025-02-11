@@ -3609,5 +3609,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.filteredSearchedPredictions = this.predictionsForSearch.filter(prediction =>
       (prediction.text ?? '').toLowerCase().includes(searchTerm.toLowerCase()),
     );
+    this.changeDetector.detectChanges();
   }
 }
