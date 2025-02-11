@@ -710,52 +710,49 @@
                             />
                           </div>
 
-                          <!-- Colonne 2 : Note et Commentaires -->
-                          <div class="flex-1 flex flex-col gap-4">
-                            <!-- Note -->
-                            <div class="flex items-center gap-2">
+                          <!-- Column 2: Grade and Comments -->
+                          <div>
+                            <!-- Grade Section -->
+                            <div>
                               <ng-container *ngIf="getSimilarGrade(similar.studentId!) !== undefined; else noGrade">
-                                <span class="text-sm font-medium text-gray-600">Note :</span>
-                                <input
-                                  type="number"
-                                  pInputText
-                                  [ngModel]="getSimilarGrade(similar.studentId!) * noteStep"
-                                  (ngModelChange)="updateSimilarGrade(similar.studentId!, $event / noteStep)"
-                                  class="text-center border border-gray-300 rounded"
-                                  [disabled]="blocked"
-                                  [step]="noteStep"
-                                  [min]="0"
-                                  [max]="maximumNote"
-                                  [style]="{ width: '75px', height: '40px' }"
-                                />
+                                <div class="flex items-center gap-2">
+                                  <span class="text-sm font-medium text-gray-600">Note :</span>
+                                  <input
+                                    type="number"
+                                    pInputText
+                                    [ngModel]="getSimilarGrade(similar.studentId!) * noteStep"
+                                    (ngModelChange)="updateSimilarGrade(similar.studentId!, $event / noteStep)"
+                                    class="text-center border border-gray-300 rounded"
+                                    [disabled]="blocked"
+                                    [step]="noteStep"
+                                    [min]="0"
+                                    [max]="maximumNote"
+                                    [style]="{ width: '75px', height: '40px' }"
+                                  />
+                                </div>
                               </ng-container>
+
+                              <ng-template #noGrade>
+                                <div class="no-grade-container">
+                                  <span class="no-grade-message" jhiTranslate="scanexam.noGradeAvailable">⚠️ Pas de note disponible</span>
+                                </div>
+                              </ng-template>
                             </div>
-                            <ng-template #noGrade>
-                              <div class="no-grade-container">
-                                <span class="no-grade-message" jhiTranslate="scanexam.noGradeAvailable">⚠️ Pas de note disponible</span>
-                              </div>
-                            </ng-template>
 
-                            <!-- Comments section below -->
-                            <div *ngIf="sameResponses.get(similar.studentId!)?.textcomments?.length" style="padding-top: 10px">
-                              Commentaires:
-                              <div class="flex flex-col gap-1">
-                                <div>
-                                  <div
-                                    *ngFor="let comment of sameResponses.get(similar.studentId!)?.textcomments; let i = index"
-                                    class="flex flex-row items-center gap-2"
-                                  >
-                                    <span>• {{ comment.text }}</span>
-
-                                    <!-- Action icons on the right -->
-                                    <div class="flex gap-2" style="padding-left: 10px">
-                                      <fa-icon
-                                        [icon]="['fas', 'trash']"
-                                        (click)="removedSimilarComment(similar.studentId!, i)"
-                                        class="cursor-pointer"
-                                      ></fa-icon>
-                                    </div>
-                                  </div>
+                            <!-- Comments Section -->
+                            <div *ngIf="sameResponses.get(similar.studentId!)?.textcomments?.length" class="mt-4">
+                              <div class="font-medium mb-2">Commentaires:</div>
+                              <div class="space-y-2">
+                                <div
+                                  *ngFor="let comment of sameResponses.get(similar.studentId!)?.textcomments; let i = index"
+                                  class="flex items-center gap-2"
+                                >
+                                  <span>• {{ comment.text }}</span>
+                                  <fa-icon
+                                    [icon]="['fas', 'trash']"
+                                    (click)="removedSimilarComment(similar.studentId!, i)"
+                                    class="cursor-pointer ml-2"
+                                  ></fa-icon>
                                 </div>
                               </div>
                             </div>

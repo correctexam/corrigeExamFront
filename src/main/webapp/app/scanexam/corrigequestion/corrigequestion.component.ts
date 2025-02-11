@@ -1868,6 +1868,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   changeStudent($event: any): void {
     this.similarPredictionsSearched = false;
+    this.searchedTerm = '';
     if (!this.init) {
       this.cleanCanvassCache();
       const m = this.preferenceService.getRandomOrderForExam(+this.examId!);
