@@ -682,12 +682,7 @@
 
                     <!-- Checkbox to select all similar predictions -->
                     <div class="flex flex-col items-center">
-                      <input
-                        type="checkbox"
-                        [checked]="areAllSimilarPredictionsSelected()"
-                        (change)="toggle_untoggle_AllSimilarPredictions($event)"
-                        class="w-14 h-14 mr-3 ml-3"
-                      />
+                      <input type="checkbox" [checked]="isAllSelected()" (change)="toggleSelectAll($event)" class="w-14 h-14 mr-3 ml-3" />
                       <label class="font-bold text-gray-700 text-l" jhiTranslate="scanexam.selectAllSimilar">Sélectionner tout</label>
                     </div>
 

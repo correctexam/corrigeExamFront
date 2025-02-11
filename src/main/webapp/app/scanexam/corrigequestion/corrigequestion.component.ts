@@ -3300,22 +3300,18 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   tempPredictions: IPrediction[] = [];
-  areAllSimilarPredictionsSelected(): boolean {
-    return this.tempPredictions.every(prediction => this.selectedSimilars.get(prediction) === 1);
+
+  isAllSelected(): boolean {
+    if (!this.tempPredictions || this.tempPredictions.length === 0) {
+      return false;
+    }
+    return this.tempPredictions.every(prediction => this.selectedSimilars.get(prediction)! > 0);
   }
 
-  toggle_untoggle_AllSimilarPredictions(event: Event): void {
-    const isChecked = (event.target as HTMLInputElement).checked;
-    this.similarPredictions.forEach(prediction => {
-      if (isChecked) {
-        if (this.selectedSimilars.get(prediction) !== 1) {
-          this.selectSimilarPrediction(prediction);
-        }
-      } else {
-        if (this.selectedSimilars.get(prediction) === 1) {
-          this.selectSimilarPrediction(prediction);
-        }
-      }
+  toggleSelectAll(event: any): void {
+    const isChecked = event.target.checked;
+    this.tempPredictions.forEach(prediction => {
+      this.selectedSimilars.set(prediction, isChecked ? 1 : 0);
     });
   }
 
