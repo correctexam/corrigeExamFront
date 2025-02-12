@@ -3468,8 +3468,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         );
         console.log('Student', i + 1, 'Response:', response);
         if (response === undefined) {
-          this.dropdownOpen = false;
-          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+          this.currentStudentPaginator = i;
+          this.currentStudent = i;
+          this.loadPrediction();
+          this.ngZone.run(() => {
+            this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+          });
+          if (this.dropdownOpen) {
+            this.dropdownOpen = !this.dropdownOpen;
+            this.similarPrediction();
+          }
           return;
         }
       }
@@ -3481,8 +3489,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       );
       console.log('Student', i + 1, 'Response:', response);
       if (response === undefined) {
-        this.dropdownOpen = false;
-        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+        this.currentStudentPaginator = i;
+        this.currentStudent = i;
+        this.loadPrediction();
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+        });
+        if (this.dropdownOpen) {
+          this.dropdownOpen = !this.dropdownOpen;
+          this.similarPrediction();
+        }
         return;
       }
     }
@@ -3504,8 +3520,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         );
         console.log('Student', i + 1, 'Response:', response);
         if (response === undefined) {
-          this.dropdownOpen = false;
-          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+          this.currentStudentPaginator = i;
+          this.currentStudent = i;
+          this.loadPrediction();
+          this.ngZone.run(() => {
+            this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+          });
+          if (this.dropdownOpen) {
+            this.dropdownOpen = !this.dropdownOpen;
+            this.similarPrediction();
+          }
           return;
         }
       }
@@ -3517,8 +3541,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       );
       console.log('Student', i + 1, 'Response:', response);
       if (response === undefined) {
-        this.dropdownOpen = false;
-        this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+        this.currentStudentPaginator = i;
+        this.currentStudent = i;
+        this.loadPrediction();
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+        });
+        if (this.dropdownOpen) {
+          this.dropdownOpen = !this.dropdownOpen;
+          this.similarPrediction();
+        }
         return;
       }
     }

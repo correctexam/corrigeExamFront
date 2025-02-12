@@ -766,7 +766,7 @@
                 </div>
               </div>
 
-              <div *ngIf="similarPredictions.length === 0 && similarPredictionsSearched">
+              <div *ngIf="dropdownOpen && similarPredictions.length === 0 && similarPredictionsSearched">
                 <p style="font-weight: bold; margin-bottom: 10px; color: #666; font-size: 20px; padding-top: 20px">
                   Aucune réponse similaire trouvée
                 </p>
