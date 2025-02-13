@@ -8,7 +8,6 @@ import { AlertComponent } from '../../../shared/alert/alert.component';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
 import { TranslateDirective } from '../../../shared/language/translate.directive';
 import { CommonModule, NgIf } from '@angular/common';
-import { ScriptService } from '../service/dan-service.service';
 
 @Component({
   standalone: true,
@@ -26,7 +25,6 @@ export class ScanDetailComponent implements OnInit {
   constructor(
     protected dataUtils: DataUtils,
     protected activatedRoute: ActivatedRoute,
-    private scriptService: ScriptService, // Ajout du service ici
   ) {}
 
   ngOnInit(): void {
@@ -46,19 +44,5 @@ export class ScanDetailComponent implements OnInit {
 
   previousState(): void {
     window.history.back();
-  }
-
-  // Méthode pour exécuter le script
-  executeScript(): void {
-    this.scriptService.runScript('').subscribe({
-      next: response => {
-        this.output = response.output; // Utilisez la sortie du script
-        this.error = ''; // Réinitialisation de l'erreur
-      },
-      error: err => {
-        this.output = ''; // Réinitialisation de la sortie
-        this.error = err.error || 'An error occurred'; // Récupération de l'erreur
-      },
-    });
   }
 }

@@ -102,7 +102,6 @@ import { TranslateDirective } from '../../shared/language/translate.directive';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { SwipeDirective } from '../swipe.directive';
-import { ScriptService } from 'app/entities/scan/service/dan-service.service';
 import { IPrediction, Prediction } from 'app/entities/prediction/prediction.model';
 
 import { HttpClient } from '@angular/common/http';
@@ -346,7 +345,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     private titleService: Title,
     private ngZone: NgZone,
     private focusViewService: FocusViewService,
-    private scriptService: ScriptService,
     private http: HttpClient,
     private mltcomponent: MltComponent,
     private coupageDimageService: CoupageDimageService,
@@ -1759,6 +1757,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.executeScript();
       }
     }, 500);
+    if (this.dropdownOpen) {
+      this.dropdownOpen = !this.dropdownOpen;
+      this.similarPrediction();
+    }
   }
 
   async nextStudent() {
@@ -1808,6 +1810,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.executeScript();
       }
     }, 500);
+    if (this.dropdownOpen) {
+      this.dropdownOpen = !this.dropdownOpen;
+      this.similarPrediction();
+    }
   }
   async previousQuestion(): Promise<void> {
     if (this.queryPoolPromise) {
@@ -1900,6 +1906,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }, 500);
     if (this.dropdownOpen) {
       this.dropdownOpen = !this.dropdownOpen;
+      this.loadPrediction();
       this.similarPrediction();
     }
   }
@@ -3164,34 +3171,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   base64Image = '';
   refinedLines: string[] = [];
-  // async callMLT() {
-  //   const imageData = this.getImageFromCanvas();
-  //   if (!imageData) {
-  //     console.error('No image data found on the canvas');
-  //     this.error = 'No image selected';
-  //     return;
-  //   }
-
-  //   this.coupageDimageService.runScript(imageData).subscribe({
-  //     next: async response => {
-  //       this.refinedLines = response.refinedLines || [];
-
-  //       for (let i = 0; i < this.refinedLines.length; i++) {
-  //         try {
-  //           const base64Line = `data:image/png;base64,${this.refinedLines[i]}`;
-
-  //           // Process the Base64 line directly
-  //           const result = await this.mltcomponent.executeMLT(base64Line);
-  //         } catch (error) {
-  //           console.error('Error processing refined line ', i, ':', error);
-  //         }
-  //       }
-  //     },
-  //     error: error => {
-  //       console.error('Error refining the image:', error);
-  //     },
-  //   });
-  // }
 
   // Méthode pour exécuter le script
   async executeScript(): Promise<void> {

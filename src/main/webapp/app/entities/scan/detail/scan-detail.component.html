@@ -25,21 +25,6 @@
             {{ scan.contentContentType }}, {{ byteSize(scan.content) }}
           </div>
         </dd>
-        <!-- J'ai ajouté ca mais il faudra ensuite faire un jhi translate je comprend pas trop ce que c'est -->
-        <dt><span>Ce que produit le DAN</span></dt>
-        <dd>
-          <div>
-            <button (click)="executeScript()">Exécuter le script</button>
-            <div *ngIf="output">
-              <h2>Résultat :</h2>
-              <pre>{{ output }}</pre>
-            </div>
-            <div *ngIf="error">
-              <h2>Erreur :</h2>
-              <pre>{{ error }}</pre>
-            </div>
-          </div>
-        </dd>
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

@@ -7,7 +7,6 @@ import { QuestionService } from '../../entities/question/service/question.servic
 import { IQuestion } from '../../entities/question/question.model';
 import { IZone } from 'app/entities/zone/zone.model';
 import { NgIf, NgFor } from '@angular/common';
-import { ScriptService } from 'app/entities/scan/service/dan-service.service';
 import { PredictionService } from 'app/entities/prediction/service/prediction.service';
 import { IPrediction } from 'app/entities/prediction/prediction.model';
 import { MltComponent } from '../mlt/mlt.component';
@@ -59,7 +58,6 @@ export class ImageAccessComponent implements OnInit {
     private alignImagesService: AlignImagesService,
     private db: CacheServiceImpl,
     private questionService: QuestionService,
-    private scriptService: ScriptService,
     private predictionService: PredictionService,
     private mltcomponent: MltComponent,
     private coupageDimageService: CoupageDimageService,
