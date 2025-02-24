@@ -1,0 +1,31 @@
+<div>
+  <input [formControl]="searchControl" placeholder="Search predictions" />
+
+  <!-- Buttons for choosing the search mode -->
+  <button
+    (click)="setSearchMode('text')"
+    [ngClass]="{ active: searchMode === 'text' }"
+    class="search-button"
+    jhiTranslate="scanexam.searchwithword"
+  >
+    Recherche par mot
+  </button>
+
+  <button
+    (click)="setSearchMode('question')"
+    [ngClass]="{ active: searchMode === 'question' }"
+    class="search-button"
+    jhiTranslate="scanexam.searchwithquestion"
+  >
+    Recherche par question
+  </button>
+
+  <ul>
+    <li *ngFor="let prediction of filteredPredictions" style="margin-bottom: 10px; padding: 10px; border: 1px solid #ccc">
+      <div><strong>Exam ID:</strong> {{ prediction.examId }}</div>
+      <div><strong>Question Number:</strong> {{ prediction.questionNumber }}</div>
+      <div><strong>Student ID:</strong> {{ prediction.studentId }}</div>
+      <div><strong>Image:</strong><img [src]="prediction.imageData" /></div>
+    </li>
+  </ul>
+</div>

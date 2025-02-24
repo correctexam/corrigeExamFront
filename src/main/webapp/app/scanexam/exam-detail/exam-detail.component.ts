@@ -40,12 +40,14 @@ import { FormsModule } from '@angular/forms';
 import { TranslateDirective } from '../../shared/language/translate.directive';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
+import { ImageAccessComponent } from '../image-access/image-access.component';
+import { MltComponent } from '../mlt/mlt.component';
 
 @Component({
   selector: 'jhi-exam-detail',
   templateUrl: './exam-detail.component.html',
   styleUrls: ['./exam-detail.component.scss'],
-  providers: [ConfirmationService, MessageService],
+  providers: [ConfirmationService, MessageService, ImageAccessComponent, MltComponent],
   standalone: true,
   imports: [
     CommonModule,
@@ -103,6 +105,8 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
 
   infoExamDetail = { nbrepagenonalign: 0, nbrepagealign: 0, nbrepagetemplate: 0, nbrecopie: 0, cond1: false, cond2: false, cond3: false };
 
+  developementMode: boolean = false;
+
   constructor(
     public courseService: CourseService,
     public examService: ExamService,
@@ -119,6 +123,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     private db: CacheServiceImpl,
     private preferenceService: PreferenceService,
     private titleService: Title,
+    private imageAccessComponent: ImageAccessComponent,
   ) {}
   setShowAlignement(v: boolean): void {
     this.showAlignement = v;
@@ -127,7 +132,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     this.showAssociation = v;
   }
 
-  setShowCorrection(v: boolean): void {
+  async setShowCorrection(v: boolean): Promise<void> {
     this.showCorrection = v;
     if (v) {
       this.examService.getExamStatusFinish(+this.examId).then(res => {
@@ -144,7 +149,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     });
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.firsthelpvalue = this.preferenceService.showFirstCorrectMessage();
     this.firsthelp = this.firsthelpvalue;
     this.activatedRoute.paramMap.subscribe(params => {
@@ -276,7 +281,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
             numberPagesInScan: this.numberPagesInScan,
           })
           .subscribe(
-            sheetsbody => {
+            async sheetsbody => {
               this.blocked = false;
               this.sheets = sheetsbody.body!.filter(sh => sh.pagemin !== -1);
 
@@ -286,6 +291,13 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
               //            console.error(ex2, this.numberPagesInScan / this.nbreFeuilleParCopie, this.numberPagesInScan, this.nbreFeuilleParCopie);
               this.showCorrection =
                 this.sheets.length === this.numberPagesInScan / this.nbreFeuilleParCopie && this.showAssociation && this.showAlignement;
+
+              if (this.showCorrection || this.showAssociation) {
+                this.imageAccessComponent.examId = this.examId;
+                console.log('I start creating the predictions');
+                await this.imageAccessComponent.loadImages(this.examId);
+              }
+
               this.examService.getExamStatusFinish(+this.examId).then(res => {
                 this.correctionFinish = res;
               });

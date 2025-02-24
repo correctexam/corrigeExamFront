@@ -47,9 +47,10 @@ import { ITextComment } from '../../entities/text-comment/text-comment.model';
 import { IGradedComment } from '../../entities/graded-comment/graded-comment.model';
 import { GradedCommentService } from '../../entities/graded-comment/service/graded-comment.service';
 import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
+import { PredictionService } from 'app/entities/prediction/service/prediction.service';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { IQCMSolution } from '../../qcm';
-import { Observable, Subscriber, firstValueFrom } from 'rxjs';
+import { Observable, Subscriber, Subscription, debounceTime, distinctUntilChanged, firstValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 import { fromWorkerPool } from 'observable-webworker';
 import { worker1 } from '../services/workerimport';
@@ -96,12 +97,20 @@ import { NgIf, NgFor, DecimalPipe, DatePipe } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Button, ButtonDirective } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslateDirective } from '../../shared/language/translate.directive';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { SwipeDirective } from '../swipe.directive';
-import { ZoneService } from '../../entities/zone/service/zone.service';
+import { IPrediction, Prediction } from 'app/entities/prediction/prediction.model';
+
+import { HttpClient } from '@angular/common/http';
+import { MltComponent } from '../mlt/mlt.component';
+import { CoupageDimageService } from '../mlt/coupage-dimage.service';
+
+import Fuse from 'fuse.js';
+import { CheckboxModule } from 'primeng/checkbox';
+import { QueueCoordinationService } from '../image-access/queue-coordination.service';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -122,7 +131,7 @@ interface CommentAction {
   selector: 'jhi-corrigequestion',
   templateUrl: './corrigequestion.component.html',
   styleUrls: ['./corrigequestion.component.scss'],
-  providers: [ConfirmationService, MessageService, { provide: LOCALE_ID, useValue: 'fr' }],
+  providers: [ConfirmationService, MessageService, { provide: LOCALE_ID, useValue: 'fr' }, MltComponent],
   standalone: true,
   imports: [
     SwipeDirective,
@@ -165,6 +174,9 @@ interface CommentAction {
     DatePipe,
     TranslateModule,
     CommentSortPipe,
+    CheckboxModule,
+    SliderModule,
+    ReactiveFormsModule,
   ],
 })
 export class CorrigequestionComponent implements OnInit, AfterViewInit {
@@ -180,6 +192,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       return 'Question ' + this.questionNumeros[this.questionindex];
     }
   }
+  protected Math = Math;
   minimizeComment = false;
   focusView = false;
 
@@ -194,6 +207,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   shortcutvalue = true;
   showImageQCM = false;
   sortCommentVisible = false;
+
+  @ViewChildren('nomImage') canvass2!: QueryList<ElementRef<HTMLCanvasElement>>;
 
   @ViewChildren('nomImage')
   canvass!: QueryList<ElementRef>;
@@ -230,6 +245,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   currentTextComment4Question: Signal<ITextComment>[] | undefined;
   currentGradedComment4Question: Signal<IGradedComment>[] | undefined;
   currentHybridGradedComment4Question: Signal<IHybridGradedComment>[] | undefined;
+  currentPrediction4Question: Signal<IPrediction>[] | undefined;
 
   windowWidth = 0;
   currentZoneCorrectionHandler: Map<string, ZoneCorrectionHandler> = new Map(); // | undefined;
@@ -285,6 +301,22 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   queriesPool: Array<CommentAction> = [];
 
+  // Variables pour gérer la sortie et l'erreur du script
+  output: string = '';
+  error: string = '';
+  imagepath: string = 'I did not get it';
+  predictionsDic: { [key: number]: string } = {}; // Object to store predictions for each page
+  currentPrediction: IPrediction | null = null;
+  questionId: number | undefined = -1;
+  deleted: boolean = false;
+  dropdownOpen: boolean = false;
+  correctionAvailable = true;
+  maximumNote = 0;
+  noteStep = 0;
+  filterPredictionsWithNotes: boolean = false;
+
+  developementMode: boolean = false;
+
   constructor(
     public examService: ExamService,
     public courseService: CourseService,
@@ -298,6 +330,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     public questionService: QuestionService,
     public gradedCommentService: GradedCommentService,
     public textCommentService: TextCommentService,
+    public predictionService: PredictionService,
     public hybridGradedCommentService: HybridGradedCommentService,
     public answer2HybridGradedCommentService: Answer2HybridGradedCommentService,
     public studentResponseService: StudentResponseService,
@@ -313,6 +346,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     private zoneService: ZoneService,
 
     private focusViewService: FocusViewService,
+    private http: HttpClient,
+    private mltcomponent: MltComponent,
+    private coupageDimageService: CoupageDimageService,
+    private queueService: QueueCoordinationService,
   ) {
     effect(() => {
       this.testdisableAndEnableKeyBoardShortCutSignal = this.testdisableAndEnableKeyBoardShortCut();
@@ -320,6 +357,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.dropdownOpen = false;
     this.windowWidth = window.innerWidth;
     this.shortcut = this.preferenceService.showKeyboardShortcuts();
     this.shortcutvalue = this.preferenceService.showKeyboardShortcuts();
@@ -423,6 +461,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.currentGradedComment4Question = [];
           this.currentTextComment4Question = [];
           this.currentHybridGradedComment4Question = [];
+          this.currentPrediction4Question = [];
 
           if (params.get('questionno') !== null) {
             this.questionindex = +params.get('questionno')! - 1;
@@ -437,7 +476,28 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             this.noteSteps = questions[0].point! * questions[0].step!;
             this.questionStep = questions[0].step!;
             this.maxNote = questions[0].point!;
+            this.maximumNote = this.maxNote;
+            this.noteStep = 1 / this.questionStep;
             this.currentQuestion = questions[0];
+
+            /* Need to be verified
+            const com = await firstValueFrom(this.predictionService.query({ questionId: questions![0].id }));
+              this.currentPrediction4Question = [];
+              com.body!.forEach(prediction => {
+                this.currentPrediction4Question?.push(signal(prediction));
+              });
+              this.currentPrediction4Question.forEach(com1 => {
+                this.active.set(com1().id!, signal(false));
+              });
+            */
+            this.questionId = questions![0].id;
+            this.similarPredictions = [];
+            this.loadPrediction();
+            setTimeout(() => {
+              if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
+                this.executeScript();
+              }
+            }, 500);
 
             if (questions![0].gradeType === GradeType.DIRECT && questions![0].typeAlgoName !== 'QCM') {
               const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
@@ -482,6 +542,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.currentGradedComment4Question?.forEach(com2 => ((com2() as any).checked = false));
         this.currentTextComment4Question?.forEach(com2 => ((com2() as any).checked = false));
         this.currentHybridGradedComment4Question?.forEach(com2 => ((com2() as any).checked = false));
+        this.currentPrediction4Question?.forEach(com2 => ((com2() as any).checked = false));
         //        this.currentHybridGradedComment4Question?.forEach(com2 => ());
 
         if (questions !== undefined && questions.length > 0) {
@@ -714,6 +775,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   populateDefaultShortCut(): void {
     const toRemove: number[] = [];
     const comments: (IGradedComment | ITextComment | IHybridGradedComment)[] = [];
+    // const predictions: IPrediction[] = [];
     if (this.currentGradedComment4Question && this.currentGradedComment4Question.length > 0) {
       comments.push(...this.currentGradedComment4Question.map(e => e()));
     }
@@ -723,6 +785,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
     if (this.currentHybridGradedComment4Question && this.currentHybridGradedComment4Question.length > 0) {
       comments.push(...this.currentHybridGradedComment4Question.map(e => e()));
+    }
+
+    if (this.currentPrediction4Question && this.currentPrediction4Question.length > 0) {
+      comments.push(...this.currentPrediction4Question.map(e => e()));
     }
 
     if (this.keyboardShortcutService.getShortCutPreference().shortcuts.has(this.examId + '_' + this.questionindex)) {
@@ -882,7 +948,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           }
         }
         const imagezone = await this.getAllImage4Zone(page, z!);
-
         this.displayImage(
           imagezone,
           this.canvass.get(i),
@@ -1549,6 +1614,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               this.resp = resp1.body!;
               (currentComment as any).checked = true;
               this.currentTextComment4Question?.push(signal(currentComment));
+
               this.testdisableAndEnableKeyBoardShortCut.set(false);
               this.populateDefaultShortCut();
               //     this.testdisableAndEnableKeyBoardShortCut.set(true);
@@ -1653,6 +1719,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.cleanCanvassCache();
 
       const m = this.preferenceService.getRandomOrderForExam(+this.examId!);
+      this.dropdownOpen = false;
       if (m.size > 0) {
         const orderForCurrentQuestion = m.get(this.questionindex! + 1)!;
         const currentIndex = orderForCurrentQuestion.indexOf(this.currentStudent + 1);
@@ -1684,6 +1751,17 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       }
     }
+    this.similarPredictions = [];
+    this.loadPrediction();
+    setTimeout(() => {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
+        this.executeScript();
+      }
+    }, 500);
+    if (this.dropdownOpen) {
+      this.dropdownOpen = !this.dropdownOpen;
+      this.similarPrediction();
+    }
   }
 
   async nextStudent() {
@@ -1695,6 +1773,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
       //      event.preventDefault();
       const m = this.preferenceService.getRandomOrderForExam(+this.examId!);
+      this.dropdownOpen = false;
       if (m.size > 0) {
         const orderForCurrentQuestion = m.get(this.questionindex! + 1)!;
         const currentIndex = orderForCurrentQuestion.indexOf(this.currentStudent + 1);
@@ -1725,6 +1804,17 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       }
     }
+    this.similarPredictions = [];
+    this.loadPrediction();
+    setTimeout(() => {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
+        this.executeScript();
+      }
+    }, 500);
+    if (this.dropdownOpen) {
+      this.dropdownOpen = !this.dropdownOpen;
+      this.similarPrediction();
+    }
   }
   async previousQuestion(): Promise<void> {
     if (this.queryPoolPromise) {
@@ -1746,6 +1836,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
+    this.similarPredictions = [];
+    this.loadPrediction();
+    setTimeout(() => {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
+        this.executeScript();
+      }
+    }, 500);
   }
 
   async nextQuestion(): Promise<void> {
@@ -1767,9 +1864,19 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
+    this.similarPredictions = [];
+    this.loadPrediction();
+    setTimeout(() => {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
+        this.executeScript();
+      }
+    }, 500);
   }
 
   changeStudent($event: any): void {
+    this.similarPredictionsSearched = false;
+    this.searchControl.reset();
+    this.searchedTerm = '';
     if (!this.init) {
       this.cleanCanvassCache();
       const m = this.preferenceService.getRandomOrderForExam(+this.examId!);
@@ -1790,13 +1897,29 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
+    this.similarPredictions = [];
+    console.log('Next student');
+    this.loadPrediction();
+    setTimeout(() => {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
+        this.executeScript();
+      }
+    }, 500);
+    if (this.dropdownOpen) {
+      this.dropdownOpen = !this.dropdownOpen;
+      this.loadPrediction();
+      this.similarPrediction();
+    }
   }
+
   changeQuestion($event: any): void {
+    this.similarPredictionsSearched = false;
+    this.searchControl.reset();
+    this.searchedTerm = '';
     if (!this.init) {
       this.cleanCanvassCache();
 
       this.questionindex = $event.page;
-
       const c = this.currentStudent + 1;
       if ($event.pageCount !== 1) {
         this.ngZone.run(() => {
@@ -1804,6 +1927,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
+    this.similarPredictions = [];
+    this.loadPrediction();
+    setTimeout(() => {
+      if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
+        this.executeScript();
+      }
+    }, 500);
   }
 
   private reviver(key: any, value: any): any {
@@ -2120,6 +2250,75 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
+  async getStudentResponse4WantedStudent(questionsId: number[], currentStudent: number): Promise<StudentResponse> {
+    const _sheets = await firstValueFrom(
+      this.sheetService.query({
+        scanId: this.exam!.scanfileId,
+        pagemin: currentStudent * this.nbreFeuilleParCopie!,
+        pagemax: (currentStudent + 1) * this.nbreFeuilleParCopie! - 1,
+      }),
+    );
+    let sheet: IExamSheet | undefined;
+    if (_sheets.body !== null && _sheets.body.length > 0) {
+      sheet = _sheets.body[0];
+    }
+
+    if (sheet !== undefined) {
+      const _sr = (
+        await firstValueFrom(
+          this.studentResponseService.query({
+            sheetId: sheet!.id!,
+            questionsId: questionsId,
+          }),
+        )
+      ).body;
+      if (_sr !== null && _sr.length > 0) {
+        return _sr[0];
+      } else {
+        const st: IStudentResponse = {};
+        st.note = 0;
+        st.questionId = this.questions![0].id;
+        st.sheetId = sheet!.id!;
+        const sr1 = await firstValueFrom(this.studentResponseService.create(st));
+        return sr1.body!;
+      }
+    } else {
+      throw new Error('No sheet for this page, should never happen');
+    }
+  }
+
+  async getStudentResponse4EmptyStudent(questionsId: number[], currentStudent: number): Promise<StudentResponse | undefined> {
+    const _sheets = await firstValueFrom(
+      this.sheetService.query({
+        scanId: this.exam!.scanfileId,
+        pagemin: currentStudent * this.nbreFeuilleParCopie!,
+        pagemax: (currentStudent + 1) * this.nbreFeuilleParCopie! - 1,
+      }),
+    );
+    let sheet: IExamSheet | undefined;
+    if (_sheets.body !== null && _sheets.body.length > 0) {
+      sheet = _sheets.body[0];
+    }
+
+    if (sheet !== undefined) {
+      const _sr = (
+        await firstValueFrom(
+          this.studentResponseService.query({
+            sheetId: sheet!.id!,
+            questionsId: questionsId,
+          }),
+        )
+      ).body;
+      if (_sr !== null && _sr.length > 0) {
+        return _sr[0];
+      } else {
+        return undefined;
+      }
+    } else {
+      throw new Error('No sheet for this page, should never happen');
+    }
+  }
+
   async getStudentResponse(questionsId: number[]): Promise<StudentResponse> {
     if (this.sheet !== undefined) {
       const _sr = (
@@ -2204,19 +2403,30 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async loadImage(file: any, page1: number): Promise<IPage> {
+    console.log('loadImage called with file:', file);
     return new Promise(resolve => {
       const i = new Image();
+
+      // Add debugging to check when the image is loaded
       i.onload = () => {
+        console.log('Image loaded with dimensions:', i.width, i.height); // Log image dimensions
+
         const editedImage: HTMLCanvasElement = <HTMLCanvasElement>document.createElement('canvas');
         editedImage.width = i.width;
         this.computeScale(i.width, i.height);
         editedImage.height = i.height;
         const ctx = editedImage.getContext('2d');
         ctx!.drawImage(i, 0, 0);
+
         const inputimage = ctx!.getImageData(0, 0, i.width, i.height);
+        console.log('ImageData extracted:', inputimage); // Log extracted image data
+
         resolve({ image: inputimage, page: page1, width: i.width, height: i.height });
       };
+
+      // Set the image source and log it
       i.src = file;
+      console.log('Image source set to:', i.src); // Debugging log for the image source
     });
   }
   updateCommentStep(event: any, l: IHybridGradedComment, graded: boolean, hybrid: boolean): any {
@@ -2348,6 +2558,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         accept: () => {
           this.retirerTComment(comment, this).then(() => {
             this.currentTextComment4Question = this.currentTextComment4Question!.filter(e => e().id !== comment.id);
+
+            // Also remove this comment from all similar responses that have it
+            this.similarPredictions.forEach(similar => {
+              const response = this.sameResponses.get(similar.studentId!);
+              if (response && response.textcomments) {
+                response.textcomments = response.textcomments.filter(c => c.id !== comment.id);
+                this.updateSimilarComment(similar.studentId!, response);
+              }
+            });
+
             this.textCommentService.delete(comment!.id!).subscribe(() => {
               const m = this.preferenceService.getCommentSort4Question(this.examId + '_' + this.currentQuestion!.id!);
               if (m.has(comment!.id!)) {
@@ -2981,5 +3201,593 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         ctx?.stroke();
       }
     }
+  }
+
+  // This method is to get the image
+  getImageFromCanvas(): string | undefined {
+    const canvasArray = this.canvass2.toArray();
+    if (canvasArray && canvasArray[0]) {
+      const canvas = canvasArray[0].nativeElement;
+      const base64Data = canvas.toDataURL(); // Convert the canvas to a base64-encoded string
+      return base64Data;
+    } else {
+      console.error('Canvas not found or not yet available');
+      return undefined;
+    }
+  }
+
+  storePrediction(
+    prediction: string,
+    question_id: number | undefined,
+    exam_id: string | undefined,
+    student_id: number | undefined,
+    question_number: number,
+    prediction_id: number | undefined,
+  ): void {
+    if (this.blocked) {
+      return;
+    } // Ensure storePrediction is not called twice
+    this.blocked = true;
+
+    const predictionData: IPrediction = {
+      id: prediction_id,
+      studentId: student_id,
+      examId: exam_id,
+      questionNumber: question_number,
+      questionId: question_id,
+      text: prediction,
+      jsonData: '{"key": "value"}',
+      zonegeneratedid: 'ZoneID123',
+    };
+
+    this.predictionService.update(predictionData).subscribe({
+      next: createdResponse => {
+        this.currentPrediction = createdResponse.body;
+        this.loadPrediction();
+        this.blocked = false; // Unblock after successful creation
+      },
+      error: createError => {
+        console.error('Error storing hardcoded prediction:', createError);
+        this.blocked = false; // Unblock UI even on error
+      },
+    });
+  }
+
+  createPrediction(
+    question_id: number | undefined,
+    exam_id: string | undefined,
+    student_id: number | undefined,
+    question_number: number,
+    image_data: string,
+  ): Promise<number | undefined> {
+    return new Promise((resolve, reject) => {
+      if (this.blocked) {
+        resolve(undefined); // Exit if already blocked
+        return;
+      }
+
+      this.blocked = true;
+      const predictionData: IPrediction = {
+        studentId: student_id,
+        examId: exam_id,
+        questionNumber: question_number,
+        questionId: question_id,
+        text: 'En attente',
+        jsonData: '{"key": "value"}',
+        zonegeneratedid: 'ZoneID123',
+        imageData: image_data,
+      };
+
+      this.predictionService.create(predictionData).subscribe({
+        next: createdResponse => {
+          this.currentPrediction = createdResponse.body;
+          const id = createdResponse.body?.id;
+          this.blocked = false; // Unblock after prediction creation
+          resolve(id);
+        },
+        error: createError => {
+          console.error('Error creating prediction:', createError);
+          this.blocked = false;
+          reject(createError);
+        },
+      });
+    });
+  }
+
+  async loadPrediction() {
+    try {
+      const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionId }));
+      const predictions = predictionResponse.body || [];
+
+      // Find the first matching prediction
+      this.currentPrediction = predictions.find(pred => pred.studentId === this.studentid) || null;
+
+      if (this.currentPrediction) {
+        this.deleted = false;
+      } else {
+        console.warn('No valid predictions found for the current question index.');
+      }
+    } catch (err) {
+      console.error('Error loading prediction:', err);
+      this.currentPrediction = null; // Explicitly reset on error
+    }
+  }
+
+  // Method to delete a prediction
+  deletePrediction(id: number): void {
+    if (confirm('Are you sure you want to delete this prediction?')) {
+      this.predictionService.delete(id).subscribe({
+        next: () => {
+          this.deleted = true;
+          console.log('Deleted:', this.deleted);
+          this.currentPrediction = null;
+          console.log(`Deleted prediction with id: ${id}`);
+        },
+        error: err => {
+          console.error(`Error deleting prediction with id ${id}:`, err);
+          alert(`Failed to delete prediction with id ${id}. Please try again.`);
+        },
+      });
+    }
+  }
+
+  base64Image = '';
+  refinedLines: string[] = [];
+
+  // Méthode pour exécuter le script
+  async executeScript(): Promise<void> {
+    this.deleted = false;
+    if (this.currentQuestion?.typeAlgoName === 'manuscrit') {
+      console.log('Before pause');
+      this.queueService.pauseQueue();
+      this.changeDetector.detectChanges();
+      const imageData = this.getImageFromCanvas();
+
+      if (!imageData) {
+        console.error('No image data found on the canvas');
+        this.error = 'No image selected';
+        return;
+      }
+
+      const question_id = this.questionId;
+      const exam_id = this.examId;
+      const student_id = this.studentid;
+      const question_number = this.questionindex + 1;
+
+      // Await the ID from createPrediction before proceeding
+      const prediction_id = await this.createPrediction(question_id, exam_id, student_id, question_number, imageData);
+
+      // Proceed only if prediction_id is valid
+      if (prediction_id !== undefined) {
+        this.coupageDimageService.runScript(imageData).subscribe({
+          next: async response => {
+            this.refinedLines = response.refinedLines || [];
+            const currentPageIndex = this.questionindex;
+            let prediction: string = '';
+            for (let i = 0; i < this.refinedLines.length; i++) {
+              try {
+                const base64Line = `data:image/png;base64,${this.refinedLines[i]}`;
+                const result = await this.mltcomponent.executeMLT(base64Line);
+                prediction += result + '\n';
+              } catch (error) {
+                console.error('Error processing refined line ', i, ':', error);
+              }
+            }
+            this.predictionsDic[currentPageIndex] = prediction;
+
+            // Now store the prediction with the actual ID
+            this.storePrediction(prediction, question_id, exam_id, student_id, question_number, prediction_id);
+            console.log('Before resume');
+            this.queueService.resumeQueue();
+            // Update the output for display
+            this.output = prediction;
+            this.error = '';
+          },
+          error: error => {
+            console.error('Error refining the image:', error);
+          },
+        });
+      }
+    }
+  }
+
+  similarPredictions: Prediction[] = [];
+  similarPredictionsSearched = false;
+  async similarPrediction() {
+    this.similarPredictions = [];
+    this.dropdownOpen = !this.dropdownOpen;
+
+    this.setupSearchListener();
+    try {
+      const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionId }));
+      const predictions = predictionResponse.body || [];
+      if (this.currentPrediction && predictions.length > 0) {
+        this.similarPredictions = this.findSimilarPredictions(this.currentPrediction, predictions);
+        this.similarPredictions = this.similarPredictions.filter(
+          (prediction, index, self) =>
+            index === self.findIndex(p => p.questionId === prediction.questionId && p.studentId === prediction.studentId),
+        );
+
+        // Sort by studentId
+        this.similarPredictions.sort((a, b) => {
+          const studentIdA = a.studentId || 0;
+          const studentIdB = b.studentId || 0;
+          return studentIdA - studentIdB;
+        });
+        this.deleted = false;
+        this.loadPredictionsForSearch();
+      } else {
+        this.executeScript();
+      }
+      this.similarPredictionsSearched = true;
+    } catch (err) {
+      console.error('Error loading prediction:', err);
+      this.currentPrediction = null; // Explicitly reset on error
+    }
+    this.getSameResponses();
+    console.log('Similar responses:', this.sameResponses);
+  }
+
+  selectedSimilars: Map<Prediction, number> = new Map();
+
+  async selectSimilarPrediction(similar: Prediction) {
+    if (this.selectedSimilars.has(similar)) {
+      const currentValue = this.selectedSimilars.get(similar);
+      if (currentValue === 1) {
+        // Unselect the prediction
+        this.selectedSimilars.set(similar, 0);
+      } else {
+        // Select the prediction
+        this.selectedSimilars.set(similar, 1);
+      }
+    } else {
+      // Add the prediction and set it to selected
+      this.selectedSimilars.set(similar, 1);
+    }
+    this.getSameResponses();
+  }
+
+  tempPredictions: IPrediction[] = [];
+
+  isAllSelected(): boolean {
+    if (!this.tempPredictions || this.tempPredictions.length === 0) {
+      return false;
+    }
+    return this.tempPredictions.every(prediction => this.selectedSimilars.get(prediction)! > 0);
+  }
+
+  toggleSelectAll(event: any): void {
+    const isChecked = event.target.checked;
+    this.tempPredictions.forEach(prediction => {
+      this.selectedSimilars.set(prediction, isChecked ? 1 : 0);
+    });
+  }
+
+  getSelectedCount(): number {
+    return Array.from(this.selectedSimilars.values()).filter(v => v === 1).length;
+  }
+
+  changeSelectedSimilarGrades() {
+    const selectedCount = Array.from(this.selectedSimilars.values()).filter(v => v === 1).length;
+    this.confirmationService.confirm({
+      message: this.translateService.instant('scanexam.confirmSelectedGrades', { count: selectedCount }),
+      accept: () => {
+        for (const similar of this.selectedSimilars) {
+          if (similar[1] === 1) {
+            this.sameGrade(similar[0]);
+          }
+        }
+        this.messageService.add({
+          severity: 'info',
+          detail: this.translateService.instant('scanexam.gradesAppliedSelected'),
+        });
+      },
+    });
+    this.getSameResponses();
+  }
+
+  changeAllSimilarGrades() {
+    const totalCount = this.similarPredictions.length;
+    this.confirmationService.confirm({
+      message: this.translateService.instant('scanexam.confirmAllGrades', { count: totalCount }),
+      accept: () => {
+        for (const similar of this.similarPredictions) {
+          this.sameGrade(similar);
+        }
+        this.messageService.add({
+          severity: 'info',
+          detail: this.translateService.instant('scanexam.gradesAppliedAll'),
+        });
+      },
+    });
+    this.getSameResponses();
+  }
+
+  // Finding the simlar prediction using fuse.js
+  findSimilarPredictions(currentPrediction: Prediction, predictions: Prediction[]) {
+    // Fuse.js options
+    const fuseOptions = {
+      keys: ['text'],
+      threshold: 0.5, // Adjust for leniency
+      distance: 300, // High value for inaccuracies
+      minMatchCharLength: 3,
+    };
+
+    const fuse = new Fuse(predictions, fuseOptions);
+
+    // Forward search: Check which predictions are similar to the current prediction
+    const forwardResults = fuse.search(currentPrediction.text!);
+
+    // Reverse search: Check if the current prediction is similar to any prediction text
+    const reverseResults = predictions.filter(prediction => {
+      const fuseForReverse = new Fuse([currentPrediction], fuseOptions);
+      const result = fuseForReverse.search(prediction.text!);
+      return result.length > 0;
+    });
+
+    // Combine forward and reverse results, ensuring no duplicates
+    const similarPredictions = new Set([...forwardResults.map(result => result.item), ...reverseResults]);
+
+    // Exclude the current prediction itself
+    return [...similarPredictions].filter(prediction => prediction.id !== currentPrediction.id);
+  }
+
+  getFilteredSimilarPredictions(): IPrediction[] {
+    if (this.searchedTerm != '') {
+      for (let prediction of this.similarPredictions) {
+        if (!this.filteredSearchedPredictions.includes(prediction)) {
+          this.selectedSimilars.set(prediction, 0);
+        }
+      }
+      if (this.filterPredictionsWithNotes) {
+        for (let prediction of this.selectedSimilars.keys()) {
+          if (this.getSimilarGrade(prediction.studentId!) != undefined) {
+            this.selectedSimilars.set(prediction, 0);
+          }
+        }
+        this.tempPredictions = this.filteredSearchedPredictions.filter(
+          prediction => this.getSimilarGrade(prediction.studentId!) == undefined,
+        );
+      }
+      this.tempPredictions = this.filteredSearchedPredictions;
+    } else if (this.filterPredictionsWithNotes) {
+      for (let prediction of this.selectedSimilars.keys()) {
+        if (this.getSimilarGrade(prediction.studentId!) != undefined) {
+          this.selectedSimilars.set(prediction, 0);
+        }
+      }
+      this.tempPredictions = this.similarPredictions.filter(prediction => this.getSimilarGrade(prediction.studentId!) == undefined);
+    } else {
+      this.tempPredictions = this.similarPredictions;
+    }
+    return this.tempPredictions;
+  }
+
+  // Same starts, comments etc
+  async sameGrade(similar: Prediction) {
+    // let try1 = await this.getStudentResponse(this.questions!.map(q => q.id!));
+    let response = await this.getStudentResponse4CurrentStudent(
+      this.questions!.map(q => q.id!),
+      similar.studentId! - 1,
+    );
+    console.log('Similar note:', response.note);
+    console.log('Note:', this.resp?.note);
+    response.note = this.resp?.note;
+    response.comments = this.resp?.comments;
+    response.gradedcomments = this.resp?.gradedcomments;
+    response.textcomments = this.resp?.textcomments;
+    response.star = this.resp?.star;
+    response.worststar = this.resp?.worststar;
+    this.updateResponseRequest(response).subscribe(sr1 => {
+      response = sr1.body!;
+      this.blocked = false;
+    });
+    console.log('Similar note:', response.note);
+    this.getSameResponses();
+  }
+
+  sameResponses: Map<number, StudentResponse> = new Map();
+  async getSameResponses() {
+    for (const similar of this.similarPredictions) {
+      // let try1 = await this.getStudentResponse(this.questions!.map(q => q.id!));
+      let response = await this.getStudentResponse4EmptyStudent(
+        this.questions!.map(q => q.id!),
+        similar.studentId! - 1,
+      );
+      this.sameResponses.set(similar.studentId!, response!);
+    }
+  }
+
+  async passToNextNotGradedQuestion() {
+    const nbStudents = this.numberPagesInScan! / this.nbreFeuilleParCopie!;
+    console.log('My note', this.resp);
+    for (let i = 0; i < nbStudents; i++) {
+      if (this.currentStudent < i) {
+        let response = await this.getStudentResponse4EmptyStudent(
+          this.questions!.map(q => q.id!),
+          i,
+        );
+        console.log('Student', i + 1, 'Response:', response);
+        if (response === undefined) {
+          this.currentStudentPaginator = i;
+          this.currentStudent = i;
+          this.loadPrediction();
+          this.ngZone.run(() => {
+            this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+          });
+          if (this.dropdownOpen) {
+            this.dropdownOpen = !this.dropdownOpen;
+            this.similarPrediction();
+          }
+          return;
+        }
+      }
+    }
+    for (let i = 0; i < nbStudents; i++) {
+      let response = await this.getStudentResponse4EmptyStudent(
+        this.questions!.map(q => q.id!),
+        i,
+      );
+      console.log('Student', i + 1, 'Response:', response);
+      if (response === undefined) {
+        this.currentStudentPaginator = i;
+        this.currentStudent = i;
+        this.loadPrediction();
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+        });
+        if (this.dropdownOpen) {
+          this.dropdownOpen = !this.dropdownOpen;
+          this.similarPrediction();
+        }
+        return;
+      }
+    }
+    // No ungraded responses were found
+    this.messageService.add({
+      severity: 'info',
+      summary: this.translateService.instant('scanexam.noUngradedResponses'),
+    });
+  }
+
+  async passToPreviousNotGradedQuestion() {
+    const nbStudents = this.numberPagesInScan! / this.nbreFeuilleParCopie!;
+    console.log('My note', this.resp);
+    for (let i = this.currentStudent - 1; i >= 0; i--) {
+      if (this.currentStudent > i) {
+        let response = await this.getStudentResponse4EmptyStudent(
+          this.questions!.map(q => q.id!),
+          i,
+        );
+        console.log('Student', i + 1, 'Response:', response);
+        if (response === undefined) {
+          this.currentStudentPaginator = i;
+          this.currentStudent = i;
+          this.loadPrediction();
+          this.ngZone.run(() => {
+            this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+          });
+          if (this.dropdownOpen) {
+            this.dropdownOpen = !this.dropdownOpen;
+            this.similarPrediction();
+          }
+          return;
+        }
+      }
+    }
+    for (let i = nbStudents - 1; i >= 0; i--) {
+      let response = await this.getStudentResponse4EmptyStudent(
+        this.questions!.map(q => q.id!),
+        i,
+      );
+      console.log('Student', i + 1, 'Response:', response);
+      if (response === undefined) {
+        this.currentStudentPaginator = i;
+        this.currentStudent = i;
+        this.loadPrediction();
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+        });
+        if (this.dropdownOpen) {
+          this.dropdownOpen = !this.dropdownOpen;
+          this.similarPrediction();
+        }
+        return;
+      }
+    }
+    // No ungraded responses were found
+    this.messageService.add({
+      severity: 'info',
+      summary: this.translateService.instant('scanexam.noUngradedResponses'),
+    });
+  }
+
+  async updateSimilarGrade(studentId: number, newGrade: number) {
+    if (this.blocked) return;
+
+    const response = this.sameResponses.get(studentId);
+    if (response) {
+      response.note = newGrade;
+      this.updateResponseRequest(response).subscribe(sr1 => {
+        this.sameResponses.set(studentId, sr1.body!);
+      });
+    }
+  }
+
+  async updateSimilarComment(studentId: number, comment: any) {
+    if (this.blocked) return;
+
+    const response = this.sameResponses.get(studentId);
+    if (response) {
+      this.updateResponseRequest(response).subscribe(sr1 => {
+        this.sameResponses.set(studentId, sr1.body!);
+      });
+    }
+  }
+
+  async removeSimilarComment(studentId: number, commentToRemove: any) {
+    if (this.blocked) return;
+
+    const response = this.sameResponses.get(studentId);
+    if (response) {
+      response.textcomments = response.textcomments?.filter(c => c.id !== commentToRemove.id);
+      this.updateResponseRequest(response).subscribe(sr1 => {
+        this.sameResponses.set(studentId, sr1.body!);
+      });
+    }
+  }
+
+  getSimilarGrade(studentId: number): number {
+    return this.sameResponses.get(studentId!)?.note!;
+  }
+
+  removedSimilarComment(studentId: number, index: number) {
+    const response = this.sameResponses.get(studentId);
+    if (response && response.textcomments) {
+      const commentToRemove = response.textcomments[index];
+      response.textcomments.splice(index, 1);
+      this.removeSimilarComment(studentId, commentToRemove);
+    }
+  }
+
+  predictionsForSearch: IPrediction[] = [];
+  searchControl = new FormControl('');
+  filteredSearchedPredictions: IPrediction[] = [];
+  private searchSubscription?: Subscription;
+
+  async loadPredictionsForSearch() {
+    try {
+      const req = {
+        page: 0,
+        size: 500,
+      };
+
+      if (this.similarPredictions.length > 0) {
+        this.predictionsForSearch = this.similarPredictions.filter(
+          prediction => prediction.examId === this.examId && prediction.questionId == this.questionId,
+        );
+        console.log('Predictions for search:', this.predictionsForSearch);
+        this.filterSearchedPredictions();
+      } else {
+        console.warn('No predictions found for search.');
+      }
+    } catch (err) {
+      console.error('Error fetching predictions for search', err);
+    }
+  }
+
+  setupSearchListener() {
+    this.searchSubscription = this.searchControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe(value => {
+      this.filterSearchedPredictions(value ?? '');
+    });
+  }
+
+  searchedTerm: string = '';
+  filterSearchedPredictions(searchTerm: string = '') {
+    this.searchedTerm = searchTerm;
+    this.filteredSearchedPredictions = this.predictionsForSearch.filter(prediction =>
+      (prediction.text ?? '').toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+    this.changeDetector.detectChanges();
   }
 }

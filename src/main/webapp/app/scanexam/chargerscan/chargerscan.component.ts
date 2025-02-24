@@ -613,6 +613,7 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
   }
 
   saveImageScan(file: any, pagen: number, template: boolean): Promise<void> {
+    console.log('I am here saveImageScan');
     if (!template && !this.processLastPage && pagen % (this.nbreFeuilleParCopie + 1) === 0) {
       return new Promise(resolve => resolve());
     } else
