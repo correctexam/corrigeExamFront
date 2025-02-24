@@ -245,17 +245,17 @@ export class ImageAccessComponent implements OnInit {
 
   private async handlePrediction(image: ExamPageImage, studentId: number) {
     try {
-      const canvas = document.createElement('canvas');
-      canvas.width = image.width;
-      canvas.height = image.height;
-      let ctx = canvas.getContext('2d');
-      ctx?.putImageData(image.imageData, 0, 0);
-      const base64Image = canvas.toDataURL();
+      //      const canvas = document.createElement('canvas');
+      //      canvas.width = image.width;
+      //      canvas.height = image.height;
+      //      let ctx = canvas.getContext('2d');
+      //      ctx?.putImageData(image.imageData, 0, 0);
+      //      const base64Image = canvas.toDataURL();
 
       // Clear canvas reference
-      canvas.width = 0;
-      canvas.height = 0;
-      (ctx as any) = null;
+      //    canvas.width = 0;
+      //    canvas.height = 0;
+      //   (ctx as any) = null;
 
       // Query predictions for this question
       const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: image.questionId }));
@@ -267,26 +267,36 @@ export class ImageAccessComponent implements OnInit {
         image.prediction = studentPrediction.text || '';
       } else {
         // Create new prediction
-        const predictionId = await this.createPrediction(image.questionId!, this.examId!, studentId, base64Image);
+        const predictionId = await this.createPrediction(image.questionId!, this.examId!, studentId, '');
 
         if (predictionId) {
           // First use CoupageDimageService
-          const coupageResponse = await firstValueFrom(this.coupageDimageService.runScript(base64Image));
+          const coupageResponse = await firstValueFrom(this.coupageDimageService.runScript(image.imageData));
           let prediction = '';
 
           // Process each refined line
-          if (coupageResponse.refinedLines) {
-            for (const refinedLine of coupageResponse.refinedLines) {
-              const base64Line = `data:image/png;base64,${refinedLine}`;
-              const lineResult = await this.mltcomponent.executeMLT(base64Line);
+          if (coupageResponse.linesbase64) {
+            for (const { index, value } of coupageResponse.linesbase64.map((value1: any, index1: number) => ({
+              index: index1,
+              value: value1,
+            }))) {
+              // const base64Line = `data:image/png;base64,${refinedLine}`;
+              const imgData = new ImageData(new Uint8ClampedArray(value), coupageResponse.widths[index], coupageResponse.heights[index]);
+              const lineResult = await this.mltcomponent.executeMLTFromImagData(
+                imgData,
+                coupageResponse.widths[index],
+                coupageResponse.heights[index],
+              );
+
+              //              .executeMLT(base64Line);
               if (lineResult) {
                 prediction += lineResult + '\n';
               }
             }
             // Clear refined lines after processing
-            coupageResponse.refinedLines = [];
+            coupageResponse.linesbase64 = [];
           }
-
+          console.error('prediction:', prediction);
           // Store and set prediction if we got any results
           if (prediction) {
             await this.storePrediction(prediction.trim(), image.questionId!, this.examId!, studentId, predictionId);

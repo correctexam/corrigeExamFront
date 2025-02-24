@@ -254,4 +254,7 @@ export class AlignImagesService {
   public correctQCM(payload: IQCMInput): Observable<IQCMOutput> {
     return this._dispatch('qcmresolution', payload);
   }
+  public getLinesFromImage(payload: any): Observable<any> {
+    return this._dispatch('getLinesFromImage', payload);
+  }
 }

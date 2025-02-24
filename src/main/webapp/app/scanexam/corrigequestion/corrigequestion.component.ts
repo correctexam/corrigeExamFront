@@ -3372,7 +3372,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
       // Proceed only if prediction_id is valid
       if (prediction_id !== undefined) {
-        this.coupageDimageService.runScript(imageData).subscribe({
+        this.coupageDimageService.runScript1(imageData).subscribe({
           next: async response => {
             this.refinedLines = response.refinedLines || [];
             const currentPageIndex = this.questionindex;

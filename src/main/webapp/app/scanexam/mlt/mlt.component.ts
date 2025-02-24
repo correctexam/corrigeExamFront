@@ -1,12 +1,12 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import * as tf from '@tensorflow/tfjs';
 import * as ort from 'onnxruntime-web';
 
-import { NgIf, NgFor } from '@angular/common';
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { InferenceSession, env } from 'onnxruntime-web';
+import { InferenceSession } from 'onnxruntime-web';
 
 type Tensor = tf.Tensor;
 // Optionnel: Vérifie la compatibilité WASM
@@ -21,7 +21,6 @@ ort.env.wasm.wasmPaths = '/public/';
 })
 export class MltComponent {
   session: InferenceSession | undefined = undefined;
-  constructor(private route: ActivatedRoute) {}
 
   charList: string[] = [
     '<BLANK>',
@@ -129,6 +128,8 @@ export class MltComponent {
     '€',
   ];
 
+  constructor(private route: ActivatedRoute) {}
+
   // Fonction pour afficher l'image prétraitée
   async plotPreprocessedImage(tensor: Tensor): Promise<void> {
     const canvas = document.getElementById('imageCanvas') as HTMLCanvasElement;
@@ -235,6 +236,59 @@ export class MltComponent {
     return paddedImage;
   }
 
+  // Prétraitement de l'image
+  async preprocessImageFromImgData(
+    imageData: ImageData,
+    width: number,
+    height: number,
+    channelNb: number,
+    padValue: number,
+    padWidthRight: number,
+    padWidthLeft: number,
+    mean: number,
+    std: number,
+    targetHeight: number,
+  ): Promise<Tensor> {
+    const imageTensor = await this.loadImageTensorFromImageData(imageData, width, height);
+    let processedImage = imageTensor;
+    if (channelNb === 1 && imageTensor.shape[2] !== undefined && imageTensor.shape[2] > 1) {
+      processedImage = tf.mean(imageTensor, -1, true);
+    }
+
+    const aspectRatio = (imageTensor.shape[1] ?? 1) / (imageTensor.shape[0] ?? 1);
+    const newWidth = Math.round(targetHeight * aspectRatio);
+    processedImage = tf.image.resizeBilinear(processedImage as tf.Tensor3D, [targetHeight, newWidth]);
+
+    processedImage = processedImage.div(tf.scalar(255.0));
+    processedImage = processedImage.sub(tf.scalar(mean)).div(tf.scalar(std));
+
+    const padLeft = tf.pad(
+      processedImage,
+      [
+        [0, 0],
+        [padWidthLeft, 0],
+        [0, 0],
+      ],
+      padValue,
+    );
+    const paddedImage = tf.pad(
+      padLeft,
+      [
+        [0, 0],
+        [0, padWidthRight],
+        [0, 0],
+      ],
+      padValue,
+    );
+
+    return paddedImage;
+  }
+
+  loadImageTensorFromImageData(imageData: ImageData, width: number, height: number): Tensor {
+    const data = tf.tensor(imageData.data, [height, width, 4], 'float32');
+    const rgb = data.slice([0, 0, 0], [-1, -1, 3]);
+    return rgb;
+  }
   // Chargement de l'image en tenseur
   async loadImageTensor(imageFile: File): Promise<Tensor> {
     if (!imageFile.type.startsWith('image/')) {
@@ -363,6 +417,46 @@ export class MltComponent {
       // Exécution de l'inférence
       const prediction = await this.runInference(preprocessedImage, modelPath);
 
+      // eslint-disable-next-line no-console
+      console.log('Prediction:', prediction);
+      return prediction;
+    } catch (error) {
+      console.error('Error in executeMLT:', error);
+      return undefined;
+    }
+  }
+  async executeMLTFromImagData(imageData: ImageData, width: number, height: number): Promise<string | undefined> {
+    this.initializeOrt();
+    // Paramètres de prétraitement (issus de la configuration ou d'un modèle)
+    const channelNb: number = 1; // Monochrome
+    const padValue: number = 0.0;
+    const padWidthRight: number = 64;
+    const padWidthLeft: number = 64;
+    const mean: number = 238.6531 / 255;
+    const std: number = 43.4356 / 255;
+    const targetHeight: number = 128;
+
+    try {
+      // Prétraitement de l'image
+      const preprocessedImage = await this.preprocessImageFromImgData(
+        imageData,
+        width,
+        height,
+        channelNb,
+        padValue,
+        padWidthRight,
+        padWidthLeft,
+        mean,
+        std,
+        targetHeight,
+      );
+      // Spécification du chemin du modèle ONNX
+      const modelPath: string = '../../content/classifier/trace_mlt-4modern_hw_rimes_lines-v3+synth-1034184_best_encoder.tar.onnx';
+
+      // Exécution de l'inférence
+      const prediction = await this.runInference(preprocessedImage, modelPath);
+
+      // eslint-disable-next-line no-console
       console.log('Prediction:', prediction);
       return prediction;
     } catch (error) {

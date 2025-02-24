@@ -71,7 +71,7 @@ export function trace(message: any): void {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function debugImage(imageData: ImageData): void {
+export function debugImage(imageData: ImageData): void {
   try {
     const c = new OffscreenCanvas(imageData.width, imageData.height);
     const ctx = c.getContext('2d');

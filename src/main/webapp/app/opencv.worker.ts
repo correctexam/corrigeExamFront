@@ -16,6 +16,7 @@ import {
   __comparePositionX,
   detectFormes,
   decoupe,
+  //  debugImage
 } from './qcm';
 import { IZone } from './entities/zone/zone.model';
 import { AlignImage, AppDB, NonAlignImage, Template } from './scanexam/db/db';
@@ -1524,10 +1525,11 @@ function mergeRect(rects: any[]): any {
 }
 
 // function to dectect lines from images
-async function getLinesFromImage(p: { msg: any; payload: any; uid: string }): Promise<void> {
+function getLinesFromImage(p: { msg: any; payload: any; uid: string }): any {
   const image = p.payload.image;
+  // console.error(image);
   // Convert image to OpenCV Mat
-  const src = cv.imread(image);
+  const src = cv.matFromImageData(image);
   const gray = new cv.Mat();
   cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
   src.delete();
@@ -1589,9 +1591,13 @@ async function getLinesFromImage(p: { msg: any; payload: any; uid: string }): Pr
     if (regionSum < 1000) {
       return;
     }
-    const paddedStart = Math.max(0, start - PAD);
+    const paddedStart = Math.max(0, start1 - PAD);
     const paddedEnd = Math.min(gray.rows, end + PAD);
-    const line = gray.rowRange(paddedStart, paddedEnd).clone();
+    const rect = new cv.Rect(0, paddedStart, gray.cols, paddedEnd - paddedStart);
+    console.error(gray.cols, gray.rows, paddedStart, paddedEnd);
+    console.error(rect);
+    //    const line = gray.rowRange(paddedStart, paddedEnd).clone();
+    const line = gray.roi(rect).clone();
     lines.push(line);
   });
 
@@ -1600,15 +1606,27 @@ async function getLinesFromImage(p: { msg: any; payload: any; uid: string }): Pr
   binary.delete();
   const res: any = {};
   // Convert lines to base64
+  const widths: number[] = [];
+  const heights: number[] = [];
   const linesbase64 = lines.map(line => {
-    const buffer = new cv.Mat();
-    cv.imencode('.png', line, buffer);
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer.data)));
-    line.delete();
-    buffer.delete();
-    return base64;
+    // const buffer = new cv.Mat();
+    //    console.error(line)
+    // console.error(line.height)
+    const i = imageDataFromMat(line);
+    widths.push(line.size().width);
+    heights.push(line.size().height);
+    // debugImage(i)
+
+    const buffer = i.data.buffer;
+    //    cv.imencode('.png', line, buffer);
+    //    const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer.data)));
+    //  line.delete();
+    //    buffer.delete();
+    return buffer;
   });
   res.linesbase64 = linesbase64;
-  //    source.target.postMessage({ msg: p.msg, payload: res, uid: p.uid }, [res]);
-  source.target.postMessage({ msg: p.msg, payload: res, uid: p.uid });
+  res.widths = widths;
+  res.heights = heights;
+
+  source.target.postMessage({ msg: p.msg, payload: res, uid: p.uid }, res.linesbase64);
 }
