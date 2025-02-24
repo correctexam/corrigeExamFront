@@ -209,10 +209,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   showImageQCM = false;
   sortCommentVisible = false;
 
-  @ViewChildren('nomImage') canvass2!: QueryList<ElementRef<HTMLCanvasElement>>;
+  //   @ViewChildren('nomImage') canvass2!: QueryList<ElementRef<HTMLCanvasElement>>;
 
   @ViewChildren('nomImage')
   canvass!: QueryList<ElementRef>;
+
   showImage: boolean[] = [];
   nbreFeuilleParCopie: number | undefined;
   numberPagesInScan: number | undefined;
@@ -3215,7 +3216,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   // This method is to get the image
   getImageFromCanvas(): string | undefined {
-    const canvasArray = this.canvass2.toArray();
+    const canvasArray = this.canvass.toArray();
     if (canvasArray && canvasArray[0]) {
       const canvas = canvasArray[0].nativeElement;
       const base64Data = canvas.toDataURL(); // Convert the canvas to a base64-encoded string
@@ -3347,6 +3348,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   // Méthode pour exécuter le script
   async executeScript(): Promise<void> {
+    console.error('Executing script');
     this.deleted = false;
     if (this.currentQuestion?.typeAlgoName === 'manuscrit') {
       console.log('Before pause');

@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Component, OnInit, OnDestroy, ViewChildren, QueryList, ElementRef, Injectable } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AlignImagesService } from '../services/align-images.service';
@@ -52,6 +54,7 @@ export class ImageAccessComponent implements OnInit {
   private processingCount = 0;
   private readonly MAX_CONCURRENT_PREDICTIONS = 1;
   private externalProcessing = false;
+  private readonly THROTTLE_DELAY = 200; // Delay between predictions
 
   constructor(
     private route: ActivatedRoute,
@@ -75,6 +78,22 @@ export class ImageAccessComponent implements OnInit {
       }
     });
   }
+  ngAfterViewInit() {
+    this.canvases.changes.subscribe(() => {
+      this.renderImages();
+    });
+  }
+
+  getUniqueStudents(): number[] {
+    // Get unique student indices and sort them
+    const students = [...new Set(this.imageList.map(img => img.studentIndex))];
+    return students.sort((a, b) => a - b);
+  }
+
+  getImagesForStudent(studentIndex: number): ExamPageImage[] {
+    // Get all images for a specific student
+    return this.imageList.filter(img => img.studentIndex === studentIndex).sort((a, b) => (a.questionId || 0) - (b.questionId || 0)); // Sort by question ID
+  }
 
   async loadManuscriptQuestions() {
     try {
@@ -97,7 +116,8 @@ export class ImageAccessComponent implements OnInit {
         await this.loadManuscriptQuestions();
       }
       if (this.manuscriptQuestions.length === 0) {
-        throw new Error('no manuscript questions found');
+        console.log('no manuscript questions found');
+        return;
       }
 
       // Get page counts
@@ -108,15 +128,16 @@ export class ImageAccessComponent implements OnInit {
 
       const totalStudents = Math.floor(this.numberPagesInScan / this.nbreFeuilleParCopie);
 
-      //Reset the queue each new time
+      // Reset the queue each new time
       this.predictionQueue = [];
       this.processingCount = 0;
 
       for (const question of this.manuscriptQuestions) {
         for (let studentIndex = 0; studentIndex < totalStudents; studentIndex++) {
           const zone = question.zoneDTO as IZone;
-          if (!zone) continue;
-
+          if (!zone) {
+            continue;
+          }
           const pageForStudent = studentIndex * this.nbreFeuilleParCopie + zone.pageNumber!;
 
           const imageToCrop = {
@@ -143,7 +164,7 @@ export class ImageAccessComponent implements OnInit {
               // Add image to list
               const newImage: ExamPageImage = {
                 pageNumber: pageForStudent,
-                imageData: imageData,
+                imageData,
                 width: crop.width,
                 height: crop.height,
                 questionId: question.id,
@@ -178,8 +199,6 @@ export class ImageAccessComponent implements OnInit {
       this.loading = false;
     }
   }
-
-  private readonly THROTTLE_DELAY = 200; // Delay between predictions
 
   private async processQueue(): Promise<void> {
     while (this.predictionQueue.length > 0 || this.processingCount > 0) {
@@ -220,6 +239,7 @@ export class ImageAccessComponent implements OnInit {
 
     // Final cleanup
     this.predictionQueue = [];
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     global.gc && global.gc();
   }
 
@@ -278,7 +298,8 @@ export class ImageAccessComponent implements OnInit {
       }
       // Clear large data after processing
       if (image.imageData) {
-        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         image.imageData = null;
       }
     } catch (error) {
@@ -289,13 +310,13 @@ export class ImageAccessComponent implements OnInit {
 
   private async createPrediction(questionId: number, examId: string, studentId: number, imageData: string): Promise<number | undefined> {
     const predictionData: IPrediction = {
-      studentId: studentId,
-      examId: examId,
-      questionId: questionId,
+      studentId,
+      examId,
+      questionId,
       text: 'En attente',
       jsonData: '{"key": "value"}',
       zonegeneratedid: 'ZoneID123',
-      imageData: imageData,
+      imageData,
     };
 
     const response = await firstValueFrom(this.predictionService.create(predictionData));
@@ -305,9 +326,9 @@ export class ImageAccessComponent implements OnInit {
   private async storePrediction(prediction: string, questionId: number, examId: string, studentId: number, predictionId: number) {
     const predictionData: IPrediction = {
       id: predictionId,
-      studentId: studentId,
-      examId: examId,
-      questionId: questionId,
+      studentId,
+      examId,
+      questionId,
       text: prediction,
       jsonData: '{"key": "value"}',
       zonegeneratedid: 'ZoneID123',
@@ -325,12 +346,6 @@ export class ImageAccessComponent implements OnInit {
   //   return value;
   // }
 
-  ngAfterViewInit() {
-    this.canvases.changes.subscribe(() => {
-      this.renderImages();
-    });
-  }
-
   private renderImages() {
     this.canvases.forEach((canvasRef, index) => {
       const imageInfo = this.imageList[index];
@@ -343,16 +358,5 @@ export class ImageAccessComponent implements OnInit {
         ctx?.putImageData(imageInfo.imageData, 0, 0);
       }
     });
-  }
-
-  getUniqueStudents(): number[] {
-    // Get unique student indices and sort them
-    const students = [...new Set(this.imageList.map(img => img.studentIndex))];
-    return students.sort((a, b) => a - b);
-  }
-
-  getImagesForStudent(studentIndex: number): ExamPageImage[] {
-    // Get all images for a specific student
-    return this.imageList.filter(img => img.studentIndex === studentIndex).sort((a, b) => (a.questionId || 0) - (b.questionId || 0)); // Sort by question ID
   }
 }

@@ -277,6 +277,8 @@ addEventListener('message', e => {
       return groupImagePerContoursLengthAndNbreContours(e.data);
     case 'qcmresolution':
       return doQCMResolution(e.data);
+    case 'getLinesFromImage':
+      return getLinesFromImage(e.data);
     default:
       break;
   }
@@ -1519,4 +1521,94 @@ function mergeRect(rects: any[]): any {
     }
   }
   return null;
+}
+
+// function to dectect lines from images
+async function getLinesFromImage(p: { msg: any; payload: any; uid: string }): Promise<void> {
+  const image = p.payload.image;
+  // Convert image to OpenCV Mat
+  const src = cv.imread(image);
+  const gray = new cv.Mat();
+  cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+  src.delete();
+
+  // Binarization
+  const binary = new cv.Mat();
+  cv.threshold(gray, binary, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
+
+  // Calculate horizontal projection
+  const horizontalProjection: any[] = [];
+  for (let row = 0; row < binary.rows; row++) {
+    let sum = 0;
+    const rowData = binary.ucharPtr(row);
+    for (let col = 0; col < binary.cols; col++) {
+      sum += rowData[col];
+    }
+    horizontalProjection.push(sum);
+  }
+
+  // Detect line boundaries
+  const threshold = Math.max(...horizontalProjection) * 0.05;
+  const lineBoundaries: any[] = [];
+  let inLine = false,
+    start = 0;
+
+  horizontalProjection.forEach((value, i) => {
+    if (value > threshold && !inLine) {
+      start = i;
+      inLine = true;
+    } else if (value <= threshold && inLine) {
+      lineBoundaries.push([start, i]);
+      inLine = false;
+    }
+  });
+
+  // Merge nearby boundaries
+  const merged: any[] = [];
+  const MERGE_THRESHOLD = 2;
+  lineBoundaries.forEach(([currStart, currEnd]) => {
+    if (currEnd - currStart < 2) {
+      return;
+    }
+
+    const last = merged[merged.length - 1];
+    if (last && currStart - last[1] <= MERGE_THRESHOLD) {
+      merged[merged.length - 1][1] = currEnd;
+    } else {
+      merged.push([currStart, currEnd]);
+    }
+  });
+
+  // Extract line images
+  const lines: any[] = [];
+  const PAD = 8;
+  merged.forEach(([start1, end]) => {
+    // Calculate region sum using projection values
+    const regionSum = horizontalProjection.slice(start1, end).reduce((acc, val) => acc + val, 0);
+
+    if (regionSum < 1000) {
+      return;
+    }
+    const paddedStart = Math.max(0, start - PAD);
+    const paddedEnd = Math.min(gray.rows, end + PAD);
+    const line = gray.rowRange(paddedStart, paddedEnd).clone();
+    lines.push(line);
+  });
+
+  // Cleanup
+  gray.delete();
+  binary.delete();
+  const res: any = {};
+  // Convert lines to base64
+  const linesbase64 = lines.map(line => {
+    const buffer = new cv.Mat();
+    cv.imencode('.png', line, buffer);
+    const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer.data)));
+    line.delete();
+    buffer.delete();
+    return base64;
+  });
+  res.linesbase64 = linesbase64;
+  //    source.target.postMessage({ msg: p.msg, payload: res, uid: p.uid }, [res]);
+  source.target.postMessage({ msg: p.msg, payload: res, uid: p.uid });
 }
