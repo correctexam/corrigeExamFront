@@ -493,7 +493,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             */
             this.questionId = questions![0].id;
             this.similarPredictions = [];
-            this.loadPrediction();
+            await this.loadPrediction();
+
+            // TODO Moche
             setTimeout(() => {
               if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
                 this.executeScript();
@@ -1753,7 +1755,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
     }
     this.similarPredictions = [];
-    this.loadPrediction();
+    // TODO Moche
+    await this.loadPrediction();
     setTimeout(() => {
       if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
         this.executeScript();
@@ -1806,7 +1809,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
     }
     this.similarPredictions = [];
-    this.loadPrediction();
+
+    //TODO Moche
+    await this.loadPrediction();
     setTimeout(() => {
       if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
         this.executeScript();
@@ -1838,7 +1843,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
     }
     this.similarPredictions = [];
-    this.loadPrediction();
+    //TODO Moche
+    await this.loadPrediction();
     setTimeout(() => {
       if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
         this.executeScript();
@@ -1866,7 +1872,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
     }
     this.similarPredictions = [];
-    this.loadPrediction();
+    // TODO moche
+    await this.loadPrediction();
     setTimeout(() => {
       if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
         this.executeScript();
@@ -1874,7 +1881,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }, 500);
   }
 
-  changeStudent($event: any): void {
+  async changeStudent($event: any) {
     this.similarPredictionsSearched = false;
     this.searchControl.reset();
     this.searchedTerm = '';
@@ -1900,7 +1907,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
     this.similarPredictions = [];
     console.log('Next student');
-    this.loadPrediction();
+    // TODO moche
+    await this.loadPrediction();
     setTimeout(() => {
       if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
         this.executeScript();
@@ -1908,12 +1916,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }, 500);
     if (this.dropdownOpen) {
       this.dropdownOpen = !this.dropdownOpen;
-      this.loadPrediction();
+      await this.loadPrediction();
       this.similarPrediction();
     }
   }
 
-  changeQuestion($event: any): void {
+  async changeQuestion($event: any) {
     this.similarPredictionsSearched = false;
     this.searchControl.reset();
     this.searchedTerm = '';
@@ -1929,7 +1937,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
     }
     this.similarPredictions = [];
-    this.loadPrediction();
+    // TODO moche
+    await this.loadPrediction();
     setTimeout(() => {
       if (this.currentQuestion?.typeAlgoName === 'manuscrit' && !this.currentPrediction) {
         this.executeScript();
@@ -3244,8 +3253,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.predictionService.update(predictionData).subscribe({
       next: createdResponse => {
         this.currentPrediction = createdResponse.body;
-        this.loadPrediction();
-        this.blocked = false; // Unblock after successful creation
+        this.loadPrediction().then(() => {
+          this.blocked = false; // Unblock after successful creation
+        });
       },
       error: createError => {
         console.error('Error storing hardcoded prediction:', createError);
@@ -3369,6 +3379,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               try {
                 const base64Line = `data:image/png;base64,${this.refinedLines[i]}`;
                 const result = await this.mltcomponent.executeMLT(base64Line);
+                console.error('Result:', result);
                 prediction += result + '\n';
               } catch (error) {
                 console.error('Error processing refined line ', i, ':', error);
@@ -3612,7 +3623,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (response === undefined) {
           this.currentStudentPaginator = i;
           this.currentStudent = i;
-          this.loadPrediction();
+          await this.loadPrediction();
           this.ngZone.run(() => {
             this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
           });
@@ -3633,7 +3644,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       if (response === undefined) {
         this.currentStudentPaginator = i;
         this.currentStudent = i;
-        this.loadPrediction();
+        await this.loadPrediction();
         this.ngZone.run(() => {
           this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
         });
@@ -3664,7 +3675,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         if (response === undefined) {
           this.currentStudentPaginator = i;
           this.currentStudent = i;
-          this.loadPrediction();
+          await this.loadPrediction();
           this.ngZone.run(() => {
             this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
           });
