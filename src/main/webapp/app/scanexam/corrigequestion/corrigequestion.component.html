@@ -720,7 +720,7 @@
                                     <input
                                       type="number"
                                       pInputText
-                                      [ngModel]="getSimilarGrade(similar.studentId!) * noteStep"
+                                      [ngModel]="getSimilarGrade(similar.studentId!)! * noteStep"
                                       (ngModelChange)="updateSimilarGrade(similar.studentId!, $event / noteStep)"
                                       class="text-center border border-gray-300 rounded"
                                       [disabled]="blocked"

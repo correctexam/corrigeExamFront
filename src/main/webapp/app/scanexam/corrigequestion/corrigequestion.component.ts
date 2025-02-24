@@ -111,6 +111,7 @@ import { CoupageDimageService } from '../mlt/coupage-dimage.service';
 import Fuse from 'fuse.js';
 import { CheckboxModule } from 'primeng/checkbox';
 import { QueueCoordinationService } from '../image-access/queue-coordination.service';
+import { ZoneService } from 'app/entities/zone/service/zone.service';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -2564,7 +2565,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               const response = this.sameResponses.get(similar.studentId!);
               if (response && response.textcomments) {
                 response.textcomments = response.textcomments.filter(c => c.id !== comment.id);
-                this.updateSimilarComment(similar.studentId!, response);
+                this.updateSimilarComment(similar.studentId!);
               }
             });
 
@@ -3533,26 +3534,26 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   getFilteredSimilarPredictions(): IPrediction[] {
-    if (this.searchedTerm != '') {
-      for (let prediction of this.similarPredictions) {
+    if (this.searchedTerm !== '') {
+      for (const prediction of this.similarPredictions) {
         if (!this.filteredSearchedPredictions.includes(prediction)) {
           this.selectedSimilars.set(prediction, 0);
         }
       }
       if (this.filterPredictionsWithNotes) {
-        for (let prediction of this.selectedSimilars.keys()) {
-          if (this.getSimilarGrade(prediction.studentId!) != undefined) {
+        for (const prediction of this.selectedSimilars.keys()) {
+          if (this.getSimilarGrade(prediction.studentId!) !== undefined) {
             this.selectedSimilars.set(prediction, 0);
           }
         }
         this.tempPredictions = this.filteredSearchedPredictions.filter(
-          prediction => this.getSimilarGrade(prediction.studentId!) == undefined,
+          prediction => this.getSimilarGrade(prediction.studentId!) === undefined,
         );
       }
       this.tempPredictions = this.filteredSearchedPredictions;
     } else if (this.filterPredictionsWithNotes) {
-      for (let prediction of this.selectedSimilars.keys()) {
-        if (this.getSimilarGrade(prediction.studentId!) != undefined) {
+      for (const prediction of this.selectedSimilars.keys()) {
+        if (this.getSimilarGrade(prediction.studentId!) !== undefined) {
           this.selectedSimilars.set(prediction, 0);
         }
       }
@@ -3590,7 +3591,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   async getSameResponses() {
     for (const similar of this.similarPredictions) {
       // let try1 = await this.getStudentResponse(this.questions!.map(q => q.id!));
-      let response = await this.getStudentResponse4EmptyStudent(
+      const response = await this.getStudentResponse4EmptyStudent(
         this.questions!.map(q => q.id!),
         similar.studentId! - 1,
       );
@@ -3603,7 +3604,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     console.log('My note', this.resp);
     for (let i = 0; i < nbStudents; i++) {
       if (this.currentStudent < i) {
-        let response = await this.getStudentResponse4EmptyStudent(
+        const response = await this.getStudentResponse4EmptyStudent(
           this.questions!.map(q => q.id!),
           i,
         );
@@ -3624,7 +3625,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
     }
     for (let i = 0; i < nbStudents; i++) {
-      let response = await this.getStudentResponse4EmptyStudent(
+      const response = await this.getStudentResponse4EmptyStudent(
         this.questions!.map(q => q.id!),
         i,
       );
@@ -3655,7 +3656,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     console.log('My note', this.resp);
     for (let i = this.currentStudent - 1; i >= 0; i--) {
       if (this.currentStudent > i) {
-        let response = await this.getStudentResponse4EmptyStudent(
+        const response = await this.getStudentResponse4EmptyStudent(
           this.questions!.map(q => q.id!),
           i,
         );
@@ -3676,7 +3677,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
     }
     for (let i = nbStudents - 1; i >= 0; i--) {
-      let response = await this.getStudentResponse4EmptyStudent(
+      const response = await this.getStudentResponse4EmptyStudent(
         this.questions!.map(q => q.id!),
         i,
       );
@@ -3703,8 +3704,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async updateSimilarGrade(studentId: number, newGrade: number) {
-    if (this.blocked) return;
-
+    if (this.blocked) {
+      return;
+    }
     const response = this.sameResponses.get(studentId);
     if (response) {
       response.note = newGrade;
@@ -3714,9 +3716,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async updateSimilarComment(studentId: number, comment: any) {
-    if (this.blocked) return;
-
+  async updateSimilarComment(studentId: number) {
+    if (this.blocked) {
+      return;
+    }
     const response = this.sameResponses.get(studentId);
     if (response) {
       this.updateResponseRequest(response).subscribe(sr1 => {
@@ -3726,8 +3729,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async removeSimilarComment(studentId: number, commentToRemove: any) {
-    if (this.blocked) return;
-
+    if (this.blocked) {
+      return;
+    }
     const response = this.sameResponses.get(studentId);
     if (response) {
       response.textcomments = response.textcomments?.filter(c => c.id !== commentToRemove.id);
@@ -3737,8 +3741,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  getSimilarGrade(studentId: number): number {
-    return this.sameResponses.get(studentId!)?.note!;
+  getSimilarGrade(studentId: number): number | undefined {
+    return this.sameResponses.get(studentId!)?.note;
   }
 
   removedSimilarComment(studentId: number, index: number) {
@@ -3757,14 +3761,14 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   async loadPredictionsForSearch() {
     try {
-      const req = {
+      /* const req = {
         page: 0,
         size: 500,
-      };
+      }; */
 
       if (this.similarPredictions.length > 0) {
         this.predictionsForSearch = this.similarPredictions.filter(
-          prediction => prediction.examId === this.examId && prediction.questionId == this.questionId,
+          prediction => prediction.examId === this.examId && prediction.questionId === this.questionId,
         );
         console.log('Predictions for search:', this.predictionsForSearch);
         this.filterSearchedPredictions();
