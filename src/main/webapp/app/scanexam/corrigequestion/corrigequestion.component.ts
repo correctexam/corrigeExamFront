@@ -103,7 +103,6 @@ import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { SwipeDirective } from '../swipe.directive';
 import { IPrediction, Prediction } from 'app/entities/prediction/prediction.model';
-
 import { HttpClient } from '@angular/common/http';
 import { MltComponent } from '../mlt/mlt.component';
 import { CoupageDimageService } from '../mlt/coupage-dimage.service';

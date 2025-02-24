@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { Component, OnInit, OnDestroy, ViewChildren, QueryList, ElementRef, Injectable } from '@angular/core';
+import { Component, OnInit, ViewChildren, QueryList, ElementRef, Injectable } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AlignImagesService } from '../services/align-images.service';
 import { firstValueFrom } from 'rxjs';

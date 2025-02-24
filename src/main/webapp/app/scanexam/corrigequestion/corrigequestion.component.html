@@ -669,12 +669,12 @@
                         <label class="text-gray-700 font-medium" jhiTranslate="scanexam.filterNoNoteStudents">
                           Filtrer les questions déjà notées :
                         </label>
-                        <p-inputSwitch
+                        <p-toggleswitch
                           [(ngModel)]="filterPredictionsWithNotes"
                           (onChange)="getFilteredSimilarPredictions()"
                           [pTooltip]="'scanexam.filterNoNoteStudentsTooltip' | translate"
                           class="ml-2"
-                        ></p-inputSwitch>
+                        ></p-toggleswitch>
                       </div>
                     </div>
 
