@@ -138,6 +138,27 @@
             </select>
           </div>
 
+          <!--Adding manuscrit html-->
+          <div *ngIf="editForm.get(['typeId'])!.value === manuscritid" class="row">
+            <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.gradeType" for="field_gradeType">Grade Type</label>
+            <select
+              class="form-control"
+              name="gradeType"
+              formControlName="gradeType"
+              id="field_manuscritGradeType"
+              [attr.disabled]="disableGradeType ? '' : null"
+              data-cy="manuscritGradeType"
+              (change)="contentChange()"
+              [pTooltip]="'scanexam.manuscritgradetypequestionTooltip' | translate"
+              [tooltipPosition]="'left'"
+            >
+              <option [ngValue]="null">{{ 'gradeScopeIsticApp.GradeType.null' | translate }}</option>
+              <option *ngFor="let gradeType of gradeTypeValues" [value]="gradeType">
+                {{ 'gradeScopeIsticApp.GradeType.' + gradeType | translate }}
+              </option>
+            </select>
+          </div>
+
           <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value !== hybrid" class="row">
             <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.step" for="field_reponsefausse">Pas </label>
 

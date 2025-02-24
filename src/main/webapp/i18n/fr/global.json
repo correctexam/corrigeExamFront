@@ -22,7 +22,20 @@
         "questionType": "Question Type",
         "textComment": "Text Comment",
         "gradedComment": "Graded Comment",
-        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
+        "prediction": "Prédiction",
+        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
+        "list": {
+          "predictionlist": "Liste des prédictions",
+          "delpredictionbyid": "Supprimer toutes les prédictions pour l'examen",
+          "delallpredictions": "Supprimer toutes les prédictions",
+          "id": "ID",
+          "questionid": "ID de la question",
+          "studentnumber": "Numéro d'étudiant",
+          "examid": "ID de l'examen",
+          "questionnumber": "Numéro de la question",
+          "predictiontext": "Texte de la prédiction",
+          "actions": "Actions"
+        }
       },
       "account": {
         "main": "Compte",

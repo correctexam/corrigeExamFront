@@ -97,6 +97,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   public layoutsidebarVisible = false;
   public manualid = 2;
   public qcmid = 3;
+  public manuscritid = 4;
   readonly hybrid = GradeType.HYBRID;
 
   public disableGradeType: boolean | null = false;
@@ -216,11 +217,18 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
 
     this.questionTypeService.query().subscribe((res: HttpResponse<IQuestionType[]>) => {
       this.questiontypes = res.body || [];
+      console.log('Question Types:', this.questiontypes);
       this.questiontypes.forEach(q => {
+        console.log('Algo Name: ', q.algoName);
         if (q.algoName === 'manual') {
+          console.log('I chose manual');
           this.manualid = q.id!;
         } else if (q.algoName === 'QCM') {
+          console.log('I chose QCM');
           this.qcmid = q.id!;
+        } else if (q.algoName === 'manuscrit') {
+          console.log('I chose manuscrit');
+          this.manuscritid = q.id!;
         }
       });
     });

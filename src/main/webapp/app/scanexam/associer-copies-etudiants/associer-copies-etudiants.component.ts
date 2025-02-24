@@ -5,6 +5,7 @@ import { AfterViewInit, Component, HostListener, OnInit, ViewChild, effect, sign
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ZoneService } from '../../entities/zone/service/zone.service';
 import { CourseService } from 'app/entities/course/service/course.service';
+import { MltComponent } from '../mlt/mlt.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService, SelectItem, PrimeTemplate } from 'primeng/api';
 import { IExam } from 'app/entities/exam/exam.model';
@@ -87,7 +88,7 @@ interface PredictResult {
   selector: 'jhi-associer-copies-etudiants',
   templateUrl: './associer-copies-etudiants.component.html',
   styleUrls: ['./associer-copies-etudiants.component.scss'],
-  providers: [ConfirmationService, MessageService, DialogService],
+  providers: [ConfirmationService, MessageService, DialogService, MltComponent],
   standalone: true,
   imports: [
     ToastModule,
@@ -229,6 +230,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     public studentService: StudentService,
     protected activatedRoute: ActivatedRoute,
     public confirmationService: ConfirmationService,
+    private mltcomponent: MltComponent,
     public router: Router,
     private alignImagesService: AlignImagesService,
     public messageService: MessageService,
@@ -1824,5 +1826,10 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   latinise(s: string | undefined): string | undefined {
     // eslint-disable-next-line no-useless-escape
     return s?.replace(/[^A-Za-z0-9\[\] ]/g, a => this.latinMap().get(a) ?? a);
+  }
+
+  executeMLTScript() {
+    this.mltcomponent.executeMLT(this.nameImageImg);
+    this.mltcomponent.executeMLT(this.firstnameImageImg);
   }
 }

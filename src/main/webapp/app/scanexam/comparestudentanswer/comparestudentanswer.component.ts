@@ -450,6 +450,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   }
 
   displayImage(v: ImageZone, imageRef: ElementRef<any> | undefined, show: (s: boolean) => void): void {
+    console.log('I am here displayImage');
     if (imageRef !== undefined) {
       imageRef!.nativeElement.width = v.w * this.scale;
       imageRef!.nativeElement.height = v.h * this.scale;
