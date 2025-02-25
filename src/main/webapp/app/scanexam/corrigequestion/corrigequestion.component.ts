@@ -488,8 +488,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               });
             */
             this.questionId = questions![0].id;
-            //            this.similarPredictions = [];
             await this.loadPrediction();
+            //            this.similarPredictions = [];
 
             if (questions![0].gradeType === GradeType.DIRECT && questions![0].typeAlgoName !== 'QCM') {
               const com = await firstValueFrom(this.textCommentService.query({ questionId: questions![0].id }));
@@ -1743,7 +1743,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       }
     }
-    this.updatePrediction4currentStudent();
   }
 
   async nextStudent() {
@@ -1786,7 +1785,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       }
     }
-    this.updatePrediction4currentStudent();
   }
   async previousQuestion(): Promise<void> {
     if (this.queryPoolPromise) {
@@ -1808,7 +1806,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
-    this.updatePrediction4currentStudent();
   }
 
   async nextQuestion(): Promise<void> {
@@ -1830,7 +1827,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
-    this.updatePrediction4currentStudent();
   }
 
   async changeStudent($event: any) {
@@ -1857,7 +1853,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
-    this.updatePrediction4currentStudent();
   }
 
   async changeQuestion($event: any) {
@@ -1875,7 +1870,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
-    this.updatePrediction4currentStudent();
   }
 
   private reviver(key: any, value: any): any {
@@ -1925,6 +1919,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       );
       if (_sheets.body !== null && _sheets.body.length > 0) {
         this.sheet = _sheets.body[0];
+        this.updatePrediction4currentStudent();
         this.studentService.query({ sheetId: this.sheet.id! }).subscribe(e => {
           if (e.body !== null) {
             this.studentName = e.body.map(e1 => e1.firstname + ' ' + e1.name).join(', ');
@@ -3165,7 +3160,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           });
           if (this.dropdownOpen) {
             this.dropdownOpen = false;
-            this.updatePrediction4currentStudent();
           }
           return;
         }
@@ -3185,7 +3179,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
         if (this.dropdownOpen) {
           this.dropdownOpen = false;
-          this.updatePrediction4currentStudent();
         }
         return;
       }
@@ -3215,7 +3208,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           });
           if (this.dropdownOpen) {
             this.dropdownOpen = false;
-            this.updatePrediction4currentStudent();
           }
           return;
         }
@@ -3235,7 +3227,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
         if (this.dropdownOpen) {
           this.dropdownOpen = false;
-          this.updatePrediction4currentStudent();
         }
         return;
       }
@@ -3315,6 +3306,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       try {
         const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionId }));
         this.allpredictions = predictionResponse.body || [];
+
         this.updatePrediction4currentStudent();
       } catch (err) {
         console.error('Error loading prediction:', err);

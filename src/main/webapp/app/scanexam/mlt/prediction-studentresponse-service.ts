@@ -55,6 +55,7 @@ export class PredictionStudentResponseService {
       const srsfilter = srs.filter(sr => !predictionResponseId.includes(sr.id));
       for (const sr of srsfilter) {
         for (const q1 of qs!) {
+          console.error(sr.pagemin!, q1.zoneDTO!.pageNumber!);
           const pageForStudent = sr.pagemin! + q1.zoneDTO!.pageNumber!;
           const imageToCrop = {
             examId,
@@ -110,7 +111,6 @@ export class PredictionStudentResponseService {
         // Clear refined lines after processing
         coupageResponse.linesbase64 = [];
       }
-      console.error('prediction:', prediction);
       // Store and set prediction if we got any results
       if (prediction) {
         const predictionData: IPrediction = {

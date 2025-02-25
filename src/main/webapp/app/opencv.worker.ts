@@ -1594,8 +1594,6 @@ function getLinesFromImage(p: { msg: any; payload: any; uid: string }): any {
     const paddedStart = Math.max(0, start1 - PAD);
     const paddedEnd = Math.min(gray.rows, end + PAD);
     const rect = new cv.Rect(0, paddedStart, gray.cols, paddedEnd - paddedStart);
-    console.error(gray.cols, gray.rows, paddedStart, paddedEnd);
-    console.error(rect);
     //    const line = gray.rowRange(paddedStart, paddedEnd).clone();
     const line = gray.roi(rect).clone();
     lines.push(line);
