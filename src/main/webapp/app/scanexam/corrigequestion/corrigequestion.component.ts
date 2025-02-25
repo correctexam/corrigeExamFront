@@ -105,13 +105,11 @@ import { SwipeDirective } from '../swipe.directive';
 import { IPrediction, Prediction } from 'app/entities/prediction/prediction.model';
 import { HttpClient } from '@angular/common/http';
 import { MltComponent } from '../mlt/deprecated/mlt.component';
-import { CoupageDimageService } from '../mlt/coupage-dimage.service';
 
-import Fuse from 'fuse.js';
 import { CheckboxModule } from 'primeng/checkbox';
-import { QueueCoordinationService } from '../mlt/deprecated/image-access/queue-coordination.service';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { PredictionStudentResponseService } from '../mlt/prediction-studentresponse-service';
+import Fuse from 'fuse.js';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -308,14 +306,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   error: string = '';
   imagepath: string = 'I did not get it';
   predictionsDic: { [key: number]: string } = {}; // Object to store predictions for each page
-  currentPrediction: IPrediction | null = null;
+  currentPrediction?: IPrediction;
   questionId: number | undefined = -1;
   deleted: boolean = false;
   dropdownOpen: boolean = false;
   correctionAvailable = true;
   maximumNote = 0;
   noteStep = 0;
-  filterPredictionsWithNotes: boolean = false;
 
   developementMode: boolean = true;
 
@@ -492,7 +489,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
               });
             */
             this.questionId = questions![0].id;
-            this.similarPredictions = [];
+            //            this.similarPredictions = [];
             await this.loadPrediction();
 
             if (questions![0].gradeType === GradeType.DIRECT && questions![0].typeAlgoName !== 'QCM') {
@@ -1747,13 +1744,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       }
     }
-    this.similarPredictions = [];
-    // TODO Moche
-    await this.loadPrediction();
-    if (this.dropdownOpen) {
-      this.dropdownOpen = !this.dropdownOpen;
-      this.similarPrediction();
-    }
+    this.updatePrediction4currentStudent();
   }
 
   async nextStudent() {
@@ -1796,14 +1787,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       }
     }
-    this.similarPredictions = [];
-
-    //TODO Moche
-    await this.loadPrediction();
-    if (this.dropdownOpen) {
-      this.dropdownOpen = !this.dropdownOpen;
-      this.similarPrediction();
-    }
+    this.updatePrediction4currentStudent();
   }
   async previousQuestion(): Promise<void> {
     if (this.queryPoolPromise) {
@@ -1825,9 +1809,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
-    this.similarPredictions = [];
-    //TODO Moche
-    await this.loadPrediction();
+    this.updatePrediction4currentStudent();
   }
 
   async nextQuestion(): Promise<void> {
@@ -1849,9 +1831,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
-    this.similarPredictions = [];
-    // TODO moche
-    await this.loadPrediction();
+    this.updatePrediction4currentStudent();
   }
 
   async changeStudent($event: any) {
@@ -1878,15 +1858,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
-    this.similarPredictions = [];
-    console.log('Next student');
-    // TODO moche
-    await this.loadPrediction();
-    if (this.dropdownOpen) {
-      this.dropdownOpen = !this.dropdownOpen;
-      await this.loadPrediction();
-      this.similarPrediction();
-    }
+    this.updatePrediction4currentStudent();
   }
 
   async changeQuestion($event: any) {
@@ -1904,9 +1876,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       }
     }
-    this.similarPredictions = [];
-    // TODO moche
-    await this.loadPrediction();
+    this.updatePrediction4currentStudent();
   }
 
   private reviver(key: any, value: any): any {
@@ -2535,13 +2505,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             this.currentTextComment4Question = this.currentTextComment4Question!.filter(e => e().id !== comment.id);
 
             // Also remove this comment from all similar responses that have it
-            this.similarPredictions.forEach(similar => {
+            /*            this.similarPredictions.forEach(similar => {
               const response = this.sameResponses.get(similar.sheetId!);
               if (response && response.textcomments) {
                 response.textcomments = response.textcomments.filter(c => c.id !== comment.id);
                 this.updateSimilarComment(similar.sheetId!);
               }
-            });
+            });*/
 
             this.textCommentService.delete(comment!.id!).subscribe(() => {
               const m = this.preferenceService.getCommentSort4Question(this.examId + '_' + this.currentQuestion!.id!);
@@ -3178,6 +3148,105 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
+  async passToNextNotGradedQuestion() {
+    const nbStudents = this.numberPagesInScan! / this.nbreFeuilleParCopie!;
+    console.log('My note', this.resp);
+    for (let i = 0; i < nbStudents; i++) {
+      if (this.currentStudent < i) {
+        const response = await this.getStudentResponse4EmptyStudent(
+          this.questions!.map(q => q.id!),
+          i,
+        );
+        console.log('Student', i + 1, 'Response:', response);
+        if (response === undefined) {
+          this.currentStudentPaginator = i;
+          this.currentStudent = i;
+          this.ngZone.run(() => {
+            this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+          });
+          if (this.dropdownOpen) {
+            this.dropdownOpen = false;
+            this.updatePrediction4currentStudent();
+          }
+          return;
+        }
+      }
+    }
+    for (let i = 0; i < nbStudents; i++) {
+      const response = await this.getStudentResponse4EmptyStudent(
+        this.questions!.map(q => q.id!),
+        i,
+      );
+      console.log('Student', i + 1, 'Response:', response);
+      if (response === undefined) {
+        this.currentStudentPaginator = i;
+        this.currentStudent = i;
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+        });
+        if (this.dropdownOpen) {
+          this.dropdownOpen = false;
+          this.updatePrediction4currentStudent();
+        }
+        return;
+      }
+    }
+    // No ungraded responses were found
+    this.messageService.add({
+      severity: 'info',
+      summary: this.translateService.instant('scanexam.noUngradedResponses'),
+    });
+  }
+
+  async passToPreviousNotGradedQuestion() {
+    const nbStudents = this.numberPagesInScan! / this.nbreFeuilleParCopie!;
+    console.log('My note', this.resp);
+    for (let i = this.currentStudent - 1; i >= 0; i--) {
+      if (this.currentStudent > i) {
+        const response = await this.getStudentResponse4EmptyStudent(
+          this.questions!.map(q => q.id!),
+          i,
+        );
+        console.log('Student', i + 1, 'Response:', response);
+        if (response === undefined) {
+          this.currentStudentPaginator = i;
+          this.currentStudent = i;
+          this.ngZone.run(() => {
+            this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+          });
+          if (this.dropdownOpen) {
+            this.dropdownOpen = false;
+            this.updatePrediction4currentStudent();
+          }
+          return;
+        }
+      }
+    }
+    for (let i = nbStudents - 1; i >= 0; i--) {
+      const response = await this.getStudentResponse4EmptyStudent(
+        this.questions!.map(q => q.id!),
+        i,
+      );
+      console.log('Student', i + 1, 'Response:', response);
+      if (response === undefined) {
+        this.currentStudentPaginator = i;
+        this.currentStudent = i;
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
+        });
+        if (this.dropdownOpen) {
+          this.dropdownOpen = false;
+          this.updatePrediction4currentStudent();
+        }
+        return;
+      }
+    }
+    // No ungraded responses were found
+    this.messageService.add({
+      severity: 'info',
+      summary: this.translateService.instant('scanexam.noUngradedResponses'),
+    });
+  }
   // This method is to get the image
   getImageFromCanvas(): string | undefined {
     const canvasArray = this.canvass.toArray();
@@ -3191,6 +3260,30 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
+  async convertImage(imageData: ImageData): Promise<string | ArrayBuffer | null> {
+    return new Promise<string | ArrayBuffer | null>((resolve, reject) => {
+      try {
+        const c = new OffscreenCanvas(imageData.width, imageData.height);
+        const ctx = c.getContext('2d');
+        if (ctx) {
+          ctx.putImageData(imageData, 0, 0);
+          c.convertToBlob().then(blob => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              const base64data = reader.result;
+              console.log(base64data);
+              resolve(base64data);
+            };
+            reader.readAsDataURL(blob);
+          });
+        }
+      } catch (e) {
+        console.error(e);
+        reject(e);
+      }
+    });
+  }
+
   async performPrediction4Question(): Promise<void> {
     if (this.currentQuestion?.typeAlgoName === 'manuscrit') {
       await this.predictionStudentResponseService.predictStudentResponsesFromQuestionIds(+this.examId!, this.currentQuestion!.id!);
@@ -3201,22 +3294,28 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     await firstValueFrom(this.predictionService.deleteByQuestionId(this.currentQuestion!.id!));
   }
 
+  similarPredictionsSearched = false;
+
+  allpredictions: IPrediction[] = [];
+  predictionsFusing: IPrediction[] = [];
+  predictionstoShow: WritableSignal<IPrediction[]> = signal([]);
+  selectedpredictions: WritableSignal<IPrediction[]> = signal([]);
+  filterPredictionsWithNotes: boolean = false;
+  searchedTerm: string = '';
+  searchControl = new FormControl('');
+  //  filteredSearchedPredictions: IPrediction[] = [];
+  private searchSubscription?: Subscription;
+
   async loadPrediction() {
-    try {
-      const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionId }));
-      const predictions = predictionResponse.body || [];
-
-      // Find the first matching prediction
-      this.currentPrediction = predictions.find(pred => pred.sheetId === this.sheet?.id) || null;
-
-      if (this.currentPrediction) {
-        this.deleted = false;
-      } else {
-        console.warn('No valid predictions found for the current question index.');
+    if (this.currentQuestion!.typeAlgoName === 'manuscrit') {
+      try {
+        const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionId }));
+        this.allpredictions = predictionResponse.body || [];
+        this.updatePrediction4currentStudent();
+      } catch (err) {
+        console.error('Error loading prediction:', err);
+        this.currentPrediction = undefined; // Explicitly reset on error
       }
-    } catch (err) {
-      console.error('Error loading prediction:', err);
-      this.currentPrediction = null; // Explicitly reset on error
     }
   }
 
@@ -3227,7 +3326,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         next: () => {
           this.deleted = true;
           console.log('Deleted:', this.deleted);
-          this.currentPrediction = null;
+          this.currentPrediction = undefined;
           console.log(`Deleted prediction with id: ${id}`);
         },
         error: err => {
@@ -3238,6 +3337,138 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
+  setupSearchListener() {
+    this.searchSubscription = this.searchControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe(value => {
+      this.filterSearchedPredictions(value ?? '');
+    });
+  }
+  filterSearchedPredictions(searchTerm: string = '') {
+    console.error('searchTerm', searchTerm);
+    this.searchedTerm = searchTerm;
+    if (searchTerm && searchTerm.length > 2) {
+      this.predictionstoShow.update(() => [
+        ...this.predictionsFusing.filter(prediction => (prediction.text ?? '').toLowerCase().includes(searchTerm.toLowerCase())),
+      ]);
+    } else {
+      this.predictionstoShow.update(() => [...this.predictionsFusing]);
+    }
+    this.changeDetector.detectChanges();
+  }
+  isAllSelected(): boolean {
+    if (!this.predictionstoShow() || this.predictionstoShow().length === 0) {
+      return false;
+    }
+    return this.predictionstoShow().every(prediction => this.selectedpredictions().includes(prediction));
+  }
+
+  toggleSelectAll(event: any): void {
+    const isChecked = event.target.checked;
+    if (isChecked) {
+      this.selectedpredictions.update(() => [...this.predictionstoShow()]);
+    } else {
+      this.selectedpredictions.update(() => []);
+    }
+  }
+
+  getSelectedCount(): number {
+    return Array.from(this.selectedpredictions()).length;
+  }
+
+  async selectSimilarPrediction(similar: Prediction) {
+    this.selectedpredictions.update(predictions => {
+      if (predictions.includes(similar)) {
+        return predictions.filter(prediction => prediction !== similar);
+      } else {
+        return [...predictions, similar];
+      }
+    });
+  }
+
+  updatePrediction4currentStudent(): void {
+    // Find the first matching prediction
+    this.currentPrediction = this.allpredictions.find(pred => pred.sheetId === this.sheet?.id) || undefined;
+    if (this.currentPrediction) {
+      this.predictionsFusing = this.findSimilarPredictions(this.currentPrediction, this.allpredictions);
+
+      this.deleted = false;
+    } else {
+      this.deleted = true;
+      console.warn('No valid predictions found for the current question index.');
+    }
+    this.dropdownOpen = false;
+  }
+
+  findSimilarPredictions(currentPrediction: Prediction, predictions: Prediction[]): Prediction[] {
+    // Fuse.js options
+    const fuseOptions = {
+      keys: ['text'],
+      threshold: 0.5, // Adjust for leniency
+      distance: 300, // High value for inaccuracies
+      minMatchCharLength: 3,
+    };
+
+    const fuse = new Fuse(predictions, fuseOptions);
+
+    // Forward search: Check which predictions are similar to the current prediction
+    const forwardResults = fuse.search(currentPrediction.text!);
+
+    // Reverse search: Check if the current prediction is similar to any prediction text
+    const reverseResults = predictions.filter(prediction => {
+      const fuseForReverse = new Fuse([currentPrediction], fuseOptions);
+      const result = fuseForReverse.search(prediction.text!);
+      return result.length > 0;
+    });
+
+    // Combine forward and reverse results, ensuring no duplicates
+    const similarPredictions = new Set([...forwardResults.map(result => result.item), ...reverseResults]);
+
+    // Exclude the current prediction itself
+    return [...similarPredictions].filter(prediction => prediction.id !== currentPrediction.id);
+  }
+
+  async initSimilarPrediction() {
+    this.dropdownOpen = !this.dropdownOpen;
+    if (this.dropdownOpen) {
+      if (this.allpredictions.length === 0) {
+        await this.loadPrediction();
+      }
+      if (this.allpredictions.length > 0) {
+        this.setupSearchListener();
+
+        try {
+          if (this.questions) {
+            for (const { i, q } of this.questions.map((value, index) => ({ i: index, q: value }))) {
+              const z = q.zoneDTO;
+              console.error(i, z);
+              for (const pred of this.predictionsFusing) {
+                if (pred.imageData === undefined || pred.imageData === '') {
+                  if (pred.sheetId !== undefined) {
+                    const _sheet = await firstValueFrom(this.sheetService.find(pred.sheetId));
+                    const sheet = _sheet.body || undefined;
+                    if (sheet) {
+                      const pagetoLoad = sheet.pagemin! + z!.pageNumber!;
+                      const imagecrop = await this.getAllImage4Zone(pagetoLoad, z!, false);
+                      const json = await this.convertImage(imagecrop.i);
+                      pred.imageData = '' + json;
+                    }
+                  }
+                }
+              }
+            }
+          }
+          this.deleted = false;
+          this.similarPredictionsSearched = true;
+          this.predictionstoShow.update(() => this.predictionsFusing);
+        } catch (err) {
+          console.error('Error loading prediction:', err);
+          this.currentPrediction = undefined; // Explicitly reset on error
+        }
+      }
+    }
+  }
+}
+
+/*
   similarPredictions: Prediction[] = [];
   similarPredictionsSearched = false;
   async similarPrediction() {
@@ -3292,7 +3523,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.similarPredictionsSearched = true;
     } catch (err) {
       console.error('Error loading prediction:', err);
-      this.currentPrediction = null; // Explicitly reset on error
+      this.currentPrediction = undefined; // Explicitly reset on error
     }
     this.getSameResponses();
     console.log('Similar responses:', this.sameResponses);
@@ -3319,23 +3550,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   tempPredictions: IPrediction[] = [];
 
-  isAllSelected(): boolean {
-    if (!this.tempPredictions || this.tempPredictions.length === 0) {
-      return false;
-    }
-    return this.tempPredictions.every(prediction => this.selectedSimilars.get(prediction)! > 0);
-  }
-
-  toggleSelectAll(event: any): void {
-    const isChecked = event.target.checked;
-    this.tempPredictions.forEach(prediction => {
-      this.selectedSimilars.set(prediction, isChecked ? 1 : 0);
-    });
-  }
-
-  getSelectedCount(): number {
-    return Array.from(this.selectedSimilars.values()).filter(v => v === 1).length;
-  }
 
   changeSelectedSimilarGrades() {
     const selectedCount = Array.from(this.selectedSimilars.values()).filter(v => v === 1).length;
@@ -3374,33 +3588,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   // Finding the simlar prediction using fuse.js
-  findSimilarPredictions(currentPrediction: Prediction, predictions: Prediction[]) {
-    // Fuse.js options
-    const fuseOptions = {
-      keys: ['text'],
-      threshold: 0.5, // Adjust for leniency
-      distance: 300, // High value for inaccuracies
-      minMatchCharLength: 3,
-    };
-
-    const fuse = new Fuse(predictions, fuseOptions);
-
-    // Forward search: Check which predictions are similar to the current prediction
-    const forwardResults = fuse.search(currentPrediction.text!);
-
-    // Reverse search: Check if the current prediction is similar to any prediction text
-    const reverseResults = predictions.filter(prediction => {
-      const fuseForReverse = new Fuse([currentPrediction], fuseOptions);
-      const result = fuseForReverse.search(prediction.text!);
-      return result.length > 0;
-    });
-
-    // Combine forward and reverse results, ensuring no duplicates
-    const similarPredictions = new Set([...forwardResults.map(result => result.item), ...reverseResults]);
-
-    // Exclude the current prediction itself
-    return [...similarPredictions].filter(prediction => prediction.id !== currentPrediction.id);
-  }
 
   getFilteredSimilarPredictions(): IPrediction[] {
     if (this.searchedTerm !== '') {
@@ -3454,7 +3641,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.blocked = false;
     });
     console.log('Similar note:', response.note);
-    this.getSameResponses();*/
+    this.getSameResponses();
   }
 
   sameResponses: Map<number, StudentResponse> = new Map();
@@ -3466,112 +3653,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         similar.studentId! - 1,
       );
       this.sameResponses.set(similar.studentId!, response!);
-    }*/
+    }
   }
+}
 
-  async passToNextNotGradedQuestion() {
-    const nbStudents = this.numberPagesInScan! / this.nbreFeuilleParCopie!;
-    console.log('My note', this.resp);
-    for (let i = 0; i < nbStudents; i++) {
-      if (this.currentStudent < i) {
-        const response = await this.getStudentResponse4EmptyStudent(
-          this.questions!.map(q => q.id!),
-          i,
-        );
-        console.log('Student', i + 1, 'Response:', response);
-        if (response === undefined) {
-          this.currentStudentPaginator = i;
-          this.currentStudent = i;
-          await this.loadPrediction();
-          this.ngZone.run(() => {
-            this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
-          });
-          if (this.dropdownOpen) {
-            this.dropdownOpen = !this.dropdownOpen;
-            this.similarPrediction();
-          }
-          return;
-        }
-      }
-    }
-    for (let i = 0; i < nbStudents; i++) {
-      const response = await this.getStudentResponse4EmptyStudent(
-        this.questions!.map(q => q.id!),
-        i,
-      );
-      console.log('Student', i + 1, 'Response:', response);
-      if (response === undefined) {
-        this.currentStudentPaginator = i;
-        this.currentStudent = i;
-        await this.loadPrediction();
-        this.ngZone.run(() => {
-          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
-        });
-        if (this.dropdownOpen) {
-          this.dropdownOpen = !this.dropdownOpen;
-          this.similarPrediction();
-        }
-        return;
-      }
-    }
-    // No ungraded responses were found
-    this.messageService.add({
-      severity: 'info',
-      summary: this.translateService.instant('scanexam.noUngradedResponses'),
-    });
-  }
 
-  async passToPreviousNotGradedQuestion() {
-    const nbStudents = this.numberPagesInScan! / this.nbreFeuilleParCopie!;
-    console.log('My note', this.resp);
-    for (let i = this.currentStudent - 1; i >= 0; i--) {
-      if (this.currentStudent > i) {
-        const response = await this.getStudentResponse4EmptyStudent(
-          this.questions!.map(q => q.id!),
-          i,
-        );
-        console.log('Student', i + 1, 'Response:', response);
-        if (response === undefined) {
-          this.currentStudentPaginator = i;
-          this.currentStudent = i;
-          await this.loadPrediction();
-          this.ngZone.run(() => {
-            this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
-          });
-          if (this.dropdownOpen) {
-            this.dropdownOpen = !this.dropdownOpen;
-            this.similarPrediction();
-          }
-          return;
-        }
-      }
-    }
-    for (let i = nbStudents - 1; i >= 0; i--) {
-      const response = await this.getStudentResponse4EmptyStudent(
-        this.questions!.map(q => q.id!),
-        i,
-      );
-      console.log('Student', i + 1, 'Response:', response);
-      if (response === undefined) {
-        this.currentStudentPaginator = i;
-        this.currentStudent = i;
-        this.loadPrediction();
-        this.ngZone.run(() => {
-          this.router.navigateByUrl('/answer/' + this.examId! + '/' + (this.questionindex! + 1) + '/' + (i + 1));
-        });
-        if (this.dropdownOpen) {
-          this.dropdownOpen = !this.dropdownOpen;
-          this.similarPrediction();
-        }
-        return;
-      }
-    }
-    // No ungraded responses were found
-    this.messageService.add({
-      severity: 'info',
-      summary: this.translateService.instant('scanexam.noUngradedResponses'),
-    });
-  }
 
   async updateSimilarGrade(studentId: number, newGrade: number) {
     if (this.blocked) {
@@ -3634,7 +3720,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       /* const req = {
         page: 0,
         size: 500,
-      }; */
+      };
 
       if (this.similarPredictions.length > 0) {
         this.predictionsForSearch = this.similarPredictions.filter(prediction => prediction.questionId === this.questionId);
@@ -3646,44 +3732,4 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     } catch (err) {
       console.error('Error fetching predictions for search', err);
     }
-  }
-
-  setupSearchListener() {
-    this.searchSubscription = this.searchControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe(value => {
-      this.filterSearchedPredictions(value ?? '');
-    });
-  }
-
-  searchedTerm: string = '';
-  filterSearchedPredictions(searchTerm: string = '') {
-    this.searchedTerm = searchTerm;
-    this.filteredSearchedPredictions = this.predictionsForSearch.filter(prediction =>
-      (prediction.text ?? '').toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-    this.changeDetector.detectChanges();
-  }
-
-  async convertImage(imageData: ImageData): Promise<string | ArrayBuffer | null> {
-    return new Promise<string | ArrayBuffer | null>((resolve, reject) => {
-      try {
-        const c = new OffscreenCanvas(imageData.width, imageData.height);
-        const ctx = c.getContext('2d');
-        if (ctx) {
-          ctx.putImageData(imageData, 0, 0);
-          c.convertToBlob().then(blob => {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-              const base64data = reader.result;
-              console.log(base64data);
-              resolve(base64data);
-            };
-            reader.readAsDataURL(blob);
-          });
-        }
-      } catch (e) {
-        console.error(e);
-        reject(e);
-      }
-    });
-  }
-}
+  }*/

@@ -621,7 +621,7 @@
                     style="background-color: var(--p-button-primary-background)"
                     type="button"
                     class="btn btn-primary w-full flex justify-between items-center px-4 py-3 text-lg font-medium relative"
-                    (click)="similarPrediction()"
+                    (click)="initSimilarPrediction()"
                   >
                     <span jhiTranslate="scanexam.displaySimilarAnswers">Afficher les réponses similaires</span>
 
@@ -632,7 +632,7 @@
                     ></fa-icon>
                     <!-- Non-Clickable Area with Input Field -->
                     <span
-                      *ngIf="dropdownOpen && similarPredictions.length != 0"
+                      *ngIf="dropdownOpen && predictionsFusing.length !== 0"
                       class="absolute right-0 top-0 h-full flex items-center"
                       (click)="$event.stopPropagation()"
                       style="padding-right: 20px; padding-top: 15px; padding-left: 30px"
@@ -659,7 +659,7 @@
                   <div
                     style="border-radius: 8px; height: fit-content"
                     class="dropdown-content w-full mt-4 border border-gray-300 rounded-md shadow-lg"
-                    *ngIf="dropdownOpen && similarPredictions.length != 0"
+                    *ngIf="dropdownOpen && predictionstoShow().length !== 0"
                   >
                     <p class="font-bold text-gray-700 text-xl px-4 py-3 border-b border-gray-300" jhiTranslate="scanexam.similarResults">
                       Résultats Similaires
@@ -667,21 +667,22 @@
 
                     <!-- Boutons de contrôle -->
                     <div class="flex flex-row gap-2 mb-3 px-4 py-3">
+                      <!--      (click)="changeSelectedSimilarGrades()"-->
                       <button
                         pButton
                         class="p-button-primary"
-                        (click)="changeSelectedSimilarGrades()"
                         [disabled]="getSelectedCount() === 0"
                         jhiTranslate="scanexam.applyNoteToSelected"
                       >
                         <i class="pi pi-check-circle mr-2"></i>
                         Appliquer la note aux sélectionnés
                       </button>
+                      <!-- (click)="changeAllSimilarGrades()"
+                         -->
                       <button
                         pButton
                         class="p-button-secondary"
-                        (click)="changeAllSimilarGrades()"
-                        [disabled]="similarPredictions.length === 0"
+                        [disabled]="predictionstoShow().length === 0"
                         jhiTranslate="scanexam.applyNoteToAll"
                       >
                         <i class="pi pi-check-square mr-2"></i>
@@ -691,9 +692,10 @@
                         <label class="text-gray-700 font-medium" jhiTranslate="scanexam.filterNoNoteStudents">
                           Filtrer les questions déjà notées :
                         </label>
+                        <!--                          (onChange)="updateFilteredSimilarPredictions()"
+-->
                         <p-toggleswitch
                           [(ngModel)]="filterPredictionsWithNotes"
-                          (onChange)="getFilteredSimilarPredictions()"
                           [pTooltip]="'scanexam.filterNoNoteStudentsTooltip' | translate"
                           class="ml-2"
                         ></p-toggleswitch>
@@ -710,8 +712,8 @@
                     <div class="max-h-screen overflow-y-auto">
                       <ul class="list-none p-0 space-y-4">
                         <li
-                          *ngFor="let similar of getFilteredSimilarPredictions()"
-                          [style.border]="selectedSimilars.get(similar) === 1 ? '5px solid green' : '1px solid #ccc'"
+                          *ngFor="let similar of predictionstoShow()"
+                          [style.border]="selectedpredictions().includes(similar) ? '5px solid green' : '1px solid #ccc'"
                           style="width: 1250px"
                           class="p-4 rounded-md hover:bg-blue-100 transition-colors duration-200"
                         >
@@ -720,7 +722,7 @@
                             <div class="flex flex-col items-center">
                               <input
                                 type="checkbox"
-                                [checked]="selectedSimilars.get(similar) === 1"
+                                [checked]="selectedpredictions().includes(similar)"
                                 (change)="selectSimilarPrediction(similar)"
                                 class="w-14 h-14 mr-4"
                               />
@@ -733,8 +735,8 @@
                             </div>
 
                             <!-- Column 2: Grade and Comments -->
-                            <div>
-                              <!-- Grade Section -->
+                            <!--  <div>
+                              <!-- Grade Section ->
                               <div>
                                 <ng-container *ngIf="getSimilarGrade(similar.sheetId!) !== undefined; else noGrade">
                                   <div class="flex items-center gap-2">
@@ -761,7 +763,7 @@
                                 </ng-template>
                               </div>
 
-                              <!-- Comments Section -->
+                              <!-- Comments Section ->
                               <div *ngIf="sameResponses.get(similar.sheetId!)?.textcomments?.length" class="mt-4">
                                 <div class="font-medium mb-2">Commentaires:</div>
                                 <div class="space-y-2">
@@ -779,7 +781,7 @@
                                 </div>
                               </div>
                             </div>
-                          </div>
+                          --></div>
                         </li>
                       </ul>
                     </div>
@@ -787,21 +789,13 @@
                 </div>
               </div>
 
-              <div *ngIf="dropdownOpen && similarPredictions.length === 0 && similarPredictionsSearched">
+              <div *ngIf="dropdownOpen && predictionstoShow().length === 0 && similarPredictionsSearched">
                 <p style="font-weight: bold; margin-bottom: 10px; color: #666; font-size: 20px; padding-top: 20px">
                   Aucune réponse similaire trouvée
                 </p>
               </div>
 
-              <div
-                *ngIf="
-                  currentPrediction &&
-                  currentPrediction.questionId === questionId &&
-                  currentPrediction.sheetId === sheet?.id &&
-                  developementMode
-                "
-                style="margin-top: 1rem; text-align: center"
-              >
+              <div *ngIf="currentPrediction && developementMode" style="margin-top: 1rem; text-align: center">
                 <dd style="font-size: 1.1rem; font-weight: bold; margin: 0">Résultat :</dd>
                 <button
                   *ngIf="currentPrediction.id !== undefined && deleted == false"
