@@ -476,7 +476,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             this.maximumNote = this.maxNote;
             this.noteStep = 1 / this.questionStep;
             this.currentQuestion = questions[0];
-            console.error(this.currentQuestion);
 
             /* Need to be verified
             const com = await firstValueFrom(this.predictionService.query({ questionId: questions![0].id }));
@@ -3271,7 +3270,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             const reader = new FileReader();
             reader.onloadend = () => {
               const base64data = reader.result;
-              console.log(base64data);
               resolve(base64data);
             };
             reader.readAsDataURL(blob);
@@ -3292,6 +3290,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   async deletePrediction4Question(): Promise<void> {
     await firstValueFrom(this.predictionService.deleteByQuestionId(this.currentQuestion!.id!));
+    this.dropdownOpen = false;
+    this.loadPrediction();
   }
 
   similarPredictionsSearched = false;
@@ -3439,7 +3439,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           if (this.questions) {
             for (const { i, q } of this.questions.map((value, index) => ({ i: index, q: value }))) {
               const z = q.zoneDTO;
-              console.error(i, z);
               for (const pred of this.predictionsFusing) {
                 if (pred.imageData === undefined || pred.imageData === '') {
                   if (pred.sheetId !== undefined) {
