@@ -9,6 +9,7 @@ import { IPrediction } from '../prediction.model';
 export class PredictionRoutingResolveService implements Resolve<IPrediction | null> {
   constructor(private service: PredictionService) {}
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<IPrediction | null> {
     const id = route.params['id'];
     if (id) {

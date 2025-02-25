@@ -1,4 +1,5 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { PredictionService } from '../../entities/prediction/service/prediction.service';
 import { firstValueFrom, Subscription } from 'rxjs';
@@ -19,6 +20,7 @@ export class SearchanswerComponent implements OnInit, OnDestroy {
   searchControl = new FormControl('');
   filteredPredictions: IPrediction[] = [];
   examId: string = '';
+  questionId: string = '';
   searchMode: 'text' | 'question' = 'text';
   private searchSubscription?: Subscription;
 
@@ -40,34 +42,32 @@ export class SearchanswerComponent implements OnInit, OnDestroy {
 
   // Récupérer les prédictions dans le back
   async loadPredictions(params: ParamMap) {
-    if (params.get('examid') !== null) {
+    if (params.get('examid') !== null && params.get('questionId')) {
       this.examId = params.get('examid')!;
-    }
-    try {
-      const req = {
-        page: 0,
-        size: 500,
-      };
-      const predictionResponse = await firstValueFrom(this.predictionService.query(req));
-      const predictions = predictionResponse.body || [];
+      this.questionId = params.get('questionId')!;
 
-      if (predictions.length > 0) {
-        this.predictions = predictions
-          .filter(prediction => prediction.examId === this.examId) // Add your desired examId here
-          .map(prediction => ({
-            examId: prediction.examId,
+      try {
+        const req = {
+          page: 0,
+          size: 500,
+          questionId: +this.questionId,
+        };
+        const predictionResponse = await firstValueFrom(this.predictionService.query(req));
+        const predictions = predictionResponse.body || [];
+
+        if (predictions.length > 0) {
+          this.predictions = predictions.map(prediction => ({
             questionNumber: prediction.questionNumber,
-            studentId: prediction.studentId,
             text: prediction.text,
-            imageData: prediction.imageData,
           }));
-
-        this.filterPredictions();
-      } else {
-        console.warn('No predictions found from backend.');
+          // TODO Populate imgData
+          this.filterPredictions();
+        } else {
+          console.warn('No predictions found from backend.');
+        }
+      } catch (err) {
+        console.error('Error fetching predictions from backend:', err);
       }
-    } catch (err) {
-      console.error('Error fetching predictions from backend:', err);
     }
   }
 
@@ -98,6 +98,7 @@ export class SearchanswerComponent implements OnInit, OnDestroy {
       }
     } else {
       // Default filter by text
+      // eslint-disable-next-line no-console
       console.log('Text prediction search', searchTerm);
       this.filteredPredictions = this.predictions.filter(prediction =>
         (prediction.text ?? '').toLowerCase().includes(searchTerm.toLowerCase()),

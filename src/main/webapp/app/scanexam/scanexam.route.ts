@@ -206,7 +206,7 @@ export const MarkingSummary_ROUTE: Route = {
 };
 
 export const SearchAnswer_ROUTE: Route = {
-  path: 'search_answear/:examid',
+  path: 'search_answear/:examid/:questionId',
   canActivate: [UserRouteAccessService],
   component: SearchanswerComponent,
   data: {

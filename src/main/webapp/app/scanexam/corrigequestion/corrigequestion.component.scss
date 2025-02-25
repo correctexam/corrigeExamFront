@@ -78,3 +78,9 @@ p-galleria ::ng-deep .p-galleria {
   border-color: var(--p-galleria-border-color);
   border-radius: var(--p-galleria-border-radius);
 }
+
+.content-container {
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+  padding-top: 0.8rem !important;
+}

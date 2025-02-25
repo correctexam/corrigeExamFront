@@ -361,7 +361,29 @@
               (click)="showQCMCorrect($event)"
               [disabled]="blocked"
             ></button>
-
+            <button
+              class="sm:text-xs md:text-xs lg:text-base"
+              styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
+              *ngIf="this.currentQuestion?.typeAlgoName === 'manuscrit'"
+              pButton
+              (click)="performPrediction4Question()"
+              [pTooltip]="'scanexam.manuscriptcorrect' | translate"
+              [tooltipZIndex]="'3000'"
+              [label]="'scanexam.manuscriptcorrectlabel' | translate"
+              [disabled]="blocked"
+            ></button>
+            <button
+              class="sm:text-xs md:text-xs lg:text-base"
+              styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
+              type="text"
+              *ngIf="this.currentQuestion?.typeAlgoName === 'manuscrit'"
+              pButton
+              [pTooltip]="'scanexam.deletemanuscriptcorrect' | translate"
+              [tooltipZIndex]="'3000'"
+              [label]="'scanexam.sdeletemanuscriptcorrectlabel' | translate"
+              (click)="deletePrediction4Question()"
+              [disabled]="blocked"
+            ></button>
             <button [hidden]="!debug" type="text" pButton [label]="'reset'" (click)="removeAllAnswer()"></button>
           </div>
 
@@ -596,7 +618,7 @@
                 <div class="dropdown-container w-full">
                   <!-- Bouton principal -->
                   <button
-                    style="background-color: #0d89ec"
+                    style="background-color: var(--p-button-primary-background)"
                     type="button"
                     class="btn btn-primary w-full flex justify-between items-center px-4 py-3 text-lg font-medium relative"
                     (click)="similarPrediction()"
@@ -714,14 +736,14 @@
                             <div>
                               <!-- Grade Section -->
                               <div>
-                                <ng-container *ngIf="getSimilarGrade(similar.studentId!) !== undefined; else noGrade">
+                                <ng-container *ngIf="getSimilarGrade(similar.sheetId!) !== undefined; else noGrade">
                                   <div class="flex items-center gap-2">
                                     <span class="text-sm font-medium text-gray-600">Note:</span>
                                     <input
                                       type="number"
                                       pInputText
-                                      [ngModel]="getSimilarGrade(similar.studentId!)! * noteStep"
-                                      (ngModelChange)="updateSimilarGrade(similar.studentId!, $event / noteStep)"
+                                      [ngModel]="getSimilarGrade(similar.sheetId!)! * noteStep"
+                                      (ngModelChange)="updateSimilarGrade(similar.sheetId!, $event / noteStep)"
                                       class="text-center border border-gray-300 rounded"
                                       [disabled]="blocked"
                                       [step]="noteStep"
@@ -740,17 +762,17 @@
                               </div>
 
                               <!-- Comments Section -->
-                              <div *ngIf="sameResponses.get(similar.studentId!)?.textcomments?.length" class="mt-4">
+                              <div *ngIf="sameResponses.get(similar.sheetId!)?.textcomments?.length" class="mt-4">
                                 <div class="font-medium mb-2">Commentaires:</div>
                                 <div class="space-y-2">
                                   <div
-                                    *ngFor="let comment of sameResponses.get(similar.studentId!)?.textcomments; let i = index"
+                                    *ngFor="let comment of sameResponses.get(similar.sheetId!)?.textcomments; let i = index"
                                     class="flex items-center gap-2"
                                   >
                                     <span>• {{ comment.text }}</span>
                                     <fa-icon
                                       [icon]="['fas', 'trash']"
-                                      (click)="removedSimilarComment(similar.studentId!, i)"
+                                      (click)="removedSimilarComment(similar.sheetId!, i)"
                                       class="cursor-pointer ml-2"
                                     ></fa-icon>
                                   </div>
@@ -775,8 +797,7 @@
                 *ngIf="
                   currentPrediction &&
                   currentPrediction.questionId === questionId &&
-                  currentPrediction.studentId === studentid &&
-                  currentPrediction.examId === examId &&
+                  currentPrediction.sheetId === sheet?.id &&
                   developementMode
                 "
                 style="margin-top: 1rem; text-align: center"
@@ -807,8 +828,8 @@
                 *ngIf="deleted == true"
                 type="button"
                 class="btn"
-                (click)="executeScript()"
-                style="margin-top: 1rem; text-align: center; background-color: #007bff; color: white"
+                (click)="performPrediction4Question()"
+                style="margin-top: 1rem; text-align: center; background-color: var(--p-button-primary-background); color: white"
               >
                 <i class="fa fa-trash"></i> Refaire Reconnaissance d'Ecriture
               </button>
@@ -1055,10 +1076,7 @@
                   class="float-end"
                   [tooltipPosition]="'left'"
                   [tooltipZIndex]="'3000'"
-                  [pTooltip]="
-                    'scanexam.kPourvoir créer un nouveau commentaire même en mode fermé
-eyboardshortcuttooltip' | translate
-                  "
+                  [pTooltip]="'scanexam.keyboardshortcuttooltip' | translate"
                   (click)="bindKeyBoardShortCut(comment)"
                 >
                   <fa-icon icon="keyboard"></fa-icon>
@@ -1781,14 +1799,6 @@ eyboardshortcuttooltip' | translate
               </div>
             </div>
           </div>
-
-          <style>
-            .content-container {
-              padding-left: 0.5rem !important;
-              padding-right: 0.5rem !important;
-              padding-top: 0.8rem !important;
-            }
-          </style>
         </div>
       </div>
 

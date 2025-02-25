@@ -30,6 +30,7 @@ export class PredictionListComponent implements OnInit {
     this.predictionService.query().subscribe((response: HttpResponse<IPrediction[]>) => {
       this.predictions = response.body || [];
     });
+    // eslint-disable-next-line no-console
     console.log('Loaded predictions:', this.predictions);
   }
 
@@ -48,42 +49,41 @@ export class PredictionListComponent implements OnInit {
     if (confirm('Are you sure you want to delete this prediction?')) {
       this.predictionService.delete(id).subscribe({
         next: () => {
-          console.log(`Deleted prediction with id: ${id}`);
           this.loadAll(); // Reload the list after deletion
         },
+        // eslint-disable-next-line object-shorthand, @typescript-eslint/no-unused-vars
         error: err => {
-          console.error(`Error deleting prediction with id ${id}:`, err);
           alert(`Failed to delete prediction with id ${id}. Please try again.`);
         },
       });
     }
   }
 
-  deleteByExam(examId: string): void {
-    const numericExamId = parseInt(examId, 10);
-    if (!numericExamId) {
-      alert('Please enter a valid exam ID');
+  deleteByQuestion(questionId: string): void {
+    const numericQuestionId = parseInt(questionId, 10);
+    if (!numericQuestionId) {
+      alert('Please enter a valid question ID');
       return;
     }
 
-    const predictionsToDelete = this.predictions.filter(p => p.examId && parseInt(p.examId, 10) === numericExamId);
+    const predictionsToDelete = this.predictions.filter(p => p.questionId === numericQuestionId);
 
     if (predictionsToDelete.length === 0) {
-      alert(`No predictions found for exam ${numericExamId}`);
+      alert(`No predictions found for exam ${numericQuestionId}`);
       return;
     }
 
-    if (confirm(`Are you sure you want to delete all ${predictionsToDelete.length} predictions for exam ${numericExamId}?`)) {
+    if (confirm(`Are you sure you want to delete all ${predictionsToDelete.length} predictions for exam ${numericQuestionId}?`)) {
       const deleteObservables = predictionsToDelete.filter(p => p.id !== undefined).map(p => this.predictionService.delete(p.id!));
 
       forkJoin(deleteObservables).subscribe({
         next: () => {
           this.loadAll();
-          alert(`Successfully deleted ${predictionsToDelete.length} predictions for exam ${numericExamId}`);
+          alert(`Successfully deleted ${predictionsToDelete.length} predictions for exam ${numericQuestionId}`);
         },
         error: err => {
-          console.error(`Error deleting predictions for exam ${numericExamId}:`, err);
-          alert(`Failed to delete some or all predictions for exam ${numericExamId}. Please try again.`);
+          console.error(`Error deleting predictions for question ${numericQuestionId}:`, err);
+          alert(`Failed to delete some or all predictions for question ${numericQuestionId}. Please try again.`);
           this.loadAll();
         },
       });

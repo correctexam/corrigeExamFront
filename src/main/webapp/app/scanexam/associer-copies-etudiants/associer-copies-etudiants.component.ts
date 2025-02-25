@@ -5,7 +5,7 @@ import { AfterViewInit, Component, HostListener, OnInit, ViewChild, effect, sign
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ZoneService } from '../../entities/zone/service/zone.service';
 import { CourseService } from 'app/entities/course/service/course.service';
-import { MltComponent } from '../mlt/mlt.component';
+import { MltComponent } from '../mlt/deprecated/mlt.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService, SelectItem, PrimeTemplate } from 'primeng/api';
 import { IExam } from 'app/entities/exam/exam.model';

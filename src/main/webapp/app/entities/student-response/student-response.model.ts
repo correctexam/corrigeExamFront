@@ -12,6 +12,8 @@ export interface IStudentResponse {
   questionNumero?: string;
   questionId?: number;
   sheetName?: string;
+  sheetPageMin?: number;
+  sheetPageMax?: number;
   sheetId?: number;
   textcomments?: ITextComment[] | null;
   gradedcomments?: IGradedComment[] | null;

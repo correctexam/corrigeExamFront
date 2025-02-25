@@ -53,4 +53,8 @@ export class PredictionService {
   countHowManyUse(id: number): Observable<number> {
     return this.http.get<number>(`${this.resourceUrl}/countHowManyUse/${id}`);
   }
+
+  deleteByQuestionId(questionId: number): Observable<HttpResponse<any>> {
+    return this.http.delete(`${this.resourceUrl}/question/${questionId}`, { observe: 'response' });
+  }
 }

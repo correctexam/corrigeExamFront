@@ -22,9 +22,7 @@
 
   <ul>
     <li *ngFor="let prediction of filteredPredictions" style="margin-bottom: 10px; padding: 10px; border: 1px solid #ccc">
-      <div><strong>Exam ID:</strong> {{ prediction.examId }}</div>
       <div><strong>Question Number:</strong> {{ prediction.questionNumber }}</div>
-      <div><strong>Student ID:</strong> {{ prediction.studentId }}</div>
       <div><strong>Image:</strong><img [src]="prediction.imageData" /></div>
     </li>
   </ul>

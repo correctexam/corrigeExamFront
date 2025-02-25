@@ -11,9 +11,10 @@ import { IZone } from 'app/entities/zone/zone.model';
 import { NgIf, NgFor } from '@angular/common';
 import { PredictionService } from 'app/entities/prediction/service/prediction.service';
 import { IPrediction } from 'app/entities/prediction/prediction.model';
-import { MltComponent } from '../mlt/mlt.component';
+import { MltComponent } from '../mlt/deprecated/mlt.component';
 import { CoupageDimageService } from '../mlt/coupage-dimage.service';
 import { QueueCoordinationService } from './queue-coordination.service';
+import { MLTService } from '../mlt/mlt.service';
 
 interface ExamPageImage {
   pageNumber: number;
@@ -62,7 +63,7 @@ export class ImageAccessComponent implements OnInit {
     private db: CacheServiceImpl,
     private questionService: QuestionService,
     private predictionService: PredictionService,
-    private mltcomponent: MltComponent,
+    private mlt: MLTService,
     private coupageDimageService: CoupageDimageService,
     private queueService: QueueCoordinationService,
   ) {
@@ -243,7 +244,7 @@ export class ImageAccessComponent implements OnInit {
     global.gc && global.gc();
   }
 
-  private async handlePrediction(image: ExamPageImage, studentId: number) {
+  private async handlePrediction(image: ExamPageImage, sheetId: number) {
     try {
       //      const canvas = document.createElement('canvas');
       //      canvas.width = image.width;
@@ -261,13 +262,13 @@ export class ImageAccessComponent implements OnInit {
       const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: image.questionId }));
 
       // Find prediction specific to this student
-      const studentPrediction = predictionResponse.body?.find(pred => pred.studentId === studentId);
+      const studentPrediction = predictionResponse.body?.find(pred => pred.sheetId === sheetId);
 
       if (studentPrediction) {
         image.prediction = studentPrediction.text || '';
       } else {
         // Create new prediction
-        const predictionId = await this.createPrediction(image.questionId!, this.examId!, studentId, '');
+        const predictionId = await this.createPrediction(image.questionId!, sheetId, '');
 
         if (predictionId) {
           // First use CoupageDimageService
@@ -282,7 +283,7 @@ export class ImageAccessComponent implements OnInit {
             }))) {
               // const base64Line = `data:image/png;base64,${refinedLine}`;
               const imgData = new ImageData(new Uint8ClampedArray(value), coupageResponse.widths[index], coupageResponse.heights[index]);
-              const lineResult = await this.mltcomponent.executeMLTFromImagData(
+              const lineResult = await this.mlt.executeMLTFromImagData(
                 imgData,
                 coupageResponse.widths[index],
                 coupageResponse.heights[index],
@@ -299,7 +300,7 @@ export class ImageAccessComponent implements OnInit {
           console.error('prediction:', prediction);
           // Store and set prediction if we got any results
           if (prediction) {
-            await this.storePrediction(prediction.trim(), image.questionId!, this.examId!, studentId, predictionId);
+            await this.storePrediction(prediction.trim(), image.questionId!, sheetId, predictionId);
             image.prediction = prediction.trim();
           } else {
             image.prediction = 'No prediction available';
@@ -318,14 +319,12 @@ export class ImageAccessComponent implements OnInit {
     }
   }
 
-  private async createPrediction(questionId: number, examId: string, studentId: number, imageData: string): Promise<number | undefined> {
+  private async createPrediction(questionId: number, sheetId: number, imageData: string): Promise<number | undefined> {
     const predictionData: IPrediction = {
-      studentId,
-      examId,
+      sheetId,
       questionId,
       text: 'En attente',
       jsonData: '{"key": "value"}',
-      zonegeneratedid: 'ZoneID123',
       imageData,
     };
 
@@ -333,15 +332,13 @@ export class ImageAccessComponent implements OnInit {
     return response.body?.id;
   }
 
-  private async storePrediction(prediction: string, questionId: number, examId: string, studentId: number, predictionId: number) {
+  private async storePrediction(prediction: string, questionId: number, sheetId: number, predictionId: number) {
     const predictionData: IPrediction = {
       id: predictionId,
-      studentId,
-      examId,
+      sheetId,
       questionId,
       text: prediction,
       jsonData: '{"key": "value"}',
-      zonegeneratedid: 'ZoneID123',
     };
 
     await firstValueFrom(this.predictionService.update(predictionData));

@@ -40,14 +40,12 @@ import { FormsModule } from '@angular/forms';
 import { TranslateDirective } from '../../shared/language/translate.directive';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
-import { ImageAccessComponent } from '../image-access/image-access.component';
-import { MltComponent } from '../mlt/mlt.component';
 
 @Component({
   selector: 'jhi-exam-detail',
   templateUrl: './exam-detail.component.html',
   styleUrls: ['./exam-detail.component.scss'],
-  providers: [ConfirmationService, MessageService, ImageAccessComponent, MltComponent],
+  providers: [ConfirmationService, MessageService],
   standalone: true,
   imports: [
     CommonModule,
@@ -123,7 +121,6 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     private db: CacheServiceImpl,
     private preferenceService: PreferenceService,
     private titleService: Title,
-    private imageAccessComponent: ImageAccessComponent,
   ) {}
   setShowAlignement(v: boolean): void {
     this.showAlignement = v;
@@ -292,11 +289,11 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
               this.showCorrection =
                 this.sheets.length === this.numberPagesInScan / this.nbreFeuilleParCopie && this.showAssociation && this.showAlignement;
 
-              if (this.showCorrection || this.showAssociation) {
+              /*              if (this.showCorrection || this.showAssociation) {
                 this.imageAccessComponent.examId = this.examId;
                 console.log('I start creating the predictions');
                 await this.imageAccessComponent.loadImages(this.examId);
-              }
+              }*/
 
               this.examService.getExamStatusFinish(+this.examId).then(res => {
                 this.correctionFinish = res;

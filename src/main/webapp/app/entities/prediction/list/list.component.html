@@ -1,12 +1,12 @@
 <div class="entity-list">
   <h2 jhiTranslate="global.menu.entities.list.predictionlist">Prediction List</h2>
   <div class="mb-3">
-    <input #examId type="number" class="form-control w-25 d-inline me-2" placeholder="Enter Exam ID" />
+    <input #questionId type="number" class="form-control w-25 d-inline me-2" placeholder="Enter Exam ID" />
     <button
       type="button"
       class="btn btn-danger"
       jhiTranslate="global.menu.entities.list.delpredictionbyid"
-      (click)="deleteByExam(examId.value)"
+      (click)="deleteByQuestion(questionId.value)"
     >
       <i class="fa fa-trash"></i> Delete All Predictions for Exam
     </button>
@@ -24,8 +24,7 @@
       <tr>
         <th jhiTranslate="global.menu.entities.list.id">ID</th>
         <th jhiTranslate="global.menu.entities.list.questionid">Id de Question</th>
-        <th jhiTranslate="global.menu.entities.list.studentnumber">Numero d'Etudiant</th>
-        <th jhiTranslate="global.menu.entities.list.examid">Id d'Exam</th>
+        <th jhiTranslate="global.menu.entities.list.studentnumber">Numero de page</th>
         <th jhiTranslate="global.menu.entities.list.questionnumber">Numero de Question</th>
         <th jhiTranslate="global.menu.entities.list.predictiontext">Prediction Text</th>
         <th jhiTranslate="global.menu.entities.list.actions">Actions</th>
@@ -35,8 +34,7 @@
       <tr *ngFor="let prediction of predictions">
         <td>{{ prediction.id }}</td>
         <td>{{ prediction.questionId }}</td>
-        <td>{{ prediction.studentId }}</td>
-        <td>{{ prediction.examId }}</td>
+        <td>{{ prediction.sheetId }}</td>
         <td>{{ prediction.questionNumber }}</td>
         <td>{{ prediction.text }}</td>
         <td>
