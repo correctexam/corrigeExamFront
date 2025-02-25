@@ -3312,6 +3312,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         console.error('Error loading prediction:', err);
         this.currentPrediction = undefined; // Explicitly reset on error
       }
+    } else {
+      this.allpredictions = [];
+      this.predictionsFusing = [];
+      this.predictionstoShow.update(() => []);
+      this.selectedpredictions.update(() => []);
+      this.filterPredictionsWithNotes = false;
+      this.searchedTerm = '';
     }
   }
 
