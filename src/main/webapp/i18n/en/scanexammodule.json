@@ -558,6 +558,10 @@
     "applyNoteToSelected": "Apply the note to the selected",
     "applyNoteToAll": "Apply the note to all",
     "selectAllSimilar": "Select all",
-    "rechercheParMot": "Search by word"
+    "rechercheParMot": "Search by word",
+    "manuscriptcorrect": "Allows you to launch OCR analysis of handwriting",
+    "manuscriptcorrectlabel": "OCR analysis",
+    "deletemanuscriptcorrect": "Allows you to delete all predictions calculated using the OCR tool for this question",
+    "deletemanuscriptcorrectlabel": "Delete OCR prediction"
   }
 }

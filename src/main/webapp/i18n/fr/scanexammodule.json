@@ -567,6 +567,10 @@
     "applyNoteToSelected": "Appliquer la note aux sélectionnés",
     "applyNoteToAll": "Appliquer la note à tous",
     "selectAllSimilar": "Sélectionner tout",
-    "rechercheParMot": "Recherche par mot"
+    "rechercheParMot": "Recherche par mot",
+    "manuscriptcorrect": "Premet de lancer l'analyse OCR de l'écriture manuscrit",
+    "manuscriptcorrectlabel": "Analyse OCR",
+    "deletemanuscriptcorrect": "Permet de supprimer toutes les prédictions calculés à l'aide de l'outil d'OCR",
+    "deletemanuscriptcorrectlabel": "Suppression Prédiction OCR"
   }
 }
