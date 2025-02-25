@@ -109,7 +109,7 @@ import { CoupageDimageService } from '../mlt/coupage-dimage.service';
 
 import Fuse from 'fuse.js';
 import { CheckboxModule } from 'primeng/checkbox';
-import { QueueCoordinationService } from '../image-access/queue-coordination.service';
+import { QueueCoordinationService } from '../mlt/deprecated/image-access/queue-coordination.service';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { PredictionStudentResponseService } from '../mlt/prediction-studentresponse-service';
 

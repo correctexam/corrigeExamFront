@@ -2,19 +2,19 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Component, OnInit, ViewChildren, QueryList, ElementRef, Injectable } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AlignImagesService } from '../services/align-images.service';
+import { AlignImagesService } from '../../../services/align-images.service';
 import { firstValueFrom } from 'rxjs';
-import { CacheServiceImpl } from '../db/CacheServiceImpl';
-import { QuestionService } from '../../entities/question/service/question.service';
-import { IQuestion } from '../../entities/question/question.model';
+import { CacheServiceImpl } from '../../../db/CacheServiceImpl';
+import { QuestionService } from '../../../../entities/question/service/question.service';
+import { IQuestion } from '../../../../entities/question/question.model';
 import { IZone } from 'app/entities/zone/zone.model';
 import { NgIf, NgFor } from '@angular/common';
 import { PredictionService } from 'app/entities/prediction/service/prediction.service';
 import { IPrediction } from 'app/entities/prediction/prediction.model';
-import { MltComponent } from '../mlt/deprecated/mlt.component';
-import { CoupageDimageService } from '../mlt/coupage-dimage.service';
+import { MltComponent } from '../mlt.component';
+import { CoupageDimageService } from '../../coupage-dimage.service';
 import { QueueCoordinationService } from './queue-coordination.service';
-import { MLTService } from '../mlt/mlt.service';
+import { MLTService } from '../../mlt.service';
 
 interface ExamPageImage {
   pageNumber: number;

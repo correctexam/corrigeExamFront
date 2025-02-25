@@ -20,8 +20,8 @@ import { MarkingSummaryComponent } from './marking-summary/marking-summary.compo
 import { ComparestudentanswerComponent } from './comparestudentanswer/comparestudentanswer.component';
 
 import { ExportanonymoupdfComponent } from './exportanonymoupdf/exportanonymoupdf.component';
-import { SearchanswerComponent } from './searchanswer/searchanswer.component';
-import { ImageAccessComponent } from './image-access/image-access.component';
+import { SearchanswerComponent } from './mlt/deprecated/searchanswer/searchanswer.component';
+import { ImageAccessComponent } from './mlt/deprecated/image-access/image-access.component';
 
 // set the location of the OpenCV files
 // registerAllModules();
@@ -204,7 +204,7 @@ export const MarkingSummary_ROUTE: Route = {
     },
   },
 };
-
+/*
 export const SearchAnswer_ROUTE: Route = {
   path: 'search_answear/:examid/:questionId',
   canActivate: [UserRouteAccessService],
@@ -232,7 +232,7 @@ export const ImageAccess_ROUTE: Route = {
     },
   },
 };
-
+*/
 export const AssocierCopiesEtudiantsToStudent_ROUTE: Route = {
   path: 'studentbindings/:examid/:currentStudent',
   canActivate: [UserRouteAccessService],
@@ -420,7 +420,4 @@ export const SCANEXAM_ROUTES = [
   EXPORTPDF_ROUTE,
   EXPORTPDFBYSHEET_ROUTE,
   CompareHybridCommentAnswer_ROUTE,
-  SearchAnswer_ROUTE,
-  // MLT_ROUTE,
-  ImageAccess_ROUTE,
 ];
