@@ -3285,13 +3285,17 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   async performPrediction4Question(): Promise<void> {
     if (this.currentQuestion?.typeAlgoName === 'manuscrit') {
       await this.predictionStudentResponseService.predictStudentResponsesFromQuestionIds(+this.examId!, this.currentQuestion!.id!);
+      this.dropdownOpen = false;
+      this.loadPrediction();
     }
   }
 
   async deletePrediction4Question(): Promise<void> {
-    await firstValueFrom(this.predictionService.deleteByQuestionId(this.currentQuestion!.id!));
-    this.dropdownOpen = false;
-    this.loadPrediction();
+    if (this.currentQuestion?.typeAlgoName === 'manuscrit') {
+      await firstValueFrom(this.predictionService.deleteByQuestionId(this.currentQuestion!.id!));
+      this.dropdownOpen = false;
+      this.loadPrediction();
+    }
   }
 
   similarPredictionsSearched = false;
