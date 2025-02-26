@@ -188,7 +188,7 @@ export class AlignImagesService {
     const uuid1 = uuid(); // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
     console.time('dispatch' + uuid1);
     this.ready.then(() => {
-      console.timeLog('dispatch' + uuid1, 'before send message', msg1, pay);
+      console.timeLog('dispatch' + uuid1, 'before send message', msg1); // , pay);
 
       // console.log( ' send message ' + msg1 + ' ' + uuid1)
       if (transferable) {

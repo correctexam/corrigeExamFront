@@ -1,5 +1,17 @@
 <div class="grid" jhiSwipe (swipeEnd)="onSwipeEnd($event)">
   <p-toast></p-toast>
+  <p-blockUI [blocked]="showSpinner">
+    <div class="grid" style="width: 90vw">
+      <div class="col-4"></div>
+      <div class="col-4 text-center">
+        <!--<i class="pi pi-lock" style="font-size: 3rem"> </i>-->
+        <p-progressSpinner></p-progressSpinner>
+        <BR />
+        <div *ngIf="showavancement"><span>Copie</span> {{ currentCopieocr }} / {{ nbrecopieocr }}</div>
+      </div>
+    </div>
+  </p-blockUI>
+
   <p-dialog
     [header]="'scanexam.keyboardshortcutlabel' | translate"
     (onHide)="cleanShortCut()"
@@ -269,11 +281,6 @@
     </ng-template>
   </p-dialog>
 
-  <p-blockUI [blocked]="showSpinner">
-    <p-progressSpinner></p-progressSpinner>
-
-    <!--<i class="pi pi-lock" style="font-size: 3rem"></i>-->
-  </p-blockUI>
   <p-popover #qcmcorrect (onShow)="computeQCMdebug()">
     <ng-template pTemplate>
       <div>

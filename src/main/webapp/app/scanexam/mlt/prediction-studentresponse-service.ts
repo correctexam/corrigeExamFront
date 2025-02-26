@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { StudentResponseService } from 'app/entities/student-response/service/student-response.service';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subject } from 'rxjs';
 import { ExamSheetService } from '../../entities/exam-sheet/service/exam-sheet.service';
 import { IExamSheet } from 'app/entities/exam-sheet/exam-sheet.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
@@ -38,7 +38,15 @@ export class PredictionStudentResponseService {
     private mlt: MLTService,
   ) {}
 
-  async predictStudentResponsesFromQuestionIds(examId: number, questionId: number): Promise<void> {
+  predictStudentResponsesFromQuestionIds(examId: number, questionId: number): Subject<number[]> {
+    const subject = new Subject<number[]>();
+    this._predictStudentResponsesFromQuestionIds(examId, questionId, subject).then(() => {
+      subject.complete();
+    });
+    return subject;
+  }
+
+  private async _predictStudentResponsesFromQuestionIds(examId: number, questionId: number, subject: Subject<number[]>): Promise<void> {
     const _srs = await firstValueFrom(this.examSheetService.query({ examId }));
     const srs: IExamSheet[] = _srs.body || [];
     const _q = await firstValueFrom(this.questionService.find(questionId));
@@ -53,9 +61,11 @@ export class PredictionStudentResponseService {
       const _qs = await firstValueFrom(this.questionService.query({ numero: q.numero, examId }));
       const qs = _qs.body || undefined;
       const srsfilter = srs.filter(sr => !predictionResponseId.includes(sr.id));
+      const max = srsfilter.length * qs!.length;
+      let currenthandling = 0;
       for (const sr of srsfilter) {
         for (const q1 of qs!) {
-          console.error(sr.pagemin!, q1.zoneDTO!.pageNumber!);
+          currenthandling = currenthandling + 1;
           const pageForStudent = sr.pagemin! + q1.zoneDTO!.pageNumber!;
           const imageToCrop = {
             examId,
@@ -80,12 +90,14 @@ export class PredictionStudentResponseService {
               questionNumero: q1.numero!,
             };
             await this.handlePrediction(newImage);
+            subject.next([currenthandling, max]);
           } catch (error: any) {
             console.error('Error cropping image:', error);
           }
         }
       }
     }
+    return;
   }
 
   private async handlePrediction(image: ExamPageImage): Promise<void> {

@@ -3275,9 +3275,28 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   async performPrediction4Question(): Promise<void> {
     if (this.currentQuestion?.typeAlgoName === 'manuscrit') {
-      await this.predictionStudentResponseService.predictStudentResponsesFromQuestionIds(+this.examId!, this.currentQuestion!.id!);
-      this.dropdownOpen = false;
-      this.loadPrediction();
+      this.blocked = true;
+      this.showSpinner = true;
+      this.showavancement = true;
+      this.predictionStudentResponseService.predictStudentResponsesFromQuestionIds(+this.examId!, this.currentQuestion!.id!).subscribe({
+        next: (res: number[]) => {
+          this.currentCopieocr = res[0];
+          this.nbrecopieocr = res[1];
+        },
+        error: err => {
+          console.error('Error predicting student responses:', err);
+          alert('Failed to predict student responses. Please try again.');
+        },
+        complete: () => {
+          this.blocked = false;
+          this.showSpinner = false;
+          this.currentCopieocr = 0;
+          this.nbrecopieocr = 0;
+          this.showavancement = false;
+          this.dropdownOpen = false;
+          this.loadPrediction();
+        },
+      });
     }
   }
 
@@ -3288,6 +3307,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.loadPrediction();
     }
   }
+
+  showavancement = false;
+  currentCopieocr = 0;
+  nbrecopieocr = 0;
 
   similarPredictionsSearched = false;
 

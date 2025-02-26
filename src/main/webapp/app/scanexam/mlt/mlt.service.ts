@@ -284,8 +284,6 @@ export class MLTService {
       // Exécution de l'inférence
       const prediction = await this.runInference(preprocessedImage, modelPath);
 
-      // eslint-disable-next-line no-console
-      console.log('Prediction:', prediction);
       return prediction;
     } catch (error) {
       console.error('Error in executeMLT:', error);

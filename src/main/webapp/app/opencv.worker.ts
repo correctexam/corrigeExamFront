@@ -1613,13 +1613,9 @@ function getLinesFromImage(p: { msg: any; payload: any; uid: string }): any {
     const i = imageDataFromMat(line);
     widths.push(line.size().width);
     heights.push(line.size().height);
-    // debugImage(i)
+    line.delete();
 
     const buffer = i.data.buffer;
-    //    cv.imencode('.png', line, buffer);
-    //    const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer.data)));
-    //  line.delete();
-    //    buffer.delete();
     return buffer;
   });
   res.linesbase64 = linesbase64;
