@@ -1919,7 +1919,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       );
       if (_sheets.body !== null && _sheets.body.length > 0) {
         this.sheet = _sheets.body[0];
-        this.updatePrediction4currentStudent();
+        await this.updatePrediction4currentStudent();
         this.studentService.query({ sheetId: this.sheet.id! }).subscribe(e => {
           if (e.body !== null) {
             this.studentName = e.body.map(e1 => e1.firstname + ' ' + e1.name).join(', ');
@@ -3278,6 +3278,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.blocked = true;
       this.showSpinner = true;
       this.showavancement = true;
+      await firstValueFrom(this.predictionService.deleteByQuestionId(this.currentQuestion!.id!));
       this.predictionStudentResponseService.predictStudentResponsesFromQuestionIds(+this.examId!, this.currentQuestion!.id!).subscribe({
         next: (res: number[]) => {
           this.currentCopieocr = res[0];
@@ -3316,6 +3317,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   allpredictions: IPrediction[] = [];
   predictionsFusing: IPrediction[] = [];
+  predictionsFusingWithoutStudentResponse: IPrediction[] = [];
   predictionstoShow: WritableSignal<IPrediction[]> = signal([]);
   selectedpredictions: WritableSignal<IPrediction[]> = signal([]);
   filterPredictionsWithNotes: boolean = false;
@@ -3330,7 +3332,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         const predictionResponse = await firstValueFrom(this.predictionService.query({ questionId: this.questionId }));
         this.allpredictions = predictionResponse.body || [];
 
-        this.updatePrediction4currentStudent();
+        await this.updatePrediction4currentStudent();
       } catch (err) {
         console.error('Error loading prediction:', err);
         this.currentPrediction = undefined; // Explicitly reset on error
@@ -3371,12 +3373,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   filterSearchedPredictions(searchTerm: string = '') {
     console.error('searchTerm', searchTerm);
     this.searchedTerm = searchTerm;
+    let predictionsF = this.predictionsFusing;
+    if (this.filterPredictionsWithNotes) {
+      predictionsF = this.predictionsFusingWithoutStudentResponse;
+    }
     if (searchTerm && searchTerm.length > 2) {
       this.predictionstoShow.update(() => [
-        ...this.predictionsFusing.filter(prediction => (prediction.text ?? '').toLowerCase().includes(searchTerm.toLowerCase())),
+        ...predictionsF.filter(prediction => (prediction.text ?? '').toLowerCase().includes(searchTerm.toLowerCase())),
       ]);
     } else {
-      this.predictionstoShow.update(() => [...this.predictionsFusing]);
+      this.predictionstoShow.update(() => [...predictionsF]);
     }
     this.changeDetector.detectChanges();
   }
@@ -3410,12 +3416,16 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  updatePrediction4currentStudent(): void {
+  async updatePrediction4currentStudent() {
     // Find the first matching prediction
     this.currentPrediction = this.allpredictions.find(pred => pred.sheetId === this.sheet?.id) || undefined;
     if (this.currentPrediction) {
       this.predictionsFusing = this.findSimilarPredictions(this.currentPrediction, this.allpredictions);
-
+      const predsheetids = this.predictionsFusing.map(prediction => prediction.sheetId!);
+      const s = await firstValueFrom(
+        this.predictionService.findPredictionWithoutStudentResponse(predsheetids, this.currentQuestion!.numero!, +this.examId!),
+      );
+      this.predictionsFusingWithoutStudentResponse = this.predictionsFusing.filter(s1 => s.predictionsids.includes(s1.sheetId!));
       this.deleted = false;
     } else {
       this.deleted = true;
@@ -3454,16 +3464,18 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   async initSimilarPrediction() {
     this.dropdownOpen = !this.dropdownOpen;
+    this.filterPredictionsWithNotes = false;
     if (this.dropdownOpen) {
       if (this.allpredictions.length === 0) {
         await this.loadPrediction();
       }
+
       if (this.allpredictions.length > 0) {
         this.setupSearchListener();
 
         try {
           if (this.questions) {
-            for (const { i, q } of this.questions.map((value, index) => ({ i: index, q: value }))) {
+            for (const q of this.questions) {
               const z = q.zoneDTO;
               for (const pred of this.predictionsFusing) {
                 if (pred.imageData === undefined || pred.imageData === '') {
@@ -3489,6 +3501,20 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.currentPrediction = undefined; // Explicitly reset on error
         }
       }
+    }
+  }
+
+  updateFilteredSimilarPredictions() {
+    let predictionsF = this.predictionsFusing;
+    if (this.filterPredictionsWithNotes) {
+      predictionsF = this.predictionsFusingWithoutStudentResponse;
+    }
+    if (this.searchedTerm && this.searchedTerm.length > 2) {
+      this.predictionstoShow.update(() => [
+        ...predictionsF.filter(prediction => (prediction.text ?? '').toLowerCase().includes(this.searchedTerm.toLowerCase())),
+      ]);
+    } else {
+      this.predictionstoShow.update(() => [...predictionsF]);
     }
   }
 }

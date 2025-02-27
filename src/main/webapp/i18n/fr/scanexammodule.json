@@ -562,6 +562,7 @@
     "searchwithword": "Rechercher par mot",
     "searchwithquestion": "Rechercher par question",
     "similarResults": "Résultats similaires",
+    "nosimilarResults": "Aucune réponse similaire trouvée",
     "displaySimilarAnswers": "Afficher les réponses similaires",
     "noGradeAvailable": "⚠️ Pas de note disponible",
     "applyNoteToSelected": "Appliquer la note aux sélectionnés",

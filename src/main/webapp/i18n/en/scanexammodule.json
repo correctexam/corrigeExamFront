@@ -553,6 +553,7 @@
     "filterNoNoteStudents": "Filter students with no grade",
     "filterNoNoteStudentsTooltip": "Filters students who have not yet been graded",
     "similarResults": "Similar results",
+    "nosimilarResults": "No similar result",
     "displaySimilarAnswers": "Display similar answers",
     "noGradeAvailable": "⚠️ No grade available",
     "applyNoteToSelected": "Apply the note to the selected",

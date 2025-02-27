@@ -54,6 +54,15 @@ export class PredictionService {
     return this.http.get<number>(`${this.resourceUrl}/countHowManyUse/${id}`);
   }
 
+  findPredictionWithoutStudentResponse(predictionsids: number[], numero: number, examId: number): Observable<{ predictionsids: number[] }> {
+    const param = {
+      predictionsids: predictionsids,
+      numero,
+      examId,
+    };
+    return this.http.post<{ predictionsids: number[] }>(`${this.resourceUrl}/findPredictionWithoutStudentResponse`, param);
+  }
+
   deleteByQuestionId(questionId: number): Observable<HttpResponse<any>> {
     return this.http.delete(`${this.resourceUrl}/question/${questionId}`, { observe: 'response' });
   }
