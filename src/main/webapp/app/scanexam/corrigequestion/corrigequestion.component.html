@@ -607,7 +607,6 @@
                 >
                   Execute MLT
                 </button-->
-                <p-progressSpinner *ngIf="blocked" styleClass="w-2rem h-2rem"></p-progressSpinner>
               </div>
 
               <!--div>
@@ -670,19 +669,20 @@
                   >
                     <!-- Boutons de contrôle -->
                     <div class="flex flex-row gap-2 mb-3 px-4 py-3">
-                      <!--      (click)="changeSelectedSimilarGrades()"-->
                       <button
                         pButton
                         class="p-button-primary"
                         [disabled]="getSelectedCount() === 0"
                         jhiTranslate="scanexam.applyNoteToSelected"
+                        (click)="applySameNoteAndGrade()"
+                        [pTooltip]="'scanexam.applyNoteToSelectedTooltip' | translate"
                       >
                         <i class="pi pi-check-circle mr-2"></i>
                         Appliquer la note aux sélectionnés
                       </button>
                       <!-- (click)="changeAllSimilarGrades()"
                          -->
-                      <button
+                      <!-- <button
                         pButton
                         class="p-button-secondary"
                         [disabled]="predictionstoShow().length === 0"
@@ -690,7 +690,7 @@
                       >
                         <i class="pi pi-check-square mr-2"></i>
                         Appliquer la note à tous
-                      </button>
+                      </button>-->
                       <div class="flex items-center p-2">
                         <label class="text-gray-700 font-medium" jhiTranslate="scanexam.filterNoNoteStudents">
                           Filtrer les questions déjà notées :
@@ -704,6 +704,7 @@
                           class="ml-2"
                         ></p-toggleswitch>
                       </div>
+                      <p-progressSpinner *ngIf="blocked" styleClass="w-2rem h-2rem"></p-progressSpinner>
                     </div>
 
                     <p
@@ -747,9 +748,10 @@
                               />
                               <img
                                 [src]="similar.imageData"
+                                (click)="goToCopie($event, similar.sheetPageMin!, similar.sheetPageMax!)"
                                 alt="Prediction Image"
                                 class="object-cover rounded"
-                                style="width: 1000px; height: auto"
+                                style="width: 1000px; height: auto; cursor: pointer"
                               />
                             </div>
 

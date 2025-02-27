@@ -714,6 +714,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
       templat: templat,
       copies: l,
     };
+    //    console.error(clus)
     // TODO manager stepvalue
     this.http
       .post<Zone4SameCommentOrSameGrade>(

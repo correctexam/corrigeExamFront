@@ -105,7 +105,7 @@ import { SwipeDirective } from '../swipe.directive';
 import { IPrediction, Prediction } from 'app/entities/prediction/prediction.model';
 import { HttpClient } from '@angular/common/http';
 import { MltComponent } from '../mlt/deprecated/mlt.component';
-
+import { Zone4SameCommentOrSameGrade } from '../comparestudentanswer/comparestudentanswer.component';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { PredictionStudentResponseService } from '../mlt/prediction-studentresponse-service';
@@ -3371,7 +3371,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
   filterSearchedPredictions(searchTerm: string = '') {
-    console.error('searchTerm', searchTerm);
     this.searchedTerm = searchTerm;
     let predictionsF = this.predictionsFusing;
     if (this.filterPredictionsWithNotes) {
@@ -3422,10 +3421,15 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     if (this.currentPrediction) {
       this.predictionsFusing = this.findSimilarPredictions(this.currentPrediction, this.allpredictions);
       const predsheetids = this.predictionsFusing.map(prediction => prediction.sheetId!);
-      const s = await firstValueFrom(
-        this.predictionService.findPredictionWithoutStudentResponse(predsheetids, this.currentQuestion!.numero!, +this.examId!),
-      );
-      this.predictionsFusingWithoutStudentResponse = this.predictionsFusing.filter(s1 => s.predictionsids.includes(s1.sheetId!));
+      if (predsheetids.length > 0) {
+        const s = await firstValueFrom(
+          this.predictionService.findPredictionWithoutStudentResponse(predsheetids, this.currentQuestion!.numero!, +this.examId!),
+        );
+
+        this.predictionsFusingWithoutStudentResponse = this.predictionsFusing.filter(s1 => s.predictionsids.includes(s1.sheetId!));
+      } else {
+        this.predictionsFusingWithoutStudentResponse = [];
+      }
       this.deleted = false;
     } else {
       this.deleted = true;
@@ -3462,10 +3466,28 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     return [...similarPredictions].filter(prediction => prediction.id !== currentPrediction.id);
   }
 
+  async applySameNoteAndGrade() {
+    const l = this.selectedpredictions().map(p => p.sheetPageMin! / (p.sheetPageMax! - p.sheetPageMin! + 1));
+    const templat = this.sheet!.pagemin! / (this.sheet!.pagemax! - this.sheet!.pagemin! + 1);
+    const clus = {
+      templat: templat,
+      copies: l,
+    };
+
+    await firstValueFrom(
+      this.http.post<Zone4SameCommentOrSameGrade>(
+        this.applicationConfigService.getEndpointFor('api/updateStudentResponse4Cluster/' + this.examId + '/' + this.questionId),
+        clus,
+      ),
+    );
+    await this.initSimilarPrediction();
+  }
+
   async initSimilarPrediction() {
     this.dropdownOpen = !this.dropdownOpen;
     this.filterPredictionsWithNotes = false;
     if (this.dropdownOpen) {
+      this.blocked = true;
       if (this.allpredictions.length === 0) {
         await this.loadPrediction();
       }
@@ -3499,8 +3521,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         } catch (err) {
           console.error('Error loading prediction:', err);
           this.currentPrediction = undefined; // Explicitly reset on error
+          this.blocked = false;
         }
       }
+      this.blocked = false;
     }
   }
 
@@ -3515,6 +3539,35 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       ]);
     } else {
       this.predictionstoShow.update(() => [...predictionsF]);
+    }
+  }
+
+  async goToCopie(event: any, pageMin: number, pageMax: number) {
+    const questionIndex = this.questionindex4shortcut! + 1;
+
+    if (event.ctrlKey || event.metaKey) {
+      if (questionIndex > 0 && Number.isInteger(pageMin / (pageMax + 1 - pageMin) + 1)) {
+        this.ngZone.run(() => {
+          const url = this.router.serializeUrl(
+            this.router.createUrlTree(['/answer/' + this.examId + '/' + questionIndex + '/' + (pageMin / (pageMax + 1 - pageMin) + 1)]),
+          );
+          if ('/' !== this.applicationConfigService.getFrontUrl()) {
+            if (this.applicationConfigService.getFrontUrl().endsWith('/') && url.startsWith('/')) {
+              window.open(this.applicationConfigService.getFrontUrl().slice(0, -1) + url, '_blank');
+            } else {
+              window.open(this.applicationConfigService.getFrontUrl() + url, '_blank');
+            }
+          } else {
+            window.open(url, '_blank');
+          }
+        });
+      }
+    } else {
+      if (questionIndex > 0 && Number.isInteger(pageMin / (pageMax + 1 - pageMin) + 1)) {
+        this.ngZone.run(() => {
+          this.router.navigate(['/answer/' + this.examId + '/' + questionIndex + '/' + (pageMin / (pageMax + 1 - pageMin) + 1)]);
+        });
+      }
     }
   }
 }

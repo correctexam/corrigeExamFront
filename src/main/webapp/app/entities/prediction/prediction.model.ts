@@ -3,6 +3,8 @@ export interface IPrediction {
   text?: string | null;
   questionId?: number;
   sheetId?: number;
+  sheetPageMin?: number;
+  sheetPageMax?: number;
   jsonData?: string | null;
   questionNumber?: number | null;
   predictionconfidence?: number | null;

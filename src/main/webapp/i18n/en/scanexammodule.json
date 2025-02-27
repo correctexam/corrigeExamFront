@@ -557,7 +557,7 @@
     "displaySimilarAnswers": "Display similar answers",
     "noGradeAvailable": "⚠️ No grade available",
     "applyNoteToSelected": "Apply the note to the selected",
-    "applyNoteToAll": "Apply the note to all",
+    "applyNoteToSelectedTooltip": "Allows you to apply the grade and comments of the answers being corrected to the answer(s) selected below",
     "selectAllSimilar": "Select all",
     "rechercheParMot": "Search by word",
     "manuscriptcorrect": "Allows you to launch OCR analysis of handwriting",
