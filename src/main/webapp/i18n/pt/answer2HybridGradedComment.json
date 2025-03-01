@@ -1,0 +1,26 @@
+{
+  "gradeScopeIsticApp": {
+    "answer2HybridGradedComment": {
+      "home": {
+        "title": "Answer2HybridGradedComments",
+        "refreshListLabel": "Atualizar a lista",
+        "createLabel": "Criar uma nova Resposta ao comentário híbrido com nota",
+        "createOrEditLabel": "Criar ou modificar Resposta ao comentário híbrido com nota",
+        "notFound": "Nenhuma Resposta ao comentário híbrido com nota foi encontrada"
+      },
+      "created": "Uma novo Resposta ao comentário híbrido com nota foi criado com o identificador {{ param }}",
+      "updated": "A Resposta ao comentário híbrido com nota de identificador {{ param }} foi atualizada",
+      "deleted": "A Resposta ao comentário híbrido com nota de identificador {{ param }} foi excluída",
+      "delete": {
+        "questão": "Tem certeza de querer excluir le Resposta ao comentário híbrido com nota {{ id }} ?"
+      },
+      "detail": {
+        "title": "Resposta ao comentário híbrido com nota"
+      },
+      "id": "ID",
+      "stepValue": "Step Value",
+      "hybridcomments": "Hybridcomments",
+      "studentResponse": "Resposta ao Estudante"
+    }
+  }
+}

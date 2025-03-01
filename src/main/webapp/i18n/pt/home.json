@@ -1,0 +1,43 @@
+{
+  "home": {
+    "title": "Bem-vindo ao aplicativo ee correção de provas em linha!",
+    "subtitle": "Esta é sua página inicial",
+    "logged": {
+      "message": "Você está conectado como \"{{username}}\"."
+    },
+    "questão": "Se tiver perguntas sobre o JHipster :",
+    "link": {
+      "homepage": "Página inicial do JHipster",
+      "stackoverflow": "JHipster sur Stack Overflow",
+      "bugtracker": "JHipster bug tracker",
+      "chat": "JHipster public chat room",
+      "follow": "Suivez @jhipster sur Twitter"
+    },
+    "like": "Se você gosta do JHipster, nos dê uma estrela no",
+    "github": "GitHub ",
+    "creercours": "Criar disciplina",
+    "coursmain": "Sua disciplina {{courseName}}",
+    "registerstudents": "Seus estudantes na disciplina {{courseName}}",
+    "liststudents": "Listar seus estudantes na disciplina {{courseName}}",
+    "creerexam": "Criar uma avaliação para a disciplina {{courseName}}",
+    "loadscan": "Carregar as provas digitalizadas para a avaliação {{examName}}",
+    "exam": "Avaliação {{examName}} da disciplina {{courseName}}",
+    "annotate": "Anotar o modelo da avaliação {{examName}}",
+    "imagealign": "Alinhamento das imagens das provas da avaliação  {{examName}}",
+    "studentbindings": "Associação de provas e estudantes para avaliação {{examName}}",
+    "resposta": "Corrigir a avaliação {{examName}}",
+    "voircopie": "Ver sua cópia",
+    "voirresultat": "Resultados da avaliação {{examName}} da disciplina {{courseName}}",
+    "voirreponse": "Ver uma resposta em particular",
+    "stats": "Estatísticas da avaliação {{examName}}",
+    "voirreponsesstarunstar": "Ver as respostas representativas",
+    "titleu": "Corrigir provas com mais eficiência ✔️",
+    "subtitleu": "Dar retorno aos estudantes em menos de um dia",
+    "slogan": "Digitalizar, corrigir por lotes, ter assistência de uma IA, dar um retorno preciso aos estudantes, a partir de um PC ou de um tablete",
+    "login": "Identificar-se",
+    "register": "Criar uma conta",
+    "welcomeadmin": "Bem-vindo à página de administração deste aplicativo",
+    "welcomeadminsub": "Você pode ter acesso aos dados a partir do menu entidade",
+    "textadmin": "Você poder gerir os usuários e os serviços a partir do menu administração."
+  }
+}

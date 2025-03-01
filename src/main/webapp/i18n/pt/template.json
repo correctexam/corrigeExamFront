@@ -1,0 +1,28 @@
+{
+  "gradeScopeIsticApp": {
+    "template": {
+      "home": {
+        "title": "Modelos de avaliação",
+        "refreshListLabel": "Atualizar a lista",
+        "createLabel": "Criar um novo modelo de avaliação",
+        "createOrEditLabel": "Criar ou modificar modelo de avaliação",
+        "notFound": "Nenhum modelo de avaliação foi encontrado"
+      },
+      "created": "Un novo modelo de avaliação foi criado com o identificador {{ param }}",
+      "updated": "O modelo de avaliação de identificador {{ param }} foi atualizado",
+      "deleted": "O modelo de avaliação de identificador {{ param }} foi excluído",
+      "delete": {
+        "questão": "Tem certeza que quer excluir le modelo de avaliação {{ id }} ?"
+      },
+      "detail": {
+        "title": "Modelo de avaliação"
+      },
+      "id": "ID",
+      "name": "Nome",
+      "content": "Enunciado da avaliação:",
+      "mark": "O modelo contém marcadores de alinhamento?",
+      "autoMapStudentCopyToList": "Associação automática prova - estudante",
+      "exam": "Avaliação"
+    }
+  }
+}

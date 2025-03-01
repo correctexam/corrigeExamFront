@@ -1,0 +1,30 @@
+{
+  "gradeScopeIsticApp": {
+    "hybridGradedComment": {
+      "home": {
+        "title": "Comentário híbrido com nota",
+        "refreshListLabel": "Atualizar a lista",
+        "createLabel": "Criar um novo Comentário híbrido com nota",
+        "createOrEditLabel": "Criar ou modificar Comentário híbrido com nota",
+        "notFound": "Nenhum Comentário híbrido com nota foi encontrado"
+      },
+      "created": "Un novo Comentário híbrido com nota foi criado com o identificador {{ param }}",
+      "updated": "O Comentário híbrido com nota de identificador {{ param }} foi atualizado",
+      "deleted": "O Comentário híbrido com nota de identificador {{ param }} foi excluído",
+      "delete": {
+        "questão": "Tem certeza de querer excluir le Comentário híbrido com nota {{ id }} ?"
+      },
+      "detail": {
+        "title": "Comentário híbrido com nota"
+      },
+      "id": "ID",
+      "text": "Text",
+      "description": "Descrição",
+      "grade": "Nota",
+      "relative": "Relativa",
+      "step": "Passo",
+      "questão": "Questão",
+      "valueAnswer": "Value Resposta"
+    }
+  }
+}

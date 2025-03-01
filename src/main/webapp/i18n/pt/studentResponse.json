@@ -1,0 +1,32 @@
+{
+  "gradeScopeIsticApp": {
+    "studentResponse": {
+      "home": {
+        "title": "Resposta ao Estudante",
+        "refreshListLabel": "Atualizar a lista",
+        "createLabel": "Criar um novo Resposta ao Estudante",
+        "createOrEditLabel": "Criar ou modificar Resposta ao Estudante",
+        "notFound": "Nenhum Resposta ao Estudante foi encontrado"
+      },
+      "created": "Un novo Resposta ao Estudante foi criado com o identificador {{ param }}",
+      "updated": "O Resposta ao Estudante de identificador {{ param }} foi atualizado",
+      "deleted": "O Resposta ao Estudante de identificador {{ param }} foi excluído",
+      "delete": {
+        "questão": "Tem certeza de querer excluir le Resposta ao Estudante {{ id }} ?"
+      },
+      "detail": {
+        "title": "Resposta ao Estudante"
+      },
+      "id": "ID",
+      "note": "Note",
+      "star": "Star",
+      "worststar": "Resposta errada notável",
+      "comments": "Comments",
+      "hybridcommentsValue": "Hybridcomments Value",
+      "questão": "Questão",
+      "sheet": "Prova",
+      "textcomments": "Textcomments",
+      "gradedcomments": "Gradedcomments"
+    }
+  }
+}
