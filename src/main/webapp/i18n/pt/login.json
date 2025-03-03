@@ -1,0 +1,19 @@
+{
+  "login": {
+    "title": "Autentificação",
+    "form": {
+      "password": "Senha",
+      "password.placeholder": "Sua senha",
+      "rememberme": "Manter a seção aberta",
+      "button": "Identificar-se"
+    },
+    "messages": {
+      "error": {
+        "authentication": "<strong>Erro de autentificação!</strong>Verifique seus identificadores de conexão."
+      }
+    },
+    "password": {
+      "forgot": "Esqueceu sua senha?"
+    }
+  }
+}

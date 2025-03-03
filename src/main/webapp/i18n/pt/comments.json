@@ -1,0 +1,26 @@
+{
+  "gradeScopeIsticApp": {
+    "comments": {
+      "home": {
+        "title": "Comentários",
+        "refreshListLabel": "Atualizar a lista",
+        "createLabel": "Criar um novo Comentário",
+        "createOrEditLabel": "Criar ou modificar Comentário",
+        "notFound": "Nenhum Comments foi encontrado"
+      },
+      "created": "Un novo Comentário foi criado com o identificador {{ param }}",
+      "updated": "O Comentário de identificador {{ param }} foi atualizado",
+      "deleted": "O Comentário de identificador {{ param }} foi excluído",
+      "delete": {
+        "questão": "Tem certeza que quer excluir o Comentário {{ id }} ?"
+      },
+      "detail": {
+        "title": "Comentários"
+      },
+      "id": "Id",
+      "zonegeneratedid": "Zonegeneratedid",
+      "jsonData": "Json Data",
+      "studentResponse": "Resposta do estudante"
+    }
+  }
+}
