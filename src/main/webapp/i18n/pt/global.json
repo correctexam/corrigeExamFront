@@ -1,0 +1,158 @@
+{
+  "global": {
+    "title": "correctExam",
+    "browsehappy": "Vous utilisez un <strong>ancien</strong> navigateur. Veuillez <a href=\"http://browsehappy.com/?locale=fr\">mettre à jour votre navigateur</a> pour une meilleure expérience.",
+    "menu": {
+      "home": "Início",
+      "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
+      "entities": {
+        "main": "Entidades",
+        "course": "Disciplina",
+        "courseGroup": "Course Group",
+        "student": "Estudante",
+        "exam": "Avaliação",
+        "template": "Template",
+        "questão": "Questão",
+        "examSheet": "Prova",
+        "scan": "Documento digitalizado",
+        "finalResult": "Final Result",
+        "studentResponse": "Resposta ao Estudante",
+        "comments": "Comentários",
+        "zone": "Zona",
+        "questionType": "Tipo de Questão",
+        "textComment": "Texto de comentário",
+        "gradedComment": "Comentário com nota",
+        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
+      },
+      "account": {
+        "main": "Conta",
+        "settings": "Perfil",
+        "password": "Senha",
+        "sessions": "Sessões",
+        "login": "Identificar-se",
+        "logout": "Desconexão",
+        "register": "Criar uma conta"
+      },
+      "admin": {
+        "main": "Administração",
+        "userManagement": "Gestão dos usuários",
+        "tracker": "Acompanhamento de usuários",
+        "metrics": "Métricas",
+        "health": "Diagnóstico",
+        "configuration": "Configuração",
+        "logs": "Logs",
+        "apidocs": "API",
+        "database": "Base de données",
+        "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)"
+      },
+      "language": "Idioma"
+    },
+    "form": {
+      "username.label": "Identificador de usuário (⚠️ não é seu e-mail!)",
+      "username.placeholder": "identificador de usuário (⚠️ não é seu e-mail!)",
+      "currentpassword.label": "Senha atual",
+      "currentpassword.placeholder": "Senha atual",
+      "newpassword.label": "Nova senha",
+      "newpassword.placeholder": "Nova senha",
+      "confirmpassword.label": "Confirmação da nova senha",
+      "confirmpassword.placeholder": "Confirmação da nova senha",
+      "email.label": "Email",
+      "email.placeholder": "Seu email"
+    },
+    "messages": {
+      "info": {
+        "authenticated": {
+          "prefix": "Se quiser ",
+          "link": "se identificar",
+          "suffix": "."
+        },
+        "register": {
+          "noaccount": "Ainda não possui uma conta? Clique ",
+          "link": "aqui",
+          "suffix": "para criar uma conta."
+        }
+      },
+      "error": {
+        "dontmatch": "A nova senha e a confirmação são diferentes!"
+      },
+      "validate": {
+        "newpassword": {
+          "required": "A senha é obrigatória.",
+          "minlength": "A senha deve conter ao menos 4 caracteres.",
+          "maxlength": "A senha não deve conter mais de 50 caracteres.",
+          "strength": "Robustez da senha :"
+        },
+        "confirmpassword": {
+          "required": "A confirmação de senha é obrigatória.",
+          "minlength": "A confirmação de senha deve conter ao menos 4 caracteres.",
+          "maxlength": "A confirmação de senha não deve conter mais de 50 caracteres."
+        },
+        "email": {
+          "required": "O email é obrigatório.",
+          "minlength": "O email deve conter ao menos 5 caracteres.",
+          "maxlength": "O email não deve conter mais de 50 caracteres.",
+          "invalid": "O email não é válido."
+        }
+      }
+    },
+    "field": {
+      "id": "ID"
+    },
+    "ribbon": {
+      "dev": "Desenvolvimento",
+      "prod": "Produção"
+    },
+    "item-count": "Exibição {{first}} - {{second}} de {{total}} itens."
+  },
+  "entity": {
+    "action": {
+      "addblob": "Adicionar blob",
+      "addimage": "Adicionar imagem",
+      "back": "Retorno",
+      "cancel": "Cancelar",
+      "edit": "Modificar",
+      "delete": "Excluir",
+      "open": "Abrir",
+      "save": "Salvar",
+      "view": "Visualizar"
+    },
+    "detail": {
+      "field": "Campos",
+      "value": "Valores"
+    },
+    "delete": {
+      "title": "Confirmação de exclusão"
+    },
+    "validation": {
+      "required": "Este campo é obrigatório.",
+      "minlength": "Este campo deve ter no mínimo{{min}} caracteres.",
+      "maxlength": "Este campo deve ter menos de {{max}} caracteres.",
+      "min": "Este campo deve ser superior a {{min}}.",
+      "max": "Este campo deve ser inferior a {{max}}.",
+      "minbytes": "Este campo deve ser superior a {{min}} bytes.",
+      "maxbytes": "Este campo deve ser inferior a {{max}} bytes.",
+      "pattern": "Este campo deve respeitar a expressão regular {{pattern}}.",
+      "number": "Este campo deve ser un número.",
+      "datetimelocal": "Este campo deve ser uma data e uma hora.",
+      "patternLogin": "Este campo só pode conter letras, números ou des endereços eletrônico."
+    }
+  },
+  "error": {
+    "internalServerError": "Erro interno do servidor",
+    "server.not.reachable": "Servidor inacessível",
+    "url.not.found": "Não foi encontrado",
+    "NotNull": "O campo {{fieldName}} não pode estar vazio!",
+    "Size": "O campo {{fieldName}} não respeita os critérios mínimo e máximo !",
+    "userexists": "Login já usado!",
+    "emailexists": "Email já usado!",
+    "idexists": "Uma nova entidade {{entityName}} não pode ter um identificador !",
+    "idnull": "Identificador invalido",
+    "idinvalid": "ID inválida",
+    "idnotfound": "ID não encontrada",
+    "file": {
+      "could.not.extract": "Não é possível extrair o arquivo",
+      "not.image": "O arquivo deve ser uma imagem e não do tipo \"{{ fileType }}\""
+    }
+  },
+  "footer": "Este é seu rodapé"
+}

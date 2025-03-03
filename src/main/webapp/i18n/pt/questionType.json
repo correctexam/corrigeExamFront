@@ -1,0 +1,26 @@
+{
+  "gradeScopeIsticApp": {
+    "questionType": {
+      "home": {
+        "title": "QuestionTypes",
+        "refreshListLabel": "Atualizar a lista",
+        "createLabel": "Criar um novo Questão Type",
+        "createOrEditLabel": "Criar ou modificar Questão Type",
+        "notFound": "Nenhum Questão Type foi encontrado"
+      },
+      "created": "Un novo Questão Type foi criado com o identificador {{ param }}",
+      "updated": "O Questão Type de identificador {{ param }} foi atualizado",
+      "deleted": "O Questão Type de identificador {{ param }} foi excluído",
+      "delete": {
+        "questão": "Tem certeza que quer excluir le Questão Type {{ id }} ?"
+      },
+      "detail": {
+        "title": "Questão Type"
+      },
+      "id": "ID",
+      "algoName": "Algo Name",
+      "endpoint": "Endpoint",
+      "jsFunction": "Js Function"
+    }
+  }
+}

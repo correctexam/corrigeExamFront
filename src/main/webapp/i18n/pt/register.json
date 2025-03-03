@@ -1,0 +1,24 @@
+{
+  "register": {
+    "title": "Criação de uma conta de usuário",
+    "form": {
+      "button": "Criar conta"
+    },
+    "messages": {
+      "validate": {
+        "login": {
+          "required": "O identificador é obrigatório.",
+          "minlength": "O identificador de usuário deve conter ao menos um caractere.",
+          "maxlength": "O identificador de usuário não pode conter mais de 50 caracteres.",
+          "pattern": "O identificador de usuário est invalide."
+        }
+      },
+      "success": "<strong>Conta registrada!</strong> Por favor, verifique seu e-mail de confirmação.",
+      "error": {
+        "fail": "<strong>Conta não criada!</strong> Tente novamente mais tarde.",
+        "userexists": "<strong>Este usuário já existe !</strong> Por favor, escolha outro.",
+        "emailexists": "<strong>Este e-mail já está sendo usado !</strong> Por favor, escolha outro."
+      }
+    }
+  }
+}

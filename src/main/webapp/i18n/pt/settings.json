@@ -1,0 +1,32 @@
+{
+  "settings": {
+    "title": "Perfil do usuário [<strong>{{username}}</strong>]",
+    "form": {
+      "firstname": "Nome",
+      "firstname.placeholder": "Seu nome",
+      "lastname": "Nome",
+      "lastname.placeholder": "Seu sobrenome",
+      "language": "Idioma",
+      "button": "Salvar"
+    },
+    "messages": {
+      "error": {
+        "fail": "<strong>Ocorreu um erro!</strong> Seu perfil não foi salvo.",
+        "emailexists": "<strong>Este e-mail já está sendo usado!</strong> Escolha um outro."
+      },
+      "success": "<strong>Seu perfil foi salvo!</strong>",
+      "validate": {
+        "firstname": {
+          "required": "O nome é obrigatório.",
+          "minlength": "O nome deve conter ao menos um caractere.",
+          "maxlength": "O nome não deve conter mais de 50 caracteres."
+        },
+        "lastname": {
+          "required": "O sobrenome é obrigatório.",
+          "minlength": "O sobrenome deve conter ao menos um caractere.",
+          "maxlength": "O sobrenome não deve conter mais de 50 caracteres."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "gradeScopeIsticApp": {
+    "exam": {
+      "home": {
+        "title": "Avaliações",
+        "refreshListLabel": "Atualisar a lista",
+        "createLabel": "Criar uma nova Avaliação",
+        "createOrEditLabel": "Criar ou modificar uma Avaliação",
+        "notFound": "Nenhuma Avaliação foi encontrada"
+      },
+      "created": "Uma nova Avaliação foi criada com o identificador {{ param }}",
+      "updated": "A Avaliação de identificador {{ param }} foi atualizada",
+      "deleted": "A Avaliação de identificador {{ param }} foi excluída",
+      "delete": {
+        "questão": "Tem certeza que quer excluir a Avaliação {{ id }} ?"
+      },
+      "detail": {
+        "title": "Avaliação"
+      },
+      "id": "Id",
+      "name": "Nome da avaliação:",
+      "template": "Modelo de avaliação",
+      "idzone": "Idzone",
+      "namezone": "Zona do sobrenome",
+      "firstnamezone": "Zona do nome",
+      "notezone": "Zona da nota",
+      "scanfile": "Documento digitalizado dos estudantes",
+      "questão": "Questão",
+      "course": "Disciplina"
+    }
+  }
+}

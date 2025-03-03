@@ -1,0 +1,28 @@
+{
+  "gradeScopeIsticApp": {
+    "zone": {
+      "home": {
+        "title": "Zones",
+        "refreshListLabel": "Atualizar a lista",
+        "createLabel": "Criar um novo Zone",
+        "createOrEditLabel": "Criar ou modificar Zone",
+        "notFound": "Nenhum Zone foi encontrado"
+      },
+      "created": "Un novo Zone foi criado com o identificador {{ param }}",
+      "updated": "O Zone de identificador {{ param }} foi atualizado",
+      "deleted": "O Zone de identificador {{ param }} foi excluído",
+      "delete": {
+        "questão": "Tem certeza que quer excluir le Zone {{ id }} ?"
+      },
+      "detail": {
+        "title": "Zone"
+      },
+      "id": "ID",
+      "pageNumber": "Page Number",
+      "xInit": "X Init",
+      "yInit": "Y Init",
+      "width": "Largura",
+      "height": "Altura"
+    }
+  }
+}
