@@ -12,7 +12,7 @@
       "updated": "O Text Comment de identificador {{ param }} foi atualizado",
       "deleted": "O Text Comment de identificador {{ param }} foi excluído",
       "delete": {
-        "questão": "Tem certeza que quer excluir le Text Comment {{ id }} ?"
+        "question": "Tem certeza que quer excluir le Text Comment {{ id }} ?"
       },
       "detail": {
         "title": "Text Comment"
@@ -21,7 +21,7 @@
       "text": "Text",
       "description": "Descrição",
       "zonegeneratedid": "Zonegeneratedid",
-      "questão": "Questão",
+      "question": "Questão",
       "studentResponse": "Resposta ao Estudante"
     }
   }

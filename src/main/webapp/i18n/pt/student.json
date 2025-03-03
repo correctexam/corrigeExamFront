@@ -12,7 +12,7 @@
       "updated": "O Estudante de identificador {{ param }} foi atualizado",
       "deleted": "O Estudante de identificador {{ param }} foi excluído",
       "delete": {
-        "questão": "Tem certeza que quer excluir o Estudante {{ id }} ?"
+        "question": "Tem certeza que quer excluir o Estudante {{ id }} ?"
       },
       "detail": {
         "title": "Estudante"

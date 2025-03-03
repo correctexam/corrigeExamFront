@@ -12,7 +12,7 @@
       "updated": "O Comentário com nota de identificador {{ param }} foi atualizado",
       "deleted": "O Comentário com nota de identificador {{ param }} foi excluído",
       "delete": {
-        "questão": "Tem certeza que quer excluir le Comentário com nota {{ id }} ?"
+        "question": "Tem certeza que quer excluir le Comentário com nota {{ id }} ?"
       },
       "detail": {
         "title": "Comentário com nota"
@@ -22,7 +22,7 @@
       "text": "Texto",
       "description": "Descrição",
       "grade": "Grade",
-      "questão": "Questão",
+      "question": "Questão",
       "studentResponse": "Resposta ao Estudante"
     }
   }

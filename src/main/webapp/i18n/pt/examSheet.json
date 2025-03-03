@@ -12,7 +12,7 @@
       "updated": "A Prova de identificador {{ param }} foi atualizada",
       "deleted": "A Prova de identificador {{ param }} foi excluída",
       "delete": {
-        "questão": "Tem certeza que quer excluir o Prova {{ id }} ?"
+        "question": "Tem certeza que quer excluir o Prova {{ id }} ?"
       },
       "detail": {
         "title": "Prova"
