@@ -12,7 +12,7 @@
       "updated": "A Avaliação de identificador {{ param }} foi atualizada",
       "deleted": "A Avaliação de identificador {{ param }} foi excluída",
       "delete": {
-        "questão": "Tem certeza que quer excluir a Avaliação {{ id }} ?"
+        "question": "Tem certeza que quer excluir a Avaliação {{ id }} ?"
       },
       "detail": {
         "title": "Avaliação"
@@ -25,7 +25,7 @@
       "firstnamezone": "Zona do nome",
       "notezone": "Zona da nota",
       "scanfile": "Documento digitalizado dos estudantes",
-      "questão": "Questão",
+      "question": "Questão",
       "course": "Disciplina"
     }
   }

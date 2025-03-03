@@ -12,7 +12,7 @@
       "updated": "A Disciplina com o identificador {{ param }} foi atualizada",
       "deleted": "A Disciplina com o identificador {{ param }} foi excluída",
       "delete": {
-        "questão": "Tem certeza que quer excluir a Disciplina {{ id }} ?"
+        "question": "Tem certeza que quer excluir a Disciplina {{ id }} ?"
       },
       "detail": {
         "title": "Disciplina"

@@ -12,7 +12,7 @@
       "updated": "O Comentário híbrido com nota de identificador {{ param }} foi atualizado",
       "deleted": "O Comentário híbrido com nota de identificador {{ param }} foi excluído",
       "delete": {
-        "questão": "Tem certeza de querer excluir le Comentário híbrido com nota {{ id }} ?"
+        "question": "Tem certeza de querer excluir le Comentário híbrido com nota {{ id }} ?"
       },
       "detail": {
         "title": "Comentário híbrido com nota"
@@ -23,7 +23,7 @@
       "grade": "Nota",
       "relative": "Relativa",
       "step": "Passo",
-      "questão": "Questão",
+      "question": "Questão",
       "valueAnswer": "Value Resposta"
     }
   }
