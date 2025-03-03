@@ -3326,6 +3326,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   //  filteredSearchedPredictions: IPrediction[] = [];
   private searchSubscription?: Subscription;
 
+  filterallexamsheets = false;
+  synchrocomments = false;
+
   async loadPrediction() {
     if (this.currentQuestion!.typeAlgoName === 'manuscrit') {
       try {
@@ -3438,6 +3441,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.dropdownOpen = false;
   }
 
+  /* Permet de trouver les réponses simulaires à partir d'un algo de fuzzing */
   findSimilarPredictions(currentPrediction: Prediction, predictions: Prediction[]): Prediction[] {
     // Fuse.js options
     const fuseOptions = {

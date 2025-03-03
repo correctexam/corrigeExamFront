@@ -643,6 +643,20 @@
                       (click)="$event.stopPropagation()"
                       style="padding-right: 20px; padding-top: 15px; padding-left: 30px"
                     >
+                      <div>
+                        <label class="text-gray-700 font-medium" jhiTranslate="scanexam.filterallexamsheets">
+                          Appliquer la recherche de texte sur les prédiction de l'ensemble des copies
+                        </label>
+                        <!--                          "
+-->
+                        <p-toggleswitch
+                          [(ngModel)]="filterallexamsheets"
+                          (onChange)="updateFilteredSimilarPredictions()"
+                          [pTooltip]="'scanexam.filterallexamsheetsTooltip' | translate"
+                          class="ml-2"
+                        ></p-toggleswitch>
+                      </div>
+                      <div class="pr-5"></div>
                       <!-- Input Field -->
                       <input
                         [formControl]="searchControl"
@@ -680,17 +694,7 @@
                         <i class="pi pi-check-circle mr-2"></i>
                         Appliquer la note aux sélectionnés
                       </button>
-                      <!-- (click)="changeAllSimilarGrades()"
-                         -->
-                      <!-- <button
-                        pButton
-                        class="p-button-secondary"
-                        [disabled]="predictionstoShow().length === 0"
-                        jhiTranslate="scanexam.applyNoteToAll"
-                      >
-                        <i class="pi pi-check-square mr-2"></i>
-                        Appliquer la note à tous
-                      </button>-->
+
                       <div class="flex items-center p-2">
                         <label class="text-gray-700 font-medium" jhiTranslate="scanexam.filterNoNoteStudents">
                           Filtrer les questions déjà notées :
@@ -705,6 +709,20 @@
                         ></p-toggleswitch>
                       </div>
                       <p-progressSpinner *ngIf="blocked" styleClass="w-2rem h-2rem"></p-progressSpinner>
+
+                      <div class="flex items-center p-2">
+                        <label class="text-gray-700 font-medium" jhiTranslate="scanexam.synchrocomments">
+                          Activer la synchronistation des commentaires :
+                        </label>
+                        <!--                          "
+-->
+                        <p-toggleswitch
+                          [(ngModel)]="synchrocomments"
+                          (onChange)="updateFilteredSimilarPredictions()"
+                          [pTooltip]="'scanexam.synchrocommentsTooltip' | translate"
+                          class="ml-2"
+                        ></p-toggleswitch>
+                      </div>
                     </div>
 
                     <p
