@@ -1,0 +1,26 @@
+{
+  "reset": {
+    "request": {
+      "title": "Reinicializar sua senha",
+      "form": {
+        "button": "Reinicializar a senha"
+      },
+      "messages": {
+        "info": "Digite o endereço de e-mail que usou para se cadastrar.",
+        "success": "Verifique seus novos e-mails e siga as instruções para redefinir sua senha."
+      }
+    },
+    "finish": {
+      "title": "Reinicialização da senha",
+      "form": {
+        "button": "Reinicializar a senha"
+      },
+      "messages": {
+        "info": "Escolher uma nova senha",
+        "success": "<strong>Sua senha foi reinicializada.</strong> Obrigado por ",
+        "keymissing": "Chave de reinicialização ausente",
+        "error": "Sua senha não pôde ser reinicializada. A solicitação de reinicialização é válida por apenas 24 horas."
+      }
+    }
+  }
+}

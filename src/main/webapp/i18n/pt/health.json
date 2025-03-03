@@ -1,0 +1,31 @@
+{
+  "health": {
+    "title": "Diagnóstico",
+    "refresh.button": "Atualizar",
+    "stacktrace": "Stacktrace",
+    "details": {
+      "details": "Detalhes",
+      "properties": "Propriedades",
+      "name": "Nome",
+      "value": "Valor",
+      "error": "Erro"
+    },
+    "indicator": {
+      "diskSpace": "Espaço disco",
+      "mail": "Email",
+      "livenessState": "Liveness state",
+      "readinessState": "Readiness state",
+      "ping": "Aplicativo",
+      "db": "Base de dados"
+    },
+    "table": {
+      "service": "Nome do serviço",
+      "status": "Estado"
+    },
+    "status": {
+      "UNKNOWN": "DESCONHECIDO",
+      "UP": "DISPONÍVEL",
+      "DOWN": "INDISPONÍVEL"
+    }
+  }
+}

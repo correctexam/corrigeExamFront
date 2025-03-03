@@ -1,0 +1,26 @@
+{
+  "gradeScopeIsticApp": {
+    "scan": {
+      "home": {
+        "title": "Scans",
+        "refreshListLabel": "Atualizar a lista",
+        "createLabel": "Criar um novo Documento digitalizado",
+        "createOrEditLabel": "Criar ou modificar Documento digitalizado",
+        "notFound": "Nenhum Documento digitalizado foi encontrado"
+      },
+      "created": "Un novo Documento digitalizado foi criado com o identificador {{ param }}",
+      "updated": "O Documento digitalizado de identificador {{ param }} foi atualizado",
+      "deleted": "O Documento digitalizado de identificador {{ param }} foi excluído",
+      "delete": {
+        "questão": "Tem certeza que quer excluir o Documento digitalizado {{ id }} ?"
+      },
+      "detail": {
+        "title": "Documento digitalizado"
+      },
+      "id": "ID",
+      "name": "Name",
+      "content": "Conteúdo",
+      "sheets": "Provas"
+    }
+  }
+}

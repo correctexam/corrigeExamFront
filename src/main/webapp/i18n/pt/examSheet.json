@@ -1,0 +1,28 @@
+{
+  "gradeScopeIsticApp": {
+    "examSheet": {
+      "home": {
+        "title": "Prova",
+        "refreshListLabel": "Atualizar a lista",
+        "createLabel": "Criar un novo Prova",
+        "createOrEditLabel": "Criar ou modificar un Prova",
+        "notFound": "Nenhum Prova foi encontrado"
+      },
+      "created": "Uma nova Prova foi criada com o identificador {{ param }}",
+      "updated": "A Prova de identificador {{ param }} foi atualizada",
+      "deleted": "A Prova de identificador {{ param }} foi excluída",
+      "delete": {
+        "questão": "Tem certeza que quer excluir o Prova {{ id }} ?"
+      },
+      "detail": {
+        "title": "Prova"
+      },
+      "id": "ID",
+      "name": "Nome",
+      "pagemin": "Pagmin",
+      "pagemax": "Pagmax",
+      "scan": "Documento digitalizado",
+      "students": "Estudantes"
+    }
+  }
+}

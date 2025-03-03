@@ -1,0 +1,27 @@
+{
+  "gradeScopeIsticApp": {
+    "course": {
+      "home": {
+        "title": "Disciplina",
+        "refreshListLabel": "Atualizar a lista",
+        "createLabel": "Criar uma nova Disciplina",
+        "createOrEditLabel": "Criar ou modificar uma Disciplina",
+        "notFound": "Nenhuma Disciplina foi encontrada"
+      },
+      "created": "Uma nova disciplina foi criada com o identificador {{ param }}",
+      "updated": "A Disciplina com o identificador {{ param }} foi atualizada",
+      "deleted": "A Disciplina com o identificador {{ param }} foi excluída",
+      "delete": {
+        "questão": "Tem certeza que quer excluir a Disciplina {{ id }} ?"
+      },
+      "detail": {
+        "title": "Disciplina"
+      },
+      "id": "Id",
+      "name": "Nome da disciplina",
+      "exam": "Avaliação",
+      "groups": "Grupos",
+      "prof": "Professor"
+    }
+  }
+}

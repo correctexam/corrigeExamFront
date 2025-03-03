@@ -36,7 +36,7 @@
     "entitySuffix": "",
     "jhiPrefix": "jhi",
     "jhipsterVersion": "7.7.0",
-    "languages": ["fr", "en"],
+    "languages": ["fr", "en", "pt"],
     "lastLiquibaseTimestamp": 1647007322000,
     "nativeLanguage": "fr",
     "otherModules": [],

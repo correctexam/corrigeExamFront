@@ -1,0 +1,11 @@
+{
+  "gradeScopeIsticApp": {
+    "GradeType": {
+      "null": "",
+      "DIRECT": "DIRETO",
+      "POSITIVE": "POSITIVO",
+      "NEGATIVE": "NEGATIVO",
+      "HYBRID": "HÍBRIDO"
+    }
+  }
+}

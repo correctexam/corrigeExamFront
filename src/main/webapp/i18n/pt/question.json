@@ -1,0 +1,36 @@
+{
+  "gradeScopeIsticApp": {
+    "questão": {
+      "home": {
+        "title": "Questões",
+        "refreshListLabel": "Atualizar a lista",
+        "createLabel": "Criar um novo Questão",
+        "createOrEditLabel": "Criar ou modificar Questão",
+        "notFound": "Nenhum Questão foi encontrado"
+      },
+      "created": "Uma nova Questão foi criada com o identificador {{ param }}",
+      "updated": "O Questão de identificador {{ param }} foi atualizada",
+      "deleted": "O Questão de identificador {{ param }} foi excluída",
+      "delete": {
+        "questão": "Tem certeza de querer excluir a Questão {{ id }} ?"
+      },
+      "detail": {
+        "title": "Questão"
+      },
+      "id": "ID",
+      "numero": "Numero",
+      "point": "Ponto",
+      "step": "Etapa",
+      "validExpression": "Expressão válida",
+      "gradeType": "Tipo de avaliação",
+      "libelle": "Etiqueta",
+      "defaultpoint": "Pontos padrão",
+      "zone": "Zona",
+      "textcomments": "Textcomments",
+      "gradedcomments": "Gradedcomments",
+      "hybridcomments": "Hybridcomments",
+      "type": "Tipo",
+      "exam": "Avaliação"
+    }
+  }
+}

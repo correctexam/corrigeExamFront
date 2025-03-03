@@ -1,0 +1,29 @@
+{
+  "gradeScopeIsticApp": {
+    "gradedComment": {
+      "home": {
+        "title": "GradedComments",
+        "refreshListLabel": "Atualizar a lista",
+        "createLabel": "Criar um novo Comentário com nota",
+        "createOrEditLabel": "Criar ou modificar Comentário com nota",
+        "notFound": "Nenhum Comentário com nota foi encontrado"
+      },
+      "created": "Un novo Comentário com nota foi criado com o identificador {{ param }}",
+      "updated": "O Comentário com nota de identificador {{ param }} foi atualizado",
+      "deleted": "O Comentário com nota de identificador {{ param }} foi excluído",
+      "delete": {
+        "questão": "Tem certeza que quer excluir le Comentário com nota {{ id }} ?"
+      },
+      "detail": {
+        "title": "Comentário com nota"
+      },
+      "id": "ID",
+      "zonegeneratedid": "Zonegeneratedid",
+      "text": "Texto",
+      "description": "Descrição",
+      "grade": "Grade",
+      "questão": "Questão",
+      "studentResponse": "Resposta ao Estudante"
+    }
+  }
+}
