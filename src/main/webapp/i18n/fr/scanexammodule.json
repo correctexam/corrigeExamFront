@@ -553,7 +553,7 @@
     "confirmAllGrades": "Êtes-vous sûr de vouloir appliquer la note aux {{count}} copies similaires ?",
     "gradesAppliedSelected": "Notes appliquées aux copies sélectionnées",
     "gradesAppliedAll": "Notes appliquées à toutes les copies similaires",
-    "noUngradedResponses": "Toutes les copies ont été corrigé pour cette question",
+    "noUngradedResponses": "Toutes les copies ont été corrigées pour cette question",
     "gotoNextUncorrectedQuestion": "Prochaine question non corrigée",
     "gotoPreviousUncorrectedQuestion": "Précédente question non corrigée",
     "executeMLT": "Executer MLT",
@@ -568,13 +568,14 @@
     "applyNoteToAll": "Appliquer la note à tous",
     "selectAllSimilar": "Sélectionner tout",
     "rechercheParMot": "Recherche par mot",
-    "manuscriptcorrect": "Premet de lancer l'analyse OCR de l'écriture manuscrit",
+    "manuscriptcorrect": "Permet de lancer l'analyse OCR de l'écriture manuscrite",
     "manuscriptcorrectlabel": "Analyse OCR",
-    "deletemanuscriptcorrect": "Permet de supprimer toutes les prédictions calculés à l'aide de l'outil d'OCR",
+    "deletemanuscriptcorrect": "Permet de supprimer toutes les prédictions calculées à l'aide de l'outil d'OCR",
     "deletemanuscriptcorrectlabel": "Suppression Prédiction OCR",
     "synchrocomments": "Synchronisation des commentaires :",
     "synchrocommentsTooltip": "Quand l'option est sélectionnée, si vous appliquez un commentaire sur la vue correction, ce commentaire est appliqué à l'ensemble des réponses similaires sélectionnées.",
     "filterallexamsheets": "Recherche par mot clé sur l'ensemble des copies :",
-    "filterallexamsheetsTooltip": "Applique la recherche sur l'ensemble des prédictions des copies (pas seulement sur celles qui semblent au départ proche sémantiquement)."
+    "filterallexamsheetsTooltip": "Applique la recherche sur l'ensemble des prédictions des copies (pas seulement sur celles qui semblent au départ proche sémantiquement).",
+    "toomuchsimilarResults": "Trop de réponses similaires trouvées"
   }
 }

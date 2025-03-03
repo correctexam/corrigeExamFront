@@ -567,6 +567,7 @@
     "synchrocomments": "Synchronised comments:",
     "synchrocommentsTooltip": "When the option is selected, if you apply a comment to the correction view, this comment is applied to all the similar answers selected.",
     "filterallexamsheets": "Search by keyword on all copies:",
-    "filterallexamsheetsTooltip": "Applies the search to all the predicted words (not only to those that initially appear to be semantically similar)"
+    "filterallexamsheetsTooltip": "Applies the search to all the predicted words (not only to those that initially appear to be semantically similar)",
+    "toomuchsimilarResults": "Too many similar answers found"
   }
 }

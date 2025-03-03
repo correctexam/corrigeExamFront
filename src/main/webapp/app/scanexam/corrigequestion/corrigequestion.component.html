@@ -726,12 +726,20 @@
                     </div>
 
                     <p
-                      *ngIf="dropdownOpen && predictionstoShow().length === 0 && similarPredictionsSearched"
+                      *ngIf="dropdownOpen && !toomuchsimilar && predictionstoShow().length === 0 && similarPredictionsSearched"
                       class="font-bold text-gray-700 text-xl px-4 py-3 border-b border-gray-300"
                       jhiTranslate="scanexam.nosimilarResults"
                     >
                       Aucune réponse similaire trouvée
                     </p>
+                    <p
+                      *ngIf="dropdownOpen && toomuchsimilar && predictionstoShow().length === 0 && similarPredictionsSearched"
+                      class="font-bold text-gray-700 text-xl px-4 py-3 border-b border-gray-300"
+                      jhiTranslate="scanexam.toomuchsimilarResults"
+                    >
+                      Trop de réponses similaires trouvées
+                    </p>
+
                     <p
                       *ngIf="dropdownOpen && predictionstoShow().length !== 0"
                       class="font-bold text-gray-700 text-xl px-4 py-3 border-b border-gray-300"

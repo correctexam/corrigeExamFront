@@ -3316,6 +3316,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   similarPredictionsSearched = false;
 
   allpredictions: IPrediction[] = [];
+  allpredictionsgWithoutStudentResponse: IPrediction[] = [];
   predictionsFusing: IPrediction[] = [];
   predictionsFusingWithoutStudentResponse: IPrediction[] = [];
   predictionstoShow: WritableSignal<IPrediction[]> = signal([]);
@@ -3328,7 +3329,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   filterallexamsheets = false;
   synchrocomments = false;
-
+  toomuchsimilar = false;
   async loadPrediction() {
     if (this.currentQuestion!.typeAlgoName === 'manuscrit') {
       try {
@@ -3342,11 +3343,15 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
     } else {
       this.allpredictions = [];
+      this.allpredictionsgWithoutStudentResponse = [];
       this.predictionsFusing = [];
       this.predictionstoShow.update(() => []);
       this.selectedpredictions.update(() => []);
       this.filterPredictionsWithNotes = false;
       this.searchedTerm = '';
+      this.toomuchsimilar = false;
+      this.synchrocomments = false;
+      this.filterallexamsheets = false;
     }
   }
 
@@ -3368,26 +3373,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  setupSearchListener() {
-    this.searchSubscription = this.searchControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe(value => {
-      this.filterSearchedPredictions(value ?? '');
-    });
-  }
-  filterSearchedPredictions(searchTerm: string = '') {
-    this.searchedTerm = searchTerm;
-    let predictionsF = this.predictionsFusing;
-    if (this.filterPredictionsWithNotes) {
-      predictionsF = this.predictionsFusingWithoutStudentResponse;
-    }
-    if (searchTerm && searchTerm.length > 2) {
-      this.predictionstoShow.update(() => [
-        ...predictionsF.filter(prediction => (prediction.text ?? '').toLowerCase().includes(searchTerm.toLowerCase())),
-      ]);
-    } else {
-      this.predictionstoShow.update(() => [...predictionsF]);
-    }
-    this.changeDetector.detectChanges();
-  }
   isAllSelected(): boolean {
     if (!this.predictionstoShow() || this.predictionstoShow().length === 0) {
       return false;
@@ -3428,10 +3413,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         const s = await firstValueFrom(
           this.predictionService.findPredictionWithoutStudentResponse(predsheetids, this.currentQuestion!.numero!, +this.examId!),
         );
-
         this.predictionsFusingWithoutStudentResponse = this.predictionsFusing.filter(s1 => s.predictionsids.includes(s1.sheetId!));
+        this.allpredictionsgWithoutStudentResponse = this.allpredictions.filter(s1 => s.predictionsids.includes(s1.sheetId!));
       } else {
         this.predictionsFusingWithoutStudentResponse = [];
+        this.allpredictionsgWithoutStudentResponse = [];
       }
       this.deleted = false;
     } else {
@@ -3487,6 +3473,28 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     await this.initSimilarPrediction();
   }
 
+  async prefetchImage(predictions: IPrediction[]) {
+    if (this.questions) {
+      for (const q of this.questions) {
+        const z = q.zoneDTO;
+        for (const pred of predictions) {
+          if (pred.imageData === undefined || pred.imageData === '') {
+            if (pred.sheetId !== undefined) {
+              const _sheet = await firstValueFrom(this.sheetService.find(pred.sheetId));
+              const sheet = _sheet.body || undefined;
+              if (sheet) {
+                const pagetoLoad = sheet.pagemin! + z!.pageNumber!;
+                const imagecrop = await this.getAllImage4Zone(pagetoLoad, z!, false);
+                const json = await this.convertImage(imagecrop.i);
+                pred.imageData = '' + json;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
   async initSimilarPrediction() {
     this.dropdownOpen = !this.dropdownOpen;
     this.filterPredictionsWithNotes = false;
@@ -3500,7 +3508,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.setupSearchListener();
 
         try {
-          if (this.questions) {
+          /* if (this.questions) {
             for (const q of this.questions) {
               const z = q.zoneDTO;
               for (const pred of this.predictionsFusing) {
@@ -3518,7 +3526,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 }
               }
             }
-          }
+          }*/
+          this.prefetchImage(this.predictionsFusing);
           this.deleted = false;
           this.similarPredictionsSearched = true;
           this.predictionstoShow.update(() => this.predictionsFusing);
@@ -3532,18 +3541,52 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  updateFilteredSimilarPredictions() {
+  setupSearchListener() {
+    this.searchSubscription = this.searchControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe(value => {
+      this.filterSearchedPredictions(value ?? '');
+    });
+  }
+
+  dofilterByText() {
     let predictionsF = this.predictionsFusing;
     if (this.filterPredictionsWithNotes) {
       predictionsF = this.predictionsFusingWithoutStudentResponse;
+    } else if (this.filterallexamsheets && !this.filterPredictionsWithNotes) {
+      predictionsF = this.allpredictions;
+    } else {
+      predictionsF = this.allpredictionsgWithoutStudentResponse;
     }
     if (this.searchedTerm && this.searchedTerm.length > 2) {
-      this.predictionstoShow.update(() => [
-        ...predictionsF.filter(prediction => (prediction.text ?? '').toLowerCase().includes(this.searchedTerm.toLowerCase())),
-      ]);
-    } else {
+      const p = predictionsF.filter(prediction => (prediction.text ?? '').toLowerCase().includes(this.searchedTerm.toLowerCase()));
+      if (p.length <= 30) {
+        this.toomuchsimilar = false;
+        this.blocked = true;
+
+        this.prefetchImage(p).then(() => {
+          this.predictionstoShow.update(() => [...p]);
+          this.blocked = false;
+        });
+      } else {
+        this.toomuchsimilar = true;
+        this.predictionstoShow.update(() => []);
+      }
+    } else if (predictionsF.length <= 30) {
+      this.toomuchsimilar = false;
       this.predictionstoShow.update(() => [...predictionsF]);
+    } else {
+      this.toomuchsimilar = true;
+      this.predictionstoShow.update(() => []);
     }
+  }
+
+  filterSearchedPredictions(searchTerm: string = '') {
+    this.searchedTerm = searchTerm;
+    this.dofilterByText();
+    this.changeDetector.detectChanges();
+  }
+
+  updateFilteredSimilarPredictions() {
+    this.dofilterByText();
   }
 
   async goToCopie(event: any, pageMin: number, pageMax: number) {
