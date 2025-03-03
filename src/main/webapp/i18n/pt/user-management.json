@@ -10,7 +10,7 @@
     "updated": "O usuário {{ param }} foi atualizado.",
     "deleted": "0 usuário {{ param }} foi excluído.",
     "delete": {
-      "questão": "Tem certeza que quer excluir o usuário {{ login }} ?"
+      "question": "Tem certeza que quer excluir o usuário {{ login }} ?"
     },
     "detail": {
       "title": "Usuário"

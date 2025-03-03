@@ -12,7 +12,7 @@
       "updated": "O Resposta ao Estudante de identificador {{ param }} foi atualizado",
       "deleted": "O Resposta ao Estudante de identificador {{ param }} foi excluído",
       "delete": {
-        "questão": "Tem certeza de querer excluir le Resposta ao Estudante {{ id }} ?"
+        "question": "Tem certeza de querer excluir le Resposta ao Estudante {{ id }} ?"
       },
       "detail": {
         "title": "Resposta ao Estudante"
@@ -23,7 +23,7 @@
       "worststar": "Resposta errada notável",
       "comments": "Comments",
       "hybridcommentsValue": "Hybridcomments Value",
-      "questão": "Questão",
+      "question": "Questão",
       "sheet": "Prova",
       "textcomments": "Textcomments",
       "gradedcomments": "Gradedcomments"
