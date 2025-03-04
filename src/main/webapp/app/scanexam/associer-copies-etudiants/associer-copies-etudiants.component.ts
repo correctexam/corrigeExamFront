@@ -5,7 +5,6 @@ import { AfterViewInit, Component, HostListener, OnInit, ViewChild, effect, sign
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ZoneService } from '../../entities/zone/service/zone.service';
 import { CourseService } from 'app/entities/course/service/course.service';
-import { MltComponent } from '../mlt/deprecated/mlt.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService, SelectItem, PrimeTemplate } from 'primeng/api';
 import { IExam } from 'app/entities/exam/exam.model';
@@ -44,6 +43,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { ToastModule } from 'primeng/toast';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { MLTService } from '../mlt/mlt.service';
 
 export interface IPage {
   image?: ImageData;
@@ -88,7 +88,7 @@ interface PredictResult {
   selector: 'jhi-associer-copies-etudiants',
   templateUrl: './associer-copies-etudiants.component.html',
   styleUrls: ['./associer-copies-etudiants.component.scss'],
-  providers: [ConfirmationService, MessageService, DialogService, MltComponent],
+  providers: [ConfirmationService, MessageService, DialogService],
   standalone: true,
   imports: [
     ToastModule,
@@ -182,6 +182,10 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   nameImageImg?: string;
   firstnameImageImg?: string;
   ineImageImg?: string;
+  nameImageImg_ImgData?: ImageData;
+  firstnameImageImg_ImgData?: ImageData;
+  ineImageImg_ImgData?: ImageData;
+
   nameImageImgDebug?: string;
   firstnameImageImgDebug?: string;
   ineImageImgDebug?: string;
@@ -230,7 +234,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     public studentService: StudentService,
     protected activatedRoute: ActivatedRoute,
     public confirmationService: ConfirmationService,
-    private mltcomponent: MltComponent,
     public router: Router,
     private alignImagesService: AlignImagesService,
     public messageService: MessageService,
@@ -240,6 +243,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     private translateService: TranslateService,
     public dialogService: DialogService,
     private titleService: Title,
+    private mltService: MLTService,
   ) {
     effect(
       () => {
@@ -367,18 +371,21 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
       this.predictionprecision = res[0].predictionprecision;
       this.recognizedStudent = res[0].recognizedStudent;
       if (res[0].nameImage) {
+        this.nameImageImg_ImgData = res[0].nameImage;
         this.nameImageImg = this.imagedata_to_image(res[0].nameImage);
       }
       if (this.debug && res[0].nameImageDebug) {
         this.nameImageImgDebug = this.imagedata_to_image(res[0].nameImageDebug);
       }
       if (res[0].firstnameImage) {
+        this.firstnameImageImg_ImgData = res[0].firstnameImage;
         this.firstnameImageImg = this.imagedata_to_image(res[0].firstnameImage);
       }
       if (this.debug && res[0].firstnameImageDebug) {
         this.firstnameImageImgDebug = this.imagedata_to_image(res[0].firstnameImageDebug);
       }
       if (res[0].ineImage) {
+        this.ineImageImg_ImgData = res[0].ineImage;
         this.ineImageImg = this.imagedata_to_image(res[0].ineImage);
       }
       if (this.debug && res[0].ineImageDebug) {
@@ -748,58 +755,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     }
     this.countRemainingFreeSheets();
   }
-  /*
-
-    // old version
-    const examSheet4CurrentStudent: IExamSheet[] = (
-      this.students.filter(s => this.selectionStudents.map((s1: IStudent) => s1.id)!.includes(s.id)).map(s => s.examSheets) as any
-    )
-      .flat()
-      .filter((ex: any) => ex?.scanId === this.exam.scanfileId);
-    // Récupère la sheet courante.
-    const examSheet4CurrentPage: IExamSheet[] = (
-      this.students
-        .filter(
-          s =>
-            s.examSheets?.some(ex => ex?.scanId === this.exam.scanfileId && ex.pagemin === this.currentStudent * this.nbreFeuilleParCopie),
-        )
-        .map(s => s.examSheets) as any
-    ).flat();
-
-    // Passe cette sheet à -1 -1. sémantique plus associé
-
-    for (const ex2 of examSheet4CurrentPage.filter(ex => !examSheet4CurrentStudent.map(ex1 => ex1.id).includes(ex!.id))) {
-      ex2!.pagemin = -1;
-      ex2!.pagemax = -1;
-      await firstValueFrom(this.sheetService.update(ex2));
-    }
-
-    // Pour l'étudiant sélectionné. récupère la sheet. Si elle existe, on met à jour les bonnes pages sinon on crée la page.
-
-    const selectedStudent = this.students.filter(s => this.selectionStudents.map((s1: IStudent) => s1.id)!.includes(s.id));
-    for (const student of selectedStudent) {
-      const examS4Student = student.examSheets?.filter((ex: IExamSheet) => ex?.scanId === this.exam.scanfileId);
-      if (examS4Student !== undefined && examS4Student.length > 0) {
-        for (const ex of examS4Student) {
-          ex.pagemin = this.currentStudent * this.nbreFeuilleParCopie;
-          ex.pagemax = (this.currentStudent + 1) * this.nbreFeuilleParCopie - 1;
-          await firstValueFrom(this.sheetService.update(ex));
-        }
-      } else {
-        const sheet: IExamSheet = {
-          name: uuid(),
-          pagemin: this.currentStudent * this.nbreFeuilleParCopie,
-          pagemax: (this.currentStudent + 1) * this.nbreFeuilleParCopie - 1,
-          scanId: this.exam.scanfileId,
-          students: this.selectionStudents,
-        };
-        const e = await firstValueFrom(this.sheetService.create(sheet));
-        for (const s1 of this.selectionStudents) {
-          s1.examSheets?.push(e.body!);
-          await firstValueFrom(this.studentService.update(s1));
-        }
-      }
-    }*/
 
   showGalleria(): void {
     this.blocked = true;
@@ -1828,8 +1783,26 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     return s?.replace(/[^A-Za-z0-9\[\] ]/g, a => this.latinMap().get(a) ?? a);
   }
 
-  executeMLTScript() {
-    this.mltcomponent.executeMLT(this.nameImageImg);
-    this.mltcomponent.executeMLT(this.firstnameImageImg);
+  async executeMLTScript(): Promise<void> {
+    let nom: string | undefined = '';
+    let prenom: string | undefined = '';
+    if (this.nameImageImg_ImgData) {
+      nom = await this.mltService.executeMLTFromImagData(
+        this.nameImageImg_ImgData!,
+        this.nameImageImg_ImgData!.width,
+        this.nameImageImg_ImgData!.height,
+      );
+    }
+    if (this.firstnameImageImg_ImgData) {
+      prenom = await this.mltService.executeMLTFromImagData(
+        this.firstnameImageImg_ImgData!,
+        this.firstnameImageImg_ImgData!.width,
+        this.firstnameImageImg_ImgData!.height,
+      );
+    }
+    this.recognizedStudent = {
+      name: this.latinise(nom),
+      firstname: this.latinise(prenom),
+    };
   }
 }

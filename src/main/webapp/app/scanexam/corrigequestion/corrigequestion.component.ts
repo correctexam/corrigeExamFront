@@ -104,7 +104,6 @@ import { ToastModule } from 'primeng/toast';
 import { SwipeDirective } from '../swipe.directive';
 import { IPrediction, Prediction } from 'app/entities/prediction/prediction.model';
 import { HttpClient } from '@angular/common/http';
-import { MltComponent } from '../mlt/deprecated/mlt.component';
 import { Zone4SameCommentOrSameGrade } from '../comparestudentanswer/comparestudentanswer.component';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
@@ -130,7 +129,7 @@ interface CommentAction {
   selector: 'jhi-corrigequestion',
   templateUrl: './corrigequestion.component.html',
   styleUrls: ['./corrigequestion.component.scss'],
-  providers: [ConfirmationService, MessageService, { provide: LOCALE_ID, useValue: 'fr' }, MltComponent],
+  providers: [ConfirmationService, MessageService, { provide: LOCALE_ID, useValue: 'fr' }],
   standalone: true,
   imports: [
     SwipeDirective,

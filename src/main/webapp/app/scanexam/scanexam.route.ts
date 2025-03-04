@@ -20,8 +20,6 @@ import { MarkingSummaryComponent } from './marking-summary/marking-summary.compo
 import { ComparestudentanswerComponent } from './comparestudentanswer/comparestudentanswer.component';
 
 import { ExportanonymoupdfComponent } from './exportanonymoupdf/exportanonymoupdf.component';
-import { SearchanswerComponent } from './mlt/deprecated/searchanswer/searchanswer.component';
-import { ImageAccessComponent } from './mlt/deprecated/image-access/image-access.component';
 
 // set the location of the OpenCV files
 // registerAllModules();
