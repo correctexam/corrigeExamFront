@@ -4,6 +4,10 @@ import { PredictionService } from 'app/entities/prediction/service/prediction.se
 import { of } from 'rxjs';
 import { Router } from '@angular/router';
 import { describe, expect } from '@jest/globals';
+import { IPrediction } from '../prediction.model';
+import { HttpResponse, provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('PredictionListComponent', () => {
   let component: PredictionListComponent;
@@ -13,19 +17,20 @@ describe('PredictionListComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [PredictionListComponent],
+      imports: [
+        PredictionListComponent,
+        TranslateModule.forRoot({
+          defaultLanguage: 'en',
+        }),
+      ],
       providers: [
-        {
-          provide: PredictionService,
-          useValue: {
-            query: jasmine.createSpy('query').and.returnValue(of([{ id: 1, text: 'Sample Prediction', questionNumber: 'Q1' }])),
-            delete: jasmine.createSpy('delete').and.returnValue(of({})),
-          },
-        },
+        provideHttpClient(),
+        provideHttpClientTesting(),
+
         {
           provide: Router,
           useValue: {
-            navigate: jasmine.createSpy('navigate'),
+            navigate: jest.fn(),
           },
         },
       ],
@@ -34,34 +39,41 @@ describe('PredictionListComponent', () => {
     fixture = TestBed.createComponent(PredictionListComponent);
     component = fixture.componentInstance;
     service = TestBed.inject(PredictionService);
+
     router = TestBed.inject(Router);
   });
 
   it('should load all predictions on init', () => {
-    component.ngOnInit();
-
-    expect(service.query).toHaveBeenCalled();
-    expect(component.predictions.length).toBeGreaterThan(0);
+    jest
+      .spyOn(service, 'query')
+      .mockReturnValue(of(new HttpResponse<IPrediction[]>({ body: [{ id: 1, text: 'Sample Prediction', questionNumber: 1 }] })));
+    component.ngOnInit().then(() => {
+      expect(service.query).toHaveBeenCalled();
+      expect(component.predictions.length).toBeGreaterThan(0);
+    });
   });
 
   it('should navigate to view page on view', () => {
     component.view(1);
 
-    expect(router.navigate).toHaveBeenCalledWith(['/prediction', 1, 'view']);
+    expect(router.navigate).toHaveBeenCalledWith(['/predictions', 1, 'view']);
   });
 
   it('should navigate to edit page on edit', () => {
+    jest.spyOn(router, 'navigate');
     component.edit(1);
 
-    expect(router.navigate).toHaveBeenCalledWith(['/prediction', 1, 'edit']);
+    expect(router.navigate).toHaveBeenCalledWith(['/predictions', 1, 'edit']);
   });
 
   it('should call delete service and reload predictions on delete', () => {
-    spyOn(window, 'confirm').and.returnValue(true);
+    jest.spyOn(window, 'confirm').mockReturnValue(true);
+    jest.spyOn(service, 'delete');
+    jest.spyOn(service, 'query');
 
-    component.delete(1);
-
-    expect(service.delete).toHaveBeenCalledWith(1);
-    expect(service.query).toHaveBeenCalled();
+    component.delete(1).then(() => {
+      expect(service.delete).toHaveBeenCalledWith(1);
+      expect(service.query).toHaveBeenCalled();
+    });
   });
 });

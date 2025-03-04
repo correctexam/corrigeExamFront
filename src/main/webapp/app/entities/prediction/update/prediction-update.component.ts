@@ -6,6 +6,7 @@ import { IPrediction } from '../prediction.model';
 @Component({
   selector: 'app-prediction-update',
   templateUrl: './prediction-update.component.html',
+  standalone: true,
 })
 export class PredictionUpdateComponent implements OnInit {
   prediction: IPrediction = { id: undefined, text: '', questionNumber: undefined };

@@ -12,13 +12,17 @@ describe('PredictionUpdateComponent', () => {
   let service: PredictionService;
   let router: Router;
 
+  const createmockCallback = jest.fn();
+  const updatemockCallback = jest.fn();
+  const navigatemockCallback = jest.fn();
+
   beforeEach(() => {
     const mockActivatedRoute = {
       data: of({ prediction: { id: 123, text: 'Sample Prediction', questionNumber: 'Q1' } }),
     };
 
     TestBed.configureTestingModule({
-      declarations: [PredictionUpdateComponent],
+      imports: [PredictionUpdateComponent],
       providers: [
         {
           provide: ActivatedRoute,
@@ -27,14 +31,14 @@ describe('PredictionUpdateComponent', () => {
         {
           provide: Router,
           useValue: {
-            navigate: jasmine.createSpy('navigate'),
+            navigate: navigatemockCallback,
           },
         },
         {
           provide: PredictionService,
           useValue: {
-            update: jasmine.createSpy('update').and.returnValue(of({})),
-            create: jasmine.createSpy('create').and.returnValue(of({})),
+            update: updatemockCallback.mockReturnValue(of({})),
+            create: createmockCallback.mockReturnValue(of({})),
           },
         },
       ],
@@ -52,14 +56,14 @@ describe('PredictionUpdateComponent', () => {
   });
 
   it('should call update service when saving an existing prediction', () => {
-    component.prediction = { id: 123, text: 'Updated Prediction', questionNumber: 'Q2' };
+    component.prediction = { id: 123, text: 'Updated Prediction', questionNumber: 2 };
     component.save();
     expect(service.update).toHaveBeenCalledWith(component.prediction);
     expect(router.navigate).toHaveBeenCalledWith(['/predictions']);
   });
 
   it('should call create service when saving a new prediction', () => {
-    component.prediction = { id: undefined, text: 'New Prediction', questionNumber: 'Q3' };
+    component.prediction = { id: undefined, text: 'New Prediction', questionNumber: 3 };
     component.save();
     expect(service.create).toHaveBeenCalledWith(component.prediction);
     expect(router.navigate).toHaveBeenCalledWith(['/predictions']);

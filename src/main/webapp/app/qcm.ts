@@ -70,7 +70,6 @@ export function trace(message: any): void {
   postMessage({ msg: { log: message }, uid: '-2' });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function debugImage(imageData: ImageData): void {
   try {
     const c = new OffscreenCanvas(imageData.width, imageData.height);
