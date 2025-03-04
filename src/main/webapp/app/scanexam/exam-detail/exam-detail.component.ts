@@ -103,8 +103,6 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
 
   infoExamDetail = { nbrepagenonalign: 0, nbrepagealign: 0, nbrepagetemplate: 0, nbrecopie: 0, cond1: false, cond2: false, cond3: false };
 
-  developementMode: boolean = false;
-
   constructor(
     public courseService: CourseService,
     public examService: ExamService,
@@ -129,7 +127,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     this.showAssociation = v;
   }
 
-  async setShowCorrection(v: boolean): Promise<void> {
+  setShowCorrection(v: boolean): void {
     this.showCorrection = v;
     if (v) {
       this.examService.getExamStatusFinish(+this.examId).then(res => {
@@ -146,7 +144,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     });
   }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     this.firsthelpvalue = this.preferenceService.showFirstCorrectMessage();
     this.firsthelp = this.firsthelpvalue;
     this.activatedRoute.paramMap.subscribe(params => {
@@ -278,22 +276,12 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
             numberPagesInScan: this.numberPagesInScan,
           })
           .subscribe(
-            async sheetsbody => {
+            sheetsbody => {
               this.blocked = false;
               this.sheets = sheetsbody.body!.filter(sh => sh.pagemin !== -1);
 
-              //            const ex2 = (this.students.map(s => s.examSheets) as any)
-              //              .flat()
-              //              .filter((ex1: any) => ex1.scanId === this.exam!.scanfileId && ex1.pagemin !== -1).length;
-              //            console.error(ex2, this.numberPagesInScan / this.nbreFeuilleParCopie, this.numberPagesInScan, this.nbreFeuilleParCopie);
               this.showCorrection =
                 this.sheets.length === this.numberPagesInScan / this.nbreFeuilleParCopie && this.showAssociation && this.showAlignement;
-
-              /*              if (this.showCorrection || this.showAssociation) {
-                this.imageAccessComponent.examId = this.examId;
-                console.log('I start creating the predictions');
-                await this.imageAccessComponent.loadImages(this.examId);
-              }*/
 
               this.examService.getExamStatusFinish(+this.examId).then(res => {
                 this.correctionFinish = res;
@@ -438,11 +426,6 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     const p = await this.db.countNonAlignImage(+this.examId);
     const p1 = await this.db.countAlignImage(+this.examId);
     const nbreSheet = this.sheets.length;
-    /* this.students
-      ? (this.students.map(s => s.examSheets) as any)
-          .flat()
-          .filter((ex1: any) => ex1.scanId === this.exam!.scanfileId && ex1.pagemin !== -1).length
-      : 0; */
 
     const samepage = p > 0 && p1 > 0 && p === p1;
     const cond2 = nbreSheet === p1 / dbTemplate;

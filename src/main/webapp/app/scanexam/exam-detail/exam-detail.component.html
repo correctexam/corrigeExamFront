@@ -169,24 +169,6 @@
             ><BR />
             <span jhiTranslate="scanexam.showresult"> Voir résultats</span>
           </button>
-          <button
-            *ngIf="developementMode"
-            [routerLink]="'/search_answear/' + this.examId"
-            [style]="{ marginBottom: '1em', margin: '1em' }"
-            [tooltipZIndex]="'3000'"
-            [pTooltip]="'scanexam.examanswerresearchdetail' | translate"
-            tooltipPosition="top"
-            class="p-element p-ripple button80"
-            pButton
-            pRipple
-            type="button"
-            [disabled]="blocked || !showCorrection"
-          >
-            <fa-stack>
-              <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
-              <fa-icon [icon]="'database'" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
-            ><BR /> <span jhiTranslate="scanexam.examanswerresearch"></span><span *ngIf="correctionFinish">✅</span>
-          </button>
         </div>
       </div>
     </div>

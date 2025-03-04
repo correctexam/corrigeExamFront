@@ -60,7 +60,6 @@
               "src/main/webapp/favicon.ico",
               "src/main/webapp/manifest.webapp",
               "src/main/webapp/robots.txt",
-              "src/main/webapp/content/images/refined_line_2.png",
               {
                 "glob": "**/*",
                 "input": "src/main/webapp/public",
