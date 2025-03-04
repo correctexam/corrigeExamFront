@@ -450,7 +450,6 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   }
 
   displayImage(v: ImageZone, imageRef: ElementRef<any> | undefined, show: (s: boolean) => void): void {
-    console.log('I am here displayImage');
     if (imageRef !== undefined) {
       imageRef!.nativeElement.width = v.w * this.scale;
       imageRef!.nativeElement.height = v.h * this.scale;
@@ -714,7 +713,6 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
       templat: templat,
       copies: l,
     };
-    //    console.error(clus)
     // TODO manager stepvalue
     this.http
       .post<Zone4SameCommentOrSameGrade>(
