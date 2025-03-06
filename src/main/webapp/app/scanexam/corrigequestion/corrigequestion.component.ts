@@ -1127,21 +1127,30 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  setNoteZero() {
+  async setNoteZero() {
     this.currentNote = 0;
-    this.changeNote();
+    await this.changeNote();
   }
 
-  changeNote(): void {
+  async changeNote(): Promise<void> {
     if (this.resp !== undefined && !this.blocked) {
       this.blocked = true;
       // When cancelling the marking, in fact it means marking to 0
       this.currentNote ??= 0;
       this.resp!.note = this.currentNote;
-      this.updateResponseRequest(this.resp!).subscribe(sr1 => {
-        this.resp = sr1.body!;
-        this.blocked = false;
-      });
+      const sr1 = await firstValueFrom(this.updateResponseRequest(this.resp!));
+      this.resp = sr1.body!;
+      if (this.dropdownOpen && this.synchrocomments && this.selectedpredictions().length > 0) {
+        await firstValueFrom(
+          this.sheetService.updateStudentsResponseWithNotes(
+            +this.examId!,
+            this.currentQuestion!.numero!,
+            this.currentNote,
+            this.selectedpredictions().map(s => s.sheetId!),
+          ),
+        );
+      }
+      this.blocked = false;
     }
   }
 
@@ -1246,6 +1255,18 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     self.resp?.textcomments?.push(comment);
     const resp1 = await firstValueFrom(self.updateResponseRequest(self.resp!));
     self.resp = resp1.body!;
+    (comment as any).checked = true;
+    if (self.dropdownOpen && self.synchrocomments && self.selectedpredictions().length > 0) {
+      await firstValueFrom(
+        self.sheetService.updateStudentsResponseWithTComment(
+          +self.examId!,
+          comment.id!,
+          self.currentQuestion!.numero!,
+          true,
+          self.selectedpredictions().map(s => s.sheetId!),
+        ),
+      );
+    }
   }
 
   private async retirerTComment(comment: ITextComment, self: CorrigequestionComponent) {
@@ -1257,6 +1278,65 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     const resp1 = await firstValueFrom(self.updateResponseRequest(self.resp!));
     self.resp = resp1.body!;
     (comment as any).checked = false;
+    if (self.dropdownOpen && self.synchrocomments && self.selectedpredictions().length > 0) {
+      await firstValueFrom(
+        self.sheetService.updateStudentsResponseWithTComment(
+          +self.examId!,
+          comment.id!,
+          self.currentQuestion!.numero!,
+          false,
+          self.selectedpredictions().map(s => s.sheetId!),
+        ),
+      );
+    }
+  }
+
+  private async ajouterGComment(comment: IGradedComment, self: CorrigequestionComponent) {
+    if (!self.resp!.id) {
+      const ret = await firstValueFrom(self.updateResponseRequest(self.resp!));
+      self.resp = ret!.body!;
+    }
+
+    self.resp?.gradedcomments?.push(comment);
+
+    const resp1 = await firstValueFrom(self.updateResponseRequest(self.resp!));
+    self.resp = resp1.body!;
+    await self.computeNote(true, self.resp!, self.currentQuestion!);
+    if (self.dropdownOpen && self.synchrocomments && self.selectedpredictions().length > 0) {
+      await firstValueFrom(
+        self.sheetService.updateStudentsResponseWithGComment(
+          +self.examId!,
+          comment.id!,
+          self.currentQuestion!.numero!,
+          true,
+          self.selectedpredictions().map(s => s.sheetId!),
+        ),
+      );
+    }
+  }
+
+  private async retirerGComment(comment: IGradedComment, self: CorrigequestionComponent) {
+    self.blocked = true;
+    if (!self.resp!.id) {
+      const ret = await firstValueFrom(self.updateResponseRequest(self.resp!));
+      self.resp = ret!.body!;
+    }
+    self.resp!.gradedcomments = self.resp?.gradedcomments!.filter(e => e.id !== comment.id);
+    self.blocked = true;
+    const resp1 = await firstValueFrom(self.updateResponseRequest(self.resp!));
+    self.resp = resp1.body!;
+    await self.computeNote(true, self.resp!, self.currentQuestion!);
+    if (self.dropdownOpen && self.synchrocomments && self.selectedpredictions().length > 0) {
+      await firstValueFrom(
+        self.sheetService.updateStudentsResponseWithGComment(
+          +self.examId!,
+          comment.id!,
+          self.currentQuestion!.numero!,
+          false,
+          self.selectedpredictions().map(s => s.sheetId!),
+        ),
+      );
+    }
   }
 
   incrementHComment(comment: IHybridGradedComment) {
@@ -1285,6 +1365,27 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
 
       await self.computeNote(true, self.resp!, self.currentQuestion!);
+      console.error('pass par la');
+      if (self.dropdownOpen && self.synchrocomments && self.selectedpredictions().length > 0) {
+        console.error('pass par la1');
+        console.error(
+          'pass par la2',
+          +self.examId!,
+          comment.id!,
+          self.currentQuestion!.numero!,
+          ah.body!.stepValue!,
+          self.selectedpredictions().map(s => s.sheetId!),
+        );
+        await firstValueFrom(
+          self.sheetService.updateStudentsResponseWithHComment(
+            +self.examId!,
+            comment.id!,
+            self.currentQuestion!.numero!,
+            ah.body!.stepValue!,
+            self.selectedpredictions().map(s => s.sheetId!),
+          ),
+        );
+      }
     }
   }
 
@@ -1381,32 +1482,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       (comment as any).checked = false;
       this.fillorcreateQueryPool(this.retirerTComment, comment);
     }
-  }
-
-  private async ajouterGComment(comment: IGradedComment, self: CorrigequestionComponent) {
-    if (!self.resp!.id) {
-      const ret = await firstValueFrom(self.updateResponseRequest(self.resp!));
-      self.resp = ret!.body!;
-    }
-
-    self.resp?.gradedcomments?.push(comment);
-
-    const resp1 = await firstValueFrom(self.updateResponseRequest(self.resp!));
-    self.resp = resp1.body!;
-    await self.computeNote(true, self.resp!, self.currentQuestion!);
-  }
-
-  private async retirerGComment(comment: IGradedComment, self: CorrigequestionComponent) {
-    self.blocked = true;
-    if (!self.resp!.id) {
-      const ret = await firstValueFrom(self.updateResponseRequest(self.resp!));
-      self.resp = ret!.body!;
-    }
-    self.resp!.gradedcomments = self.resp?.gradedcomments!.filter(e => e.id !== comment.id);
-    self.blocked = true;
-    const resp1 = await firstValueFrom(self.updateResponseRequest(self.resp!));
-    self.resp = resp1.body!;
-    await self.computeNote(true, self.resp!, self.currentQuestion!);
   }
 
   updateNote4updateQuestion(update: boolean, resp: IStudentResponse, currentQ: IQuestion[]): Promise<IStudentResponse | undefined> {
@@ -2982,6 +3057,17 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
 
       await this.computeNote(true, this.resp!, this.currentQuestion!);
+      if (this.dropdownOpen && this.synchrocomments && this.selectedpredictions().length > 0) {
+        await firstValueFrom(
+          this.sheetService.updateStudentsResponseWithHComment(
+            +this.examId!,
+            comment.id!,
+            this.currentQuestion!.numero!,
+            ah.body!.stepValue!,
+            this.selectedpredictions().map(s => s.sheetId!),
+          ),
+        );
+      }
     }
   }
 

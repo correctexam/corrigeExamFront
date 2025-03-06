@@ -572,8 +572,8 @@
     "manuscriptcorrectlabel": "Analyse OCR",
     "deletemanuscriptcorrect": "Permet de supprimer toutes les prédictions calculées à l'aide de l'outil d'OCR",
     "deletemanuscriptcorrectlabel": "Suppression Prédiction OCR",
-    "synchrocomments": "Synchronisation des commentaires :",
-    "synchrocommentsTooltip": "Quand l'option est sélectionnée, si vous appliquez un commentaire sur la vue correction, ce commentaire est appliqué à l'ensemble des réponses similaires sélectionnées.",
+    "synchrocomments": "Synchronisation commentaires/notes :",
+    "synchrocommentsTooltip": "Quand l'option est sélectionnée, si vous appliquez un commentaire ou une note directe sur la vue correction, ce commentaire ou cette note est appliqué à l'ensemble des réponses similaires sélectionnées.",
     "filterallexamsheets": "Recherche par mot clé sur l'ensemble des copies :",
     "filterallexamsheetsTooltip": "Applique la recherche sur l'ensemble des prédictions des copies (pas seulement sur celles qui semblent au départ proche sémantiquement).",
     "toomuchsimilarResults": "Trop de réponses similaires trouvées"

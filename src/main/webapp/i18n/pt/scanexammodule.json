@@ -572,8 +572,8 @@
     "manuscriptcorrectlabel": "Análise OCR",
     "deletemanuscriptcorrect": "Elimina todas as estimativas calculadas com a ferramenta OCR",
     "deletemanuscriptcorrectlabel": "Previsão de OCR de eliminação",
-    "synchrocomments": "Sincronização dos comentários :",
-    "synchrocommentsTooltip": "Quando esta opção está selecionada, se aplicar um comentário à vista de correção, este comentário é aplicado a todas as respostas semelhantes selecionadas.",
+    "synchrocomments": "Comentários/classificações sincronizados:",
+    "synchrocommentsTooltip": "Quando esta opção está selecionada, se aplicar um comentário ou uma classificação direta à vista de correção, este comentário/classificação é aplicado a todas as respostas semelhantes selecionadas.",
     "filterallexamsheets": "Busca por palavra-chave em todas as provas :",
     "filterallexamsheetsTooltip": "Aplica a pesquisa a todas as estimativas de provas (não apenas àquelas que inicialmente parecem semanticamente próximas).",
     "toomuchsimilarResults": "Foram encontradas demasiadas respostas semelhantes"
