@@ -570,6 +570,8 @@
     "filterallexamsheetsTooltip": "Applies the search to all the predicted words (not only to those that initially appear to be semantically similar)",
     "toomuchsimilarResults": "Too many similar answers found",
     "boxname": "One box per letter/number",
-    "boxnameTooltip": "Option to use a student name or number recognition tool based on the fact that each letter/number has been entered in a box. In the other case, it will use a related handwriting recognition technique."
+    "boxnameTooltip": "Option to use a student name or number recognition tool based on the fact that each letter/number has been entered in a box. In the other case, it will use a related handwriting recognition technique.",
+    "coursnonarchive": "Active course",
+    "coursarchive": "Archived course"
   }
 }

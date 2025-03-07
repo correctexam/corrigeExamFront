@@ -6,7 +6,7 @@
       <p jhiTranslate="scanexam.slogan2">votre correction de copies assistée à l'aide du numérique</p>
     </div>
     <div id="form-total" pDroppable (onDrop)="drop(false)">
-      <h4>Cours actif</h4>
+      <h4 jhiTranslate="scanexam.coursnonarchive">Cours actif</h4>
       <div class="inner" [style]="{ 'text-align': 'center' }">
         <button
           pDraggable
@@ -35,7 +35,7 @@
       </div>
     </div>
     <div id="form-total1" pDroppable (onDrop)="drop(true)">
-      <h4>Cours archivée</h4>
+      <h4 jhiTranslate="scanexam.coursarchive">Cours archivée</h4>
       <div class="inner" [style]="{ 'text-align': 'center' }">
         <button
           pDraggable

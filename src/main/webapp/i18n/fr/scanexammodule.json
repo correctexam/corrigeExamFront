@@ -578,6 +578,8 @@
     "filterallexamsheetsTooltip": "Applique la recherche sur l'ensemble des prédictions des copies (pas seulement sur celles qui semblent au départ proche sémantiquement).",
     "toomuchsimilarResults": "Trop de réponses similaires trouvées",
     "boxname": "Une case par lettre/chiffre",
-    "boxnameTooltip": "Option pour utiliser un outil de reconnaissance de nom ou de numéro étudiant qui se fonde sur le fait que chaque lettre/nombre a été inscrite dans une case"
+    "boxnameTooltip": "Option pour utiliser un outil de reconnaissance de nom ou de numéro étudiant qui se fonde sur le fait que chaque lettre/nombre a été inscrite dans une case. Dans l'autre cas, il utilisera une technique de reconnaissance d'écriture manuscrite liée",
+    "coursnonarchive": "Cours actif",
+    "coursarchive": "Cours archivé"
   }
 }

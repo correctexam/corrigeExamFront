@@ -578,6 +578,8 @@
     "filterallexamsheetsTooltip": "Aplica a pesquisa a todas as estimativas de provas (não apenas àquelas que inicialmente parecem semanticamente próximas).",
     "toomuchsimilarResults": "Foram encontradas demasiadas respostas semelhantes",
     "boxname": "Uma caixa por letra/número",
-    "boxnameTooltip": "Opção de utilizar uma ferramenta de reconhecimento do nome ou do número do aluno com base no facto de cada letra/número ter sido escrito numa caixa. No outro caso, utilizará uma técnica de reconhecimento de escrita manual ligada a"
+    "boxnameTooltip": "Opção de utilizar uma ferramenta de reconhecimento do nome ou do número do aluno com base no facto de cada letra/número ter sido escrito numa caixa. No outro caso, utilizará uma técnica de reconhecimento de escrita manual ligada a",
+    "coursnonarchive": "Curso ativo",
+    "coursarchive": "Curso arquivado"
   }
 }
