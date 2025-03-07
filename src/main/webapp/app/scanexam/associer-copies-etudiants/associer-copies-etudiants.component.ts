@@ -178,7 +178,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   columnstyle = {
     width: '100%',
   };
-
+  boxname = true;
   nameImageImg?: string;
   firstnameImageImg?: string;
   ineImageImg?: string;
@@ -281,7 +281,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
               this.nbreFeuilleParCopie = value[0];
               this.numberPagesInScan = value[1];
               this.exam = value[2].body!;
-
+              if (this.exam.templateNameBoxCase !== undefined) {
+                this.boxname = this.exam.templateNameBoxCase;
+              }
               this.updateTitle();
               this.translateService.onLangChange.subscribe(() => {
                 this.updateTitle();
@@ -366,7 +368,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     const res = await this.testLoadImage4pages([this.currentStudent! * this.nbreFeuilleParCopie!]);
     console.timeLog('loadpage', 'after testLoadImage4pages');
     console.timeLog('loadpagesameexam', 'after testLoadImage4pages');
-
     if (res.length === 1) {
       this.predictionprecision = res[0].predictionprecision;
       this.recognizedStudent = res[0].recognizedStudent;
@@ -455,8 +456,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
         removeHorizontal: this.preferenceService.getPreference().removeHorizontalName,
         looking4missing: true,
         preferences: this.preferenceService.getPreference(),
-        assist: this.assisted,
-        debug: this.debug,
+        assist: this.assisted && this.exam.templateNameBoxCase!,
+        debug: this.debug && this.exam.templateNameBoxCase!,
       };
       const output: PredictResult[] = [];
       console.timeLog('loadpage', 'before doPredictions');
@@ -469,14 +470,14 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
         let result: PredictResult = { predictionprecision: 0, page: r1.page };
         if (r1.nameZone) {
           result.nameImage = new ImageData(new Uint8ClampedArray(r1.nameZone), r1.nameZoneW!, r1.nameZoneH!);
-          if (this.debug && r1.nameZoneDebug) {
+          if (this.debug && this.exam.templateNameBoxCase! && r1.nameZoneDebug) {
             result.nameImageDebug = new ImageData(new Uint8ClampedArray(r1.nameZoneDebug), r1.nameZoneW!, r1.nameZoneH!);
           }
         }
 
         if (r1.firstnameZone) {
           result.firstnameImage = new ImageData(new Uint8ClampedArray(r1.firstnameZone), r1.firstnameZoneW!, r1.firstnameZoneH!);
-          if (this.debug && r1.firstnameZoneDebug) {
+          if (this.debug && this.exam.templateNameBoxCase! && r1.firstnameZoneDebug) {
             result.firstnameImageDebug = new ImageData(
               new Uint8ClampedArray(r1.firstnameZoneDebug),
               r1.firstnameZoneW!,
@@ -486,14 +487,86 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
         }
         if (r1.ineZone) {
           result.ineImage = new ImageData(new Uint8ClampedArray(r1.ineZone), r1.ineZoneW!, r1.ineZoneH!);
-          if (this.debug && r1.ineZoneDebug) {
+          if (this.debug && this.exam.templateNameBoxCase! && r1.ineZoneDebug) {
             result.ineImageDebug = new ImageData(new Uint8ClampedArray(r1.ineZoneDebug), r1.ineZoneW!, r1.ineZoneH!);
           }
         }
 
-        if (r1.resultPrediction.length > 0) {
+        if (r1.resultPrediction.length > 0 && this.exam.templateNameBoxCase!) {
           result.predictionprecision = r1.resultPrediction[0].proba! * r1.resultPrediction[0].score!;
           result.recognizedStudent = this.students.find(st => st.id === r1.resultPrediction[0].id);
+        } else if (this.assisted && !this.exam.templateNameBoxCase!) {
+          const s = await this.executeMLTScript(result);
+          if (s.name && s.ine && s.firstname) {
+            const s2 = candidates.map(
+              c =>
+                levenshteinDistance(c.name!, s.name!) +
+                levenshteinDistance(c.firstname!, s.firstname!) +
+                levenshteinDistance(c.ine!, s.ine!),
+            );
+            const min = Math.min(...s2);
+            const index = s2.indexOf(min);
+            if (index !== -1) {
+              result.recognizedStudent = candidates[index];
+              const length =
+                result.recognizedStudent.name!.length + result.recognizedStudent.firstname!.length + result.recognizedStudent.ine!.length;
+              result.predictionprecision = ((length - min) * 100) / length;
+            }
+          } else if (s.name && s.firstname) {
+            const s2 = candidates.map(c => levenshteinDistance(c.name!, s.name!) + levenshteinDistance(c.firstname!, s.firstname!));
+            const min = Math.min(...s2);
+            const index = s2.indexOf(min);
+            if (index !== -1) {
+              result.recognizedStudent = candidates[index];
+              const length = result.recognizedStudent.name!.length + result.recognizedStudent.firstname!.length;
+              result.predictionprecision = ((length - min) * 100) / length;
+            }
+          } else if (s.name && s.ine) {
+            const s2 = candidates.map(c => levenshteinDistance(c.name!, s.name!) + levenshteinDistance(c.ine!, s.ine!));
+            const min = Math.min(...s2);
+            const index = s2.indexOf(min);
+            if (index !== -1) {
+              result.recognizedStudent = candidates[index];
+              const length = result.recognizedStudent.name!.length + result.recognizedStudent.ine!.length;
+              result.predictionprecision = ((length - min) * 100) / length;
+            }
+          } else if (s.firstname && s.ine) {
+            const s2 = candidates.map(c => levenshteinDistance(c.firstname!, s.firstname!) + levenshteinDistance(c.ine!, s.ine!));
+            const min = Math.min(...s2);
+            const index = s2.indexOf(min);
+            if (index !== -1) {
+              result.recognizedStudent = candidates[index];
+              const length = result.recognizedStudent.firstname!.length + result.recognizedStudent.ine!.length;
+              result.predictionprecision = ((length - min) * 100) / length;
+            }
+          } else if (s.name) {
+            const s2 = candidates.map(c => levenshteinDistance(c.name!, s.name!));
+            const min = Math.min(...s2);
+            const index = s2.indexOf(min);
+            if (index !== -1) {
+              result.recognizedStudent = candidates[index];
+              const length = result.recognizedStudent.name!.length;
+              result.predictionprecision = ((length - min) * 100) / length;
+            }
+          } else if (s.firstname) {
+            const s2 = candidates.map(c => levenshteinDistance(c.firstname!, s.firstname!));
+            const min = Math.min(...s2);
+            const index = s2.indexOf(min);
+            if (index !== -1) {
+              result.recognizedStudent = candidates[index];
+              const length = result.recognizedStudent.firstname!.length;
+              result.predictionprecision = ((length - min) * 100) / length;
+            }
+          } else if (s.ine) {
+            const s2 = candidates.map(c => levenshteinDistance(c.ine!, s.ine!));
+            const min = Math.min(...s2);
+            const index = s2.indexOf(min);
+            if (index !== -1) {
+              result.recognizedStudent = candidates[index];
+              const length = result.recognizedStudent.ine!.length;
+              result.predictionprecision = ((length - min) * 100) / length;
+            }
+          }
         }
         output.push(result);
       }
@@ -1783,26 +1856,65 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     return s?.replace(/[^A-Za-z0-9\[\] ]/g, a => this.latinMap().get(a) ?? a);
   }
 
-  async executeMLTScript(): Promise<void> {
+  async executeMLTScript(self: PredictResult): Promise<IStudent> {
     let nom: string | undefined = '';
     let prenom: string | undefined = '';
-    if (this.nameImageImg_ImgData) {
-      nom = await this.mltService.executeMLTFromImagData(
-        this.nameImageImg_ImgData!,
-        this.nameImageImg_ImgData!.width,
-        this.nameImageImg_ImgData!.height,
-      );
+    let ine: string | undefined = '';
+    const st = new Student();
+
+    if (self.nameImage) {
+      nom = await this.mltService.executeMLTFromImagData(self.nameImage!, self.nameImage!.width, self.nameImage!.height);
+      st.name = nom;
     }
-    if (this.firstnameImageImg_ImgData) {
-      prenom = await this.mltService.executeMLTFromImagData(
-        this.firstnameImageImg_ImgData!,
-        this.firstnameImageImg_ImgData!.width,
-        this.firstnameImageImg_ImgData!.height,
-      );
+    if (self.firstnameImage) {
+      prenom = await this.mltService.executeMLTFromImagData(self.firstnameImage!, self.firstnameImage!.width, self.firstnameImage!.height);
+      st.firstname = prenom;
     }
-    this.recognizedStudent = {
-      name: this.latinise(nom),
-      firstname: this.latinise(prenom),
-    };
+
+    if (self.ineImage) {
+      ine = await this.mltService.executeMLTFromImagData(self.ineImage!, self.ineImage!.width, self.ineImage!.height);
+      st.ine = ine;
+    }
+    // this.recognizedStudent = st;
+    return st;
   }
+
+  async updateExam(): Promise<void> {
+    if (this.exam) {
+      this.exam.templateNameBoxCase = this.boxname;
+      await firstValueFrom(this.examService.update(this.exam));
+      await this.loadImage();
+    }
+  }
+}
+
+function levenshteinDistance(a: string, b: string): number {
+  // Create a 2D array to store the distances
+  let distances = new Array(a.length + 1);
+  for (let i = 0; i <= a.length; i++) {
+    distances[i] = new Array(b.length + 1);
+  }
+
+  // Initialize the first row and column
+  for (let i = 0; i <= a.length; i++) {
+    distances[i][0] = i;
+  }
+  for (let j = 0; j <= b.length; j++) {
+    distances[0][j] = j;
+  }
+
+  // Fill in the rest of the array
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      if (a[i - 1] === b[j - 1]) {
+        distances[i][j] = distances[i - 1][j - 1];
+      } else {
+        distances[i][j] = Math.min(distances[i - 1][j], distances[i][j - 1], distances[i - 1][j - 1]) + 1;
+      }
+    }
+  }
+
+  // Return the final distance
+
+  return distances[a.length][b.length];
 }

@@ -64,6 +64,16 @@
         [tooltipPosition]="'right'"
       ></p-toggleSwitch>
     </div>
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <label jhiTranslate="scanexam.boxname">Une case par lettre</label>
+      <p-toggleSwitch
+        [(ngModel)]="boxname"
+        (onChange)="updateExam()"
+        [pTooltip]="'scanexam.boxnameTooltip' | translate"
+        [tooltipZIndex]="'3000'"
+        [tooltipPosition]="'right'"
+      ></p-toggleSwitch>
+    </div>
 
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <label><span jhiTranslate="scanexam.zoomfactor"> Facteur d'agrandissement: </span>{{ factor }} </label>
@@ -144,7 +154,7 @@
             <button *ngIf="selectionStudents.length > 0" pButton icon="pi pi-times" (click)="unbindCurrentStudent()"></button>
 
             <BR />
-            <ng-container *ngIf="assisted && recognizedStudent !== undefined && predictionprecision > 0.07">
+            <ng-container *ngIf="assisted && recognizedStudent !== undefined">
               <span><span jhiTranslate="scanexam.aistudent">Etudiant(es) Reconnu(es):</span> {{ showRecognizedStudent() }}</span>
             </ng-container>
 
@@ -209,11 +219,6 @@
             >
               Show full page
             </button>
-          </div>
-        </div>
-        <div class="col-3">
-          <div class="d-flex justify-content-end">
-            <button pButton (click)="executeMLTScript()" jhiTranslate="scanexam.executeMLT">Execute MLT</button>
           </div>
         </div>
       </div>

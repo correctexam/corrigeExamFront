@@ -94,6 +94,7 @@ export class AllbindingsComponent implements OnInit {
       ...new Set(this.students.filter(s => s.recognizedStudent !== undefined).flatMap(s => s.recognizedStudent.examSheets!)),
     ].filter(
       sh =>
+        sh &&
         sh.pagemin === currentStudent * this.nbreFeuilleParCopie &&
         sh.pagemax === (currentStudent + 1) * this.nbreFeuilleParCopie - 1 &&
         sh.scanId === this.exam.scanfileId,

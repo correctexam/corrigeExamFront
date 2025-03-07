@@ -576,6 +576,8 @@
     "synchrocommentsTooltip": "Quand l'option est sélectionnée, si vous appliquez un commentaire ou une note directe sur la vue correction, ce commentaire ou cette note est appliqué à l'ensemble des réponses similaires sélectionnées.",
     "filterallexamsheets": "Recherche par mot clé sur l'ensemble des copies :",
     "filterallexamsheetsTooltip": "Applique la recherche sur l'ensemble des prédictions des copies (pas seulement sur celles qui semblent au départ proche sémantiquement).",
-    "toomuchsimilarResults": "Trop de réponses similaires trouvées"
+    "toomuchsimilarResults": "Trop de réponses similaires trouvées",
+    "boxname": "Une case par lettre/chiffre",
+    "boxnameTooltip": "Option pour utiliser un outil de reconnaissance de nom ou de numéro étudiant qui se fonde sur le fait que chaque lettre/nombre a été inscrite dans une case"
   }
 }

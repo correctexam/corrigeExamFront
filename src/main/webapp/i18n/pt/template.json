@@ -21,6 +21,7 @@
       "name": "Nome",
       "content": "Enunciado da avaliação:",
       "mark": "O modelo contém marcadores de alinhamento?",
+      "caseBoxName": "A disciplina contém marcadores para cada uma das letras dos identificadores dos alunos?",
       "autoMapStudentCopyToList": "Associação automática prova - estudante",
       "exam": "Avaliação"
     }

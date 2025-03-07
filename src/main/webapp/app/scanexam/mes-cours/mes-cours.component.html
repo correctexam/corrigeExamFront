@@ -5,16 +5,49 @@
       <h3 jhiTranslate="scanexam.mescours">Mes cours</h3>
       <p jhiTranslate="scanexam.slogan2">votre correction de copies assistée à l'aide du numérique</p>
     </div>
-    <div id="form-total" #formTotal>
+    <div id="form-total" pDroppable (onDrop)="drop(false)">
+      <h4>Cours actif</h4>
       <div class="inner" [style]="{ 'text-align': 'center' }">
         <button
-          *ngFor="let course of courses"
+          pDraggable
+          *ngFor="let course of coursesnonarchived()"
           [style]="{ marginBottom: '1em', margin: '1em' }"
           class="p-element p-ripple button80"
           pButton
           pRipple
           type="button"
           [routerLink]="'course/' + course.id"
+          (onDragStart)="dragStart(course)"
+          (onDragEnd)="dragEnd()"
+        >
+          <fa-stack>
+            <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
+            <fa-icon [icon]="faGraduationCap" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
+          ><BR /> <span>{{ course.name }}</span
+          ><span *jhiHasAnyAuthority="'ROLE_ADMIN'"
+            >(
+            <span *ngFor="let prof of course.profs; let index = index; let isFirst = first"
+              ><span *ngIf="!isFirst">, </span>{{ prof.login }}</span
+            >
+            )</span
+          >
+        </button>
+      </div>
+    </div>
+    <div id="form-total1" pDroppable (onDrop)="drop(true)">
+      <h4>Cours archivée</h4>
+      <div class="inner" [style]="{ 'text-align': 'center' }">
+        <button
+          pDraggable
+          *ngFor="let course of coursesarchived()"
+          [style]="{ marginBottom: '1em', margin: '1em' }"
+          class="p-element p-ripple button80"
+          pButton
+          pRipple
+          type="button"
+          [routerLink]="'course/' + course.id"
+          (onDragStart)="dragStart(course)"
+          (onDragEnd)="dragEnd()"
         >
           <fa-stack>
             <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
