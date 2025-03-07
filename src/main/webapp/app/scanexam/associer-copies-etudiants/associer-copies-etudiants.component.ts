@@ -44,6 +44,7 @@ import { BlockUIModule } from 'primeng/blockui';
 import { ToastModule } from 'primeng/toast';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { MLTService } from '../mlt/mlt.service';
+import { TemplateService } from 'app/entities/template/service/template.service';
 
 export interface IPage {
   image?: ImageData;
@@ -244,6 +245,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     public dialogService: DialogService,
     private titleService: Title,
     private mltService: MLTService,
+    private templateService: TemplateService,
   ) {
     effect(
       () => {
@@ -1880,9 +1882,14 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   }
 
   async updateExam(): Promise<void> {
+    this.exam.templateNameBoxCase = this.boxname;
     if (this.exam) {
-      this.exam.templateNameBoxCase = this.boxname;
-      await firstValueFrom(this.examService.update(this.exam));
+      await firstValueFrom(
+        this.templateService.partialUpdate({
+          id: this.exam.templateId,
+          caseboxname: this.boxname,
+        }),
+      );
       await this.loadImage();
     }
   }
