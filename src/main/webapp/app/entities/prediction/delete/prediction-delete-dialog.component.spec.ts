@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { PredictionDeleteDialogComponent } from './prediction-delete-dialog.component';
 import { PredictionService } from 'app/entities/prediction/service/prediction.service';
-import { of } from 'rxjs';
 import { describe, expect } from '@jest/globals';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
