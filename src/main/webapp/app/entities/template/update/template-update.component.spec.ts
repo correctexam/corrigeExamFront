@@ -60,7 +60,16 @@ describe('Template Management Update Component', () => {
     it('Should call update service on save for existing entity', () => {
       // GIVEN
       const saveSubject = new Subject<HttpResponse<Template>>();
-      const template = { id: 123 };
+      const template = {
+        id: 123,
+        autoMapStudentCopyToList: undefined,
+        caseboxname: true,
+        content: undefined,
+        contentContentType: undefined,
+        exam: undefined,
+        mark: undefined,
+        name: undefined,
+      };
       jest.spyOn(templateService, 'update').mockReturnValue(saveSubject);
       jest.spyOn(comp, 'previousState');
       activatedRoute.data = of({ template });
@@ -102,7 +111,16 @@ describe('Template Management Update Component', () => {
     it('Should set isSaving to false on error', () => {
       // GIVEN
       const saveSubject = new Subject<HttpResponse<Template>>();
-      const template = { id: 123 };
+      const template = {
+        id: 123,
+        autoMapStudentCopyToList: undefined,
+        caseboxname: true,
+        content: undefined,
+        contentContentType: undefined,
+        exam: undefined,
+        mark: undefined,
+        name: undefined,
+      };
       jest.spyOn(templateService, 'update').mockReturnValue(saveSubject);
       jest.spyOn(comp, 'previousState');
       activatedRoute.data = of({ template });

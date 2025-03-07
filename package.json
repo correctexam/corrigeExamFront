@@ -84,7 +84,6 @@
     "fabric": "6.4.3",
     "file-saver": "2.0.5",
     "fuse.js": "^7.0.0",
-    "hmr": "^0.1.0",
     "jest": "29.7.0",
     "jest-date-mock": "1.0.10",
     "jest-junit": "16.0.0",
