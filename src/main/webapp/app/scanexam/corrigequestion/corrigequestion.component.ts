@@ -1365,17 +1365,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
 
       await self.computeNote(true, self.resp!, self.currentQuestion!);
-      console.error('pass par la');
       if (self.dropdownOpen && self.synchrocomments && self.selectedpredictions().length > 0) {
-        console.error('pass par la1');
-        console.error(
-          'pass par la2',
-          +self.examId!,
-          comment.id!,
-          self.currentQuestion!.numero!,
-          ah.body!.stepValue!,
-          self.selectedpredictions().map(s => s.sheetId!),
-        );
         await firstValueFrom(
           self.sheetService.updateStudentsResponseWithHComment(
             +self.examId!,

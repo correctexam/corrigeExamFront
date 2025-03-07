@@ -282,7 +282,7 @@
   </p-dialog>
 
   <p-popover #qcmcorrect (onShow)="computeQCMdebug()">
-    <ng-template pTemplate>
+    <ng-template #content>
       <div>
         <canvas [hidden]="!showImageQCM" #imageQcmDebugs></canvas>
       </div>
@@ -1110,7 +1110,7 @@
                   [tooltipZIndex]="'3000'"
                   [pTooltip]="'scanexam.minimizeComment' | translate"
                   (click)="toggleCommentLayout()"
-                  >enables
+                >
                   <fa-icon *ngIf="!minimizeComment" icon="minus"></fa-icon>
                   <fa-icon *ngIf="minimizeComment" icon="maximize"></fa-icon>
                 </span>
@@ -1706,7 +1706,6 @@
                           *ngIf="comment?.step !== undefined && comment?.step !== null && comment.step! > 1"
                           [stars]="comment.step!"
                           [disabled]="blocked"
-                          enables
                           (ngModelChange)="changestepValue($event, comment)"
                           [ngModel]="answer2HybridGradedCommentMap.get(comment.id)"
                         ></p-rating>
