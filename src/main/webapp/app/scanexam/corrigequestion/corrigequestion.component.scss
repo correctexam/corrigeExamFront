@@ -17,6 +17,55 @@ small {
   opacity: 0.5;
   pointer-events: none;
 }
+.fa-bounce-slow {
+  animation: bounce 10s infinite;
+}
+
+@keyframes bounce {
+  0%,
+  90%,
+  100% {
+    transform: translateY(0);
+  }
+  92% {
+    transform: translateY(-10px);
+  }
+  94% {
+    transform: translateY(-5px);
+  }
+  96% {
+    transform: translateY(-10px);
+  }
+  98% {
+    transform: translateY(-5px);
+  }
+}
+
+.no-grade-message {
+  color: #e74c3c; /* Rouge vif */
+  font-weight: bold;
+  font-size: 1.1rem;
+  background-color: #fdecea; /* Fond rouge clair */
+  text-align: center; /* Aligne le texte horizontalement */
+  padding: 1rem;
+  border-radius: 8px; /* Coins arrondis */
+  border: 2px solid #e74c3c; /* Bordure rouge */
+  display: flex; /* Utilisation de flexbox */
+  justify-content: center; /* Centre horizontalement */
+  align-items: center; /* Centre verticalement */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre douce */
+}
+
+/* Animation d'un effet de pulsation */
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 4px 6px rgba(255, 77, 77, 0.1);
+  }
+  50% {
+    box-shadow: 0 6px 8px rgba(255, 77, 77, 0.2);
+  }
+}
 
 ::ng-deep .p-overlay-mask {
   background: rgba(0, 0, 0, 0.85);
@@ -28,4 +77,10 @@ p-galleria ::ng-deep .p-galleria {
   border-width: var(--p-galleria-border-width);
   border-color: var(--p-galleria-border-color);
   border-radius: var(--p-galleria-border-radius);
+}
+
+.content-container {
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+  padding-top: 0.8rem !important;
 }

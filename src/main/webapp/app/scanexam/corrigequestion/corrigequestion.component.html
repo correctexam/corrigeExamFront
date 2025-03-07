@@ -1,5 +1,17 @@
 <div class="grid" jhiSwipe (swipeEnd)="onSwipeEnd($event)">
   <p-toast></p-toast>
+  <p-blockUI [blocked]="showSpinner">
+    <div class="grid" style="width: 90vw">
+      <div class="col-4"></div>
+      <div class="col-4 text-center">
+        <!--<i class="pi pi-lock" style="font-size: 3rem"> </i>-->
+        <p-progressSpinner></p-progressSpinner>
+        <BR />
+        <div *ngIf="showavancement"><span jhiTranslate="scanexam.sheet">Copie</span> {{ currentCopieocr }} / {{ nbrecopieocr }}</div>
+      </div>
+    </div>
+  </p-blockUI>
+
   <p-dialog
     [header]="'scanexam.keyboardshortcutlabel' | translate"
     (onHide)="cleanShortCut()"
@@ -269,13 +281,8 @@
     </ng-template>
   </p-dialog>
 
-  <p-blockUI [blocked]="showSpinner">
-    <p-progressSpinner></p-progressSpinner>
-
-    <!--<i class="pi pi-lock" style="font-size: 3rem"></i>-->
-  </p-blockUI>
   <p-popover #qcmcorrect (onShow)="computeQCMdebug()">
-    <ng-template pTemplate>
+    <ng-template #content>
       <div>
         <canvas [hidden]="!showImageQCM" #imageQcmDebugs></canvas>
       </div>
@@ -361,7 +368,29 @@
               (click)="showQCMCorrect($event)"
               [disabled]="blocked"
             ></button>
-
+            <button
+              class="sm:text-xs md:text-xs lg:text-base"
+              styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
+              *ngIf="this.currentQuestion?.typeAlgoName === 'manuscrit'"
+              pButton
+              (click)="performPrediction4Question()"
+              [pTooltip]="'scanexam.manuscriptcorrect' | translate"
+              [tooltipZIndex]="'3000'"
+              [label]="'scanexam.manuscriptcorrectlabel' | translate"
+              [disabled]="blocked"
+            ></button>
+            <button
+              class="sm:text-xs md:text-xs lg:text-base"
+              styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
+              type="text"
+              *ngIf="this.currentQuestion?.typeAlgoName === 'manuscrit'"
+              pButton
+              [pTooltip]="'scanexam.deletemanuscriptcorrect' | translate"
+              [tooltipZIndex]="'3000'"
+              [label]="'scanexam.deletemanuscriptcorrectlabel' | translate"
+              (click)="deletePrediction4Question()"
+              [disabled]="blocked"
+            ></button>
             <button [hidden]="!debug" type="text" pButton [label]="'reset'" (click)="removeAllAnswer()"></button>
           </div>
 
@@ -491,6 +520,7 @@
             <canvas [hidden]="!showImage[i]" #nomImage></canvas>
           </div>
         </div>
+
         <div style="padding-bottom: 2rem"></div>
         <div class="d-flex justify-content-center" *ngIf="!focusView">
           <div class="p-0 p-paginator p-component ng-star-inserted" *ngIf="currentStudentPaginator === 0 && questionindex !== 0">
@@ -505,7 +535,19 @@
               <fa-icon icon="arrow-left"></fa-icon>
             </button>
           </div>
-
+          <button
+            *ngIf="correctionAvailable"
+            type="button"
+            pButton
+            class="p-ripple"
+            [pTooltip]="'scanexam.gotoPreviousUncorrectedQuestion' | translate"
+            [tooltipZIndex]="'3000'"
+            [tooltipPosition]="'bottom'"
+            (click)="passToPreviousNotGradedQuestion()"
+            [disabled]="blocked"
+          >
+            <fa-icon icon="arrow-left"></fa-icon>
+          </button>
           <p-paginator
             [currentPageReportTemplate]="'scanexam.currentstudent' | translate"
             [rows]="1"
@@ -519,6 +561,21 @@
             [tooltipPosition]="'bottom'"
           >
           </p-paginator>
+
+          <button
+            *ngIf="correctionAvailable"
+            type="button"
+            pButton
+            class="p-ripple"
+            [pTooltip]="'scanexam.gotoNextUncorrectedQuestion' | translate"
+            [tooltipZIndex]="'3000'"
+            [tooltipPosition]="'bottom'"
+            (click)="passToNextNotGradedQuestion()"
+            [disabled]="blocked"
+          >
+            <fa-icon icon="arrow-right"></fa-icon>
+          </button>
+
           <div
             class="p-0 p-paginator p-component ng-star-inserted"
             *ngIf="currentStudentPaginator + 1 === numberPagesInScan! / nbreFeuilleParCopie! && questionindex + 1 !== nbreQuestions!"
@@ -533,6 +590,326 @@
             >
               <fa-icon icon="arrow-right"></fa-icon>
             </button>
+          </div>
+        </div>
+        <div style="padding: 1rem" class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
+          <div *ngIf="currentQuestion?.typeAlgoName === 'manuscrit'" class="none">
+            <div class="card-body" style="display: flex; flex-direction: column; align-items: center">
+              <div class="col-2 p-0" *ngIf="!focusView">
+                <div *ngIf="currentQuestion?.typeAlgoName === 'manuscrit' && !currentPrediction">
+                  <!--div *ngIf="isLoading" class="loading-indicator">Chargement de la reconnaissance de l'écriture manuscrite ...</div-->
+                </div>
+                <!--button
+                  class="sm:text-xs md:text-xs lg:text-base"
+                  pButton
+                  [disabled]="!examId && blocked"
+                  (click)="callMLT()"
+                >
+                  Execute MLT
+                </button-->
+              </div>
+
+              <!--div>
+                <button
+                  type="button"
+                  class="btn"
+                  (click)="tryGetAllImages()"
+                  style="margin-top: 1rem; text-align: center; background-color: #007bff; color: white"
+                >
+                  <i class="fa fa-trash"></i> GetAllImages
+                </button>
+              </div-->
+
+              <div *ngIf="this.currentQuestion?.typeAlgoName === 'manuscrit'" class="w-full">
+                <div class="dropdown-container w-full">
+                  <!-- Bouton principal -->
+                  <button
+                    style="background-color: var(--p-button-primary-background)"
+                    type="button"
+                    class="btn btn-primary w-full flex justify-between items-center px-4 py-3 text-lg font-medium relative"
+                    (click)="initSimilarPrediction()"
+                  >
+                    <span jhiTranslate="scanexam.displaySimilarAnswers">Afficher les réponses similaires</span>
+
+                    <fa-icon
+                      [icon]="dropdownOpen ? 'chevron-up' : 'chevron-down'"
+                      class="fa-bounce-slow ml-2"
+                      style="color: #deddda"
+                    ></fa-icon>
+                    <!-- Non-Clickable Area with Input Field -->
+                    <span
+                      *ngIf="dropdownOpen && predictionsFusing.length !== 0"
+                      class="absolute right-0 top-0 h-full flex items-center"
+                      (click)="$event.stopPropagation()"
+                      style="padding-right: 20px; padding-top: 15px; padding-left: 30px"
+                    >
+                      <div>
+                        <label class="text-gray-700 font-medium" jhiTranslate="scanexam.filterallexamsheets">
+                          Appliquer la recherche de texte sur les prédiction de l'ensemble des copies
+                        </label>
+                        <!--                          "
+-->
+                        <p-toggleswitch
+                          [(ngModel)]="filterallexamsheets"
+                          (onChange)="updateFilteredSimilarPredictions()"
+                          [pTooltip]="'scanexam.filterallexamsheetsTooltip' | translate"
+                          class="ml-2"
+                        ></p-toggleswitch>
+                      </div>
+                      <div class="pr-5"></div>
+                      <!-- Input Field -->
+                      <input
+                        [formControl]="searchControl"
+                        [placeholder]="'scanexam.rechercheParMot' | translate"
+                        class="p-2 border rounded text-black bg-white"
+                        style="height: 30px; width: 200px"
+                      />
+
+                      <style>
+                        input:focus {
+                          border-color: rgb(0, 0, 59);
+                          box-shadow: 0 0 20px rgba(1, 1, 71, 0.5);
+                          outline: none;
+                        }
+                      </style>
+                    </span>
+                  </button>
+
+                  <!--Contenu dropdown -->
+                  <div
+                    style="border-radius: 8px; height: fit-content"
+                    class="dropdown-content w-full mt-4 border border-gray-300 rounded-md shadow-lg"
+                    *ngIf="dropdownOpen"
+                  >
+                    <!-- Boutons de contrôle -->
+                    <div class="flex flex-row gap-2 mb-3 px-4 py-3">
+                      <button
+                        pButton
+                        class="p-button-primary"
+                        [disabled]="getSelectedCount() === 0"
+                        jhiTranslate="scanexam.applyNoteToSelected"
+                        (click)="applySameNoteAndGrade()"
+                        [pTooltip]="'scanexam.applyNoteToSelectedTooltip' | translate"
+                      >
+                        <i class="pi pi-check-circle mr-2"></i>
+                        Appliquer la note aux sélectionnés
+                      </button>
+
+                      <div class="flex items-center p-2">
+                        <label class="text-gray-700 font-medium" jhiTranslate="scanexam.filterNoNoteStudents">
+                          Filtrer les questions déjà notées :
+                        </label>
+                        <!--                          "
+-->
+                        <p-toggleswitch
+                          [(ngModel)]="filterPredictionsWithNotes"
+                          (onChange)="updateFilteredSimilarPredictions()"
+                          [pTooltip]="'scanexam.filterNoNoteStudentsTooltip' | translate"
+                          class="ml-2"
+                        ></p-toggleswitch>
+                      </div>
+                      <p-progressSpinner *ngIf="blocked" styleClass="w-2rem h-2rem"></p-progressSpinner>
+
+                      <div class="flex items-center p-2">
+                        <label class="text-gray-700 font-medium" jhiTranslate="scanexam.synchrocomments">
+                          Activer la synchronistation des commentaires :
+                        </label>
+                        <!--                          "
+-->
+                        <p-toggleswitch
+                          [(ngModel)]="synchrocomments"
+                          (onChange)="updateFilteredSimilarPredictions()"
+                          [pTooltip]="'scanexam.synchrocommentsTooltip' | translate"
+                          class="ml-2"
+                        ></p-toggleswitch>
+                      </div>
+                    </div>
+
+                    <p
+                      *ngIf="dropdownOpen && !toomuchsimilar && predictionstoShow().length === 0 && similarPredictionsSearched"
+                      class="font-bold text-gray-700 text-xl px-4 py-3 border-b border-gray-300"
+                      jhiTranslate="scanexam.nosimilarResults"
+                    >
+                      Aucune réponse similaire trouvée
+                    </p>
+                    <p
+                      *ngIf="dropdownOpen && toomuchsimilar && predictionstoShow().length === 0 && similarPredictionsSearched"
+                      class="font-bold text-gray-700 text-xl px-4 py-3 border-b border-gray-300"
+                      jhiTranslate="scanexam.toomuchsimilarResults"
+                    >
+                      Trop de réponses similaires trouvées
+                    </p>
+
+                    <p
+                      *ngIf="dropdownOpen && predictionstoShow().length !== 0"
+                      class="font-bold text-gray-700 text-xl px-4 py-3 border-b border-gray-300"
+                      jhiTranslate="scanexam.similarResults"
+                    >
+                      Résultats Similaires
+                    </p>
+
+                    <!-- Checkbox to select all similar predictions -->
+                    <div *ngIf="dropdownOpen && predictionstoShow().length !== 0" class="flex flex-col items-center">
+                      <input type="checkbox" [checked]="isAllSelected()" (change)="toggleSelectAll($event)" class="w-14 h-14 mr-3 ml-3" />
+                      <label class="font-bold text-gray-700 text-l" jhiTranslate="scanexam.selectAllSimilar">Sélectionner tout</label>
+                    </div>
+
+                    <!-- Liste des prédictions similaires -->
+                    <div *ngIf="dropdownOpen && predictionstoShow().length !== 0" class="max-h-screen overflow-y-auto">
+                      <ul class="list-none p-0 space-y-4">
+                        <li
+                          *ngFor="let similar of predictionstoShow()"
+                          [style.border]="selectedpredictions().includes(similar) ? '5px solid green' : '1px solid #ccc'"
+                          style="width: 1250px"
+                          class="p-4 rounded-md hover:bg-blue-100 transition-colors duration-200"
+                        >
+                          <div class="flex items-start gap-4">
+                            <!-- Colonne 1 : Checkbox et Image -->
+                            <div class="flex flex-col items-center">
+                              <input
+                                type="checkbox"
+                                [checked]="selectedpredictions().includes(similar)"
+                                (change)="selectSimilarPrediction(similar)"
+                                class="w-14 h-14 mr-4"
+                              />
+                              <img
+                                [src]="similar.imageData"
+                                [pTooltip]="similar.text!"
+                                (click)="goToCopie($event, similar.sheetPageMin!, similar.sheetPageMax!)"
+                                alt="Prediction Image"
+                                class="object-cover rounded"
+                                style="width: 1000px; height: auto; cursor: pointer"
+                              />
+                            </div>
+
+                            <!-- Column 2: Grade and Comments -->
+                            <!--  <div>
+                              <!-- Grade Section ->
+                              <div>
+                                <ng-container *ngIf="getSimilarGrade(similar.sheetId!) !== undefined; else noGrade">
+                                  <div class="flex items-center gap-2">
+                                    <span class="text-sm font-medium text-gray-600">Note:</span>
+                                    <input
+                                      type="number"
+                                      pInputText
+                                      [ngModel]="getSimilarGrade(similar.sheetId!)! * noteStep"
+                                      (ngModelChange)="updateSimilarGrade(similar.sheetId!, $event / noteStep)"
+                                      class="text-center border border-gray-300 rounded"
+                                      [disabled]="blocked"
+                                      [step]="noteStep"
+                                      [min]="0"
+                                      [max]="maximumNote"
+                                      [style]="{ width: '75px', height: '40px' }"
+                                    />
+                                  </div>
+                                </ng-container>
+
+                                <ng-template #noGrade>
+                                  <div class="no-grade-container">
+                                    <span class="no-grade-message" jhiTranslate="scanexam.noGradeAvailable">⚠️ Pas de note disponible</span>
+                                  </div>
+                                </ng-template>
+                              </div>
+
+                              <!-- Comments Section ->
+                              <div *ngIf="sameResponses.get(similar.sheetId!)?.textcomments?.length" class="mt-4">
+                                <div class="font-medium mb-2">Commentaires:</div>
+                                <div class="space-y-2">
+                                  <div
+                                    *ngFor="let comment of sameResponses.get(similar.sheetId!)?.textcomments; let i = index"
+                                    class="flex items-center gap-2"
+                                  >
+                                    <span>• {{ comment.text }}</span>
+                                    <fa-icon
+                                      [icon]="['fas', 'trash']"
+                                      (click)="removedSimilarComment(similar.sheetId!, i)"
+                                      class="cursor-pointer ml-2"
+                                    ></fa-icon>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          --></div>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!--              <div *ngIf="dropdownOpen && predictionstoShow().length === 0 && similarPredictionsSearched">
+
+
+                <p style="font-weight: bold; margin-bottom: 10px; color: #666; font-size: 20px; padding-top: 20px">
+                  Aucune réponse similaire trouvée
+                </p>
+              </div>
+-->
+              <div *ngIf="currentPrediction && developementMode" style="margin-top: 1rem; text-align: center">
+                <dd style="font-size: 1.1rem; font-weight: bold; margin: 0">Résultat :</dd>
+                <!--<button
+                  *ngIf="currentPrediction.id !== undefined && deleted == false"
+                  type="button"
+                  class="btn btn-danger"
+                  (click)="deletePrediction(currentPrediction.id)"
+                >
+                  <i class="fa fa-trash"></i> Delete
+                </button>-->
+                <div
+                  [innerHTML]="currentPrediction.text"
+                  style="
+                    font-size: 1rem;
+                    line-height: 1.5;
+                    margin-top: 0.5rem;
+                    padding: 0.5rem;
+                    background-color: #f9f9f9;
+                    border: 1px solid #ddd;
+                    border-radius: 5px;
+                  "
+                ></div>
+              </div>
+              <button
+                *ngIf="deleted == true"
+                type="button"
+                class="btn"
+                (click)="performPrediction4Question()"
+                style="margin-top: 1rem; text-align: center; background-color: var(--p-button-primary-background); color: white"
+              >
+                <i class="fa fa-trash"></i> Refaire Reconnaissance d'Ecriture
+              </button>
+
+              <!--div *ngIf="predictionsDic[questionindex]" style="margin-top: 1rem; text-align: center">
+                <dd style="font-size: 1.1rem; font-weight: bold; margin: 0">Résultat :</dd>
+                <div
+                  [innerHTML]="predictionsDic[questionindex]"
+                  style="
+                    font-size: 1rem;
+                    line-height: 1.5;
+                    margin-top: 0.5rem;
+                    padding: 0.5rem;
+                    background-color: #f9f9f9;
+                    border: 1px solid #ddd;
+                    border-radius: 5px;
+                  "
+                ></div>
+                < Utilise innerHTML pour interpréter le HTML-->
+
+              <!--div *ngIf="error" style="margin-top: 1rem; text-align: center">
+                <dd style="font-size: 1.1rem; font-weight: bold; margin: 0">Erreur :</dd>
+                <pre
+                  style="
+                    font-size: 0.9rem;
+                    line-height: 1.5;
+                    margin-top: 0.5rem;
+                    background-color: #ffefef;
+                    border: 1px solid #f00;
+                    border-radius: 5px;
+                    padding: 0.5rem;
+                  "
+                  >{{ error }}</pre
+                >
+              </div-->
+            </div>
           </div>
         </div>
         <ng-container
@@ -743,10 +1120,7 @@
                   class="float-end"
                   [tooltipPosition]="'left'"
                   [tooltipZIndex]="'3000'"
-                  [pTooltip]="
-                    'scanexam.kPourvoir créer un nouveau commentaire même en mode fermé
-eyboardshortcuttooltip' | translate
-                  "
+                  [pTooltip]="'scanexam.keyboardshortcuttooltip' | translate"
                   (click)="bindKeyBoardShortCut(comment)"
                 >
                   <fa-icon icon="keyboard"></fa-icon>
@@ -1250,7 +1624,7 @@ eyboardshortcuttooltip' | translate
                           [min]="1"
                           [max]="12"
                           [ngModel]="comment.step"
-                          (change)="updateCommentStep($event, comment, true, true)"
+                          (change)="updateComment($event, comment, true, true)"
                           [pTooltip]="'scanexam.hybridcommentStepTooltip' | translate"
                           [tooltipPosition]="'left'"
                         />

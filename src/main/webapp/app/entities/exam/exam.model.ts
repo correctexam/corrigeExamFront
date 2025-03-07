@@ -1,9 +1,10 @@
-
 import { IQuestion } from 'app/entities/question/question.model';
 export interface IExam {
   id?: number;
   name?: string;
   templateName?: string;
+  templateMark?: boolean;
+  templateNameBoxCase?: boolean;
   templateId?: number;
   idzoneId?: number;
   namezoneId?: number;
@@ -30,7 +31,7 @@ export class Exam implements IExam {
     public scanfileId?: number,
     public questions?: IQuestion[],
     public courseName?: string,
-    public courseId?: number
+    public courseId?: number,
   ) {}
 }
 

@@ -97,6 +97,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   public layoutsidebarVisible = false;
   public manualid = 2;
   public qcmid = 3;
+  public manuscritid = 4;
   readonly hybrid = GradeType.HYBRID;
 
   public disableGradeType: boolean | null = false;
@@ -221,6 +222,8 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
           this.manualid = q.id!;
         } else if (q.algoName === 'QCM') {
           this.qcmid = q.id!;
+        } else if (q.algoName === 'manuscrit') {
+          this.manuscritid = q.id!;
         }
       });
     });

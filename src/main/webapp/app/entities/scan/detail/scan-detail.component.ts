@@ -10,9 +10,9 @@ import { TranslateDirective } from '../../../shared/language/translate.directive
 import { NgIf } from '@angular/common';
 
 @Component({
+  standalone: true,
   selector: 'jhi-scan-detail',
   templateUrl: './scan-detail.component.html',
-  standalone: true,
   imports: [NgIf, TranslateDirective, AlertErrorComponent, AlertComponent, FaIconComponent, RouterLink],
 })
 export class ScanDetailComponent implements OnInit {

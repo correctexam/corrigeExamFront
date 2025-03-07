@@ -6,6 +6,7 @@ import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
 import { IExamSheet, getExamSheetIdentifier } from '../exam-sheet.model';
+import { StudentResponse } from 'app/entities/student-response/student-response.model';
 
 export type EntityResponseType = HttpResponse<IExamSheet>;
 export type EntityArrayResponseType = HttpResponse<IExamSheet[]>;
@@ -52,6 +53,48 @@ export class ExamSheetService {
 
   updateStudents(sheetid: number, studentId: number[]): Observable<EntityResponseType> {
     return this.http.put<IExamSheet>(`${this.resourceUrl}/boundstudents/${sheetid}`, studentId, {
+      observe: 'response',
+    });
+  }
+
+  updateStudentsResponseWithTComment(
+    examid: number,
+    commentid: number,
+    numero: number,
+    checked: boolean,
+    sheetsid: number[],
+  ): Observable<EntityArrayResponseType> {
+    return this.http.put<StudentResponse[]>(`${this.resourceUrl}/toggletcomments/${examid}/${commentid}/${numero}/${checked}`, sheetsid, {
+      observe: 'response',
+    });
+  }
+
+  updateStudentsResponseWithGComment(
+    examid: number,
+    commentid: number,
+    numero: number,
+    checked: boolean,
+    sheetsid: number[],
+  ): Observable<EntityArrayResponseType> {
+    return this.http.put<IExamSheet[]>(`${this.resourceUrl}/togglegcomments/${examid}/${commentid}/${numero}/${checked}`, sheetsid, {
+      observe: 'response',
+    });
+  }
+
+  updateStudentsResponseWithHComment(
+    examid: number,
+    commentid: number,
+    numero: number,
+    step: number,
+    sheetsid: number[],
+  ): Observable<EntityArrayResponseType> {
+    return this.http.put<IExamSheet[]>(`${this.resourceUrl}/togglehcomments/${examid}/${commentid}/${numero}/${step}`, sheetsid, {
+      observe: 'response',
+    });
+  }
+
+  updateStudentsResponseWithNotes(examid: number, numero: number, step: number, sheetsid: number[]): Observable<EntityArrayResponseType> {
+    return this.http.put<IExamSheet[]>(`${this.resourceUrl}/updatenotes/${examid}/${numero}/${step}`, sheetsid, {
       observe: 'response',
     });
   }

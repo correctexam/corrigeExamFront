@@ -202,7 +202,35 @@ export const MarkingSummary_ROUTE: Route = {
     },
   },
 };
+/*
+export const SearchAnswer_ROUTE: Route = {
+  path: 'search_answear/:examid/:questionId',
+  canActivate: [UserRouteAccessService],
+  component: SearchanswerComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.answer',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-6-correct-copies-question-by-question-or-student-by-student-or-any-other-combination',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-6-corriger-ses-copies-question-par-question-ou-etudiant-par-etudiant-ou-tout-autre-combinaison',
+    },
+  },
+};
 
+export const ImageAccess_ROUTE: Route = {
+  path: 'image-acces/:examid',
+  canActivate: [UserRouteAccessService],
+  component: ImageAccessComponent,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.answer',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-6-correct-copies-question-by-question-or-student-by-student-or-any-other-combination',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-6-corriger-ses-copies-question-par-question-ou-etudiant-par-etudiant-ou-tout-autre-combinaison',
+    },
+  },
+};
+*/
 export const AssocierCopiesEtudiantsToStudent_ROUTE: Route = {
   path: 'studentbindings/:examid/:currentStudent',
   canActivate: [UserRouteAccessService],

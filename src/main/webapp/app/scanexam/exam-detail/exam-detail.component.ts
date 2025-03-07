@@ -280,12 +280,9 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
               this.blocked = false;
               this.sheets = sheetsbody.body!.filter(sh => sh.pagemin !== -1);
 
-              //            const ex2 = (this.students.map(s => s.examSheets) as any)
-              //              .flat()
-              //              .filter((ex1: any) => ex1.scanId === this.exam!.scanfileId && ex1.pagemin !== -1).length;
-              //            console.error(ex2, this.numberPagesInScan / this.nbreFeuilleParCopie, this.numberPagesInScan, this.nbreFeuilleParCopie);
               this.showCorrection =
                 this.sheets.length === this.numberPagesInScan / this.nbreFeuilleParCopie && this.showAssociation && this.showAlignement;
+
               this.examService.getExamStatusFinish(+this.examId).then(res => {
                 this.correctionFinish = res;
               });
@@ -429,11 +426,6 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     const p = await this.db.countNonAlignImage(+this.examId);
     const p1 = await this.db.countAlignImage(+this.examId);
     const nbreSheet = this.sheets.length;
-    /* this.students
-      ? (this.students.map(s => s.examSheets) as any)
-          .flat()
-          .filter((ex1: any) => ex1.scanId === this.exam!.scanfileId && ex1.pagemin !== -1).length
-      : 0; */
 
     const samepage = p > 0 && p1 > 0 && p === p1;
     const cond2 = nbreSheet === p1 / dbTemplate;

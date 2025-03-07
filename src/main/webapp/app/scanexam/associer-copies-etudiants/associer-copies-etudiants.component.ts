@@ -43,6 +43,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { ToastModule } from 'primeng/toast';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { MLTService } from '../mlt/mlt.service';
 
 export interface IPage {
   image?: ImageData;
@@ -177,10 +178,14 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
   columnstyle = {
     width: '100%',
   };
-
+  boxname = true;
   nameImageImg?: string;
   firstnameImageImg?: string;
   ineImageImg?: string;
+  nameImageImg_ImgData?: ImageData;
+  firstnameImageImg_ImgData?: ImageData;
+  ineImageImg_ImgData?: ImageData;
+
   nameImageImgDebug?: string;
   firstnameImageImgDebug?: string;
   ineImageImgDebug?: string;
@@ -238,6 +243,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     private translateService: TranslateService,
     public dialogService: DialogService,
     private titleService: Title,
+    private mltService: MLTService,
   ) {
     effect(
       () => {
@@ -275,7 +281,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
               this.nbreFeuilleParCopie = value[0];
               this.numberPagesInScan = value[1];
               this.exam = value[2].body!;
-
+              if (this.exam.templateNameBoxCase !== undefined) {
+                this.boxname = this.exam.templateNameBoxCase;
+              }
               this.updateTitle();
               this.translateService.onLangChange.subscribe(() => {
                 this.updateTitle();
@@ -360,23 +368,25 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     const res = await this.testLoadImage4pages([this.currentStudent! * this.nbreFeuilleParCopie!]);
     console.timeLog('loadpage', 'after testLoadImage4pages');
     console.timeLog('loadpagesameexam', 'after testLoadImage4pages');
-
     if (res.length === 1) {
       this.predictionprecision = res[0].predictionprecision;
       this.recognizedStudent = res[0].recognizedStudent;
       if (res[0].nameImage) {
+        this.nameImageImg_ImgData = res[0].nameImage;
         this.nameImageImg = this.imagedata_to_image(res[0].nameImage);
       }
       if (this.debug && res[0].nameImageDebug) {
         this.nameImageImgDebug = this.imagedata_to_image(res[0].nameImageDebug);
       }
       if (res[0].firstnameImage) {
+        this.firstnameImageImg_ImgData = res[0].firstnameImage;
         this.firstnameImageImg = this.imagedata_to_image(res[0].firstnameImage);
       }
       if (this.debug && res[0].firstnameImageDebug) {
         this.firstnameImageImgDebug = this.imagedata_to_image(res[0].firstnameImageDebug);
       }
       if (res[0].ineImage) {
+        this.ineImageImg_ImgData = res[0].ineImage;
         this.ineImageImg = this.imagedata_to_image(res[0].ineImage);
       }
       if (this.debug && res[0].ineImageDebug) {
@@ -446,8 +456,8 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
         removeHorizontal: this.preferenceService.getPreference().removeHorizontalName,
         looking4missing: true,
         preferences: this.preferenceService.getPreference(),
-        assist: this.assisted,
-        debug: this.debug,
+        assist: this.assisted && this.exam.templateNameBoxCase!,
+        debug: this.debug && this.exam.templateNameBoxCase!,
       };
       const output: PredictResult[] = [];
       console.timeLog('loadpage', 'before doPredictions');
@@ -460,14 +470,14 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
         let result: PredictResult = { predictionprecision: 0, page: r1.page };
         if (r1.nameZone) {
           result.nameImage = new ImageData(new Uint8ClampedArray(r1.nameZone), r1.nameZoneW!, r1.nameZoneH!);
-          if (this.debug && r1.nameZoneDebug) {
+          if (this.debug && this.exam.templateNameBoxCase! && r1.nameZoneDebug) {
             result.nameImageDebug = new ImageData(new Uint8ClampedArray(r1.nameZoneDebug), r1.nameZoneW!, r1.nameZoneH!);
           }
         }
 
         if (r1.firstnameZone) {
           result.firstnameImage = new ImageData(new Uint8ClampedArray(r1.firstnameZone), r1.firstnameZoneW!, r1.firstnameZoneH!);
-          if (this.debug && r1.firstnameZoneDebug) {
+          if (this.debug && this.exam.templateNameBoxCase! && r1.firstnameZoneDebug) {
             result.firstnameImageDebug = new ImageData(
               new Uint8ClampedArray(r1.firstnameZoneDebug),
               r1.firstnameZoneW!,
@@ -477,14 +487,86 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
         }
         if (r1.ineZone) {
           result.ineImage = new ImageData(new Uint8ClampedArray(r1.ineZone), r1.ineZoneW!, r1.ineZoneH!);
-          if (this.debug && r1.ineZoneDebug) {
+          if (this.debug && this.exam.templateNameBoxCase! && r1.ineZoneDebug) {
             result.ineImageDebug = new ImageData(new Uint8ClampedArray(r1.ineZoneDebug), r1.ineZoneW!, r1.ineZoneH!);
           }
         }
 
-        if (r1.resultPrediction.length > 0) {
+        if (r1.resultPrediction.length > 0 && this.exam.templateNameBoxCase!) {
           result.predictionprecision = r1.resultPrediction[0].proba! * r1.resultPrediction[0].score!;
           result.recognizedStudent = this.students.find(st => st.id === r1.resultPrediction[0].id);
+        } else if (this.assisted && !this.exam.templateNameBoxCase!) {
+          const s = await this.executeMLTScript(result);
+          if (s.name && s.ine && s.firstname) {
+            const s2 = candidates.map(
+              c =>
+                levenshteinDistance(c.name!, s.name!) +
+                levenshteinDistance(c.firstname!, s.firstname!) +
+                levenshteinDistance(c.ine!, s.ine!),
+            );
+            const min = Math.min(...s2);
+            const index = s2.indexOf(min);
+            if (index !== -1) {
+              result.recognizedStudent = candidates[index];
+              const length =
+                result.recognizedStudent.name!.length + result.recognizedStudent.firstname!.length + result.recognizedStudent.ine!.length;
+              result.predictionprecision = ((length - min) * 100) / length;
+            }
+          } else if (s.name && s.firstname) {
+            const s2 = candidates.map(c => levenshteinDistance(c.name!, s.name!) + levenshteinDistance(c.firstname!, s.firstname!));
+            const min = Math.min(...s2);
+            const index = s2.indexOf(min);
+            if (index !== -1) {
+              result.recognizedStudent = candidates[index];
+              const length = result.recognizedStudent.name!.length + result.recognizedStudent.firstname!.length;
+              result.predictionprecision = ((length - min) * 100) / length;
+            }
+          } else if (s.name && s.ine) {
+            const s2 = candidates.map(c => levenshteinDistance(c.name!, s.name!) + levenshteinDistance(c.ine!, s.ine!));
+            const min = Math.min(...s2);
+            const index = s2.indexOf(min);
+            if (index !== -1) {
+              result.recognizedStudent = candidates[index];
+              const length = result.recognizedStudent.name!.length + result.recognizedStudent.ine!.length;
+              result.predictionprecision = ((length - min) * 100) / length;
+            }
+          } else if (s.firstname && s.ine) {
+            const s2 = candidates.map(c => levenshteinDistance(c.firstname!, s.firstname!) + levenshteinDistance(c.ine!, s.ine!));
+            const min = Math.min(...s2);
+            const index = s2.indexOf(min);
+            if (index !== -1) {
+              result.recognizedStudent = candidates[index];
+              const length = result.recognizedStudent.firstname!.length + result.recognizedStudent.ine!.length;
+              result.predictionprecision = ((length - min) * 100) / length;
+            }
+          } else if (s.name) {
+            const s2 = candidates.map(c => levenshteinDistance(c.name!, s.name!));
+            const min = Math.min(...s2);
+            const index = s2.indexOf(min);
+            if (index !== -1) {
+              result.recognizedStudent = candidates[index];
+              const length = result.recognizedStudent.name!.length;
+              result.predictionprecision = ((length - min) * 100) / length;
+            }
+          } else if (s.firstname) {
+            const s2 = candidates.map(c => levenshteinDistance(c.firstname!, s.firstname!));
+            const min = Math.min(...s2);
+            const index = s2.indexOf(min);
+            if (index !== -1) {
+              result.recognizedStudent = candidates[index];
+              const length = result.recognizedStudent.firstname!.length;
+              result.predictionprecision = ((length - min) * 100) / length;
+            }
+          } else if (s.ine) {
+            const s2 = candidates.map(c => levenshteinDistance(c.ine!, s.ine!));
+            const min = Math.min(...s2);
+            const index = s2.indexOf(min);
+            if (index !== -1) {
+              result.recognizedStudent = candidates[index];
+              const length = result.recognizedStudent.ine!.length;
+              result.predictionprecision = ((length - min) * 100) / length;
+            }
+          }
         }
         output.push(result);
       }
@@ -746,58 +828,6 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     }
     this.countRemainingFreeSheets();
   }
-  /*
-
-    // old version
-    const examSheet4CurrentStudent: IExamSheet[] = (
-      this.students.filter(s => this.selectionStudents.map((s1: IStudent) => s1.id)!.includes(s.id)).map(s => s.examSheets) as any
-    )
-      .flat()
-      .filter((ex: any) => ex?.scanId === this.exam.scanfileId);
-    // Récupère la sheet courante.
-    const examSheet4CurrentPage: IExamSheet[] = (
-      this.students
-        .filter(
-          s =>
-            s.examSheets?.some(ex => ex?.scanId === this.exam.scanfileId && ex.pagemin === this.currentStudent * this.nbreFeuilleParCopie),
-        )
-        .map(s => s.examSheets) as any
-    ).flat();
-
-    // Passe cette sheet à -1 -1. sémantique plus associé
-
-    for (const ex2 of examSheet4CurrentPage.filter(ex => !examSheet4CurrentStudent.map(ex1 => ex1.id).includes(ex!.id))) {
-      ex2!.pagemin = -1;
-      ex2!.pagemax = -1;
-      await firstValueFrom(this.sheetService.update(ex2));
-    }
-
-    // Pour l'étudiant sélectionné. récupère la sheet. Si elle existe, on met à jour les bonnes pages sinon on crée la page.
-
-    const selectedStudent = this.students.filter(s => this.selectionStudents.map((s1: IStudent) => s1.id)!.includes(s.id));
-    for (const student of selectedStudent) {
-      const examS4Student = student.examSheets?.filter((ex: IExamSheet) => ex?.scanId === this.exam.scanfileId);
-      if (examS4Student !== undefined && examS4Student.length > 0) {
-        for (const ex of examS4Student) {
-          ex.pagemin = this.currentStudent * this.nbreFeuilleParCopie;
-          ex.pagemax = (this.currentStudent + 1) * this.nbreFeuilleParCopie - 1;
-          await firstValueFrom(this.sheetService.update(ex));
-        }
-      } else {
-        const sheet: IExamSheet = {
-          name: uuid(),
-          pagemin: this.currentStudent * this.nbreFeuilleParCopie,
-          pagemax: (this.currentStudent + 1) * this.nbreFeuilleParCopie - 1,
-          scanId: this.exam.scanfileId,
-          students: this.selectionStudents,
-        };
-        const e = await firstValueFrom(this.sheetService.create(sheet));
-        for (const s1 of this.selectionStudents) {
-          s1.examSheets?.push(e.body!);
-          await firstValueFrom(this.studentService.update(s1));
-        }
-      }
-    }*/
 
   showGalleria(): void {
     this.blocked = true;
@@ -1825,4 +1855,66 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
     // eslint-disable-next-line no-useless-escape
     return s?.replace(/[^A-Za-z0-9\[\] ]/g, a => this.latinMap().get(a) ?? a);
   }
+
+  async executeMLTScript(self: PredictResult): Promise<IStudent> {
+    let nom: string | undefined = '';
+    let prenom: string | undefined = '';
+    let ine: string | undefined = '';
+    const st = new Student();
+
+    if (self.nameImage) {
+      nom = await this.mltService.executeMLTFromImagData(self.nameImage!, self.nameImage!.width, self.nameImage!.height);
+      st.name = nom;
+    }
+    if (self.firstnameImage) {
+      prenom = await this.mltService.executeMLTFromImagData(self.firstnameImage!, self.firstnameImage!.width, self.firstnameImage!.height);
+      st.firstname = prenom;
+    }
+
+    if (self.ineImage) {
+      ine = await this.mltService.executeMLTFromImagData(self.ineImage!, self.ineImage!.width, self.ineImage!.height);
+      st.ine = ine;
+    }
+    // this.recognizedStudent = st;
+    return st;
+  }
+
+  async updateExam(): Promise<void> {
+    if (this.exam) {
+      this.exam.templateNameBoxCase = this.boxname;
+      await firstValueFrom(this.examService.update(this.exam));
+      await this.loadImage();
+    }
+  }
+}
+
+function levenshteinDistance(a: string, b: string): number {
+  // Create a 2D array to store the distances
+  let distances = new Array(a.length + 1);
+  for (let i = 0; i <= a.length; i++) {
+    distances[i] = new Array(b.length + 1);
+  }
+
+  // Initialize the first row and column
+  for (let i = 0; i <= a.length; i++) {
+    distances[i][0] = i;
+  }
+  for (let j = 0; j <= b.length; j++) {
+    distances[0][j] = j;
+  }
+
+  // Fill in the rest of the array
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      if (a[i - 1] === b[j - 1]) {
+        distances[i][j] = distances[i - 1][j - 1];
+      } else {
+        distances[i][j] = Math.min(distances[i - 1][j], distances[i][j - 1], distances[i - 1][j - 1]) + 1;
+      }
+    }
+  }
+
+  // Return the final distance
+
+  return distances[a.length][b.length];
 }

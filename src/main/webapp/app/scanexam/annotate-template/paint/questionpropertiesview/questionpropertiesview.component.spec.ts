@@ -115,7 +115,8 @@ describe('QuestionpropertiesviewComponent', () => {
     mockQuestionTypeService = TestBed.inject(QuestionTypeService);
 
     mockQuestionTypeService.query = jest.fn(
-      (): Observable<HttpResponse<IQuestionType[]>> => of(new HttpResponse({ body: [{ algoName: 'foo' }, { algoName: 'bar' }] })),
+      (): Observable<HttpResponse<IQuestionType[]>> =>
+        of(new HttpResponse({ body: [{ algoName: 'foo' }, { algoName: 'bar' }, { algoName: 'manuscrit' }] })),
     );
 
     await waitForAll();
@@ -125,7 +126,7 @@ describe('QuestionpropertiesviewComponent', () => {
     expect(component.isSaving).toBeFalsy();
     expect(component.layoutsidebarVisible).toBeFalsy();
     expect(component.questions).toHaveLength(0);
-    expect(component.questiontypes).toStrictEqual([{ algoName: 'foo' }, { algoName: 'bar' }]);
+    expect(component.questiontypes).toStrictEqual([{ algoName: 'foo' }, { algoName: 'bar' }, { algoName: 'manuscrit' }]);
     expect(component.editForm).toBeDefined();
     expect(getPanel()).toBeNull();
   });
@@ -540,15 +541,25 @@ describe('QuestionpropertiesviewComponent', () => {
       expect(fixture.debugElement.query(By.css('#validexp'))).toBeNull();
     });
 
+    it('shows correct thing on manuscrit type', () => {
+      // Assuming that the behavior for manuscrit is similar to manual
+      expect(fixture.debugElement.query(By.css('#field_gradeType'))).not.toBeNull(); // Grade Type should be visible
+      expect(fixture.debugElement.query(By.css('#field_step1'))).not.toBeNull(); // Step field should be visible
+      expect(fixture.debugElement.query(By.css('#sidebar-show-button'))).not.toBeNull(); // Sidebar button should be visible
+      expect(fixture.debugElement.query(By.css('#validexp'))).toBeNull(); // Valid expression field should be hidden
+    });
+
     it('sets manualid correctly', () => {
       component.manualid = 0;
       component.qcmid = 0;
+      component.manuscritid = 0;
       mockQuestionTypeService.query = jest.fn(
         (): Observable<HttpResponse<IQuestionType[]>> => of(new HttpResponse({ body: [{ algoName: 'manual', id: 11 }] })),
       );
 
       component.ngOnInit();
 
+      expect(component.manuscritid).toStrictEqual(0);
       expect(component.manualid).toStrictEqual(11);
       expect(component.qcmid).toStrictEqual(0);
     });
@@ -556,14 +567,31 @@ describe('QuestionpropertiesviewComponent', () => {
     it('sets qcmid correctly', () => {
       component.manualid = 0;
       component.qcmid = 0;
+      component.manuscritid = 0;
       mockQuestionTypeService.query = jest.fn(
         (): Observable<HttpResponse<IQuestionType[]>> => of(new HttpResponse({ body: [{ algoName: 'QCM', id: 12 }] })),
       );
 
       component.ngOnInit();
 
+      expect(component.manuscritid).toStrictEqual(0);
       expect(component.qcmid).toStrictEqual(12);
       expect(component.manualid).toStrictEqual(0);
+    });
+
+    it('sets manuscritid correctly', () => {
+      component.manualid = 0;
+      component.qcmid = 0;
+      component.manuscritid = 0;
+      mockQuestionTypeService.query = jest.fn(
+        (): Observable<HttpResponse<IQuestionType[]>> => of(new HttpResponse({ body: [{ algoName: 'manuscrit', id: 13 }] })),
+      );
+
+      component.ngOnInit();
+
+      expect(component.manuscritid).toStrictEqual(13);
+      expect(component.manualid).toStrictEqual(0);
+      expect(component.qcmid).toStrictEqual(0);
     });
   });
 });

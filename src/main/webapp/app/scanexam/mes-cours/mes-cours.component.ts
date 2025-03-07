@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, computed, Input, OnInit, Signal, signal, WritableSignal } from '@angular/core';
 // import { faCoffee } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 import { faMotorcycle as fasMotorcycle } from '@fortawesome/free-solid-svg-icons';
@@ -12,6 +12,10 @@ import { RouterLink } from '@angular/router';
 import { ButtonDirective } from 'primeng/button';
 import { TranslateDirective } from '../../shared/language/translate.directive';
 import { NgIf, NgFor } from '@angular/common';
+import { DragDropModule } from 'primeng/dragdrop';
+import { firstValueFrom } from 'rxjs';
+import { TooltipModule } from 'primeng/tooltip';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'jhi-mes-cours',
@@ -22,6 +26,8 @@ import { NgIf, NgFor } from '@angular/common';
   imports: [
     NgIf,
     TranslateDirective,
+    TooltipModule,
+    DragDropModule,
     NgFor,
     ButtonDirective,
     RouterLink,
@@ -29,22 +35,48 @@ import { NgIf, NgFor } from '@angular/common';
     FaIconComponent,
     FaStackItemSizeDirective,
     HasAnyAuthorityDirective,
+    TranslateModule,
   ],
 })
 export class MesCoursComponent implements OnInit {
   farCircle = farCircle as IconProp;
   fasMotorcycle = fasMotorcycle as IconProp;
   faGraduationCap = faGraduationCap as IconProp;
-  courses!: ICourse[];
-
+  courses: WritableSignal<ICourse[]> = signal([]);
+  coursesnonarchived: Signal<ICourse[]> = computed(() => this.courses().filter(c => !c.archived));
+  coursesarchived: Signal<ICourse[]> = computed(() => this.courses().filter(c => c.archived));
   @Input()
   showImage = true;
+  currentCourse?: ICourse;
 
   constructor(public courseService: CourseService) {}
 
   ngOnInit(): void {
     this.courseService.query().subscribe(data => {
-      this.courses = data.body!;
+      this.courses.update(() => [...data.body!]);
     });
+  }
+
+  dragStart(c: ICourse): void {
+    this.currentCourse = c;
+  }
+
+  dragEnd(): void {
+    console.error('dragEnd');
+  }
+  drop(archived: boolean): void {
+    if (this.currentCourse && this.currentCourse.archived !== archived) {
+      this.currentCourse.archived = archived;
+      firstValueFrom(this.courseService.update(this.currentCourse)).then(() => {
+        this.courses.update(courses => {
+          const filtercourses = courses.filter(e => e.id === this.currentCourse?.id);
+          if (filtercourses.length > 0) {
+            filtercourses[0].archived = archived;
+          }
+          this.currentCourse = undefined;
+          return [...courses];
+        });
+      });
+    }
   }
 }

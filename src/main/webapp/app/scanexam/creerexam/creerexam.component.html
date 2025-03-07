@@ -139,6 +139,20 @@
           <input type="checkbox" class="form-check col-1" name="mark" id="field_mark" data-cy="mark" formControlName="mark" />
         </div>
 
+        <div class="row">
+          <label class="form-label col-4" jhiTranslate="gradeScopeIsticApp.template.caseBoxName" for="field_caseBoxName"
+            >Box for name</label
+          >
+          <input
+            type="checkbox"
+            class="form-check col-1"
+            name="caseBoxName"
+            id="field_caseBoxName"
+            data-cy="caseBoxName"
+            formControlName="caseBoxName"
+          />
+        </div>
+
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="gotoUE()">
           <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
         </button>

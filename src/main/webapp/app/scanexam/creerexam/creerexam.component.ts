@@ -69,6 +69,7 @@ export class CreerexamComponent implements OnInit, AfterViewInit {
       content: [],
       contentContentType: [null, [Validators.required]],
       mark: [true],
+      caseBoxName: [true],
       autoMapStudentCopyToList: [true],
     });
   }
@@ -130,8 +131,10 @@ export class CreerexamComponent implements OnInit, AfterViewInit {
     template.name = `${String(this.editForm.get(['name'])!.value)}Template`;
     template.content = this.editForm.get(['content'])!.value;
     template.contentContentType = this.editForm.get(['contentContentType'])!.value;
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    (template.mark = this.editForm.get(['mark'])!.value), (template.autoMapStudentCopyToList = true);
+    template.mark = this.editForm.get(['mark'])!.value;
+    template.autoMapStudentCopyToList = true;
+    template.caseboxname = this.editForm.get(['caseBoxName'])!.value ? this.editForm.get(['caseBoxName'])!.value : true;
+    console.error(template.caseboxname);
 
     this.templateService.create(template).subscribe({
       next: (res: HttpResponse<ITemplate>) => {
