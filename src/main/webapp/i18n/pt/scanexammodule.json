@@ -580,6 +580,8 @@
     "boxname": "Uma caixa por letra/número",
     "boxnameTooltip": "Opção de utilizar uma ferramenta de reconhecimento do nome ou do número do aluno com base no facto de cada letra/número ter sido escrito numa caixa. No outro caso, utilizará uma técnica de reconhecimento de escrita manual ligada a",
     "coursnonarchive": "Curso ativo",
-    "coursarchive": "Curso arquivado"
+    "coursarchive": "Curso arquivado",
+    "coursnonarchiveTooltip": "Pode arquivar cursos arrastando e largando um curso para a secção de cursos arquivados.",
+    "coursarchiveTooltip": "É possível colocar a disciplina nas disciplinas activas arrastando e largando uma disciplina na secção de disciplinas activas."
   }
 }

@@ -14,6 +14,8 @@ import { TranslateDirective } from '../../shared/language/translate.directive';
 import { NgIf, NgFor } from '@angular/common';
 import { DragDropModule } from 'primeng/dragdrop';
 import { firstValueFrom } from 'rxjs';
+import { TooltipModule } from 'primeng/tooltip';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'jhi-mes-cours',
@@ -24,6 +26,7 @@ import { firstValueFrom } from 'rxjs';
   imports: [
     NgIf,
     TranslateDirective,
+    TooltipModule,
     DragDropModule,
     NgFor,
     ButtonDirective,
@@ -32,6 +35,7 @@ import { firstValueFrom } from 'rxjs';
     FaIconComponent,
     FaStackItemSizeDirective,
     HasAnyAuthorityDirective,
+    TranslateModule,
   ],
 })
 export class MesCoursComponent implements OnInit {

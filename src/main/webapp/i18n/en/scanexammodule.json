@@ -572,6 +572,8 @@
     "boxname": "One box per letter/number",
     "boxnameTooltip": "Option to use a student name or number recognition tool based on the fact that each letter/number has been entered in a box. In the other case, it will use a related handwriting recognition technique.",
     "coursnonarchive": "Active course",
-    "coursarchive": "Archived course"
+    "coursarchive": "Archived course",
+    "coursnonarchiveTooltip": "It is possible to archive classes by dragging and dropping a class to the archived classes section.",
+    "coursarchiveTooltip": "It is now possible to place the course in the active courses by dragging and dropping a course to the active course section."
   }
 }
