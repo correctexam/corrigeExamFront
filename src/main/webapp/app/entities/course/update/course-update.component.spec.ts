@@ -55,7 +55,8 @@ describe('Course Management Update Component', () => {
     it('Should call update service on save for existing entity', () => {
       // GIVEN
       const saveSubject = new Subject<HttpResponse<Course>>();
-      const course = { id: 123 };
+      const course = { id: 123,
+        archived: false };
       jest.spyOn(courseService, 'update').mockReturnValue(saveSubject);
       jest.spyOn(comp, 'previousState');
       activatedRoute.data = of({ course });
@@ -97,7 +98,8 @@ describe('Course Management Update Component', () => {
     it('Should set isSaving to false on error', () => {
       // GIVEN
       const saveSubject = new Subject<HttpResponse<Course>>();
-      const course = { id: 123 };
+      const course = { id: 123,
+        archived: false };
       jest.spyOn(courseService, 'update').mockReturnValue(saveSubject);
       jest.spyOn(comp, 'previousState');
       activatedRoute.data = of({ course });
