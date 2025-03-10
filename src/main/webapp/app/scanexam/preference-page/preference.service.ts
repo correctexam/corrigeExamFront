@@ -45,6 +45,7 @@ export class PreferenceService {
         cacheDb: 'indexdb',
         imageTypeExport: 'image/webp',
         exportImageCompression: 0.66,
+        maxNumberOfPredictionToShow: 30,
       };
       this.localStorageService.store('preferences', defaultvalue);
       pref = defaultvalue;
@@ -78,6 +79,7 @@ export class PreferenceService {
       cacheDb: 'indexdb',
       imageTypeExport: 'image/webp',
       exportImageCompression: 0.66,
+      maxNumberOfPredictionToShow: 30,
     };
     this.localStorageService.store('preferences', defaultvalue);
     return defaultvalue;

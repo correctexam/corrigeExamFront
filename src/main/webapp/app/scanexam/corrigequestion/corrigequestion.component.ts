@@ -903,6 +903,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async reloadImage() {
+    const maxNumberOfPredictionToShow = this.preferenceService.getPreference().maxNumberOfPredictionToShow
+      ? this.preferenceService.getPreference().maxNumberOfPredictionToShow
+      : 30;
+
     if (this.questions) {
       for (const { i, q } of this.questions.map((value, index) => ({ i: index, q: value }))) {
         this.showImage[i] = false;
@@ -914,7 +918,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           page = pagewithoffset;
         }
         if (i === 0) {
-          if (this.numberPagesInScan! > 30) {
+          if (this.numberPagesInScan! > maxNumberOfPredictionToShow) {
             this.activeIndex = (page - 1) % this.nbreFeuilleParCopie!;
           } else {
             this.activeIndex = page - 1;
@@ -3570,6 +3574,10 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   dofilterByText() {
+    const maxNumberOfPredictionToShow = this.preferenceService.getPreference().maxNumberOfPredictionToShow
+      ? this.preferenceService.getPreference().maxNumberOfPredictionToShow
+      : 30;
+
     let predictionsF = this.predictionsFusing;
     if (this.filterPredictionsWithNotes) {
       predictionsF = this.predictionsFusingWithoutStudentResponse;
@@ -3580,7 +3588,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
     if (this.searchedTerm && this.searchedTerm.length > 2) {
       const p = predictionsF.filter(prediction => (prediction.text ?? '').toLowerCase().includes(this.searchedTerm.toLowerCase()));
-      if (p.length <= 30) {
+      if (p.length <= maxNumberOfPredictionToShow) {
         this.toomuchsimilar = false;
         this.blocked = true;
 
@@ -3592,7 +3600,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.toomuchsimilar = true;
         this.predictionstoShow.update(() => []);
       }
-    } else if (predictionsF.length <= 30) {
+    } else if (predictionsF.length <= maxNumberOfPredictionToShow) {
       this.toomuchsimilar = false;
       this.blocked = true;
       this.prefetchImage(predictionsF).then(() => {

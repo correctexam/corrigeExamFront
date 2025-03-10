@@ -280,6 +280,21 @@
           />
         </div>
       </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="maxNumberOfPredictionToShow">maxNumberOfPredictionToShow: </label>
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            name="maxNumberOfPredictionToShow"
+            formControlName="maxNumberOfPredictionToShow"
+            class="form-control"
+            value="30"
+            [min]="20"
+            [step]="1"
+          />
+        </div>
+      </div>
     </div>
     <button class="p-button p-button-primary" type="submit">Submit</button>
     <button class="p-button p-button-secondary" (click)="clearToDefault()">Reset to default value</button>

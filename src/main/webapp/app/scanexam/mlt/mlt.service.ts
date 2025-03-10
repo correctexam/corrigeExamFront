@@ -4,6 +4,7 @@ import * as ort from 'onnxruntime-web';
 import { Injectable } from '@angular/core';
 
 import { InferenceSession } from 'onnxruntime-web';
+import { ApplicationConfigService } from 'app/core/config/application-config.service';
 
 type Tensor = tf.Tensor;
 // Optionnel: Vérifie la compatibilité WASM
@@ -120,7 +121,9 @@ export class MLTService {
     '€',
   ];
 
-  constructor() {}
+  constructor(public appConfig: ApplicationConfigService) {
+    ort.env.wasm.wasmPaths = this.appConfig.getFrontUrl() + 'public/';
+  }
 
   async initializeOrt() {
     try {

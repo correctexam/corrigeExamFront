@@ -49,6 +49,7 @@ export class PreferencePageComponent implements OnInit {
       numberofgoodpointToMatch: [],
       defaultAlignAlgowithMarker: [true],
       removeHorizontalName: [true],
+      maxNumberOfPredictionToShow: [],
     });
   }
 

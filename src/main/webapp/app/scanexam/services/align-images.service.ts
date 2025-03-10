@@ -43,6 +43,7 @@ export interface IPreference {
   cacheDb: string;
   imageTypeExport: string;
   exportImageCompression: number;
+  maxNumberOfPredictionToShow: number;
 }
 
 export interface IImageAlignementInput {
