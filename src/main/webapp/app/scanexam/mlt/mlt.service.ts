@@ -121,8 +121,13 @@ export class MLTService {
     '€',
   ];
 
+  modelPath: string;
+
   constructor(public appConfig: ApplicationConfigService) {
     ort.env.wasm.wasmPaths = this.appConfig.getFrontUrl() + 'public/';
+    this.modelPath =
+      this.appConfig.getFrontUrl() + 'content/classifier/trace_mlt-4modern_hw_rimes_lines-v3+synth-1034184_best_encoder.tar.onnx';
+    //    const modelPath: string = '../../content/classifier/trace_mlt-4modern_hw_rimes_lines-v3+synth-1034184_best_encoder.tar.onnx';
   }
 
   async initializeOrt() {
@@ -282,10 +287,9 @@ export class MLTService {
         targetHeight,
       );
       // Spécification du chemin du modèle ONNX
-      const modelPath: string = '../../content/classifier/trace_mlt-4modern_hw_rimes_lines-v3+synth-1034184_best_encoder.tar.onnx';
 
       // Exécution de l'inférence
-      const prediction = await this.runInference(preprocessedImage, modelPath);
+      const prediction = await this.runInference(preprocessedImage, this.modelPath);
 
       return prediction;
     } catch (error) {
