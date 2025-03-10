@@ -62,7 +62,7 @@
             (mouseup)="$event.stopPropagation()"
             name="qcm_min_height_shape"
             formControlName="qcm_min_height_shape"
-            class="form-control"
+            class="form-controlmaxNumberOfPredictionToShow"
             value="10"
             [min]="1"
             [step]="1"
@@ -277,6 +277,21 @@
             id="removeHorizontalName"
             data-cy="removeHorizontalName"
             formControlName="removeHorizontalName"
+          />
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="maxNumberOfPredictionToShow">maxNumberOfPredictionToShow: </label>
+          <input
+            type="number"
+            (mouseup)="$event.stopPropagation()"
+            name="maxNumberOfPredictionToShow"
+            formControlName="maxNumberOfPredictionToShow"
+            class="form-control"
+            value="30"
+            [min]="20"
+            [step]="1"
           />
         </div>
       </div>

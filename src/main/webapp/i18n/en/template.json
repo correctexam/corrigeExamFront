@@ -21,6 +21,8 @@
       "name": "Name",
       "content": "Test subject:",
       "mark": "Does the test subject contain alignment marks?",
+      "caseBoxName": "Does the subject contain markers for each of the letters of the student identifiers?",
+
       "autoMapStudentCopyToList": "Auto Map Student Copy To List",
       "exam": "Exam"
     }
