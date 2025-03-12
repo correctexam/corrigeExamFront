@@ -20,8 +20,8 @@
       "id": "ID",
       "name": "Nome",
       "content": "Enunciado da avaliação:",
-      "mark": "O modelo contém marcadores de alinhamento?",
-      "caseBoxName": "A disciplina contém marcadores para cada uma das letras dos identificadores dos alunos?",
+      "mark": "O enunciado contém marcadores de alinhamento?",
+      "caseBoxName": "O enunciado contém caixas para cada uma das letras dos identificadores dos alunos?",
       "autoMapStudentCopyToList": "Associação automática prova - estudante",
       "exam": "Avaliação"
     }
