@@ -20,11 +20,11 @@
       "id": "ID",
       "name": "Sobrenome",
       "firstname": "Nome",
-      "ine": "Ine",
+      "ine": "N° matrícula",
       "caslogin": "Caslogin",
       "mail": "Mail",
       "examSheets": "Provas",
-      "groups": "Grupos"
+      "groups": "Turmas"
     }
   }
 }
