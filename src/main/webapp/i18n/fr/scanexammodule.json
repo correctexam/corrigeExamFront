@@ -579,9 +579,9 @@
     "toomuchsimilarResults": "Trop de réponses similaires trouvées",
     "boxname": "Une case par lettre/chiffre",
     "boxnameTooltip": "Option pour utiliser un outil de reconnaissance de nom ou de numéro étudiant qui se fonde sur le fait que chaque lettre/nombre a été inscrite dans une case. Dans l'autre cas, il utilisera une technique de reconnaissance d'écriture manuscrite liée",
-    "coursnonarchive": "Cours actif",
-    "coursarchive": "Cours archivé",
-    "coursnonarchiveTooltip": "Il est possible d'archiver les cours en glissant déposant un cours vers la section cours archivé",
-    "coursarchiveTooltip": "Il est possible de placer le cours dans les cours actif en glissant déposant un cours vers la section cours actif"
+    "coursnonarchive": "Cours actif(s)",
+    "coursarchive": "Cours archivé(s)",
+    "coursnonarchiveTooltip": "Il est possible d'archiver les cours en glissant déposant un cours vers la section cours archivé(s)",
+    "coursarchiveTooltip": "Il est possible de placer le cours dans les cours actifs en glissant déposant un cours vers la section cours actif(s)"
   }
 }
