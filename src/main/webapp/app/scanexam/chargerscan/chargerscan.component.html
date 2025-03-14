@@ -138,7 +138,6 @@
 
   <div class="canvas-wrapper foo" *ngIf="blob1">
     <ngx-extended-pdf-viewer
-      [hidden]="'true'"
       [src]="blob1"
       style="flex: 1 1 100%"
       #viewer
@@ -149,7 +148,6 @@
       [textLayer]="false"
       [(scrollMode)]="scrollMode"
       [showToolbar]="false"
-      [pageViewMode]="'infinite-scroll'"
       [showSecondaryToolbarButton]="false"
       backgroundColor="#ffffff"
       [zoom]="'100%'"
