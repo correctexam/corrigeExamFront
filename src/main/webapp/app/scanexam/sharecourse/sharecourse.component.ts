@@ -34,7 +34,6 @@ export class SharecourseComponent implements OnInit {
     this.courseid = this.config.data.courseid;
     this.http.get<any>(this.applicationConfigService.getEndpointFor('api/getUsers/' + this.courseid)).subscribe(s => {
       this.list1 = s.availables;
-      console.error(this.list1);
       this.list2 = s.shared;
     });
   }
