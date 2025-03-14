@@ -49,8 +49,4 @@ export class SharecourseComponent implements OnInit {
       .put<any>(this.applicationConfigService.getEndpointFor('api/updateProfs/' + this.courseid), { shared: event.items })
       .subscribe(() => {});
   }
-
-  filter(event: any): void {
-    console.error(event);
-  }
 }
