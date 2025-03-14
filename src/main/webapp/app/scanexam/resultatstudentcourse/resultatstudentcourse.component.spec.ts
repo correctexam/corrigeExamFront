@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { describe, expect } from '@jest/globals';
+HTMLCanvasElement.prototype.getContext = jest.fn();
 
 import { ResultatStudentcourseComponent } from './resultatstudentcourse.component';
 

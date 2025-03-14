@@ -59,7 +59,7 @@ describe('Account Service', () => {
     jest.spyOn(mockRouter, 'navigateByUrl').mockImplementation(() => Promise.resolve(true));
 
     mockTranslateService = TestBed.inject(TranslateService);
-    jest.spyOn(mockTranslateService, 'use').mockImplementation(() => of(''));
+    jest.spyOn(mockTranslateService, 'use').mockImplementation(() => of({}));
     sessionStorageService = TestBed.inject(SessionStorageService);
   });
 

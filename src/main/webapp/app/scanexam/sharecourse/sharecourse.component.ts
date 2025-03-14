@@ -7,13 +7,14 @@ import { TranslateModule } from '@ngx-translate/core';
 import { NgIf } from '@angular/common';
 import { PrimeTemplate } from 'primeng/api';
 import { PickListModule } from 'primeng/picklist';
+import { TranslateDirective } from 'app/shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-sharecourse',
   templateUrl: './sharecourse.component.html',
   styleUrls: ['./sharecourse.component.scss'],
   standalone: true,
-  imports: [PickListModule, PrimeTemplate, NgIf, TranslateModule],
+  imports: [PickListModule, PrimeTemplate, NgIf, TranslateModule, TranslateDirective],
 })
 export class SharecourseComponent implements OnInit {
   courseid = '';

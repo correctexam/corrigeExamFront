@@ -28,8 +28,6 @@ export class PredictionListComponent implements OnInit {
   async loadAll(): Promise<void> {
     const response = await firstValueFrom(this.predictionService.query());
     this.predictions = response.body || [];
-    // eslint-disable-next-line no-console
-    console.log('Loaded predictions:', this.predictions);
   }
 
   // Method to view prediction details

@@ -46,7 +46,6 @@ import { ViewandreorderpagesComponent } from '../viewandreorderpages.component';
     ButtonModule,
     SelectButtonModule,
     FormsModule,
-    NgIf,
     ProgressSpinnerModule,
     NgFor,
     DragDropModule,
