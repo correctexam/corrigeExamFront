@@ -384,6 +384,22 @@ pdfjs-editor-resizer-label-bottom-right = Spodnji desni kot – spremeni velikos
 pdfjs-editor-resizer-label-bottom-middle = Spodaj na sredini – spremeni velikost
 pdfjs-editor-resizer-label-bottom-left = Spodnji levi kot – spremeni velikost
 pdfjs-editor-resizer-label-middle-left = Levo na sredini – spremeni velikost
+pdfjs-editor-resizer-top-left =
+    .aria-label = Zgornji levi kot – spremeni velikost
+pdfjs-editor-resizer-top-middle =
+    .aria-label = Zgoraj na sredini – spremeni velikost
+pdfjs-editor-resizer-top-right =
+    .aria-label = Zgornji desni kot – spremeni velikost
+pdfjs-editor-resizer-middle-right =
+    .aria-label = Desno na sredini – spremeni velikost
+pdfjs-editor-resizer-bottom-right =
+    .aria-label = Spodnji desni kot – spremeni velikost
+pdfjs-editor-resizer-bottom-middle =
+    .aria-label = Spodaj na sredini – spremeni velikost
+pdfjs-editor-resizer-bottom-left =
+    .aria-label = Spodnji levi kot – spremeni velikost
+pdfjs-editor-resizer-middle-left =
+    .aria-label = Levo na sredini – spremeni velikost
 
 ## Color picker
 
@@ -468,26 +484,27 @@ pdfjs-editor-alt-text-settings-show-dialog-button-label = Ob dodajanju slike tak
 pdfjs-editor-alt-text-settings-show-dialog-description = Pomaga vam zagotoviti, da imajo vse vaše slike nadomestno besedilo.
 pdfjs-editor-alt-text-settings-close-button = Zapri
 
-pdfjs-editor-resizer-top-left =
-    .aria-label = Zgornji levi kot – spremeni velikost
-pdfjs-editor-resizer-top-middle =
-    .aria-label = Zgoraj na sredini – spremeni velikost
-pdfjs-editor-resizer-top-right =
-    .aria-label = Zgornji desni kot – spremeni velikost
-pdfjs-editor-resizer-middle-right =
-    .aria-label = Desno na sredini – spremeni velikost
-pdfjs-editor-resizer-bottom-right =
-    .aria-label = Spodnji desni kot – spremeni velikost
-pdfjs-editor-resizer-bottom-middle =
-    .aria-label = Spodaj na sredini – spremeni velikost
-pdfjs-editor-resizer-bottom-left =
-    .aria-label = Spodnji levi kot – spremeni velikost
-pdfjs-editor-resizer-middle-left =
-    .aria-label = Levo na sredini – spremeni velikost
-unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
+# Additional translations for ngx-extended-pdf-viewer (sl)
+unverified-signature-warning = Dokument vsebuje digitalni podpis. PDF viewer ne more preveriti veljavnost podpisa. Prosimo prenesite dokument in veljavnost podpisa preverite v programu Acrobat Reader.
+# Translations for ngx-extended-pdf-viewer additions only available in en-US
 pdfjs-infinite-scroll-button-label = Infinite scroll
 pdfjs-find-multiple-checkbox-label = match each word
 pdfjs-find-regexp-checkbox-label = regular expression
-
-# Translations for ngx-extended-pdf-viewer additions
-
+pdfjs-free-text2 =
+    .aria-label = Text Editor
+    .default-content = Start typing…
+pdfjs-editor-undo-bar-message-highlight = Highlight removed
+pdfjs-editor-undo-bar-message-freetext = Text removed
+pdfjs-editor-undo-bar-message-ink = Drawing removed
+pdfjs-editor-undo-bar-message-stamp = Image removed
+pdfjs-editor-undo-bar-message-multiple =
+    { $count ->
+        [one] { $count } annotation removed
+       *[other] { $count } annotations removed
+    }
+pdfjs-editor-undo-bar-undo-button =
+    .title = Undo
+pdfjs-editor-undo-bar-undo-button-label = Undo
+pdfjs-editor-undo-bar-close-button =
+    .title = Close
+pdfjs-editor-undo-bar-close-button-label = Close

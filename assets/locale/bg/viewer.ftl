@@ -369,6 +369,22 @@ pdfjs-editor-resizer-label-bottom-right = Долен десен ъгъл — п�
 pdfjs-editor-resizer-label-bottom-middle = Долу в средата — преоразмеряване
 pdfjs-editor-resizer-label-bottom-left = Долен ляв ъгъл — преоразмеряване
 pdfjs-editor-resizer-label-middle-left = Ляво в средата — преоразмеряване
+pdfjs-editor-resizer-top-left =
+    .aria-label = Горен ляв ъгъл — преоразмеряване
+pdfjs-editor-resizer-top-middle =
+    .aria-label = Горе в средата — преоразмеряване
+pdfjs-editor-resizer-top-right =
+    .aria-label = Горен десен ъгъл — преоразмеряване
+pdfjs-editor-resizer-middle-right =
+    .aria-label = Дясно в средата — преоразмеряване
+pdfjs-editor-resizer-bottom-right =
+    .aria-label = Долен десен ъгъл — преоразмеряване
+pdfjs-editor-resizer-bottom-middle =
+    .aria-label = Долу в средата — преоразмеряване
+pdfjs-editor-resizer-bottom-left =
+    .aria-label = Долен ляв ъгъл — преоразмеряване
+pdfjs-editor-resizer-middle-left =
+    .aria-label = Ляво в средата — преоразмеряване
 
 ## Color picker
 
@@ -400,22 +416,7 @@ pdfjs-editor-colorpicker-red =
 ## Image alt-text settings
 
 
-pdfjs-editor-resizer-top-left =
-    .aria-label = Горен ляв ъгъл — преоразмеряване
-pdfjs-editor-resizer-top-middle =
-    .aria-label = Горе в средата — преоразмеряване
-pdfjs-editor-resizer-top-right =
-    .aria-label = Горен десен ъгъл — преоразмеряване
-pdfjs-editor-resizer-middle-right =
-    .aria-label = Дясно в средата — преоразмеряване
-pdfjs-editor-resizer-bottom-right =
-    .aria-label = Долен десен ъгъл — преоразмеряване
-pdfjs-editor-resizer-bottom-middle =
-    .aria-label = Долу в средата — преоразмеряване
-pdfjs-editor-resizer-bottom-left =
-    .aria-label = Долен ляв ъгъл — преоразмеряване
-pdfjs-editor-resizer-middle-left =
-    .aria-label = Ляво в средата — преоразмеряване
+# Translations for ngx-extended-pdf-viewer additions only available in en-US
 pdfjs-editor-highlight-button =
     .title = Highlight
 pdfjs-editor-highlight-button-label = Highlight
@@ -427,6 +428,8 @@ pdfjs-editor-free-highlight-thickness-input = Thickness
 pdfjs-editor-free-highlight-thickness-title =
     .title = Change thickness when highlighting items other than text
 pdfjs-editor-highlight-show-all-button-label = Show all
+pdfjs-editor-highlight-show-all-button =
+    .title = Show all
 pdfjs-editor-new-alt-text-dialog-edit-label = Edit alt text (image description)
 pdfjs-editor-new-alt-text-dialog-add-label = Add alt text (image description)
 pdfjs-editor-new-alt-text-textarea =
@@ -465,3 +468,21 @@ unverified-signature-warning = This PDF file contains a digital signature. The P
 pdfjs-infinite-scroll-button-label = Infinite scroll
 pdfjs-find-multiple-checkbox-label = match each word
 pdfjs-find-regexp-checkbox-label = regular expression
+pdfjs-free-text2 =
+    .aria-label = Text Editor
+    .default-content = Start typing…
+pdfjs-editor-undo-bar-message-highlight = Highlight removed
+pdfjs-editor-undo-bar-message-freetext = Text removed
+pdfjs-editor-undo-bar-message-ink = Drawing removed
+pdfjs-editor-undo-bar-message-stamp = Image removed
+pdfjs-editor-undo-bar-message-multiple =
+    { $count ->
+        [one] { $count } annotation removed
+       *[other] { $count } annotations removed
+    }
+pdfjs-editor-undo-bar-undo-button =
+    .title = Undo
+pdfjs-editor-undo-bar-undo-button-label = Undo
+pdfjs-editor-undo-bar-close-button =
+    .title = Close
+pdfjs-editor-undo-bar-close-button-label = Close

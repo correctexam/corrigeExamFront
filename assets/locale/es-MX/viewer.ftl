@@ -326,16 +326,22 @@ pdfjs-editor-highlight-show-all-button-label = Mostrar todo
 pdfjs-editor-highlight-show-all-button =
     .title = Mostrar todo
 
+# Additional translations for ngx-extended-pdf-viewer (es)
+unverified-signature-warning = Este archivo PDF contiene una firma digital. El visor de PDF no puede verificar si la firma es válida. Por favor, descargue el archivo y ábralo en Acrobat Reader para verificar si la firma es válida.
+pdfjs-infinite-scroll-button-label = Desplazamiento infinito
+pdfjs-find-multiple-checkbox-label = Coincidir cada palabra
+pdfjs-find-regexp-checkbox-label = Expresión regular
+# Translations for ngx-extended-pdf-viewer additions only available in en-US
 pdfjs-document-properties-size-kb = { NUMBER($kb, maximumSignificantDigits: 3) } KB ({ $b } bytes)
 pdfjs-document-properties-size-mb = { NUMBER($mb, maximumSignificantDigits: 3) } MB ({ $b } bytes)
 pdfjs-document-properties-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
 pdfjs-find-match-count =
-    { NUMBER($total) ->
+    { $total ->
         [one] { $current } of { $total } match
        *[other] { $current } of { $total } matches
     }
 pdfjs-find-match-count-limit =
-    { NUMBER($limit) ->
+    { $limit ->
         [one] More than { $limit } match
        *[other] More than { $limit } matches
     }
@@ -430,10 +436,30 @@ pdfjs-editor-alt-text-settings-editor-title = Alt text editor
 pdfjs-editor-alt-text-settings-show-dialog-button-label = Show alt text editor right away when adding an image
 pdfjs-editor-alt-text-settings-show-dialog-description = Helps you make sure all your images have alt text.
 pdfjs-editor-alt-text-settings-close-button = Close
-unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
-pdfjs-infinite-scroll-button-label = Infinite scroll
-pdfjs-find-multiple-checkbox-label = match each word
-pdfjs-find-regexp-checkbox-label = regular expression
-
-# Translations for ngx-extended-pdf-viewer additions
-
+pdfjs-free-text2 =
+    .aria-label = Text Editor
+    .default-content = Start typing…
+pdfjs-editor-undo-bar-message-highlight = Highlight removed
+pdfjs-editor-undo-bar-message-freetext = Text removed
+pdfjs-editor-undo-bar-message-ink = Drawing removed
+pdfjs-editor-undo-bar-message-stamp = Image removed
+pdfjs-editor-undo-bar-message-multiple =
+    { $count ->
+        [one] { $count } annotation removed
+       *[other] { $count } annotations removed
+    }
+pdfjs-editor-undo-bar-undo-button =
+    .title = Undo
+pdfjs-editor-undo-bar-undo-button-label = Undo
+pdfjs-editor-undo-bar-close-button =
+    .title = Close
+pdfjs-editor-undo-bar-close-button-label = Close
+# Additional translations for ngx-extended-pdf-viewer from the es-mx bleeding edge branch
+pdfjs-editor-resizer-label-top-left = Esquina superior izquierda: cambiar el tamaño
+pdfjs-editor-resizer-label-top-middle = Arriba en el medio: cambiar el tamaño
+pdfjs-editor-resizer-label-top-right = Esquina superior derecha: cambiar el tamaño
+pdfjs-editor-resizer-label-middle-right = Centro derecha: cambiar el tamaño
+pdfjs-editor-resizer-label-bottom-right = Esquina inferior derecha: cambiar el tamaño
+pdfjs-editor-resizer-label-bottom-middle = Abajo en el medio: cambiar el tamaño
+pdfjs-editor-resizer-label-bottom-left = Esquina inferior izquierda: cambiar el tamaño
+pdfjs-editor-resizer-label-middle-left = Centro izquierda: cambiar el tamaño

@@ -105,9 +105,17 @@ pdfjs-document-properties-button-label = Властивості документ
 pdfjs-document-properties-file-name = Назва файлу:
 pdfjs-document-properties-file-size = Розмір файлу:
 # Variables:
+#   $kb (Number) - the PDF file size in kilobytes
+#   $b (Number) - the PDF file size in bytes
+pdfjs-document-properties-size-kb = { NUMBER($kb, maximumSignificantDigits: 3) } кБ ({ $b } байтів)
+# Variables:
+#   $mb (Number) - the PDF file size in megabytes
+#   $b (Number) - the PDF file size in bytes
+pdfjs-document-properties-size-mb = { NUMBER($mb, maximumSignificantDigits: 3) } МБ ({ $b } байтів)
+# Variables:
 #   $size_kb (Number) - the PDF file size in kilobytes
 #   $size_b (Number) - the PDF file size in bytes
-pdfjs-document-properties-kb = { $size_kb } КБ ({ $size_b } байтів)
+pdfjs-document-properties-kb = { $size_kb } кБ ({ $size_b } байтів)
 # Variables:
 #   $size_mb (Number) - the PDF file size in megabytes
 #   $size_b (Number) - the PDF file size in bytes
@@ -118,6 +126,9 @@ pdfjs-document-properties-subject = Тема:
 pdfjs-document-properties-keywords = Ключові слова:
 pdfjs-document-properties-creation-date = Дата створення:
 pdfjs-document-properties-modification-date = Дата зміни:
+# Variables:
+#   $dateObj (Date) - the creation/modification date and time of the PDF file
+pdfjs-document-properties-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
 # Variables:
 #   $date (Date) - the creation/modification date of the PDF file
 #   $time (Time) - the creation/modification time of the PDF file
@@ -277,6 +288,9 @@ pdfjs-annotation-date-string = { $date }, { $time }
 # Some common types are e.g.: "Check", "Text", "Comment", "Note"
 pdfjs-text-annotation-type =
     .alt = [{ $type }-анотація]
+# Variables:
+#   $dateObj (Date) - the modification date and time of the annotation
+pdfjs-annotation-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
 
 ## Password
 
@@ -368,6 +382,22 @@ pdfjs-editor-resizer-label-bottom-right = Нижній правий кут – �
 pdfjs-editor-resizer-label-bottom-middle = Внизу посередині – зміна розміру
 pdfjs-editor-resizer-label-bottom-left = Нижній лівий кут – зміна розміру
 pdfjs-editor-resizer-label-middle-left = Ліворуч посередині – зміна розміру
+pdfjs-editor-resizer-top-left =
+    .aria-label = Верхній лівий кут – зміна розміру
+pdfjs-editor-resizer-top-middle =
+    .aria-label = Вгорі посередині – зміна розміру
+pdfjs-editor-resizer-top-right =
+    .aria-label = Верхній правий кут – зміна розміру
+pdfjs-editor-resizer-middle-right =
+    .aria-label = Праворуч посередині – зміна розміру
+pdfjs-editor-resizer-bottom-right =
+    .aria-label = Нижній правий кут – зміна розміру
+pdfjs-editor-resizer-bottom-middle =
+    .aria-label = Внизу посередині – зміна розміру
+pdfjs-editor-resizer-bottom-left =
+    .aria-label = Нижній лівий кут – зміна розміру
+pdfjs-editor-resizer-middle-left =
+    .aria-label = Ліворуч посередині – зміна розміру
 
 ## Color picker
 
@@ -404,10 +434,22 @@ pdfjs-editor-new-alt-text-dialog-edit-label = Редагувати альтер�
 pdfjs-editor-new-alt-text-dialog-add-label = Додати альтернативний текст (опис зображення)
 pdfjs-editor-new-alt-text-textarea =
     .placeholder = Напишіть свій опис тут…
+# This text refers to the alt text box above this description. It offers a definition of alt text.
+pdfjs-editor-new-alt-text-description = Короткий опис для людей, які не бачать зображення, або якщо зображення не завантажується.
+# This is a required legal disclaimer that refers to the automatically created text inside the alt text box above this text. It disappears if the text is edited by a human.
+pdfjs-editor-new-alt-text-disclaimer1 = Цей альтернативний текст створено автоматично, тому він може бути неточним.
 pdfjs-editor-new-alt-text-disclaimer-learn-more-url = Докладніше
 pdfjs-editor-new-alt-text-create-automatically-button-label = Автоматично створювати альтернативний текст
 pdfjs-editor-new-alt-text-not-now-button = Не зараз
+pdfjs-editor-new-alt-text-error-title = Не вдалося автоматично створити альтернативний текст
+pdfjs-editor-new-alt-text-error-description = Напишіть власний альтернативний текст або повторіть спробу пізніше.
 pdfjs-editor-new-alt-text-error-close-button = Закрити
+# Variables:
+#   $totalSize (Number) - the total size (in MB) of the AI model.
+#   $downloadedSize (Number) - the downloaded size (in MB) of the AI model.
+#   $percent (Number) - the percentage of the downloaded size.
+pdfjs-editor-new-alt-text-ai-model-downloading-progress = Завантаження моделі ШІ для альтернативного тексту ({ $downloadedSize } з { $totalSize } МБ)
+    .aria-valuetext = Завантаження моделі ШІ для альтернативного тексту ({ $downloadedSize } з { $totalSize } МБ)
 # This is a button that users can click to edit the alt text they have already added.
 pdfjs-editor-new-alt-text-added-button-label = Альтернативний текст додано
 # This is a button that users can click to open the alt text editor and add alt text when it is not present.
@@ -427,34 +469,9 @@ pdfjs-image-alt-text-settings-button-label = Налаштування альте
 pdfjs-editor-alt-text-settings-dialog-label = Налаштування альтернативного тексту зображення
 pdfjs-editor-alt-text-settings-automatic-title = Автоматичний альтернативний текст
 pdfjs-editor-alt-text-settings-create-model-button-label = Автоматично створювати альтернативний текст
-
-pdfjs-document-properties-size-kb = { NUMBER($kb, maximumSignificantDigits: 3) } кБ ({ $b } байтів)
-pdfjs-document-properties-size-mb = { NUMBER($mb, maximumSignificantDigits: 3) } МБ ({ $b } байтів)
-pdfjs-document-properties-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
-pdfjs-annotation-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
-pdfjs-editor-resizer-top-left =
-    .aria-label = Верхній лівий кут – зміна розміру
-pdfjs-editor-resizer-top-middle =
-    .aria-label = Вгорі посередині – зміна розміру
-pdfjs-editor-resizer-top-right =
-    .aria-label = Верхній правий кут – зміна розміру
-pdfjs-editor-resizer-middle-right =
-    .aria-label = Праворуч посередині – зміна розміру
-pdfjs-editor-resizer-bottom-right =
-    .aria-label = Нижній правий кут – зміна розміру
-pdfjs-editor-resizer-bottom-middle =
-    .aria-label = Внизу посередині – зміна розміру
-pdfjs-editor-resizer-bottom-left =
-    .aria-label = Нижній лівий кут – зміна розміру
-pdfjs-editor-resizer-middle-left =
-    .aria-label = Ліворуч посередині – зміна розміру
-pdfjs-editor-new-alt-text-description = Короткий опис для людей, які не бачать зображення, або якщо зображення не завантажується.
-pdfjs-editor-new-alt-text-disclaimer1 = Цей альтернативний текст створено автоматично, тому він може бути неточним.
-pdfjs-editor-new-alt-text-error-title = Не вдалося автоматично створити альтернативний текст
-pdfjs-editor-new-alt-text-error-description = Напишіть власний альтернативний текст або повторіть спробу пізніше.
-pdfjs-editor-new-alt-text-ai-model-downloading-progress = Завантаження моделі ШІ для альтернативного тексту ({ $downloadedSize } з { $totalSize } МБ)
-    .aria-valuetext = Завантаження моделі ШІ для альтернативного тексту ({ $downloadedSize } з { $totalSize } МБ)
 pdfjs-editor-alt-text-settings-create-model-description = Пропонує описи, щоб допомогти людям, які не бачать зображення, або якщо зображення не завантажується.
+# Variables:
+#   $totalSize (Number) - the total size (in MB) of the AI model.
 pdfjs-editor-alt-text-settings-download-model-label = Модель ШІ для альтернативного тексту ({ $totalSize } МБ)
 pdfjs-editor-alt-text-settings-ai-model-description = Працює локально на вашому пристрої, тому приватність ваших даних захищена. Призначена для автоматичного створення альтернативного тексту.
 pdfjs-editor-alt-text-settings-delete-model-button = Видалити
@@ -464,7 +481,27 @@ pdfjs-editor-alt-text-settings-editor-title = Редактор альтерна�
 pdfjs-editor-alt-text-settings-show-dialog-button-label = Показувати редактор альтернативного тексту під час додавання зображення
 pdfjs-editor-alt-text-settings-show-dialog-description = Допомагає переконатися, що всі ваші зображення мають альтернативний текст.
 pdfjs-editor-alt-text-settings-close-button = Закрити
+
+# Translations for ngx-extended-pdf-viewer additions only available in en-US
 unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
 pdfjs-infinite-scroll-button-label = Infinite scroll
 pdfjs-find-multiple-checkbox-label = match each word
 pdfjs-find-regexp-checkbox-label = regular expression
+pdfjs-free-text2 =
+    .aria-label = Text Editor
+    .default-content = Start typing…
+pdfjs-editor-undo-bar-message-highlight = Highlight removed
+pdfjs-editor-undo-bar-message-freetext = Text removed
+pdfjs-editor-undo-bar-message-ink = Drawing removed
+pdfjs-editor-undo-bar-message-stamp = Image removed
+pdfjs-editor-undo-bar-message-multiple =
+    { $count ->
+        [one] { $count } annotation removed
+       *[other] { $count } annotations removed
+    }
+pdfjs-editor-undo-bar-undo-button =
+    .title = Undo
+pdfjs-editor-undo-bar-undo-button-label = Undo
+pdfjs-editor-undo-bar-close-button =
+    .title = Close
+pdfjs-editor-undo-bar-close-button-label = Close
