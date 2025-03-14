@@ -12,7 +12,6 @@ import { NgIf } from '@angular/common';
   selector: 'jhi-text-comment-detail',
   templateUrl: './prediction-detail.component.html',
   standalone: true,
-  imports: [NgIf, TranslateDirective, AlertErrorComponent, AlertComponent, RouterLink, FaIconComponent],
 })
 export class PredictionDetailComponent implements OnInit {
   prediction: IPrediction | null = null;

@@ -14,19 +14,7 @@ import { SortDirective } from 'app/shared/sort/sort.directive';
 
 @Component({
   standalone: true,
-  imports: [
-    FontAwesomeModule,
-    NgFor,
-    AlertErrorComponent,
-    NgIf,
-    FormsModule,
-    ReactiveFormsModule,
-    RouterLink,
-    ItemCountComponent,
-    NgbPagination,
-    AlertComponent,
-    SortDirective,
-  ],
+  imports: [FontAwesomeModule, AlertErrorComponent, NgIf, FormsModule, ReactiveFormsModule, RouterLink, AlertComponent],
 
   selector: 'jhi-hybrid-graded-comment-detail',
   templateUrl: './hybrid-graded-comment-detail.component.html',
