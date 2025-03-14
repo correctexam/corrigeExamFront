@@ -181,8 +181,8 @@ pdfjs-printing-not-ready = Aviso: o PDF não está totalmente carregado para imp
 pdfjs-toggle-sidebar-button =
     .title = Exibir/ocultar painel lateral
 pdfjs-toggle-sidebar-notification-button =
-    .title = Exibir/ocultar painel (documento contém estrutura/anexos/camadas)
-pdfjs-toggle-sidebar-button-label = Exibir/ocultar painel
+    .title = Exibir/ocultar painel lateral (documento contém estrutura/anexos/camadas)
+pdfjs-toggle-sidebar-button-label = Exibir/ocultar painel lateral
 pdfjs-document-outline-button =
     .title = Mostrar estrutura do documento (duplo-clique expande/recolhe todos os itens)
 pdfjs-document-outline-button-label = Estrutura do documento
@@ -380,6 +380,22 @@ pdfjs-editor-resizer-label-bottom-right = Canto inferior direito — redimension
 pdfjs-editor-resizer-label-bottom-middle = No centro da base — redimensionar
 pdfjs-editor-resizer-label-bottom-left = Canto inferior esquerdo — redimensionar
 pdfjs-editor-resizer-label-middle-left = No meio à esquerda — redimensionar
+pdfjs-editor-resizer-top-left =
+    .aria-label = Canto superior esquerdo — redimensionar
+pdfjs-editor-resizer-top-middle =
+    .aria-label = No centro do topo — redimensionar
+pdfjs-editor-resizer-top-right =
+    .aria-label = Canto superior direito — redimensionar
+pdfjs-editor-resizer-middle-right =
+    .aria-label = No meio à direita — redimensionar
+pdfjs-editor-resizer-bottom-right =
+    .aria-label = Canto inferior direito — redimensionar
+pdfjs-editor-resizer-bottom-middle =
+    .aria-label = No centro da base — redimensionar
+pdfjs-editor-resizer-bottom-left =
+    .aria-label = Canto inferior esquerdo — redimensionar
+pdfjs-editor-resizer-middle-left =
+    .aria-label = No meio à esquerda — redimensionar
 
 ## Color picker
 
@@ -464,26 +480,27 @@ pdfjs-editor-alt-text-settings-show-dialog-button-label = Mostrar o editor de te
 pdfjs-editor-alt-text-settings-show-dialog-description = Ajuda a assegurar que todas as suas imagens tenham texto alternativo.
 pdfjs-editor-alt-text-settings-close-button = Fechar
 
-pdfjs-editor-resizer-top-left =
-    .aria-label = Canto superior esquerdo — redimensionar
-pdfjs-editor-resizer-top-middle =
-    .aria-label = No centro do topo — redimensionar
-pdfjs-editor-resizer-top-right =
-    .aria-label = Canto superior direito — redimensionar
-pdfjs-editor-resizer-middle-right =
-    .aria-label = No meio à direita — redimensionar
-pdfjs-editor-resizer-bottom-right =
-    .aria-label = Canto inferior direito — redimensionar
-pdfjs-editor-resizer-bottom-middle =
-    .aria-label = No centro da base — redimensionar
-pdfjs-editor-resizer-bottom-left =
-    .aria-label = Canto inferior esquerdo — redimensionar
-pdfjs-editor-resizer-middle-left =
-    .aria-label = No meio à esquerda — redimensionar
-unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
+# Additional translations for ngx-extended-pdf-viewer (pt)
+unverified-signature-warning = Este arquivo PDF contém uma assinatura digital. O visualizador de PDF não pode verificar se a assinatura é válida. Faça download do arquivo e abra-o no Acrobat Reader para verificar se a assinatura é válida.
+# Translations for ngx-extended-pdf-viewer additions only available in en-US
 pdfjs-infinite-scroll-button-label = Infinite scroll
 pdfjs-find-multiple-checkbox-label = match each word
 pdfjs-find-regexp-checkbox-label = regular expression
-
-# Translations for ngx-extended-pdf-viewer additions
-
+pdfjs-free-text2 =
+    .aria-label = Text Editor
+    .default-content = Start typing…
+pdfjs-editor-undo-bar-message-highlight = Highlight removed
+pdfjs-editor-undo-bar-message-freetext = Text removed
+pdfjs-editor-undo-bar-message-ink = Drawing removed
+pdfjs-editor-undo-bar-message-stamp = Image removed
+pdfjs-editor-undo-bar-message-multiple =
+    { $count ->
+        [one] { $count } annotation removed
+       *[other] { $count } annotations removed
+    }
+pdfjs-editor-undo-bar-undo-button =
+    .title = Undo
+pdfjs-editor-undo-bar-undo-button-label = Undo
+pdfjs-editor-undo-bar-close-button =
+    .title = Close
+pdfjs-editor-undo-bar-close-button-label = Close

@@ -380,6 +380,22 @@ pdfjs-editor-resizer-label-bottom-right = Angulo inferior dextre — redimension
 pdfjs-editor-resizer-label-bottom-middle = Medio inferior — redimensionar
 pdfjs-editor-resizer-label-bottom-left = Angulo inferior sinistre — redimensionar
 pdfjs-editor-resizer-label-middle-left = Medio sinistre — redimensionar
+pdfjs-editor-resizer-top-left =
+    .aria-label = Angulo superior sinistre — redimensionar
+pdfjs-editor-resizer-top-middle =
+    .aria-label = Medio superior — redimensionar
+pdfjs-editor-resizer-top-right =
+    .aria-label = Angulo superior dextre — redimensionar
+pdfjs-editor-resizer-middle-right =
+    .aria-label = Medio dextre — redimensionar
+pdfjs-editor-resizer-bottom-right =
+    .aria-label = Angulo inferior dextre — redimensionar
+pdfjs-editor-resizer-bottom-middle =
+    .aria-label = Medio inferior — redimensionar
+pdfjs-editor-resizer-bottom-left =
+    .aria-label = Angulo inferior sinistre — redimensionar
+pdfjs-editor-resizer-middle-left =
+    .aria-label = Medio sinistre — redimensionar
 
 ## Color picker
 
@@ -464,23 +480,26 @@ pdfjs-editor-alt-text-settings-show-dialog-button-label = Monstrar le redactor d
 pdfjs-editor-alt-text-settings-show-dialog-description = Te adjuta a verifica que tote tu imagines ha un texto alternative.
 pdfjs-editor-alt-text-settings-close-button = Clauder
 
-pdfjs-editor-resizer-top-left =
-    .aria-label = Angulo superior sinistre — redimensionar
-pdfjs-editor-resizer-top-middle =
-    .aria-label = Medio superior — redimensionar
-pdfjs-editor-resizer-top-right =
-    .aria-label = Angulo superior dextre — redimensionar
-pdfjs-editor-resizer-middle-right =
-    .aria-label = Medio dextre — redimensionar
-pdfjs-editor-resizer-bottom-right =
-    .aria-label = Angulo inferior dextre — redimensionar
-pdfjs-editor-resizer-bottom-middle =
-    .aria-label = Medio inferior — redimensionar
-pdfjs-editor-resizer-bottom-left =
-    .aria-label = Angulo inferior sinistre — redimensionar
-pdfjs-editor-resizer-middle-left =
-    .aria-label = Medio sinistre — redimensionar
+# Translations for ngx-extended-pdf-viewer additions only available in en-US
 unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
 pdfjs-infinite-scroll-button-label = Infinite scroll
 pdfjs-find-multiple-checkbox-label = match each word
 pdfjs-find-regexp-checkbox-label = regular expression
+pdfjs-free-text2 =
+    .aria-label = Text Editor
+    .default-content = Start typing…
+pdfjs-editor-undo-bar-message-highlight = Highlight removed
+pdfjs-editor-undo-bar-message-freetext = Text removed
+pdfjs-editor-undo-bar-message-ink = Drawing removed
+pdfjs-editor-undo-bar-message-stamp = Image removed
+pdfjs-editor-undo-bar-message-multiple =
+    { $count ->
+        [one] { $count } annotation removed
+       *[other] { $count } annotations removed
+    }
+pdfjs-editor-undo-bar-undo-button =
+    .title = Undo
+pdfjs-editor-undo-bar-undo-button-label = Undo
+pdfjs-editor-undo-bar-close-button =
+    .title = Close
+pdfjs-editor-undo-bar-close-button-label = Close

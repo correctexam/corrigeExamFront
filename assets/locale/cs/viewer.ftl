@@ -105,6 +105,14 @@ pdfjs-document-properties-button-label = Vlastnosti dokumentu…
 pdfjs-document-properties-file-name = Název souboru:
 pdfjs-document-properties-file-size = Velikost souboru:
 # Variables:
+#   $kb (Number) - the PDF file size in kilobytes
+#   $b (Number) - the PDF file size in bytes
+pdfjs-document-properties-size-kb = { NUMBER($kb, maximumSignificantDigits: 3) } kB ({ $b } bajtů)
+# Variables:
+#   $mb (Number) - the PDF file size in megabytes
+#   $b (Number) - the PDF file size in bytes
+pdfjs-document-properties-size-mb = { NUMBER($mb, maximumSignificantDigits: 3) } MB ({ $b } bajtů)
+# Variables:
 #   $size_kb (Number) - the PDF file size in kilobytes
 #   $size_b (Number) - the PDF file size in bytes
 pdfjs-document-properties-kb = { $size_kb } KB ({ $size_b } bajtů)
@@ -376,6 +384,22 @@ pdfjs-editor-resizer-label-bottom-right = Pravý dolní roh — změna velikosti
 pdfjs-editor-resizer-label-bottom-middle = Střed dole — změna velikosti
 pdfjs-editor-resizer-label-bottom-left = Levý dolní roh — změna velikosti
 pdfjs-editor-resizer-label-middle-left = Vlevo uprostřed — změna velikosti
+pdfjs-editor-resizer-top-left =
+    .aria-label = Levý horní roh — změna velikosti
+pdfjs-editor-resizer-top-middle =
+    .aria-label = Horní střed — změna velikosti
+pdfjs-editor-resizer-top-right =
+    .aria-label = Pravý horní roh — změna velikosti
+pdfjs-editor-resizer-middle-right =
+    .aria-label = Vpravo uprostřed — změna velikosti
+pdfjs-editor-resizer-bottom-right =
+    .aria-label = Pravý dolní roh — změna velikosti
+pdfjs-editor-resizer-bottom-middle =
+    .aria-label = Střed dole — změna velikosti
+pdfjs-editor-resizer-bottom-left =
+    .aria-label = Levý dolní roh — změna velikosti
+pdfjs-editor-resizer-middle-left =
+    .aria-label = Vlevo uprostřed — změna velikosti
 
 ## Color picker
 
@@ -460,25 +484,26 @@ pdfjs-editor-alt-text-settings-show-dialog-button-label = Při přidávání obr
 pdfjs-editor-alt-text-settings-show-dialog-description = Pomůže vám zajistit, aby všechny vaše obrázky obsahovaly alternativní text.
 pdfjs-editor-alt-text-settings-close-button = Zavřít
 
-pdfjs-document-properties-size-kb = { NUMBER($kb, maximumSignificantDigits: 3) } kB ({ $b } bajtů)
-pdfjs-document-properties-size-mb = { NUMBER($mb, maximumSignificantDigits: 3) } MB ({ $b } bajtů)
-pdfjs-editor-resizer-top-left =
-    .aria-label = Levý horní roh — změna velikosti
-pdfjs-editor-resizer-top-middle =
-    .aria-label = Horní střed — změna velikosti
-pdfjs-editor-resizer-top-right =
-    .aria-label = Pravý horní roh — změna velikosti
-pdfjs-editor-resizer-middle-right =
-    .aria-label = Vpravo uprostřed — změna velikosti
-pdfjs-editor-resizer-bottom-right =
-    .aria-label = Pravý dolní roh — změna velikosti
-pdfjs-editor-resizer-bottom-middle =
-    .aria-label = Střed dole — změna velikosti
-pdfjs-editor-resizer-bottom-left =
-    .aria-label = Levý dolní roh — změna velikosti
-pdfjs-editor-resizer-middle-left =
-    .aria-label = Vlevo uprostřed — změna velikosti
+# Translations for ngx-extended-pdf-viewer additions only available in en-US
 unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
 pdfjs-infinite-scroll-button-label = Infinite scroll
 pdfjs-find-multiple-checkbox-label = match each word
 pdfjs-find-regexp-checkbox-label = regular expression
+pdfjs-free-text2 =
+    .aria-label = Text Editor
+    .default-content = Start typing…
+pdfjs-editor-undo-bar-message-highlight = Highlight removed
+pdfjs-editor-undo-bar-message-freetext = Text removed
+pdfjs-editor-undo-bar-message-ink = Drawing removed
+pdfjs-editor-undo-bar-message-stamp = Image removed
+pdfjs-editor-undo-bar-message-multiple =
+    { $count ->
+        [one] { $count } annotation removed
+       *[other] { $count } annotations removed
+    }
+pdfjs-editor-undo-bar-undo-button =
+    .title = Undo
+pdfjs-editor-undo-bar-undo-button-label = Undo
+pdfjs-editor-undo-bar-close-button =
+    .title = Close
+pdfjs-editor-undo-bar-close-button-label = Close

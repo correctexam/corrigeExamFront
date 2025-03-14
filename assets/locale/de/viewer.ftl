@@ -105,6 +105,14 @@ pdfjs-document-properties-button-label = Dokumenteigenschaften…
 pdfjs-document-properties-file-name = Dateiname:
 pdfjs-document-properties-file-size = Dateigröße:
 # Variables:
+#   $kb (Number) - the PDF file size in kilobytes
+#   $b (Number) - the PDF file size in bytes
+pdfjs-document-properties-size-kb = { NUMBER($kb, maximumSignificantDigits: 3) } KB ({ $b } Bytes)
+# Variables:
+#   $mb (Number) - the PDF file size in megabytes
+#   $b (Number) - the PDF file size in bytes
+pdfjs-document-properties-size-mb = { NUMBER($mb, maximumSignificantDigits: 3) } MB ({ $b } Bytes)
+# Variables:
 #   $size_kb (Number) - the PDF file size in kilobytes
 #   $size_b (Number) - the PDF file size in bytes
 pdfjs-document-properties-kb = { $size_kb } KB ({ $size_b } Bytes)
@@ -118,6 +126,9 @@ pdfjs-document-properties-subject = Thema:
 pdfjs-document-properties-keywords = Stichwörter:
 pdfjs-document-properties-creation-date = Erstelldatum:
 pdfjs-document-properties-modification-date = Bearbeitungsdatum:
+# Variables:
+#   $dateObj (Date) - the creation/modification date and time of the PDF file
+pdfjs-document-properties-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
 # Variables:
 #   $date (Date) - the creation/modification date of the PDF file
 #   $time (Time) - the creation/modification time of the PDF file
@@ -275,6 +286,9 @@ pdfjs-annotation-date-string = { $date }, { $time }
 # Some common types are e.g.: "Check", "Text", "Comment", "Note"
 pdfjs-text-annotation-type =
     .alt = [Anlage: { $type }]
+# Variables:
+#   $dateObj (Date) - the modification date and time of the annotation
+pdfjs-annotation-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
 
 ## Password
 
@@ -366,6 +380,22 @@ pdfjs-editor-resizer-label-bottom-right = Rechte untere Ecke - Größe ändern
 pdfjs-editor-resizer-label-bottom-middle = Unten mittig - Größe ändern
 pdfjs-editor-resizer-label-bottom-left = Linke untere Ecke - Größe ändern
 pdfjs-editor-resizer-label-middle-left = Mitte links - Größe ändern
+pdfjs-editor-resizer-top-left =
+    .aria-label = Linke obere Ecke - Größe ändern
+pdfjs-editor-resizer-top-middle =
+    .aria-label = Oben mittig - Größe ändern
+pdfjs-editor-resizer-top-right =
+    .aria-label = Rechts oben - Größe ändern
+pdfjs-editor-resizer-middle-right =
+    .aria-label = Mitte rechts - Größe ändern
+pdfjs-editor-resizer-bottom-right =
+    .aria-label = Rechte untere Ecke - Größe ändern
+pdfjs-editor-resizer-bottom-middle =
+    .aria-label = Unten mittig - Größe ändern
+pdfjs-editor-resizer-bottom-left =
+    .aria-label = Linke untere Ecke - Größe ändern
+pdfjs-editor-resizer-middle-left =
+    .aria-label = Mitte links - Größe ändern
 
 ## Color picker
 
@@ -406,8 +436,6 @@ pdfjs-editor-new-alt-text-textarea =
 pdfjs-editor-new-alt-text-description = Kurze Beschreibung für Personen, die die Grafik nicht sehen können, oder wenn die Grafik nicht geladen wird.
 # This is a required legal disclaimer that refers to the automatically created text inside the alt text box above this text. It disappears if the text is edited by a human.
 pdfjs-editor-new-alt-text-disclaimer1 = Dieser Alternativ-Text wurde automatisch erstellt und könnte ungenau sein.
-# This is a required legal disclaimer that refers to the automatically created text inside the alt text box above this text. It disappears if the text is edited by a human.
-pdfjs-editor-new-alt-text-disclaimer = Dieser Alternativ-Text wurde automatisch erstellt.
 pdfjs-editor-new-alt-text-disclaimer-learn-more-url = Weitere Informationen
 pdfjs-editor-new-alt-text-create-automatically-button-label = Alternativ-Text automatisch erstellen
 pdfjs-editor-new-alt-text-not-now-button = Nicht jetzt
@@ -452,30 +480,27 @@ pdfjs-editor-alt-text-settings-show-dialog-button-label = Alternativ-Texteditor 
 pdfjs-editor-alt-text-settings-show-dialog-description = Hilft Ihnen, sicherzustellen, dass alle Ihre Grafiken Alternativ-Text haben.
 pdfjs-editor-alt-text-settings-close-button = Schließen
 
-pdfjs-document-properties-size-kb = { NUMBER($kb, maximumSignificantDigits: 3) } KB ({ $b } Bytes)
-pdfjs-document-properties-size-mb = { NUMBER($mb, maximumSignificantDigits: 3) } MB ({ $b } Bytes)
-pdfjs-document-properties-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
-pdfjs-annotation-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
-pdfjs-editor-resizer-top-left =
-    .aria-label = Linke obere Ecke - Größe ändern
-pdfjs-editor-resizer-top-middle =
-    .aria-label = Oben mittig - Größe ändern
-pdfjs-editor-resizer-top-right =
-    .aria-label = Rechts oben - Größe ändern
-pdfjs-editor-resizer-middle-right =
-    .aria-label = Mitte rechts - Größe ändern
-pdfjs-editor-resizer-bottom-right =
-    .aria-label = Rechte untere Ecke - Größe ändern
-pdfjs-editor-resizer-bottom-middle =
-    .aria-label = Unten mittig - Größe ändern
-pdfjs-editor-resizer-bottom-left =
-    .aria-label = Linke untere Ecke - Größe ändern
-pdfjs-editor-resizer-middle-left =
-    .aria-label = Mitte links - Größe ändern
-unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
-pdfjs-infinite-scroll-button-label = Infinite scroll
-pdfjs-find-multiple-checkbox-label = match each word
-pdfjs-find-regexp-checkbox-label = regular expression
-
-# Translations for ngx-extended-pdf-viewer additions
-
+# Additional translations for ngx-extended-pdf-viewer (de)
+unverified-signature-warning = Diese PDF-Datei enthält eine digitale Signatur. Der PDF-Viewer kann nicht überprüfen, ob die Signatur gültig ist. Bitte laden Sie die Datei herunter und öffnen Sie sie in Acrobat Reader, um die Gültigkeit der Signatur zu überprüfen.
+pdfjs-infinite-scroll-button-label = Infinite Scroll
+pdfjs-find-multiple-checkbox-label = Jedes Wort finden
+pdfjs-find-regexp-checkbox-label = Regulärer Ausdruck
+# Translations for ngx-extended-pdf-viewer additions only available in en-US
+pdfjs-free-text2 =
+    .aria-label = Text Editor
+    .default-content = Start typing…
+pdfjs-editor-undo-bar-message-highlight = Highlight removed
+pdfjs-editor-undo-bar-message-freetext = Text removed
+pdfjs-editor-undo-bar-message-ink = Drawing removed
+pdfjs-editor-undo-bar-message-stamp = Image removed
+pdfjs-editor-undo-bar-message-multiple =
+    { $count ->
+        [one] { $count } annotation removed
+       *[other] { $count } annotations removed
+    }
+pdfjs-editor-undo-bar-undo-button =
+    .title = Undo
+pdfjs-editor-undo-bar-undo-button-label = Undo
+pdfjs-editor-undo-bar-close-button =
+    .title = Close
+pdfjs-editor-undo-bar-close-button-label = Close

@@ -376,6 +376,22 @@ pdfjs-editor-resizer-label-bottom-right = Coin inférieur droit — redimensionn
 pdfjs-editor-resizer-label-bottom-middle = Centre bas — redimensionner
 pdfjs-editor-resizer-label-bottom-left = Coin inférieur gauche — redimensionner
 pdfjs-editor-resizer-label-middle-left = Milieu gauche — redimensionner
+pdfjs-editor-resizer-top-left =
+    .aria-label = Coin supérieur gauche — redimensionner
+pdfjs-editor-resizer-top-middle =
+    .aria-label = Milieu haut — redimensionner
+pdfjs-editor-resizer-top-right =
+    .aria-label = Coin supérieur droit — redimensionner
+pdfjs-editor-resizer-middle-right =
+    .aria-label = Milieu droit — redimensionner
+pdfjs-editor-resizer-bottom-right =
+    .aria-label = Coin inférieur droit — redimensionner
+pdfjs-editor-resizer-bottom-middle =
+    .aria-label = Centre bas — redimensionner
+pdfjs-editor-resizer-bottom-left =
+    .aria-label = Coin inférieur gauche — redimensionner
+pdfjs-editor-resizer-middle-left =
+    .aria-label = Milieu gauche — redimensionner
 
 ## Color picker
 
@@ -460,26 +476,27 @@ pdfjs-editor-alt-text-settings-show-dialog-button-label = Afficher l’éditeur 
 pdfjs-editor-alt-text-settings-show-dialog-description = Vous aide à vous assurer que toutes vos images ont du texte alternatif.
 pdfjs-editor-alt-text-settings-close-button = Fermer
 
-pdfjs-editor-resizer-top-left =
-    .aria-label = Coin supérieur gauche — redimensionner
-pdfjs-editor-resizer-top-middle =
-    .aria-label = Milieu haut — redimensionner
-pdfjs-editor-resizer-top-right =
-    .aria-label = Coin supérieur droit — redimensionner
-pdfjs-editor-resizer-middle-right =
-    .aria-label = Milieu droit — redimensionner
-pdfjs-editor-resizer-bottom-right =
-    .aria-label = Coin inférieur droit — redimensionner
-pdfjs-editor-resizer-bottom-middle =
-    .aria-label = Centre bas — redimensionner
-pdfjs-editor-resizer-bottom-left =
-    .aria-label = Coin inférieur gauche — redimensionner
-pdfjs-editor-resizer-middle-left =
-    .aria-label = Milieu gauche — redimensionner
-unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
-pdfjs-infinite-scroll-button-label = Infinite scroll
-pdfjs-find-multiple-checkbox-label = match each word
-pdfjs-find-regexp-checkbox-label = regular expression
-
-# Translations for ngx-extended-pdf-viewer additions
-
+# Additional translations for ngx-extended-pdf-viewer (fr)
+unverified-signature-warning = Ce fichier PDF contient une signature numérique. Le lecteur PDF ne peut pas vérifier si la signature est valide. Veuillez télécharger le fichier et l’ouvrir dans Acrobat Reader pour vérifier si la signature est valide.
+pdfjs-infinite-scroll-button-label = Défilement infini
+pdfjs-find-multiple-checkbox-label = Correspondre à chaque mot
+pdfjs-find-regexp-checkbox-label = Expression régulière
+# Translations for ngx-extended-pdf-viewer additions only available in en-US
+pdfjs-free-text2 =
+    .aria-label = Text Editor
+    .default-content = Start typing…
+pdfjs-editor-undo-bar-message-highlight = Highlight removed
+pdfjs-editor-undo-bar-message-freetext = Text removed
+pdfjs-editor-undo-bar-message-ink = Drawing removed
+pdfjs-editor-undo-bar-message-stamp = Image removed
+pdfjs-editor-undo-bar-message-multiple =
+    { $count ->
+        [one] { $count } annotation removed
+       *[other] { $count } annotations removed
+    }
+pdfjs-editor-undo-bar-undo-button =
+    .title = Undo
+pdfjs-editor-undo-bar-undo-button-label = Undo
+pdfjs-editor-undo-bar-close-button =
+    .title = Close
+pdfjs-editor-undo-bar-close-button-label = Close
