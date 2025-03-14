@@ -105,6 +105,14 @@ pdfjs-document-properties-button-label = Уласцівасці дакумент
 pdfjs-document-properties-file-name = Назва файла:
 pdfjs-document-properties-file-size = Памер файла:
 # Variables:
+#   $kb (Number) - the PDF file size in kilobytes
+#   $b (Number) - the PDF file size in bytes
+pdfjs-document-properties-size-kb = { NUMBER($kb, maximumSignificantDigits: 3) } КБ ({ $b } байтаў)
+# Variables:
+#   $mb (Number) - the PDF file size in megabytes
+#   $b (Number) - the PDF file size in bytes
+pdfjs-document-properties-size-mb = { NUMBER($mb, maximumSignificantDigits: 3) } МБ ({ $b } байтаў)
+# Variables:
 #   $size_kb (Number) - the PDF file size in kilobytes
 #   $size_b (Number) - the PDF file size in bytes
 pdfjs-document-properties-kb = { $size_kb } КБ ({ $size_b } байт)
@@ -374,6 +382,22 @@ pdfjs-editor-resizer-label-bottom-right = Правы ніжні кут — зм�
 pdfjs-editor-resizer-label-bottom-middle = Пасярэдзіне ўнізе — змяніць памер
 pdfjs-editor-resizer-label-bottom-left = Левы ніжні кут — змяніць памер
 pdfjs-editor-resizer-label-middle-left = Пасярэдзіне злева — змяніць памер
+pdfjs-editor-resizer-top-left =
+    .aria-label = Верхні левы кут — змяніць памер
+pdfjs-editor-resizer-top-middle =
+    .aria-label = Уверсе пасярэдзіне — змяніць памер
+pdfjs-editor-resizer-top-right =
+    .aria-label = Верхні правы кут — змяніць памер
+pdfjs-editor-resizer-middle-right =
+    .aria-label = Пасярэдзіне справа — змяніць памер
+pdfjs-editor-resizer-bottom-right =
+    .aria-label = Правы ніжні кут — змяніць памер
+pdfjs-editor-resizer-bottom-middle =
+    .aria-label = Пасярэдзіне ўнізе — змяніць памер
+pdfjs-editor-resizer-bottom-left =
+    .aria-label = Левы ніжні кут — змяніць памер
+pdfjs-editor-resizer-middle-left =
+    .aria-label = Пасярэдзіне злева — змяніць памер
 
 ## Color picker
 
@@ -458,25 +482,26 @@ pdfjs-editor-alt-text-settings-show-dialog-button-label = Адразу пака�
 pdfjs-editor-alt-text-settings-show-dialog-description = Дапамагае пераканацца, што ўсе вашы выявы маюць альтэрнатыўны тэкст.
 pdfjs-editor-alt-text-settings-close-button = Закрыць
 
-pdfjs-document-properties-size-kb = { NUMBER($kb, maximumSignificantDigits: 3) } КБ ({ $b } байтаў)
-pdfjs-document-properties-size-mb = { NUMBER($mb, maximumSignificantDigits: 3) } МБ ({ $b } байтаў)
-pdfjs-editor-resizer-top-left =
-    .aria-label = Верхні левы кут — змяніць памер
-pdfjs-editor-resizer-top-middle =
-    .aria-label = Уверсе пасярэдзіне — змяніць памер
-pdfjs-editor-resizer-top-right =
-    .aria-label = Верхні правы кут — змяніць памер
-pdfjs-editor-resizer-middle-right =
-    .aria-label = Пасярэдзіне справа — змяніць памер
-pdfjs-editor-resizer-bottom-right =
-    .aria-label = Правы ніжні кут — змяніць памер
-pdfjs-editor-resizer-bottom-middle =
-    .aria-label = Пасярэдзіне ўнізе — змяніць памер
-pdfjs-editor-resizer-bottom-left =
-    .aria-label = Левы ніжні кут — змяніць памер
-pdfjs-editor-resizer-middle-left =
-    .aria-label = Пасярэдзіне злева — змяніць памер
+# Translations for ngx-extended-pdf-viewer additions only available in en-US
 unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
 pdfjs-infinite-scroll-button-label = Infinite scroll
 pdfjs-find-multiple-checkbox-label = match each word
 pdfjs-find-regexp-checkbox-label = regular expression
+pdfjs-free-text2 =
+    .aria-label = Text Editor
+    .default-content = Start typing…
+pdfjs-editor-undo-bar-message-highlight = Highlight removed
+pdfjs-editor-undo-bar-message-freetext = Text removed
+pdfjs-editor-undo-bar-message-ink = Drawing removed
+pdfjs-editor-undo-bar-message-stamp = Image removed
+pdfjs-editor-undo-bar-message-multiple =
+    { $count ->
+        [one] { $count } annotation removed
+       *[other] { $count } annotations removed
+    }
+pdfjs-editor-undo-bar-undo-button =
+    .title = Undo
+pdfjs-editor-undo-bar-undo-button-label = Undo
+pdfjs-editor-undo-bar-close-button =
+    .title = Close
+pdfjs-editor-undo-bar-close-button-label = Close

@@ -380,6 +380,22 @@ pdfjs-editor-resizer-label-bottom-right = Esquina inferior derecha — cambiar e
 pdfjs-editor-resizer-label-bottom-middle = Borde inferior en el medio — cambiar el tamaño
 pdfjs-editor-resizer-label-bottom-left = Esquina inferior izquierda — cambiar el tamaño
 pdfjs-editor-resizer-label-middle-left = Borde izquierdo en el medio — cambiar el tamaño
+pdfjs-editor-resizer-top-left =
+    .aria-label = Esquina superior izquierda — cambiar el tamaño
+pdfjs-editor-resizer-top-middle =
+    .aria-label = Borde superior en el medio — cambiar el tamaño
+pdfjs-editor-resizer-top-right =
+    .aria-label = Esquina superior derecha — cambiar el tamaño
+pdfjs-editor-resizer-middle-right =
+    .aria-label = Borde derecho en el medio — cambiar el tamaño
+pdfjs-editor-resizer-bottom-right =
+    .aria-label = Esquina inferior derecha — cambiar el tamaño
+pdfjs-editor-resizer-bottom-middle =
+    .aria-label = Borde inferior en el medio — cambiar el tamaño
+pdfjs-editor-resizer-bottom-left =
+    .aria-label = Esquina inferior izquierda — cambiar el tamaño
+pdfjs-editor-resizer-middle-left =
+    .aria-label = Borde izquierdo en el medio — cambiar el tamaño
 
 ## Color picker
 
@@ -464,26 +480,27 @@ pdfjs-editor-alt-text-settings-show-dialog-button-label = Mostrar el editor de t
 pdfjs-editor-alt-text-settings-show-dialog-description = Te ayuda a asegurarte de que todas tus imágenes tengan texto alternativo.
 pdfjs-editor-alt-text-settings-close-button = Cerrar
 
-pdfjs-editor-resizer-top-left =
-    .aria-label = Esquina superior izquierda — cambiar el tamaño
-pdfjs-editor-resizer-top-middle =
-    .aria-label = Borde superior en el medio — cambiar el tamaño
-pdfjs-editor-resizer-top-right =
-    .aria-label = Esquina superior derecha — cambiar el tamaño
-pdfjs-editor-resizer-middle-right =
-    .aria-label = Borde derecho en el medio — cambiar el tamaño
-pdfjs-editor-resizer-bottom-right =
-    .aria-label = Esquina inferior derecha — cambiar el tamaño
-pdfjs-editor-resizer-bottom-middle =
-    .aria-label = Borde inferior en el medio — cambiar el tamaño
-pdfjs-editor-resizer-bottom-left =
-    .aria-label = Esquina inferior izquierda — cambiar el tamaño
-pdfjs-editor-resizer-middle-left =
-    .aria-label = Borde izquierdo en el medio — cambiar el tamaño
-unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
-pdfjs-infinite-scroll-button-label = Infinite scroll
-pdfjs-find-multiple-checkbox-label = match each word
-pdfjs-find-regexp-checkbox-label = regular expression
-
-# Translations for ngx-extended-pdf-viewer additions
-
+# Additional translations for ngx-extended-pdf-viewer (es)
+unverified-signature-warning = Este archivo PDF contiene una firma digital. El visor de PDF no puede verificar si la firma es válida. Por favor, descargue el archivo y ábralo en Acrobat Reader para verificar si la firma es válida.
+pdfjs-infinite-scroll-button-label = Desplazamiento infinito
+pdfjs-find-multiple-checkbox-label = Coincidir cada palabra
+pdfjs-find-regexp-checkbox-label = Expresión regular
+# Translations for ngx-extended-pdf-viewer additions only available in en-US
+pdfjs-free-text2 =
+    .aria-label = Text Editor
+    .default-content = Start typing…
+pdfjs-editor-undo-bar-message-highlight = Highlight removed
+pdfjs-editor-undo-bar-message-freetext = Text removed
+pdfjs-editor-undo-bar-message-ink = Drawing removed
+pdfjs-editor-undo-bar-message-stamp = Image removed
+pdfjs-editor-undo-bar-message-multiple =
+    { $count ->
+        [one] { $count } annotation removed
+       *[other] { $count } annotations removed
+    }
+pdfjs-editor-undo-bar-undo-button =
+    .title = Undo
+pdfjs-editor-undo-bar-undo-button-label = Undo
+pdfjs-editor-undo-bar-close-button =
+    .title = Close
+pdfjs-editor-undo-bar-close-button-label = Close

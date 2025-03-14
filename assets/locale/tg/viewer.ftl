@@ -105,6 +105,14 @@ pdfjs-document-properties-button-label = Хусусиятҳои ҳуҷҷат…
 pdfjs-document-properties-file-name = Номи файл:
 pdfjs-document-properties-file-size = Андозаи файл:
 # Variables:
+#   $kb (Number) - the PDF file size in kilobytes
+#   $b (Number) - the PDF file size in bytes
+pdfjs-document-properties-size-kb = { NUMBER($kb, maximumSignificantDigits: 3) } КБ ({ $b } байт)
+# Variables:
+#   $mb (Number) - the PDF file size in megabytes
+#   $b (Number) - the PDF file size in bytes
+pdfjs-document-properties-size-mb = { NUMBER($mb, maximumSignificantDigits: 3) } МБ ({ $b } байт)
+# Variables:
 #   $size_kb (Number) - the PDF file size in kilobytes
 #   $size_b (Number) - the PDF file size in bytes
 pdfjs-document-properties-kb = { $size_kb } КБ ({ $size_b } байт)
@@ -118,6 +126,9 @@ pdfjs-document-properties-subject = Мавзуъ:
 pdfjs-document-properties-keywords = Калимаҳои калидӣ:
 pdfjs-document-properties-creation-date = Санаи эҷод:
 pdfjs-document-properties-modification-date = Санаи тағйирот:
+# Variables:
+#   $dateObj (Date) - the creation/modification date and time of the PDF file
+pdfjs-document-properties-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
 # Variables:
 #   $date (Date) - the creation/modification date of the PDF file
 #   $time (Time) - the creation/modification time of the PDF file
@@ -275,6 +286,9 @@ pdfjs-annotation-date-string = { $date }, { $time }
 # Some common types are e.g.: "Check", "Text", "Comment", "Note"
 pdfjs-text-annotation-type =
     .alt = [Ҳошиянависӣ - { $type }]
+# Variables:
+#   $dateObj (Date) - the modification date and time of the annotation
+pdfjs-annotation-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
 
 ## Password
 
@@ -340,8 +354,8 @@ pdfjs-ink-canvas =
 ## Alt-text dialog
 
 # Alternative text (alt text) helps when people can't see the image.
-pdfjs-editor-alt-text-button-label = Матни ивазкунанда
-pdfjs-editor-alt-text-edit-button-label = Таҳрир кардани матни ивазкунанда
+pdfjs-editor-alt-text-button-label = Матни иловагӣ
+pdfjs-editor-alt-text-edit-button-label = Таҳрир кардани матни иловагӣ
 pdfjs-editor-alt-text-dialog-label = Имконеро интихоб намоед
 pdfjs-editor-alt-text-dialog-description = Вақте ки одамон тасвирро дида наметавонанд ё вақте ки тасвир бор карда намешавад, матни иловагӣ (Alt text) кумак мерасонад.
 pdfjs-editor-alt-text-add-description-label = Илова кардани тавсиф
@@ -366,6 +380,22 @@ pdfjs-editor-resizer-label-bottom-right = Кунҷи рости поён — т�
 pdfjs-editor-resizer-label-bottom-middle = Канори миёнаи поён — тағйир додани андоза
 pdfjs-editor-resizer-label-bottom-left = Кунҷи чапи поён — тағйир додани андоза
 pdfjs-editor-resizer-label-middle-left = Канори миёнаи чап — тағйир додани андоза
+pdfjs-editor-resizer-top-left =
+    .aria-label = Кунҷи чапи боло — тағйир додани андоза
+pdfjs-editor-resizer-top-middle =
+    .aria-label = Канори миёнаи боло — тағйир додани андоза
+pdfjs-editor-resizer-top-right =
+    .aria-label = Кунҷи рости боло — тағйир додани андоза
+pdfjs-editor-resizer-middle-right =
+    .aria-label = Канори миёнаи рост — тағйир додани андоза
+pdfjs-editor-resizer-bottom-right =
+    .aria-label = Кунҷи рости поён — тағйир додани андоза
+pdfjs-editor-resizer-bottom-middle =
+    .aria-label = Канори миёнаи поён — тағйир додани андоза
+pdfjs-editor-resizer-bottom-left =
+    .aria-label = Кунҷи чапи поён — тағйир додани андоза
+pdfjs-editor-resizer-middle-left =
+    .aria-label = Канори миёнаи чап — тағйир додани андоза
 
 ## Color picker
 
@@ -396,41 +426,28 @@ pdfjs-editor-highlight-show-all-button =
 ## New alt-text dialog
 ## Group note for entire feature: Alternative text (alt text) helps when people can't see the image. This feature includes a tool to create alt text automatically using an AI model that works locally on the user's device to preserve privacy.
 
-pdfjs-editor-new-alt-text-disclaimer-learn-more-url = Маълумоти бештар
-
-## Image alt-text settings
-
-
-pdfjs-document-properties-size-kb = { NUMBER($kb, maximumSignificantDigits: 3) } КБ ({ $b } байт)
-pdfjs-document-properties-size-mb = { NUMBER($mb, maximumSignificantDigits: 3) } МБ ({ $b } байт)
-pdfjs-document-properties-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
-pdfjs-annotation-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
-pdfjs-editor-resizer-top-left =
-    .aria-label = Кунҷи чапи боло — тағйир додани андоза
-pdfjs-editor-resizer-top-middle =
-    .aria-label = Канори миёнаи боло — тағйир додани андоза
-pdfjs-editor-resizer-top-right =
-    .aria-label = Кунҷи рости боло — тағйир додани андоза
-pdfjs-editor-resizer-middle-right =
-    .aria-label = Канори миёнаи рост — тағйир додани андоза
-pdfjs-editor-resizer-bottom-right =
-    .aria-label = Кунҷи рости поён — тағйир додани андоза
-pdfjs-editor-resizer-bottom-middle =
-    .aria-label = Канори миёнаи поён — тағйир додани андоза
-pdfjs-editor-resizer-bottom-left =
-    .aria-label = Кунҷи чапи поён — тағйир додани андоза
-pdfjs-editor-resizer-middle-left =
-    .aria-label = Канори миёнаи чап — тағйир додани андоза
+# Modal header positioned above a text box where users can edit the alt text.
 pdfjs-editor-new-alt-text-dialog-edit-label = Таҳрир кардани матни иловагӣ (тафсири тасвир)
+# Modal header positioned above a text box where users can add the alt text.
 pdfjs-editor-new-alt-text-dialog-add-label = Илова кардани матни иловагӣ (тафсири тасвир)
 pdfjs-editor-new-alt-text-textarea =
     .placeholder = Тафсири худро дар ин ҷо нависед…
+pdfjs-editor-new-alt-text-disclaimer-learn-more-url = Маълумоти бештар
 pdfjs-editor-new-alt-text-not-now-button = Ҳоло не
 pdfjs-editor-new-alt-text-error-close-button = Пӯшидан
+# This is a button that users can click to edit the alt text they have already added.
 pdfjs-editor-new-alt-text-added-button-label = Матни иловагӣ илова карда шуд
+# This is a button that users can click to open the alt text editor and add alt text when it is not present.
 pdfjs-editor-new-alt-text-missing-button-label = Матни иловагӣ вуҷуд надорад
+# This is a button that opens up the alt text modal where users should review the alt text that was automatically generated.
 pdfjs-editor-new-alt-text-to-review-button-label = Бознигарӣ кардани матни иловагӣ
+# "Created automatically" is a prefix that will be added to the beginning of any alt text that has been automatically generated. After the colon, the user will see/hear the actual alt text description. If the alt text has been edited by a human, this prefix will not appear.
+# Variables:
+#   $generatedAltText (String) - the generated alt-text.
 pdfjs-editor-new-alt-text-generated-alt-text-with-disclaimer = Ба таври худкор сохта шудааст: «{ $generatedAltText }»
+
+## Image alt-text settings
+
 pdfjs-image-alt-text-settings-button =
     .title = Танзимоти матни иловагии тасвир
 pdfjs-image-alt-text-settings-button-label = Танзимоти матни иловагии тасвир
@@ -442,6 +459,8 @@ pdfjs-editor-alt-text-settings-download-model-button = Боргирӣ карда
 pdfjs-editor-alt-text-settings-downloading-model-button = Дар ҳоли боргирӣ…
 pdfjs-editor-alt-text-settings-editor-title = Муҳаррири матни иловагӣ
 pdfjs-editor-alt-text-settings-close-button = Пӯшидан
+
+# Translations for ngx-extended-pdf-viewer additions only available in en-US
 pdfjs-editor-new-alt-text-description = Short description for people who can’t see the image or when the image doesn’t load.
 pdfjs-editor-new-alt-text-disclaimer1 = This alt text was created automatically and may be inaccurate.
 pdfjs-editor-new-alt-text-create-automatically-button-label = Create alt text automatically
@@ -458,3 +477,21 @@ unverified-signature-warning = This PDF file contains a digital signature. The P
 pdfjs-infinite-scroll-button-label = Infinite scroll
 pdfjs-find-multiple-checkbox-label = match each word
 pdfjs-find-regexp-checkbox-label = regular expression
+pdfjs-free-text2 =
+    .aria-label = Text Editor
+    .default-content = Start typing…
+pdfjs-editor-undo-bar-message-highlight = Highlight removed
+pdfjs-editor-undo-bar-message-freetext = Text removed
+pdfjs-editor-undo-bar-message-ink = Drawing removed
+pdfjs-editor-undo-bar-message-stamp = Image removed
+pdfjs-editor-undo-bar-message-multiple =
+    { $count ->
+        [one] { $count } annotation removed
+       *[other] { $count } annotations removed
+    }
+pdfjs-editor-undo-bar-undo-button =
+    .title = Undo
+pdfjs-editor-undo-bar-undo-button-label = Undo
+pdfjs-editor-undo-bar-close-button =
+    .title = Close
+pdfjs-editor-undo-bar-close-button-label = Close

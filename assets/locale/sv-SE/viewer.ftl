@@ -380,6 +380,22 @@ pdfjs-editor-resizer-label-bottom-right = Nedre högra hörnet — ändra storle
 pdfjs-editor-resizer-label-bottom-middle = Nedre mitten — ändra storlek
 pdfjs-editor-resizer-label-bottom-left = Nedre vänstra hörnet — ändra storlek
 pdfjs-editor-resizer-label-middle-left = Mitten till vänster — ändra storlek
+pdfjs-editor-resizer-top-left =
+    .aria-label = Det övre vänstra hörnet — ändra storlek
+pdfjs-editor-resizer-top-middle =
+    .aria-label = Överst i mitten — ändra storlek
+pdfjs-editor-resizer-top-right =
+    .aria-label = Det övre högra hörnet — ändra storlek
+pdfjs-editor-resizer-middle-right =
+    .aria-label = Mitten höger — ändra storlek
+pdfjs-editor-resizer-bottom-right =
+    .aria-label = Nedre högra hörnet — ändra storlek
+pdfjs-editor-resizer-bottom-middle =
+    .aria-label = Nedre mitten — ändra storlek
+pdfjs-editor-resizer-bottom-left =
+    .aria-label = Nedre vänstra hörnet — ändra storlek
+pdfjs-editor-resizer-middle-left =
+    .aria-label = Mitten till vänster — ändra storlek
 
 ## Color picker
 
@@ -464,23 +480,26 @@ pdfjs-editor-alt-text-settings-show-dialog-button-label = Visa alternativ textre
 pdfjs-editor-alt-text-settings-show-dialog-description = Hjälper dig att se till att alla dina bilder har alternativ text.
 pdfjs-editor-alt-text-settings-close-button = Stäng
 
-pdfjs-editor-resizer-top-left =
-    .aria-label = Det övre vänstra hörnet — ändra storlek
-pdfjs-editor-resizer-top-middle =
-    .aria-label = Överst i mitten — ändra storlek
-pdfjs-editor-resizer-top-right =
-    .aria-label = Det övre högra hörnet — ändra storlek
-pdfjs-editor-resizer-middle-right =
-    .aria-label = Mitten höger — ändra storlek
-pdfjs-editor-resizer-bottom-right =
-    .aria-label = Nedre högra hörnet — ändra storlek
-pdfjs-editor-resizer-bottom-middle =
-    .aria-label = Nedre mitten — ändra storlek
-pdfjs-editor-resizer-bottom-left =
-    .aria-label = Nedre vänstra hörnet — ändra storlek
-pdfjs-editor-resizer-middle-left =
-    .aria-label = Mitten till vänster — ändra storlek
+# Translations for ngx-extended-pdf-viewer additions only available in en-US
 unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
 pdfjs-infinite-scroll-button-label = Infinite scroll
 pdfjs-find-multiple-checkbox-label = match each word
 pdfjs-find-regexp-checkbox-label = regular expression
+pdfjs-free-text2 =
+    .aria-label = Text Editor
+    .default-content = Start typing…
+pdfjs-editor-undo-bar-message-highlight = Highlight removed
+pdfjs-editor-undo-bar-message-freetext = Text removed
+pdfjs-editor-undo-bar-message-ink = Drawing removed
+pdfjs-editor-undo-bar-message-stamp = Image removed
+pdfjs-editor-undo-bar-message-multiple =
+    { $count ->
+        [one] { $count } annotation removed
+       *[other] { $count } annotations removed
+    }
+pdfjs-editor-undo-bar-undo-button =
+    .title = Undo
+pdfjs-editor-undo-bar-undo-button-label = Undo
+pdfjs-editor-undo-bar-close-button =
+    .title = Close
+pdfjs-editor-undo-bar-close-button-label = Close

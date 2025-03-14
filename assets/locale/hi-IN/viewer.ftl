@@ -39,12 +39,6 @@ pdfjs-open-file-button-label = खोलें
 pdfjs-print-button =
     .title = छापें
 pdfjs-print-button-label = छापें
-# Used in Firefox for Android.
-pdfjs-open-in-app-button =
-    .title = ऐप में खोलें
-# Used in Firefox for Android.
-# Length of the translation matters since we are in a mobile context, with limited screen estate.
-pdfjs-open-in-app-button-label = ऐप में खोलें
 
 ##  Secondary toolbar and context menu
 
@@ -242,6 +236,12 @@ pdfjs-web-fonts-disabled = वेब फॉन्ट्स निष्क्र
 
 ## Editing
 
+
+## Remove button for the various kind of editor.
+
+
+##
+
 # Editor Parameters
 pdfjs-editor-free-text-color-input = रंग
 
@@ -252,6 +252,21 @@ pdfjs-editor-free-text-color-input = रंग
 ## This is used in an aria label to help to understand the role of the resizer.
 
 
+## Color picker
+
+
+## Show all highlights
+## This is a toggle button to show/hide all the highlights.
+
+
+## New alt-text dialog
+## Group note for entire feature: Alternative text (alt text) helps when people can't see the image. This feature includes a tool to create alt text automatically using an AI model that works locally on the user's device to preserve privacy.
+
+
+## Image alt-text settings
+
+
+# Translations for ngx-extended-pdf-viewer additions only available in en-US
 pdfjs-save-button =
     .title = Save
 pdfjs-save-button-label = Save
@@ -282,12 +297,12 @@ pdfjs-current-outline-item-button-label = Current Outline Item
 pdfjs-additional-layers = Additional Layers
 pdfjs-find-match-diacritics-checkbox-label = Match Diacritics
 pdfjs-find-match-count =
-    { NUMBER($total) ->
+    { $total ->
         [one] { $current } of { $total } match
        *[other] { $current } of { $total } matches
     }
 pdfjs-find-match-count-limit =
-    { NUMBER($limit) ->
+    { $limit ->
         [one] More than { $limit } match
        *[other] More than { $limit } matches
     }
@@ -380,6 +395,8 @@ pdfjs-editor-colorpicker-pink =
 pdfjs-editor-colorpicker-red =
     .title = Red
 pdfjs-editor-highlight-show-all-button-label = Show all
+pdfjs-editor-highlight-show-all-button =
+    .title = Show all
 pdfjs-editor-new-alt-text-dialog-edit-label = Edit alt text (image description)
 pdfjs-editor-new-alt-text-dialog-add-label = Add alt text (image description)
 pdfjs-editor-new-alt-text-textarea =
@@ -418,3 +435,21 @@ unverified-signature-warning = This PDF file contains a digital signature. The P
 pdfjs-infinite-scroll-button-label = Infinite scroll
 pdfjs-find-multiple-checkbox-label = match each word
 pdfjs-find-regexp-checkbox-label = regular expression
+pdfjs-free-text2 =
+    .aria-label = Text Editor
+    .default-content = Start typing…
+pdfjs-editor-undo-bar-message-highlight = Highlight removed
+pdfjs-editor-undo-bar-message-freetext = Text removed
+pdfjs-editor-undo-bar-message-ink = Drawing removed
+pdfjs-editor-undo-bar-message-stamp = Image removed
+pdfjs-editor-undo-bar-message-multiple =
+    { $count ->
+        [one] { $count } annotation removed
+       *[other] { $count } annotations removed
+    }
+pdfjs-editor-undo-bar-undo-button =
+    .title = Undo
+pdfjs-editor-undo-bar-undo-button-label = Undo
+pdfjs-editor-undo-bar-close-button =
+    .title = Close
+pdfjs-editor-undo-bar-close-button-label = Close
