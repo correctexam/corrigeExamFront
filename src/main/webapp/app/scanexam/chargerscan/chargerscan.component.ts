@@ -450,13 +450,10 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
     this.processLastPage = true;
     await this.process();
   }
+
   async doNotProcessLastPage(): Promise<void> {
     this.processLastPage = false;
     await this.process();
-  }
-
-  onPdfError(): void {
-    console.error('error');
   }
 
   public async pdfloaded(): Promise<void> {
