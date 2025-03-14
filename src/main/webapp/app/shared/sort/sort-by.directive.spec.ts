@@ -7,6 +7,7 @@ import { fas, faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-i
 
 import { SortByDirective } from './sort-by.directive';
 import { SortDirective } from './sort.directive';
+import { NgIf } from '@angular/common';
 
 @Component({
   template: `
@@ -18,7 +19,7 @@ import { SortDirective } from './sort.directive';
       </thead>
     </table>
   `,
-  imports: [FaIconComponent, SortDirective, SortByDirective],
+  imports: [FaIconComponent, SortDirective, SortByDirective, NgIf],
   standalone: true,
 })
 class TestSortByDirectiveComponent {

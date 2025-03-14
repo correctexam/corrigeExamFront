@@ -63,7 +63,7 @@ describe('Home Component', () => {
     jest.spyOn(mockRouter, 'navigate').mockImplementation(() => Promise.resolve(true));
 
     mockTranslateService = TestBed.inject(TranslateService);
-    jest.spyOn(mockTranslateService, 'use').mockImplementation(() => of(''));
+    jest.spyOn(mockTranslateService, 'use').mockImplementation(() => of({}));
   });
 
   describe('ngOnInit', () => {
