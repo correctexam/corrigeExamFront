@@ -173,7 +173,8 @@
     <div class="row" *ngIf="editForm.get(['content'])?.value !== null">
       <ngx-extended-pdf-viewer
         [base64Src]="editForm.get(['content'])!.value"
-        [textLayer]="true"
+        [textLayer]="false"
+        [sidebarVisible]="false"
         [height]="'95%'"
         [showToolbar]="false"
         (pdfLoadingFailed)="onPdfError()"
