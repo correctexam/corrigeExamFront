@@ -136,11 +136,10 @@
     ></jhi-viewandreorderpages>
   </div>
 
-  <div class="canvas-wrapper foo" *ngIf="blob1">
+  <div class="canvas-wrapper foo">
     <ngx-extended-pdf-viewer
       [src]="blob1"
       style="flex: 1 1 100%"
-      #viewer
       [height]="'90vh'"
       [page]="1"
       [handTool]="false"
@@ -155,6 +154,11 @@
       [minZoom]="1"
       [maxZoom]="1"
       (pdfLoaded)="pdfloaded()"
+      [disableForms]="true"
+      [enableDragAndDrop]="true"
+      [enablePrint]="false"
+      [handTool]="false"
+      [showBorders]="false"
     ></ngx-extended-pdf-viewer>
   </div>
 </div>

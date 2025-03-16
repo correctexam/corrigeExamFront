@@ -26,7 +26,7 @@ import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { CacheUploadService } from '../exam-detail/cacheUpload.service';
 import { PreferenceService } from '../preference-page/preference.service';
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, OnDestroy } from '@angular/core';
 import { AlignImage, ImageDB, Template } from '../db/db';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TooltipModule } from 'primeng/tooltip';
@@ -41,7 +41,14 @@ import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { PageToRotateOrDeleteComponent } from './pagetorotateordelete/pagetorotateordelete.component';
 import { ImageModule } from 'primeng/image';
 import { DialogModule } from 'primeng/dialog';
-import { NgxExtendedPdfViewerModule, NgxExtendedPdfViewerService, ScrollModeType } from 'ngx-extended-pdf-viewer';
+
+import {
+  IPDFViewerApplication,
+  NgxExtendedPdfViewerService,
+  ScrollModeType,
+  NgxExtendedPdfViewerModule,
+  PDFNotificationService,
+} from 'ngx-extended-pdf-viewer';
 import { firstValueFrom } from 'rxjs';
 import { Exam, IExam } from 'app/entities/exam/exam.model';
 import { ToastModule } from 'primeng/toast';
@@ -73,7 +80,7 @@ import { MessageService } from 'primeng/api';
   ],
   providers: [DialogService, MessageService],
 })
-export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
+export class ViewandreorderpagesComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   examId!: number;
 
@@ -139,9 +146,21 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
     public dialogService: DialogService,
     public pdfService: NgxExtendedPdfViewerService,
     public messageService: MessageService,
+    private pdfNotificationService: PDFNotificationService,
   ) {}
   ngOnInit(): void {
     this.update();
+  }
+
+  ngOnDestroy(): void {
+    const PDFViewerApplication: IPDFViewerApplication = this.pdfNotificationService.onPDFJSInitSignal();
+
+    if (PDFViewerApplication) {
+      PDFViewerApplication.unbindEvents();
+      PDFViewerApplication.unbindWindowEvents();
+      PDFViewerApplication._cleanup();
+      PDFViewerApplication.close();
+    }
   }
 
   async update() {
@@ -724,20 +743,25 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
     }
   }
 
+  firstfireloaded = false;
   async pdfloaded() {
-    const scale = { scale: this.preferenceService.getPreference().pdfscale };
-    try {
-      const dataURL = await this.pdfService.getPageAsImage(this.currentPage, scale);
-      await this.saveImageScan(dataURL);
-    } catch (e) {
-      const e1 = await firstValueFrom(this.translateService.get('scanexam.pageinpdfdoesnotexit'));
-      const e2 = this.translateService.instant('scanexam.actionimpossible');
-      this.messageService.add({ severity: 'warn', summary: e2, detail: e1 });
-      this.setblocked.emit(false);
-      this.candropordelete = true;
-      this.showProgressBar = false;
-      this.currentPage = 0;
-      this.destinationpage = 0;
+    if (!this.firstfireloaded) {
+      this.firstfireloaded = true;
+      const scale = { scale: this.preferenceService.getPreference().pdfscale };
+      try {
+        const dataURL = await this.pdfService.getPageAsImage(this.currentPage, scale);
+        await this.saveImageScan(dataURL);
+      } catch (e) {
+        const e1 = await firstValueFrom(this.translateService.get('scanexam.pageinpdfdoesnotexit'));
+        const e2 = this.translateService.instant('scanexam.actionimpossible');
+        this.messageService.add({ severity: 'warn', summary: e2, detail: e1 });
+        this.setblocked.emit(false);
+        this.candropordelete = true;
+        this.showProgressBar = false;
+        this.currentPage = 0;
+        this.destinationpage = 0;
+        this.firstfireloaded = false;
+      }
     }
   }
 
@@ -792,6 +816,8 @@ export class ViewandreorderpagesComponent implements OnInit, AfterViewInit {
         this.showProgressBar = false;
         this.currentPage = 0;
         this.destinationpage = 0;
+        this.firstfireloaded = false;
+
         resolve();
         this.ngOnInit();
       };
