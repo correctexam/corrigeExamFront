@@ -10,7 +10,7 @@ describe('PaintComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [PaintComponent],
+      imports: [],
     }).compileComponents();
   });
 

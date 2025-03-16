@@ -134,7 +134,6 @@ export class CreerexamComponent implements OnInit, AfterViewInit {
     template.mark = this.editForm.get(['mark'])!.value;
     template.autoMapStudentCopyToList = true;
     template.caseboxname = this.editForm.get(['caseBoxName'])!.value ? this.editForm.get(['caseBoxName'])!.value : true;
-    console.error(template.caseboxname);
 
     this.templateService.create(template).subscribe({
       next: (res: HttpResponse<ITemplate>) => {

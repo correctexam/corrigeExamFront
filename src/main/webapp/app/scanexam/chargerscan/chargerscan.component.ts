@@ -209,6 +209,7 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
     private titleService: Title,
     private pdfNotificationService: PDFNotificationService,
   ) {
+    //    pdfDefaultOptions.assetsFolder = 'bleeding-edge';
     this.editForm = this.fb.group({
       content: [],
       contentContentType: [null, [Validators.required]],
@@ -444,8 +445,10 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
       this.loaded = true;
     }
   }
+
   i = 1;
   processLastPage = true;
+
   async doProcessLastPage(): Promise<void> {
     this.processLastPage = true;
     await this.process();
@@ -456,8 +459,11 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
     await this.process();
   }
 
+  firstEventFire = false;
+
   public async pdfloaded(): Promise<void> {
-    if (this.loaded && this.pdfService.numberOfPages() !== 0) {
+    if (!this.firstEventFire && this.loaded && this.pdfService.numberOfPages() !== 0) {
+      this.firstEventFire = true;
       if (!this.phase1) {
         this.nbreFeuilleParCopie = this.pdfService.numberOfPages();
         if (this.nbreFeuilleParCopie >= 3 && this.nbreFeuilleParCopie % 2 !== 0) {
@@ -491,7 +497,6 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
 
   async process(): Promise<void> {
     this.translateService.get('scanexam.processingencours').subscribe(res => (this.message = '' + res));
-
     this.blocked = true;
     this.currentPageAlignOver = 1;
     this.avancement = 0;
@@ -502,9 +507,19 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
           this.phase1 = true;
           if (this.exam.scanfileId) {
             if (this.blob !== undefined) {
-              this.blob1 = this.blob;
+              setTimeout(async () => {
+                if (this.exam.scanfileId) {
+                  this.firstEventFire = false;
+                  this.blob1 = this.blob;
+                }
+              }, 200);
             } else {
-              this.blob1 = await firstValueFrom(this.scanService.getPdf(this.exam.scanfileId));
+              setTimeout(async () => {
+                if (this.exam.scanfileId) {
+                  this.firstEventFire = false;
+                  this.blob1 = await firstValueFrom(this.scanService.getPdf(this.exam.scanfileId!));
+                }
+              }, 200);
             }
           }
         }
@@ -564,6 +579,7 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
       this.loaded = false;
       this.i = 1;
       this.phase1 = false;
+      this.firstEventFire = false;
     }
   }
 

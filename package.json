@@ -96,7 +96,7 @@
     "jszip": "3.10.1",
     "long": "^5.2.3",
     "ng-keyboard-shortcuts": "^13.0.8",
-    "ngx-extended-pdf-viewer": "23.0.0-alpha.4",
+    "ngx-extended-pdf-viewer": "22.3.9",
     "ngx-infinite-scroll": "19.0.0",
     "ngx-webstorage": "19.0.1",
     "node-polyfill-webpack-plugin": "^4.0.0",
