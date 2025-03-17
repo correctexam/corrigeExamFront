@@ -229,7 +229,6 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.blob = undefined;
     this.blob1 = undefined;
-    this.blob2 = undefined;
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('examid') !== null) {
         this.examid = params.get('examid')!;
@@ -441,13 +440,17 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
         this.firstPageToLoad = await this.db.countNonAlignImage(+this.examid!);
       }
       const e1 = await firstValueFrom(this.templateService.getPdf(this.exam.templateId));
-      this.blob1 = e1;
       this.loaded = true;
+      this.showPdfViewer = true;
+      setTimeout(() => (this.blob1 = e1), 500);
     }
   }
 
   i = 1;
   processLastPage = true;
+  firstEventFire = false;
+
+  showPdfViewer = false;
 
   async doProcessLastPage(): Promise<void> {
     this.processLastPage = true;
@@ -458,8 +461,6 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
     this.processLastPage = false;
     await this.process();
   }
-
-  firstEventFire = false;
 
   public async pdfloaded(): Promise<void> {
     if (!this.firstEventFire && this.loaded && this.pdfService.numberOfPages() !== 0) {
@@ -493,7 +494,6 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
 
   blob: any;
   blob1: any;
-  blob2: any;
 
   async process(): Promise<void> {
     this.translateService.get('scanexam.processingencours').subscribe(res => (this.message = '' + res));
@@ -580,6 +580,16 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
       this.i = 1;
       this.phase1 = false;
       this.firstEventFire = false;
+      this.blob1 = undefined;
+      this.blob = undefined;
+      const PDFViewerApplication: IPDFViewerApplication = this.pdfNotificationService.onPDFJSInitSignal();
+      if (PDFViewerApplication) {
+        await PDFViewerApplication.unbindEvents();
+        await PDFViewerApplication.unbindWindowEvents();
+        await PDFViewerApplication._cleanup();
+        await PDFViewerApplication.close();
+        this.showPdfViewer = false;
+      }
     }
   }
 

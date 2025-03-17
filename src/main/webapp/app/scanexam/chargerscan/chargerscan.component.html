@@ -135,30 +135,31 @@
       [examId]="+examid!"
     ></jhi-viewandreorderpages>
   </div>
-
-  <div class="canvas-wrapper foo">
-    <ngx-extended-pdf-viewer
-      [src]="blob1"
-      style="flex: 1 1 100%"
-      [height]="'90vh'"
-      [page]="1"
-      [handTool]="false"
-      [showHandToolButton]="false"
-      [textLayer]="false"
-      [(scrollMode)]="scrollMode"
-      [showToolbar]="false"
-      [showSecondaryToolbarButton]="false"
-      [sidebarVisible]="false"
-      backgroundColor="#ffffff"
-      [zoom]="'100%'"
-      [minZoom]="1"
-      [maxZoom]="1"
-      (pdfLoaded)="pdfloaded()"
-      [disableForms]="true"
-      [enableDragAndDrop]="true"
-      [enablePrint]="false"
-      [handTool]="false"
-      [showBorders]="false"
-    ></ngx-extended-pdf-viewer>
-  </div>
+  @if (showPdfViewer) {
+    <div class="canvas-wrapper foo">
+      <ngx-extended-pdf-viewer
+        [src]="blob1"
+        style="flex: 1 1 100%"
+        [height]="'90vh'"
+        [page]="1"
+        [handTool]="false"
+        [showHandToolButton]="false"
+        [textLayer]="false"
+        [(scrollMode)]="scrollMode"
+        [showToolbar]="false"
+        [showSecondaryToolbarButton]="false"
+        [sidebarVisible]="false"
+        backgroundColor="#ffffff"
+        [zoom]="'100%'"
+        [minZoom]="1"
+        [maxZoom]="1"
+        (pdfLoaded)="pdfloaded()"
+        [disableForms]="true"
+        [enableDragAndDrop]="true"
+        [enablePrint]="false"
+        [handTool]="false"
+        [showBorders]="false"
+      ></ngx-extended-pdf-viewer>
+    </div>
+  }
 </div>
