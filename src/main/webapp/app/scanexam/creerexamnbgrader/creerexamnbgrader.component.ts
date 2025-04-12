@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -157,6 +156,8 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
       // console.error(s,    entries[s].size);
       const lastSegment = s.split('/').pop();
       if (lastSegment?.endsWith('.html') && lastSegment !== 'index.html' && lastSegment !== 'scores.html' && lastSegment === filename) {
+        // TODO
+        console.error('processFiles', s, lastSegment);
       }
     }
   }
