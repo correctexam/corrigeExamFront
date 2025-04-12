@@ -39,6 +39,7 @@
     "welcomeadmin": "Bienvenue sur la page d'administration de cette application",
     "welcomeadminsub": "Vous pouvez accéder aux données depuis le menu entité",
     "textadmin": "Vous pouvez gérer les utilisateurs et les services depuis le menu administration.",
-    "answerseach": "Réponses de chaque étudiant"
+    "answerseach": "Réponses de chaque étudiant",
+    "creerexamnbgrader": "Créer votre examen pour le TP NBGrader {{courseName}}"
   }
 }

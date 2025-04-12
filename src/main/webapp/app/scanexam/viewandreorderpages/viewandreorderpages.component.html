@@ -36,7 +36,7 @@
   </div>
   <ng-container *ngFor="let value of templates">
     <div [ngClass]="colonneStyle">
-      <div class="card" [style]="'width: 100%;height: 100%;position: static;'">
+      <div class="card" [style]="'width: 100%;position: static;'">
         <div class="card-container yellow-container overflow-hidden">
           <div class="flex flex-column">
             <canvas [style]="{ cursor: 'pointer' }" [id]="'' + value" #nomImageTemplateVisible (click)="showImage(value, false)"></canvas>

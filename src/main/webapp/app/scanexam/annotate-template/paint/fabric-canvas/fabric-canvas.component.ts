@@ -218,7 +218,8 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
   }
 
   pageRender(): void {
-    this.blocked = true;
+    /*    this.blocked = true;
+    console.error('page rendered',this.runningTimer)
     if (this.runningTimer) {
       this.stopTimer();
       this.runningTimer = false;
@@ -226,19 +227,20 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
     this.timer = setTimeout(() => {
       if (this.blocked) {
         this.blocked = false;
+        console.error('blocked true')
       }
       this.runningTimer = false;
-    }, 3000);
+    }, 300);*/
   }
-  timer: any = 0;
-  runningTimer = false;
+  /**  timer: any = 0;
+  runningTimer = false;*/
 
-  stopTimer(): void {
+  /* stopTimer(): void {
     if (this.timer) {
       clearTimeout(this.timer);
       this.timer = 0;
     }
-  }
+  }*/
 
   goToQuestion(q: Question): void {
     if (q.zoneDTO?.pageNumber && q.zoneDTO?.yInit !== undefined && this.eventHandler.pages?.[1]) {
