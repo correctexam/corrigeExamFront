@@ -38,6 +38,7 @@
     "register": "Register",
     "welcomeadmin": "Welcome to the administration page of this application",
     "welcomeadminsub": "You can access the data from the entity menu",
-    "textadmin": "You can manage users and services from the administration menu."
+    "textadmin": "You can manage users and services from the administration menu.",
+    "creerexamnbgrader": "Create your exam for the NBGrader lab {{courseName}}"
   }
 }

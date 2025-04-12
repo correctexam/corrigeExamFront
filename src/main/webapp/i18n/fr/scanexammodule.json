@@ -582,6 +582,8 @@
     "coursnonarchive": "Cours actif(s)",
     "coursarchive": "Cours archivé(s)",
     "coursnonarchiveTooltip": "Il est possible d'archiver les cours en glissant déposant un cours vers la section cours archivé(s)",
-    "coursarchiveTooltip": "Il est possible de placer le cours dans les cours actifs en glissant déposant un cours vers la section cours actif(s)"
+    "coursarchiveTooltip": "Il est possible de placer le cours dans les cours actifs en glissant déposant un cours vers la section cours actif(s)",
+    "creerexamnbgrader": "Créer un examen pour corriger un TP précorriger avec nbgrader",
+    "enonceexamnbgrader": "Archive de l'examen (au format Zip) :"
   }
 }

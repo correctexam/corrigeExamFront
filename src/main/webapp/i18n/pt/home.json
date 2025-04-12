@@ -38,6 +38,7 @@
     "register": "Criar uma conta",
     "welcomeadmin": "Bem-vindo à página de administração deste aplicativo",
     "welcomeadminsub": "Você pode ter acesso aos dados a partir do menu entidade",
-    "textadmin": "Você poder gerir os usuários e os serviços a partir do menu administração."
+    "textadmin": "Você poder gerir os usuários e os serviços a partir do menu administração.",
+    "creerexamnbgrader": "Crie sua prova para o trabalho prático do NBGrader {{courseName}}"
   }
 }

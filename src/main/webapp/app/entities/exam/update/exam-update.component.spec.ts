@@ -49,7 +49,22 @@ describe('Exam Management Update Component', () => {
     it('Should call update service on save for existing entity', () => {
       // GIVEN
       const saveSubject = new Subject<HttpResponse<Exam>>();
-      const exam = { id: 123 };
+      const exam = {
+        courseId: undefined,
+        courseName: undefined,
+        firstnamezoneId: undefined,
+        id: 123,
+        idzoneId: undefined,
+        name: undefined,
+        namezoneId: undefined,
+        nbgrader: false,
+        notezoneId: undefined,
+        questions: undefined,
+        scanfileId: undefined,
+        scanfileName: undefined,
+        templateId: undefined,
+        templateName: undefined,
+      };
       jest.spyOn(examService, 'update').mockReturnValue(saveSubject);
       jest.spyOn(comp, 'previousState');
       activatedRoute.data = of({ exam });
@@ -91,7 +106,23 @@ describe('Exam Management Update Component', () => {
     it('Should set isSaving to false on error', () => {
       // GIVEN
       const saveSubject = new Subject<HttpResponse<Exam>>();
-      const exam = { id: 123 };
+      //      const exam = { id: 123 };
+      const exam = {
+        courseId: undefined,
+        courseName: undefined,
+        firstnamezoneId: undefined,
+        id: 123,
+        idzoneId: undefined,
+        name: undefined,
+        namezoneId: undefined,
+        nbgrader: false,
+        notezoneId: undefined,
+        questions: undefined,
+        scanfileId: undefined,
+        scanfileName: undefined,
+        templateId: undefined,
+        templateName: undefined,
+      };
       jest.spyOn(examService, 'update').mockReturnValue(saveSubject);
       jest.spyOn(comp, 'previousState');
       activatedRoute.data = of({ exam });

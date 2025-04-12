@@ -20,6 +20,7 @@ import { MarkingSummaryComponent } from './marking-summary/marking-summary.compo
 import { ComparestudentanswerComponent } from './comparestudentanswer/comparestudentanswer.component';
 
 import { ExportanonymoupdfComponent } from './exportanonymoupdf/exportanonymoupdf.component';
+import { CreerexamComponentNbGrader } from './creerexamnbgrader/creerexamnbgrader.component';
 
 // set the location of the OpenCV files
 // registerAllModules();
@@ -112,6 +113,20 @@ export const CREEREXAM_ROUTE: Route = {
   data: {
     authorities: ['ROLE_USER'],
     pageTitle: 'home.creerexam',
+    documentation: {
+      en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-1-create-your-course-and-exam-this-includes-creating-your-exam-using-a-word-processor-word-google-doc-libreoffice-or-latex',
+      fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-1-creer-son-cours-et-son-examen-cela-comprend-fabriquer-l-enonce-de-son-examen-a-l-aide-d-un-traitement-de-texte-word-google-doc-libreoffice-ou-de-latex',
+    },
+  },
+};
+
+export const CREEREXAMNBGRADER_ROUTE: Route = {
+  path: 'creerexamnbgrader/:courseid',
+  canActivate: [UserRouteAccessService],
+  component: CreerexamComponentNbGrader,
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'home.creerexamnbgrader',
     documentation: {
       en: 'https://correctexam.readthedocs.io/en/latest/user.html#step-1-create-your-course-and-exam-this-includes-creating-your-exam-using-a-word-processor-word-google-doc-libreoffice-or-latex',
       fr: 'https://correctexam.readthedocs.io/fr/latest/user.html#etape-1-creer-son-cours-et-son-examen-cela-comprend-fabriquer-l-enonce-de-son-examen-a-l-aide-d-un-traitement-de-texte-word-google-doc-libreoffice-ou-de-latex',
@@ -397,6 +412,7 @@ export const SCANEXAM_ROUTES = [
   COURSMAIN_ROUTE,
   REGISTERSTUDENT_ROUTE,
   CREEREXAM_ROUTE,
+  CREEREXAMNBGRADER_ROUTE,
   EXAMDETAIL_ROUTE,
   ANNOTATETEMPLATE_ROUTE,
   CHARGERSCAN_ROUTE,

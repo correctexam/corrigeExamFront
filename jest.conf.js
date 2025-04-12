@@ -28,6 +28,7 @@ module.exports = {
     { '^uuid$': 'uuid' },
     { '\\.(scss|css|less)$': '<rootDir>/__mocks__/styleMock.js' },
     { 'export-to-csv': '<rootDir>/__mocks__/exportCsvMock.js' },
+    { cheerio: '<rootDir>/__mocks__/exportCheerioMock.js' },
   ),
   reporters: ['default', ['jest-junit', { outputDirectory: '<rootDir>/target/test-results/', outputName: 'TESTS-results-jest.xml' }]],
   testResultsProcessor: 'jest-sonar-reporter',
