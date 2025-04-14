@@ -8,7 +8,7 @@ import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { Title } from '@angular/platform-browser';
 import { PreferenceService } from '../preference-page/preference.service';
 import { ButtonDirective } from 'primeng/button';
-import { TabViewModule } from 'primeng/tabview';
+import { TabsModule } from 'primeng/tabs';
 import { TranslateDirective } from '../../shared/language/translate.directive';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TooltipModule } from 'primeng/tooltip';
@@ -26,7 +26,7 @@ import { NgIf, NgFor, PercentPipe } from '@angular/common';
     TooltipModule,
     FaIconComponent,
     TranslateDirective,
-    TabViewModule,
+    TabsModule,
     NgFor,
     ButtonDirective,
     RouterLink,
