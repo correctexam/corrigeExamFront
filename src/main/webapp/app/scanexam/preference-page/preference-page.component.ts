@@ -50,6 +50,7 @@ export class PreferencePageComponent implements OnInit {
       defaultAlignAlgowithMarker: [true],
       removeHorizontalName: [true],
       maxNumberOfPredictionToShow: [],
+      warpPerspective: [false],
     });
   }
 

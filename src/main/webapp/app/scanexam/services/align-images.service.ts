@@ -44,6 +44,7 @@ export interface IPreference {
   imageTypeExport: string;
   exportImageCompression: number;
   maxNumberOfPredictionToShow: number;
+  warpPerspective: boolean;
 }
 
 export interface IImageAlignementInput {

@@ -46,6 +46,7 @@ export class PreferenceService {
         imageTypeExport: 'image/webp',
         exportImageCompression: 0.66,
         maxNumberOfPredictionToShow: 30,
+        warpPerspective: false,
       };
       this.localStorageService.store('preferences', defaultvalue);
       pref = defaultvalue;
@@ -80,6 +81,7 @@ export class PreferenceService {
       imageTypeExport: 'image/webp',
       exportImageCompression: 0.66,
       maxNumberOfPredictionToShow: 30,
+      warpPerspective: false,
     };
     this.localStorageService.store('preferences', defaultvalue);
     return defaultvalue;

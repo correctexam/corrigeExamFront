@@ -295,6 +295,21 @@
           />
         </div>
       </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label col-4" for="warpPerspective" [pTooltip]="'Used if scan is took using a camera'"
+            >warpPerspective to align scan:</label
+          >
+          <input
+            type="checkbox"
+            class="form-check col-1"
+            name="warpPerspective"
+            id="warpPerspective"
+            data-cy="warpPerspective"
+            formControlName="warpPerspective"
+          />
+        </div>
+      </div>
     </div>
     <button class="p-button p-button-primary" type="submit">Submit</button>
     <button class="p-button p-button-secondary" (click)="clearToDefault()">Reset to default value</button>
