@@ -141,6 +141,7 @@ export class CreerexamComponent implements OnInit, AfterViewInit {
         exam.name = this.editForm.get(['name'])!.value;
         exam.templateId = res.body?.id;
         exam.courseId = +this.courseid!;
+        exam.nbgrader = false;
         this.examService.create(exam).subscribe({
           next: () => {
             this.isSaving = false;

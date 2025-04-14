@@ -124,7 +124,7 @@ describe('QuestionpropertiesviewComponent', () => {
 
   it('should create with default values', () => {
     expect(component.isSaving).toBeFalsy();
-    expect(component.layoutsidebarVisible).toBeFalsy();
+    expect(component.layoutsidebarVisible()).toBeFalsy();
     expect(component.questions).toHaveLength(0);
     expect(component.questiontypes).toStrictEqual([{ algoName: 'foo' }, { algoName: 'bar' }, { algoName: 'manuscrit' }]);
     expect(component.editForm).toBeDefined();
