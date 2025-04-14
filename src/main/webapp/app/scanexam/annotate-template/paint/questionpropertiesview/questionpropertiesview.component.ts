@@ -256,6 +256,8 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
 
     if (this.questionsInput.length > 0) {
       this.questions = this.questionsInput;
+      this.foo.set(true);
+
       this.updateForm();
     }
   }
