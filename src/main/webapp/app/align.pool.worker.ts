@@ -822,30 +822,43 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
 
     if (goodpointsx.length >= 3) {
       let dsize = new cv.Size(srcMat.cols, srcMat.rows);
-      const d1 = x5 * x5 + y5 * y5;
-      const d2 = (srcMWidth1 - x6) * (srcMWidth1 - x6) + y6 * y6;
-      const d3 = (srcMHeight1 - y7) * (srcMHeight1 - y7) + x7 * x7;
-      const d4 = (srcMHeight1 - y8) * (srcMHeight1 - y8) + (srcMWidth1 - x8) * (srcMWidth1 - x8);
-
+      let dst = new cv.Mat(); ///cv.Mat.zeros(srcMat.rows, srcMat.cols, cv.CV_8U);
       let srcTri = undefined;
       let dstTri = undefined;
+      if (goodpointsx.length === 3) {
+        const d1 = x5 * x5 + y5 * y5;
+        const d2 = (srcMWidth1 - x6) * (srcMWidth1 - x6) + y6 * y6;
+        const d3 = (srcMHeight1 - y7) * (srcMHeight1 - y7) + x7 * x7;
+        const d4 = (srcMHeight1 - y8) * (srcMHeight1 - y8) + (srcMWidth1 - x8) * (srcMWidth1 - x8);
 
-      if (Math.max(d1, d2, d3, d4) === d3) {
-        srcTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x1, y1, x2, y2, x4, y4]);
-        dstTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x5, y5, x6, y6, x8, y8]);
-      } else if (Math.max(d1, d2, d3, d4) === d2) {
-        srcTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x1, y1, x3, y3, x4, y4]);
-        dstTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x5, y5, x7, y7, x8, y8]);
-      } else if (Math.max(d1, d2, d3, d4) === d1) {
-        srcTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x2, y2, x3, y3, x4, y4]);
-        dstTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x6, y6, x7, y7, x8, y8]);
-      } else {
-        srcTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x1, y1, x2, y2, x3, y3]);
-        dstTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x5, y5, x6, y6, x7, y7]);
+        if (Math.max(d1, d2, d3, d4) === d3) {
+          srcTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x1, y1, x2, y2, x4, y4]);
+          dstTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x5, y5, x6, y6, x8, y8]);
+        } else if (Math.max(d1, d2, d3, d4) === d2) {
+          srcTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x1, y1, x3, y3, x4, y4]);
+          dstTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x5, y5, x7, y7, x8, y8]);
+        } else if (Math.max(d1, d2, d3, d4) === d1) {
+          srcTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x2, y2, x3, y3, x4, y4]);
+          dstTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x6, y6, x7, y7, x8, y8]);
+        } else {
+          srcTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x1, y1, x2, y2, x3, y3]);
+          dstTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x5, y5, x6, y6, x7, y7]);
+        }
+
+        // const M = cv.getAffineTransform(srcTri, dstTri);
+        const M = cv.estimateAffine2D(srcTri, dstTri);
+
+        cv.warpAffine(srcMat2, dst, M, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
+        M.delete();
+      } else if (goodpointsx.length >= 4) {
+        srcTri = cv.matFromArray(4, 1, cv.CV_32FC2, [x1, y1, x2, y2, x3, y3, x4, y4]);
+        dstTri = cv.matFromArray(4, 1, cv.CV_32FC2, [x5, y5, x6, y6, x7, y7, x8, y8]);
+        //            const M = cv.getPerspectiveTransform(dstTri, srcTri);
+        const M = cv.estimateAffine2D(dstTri, srcTri);
+        cv.warpAffine(srcMat2, dst, M, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
+        //   cv.warpPerspective(srcMat2, dst, M, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
+        M.delete();
       }
-
-      //      let srcTri = cv.matFromArray(4, 1, cv.CV_32FC2, [x1, y1, x2, y2, x3, y3, x4, y4]);
-      //      let dstTri = cv.matFromArray(4, 1, cv.CV_32FC2, [x5, y5, x6, y6, x7, y7, x8, y8]);
 
       //        let srcTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x1, y1, x2, y2, x3, y3]);
       //        let dstTri = cv.matFromArray(3, 1, cv.CV_32FC2, [x5, y5, x6, y6, x7, y7]);
@@ -856,14 +869,6 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         let center = new cv.Point(xx, yy);
         cv.circle(srcMat2, center, radius, [0, 0, 255, 255], 1);
       }*/
-
-      let dst = new cv.Mat(); ///cv.Mat.zeros(srcMat.rows, srcMat.cols, cv.CV_8U);
-
-      // let M = cv.getPerspectiveTransform(dstTri, srcTri);
-      let M = cv.getAffineTransform(srcTri, dstTri);
-      // You can try more different parameters
-      cv.warpAffine(srcMat2, dst, M, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
-      //  cv.warpPerspective(srcMat2, dst, M, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
 
       let result = {} as any;
 
@@ -920,7 +925,6 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       dstTri.delete();
       //      dst.delete();
       srcMat2.delete();
-      M.delete();
 
       return result;
     } else {
