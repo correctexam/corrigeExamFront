@@ -38,7 +38,7 @@ import { KeyValue, Location, NgIf, NgFor, NgClass, DecimalPipe, KeyValuePipe } f
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import jszip from 'jszip';
 import * as FileSaver from 'file-saver';
-import { firstValueFrom } from 'rxjs';
+import { finalize, firstValueFrom } from 'rxjs';
 import { IHybridGradedComment } from '../../entities/hybrid-graded-comment/hybrid-graded-comment.model';
 import { DragDropModule } from 'primeng/dragdrop';
 import { SelectButtonModule } from 'primeng/selectbutton';
@@ -52,6 +52,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { Button, ButtonDirective } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
+import { PredictionStudentResponseService } from '../mlt/prediction-studentresponse-service';
 
 export interface Zone4SameCommentOrSameGrade {
   answers: Answer[];
@@ -206,6 +207,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     private applicationConfigService: ApplicationConfigService,
     protected location: Location,
     private zone: NgZone,
+    private predictionStudentResponseService: PredictionStudentResponseService,
   ) {
     this.firstImageLoaded = new Promise(resolve => {
       this.firstImageLoadedReolve = resolve;
@@ -643,6 +645,49 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     zip.generateAsync({ type: 'blob' }).then(content => {
       FileSaver.saveAs(content, 'Exam' + this.examId + '.zip');
     });
+  }
+
+  downloadAllHighQuality(): void {
+    const zip = new jszip();
+    const img = zip.folder('images');
+
+    let exportImageType = 'image/webp';
+    if (
+      this.preferenceService.getPreference().imageTypeExport !== undefined &&
+      ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
+    ) {
+      exportImageType = this.preferenceService.getPreference().imageTypeExport;
+    }
+    let _extension = '.webp';
+    if (exportImageType === 'image/png') {
+      _extension = '.png';
+    } else if (exportImageType === 'image/jpg') {
+      _extension = '.jpg';
+    }
+    const extension = _extension;
+
+    const obs = this.predictionStudentResponseService.downloadStudentResponsesFromQuestionIds(+this.examId!, +this.qId!);
+    const ps: Promise<any>[] = [];
+    obs
+      .pipe(
+        finalize(() => {
+          Promise.all(ps).then(() => {
+            zip.generateAsync({ type: 'blob' }).then(content => {
+              FileSaver.saveAs(content, 'Exam' + this.examId + '.zip');
+            });
+          });
+        }),
+      )
+      .subscribe(e => {
+        const editedImage = new OffscreenCanvas(e.width, e.height);
+        const ctx1 = editedImage.getContext('2d');
+        ctx1!.putImageData(e.imageData!, 0, 0);
+        const p = editedImage.convertToBlob({ type: exportImageType, quality: 1 });
+        ps.push(p);
+        p.then(blob => {
+          img!.file('reponse_' + e.questionNumero + '_' + e.reponse_index + '_' + e.question_index + extension, blob, { binary: true });
+        });
+      });
   }
 
   dragStart(value: any): void {

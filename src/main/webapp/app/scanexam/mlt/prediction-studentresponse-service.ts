@@ -22,6 +22,17 @@ interface ExamPageImage {
   prediction?: string | undefined;
 }
 
+interface ImageQuestion {
+  imageData: ImageData;
+  width: number;
+  height: number;
+  questionId?: number;
+  sheetId?: number;
+  question_index?: number;
+  reponse_index?: number;
+  questionNumero: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -38,12 +49,78 @@ export class PredictionStudentResponseService {
     private mlt: MLTService,
   ) {}
 
+  downloadStudentResponsesFromQuestionIds(examId: number, questionId: number): Subject<ImageQuestion> {
+    const subject = new Subject<ImageQuestion>();
+    this._downloadStudentResponsesFromQuestionIds(examId, questionId, subject).then(() => {
+      subject.complete();
+    });
+    return subject;
+  }
+
   predictStudentResponsesFromQuestionIds(examId: number, questionId: number): Subject<number[]> {
     const subject = new Subject<number[]>();
     this._predictStudentResponsesFromQuestionIds(examId, questionId, subject).then(() => {
       subject.complete();
     });
     return subject;
+  }
+
+  private async _downloadStudentResponsesFromQuestionIds(
+    examId: number,
+    questionId: number,
+    subject: Subject<ImageQuestion>,
+  ): Promise<void> {
+    const _srs = await firstValueFrom(this.examSheetService.query({ examId }));
+    const srs: IExamSheet[] = _srs.body || [];
+    const _q = await firstValueFrom(this.questionService.find(questionId));
+    // Query predictions for this question
+
+    const q = _q.body || undefined;
+
+    if (q !== undefined) {
+      const _qs = await firstValueFrom(this.questionService.query({ numero: q.numero, examId }));
+      const qs = _qs.body || undefined;
+      let currenthandling = 0;
+      let j = 1;
+      for (const sr of srs) {
+        let i = 1;
+        for (const q1 of qs!) {
+          currenthandling = currenthandling + 1;
+          const pageForStudent = sr.pagemin! + q1.zoneDTO!.pageNumber!;
+          const imageToCrop = {
+            examId,
+            factor: 1,
+            align: true,
+            template: false,
+            indexDb: this.preferenceService.getPreference().cacheDb !== 'sqlite',
+            page: pageForStudent,
+            z: q1.zoneDTO!,
+          };
+
+          try {
+            const crop = await firstValueFrom(this.alignImagesService.imageCropFromZone(imageToCrop));
+            const imageData = new ImageData(new Uint8ClampedArray(crop.image), crop.width, crop.height);
+            const res: ImageQuestion = {
+              imageData,
+              sheetId: sr.id!,
+              width: crop.width,
+              height: crop.height,
+              questionId: q1.id,
+              question_index: i,
+              reponse_index: j,
+              questionNumero: q1.numero!,
+            };
+            i = i + 1;
+            // Add image to list
+            subject.next(res);
+          } catch (error: any) {
+            console.error('Error cropping image:', error);
+          }
+        }
+        j = j + 1;
+      }
+    }
+    return;
   }
 
   private async _predictStudentResponsesFromQuestionIds(examId: number, questionId: number, subject: Subject<number[]>): Promise<void> {
