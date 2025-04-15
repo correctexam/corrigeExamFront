@@ -509,6 +509,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     ) {
       exportImageType = this.preferenceService.getPreference().imageTypeExport;
     }
+
     return canvas.toDataURL(exportImageType);
   }
 
