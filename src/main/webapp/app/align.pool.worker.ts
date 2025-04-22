@@ -408,7 +408,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
         cv.warpPerspective(image_B_final_result, image_B_final_result, h, im2.size());
         h.delete();
       } else {
-        const h = cv.estimateAffine2D(mat1, mat2, cv.RANSAC);
+        const h = cv.estimateAffine2D(mat1, mat2);
         cv.warpAffine(image_B_final_result, image_B_final_result, h, im2.size(), cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
         h.delete();
       }
