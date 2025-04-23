@@ -650,6 +650,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   downloadAllHighQuality(): void {
     const zip = new jszip();
     const img = zip.folder('images');
+    const metadata = zip.folder('metadata');
 
     let exportImageType = 'image/webp';
     if (
@@ -666,28 +667,48 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     }
     const extension = _extension;
 
-    const obs = this.predictionStudentResponseService.downloadStudentResponsesFromQuestionIds(+this.examId!, +this.qId!);
-    const ps: Promise<any>[] = [];
-    obs
-      .pipe(
-        finalize(() => {
-          Promise.all(ps).then(() => {
-            zip.generateAsync({ type: 'blob' }).then(content => {
-              FileSaver.saveAs(content, 'Exam' + this.examId + '.zip');
+    firstValueFrom(this.questionService.getallcommentsandprediction4qId(+this.qId!)).then(res => {
+      const all = res;
+      metadata?.file('metadata.json', JSON.stringify(all));
+
+      const obs = this.predictionStudentResponseService.downloadStudentResponsesFromQuestionIds(+this.examId!, +this.qId!);
+      const ps: Promise<any>[] = [];
+      obs
+        .pipe(
+          finalize(() => {
+            Promise.all(ps).then(() => {
+              zip.generateAsync({ type: 'blob' }).then(content => {
+                FileSaver.saveAs(content, 'Exam' + this.examId + '.zip');
+              });
             });
+          }),
+        )
+        .subscribe(e => {
+          const editedImage = new OffscreenCanvas(e.width, e.height);
+          const ctx1 = editedImage.getContext('2d');
+          ctx1!.putImageData(e.imageData!, 0, 0);
+          const p = editedImage.convertToBlob({ type: exportImageType, quality: 1 });
+          ps.push(p);
+
+          p.then(blob => {
+            img!.file(
+              'reponse_' +
+                e.questionNumero +
+                '_' +
+                e.reponse_index +
+                '_' +
+                e.question_index +
+                '_' +
+                e.questionId +
+                '_' +
+                e.sheetId +
+                extension,
+              blob,
+              { binary: true },
+            );
           });
-        }),
-      )
-      .subscribe(e => {
-        const editedImage = new OffscreenCanvas(e.width, e.height);
-        const ctx1 = editedImage.getContext('2d');
-        ctx1!.putImageData(e.imageData!, 0, 0);
-        const p = editedImage.convertToBlob({ type: exportImageType, quality: 1 });
-        ps.push(p);
-        p.then(blob => {
-          img!.file('reponse_' + e.questionNumero + '_' + e.reponse_index + '_' + e.question_index + extension, blob, { binary: true });
         });
-      });
+    });
   }
 
   dragStart(value: any): void {
