@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
-import { IQuestion, getQuestionIdentifier } from '../question.model';
+import { AnswersWithPredictionDto, IQuestion, getQuestionIdentifier } from '../question.model';
 
 export type EntityResponseType = HttpResponse<IQuestion>;
 export type EntityArrayResponseType = HttpResponse<IQuestion[]>;
@@ -37,6 +37,11 @@ export class QuestionService {
 
   find(id: number): Observable<EntityResponseType> {
     return this.http.get<IQuestion>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  }
+
+  getallcommentsandprediction4qId(qid: number): Observable<AnswersWithPredictionDto> {
+    const url = this.applicationConfigService.getEndpointFor('api/getallcommentsandprediction4qId');
+    return this.http.get<AnswersWithPredictionDto>(`${url}/${qid}`);
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {

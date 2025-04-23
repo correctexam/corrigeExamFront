@@ -56,3 +56,30 @@ export class Question implements IQuestion {
 export function getQuestionIdentifier(question: IQuestion): number | undefined {
   return question.id;
 }
+
+export interface AnswersWithPredictionDto {
+  maxgrade?: number;
+  qid?: number;
+  answer?: Answer[];
+}
+
+export interface Answer {
+  sheetId?: number;
+  sheetName?: string;
+  grade?: number;
+  pagemin?: number;
+  pagemax?: number;
+  comments?: Comment[];
+  prediction?: Prediction;
+}
+
+export interface Comment {
+  text?: string;
+  description?: string;
+  noteComments?: number;
+}
+
+export interface Prediction {
+  text?: string;
+  predictionconfidence?: number;
+}
