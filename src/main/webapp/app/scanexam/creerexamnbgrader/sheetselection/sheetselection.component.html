@@ -1,0 +1,25 @@
+<p-pickList
+  [source]="list1"
+  [target]="list2"
+  [responsive]="true"
+  [dragdrop]="true"
+  [showSourceControls]="false"
+  [showTargetControls]="true"
+  [stripedRows]="true"
+>
+  <ng-template pTemplate="sourceHeader">
+    <span style="font-weight: bold" [jhiTranslate]="'scanexam.listfile'"> </span>
+  </ng-template>
+  <ng-template pTemplate="targetHeader">
+    <span style="font-weight: bold" [jhiTranslate]="'scanexam.listfiletoanalyse'"> </span>
+  </ng-template>
+  <ng-template let-filename pTemplate="item">
+    <div>
+      {{ filename.filename }}
+    </div>
+  </ng-template>
+</p-pickList>
+<div class="flex align-items-center gap-2">
+  <p-button [label]="'scanexam.processfile' | translate" (click)="closeDialog(true, this.list2)" [text]="true" class="w-full"></p-button>
+  <p-button [label]="'scanexam.cancel' | translate" (click)="closeDialog(false, this.list2)" [text]="true" class="w-full"></p-button>
+</div>

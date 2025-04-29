@@ -12,7 +12,7 @@ import { TemplateService } from '../../entities/template/service/template.servic
 import { TranslateService } from '@ngx-translate/core';
 import { Title } from '@angular/platform-browser';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
-import { NgIf } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TranslateDirective } from '../../shared/language/translate.directive';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -22,6 +22,12 @@ import * as cheerio from 'cheerio';
 import html2canvas from 'html2canvas';
 import * as unzipit from 'unzipit';
 import { v4 as uuidv4 } from 'uuid';
+import { SheetSelectionComponent } from './sheetselection/sheetselection.component';
+import { DialogService } from 'primeng/dynamicdialog';
+import { PreferenceService } from '../preference-page/preference.service';
+import { CacheServiceImpl } from '../db/CacheServiceImpl';
+import { IExam } from 'app/entities/exam/exam.model';
+import { firstValueFrom } from 'rxjs';
 
 unzipit.setOptions({ workerURL: 'js/unzipit-worker.module.js' });
 
@@ -33,7 +39,7 @@ class Response {
   selector: 'jhi-creerexamnbgrader',
   templateUrl: './creerexamnbgrader.component.html',
   styleUrls: ['./creerexamnbgrader.component.scss'],
-  providers: [MessageService, ConfirmationService],
+  providers: [MessageService, ConfirmationService, DialogService],
   standalone: true,
   imports: [
     ToastModule,
@@ -44,6 +50,7 @@ class Response {
     FormsModule,
     ReactiveFormsModule,
     NgIf,
+    NgFor,
     NgxExtendedPdfViewerModule,
   ],
 })
@@ -58,6 +65,8 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
   errorParsingPdf = false;
   entries?: { [key: string]: unzipit.ZipEntry };
 
+  fileToAnalyse: string[] = [];
+
   constructor(
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
@@ -71,6 +80,9 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
     private ref: ChangeDetectorRef,
     private translateService: TranslateService,
     private titleService: Title,
+    public dialogService: DialogService,
+    public preferenceService: PreferenceService,
+    public cacheServiceImpl: CacheServiceImpl,
   ) {
     this.editForm = this.fb.group({
       name: [null, [Validators.required]],
@@ -127,21 +139,30 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
     if (eventTarget?.files?.[0]) {
       const file: File = eventTarget.files[0];
       const { entries } = await unzipit.unzip(file);
+
       this.entries = entries;
       const htmlfiles: string[] = [];
       for (const s of Object.keys(entries)) {
         // console.error(s,    entries[s].size);
-        const lastSegment = s.split('/').pop();
-        if (
-          lastSegment?.endsWith('.html') &&
-          lastSegment !== 'index.html' &&
-          lastSegment !== 'scores.html' &&
-          !htmlfiles.includes(lastSegment)
-        ) {
-          htmlfiles.push(lastSegment);
+        const segments = s.split('/');
+        const lastSegment = segments[segments.length - 1];
+        const firstSegment = segments[0];
+        const numberOfSegment = segments.length;
+        let previousSegmentName = 0;
+        if (firstSegment === 'feedback_generated' && numberOfSegment > 3) {
+          previousSegmentName = numberOfSegment - 2;
+        } else if (firstSegment !== 'feedback_generated' && numberOfSegment > 2) {
+          previousSegmentName = numberOfSegment - 1;
+        }
+
+        if (lastSegment?.endsWith('.html') && lastSegment !== 'index.html' && lastSegment !== 'scores.html') {
+          const s1 = segments.slice(previousSegmentName, numberOfSegment).join('/');
+          if (!htmlfiles.includes(s1)) {
+            htmlfiles.push(s1);
+          }
         }
       }
-      console.error(htmlfiles);
+      this.showListFiles(htmlfiles);
     }
 
     this.dataUtils.loadFileToForm(event, this.editForm, field, isImage).subscribe({
@@ -169,6 +190,102 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
         el.attribs['id'] = uuidv4();
       }
     });
+  }
+
+  async loadFile(file: string): Promise<string> {
+    const blob = await this.entries![file].blob('text/html');
+    const text = await blob.text();
+    return text;
+  }
+
+  async getNumberQuestion(text: string): Promise<number> {
+    const $ = await cheerio.load(text);
+    return $('#toc').find('li').find('a').length;
+  }
+
+  async processFileAnswer(file: string, c: boolean, examId: number, sheetName: string): Promise<any> {
+    const res: any = {
+      examId,
+      sheetName,
+      questions: [],
+    };
+
+    const text = await this.loadFile(file);
+    const questionNumber = await this.getNumberQuestion(text);
+    //    const question = await this.getNumberQuestion(text);
+    if (questionNumber === 0) {
+      return res;
+    }
+
+    for (let questionIndex = 0; questionIndex < questionNumber; questionIndex++) {
+      const $ = await cheerio.load(text);
+      const question = $('#toc').find('li').find('a');
+      this.addIDToDiv($);
+
+      const anchors = question.map((e, el) => el.attribs['href'].substring(1)).toArray();
+
+      const idsWithAnswer = $('div.cell a')
+        .filter((e, el) => el.attribs['name'] !== undefined && anchors.includes(el.attribs['name']))
+        .closest('div.cell')
+        .map((e, el) => (el as any).attribs['id'])
+        .toArray();
+
+      const notbook = $('#notebook-container').find('div.cell');
+      const responses: Response[] = [];
+      let currentResponse: Response | undefined = undefined;
+      for (const cell of notbook) {
+        if (currentResponse === undefined) {
+          currentResponse = new Response();
+          responses.push(currentResponse);
+        }
+
+        currentResponse.element.push(cell.attribs['id']);
+
+        if (idsWithAnswer.includes(cell.attribs['id'])) {
+          currentResponse = undefined;
+        }
+      }
+
+      const score = this.processSection(questionIndex, responses, $);
+
+      $('#toc').closest('div.panel-heading').remove();
+
+      document.getElementById('body')!.innerHTML = $.html();
+      if (c) {
+        const canvas = await html2canvas(document.getElementById('body')!);
+
+        let exportImageType = 'image/webp';
+        if (
+          this.preferenceService.getPreference().imageTypeExport !== undefined &&
+          ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
+        ) {
+          exportImageType = this.preferenceService.getPreference().imageTypeExport;
+        }
+
+        const t = canvas.toDataURL(exportImageType);
+        this.cacheServiceImpl.addAligneImage({
+          examId,
+          pageNumber: questionIndex + 1,
+          value: JSON.stringify(
+            {
+              pages: t!,
+            },
+            this.replacer,
+          ),
+        });
+      }
+      const note = score.substring(0, score.indexOf('/') - 1);
+      const notemax = score.substring(score.indexOf('/') + 1);
+      res.questions.push({
+        numero: questionIndex + 1,
+        note: Number(note),
+        notemax: Number(notemax),
+      });
+      // document.getElementById('snote')!.innerHTML = '' + note;
+      // document.getElementById('snotemax')!.innerHTML = '' + notemax;
+    }
+    //    document.getElementById('body')!.remove();
+    return res;
   }
 
   async processFile(file: string, questionIndex: number, c: boolean): Promise<string> {
@@ -249,10 +366,110 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
     return res;
   }
 
-  save(): void {
+  async save(): Promise<void> {
     this.isSaving = true;
     const template: any = {};
     template.name = `${String(this.editForm.get(['name'])!.value)}Template`;
-    template.content = this.editForm.get(['content'])!.value;
+
+    const exam: IExam = {
+      courseId: Number(this.courseid),
+      nbgrader: true,
+      name: this.editForm.get(['name'])!.value,
+    };
+    const exam1 = await firstValueFrom(this.examService.create(exam));
+    console.error('exam1', exam1);
+    // template.content = this.editForm.get(['content'])!.value;
+    // const t = await firstValueFrom( this.templateService.create(template))
+    const htmlfilesToProcess: string[] = [];
+
+    let feedbackGeneratedPrefix = false;
+    for (const s of Object.keys(this.entries!)) {
+      const segments = s.split('/');
+      //      const lastSegment = segments[segments.length-1];
+      const firstSegment = segments[0];
+      const numberOfSegment = segments.length;
+      let previousSegmentName = 0;
+      if (firstSegment === 'feedback_generated' && numberOfSegment > 3) {
+        feedbackGeneratedPrefix = true;
+        previousSegmentName = numberOfSegment - 2;
+      } else if (firstSegment !== 'feedback_generated' && numberOfSegment > 2) {
+        feedbackGeneratedPrefix = false;
+        previousSegmentName = numberOfSegment - 1;
+      }
+      const s1 = segments.slice(previousSegmentName, numberOfSegment).join('/');
+
+      if (s1 !== undefined && this.fileToAnalyse.includes(s1)) {
+        htmlfilesToProcess.push(s);
+      }
+    }
+    if (htmlfilesToProcess.length === 0) {
+      this.isSaving = false;
+      return;
+    } else {
+      const maps = new Map();
+      for (const s of htmlfilesToProcess) {
+        const segments = s.split('/');
+        if (feedbackGeneratedPrefix) {
+          if (maps.has(segments[1])) {
+            maps.set(segments[1], [...maps.get(segments[1]), segments.join('/')]);
+          } else {
+            maps.set(segments[1], [segments.join('/')]);
+          }
+        } else {
+          if (maps.has(segments[0])) {
+            maps.set(segments[0], [...maps.get(segments[0]), segments.join('/')]);
+          } else {
+            maps.set(segments[0], [segments.join('/')]);
+          }
+        }
+      }
+      const keys = Array.from(maps.keys());
+      for (const key of keys) {
+        const value = maps.get(key);
+        if (value !== undefined) {
+          for (const e of value) {
+            const e1 = await this.processFileAnswer(e, true, exam1.body!.id!, key);
+            console.error('processFileAnswer', e, e1);
+          }
+
+          document.getElementById('body')!.remove();
+        }
+      }
+    }
+
+    //    console.error('htmlfilesToProcess', htmlfilesToProcess);
+  }
+
+  showListFiles(filenames: string[]): void {
+    this.translateService.get('scanexam.listfilesheader').subscribe(data1 => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const ref = this.dialogService.open(SheetSelectionComponent, {
+        data: {
+          filenames: filenames.map(e => {
+            const o = { filename: e };
+            return o;
+          }),
+        },
+        closable: true,
+        closeOnEscape: true,
+        maximizable: true,
+        header: data1,
+        width: '70%',
+      });
+      ref.onClose.subscribe((result: any[]) => {
+        console.error('result', result);
+        this.fileToAnalyse = result.map(e => e.filename);
+      });
+    });
+  }
+  replacer(key: any, value: any): any {
+    if (value instanceof Map) {
+      return {
+        dataType: 'Map',
+        value: Array.from(value.entries()), // or with spread: value: [...value]
+      };
+    } else {
+      return value;
+    }
   }
 }

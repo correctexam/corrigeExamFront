@@ -81,7 +81,13 @@
             formControlName="contentContentType"
           />
         </div>
-
+        <div *ngIf="fileToAnalyse.length > 0">
+          <div class="row" *ngFor="let item of fileToAnalyse; index as i">
+            <label *ngIf="i === 0" class="form-label col-2" jhiTranslate="scanexam.listfiletoanalyse" for="field_name">Name</label>
+            <span *ngIf="i !== 0" class="col-2"></span>
+            <span class="col-10">{{ item }}</span>
+          </div>
+        </div>
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="gotoUE()">
           <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
         </button>
@@ -90,13 +96,14 @@
           type="submit"
           id="save-entity"
           data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving"
+          [disabled]="editForm.invalid || isSaving || fileToAnalyse.length === 0"
           class="p-button p-button-primary"
         >
           <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
         </button>
       </div>
     </form>
+    <div id="body"></div>
   </div>
   <div class="lg:col-4 xl:col-4 overflow-hidden sm:hidden md:hidden lg:flex xl:flex">
     <img
