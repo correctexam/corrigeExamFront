@@ -28,6 +28,7 @@ import { PreferenceService } from '../preference-page/preference.service';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { IExam } from 'app/entities/exam/exam.model';
 import { firstValueFrom } from 'rxjs';
+import { Template } from 'app/entities/template/template.model';
 
 unzipit.setOptions({ workerURL: 'js/unzipit-worker.module.js' });
 
@@ -172,17 +173,6 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
     });
   }
 
-  async processFiles(filename: string): Promise<void> {
-    for (const s of Object.keys(this.entries!)) {
-      // console.error(s,    entries[s].size);
-      const lastSegment = s.split('/').pop();
-      if (lastSegment?.endsWith('.html') && lastSegment !== 'index.html' && lastSegment !== 'scores.html' && lastSegment === filename) {
-        // TODO
-        console.error('processFiles', s, lastSegment);
-      }
-    }
-  }
-
   addIDToDiv($: cheerio.CheerioAPI): void {
     const divs = $('div');
     divs.each((e, el) => {
@@ -203,7 +193,15 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
     return $('#toc').find('li').find('a').length;
   }
 
-  async processFileAnswer(file: string, c: boolean, examId: number, sheetName: string): Promise<any> {
+  async processFileAnswer(
+    file: string,
+    c: boolean,
+    examId: number,
+    sheetName: string,
+    studentIndex: number,
+    maxCurrentquestion: number,
+    firstQuestionIndex: number,
+  ): Promise<any> {
     const res: any = {
       examId,
       sheetName,
@@ -265,7 +263,7 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
         const t = canvas.toDataURL(exportImageType);
         this.cacheServiceImpl.addAligneImage({
           examId,
-          pageNumber: questionIndex + 1,
+          pageNumber: studentIndex * maxCurrentquestion + firstQuestionIndex + questionIndex + 1,
           value: JSON.stringify(
             {
               pages: t!,
@@ -276,70 +274,14 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
       }
       const note = score.substring(0, score.indexOf('/') - 1);
       const notemax = score.substring(score.indexOf('/') + 1);
+      console.error('note', note, notemax);
       res.questions.push({
-        numero: questionIndex + 1,
+        numero: firstQuestionIndex + questionIndex + 1,
         note: Number(note),
         notemax: Number(notemax),
       });
-      // document.getElementById('snote')!.innerHTML = '' + note;
-      // document.getElementById('snotemax')!.innerHTML = '' + notemax;
     }
-    //    document.getElementById('body')!.remove();
     return res;
-  }
-
-  async processFile(file: string, questionIndex: number, c: boolean): Promise<string> {
-    // TODO load file
-    const $ = await cheerio.load('');
-    this.addIDToDiv($);
-
-    const question = $('#toc').find('li').find('a');
-    const nbrQuestion = question.length;
-    if (questionIndex < 0 || questionIndex >= nbrQuestion) {
-      return 'no score';
-    }
-
-    const anchors = question.map((e, el) => el.attribs['href'].substring(1)).toArray();
-
-    const idsWithAnswer = $('div.cell a')
-      .filter((e, el) => el.attribs['name'] !== undefined && anchors.includes(el.attribs['name']))
-      .closest('div.cell')
-      .map((e, el) => (el as any).attribs['id'])
-      .toArray();
-
-    const notbook = $('#notebook-container').find('div.cell');
-    const responses: Response[] = [];
-    let currentResponse: Response | undefined = undefined;
-    for (const cell of notbook) {
-      if (currentResponse === undefined) {
-        currentResponse = new Response();
-        responses.push(currentResponse);
-      }
-
-      currentResponse.element.push(cell.attribs['id']);
-
-      if (idsWithAnswer.includes(cell.attribs['id'])) {
-        currentResponse = undefined;
-      }
-    }
-
-    const score = this.processSection(questionIndex, responses, $);
-
-    $('#toc').closest('div.panel-heading').remove();
-
-    document.getElementById('body')!.innerHTML = $.html();
-    if (c) {
-      html2canvas(document.getElementById('body')!).then(function (canvas) {
-        document.getElementById('body')!.parentNode!.insertBefore(canvas, document.getElementById('body'));
-        document.getElementById('body')!.remove();
-      });
-    }
-    const note = score.substring(0, score.indexOf('/') - 1);
-    const notemax = score.substring(score.indexOf('/') + 1);
-    document.getElementById('snote')!.innerHTML = '' + note;
-    document.getElementById('snotemax')!.innerHTML = '' + notemax;
-
-    return score;
   }
 
   processSection(index: number, responses: Response[], $: cheerio.CheerioAPI): string {
@@ -368,16 +310,22 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
 
   async save(): Promise<void> {
     this.isSaving = true;
-    const template: any = {};
+    const template = new Template();
     template.name = `${String(this.editForm.get(['name'])!.value)}Template`;
+    template.content = this.editForm.get(['content'])!.value;
+    template.contentContentType = this.editForm.get(['contentContentType'])!.value;
+    template.mark = false;
+    template.autoMapStudentCopyToList = true;
+    template.caseboxname = false;
+    const template1 = await firstValueFrom(this.templateService.create(template));
 
     const exam: IExam = {
       courseId: Number(this.courseid),
       nbgrader: true,
       name: this.editForm.get(['name'])!.value,
+      templateId: template1.body?.id,
     };
     const exam1 = await firstValueFrom(this.examService.create(exam));
-    console.error('exam1', exam1);
     // template.content = this.editForm.get(['content'])!.value;
     // const t = await firstValueFrom( this.templateService.create(template))
     const htmlfilesToProcess: string[] = [];
@@ -424,17 +372,39 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
         }
       }
       const keys = Array.from(maps.keys());
+      let questionMax = 0;
       for (const key of keys) {
         const value = maps.get(key);
         if (value !== undefined) {
+          let currentQuestionMax = 0;
           for (const e of value) {
-            const e1 = await this.processFileAnswer(e, true, exam1.body!.id!, key);
-            console.error('processFileAnswer', e, e1);
+            const text = await this.loadFile(e);
+            currentQuestionMax = currentQuestionMax + (await this.getNumberQuestion(text));
           }
-
-          document.getElementById('body')!.remove();
+          if (currentQuestionMax > questionMax) {
+            questionMax = currentQuestionMax;
+          }
         }
       }
+      let studentIndex = 0;
+      const res: any = {};
+      for (const key of keys) {
+        const value = maps.get(key);
+        if (value !== undefined) {
+          let max = 0;
+          for (const e of value) {
+            const e1 = await this.processFileAnswer(e, true, exam1.body!.id!, key, studentIndex, questionMax, max);
+            max = Math.max(e1.questions.map((e2: any) => e2.numero));
+            if (res[key] === undefined) {
+              res[key] = e1;
+            } else {
+              res[key].questions = [...res[key].questions, ...e1.questions];
+            }
+          }
+        }
+        studentIndex = studentIndex + 1;
+      }
+      document.getElementById('body')!.remove();
     }
 
     //    console.error('htmlfilesToProcess', htmlfilesToProcess);
@@ -457,7 +427,6 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
         width: '70%',
       });
       ref.onClose.subscribe((result: any[]) => {
-        console.error('result', result);
         this.fileToAnalyse = result.map(e => e.filename);
       });
     });
