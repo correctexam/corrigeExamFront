@@ -418,7 +418,6 @@ export class AssocierNbgraderComponent implements OnInit, AfterViewInit {
     const filterStudent = this.students.filter(s =>
       s.examSheets?.some(ex => ex?.scanId === this.exam.scanfileId && ex?.pagemin === this.currentStudent * this.nbreFeuilleParCopie),
     );
-    console.error('filterStudent', filterStudent);
     this.selectionStudents = filterStudent;
     const freeStudent = this.students.filter(
       s =>
