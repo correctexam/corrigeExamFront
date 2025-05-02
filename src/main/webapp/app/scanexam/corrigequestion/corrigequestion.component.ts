@@ -525,18 +525,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           this.noteSteps = questions[0].point! * questions[0].step!;
 
           if (this.sheet !== undefined) {
-            console.error(
-              this.sheet.id,
-              this.sheet,
-              questions!.map(q => q.id),
-            );
             const sr = await firstValueFrom(
               this.studentResponseService.query({
                 sheetId: this.sheet.id!,
                 questionsId: questions!.map(q => q.id),
               }),
             );
-            console.error('sr', sr.body);
             if (sr.body !== null && sr.body.length > 0) {
               this.resp = sr.body![0];
               this.currentNote = this.resp.note!;

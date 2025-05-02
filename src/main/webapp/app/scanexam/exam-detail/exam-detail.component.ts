@@ -161,15 +161,11 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
             },
           );
           if (this.exam.nbgrader === true) {
-            console.error('showAlignement');
-
             this.db.countAlignImage(+this.examId).then(c1 => {
-              console.error('showAlignement', c1);
               if (c1 !== 0) {
                 this.showAlignement = true;
                 this.showAssociation = true;
                 this.showCorrection = true;
-                console.error('showAlignement');
               } else {
                 this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, false);
               }
