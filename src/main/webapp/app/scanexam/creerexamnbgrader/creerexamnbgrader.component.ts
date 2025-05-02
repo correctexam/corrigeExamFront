@@ -324,7 +324,7 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
 
     document.getElementById('body')!.innerHTML = $.html();
     if (cache) {
-      const canvas = await html2canvas(document.getElementById('body')!);
+      const canvas = await html2canvas(document.getElementById('body')!, { scale: 2.0, backgroundColor: null });
 
       let exportImageType = 'image/webp';
       if (
@@ -351,7 +351,7 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
   }
 
   async save(): Promise<void> {
-    //   this.blocked = true;
+    this.blocked = true;
     this.isSaving = true;
     const template = new Template();
     template.name = `${String(this.editForm.get(['name'])!.value)}Template`;
@@ -508,6 +508,7 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
         console.error(' no questionMax');
       }
       this.blocked = false;
+      this.isSaving = false;
 
       /*
        */
