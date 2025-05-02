@@ -160,34 +160,50 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
               this.router.navigateByUrl('/');
             },
           );
+          if (this.exam.nbgrader === true) {
+            console.error('showAlignement');
 
-          this.db.countPageTemplate(+this.examId).then(c => {
-            if (c !== 0) {
-              this.blocked = true;
-              this.db.countNonAlignImage(+this.examId).then(c1 => {
-                if (c1 !== 0) {
-                  this.showAlignement = true;
+            this.db.countAlignImage(+this.examId).then(c1 => {
+              console.error('showAlignement', c1);
+              if (c1 !== 0) {
+                this.showAlignement = true;
+                this.showAssociation = true;
+                this.showCorrection = true;
+                console.error('showAlignement');
+              } else {
+                this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, false);
+              }
+              this.blocked = false;
+            });
+          } else {
+            this.db.countPageTemplate(+this.examId).then(c => {
+              if (c !== 0) {
+                this.blocked = true;
+                this.db.countNonAlignImage(+this.examId).then(c1 => {
+                  if (c1 !== 0) {
+                    this.showAlignement = true;
 
-                  this.checkIfAlreadyAlign().then(res => {
-                    if (res && this.exam?.scanfileId) {
-                      this.showAssociation = true;
-                      this.initTemplate();
-                    } else {
-                      this.blocked = false;
-                    }
-                  });
+                    this.checkIfAlreadyAlign().then(res => {
+                      if (res && this.exam?.scanfileId) {
+                        this.showAssociation = true;
+                        this.initTemplate();
+                      } else {
+                        this.blocked = false;
+                      }
+                    });
+                  } else {
+                    this.blocked = false;
+                  }
+                });
+              } else {
+                if (this.exam?.scanfileId) {
+                  this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, false);
                 } else {
                   this.blocked = false;
                 }
-              });
-            } else {
-              if (this.exam?.scanfileId) {
-                this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, false);
-              } else {
-                this.blocked = false;
               }
-            }
-          });
+            });
+          }
         });
 
         this.translateService.get('scanexam.removeexam').subscribe(() => {

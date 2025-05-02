@@ -27,8 +27,10 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { PreferenceService } from '../preference-page/preference.service';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { IExam } from 'app/entities/exam/exam.model';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, filter } from 'rxjs';
 import { Template } from 'app/entities/template/template.model';
+import { map } from 'rxjs/operators';
+import { all } from '@tensorflow/tfjs';
 
 unzipit.setOptions({ workerURL: 'js/unzipit-worker.module.js' });
 
@@ -190,7 +192,36 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
 
   async getNumberQuestion(text: string): Promise<number> {
     const $ = await cheerio.load(text);
-    return $('#toc').find('li').find('a').length;
+    const questions = $('#toc')
+      .find('li')
+      .find('a')
+      .filter((e, el) => el.next !== null && (el.next! as any).data !== undefined);
+
+    return questions.length;
+  }
+
+  async checkFileAnswer(file: string, questions: any): Promise<void> {
+    const text = await this.loadFile(file);
+    const $ = await cheerio.load(text);
+
+    const question = $('#toc').find('li').find('a');
+    const questionNumber = question.length;
+    //    const question = await this.getNumberQuestion(text);
+    if (questionNumber === 0) {
+      return questions;
+    }
+    this.addIDToDiv($);
+    for (const el of question) {
+      if (el.next !== null && (el.next! as any).data !== undefined) {
+        const score = ((el.next! as any).data as string).replace(' (Score:', '').replace(')', '');
+        const scoresplit = score.split('/');
+        const q: any = {};
+        q.notemax = Number(scoresplit[1]);
+        q.note = Number(scoresplit[0]);
+        q.anchor = el.attribs['href'].substring(1);
+        questions.push(q);
+      }
+    }
   }
 
   async processFileAnswer(
@@ -199,8 +230,7 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
     examId: number,
     sheetName: string,
     studentIndex: number,
-    maxCurrentquestion: number,
-    firstQuestionIndex: number,
+    questionsDesc: any[],
   ): Promise<any> {
     const res: any = {
       examId,
@@ -209,82 +239,66 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
     };
 
     const text = await this.loadFile(file);
-    const questionNumber = await this.getNumberQuestion(text);
+    // const questionNumber = await this.getNumberQuestion(text);
     //    const question = await this.getNumberQuestion(text);
-    if (questionNumber === 0) {
+    /* if (questionNumber === 0) {
       return res;
+    }*/
+
+    const $ = await cheerio.load(text);
+    this.addIDToDiv($);
+    const anchors = questionsDesc.map(q => q.anchor);
+
+    const idsWithAnswer = $('div.cell a')
+      .filter((e, el) => el.attribs['name'] !== undefined && anchors.includes(el.attribs['name']))
+      .closest('div.cell')
+      .map((e, el) => (el as any).attribs['id'])
+      .toArray();
+
+    const notbook = $('#notebook-container').find('div.cell');
+    const responses: Response[] = [];
+    let currentResponse: Response | undefined = undefined;
+    for (const cell of notbook) {
+      if (currentResponse === undefined) {
+        currentResponse = new Response();
+        responses.push(currentResponse);
+      }
+
+      currentResponse.element.push(cell.attribs['id']);
+
+      if (idsWithAnswer.includes(cell.attribs['id'])) {
+        currentResponse = undefined;
+      }
     }
 
-    for (let questionIndex = 0; questionIndex < questionNumber; questionIndex++) {
-      const $ = await cheerio.load(text);
-      const question = $('#toc').find('li').find('a');
-      this.addIDToDiv($);
+    for (let questionIndex = 0; questionIndex < questionsDesc.length; questionIndex++) {
+      const pageNumber = studentIndex * questionsDesc.length + questionIndex + 1;
+      const textwithdiv = $.html();
+      if (textwithdiv.includes(questionsDesc[questionIndex].anchor)) {
+        const score = await this.processSection(questionIndex, responses, textwithdiv, c, examId, pageNumber);
 
-      const anchors = question.map((e, el) => el.attribs['href'].substring(1)).toArray();
-
-      const idsWithAnswer = $('div.cell a')
-        .filter((e, el) => el.attribs['name'] !== undefined && anchors.includes(el.attribs['name']))
-        .closest('div.cell')
-        .map((e, el) => (el as any).attribs['id'])
-        .toArray();
-
-      const notbook = $('#notebook-container').find('div.cell');
-      const responses: Response[] = [];
-      let currentResponse: Response | undefined = undefined;
-      for (const cell of notbook) {
-        if (currentResponse === undefined) {
-          currentResponse = new Response();
-          responses.push(currentResponse);
-        }
-
-        currentResponse.element.push(cell.attribs['id']);
-
-        if (idsWithAnswer.includes(cell.attribs['id'])) {
-          currentResponse = undefined;
-        }
-      }
-
-      const score = this.processSection(questionIndex, responses, $);
-
-      $('#toc').closest('div.panel-heading').remove();
-
-      document.getElementById('body')!.innerHTML = $.html();
-      if (c) {
-        const canvas = await html2canvas(document.getElementById('body')!);
-
-        let exportImageType = 'image/webp';
-        if (
-          this.preferenceService.getPreference().imageTypeExport !== undefined &&
-          ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
-        ) {
-          exportImageType = this.preferenceService.getPreference().imageTypeExport;
-        }
-
-        const t = canvas.toDataURL(exportImageType);
-        this.cacheServiceImpl.addAligneImage({
-          examId,
-          pageNumber: studentIndex * maxCurrentquestion + firstQuestionIndex + questionIndex + 1,
-          value: JSON.stringify(
-            {
-              pages: t!,
-            },
-            this.replacer,
-          ),
+        const note = score.substring(0, score.indexOf('/') - 1);
+        const notemax = score.substring(score.indexOf('/') + 1);
+        res.questions.push({
+          numero: questionIndex + 1,
+          note: Number(note),
+          notemax: Number(notemax),
         });
       }
-      const note = score.substring(0, score.indexOf('/') - 1);
-      const notemax = score.substring(score.indexOf('/') + 1);
-      console.error('note', note, notemax);
-      res.questions.push({
-        numero: firstQuestionIndex + questionIndex + 1,
-        note: Number(note),
-        notemax: Number(notemax),
-      });
     }
     return res;
   }
 
-  processSection(index: number, responses: Response[], $: cheerio.CheerioAPI): string {
+  async processSection(
+    index: number,
+    responses: Response[],
+    text: string,
+    cache: boolean,
+    examId: number,
+    pageNumber: number,
+  ): Promise<string> {
+    const $ = await cheerio.load(text);
+
     let res = '';
     responses.forEach((e, i) => {
       if (i === index) {
@@ -305,10 +319,39 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
         });
       }
     });
+
+    $('#toc').closest('div.panel-heading').remove();
+
+    document.getElementById('body')!.innerHTML = $.html();
+    if (cache) {
+      const canvas = await html2canvas(document.getElementById('body')!);
+
+      let exportImageType = 'image/webp';
+      if (
+        this.preferenceService.getPreference().imageTypeExport !== undefined &&
+        ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
+      ) {
+        exportImageType = this.preferenceService.getPreference().imageTypeExport;
+      }
+
+      const t = canvas.toDataURL(exportImageType);
+      this.cacheServiceImpl.addAligneImage({
+        examId,
+        pageNumber,
+        value: JSON.stringify(
+          {
+            pages: t!,
+          },
+          this.replacer,
+        ),
+      });
+    }
+
     return res;
   }
 
   async save(): Promise<void> {
+    //   this.blocked = true;
     this.isSaving = true;
     const template = new Template();
     template.name = `${String(this.editForm.get(['name'])!.value)}Template`;
@@ -371,39 +414,103 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
           }
         }
       }
+
+      // Ensure notebook order   fix by user
+
       const keys = Array.from(maps.keys());
       let questionMax = 0;
       for (const key of keys) {
         const value = maps.get(key);
         if (value !== undefined) {
-          let currentQuestionMax = 0;
-          for (const e of value) {
-            const text = await this.loadFile(e);
-            currentQuestionMax = currentQuestionMax + (await this.getNumberQuestion(text));
-          }
-          if (currentQuestionMax > questionMax) {
-            questionMax = currentQuestionMax;
-          }
+          const prefixedMap = new Map(
+            value.map((item: string) => {
+              const segments = item.split('/');
+              const firstSegment = segments[0];
+              const numberOfSegment = segments.length;
+              let previousSegmentName = 0;
+              if (firstSegment === 'feedback_generated' && numberOfSegment > 3) {
+                feedbackGeneratedPrefix = true;
+                previousSegmentName = numberOfSegment - 2;
+              } else if (firstSegment !== 'feedback_generated' && numberOfSegment > 2) {
+                feedbackGeneratedPrefix = false;
+                previousSegmentName = numberOfSegment - 1;
+              }
+              const s1 = segments.slice(previousSegmentName, numberOfSegment).join('/');
+              return [s1, item];
+            }),
+          );
+
+          const reordered = this.fileToAnalyse.map(item => prefixedMap.get(item)).filter(e1 => e1 !== undefined);
+          maps.set(key, reordered);
         }
       }
-      let studentIndex = 0;
-      const res: any = {};
+
+      // Do a first pass on notebook to get the questions and the notes
+
+      const maps1 = new Map<string, Array<any>>();
       for (const key of keys) {
         const value = maps.get(key);
         if (value !== undefined) {
-          let max = 0;
+          const questions: any = [];
           for (const e of value) {
-            const e1 = await this.processFileAnswer(e, true, exam1.body!.id!, key, studentIndex, questionMax, max);
-            max = Math.max(e1.questions.map((e2: any) => e2.numero));
-            if (res[key] === undefined) {
-              res[key] = e1;
-            } else {
-              res[key].questions = [...res[key].questions, ...e1.questions];
-            }
+            await this.checkFileAnswer(e, questions);
           }
+          maps1.set(key, questions);
         }
-        studentIndex = studentIndex + 1;
       }
+
+      // Find an order list of ids for questions
+
+      const allIds: string[] = [];
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      maps1.forEach((v, k) => {
+        allIds.push(...v.map(c1 => c1.anchor));
+        if (questionMax < v.length) {
+          questionMax = v.length;
+        }
+      });
+      const uniqueIds = [...new Set(allIds)];
+      if (uniqueIds.length === questionMax) {
+        const q = [...maps1.values()].find(e => e.length === questionMax);
+        // TODO manage if q is undefined
+        // Create Question
+        if (q !== undefined) {
+          let studentIndex = 0;
+          const res: any = {};
+          for (const key of keys) {
+            const value = maps.get(key);
+            if (value !== undefined) {
+              for (const e of value) {
+                const e1 = await this.processFileAnswer(e, true, exam1.body!.id!, key, studentIndex, q);
+                if (res[key] === undefined) {
+                  res[key] = e1;
+                } else {
+                  res[key].questions = [...res[key].questions, ...e1.questions];
+                }
+              }
+            }
+            studentIndex = studentIndex + 1;
+          }
+          // eslint-disable-next-line arrow-body-style
+          /* const result = Array.from(new Map(Object.entries(res)), ([key, value]) => {
+            return {
+            name: key,
+            value,
+          }}); */
+          //          console.error('result',res, new Map(Object.entries(res)), );
+          const result = Array.from(new Map(Object.entries(res)).values());
+          console.error('result', result);
+          await firstValueFrom(this.examService.createNoteBookExamStructure(result));
+          this.blocked = false;
+          this.gotoUE();
+        }
+      } else {
+        console.error(' no questionMax');
+      }
+      this.blocked = false;
+
+      /*
+       */
       document.getElementById('body')!.remove();
     }
 
