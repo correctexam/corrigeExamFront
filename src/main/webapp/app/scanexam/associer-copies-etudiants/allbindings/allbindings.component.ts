@@ -28,6 +28,7 @@ export class AllbindingsComponent implements OnInit {
   showName = true;
   showFirstname = true;
   showIne = true;
+  showNbName = false;
   nobutton = false;
 
   constructor(
@@ -65,8 +66,8 @@ export class AllbindingsComponent implements OnInit {
         this.showName = students[0].nameImage !== undefined;
         this.showFirstname = students[0].firstnameImage !== undefined;
         this.showIne = students[0].ineImage !== undefined;
+        this.showNbName = students[0].nbName !== undefined;
         const length = imgs.filter(e => e !== undefined).length;
-        //      console.error(length);
         if (length > 1) {
           this.columnstyle = { width: Math.floor(75 / length) + '%' };
         } else {

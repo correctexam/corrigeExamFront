@@ -177,7 +177,7 @@ export class AssocierNbgraderComponent implements OnInit, AfterViewInit {
 
             Promise.all(promises).then(value => {
               this.nbreFeuilleParCopie = value[0].body!.length;
-              this.numberPagesInScan = value[1].body!.length;
+              this.numberPagesInScan = value[1].body!.length * this.nbreFeuilleParCopie;
               this.sheets = value[1].body!;
               this.exam = value[2].body!;
               this.updateTitle();
@@ -546,6 +546,7 @@ export class AssocierNbgraderComponent implements OnInit, AfterViewInit {
     const examSheet4Exam: IExamSheet[] = (this.students.map(s => s.examSheets) as any)
       .flat()
       .filter((ex: any) => ex?.scanId === this.exam.scanfileId);
+
     let listAllFreeSheet: number[] = [];
     for (let i = 0; i < Math.floor(this.numberPagesInScan / this.nbreFeuilleParCopie); i++) {
       if (!examSheet4Exam.map(sheet => sheet.pagemin! / this.nbreFeuilleParCopie).includes(i)) {
@@ -571,12 +572,43 @@ export class AssocierNbgraderComponent implements OnInit, AfterViewInit {
     });
   }
 
+  testLoadImage4pages(pagesToAnalyze: number[]): any[] {
+    const result: any[] = [];
+    this.getFilterStudent();
+
+    this.sheets.sort((sh1, sh2) => (sh1 < sh2 ? 1 : -1));
+    const sheets1 = this.sheets.filter((sh, index) => pagesToAnalyze.includes(index));
+    let shpage = 0;
+    for (const sh of sheets1) {
+      const res: any = {};
+      const students = [...this.freeStudent].sort((a, b) =>
+        levenshteinDistance(a.firstname! + '.' + a.name!, sh.name!) < levenshteinDistance(b.firstname! + '.' + b.name!, sh.name!) ? -1 : 1,
+      );
+      const recognizedStudent = students[0];
+      const distance = levenshteinDistance(recognizedStudent.firstname! + '.' + recognizedStudent.name!, sh.name!);
+      let predictionprecision = 1;
+      if (distance !== 0) {
+        predictionprecision =
+          1 - distance / Math.max(recognizedStudent.firstname!.length + recognizedStudent.name!.length, sh.name!.length);
+      }
+      res.page = shpage * this.nbreFeuilleParCopie;
+      res.predictionprecision = predictionprecision;
+      res.recognizedStudent = recognizedStudent;
+      res.nbName = sh.name;
+      result.push(res);
+      shpage = shpage + 1;
+    }
+    return result;
+  }
+
   async openAllBinding(): Promise<void> {
     const freeSheets = this.computeFreeSheets();
+
     if (freeSheets.length > 0) {
       this.blocked = true;
-      const res1 = {};
-      // const res1 = await this.testLoadImage4pages(freeSheets.map(e => e * this.nbreFeuilleParCopie!));
+      // const res1 = {};
+
+      const res1 = this.testLoadImage4pages(freeSheets.map(e => e * this.nbreFeuilleParCopie!));
       this.blocked = false;
 
       const ref = this.dialogService.open(AllbindingsComponent, {
