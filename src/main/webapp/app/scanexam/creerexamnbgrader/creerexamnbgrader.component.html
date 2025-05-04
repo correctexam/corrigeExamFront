@@ -1,9 +1,24 @@
 <div class="grid">
   <p-toast></p-toast>
+
   <p-blockUI [blocked]="blocked">
-    <p-progressSpinner></p-progressSpinner>
-    <!--    <i class="pi pi-lock" style="font-size: 3rem"></i>-->
+    <div class="grid" style="width: 90vw">
+      <div class="col-4"></div>
+      <div class="col-4 text-center">
+        <p-progressSpinner></p-progressSpinner>
+        <!--          <i class="pi pi-lock" style="font-size: 3rem"> </i>-->
+        <BR />
+        <div *ngIf="message() !== undefined && message().length > 0">
+          {{ message() }} <BR />
+          {{ submessage() }}
+          <span *ngIf="submessage !== undefined && submessage.length > 0 && progress() !== -1">{{ progress() }} / 100</span>
+          <BR />
+        </div>
+      </div>
+      <div class="col-4"></div>
+    </div>
   </p-blockUI>
+
   @if (!isSaving) {
     <div class="sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <div class="grid grid-nogutter">

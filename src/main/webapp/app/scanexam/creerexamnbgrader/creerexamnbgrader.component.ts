@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, signal } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faDownload, faLink } from '@fortawesome/free-solid-svg-icons';
@@ -29,8 +29,7 @@ import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { IExam } from 'app/entities/exam/exam.model';
 import { firstValueFrom, filter } from 'rxjs';
 import { Template } from 'app/entities/template/template.model';
-import { map } from 'rxjs/operators';
-import { all } from '@tensorflow/tfjs';
+import { CacheUploadNotification, CacheUploadService } from '../exam-detail/cacheUpload.service';
 
 unzipit.setOptions({ workerURL: 'js/unzipit-worker.module.js' });
 
@@ -57,7 +56,7 @@ class Response {
     NgxExtendedPdfViewerModule,
   ],
 })
-export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
+export class CreerexamComponentNbGrader implements OnInit, AfterViewInit, CacheUploadNotification {
   blocked = false;
   courseid: string | undefined = undefined;
   isSaving = false;
@@ -70,6 +69,10 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
 
   fileToAnalyse: string[] = [];
 
+  message = signal('');
+  submessage = signal('');
+  progress = signal(0);
+
   constructor(
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
@@ -81,11 +84,13 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
     protected examService: ExamService,
     protected templateService: TemplateService,
     private ref: ChangeDetectorRef,
+    protected messageService: MessageService,
     private translateService: TranslateService,
     private titleService: Title,
     public dialogService: DialogService,
     public preferenceService: PreferenceService,
     public cacheServiceImpl: CacheServiceImpl,
+    public cacheUploadService: CacheUploadService,
   ) {
     this.editForm = this.fb.group({
       name: [null, [Validators.required]],
@@ -369,6 +374,7 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
       templateId: template1.body?.id,
     };
     const exam1 = await firstValueFrom(this.examService.create(exam));
+    await this.cacheServiceImpl.addExam(exam1.body!.id!);
     // template.content = this.editForm.get(['content'])!.value;
     // const t = await firstValueFrom( this.templateService.create(template))
     const htmlfilesToProcess: string[] = [];
@@ -501,6 +507,8 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
           const result = Array.from(new Map(Object.entries(res)).values());
           console.error('result', result);
           await firstValueFrom(this.examService.createNoteBookExamStructure(result));
+          const countNbPageInCache = await this.cacheServiceImpl.countAlignImage(exam1.body!.id!);
+          await this.cacheUploadService.exportCache(exam1.body!.id!, this.translateService, this.messageService, countNbPageInCache, this);
           this.blocked = false;
           this.gotoUE();
         }
@@ -548,5 +556,18 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit {
     } else {
       return value;
     }
+  }
+
+  setMessage(v: string): void {
+    this.message.set(v);
+  }
+  setSubMessage(v: string): void {
+    this.submessage.set(v);
+  }
+  setBlocked(v: boolean): void {
+    this.blocked = v;
+  }
+  setProgress(v: number): void {
+    this.progress.set(v);
   }
 }
