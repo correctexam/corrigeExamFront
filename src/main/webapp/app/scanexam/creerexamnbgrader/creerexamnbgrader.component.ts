@@ -500,14 +500,7 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit, CacheU
             }
             studentIndex = studentIndex + 1;
           }
-          /* const result = Array.from(new Map(Object.entries(res)), ([key, value]) => {
-            return {
-            name: key,
-            value,
-          }}); */
-          //          console.error('result',res, new Map(Object.entries(res)), );
           const result = Array.from(new Map(Object.entries(res)).values());
-          console.error('result', result);
           await firstValueFrom(this.examService.createNoteBookExamStructure(result));
           const countNbPageInCache = await this.cacheServiceImpl.countAlignImage(exam1.body!.id!);
           await this.cacheUploadService.exportCache(exam1.body!.id!, this.translateService, this.messageService, countNbPageInCache, this);

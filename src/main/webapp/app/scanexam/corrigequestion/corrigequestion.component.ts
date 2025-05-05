@@ -285,7 +285,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     },
   ];
   displayBasic = false;
-  images: any[] = [];
+  images: WritableSignal<any> = signal<any[]>([]);
   pageOffset = 0;
   init = true;
   showSpinner = false;
@@ -2023,11 +2023,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async loadAllPages(): Promise<void> {
-    this.images = [];
+    this.images.set([]);
+    const images: any[] = [];
 
     const page = await this.db.countAlignImage(+this.examId!);
     if (page > 30) {
-      const page1 = await this.db.countPageTemplate(+this.examId!);
+      const page1 = this.nbreFeuilleParCopie!;
       if (this.noalign) {
         const e1 = await this.db.getNonAlignImageBetweenAndSortByPageNumber(
           +this.examId!,
@@ -2054,7 +2055,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             s = image.pages;
           }
           if (s !== '') {
-            this.images.push({
+            images.push({
               src: s,
               alt: 'Description for Image 2',
               title: 'Exam',
@@ -2072,7 +2073,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           const image = JSON.parse(e!.value, this.reviver);
           let s: string = '';
           if (this.studentName === undefined || this.studentName === '') {
-            const paget = await this.db.countPageTemplate(+this.examId!);
+            // const paget = await this.db.countPageTemplate(+this.examId!);
+            const paget = this.nbreFeuilleParCopie!;
             if (paget === 1) {
               s = await this.loadImageAnonymous(image.pages);
             } else {
@@ -2086,7 +2088,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             s = image.pages;
           }
           if (s !== '') {
-            this.images.push({
+            images.push({
               src: s,
               alt: 'Description for Image 2',
               title: 'Exam',
@@ -2103,21 +2105,23 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           const image = JSON.parse(e!.value, this.reviver);
           let s: string = '';
           if (this.studentName === undefined || this.studentName === '') {
-            const paget = await this.db.countPageTemplate(+this.examId!);
+            const paget = this.nbreFeuilleParCopie!;
+
+            // const paget = await this.db.countPageTemplate(+this.examId!);
             if (paget === 1) {
               s = await this.loadImageAnonymous(image.pages);
             } else {
               if ((index % paget) % 2 === 0) {
                 s = await this.loadImageAnonymous(image.pages);
               } else {
-                s = image.pages;
+                s = await this.loadImageAnonymous(image.pages);
               }
             }
           } else {
             s = image.pages;
           }
           if (s !== '') {
-            this.images.push({
+            images.push({
               src: s,
               alt: 'Description for Image 2',
               title: 'Exam',
@@ -2131,21 +2135,23 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           const image = JSON.parse(e!.value, this.reviver);
           let s: string = '';
           if (this.studentName === undefined || this.studentName === '') {
-            const paget = await this.db.countPageTemplate(+this.examId!);
+            const paget = this.nbreFeuilleParCopie!;
+            // await this.db.countPageTemplate(+this.examId!);
             if (paget === 1) {
               s = await this.loadImageAnonymous(image.pages);
             } else {
               if ((index % paget) % 2 === 0) {
                 s = await this.loadImageAnonymous(image.pages);
               } else {
-                s = image.pages;
+                s = await this.loadImageAnonymous(image.pages);
               }
             }
           } else {
             s = image.pages;
           }
+
           if (s !== '') {
-            this.images.push({
+            images.push({
               src: s,
               alt: 'Description for Image 2',
               title: 'Exam',
@@ -2154,10 +2160,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       }
     }
+    this.images.set(images);
   }
   async getAllImage4Zone(pageInscan: number, zone: IZone, computescale: boolean): Promise<ImageZone> {
     if (this.exam?.nbgrader === true) {
-      const i = await this.db.getAlignImagesForPageNumbers(+this.examId!, [pageInscan + 1]);
+      const i = await this.db.getAlignImagesForPageNumbers(+this.examId!, [pageInscan]);
       const pageNumber = pageInscan;
       let imageb64 = '';
       if (i.length === 0) {
@@ -2492,7 +2499,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   changeAlign(): void {
-    this.images = [];
+    this.images.set([]);
     this.reloadImage();
   }
   // getStudentName(): string | undefined {
@@ -2773,7 +2780,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.replacer,
       ),
     });
-    this.images = [];
+    this.images.set([]);
     //  this.loadAllPages();
     this.reloadImage();
   }
