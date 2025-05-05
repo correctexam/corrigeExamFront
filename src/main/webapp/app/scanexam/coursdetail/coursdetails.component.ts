@@ -244,12 +244,12 @@ export class CoursdetailsComponent implements OnInit {
         title: this.translateService.instant('scanexam.creerexam'),
         route: '/creerexam/' + this.courseId,
       },
-      /*   {
+      {
         label: this.translateService.instant('scanexam.creerexamnbgrader'),
         icon: this.appConfig.getFrontUrl() + 'content/images/jupyter_logo.svg',
         title: this.translateService.instant('scanexam.creerexamnbgrader'),
         route: '/creerexamnbgrader/' + this.courseId,
-      },*/
+      },
       {
         label: this.translateService.instant('scanexam.enregistreretudiant'),
         icon: this.appConfig.getFrontUrl() + 'content/images/students.svg',

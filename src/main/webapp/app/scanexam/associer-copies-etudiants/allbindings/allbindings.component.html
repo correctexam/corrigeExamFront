@@ -4,6 +4,7 @@
       <th *ngIf="showName" [style]="columnstyle"><span jhiTranslate="scanexam.nom">Name</span></th>
       <th *ngIf="showFirstname" [style]="columnstyle"><span jhiTranslate="scanexam.prenom">FirsName</span></th>
       <th *ngIf="showIne" [style]="columnstyle">INE</th>
+      <th *ngIf="showNbName" [style]="columnstyle"><span jhiTranslate="scanexam.nom">Name</span></th>
       <th pSortableColumn="recognizedStudentShow" style="width: 18%">
         <span jhiTranslate="scanexam.recognizedstudent">Recognized Student</span> <p-sortIcon field="student"></p-sortIcon>
       </th>
@@ -22,6 +23,8 @@
       <td *ngIf="showFirstname && sheet.firstnameImageImg === undefined"></td>
       <td *ngIf="sheet?.ineImageImg"><img style="max-width: 100%" [src]="sheet?.ineImageImg" /></td>
       <td *ngIf="showIne && sheet.ineImageImg === undefined"></td>
+      <td *ngIf="sheet?.nbName">{{ sheet.nbName }}</td>
+      <td *ngIf="showNbName && sheet.nbName === undefined"></td>
       <td>
         <span style="float: left" [ngClass]="selectedColor(sheet)">{{ sheet.recognizedStudentShow }}</span>
       </td>
@@ -42,7 +45,8 @@
           *ngIf="
             (exam.templateNameBoxCase === undefined && sheet.predictionprecision >= 500) ||
             (exam.templateNameBoxCase && sheet.predictionprecision >= 500) ||
-            (!exam.templateNameBoxCase && sheet.predictionprecision >= 20)
+            (!exam.templateNameBoxCase && sheet.predictionprecision >= 20) ||
+            (exam.nbgrader !== undefined && exam.nbgrader === true && sheet.predictionprecision >= 20)
           "
           [disabled]="nobutton"
           [pTooltip]="'scanexam.bindAllTooltip' | translate"

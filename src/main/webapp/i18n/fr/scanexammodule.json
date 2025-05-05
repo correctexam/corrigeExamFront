@@ -584,6 +584,10 @@
     "coursnonarchiveTooltip": "Il est possible d'archiver les cours en glissant déposant un cours vers la section cours archivé(s)",
     "coursarchiveTooltip": "Il est possible de placer le cours dans les cours actifs en glissant déposant un cours vers la section cours actif(s)",
     "creerexamnbgrader": "Créer un examen pour corriger un TP précorriger avec nbgrader",
-    "enonceexamnbgrader": "Archive de l'examen (au format Zip) :"
+    "enonceexamnbgrader": "Archive de l'examen (au format Zip) :",
+    "processfile": "Selectionner ces templates de fichier",
+    "listfile": "Liste des templates de fichiers présents dans l'archive",
+    "listfiletoanalyse": "Liste des templates de fichiers à analyser",
+    "listfilesheader": "Sélections des templates de fichiers à analyser"
   }
 }

@@ -1,0 +1,187 @@
+<div class="grid">
+  <p-toast></p-toast>
+  <p-blockUI [blocked]="blocked">
+    <p-progressSpinner></p-progressSpinner>
+    <!--    <i class="pi pi-lock" style="font-size: 3rem"></i>-->
+  </p-blockUI>
+  <ng-keyboard-shortcuts [shortcuts]="shortcuts"></ng-keyboard-shortcuts>
+
+  <p-drawer [(visible)]="layoutsidebarVisible">
+    <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <button
+        pButton
+        [pTooltip]="'scanexam.removeallbindingtooltip' | translate"
+        [tooltipZIndex]="'3000'"
+        [tooltipPosition]="'right'"
+        (click)="cleanBinding()"
+        jhiTranslate="scanexam.removeallbinding"
+      ></button>
+    </div>
+  </p-drawer>
+  <div class="col-12 p-0">
+    <p-progressBar [value]="remainingFree()" [showValue]="false" [style]="{ height: '6px' }"></p-progressBar>
+  </div>
+
+  <div class="col-12">
+    <div class="grid grid-nogutter">
+      <div class="col-8">
+        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" jhiTranslate="scanexam.bindcopies">Associer étudiants/copies</h2>
+      </div>
+      <div class="col-4 flex flex-row-reverse">
+        <button
+          [disabled]="!this.examId"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="p-button p-button-primary"
+          (click)="gotoUE()"
+        >
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam">Retourner à l'exam</span>
+        </button>
+        <button
+          [disabled]="!this.examId"
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          class="p-button p-button-primary"
+          (click)="openAllBinding()"
+          [pTooltip]="'scanexam.allbindingsTooltip' | translate"
+          [tooltipZIndex]="'3000'"
+          [tooltipPosition]="'bottom'"
+        >
+          <fa-icon icon="magnifying-glass-arrow-right"></fa-icon>&nbsp;<span jhiTranslate="scanexam.allbindings">Show all binding</span>
+        </button>
+      </div>
+    </div>
+    <div class="col-12 md:col-12">
+      <div class="grid">
+        <div class="col-1">
+          <p-button
+            class="sm:text-xs md:text-xs lg:text-base"
+            styleClass="md:text-xs sm:p-button-sm md:p-button-sm lg:p-button"
+            (click)="layoutsidebarVisible = true"
+            icon="pi pi-cog"
+            [pTooltip]="'scanexam.showLayoutOptionsTooltip' | translate"
+            [tooltipPosition]="'right'"
+            [disabled]="blocked"
+          ></p-button>
+        </div>
+        <div class="col-10 d-flex justify-content-center">
+          <div>
+            <span jhiTranslate="scanexam.selectedstudent">Etudiant(es) Séléctionné(es):</span> {{ selectionStudentsString() }}
+            <button *ngIf="selectionStudents.length > 0" pButton icon="pi pi-times" (click)="unbindCurrentStudent()"></button>
+
+            <BR />
+            <ng-container *ngIf="assisted && recognizedStudent !== undefined">
+              <span><span jhiTranslate="scanexam.aistudent">Etudiant(es) Reconnu(es):</span> {{ showRecognizedStudent() }}</span>
+            </ng-container>
+
+            <p-button
+              [pTooltip]="'scanexam.validaterecognizedTooltip' | translate"
+              (onClick)="selectRecogniezStudent()"
+              [style.padding]="'0.1rem'"
+              *ngIf="assisted && recognizedStudent !== undefined && predictionprecision > 0.07"
+              >✔️</p-button
+            >
+          </div>
+        </div>
+        <div class="col-1"></div>
+      </div>
+      <div class="grid">
+        <div class="col-3"></div>
+        <div class="col-6">
+          <div class="d-flex justify-content-center">
+            <button
+              pButton
+              [pTooltip]="'scanexam.gotopreviousnonboundsheet' | translate"
+              [tooltipZIndex]="'3000'"
+              [tooltipPosition]="'bottom'"
+              (click)="gotopreviousnonboundsheet()"
+              class="p-button"
+              [disabled]="blocked"
+            >
+              <fa-icon icon="arrow-left"></fa-icon>
+            </button>
+
+            <p-paginator
+              [rows]="1"
+              [first]="currentStudent"
+              [totalRecords]="numberPagesInScan / nbreFeuilleParCopie"
+              (onPageChange)="onPageChange($event)"
+              [showJumpToPageDropdown]="true"
+              [showPageLinks]="false"
+              [pTooltip]="'scanexam.showPaginatorTooltip' | translate"
+              [tooltipPosition]="'bottom'"
+            ></p-paginator>
+            <button
+              pButton
+              [pTooltip]="'scanexam.gotonextnonboundsheet' | translate"
+              [tooltipZIndex]="'3000'"
+              [tooltipPosition]="'bottom'"
+              (click)="gotonextnonboundsheet()"
+              class="p-button"
+              [disabled]="blocked"
+            >
+              <fa-icon icon="arrow-right"></fa-icon>
+            </button>
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="d-flex justify-content-end"></div>
+        </div>
+      </div>
+
+      <div class="canvas-wrapper foo">
+        <h1>{{ sheetName.replace('.', ' ') }}</h1>
+      </div>
+      <div class="grid align-items-center">
+        <div class="col-3">
+          <label jhiTranslate="scanexam.filterboundstudent">Filtrer les étudiants déjà affectées: </label>
+          <p-toggleSwitch
+            [(ngModel)]="filterbindstudent"
+            (onChange)="refreshLocalStudentList()"
+            [pTooltip]="'scanexam.filterboundstudentTooltip' | translate"
+          ></p-toggleSwitch>
+        </div>
+        <div class="col-6"></div>
+        <div class="col-3"></div>
+      </div>
+      <p-listbox
+        #list
+        [options]="studentsOptions"
+        [(ngModel)]="selectionStudents"
+        [filter]="true"
+        [multiple]="true"
+        [optionLabel]="'label'"
+        [metaKeySelection]="true"
+        [optionValue]="'value'"
+        (ngModelChange)="bindStudentOnClick($event)"
+      >
+        <ng-template let-table pTemplate="item">
+          <div class="col-12" style="width: '100%'">
+            <div class="flex flex-row m-0 p-0">
+              <div class="flex-grow-1 flex-shrink-1 flex align-items-center justify-content-left border-round m-0 p-0">
+                <span style="float: left" [ngClass]="selectedColor(table)">{{ table.label }}</span>
+              </div>
+              <div class="flex-shrink-0 flex align-items-center justify-content-right border-round m-0 p-0"></div>
+              <div class="flex-grow-1 flex-shrink-1 flex align-items-end justify-content-end border-round m-0 p-0">
+                <button
+                  style="padding: '0.0rem'"
+                  pButton
+                  (click)="selectStudents(table.value)"
+                  jhiTranslate="scanexam.associeretnext"
+                  [pTooltip]="'scanexam.gotonextnonboundsheetTooltip' | translate"
+                  [tooltipZIndex]="'3000'"
+                  [tooltipPosition]="'left'"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </p-listbox>
+    </div>
+  </div>
+</div>

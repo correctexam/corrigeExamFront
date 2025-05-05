@@ -109,6 +109,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { PredictionStudentResponseService } from '../mlt/prediction-studentresponse-service';
 import Fuse from 'fuse.js';
+import { imagenoanswer } from './noresponse';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -284,7 +285,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     },
   ];
   displayBasic = false;
-  images: any[] = [];
+  images: WritableSignal<any> = signal<any[]>([]);
   pageOffset = 0;
   init = true;
   showSpinner = false;
@@ -389,10 +390,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     //      'answer/:examid/:questionno/:studentid',
     if (params.get('examid') !== null) {
       this.examId = params.get('examid')!;
-      if (this.images.length === 0) {
-        this.examId = params.get('examid')!;
-        //   forceRefreshStudent = true;
-      }
       if (params.get('questionno') !== null) {
         this.questionindex4shortcut = +params.get('questionno')! - 1;
       }
@@ -419,10 +416,17 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           studentid_prev = -1;
           questionindex4shortcut_prev = -1;
           questionindex4shortcut_prev = -1;
-          this.nbreFeuilleParCopie = await this.db.countPageTemplate(+this.examId);
-          this.numberPagesInScan = await this.db.countAlignImage(+this.examId!);
           const data = await firstValueFrom(this.examService.find(+this.examId!));
           this.exam = data.body!;
+          if (this.exam.nbgrader === true) {
+            const questions = await firstValueFrom(this.questionService.query({ examId: this.exam.id }));
+            this.nbreFeuilleParCopie = questions.body!.length;
+            const sheets = await firstValueFrom(this.sheetService.query({ examId: this.exam.id }));
+            this.numberPagesInScan = this.nbreFeuilleParCopie! * sheets.body!.length;
+          } else {
+            this.nbreFeuilleParCopie = await this.db.countPageTemplate(+this.examId);
+            this.numberPagesInScan = await this.db.countAlignImage(+this.examId!);
+          }
           this.updateTitle();
           this.translateService.onLangChange.subscribe(() => {
             this.updateTitle();
@@ -492,9 +496,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             } else if (questions![0].gradeType === GradeType.HYBRID && questions![0].typeAlgoName !== 'QCM') {
               const com = await firstValueFrom(this.hybridGradedCommentService.query({ questionId: questions![0].id }));
               this.currentHybridGradedComment4Question = [];
-              com.body!.forEach(comment => {
+              for (const comment of com.body!) {
                 this.currentHybridGradedComment4Question?.push(signal(comment));
-              });
+              }
 
               this.currentHybridGradedComment4Question.forEach(com1 => {
                 this.active.set(com1().id!, signal(false));
@@ -546,27 +550,33 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 this.resp.textcomments!.forEach(com1 => {
                   const elt = this.currentTextComment4Question?.find(com2 => com2().id === com1.id);
                   if (elt !== undefined) {
-                    (elt as any)().checked = true;
-                  } else {
-                    (elt as any)().checked = false;
+                    if ((elt as any)() !== undefined) {
+                      (elt as any)().checked = true;
+                    } else {
+                      (elt as any)().checked = false;
+                    }
                   }
                 });
               } else if (questions![0].gradeType === GradeType.HYBRID && questions![0].typeAlgoName !== 'QCM') {
                 this.answer2HybridGradedCommentMap.forEach((com1v, com1k) => {
                   const elt = this.currentHybridGradedComment4Question?.find(com2 => com2().id === com1k);
-                  if (elt !== undefined && com1v > 0) {
-                    (elt as any)().checked = true;
-                  } else {
-                    (elt as any)().checked = false;
+                  if (elt !== undefined) {
+                    if ((elt as any)() !== undefined && com1v > 0) {
+                      (elt as any)().checked = true;
+                    } else {
+                      (elt as any)().checked = false;
+                    }
                   }
                 });
               } else {
                 this.resp.gradedcomments!.forEach(com1 => {
                   const elt = this.currentGradedComment4Question?.find(com2 => com2().id === com1.id);
                   if (elt !== undefined) {
-                    (elt as any)().checked = true;
-                  } else {
-                    (elt as any)().checked = false;
+                    if ((elt as any)() !== undefined) {
+                      (elt as any)().checked = true;
+                    } else {
+                      (elt as any)().checked = false;
+                    }
                   }
                 });
               }
@@ -583,7 +593,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             this.populateDefaultShortCut();
           }
           this.showImage = new Array<boolean>(questions.length);
-
           this.questions = questions;
           if (this.questionindex4shortcut === questionindex4shortcut_prev) {
             setTimeout(() => {
@@ -2014,11 +2023,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async loadAllPages(): Promise<void> {
-    this.images = [];
+    this.images.set([]);
+    const images: any[] = [];
 
-    const page = await this.db.countNonAlignImage(+this.examId!);
+    const page = await this.db.countAlignImage(+this.examId!);
     if (page > 30) {
-      const page1 = await this.db.countPageTemplate(+this.examId!);
+      const page1 = this.nbreFeuilleParCopie!;
       if (this.noalign) {
         const e1 = await this.db.getNonAlignImageBetweenAndSortByPageNumber(
           +this.examId!,
@@ -2045,7 +2055,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             s = image.pages;
           }
           if (s !== '') {
-            this.images.push({
+            images.push({
               src: s,
               alt: 'Description for Image 2',
               title: 'Exam',
@@ -2063,7 +2073,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           const image = JSON.parse(e!.value, this.reviver);
           let s: string = '';
           if (this.studentName === undefined || this.studentName === '') {
-            const paget = await this.db.countPageTemplate(+this.examId!);
+            // const paget = await this.db.countPageTemplate(+this.examId!);
+            const paget = this.nbreFeuilleParCopie!;
             if (paget === 1) {
               s = await this.loadImageAnonymous(image.pages);
             } else {
@@ -2077,7 +2088,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             s = image.pages;
           }
           if (s !== '') {
-            this.images.push({
+            images.push({
               src: s,
               alt: 'Description for Image 2',
               title: 'Exam',
@@ -2094,21 +2105,23 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           const image = JSON.parse(e!.value, this.reviver);
           let s: string = '';
           if (this.studentName === undefined || this.studentName === '') {
-            const paget = await this.db.countPageTemplate(+this.examId!);
+            const paget = this.nbreFeuilleParCopie!;
+
+            // const paget = await this.db.countPageTemplate(+this.examId!);
             if (paget === 1) {
               s = await this.loadImageAnonymous(image.pages);
             } else {
               if ((index % paget) % 2 === 0) {
                 s = await this.loadImageAnonymous(image.pages);
               } else {
-                s = image.pages;
+                s = await this.loadImageAnonymous(image.pages);
               }
             }
           } else {
             s = image.pages;
           }
           if (s !== '') {
-            this.images.push({
+            images.push({
               src: s,
               alt: 'Description for Image 2',
               title: 'Exam',
@@ -2122,21 +2135,23 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           const image = JSON.parse(e!.value, this.reviver);
           let s: string = '';
           if (this.studentName === undefined || this.studentName === '') {
-            const paget = await this.db.countPageTemplate(+this.examId!);
+            const paget = this.nbreFeuilleParCopie!;
+            // await this.db.countPageTemplate(+this.examId!);
             if (paget === 1) {
               s = await this.loadImageAnonymous(image.pages);
             } else {
               if ((index % paget) % 2 === 0) {
                 s = await this.loadImageAnonymous(image.pages);
               } else {
-                s = image.pages;
+                s = await this.loadImageAnonymous(image.pages);
               }
             }
           } else {
             s = image.pages;
           }
+
           if (s !== '') {
-            this.images.push({
+            images.push({
               src: s,
               alt: 'Description for Image 2',
               title: 'Exam',
@@ -2145,27 +2160,46 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       }
     }
+    this.images.set(images);
   }
   async getAllImage4Zone(pageInscan: number, zone: IZone, computescale: boolean): Promise<ImageZone> {
-    const imageToCrop: IImageCropFromZoneInput = {
-      examId: +this.examId!,
-      factor: +this.factor,
-      align: !this.noalign,
-      template: false,
-      indexDb: this.preferenceService.getPreference().cacheDb === 'indexdb',
-      page: pageInscan,
-      z: zone,
-    };
-    const crop = await firstValueFrom(this.alignImagesService.imageCropFromZone(imageToCrop));
-    if (computescale) {
-      this.computeScale(crop.width, crop.height);
-    }
+    if (this.exam?.nbgrader === true) {
+      const i = await this.db.getAlignImagesForPageNumbers(+this.examId!, [pageInscan]);
+      const pageNumber = pageInscan;
+      let imageb64 = '';
+      if (i.length === 0) {
+        imageb64 = imagenoanswer;
+      } else {
+        const image = JSON.parse(i[0].value, this.reviver);
+        imageb64 = image.pages;
+      }
+      const v = await this.loadImage(imageb64, pageNumber!);
+      return {
+        i: v.image!,
+        h: v.height!,
+        w: v.width!,
+      };
+    } else {
+      const imageToCrop: IImageCropFromZoneInput = {
+        examId: +this.examId!,
+        factor: +this.factor,
+        align: !this.noalign,
+        template: false,
+        indexDb: this.preferenceService.getPreference().cacheDb === 'indexdb',
+        page: pageInscan,
+        z: zone,
+      };
+      const crop = await firstValueFrom(this.alignImagesService.imageCropFromZone(imageToCrop));
+      if (computescale) {
+        this.computeScale(crop.width, crop.height);
+      }
 
-    return {
-      i: new ImageData(new Uint8ClampedArray(crop.image), crop.width, crop.height),
-      h: crop.height,
-      w: crop.width,
-    };
+      return {
+        i: new ImageData(new Uint8ClampedArray(crop.image), crop.width, crop.height),
+        h: crop.height,
+        w: crop.width,
+      };
+    }
   }
 
   async getTemplateImage4Zone(zone: IZone): Promise<ImageZone> {
@@ -2378,14 +2412,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async loadImage(file: any, page1: number): Promise<IPage> {
-    console.log('loadImage called with file:', file);
     return new Promise(resolve => {
       const i = new Image();
 
       // Add debugging to check when the image is loaded
       i.onload = () => {
-        console.log('Image loaded with dimensions:', i.width, i.height); // Log image dimensions
-
         const editedImage: HTMLCanvasElement = <HTMLCanvasElement>document.createElement('canvas');
         editedImage.width = i.width;
         this.computeScale(i.width, i.height);
@@ -2394,14 +2425,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         ctx!.drawImage(i, 0, 0);
 
         const inputimage = ctx!.getImageData(0, 0, i.width, i.height);
-        console.log('ImageData extracted:', inputimage); // Log extracted image data
 
         resolve({ image: inputimage, page: page1, width: i.width, height: i.height });
       };
 
       // Set the image source and log it
       i.src = file;
-      console.log('Image source set to:', i.src); // Debugging log for the image source
     });
   }
   updateCommentStep(event: any, l: IHybridGradedComment, graded: boolean, hybrid: boolean): any {
@@ -2470,7 +2499,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   changeAlign(): void {
-    this.images = [];
+    this.images.set([]);
     this.reloadImage();
   }
   // getStudentName(): string | undefined {
@@ -2751,7 +2780,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         this.replacer,
       ),
     });
-    this.images = [];
+    this.images.set([]);
     //  this.loadAllPages();
     this.reloadImage();
   }
@@ -3191,14 +3220,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   async passToNextNotGradedQuestion() {
     const nbStudents = this.numberPagesInScan! / this.nbreFeuilleParCopie!;
-    console.log('My note', this.resp);
     for (let i = 0; i < nbStudents; i++) {
       if (this.currentStudent < i) {
         const response = await this.getStudentResponse4EmptyStudent(
           this.questions!.map(q => q.id!),
           i,
         );
-        console.log('Student', i + 1, 'Response:', response);
         if (response === undefined) {
           this.currentStudentPaginator = i;
           this.currentStudent = i;
@@ -3467,7 +3494,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.deleted = false;
     } else {
       this.deleted = true;
-      console.warn('No valid predictions found for the current question index.');
     }
     this.dropdownOpen = false;
   }

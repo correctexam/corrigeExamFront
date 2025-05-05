@@ -220,7 +220,6 @@ export class CacheUploadService {
       .subscribe(res => cacheUploadNotification.setMessage('' + res + ' Part ' + part + '/' + nbrPart));
     try {
       const value = await this.db.export(examId, o);
-
       const file = new File([value], filename);
 
       cacheUploadNotification.setProgress(0);
