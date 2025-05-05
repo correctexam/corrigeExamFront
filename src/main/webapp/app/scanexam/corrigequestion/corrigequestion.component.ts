@@ -109,6 +109,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { PredictionStudentResponseService } from '../mlt/prediction-studentresponse-service';
 import Fuse from 'fuse.js';
+import { imagenoanswer } from './noresponse';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -495,9 +496,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             } else if (questions![0].gradeType === GradeType.HYBRID && questions![0].typeAlgoName !== 'QCM') {
               const com = await firstValueFrom(this.hybridGradedCommentService.query({ questionId: questions![0].id }));
               this.currentHybridGradedComment4Question = [];
-              com.body!.forEach(comment => {
+              for (const comment of com.body!) {
                 this.currentHybridGradedComment4Question?.push(signal(comment));
-              });
+              }
 
               this.currentHybridGradedComment4Question.forEach(com1 => {
                 this.active.set(com1().id!, signal(false));
@@ -549,27 +550,33 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
                 this.resp.textcomments!.forEach(com1 => {
                   const elt = this.currentTextComment4Question?.find(com2 => com2().id === com1.id);
                   if (elt !== undefined) {
-                    (elt as any)().checked = true;
-                  } else {
-                    (elt as any)().checked = false;
+                    if ((elt as any)() !== undefined) {
+                      (elt as any)().checked = true;
+                    } else {
+                      (elt as any)().checked = false;
+                    }
                   }
                 });
               } else if (questions![0].gradeType === GradeType.HYBRID && questions![0].typeAlgoName !== 'QCM') {
                 this.answer2HybridGradedCommentMap.forEach((com1v, com1k) => {
                   const elt = this.currentHybridGradedComment4Question?.find(com2 => com2().id === com1k);
-                  if (elt !== undefined && com1v > 0) {
-                    (elt as any)().checked = true;
-                  } else {
-                    (elt as any)().checked = false;
+                  if (elt !== undefined) {
+                    if ((elt as any)() !== undefined && com1v > 0) {
+                      (elt as any)().checked = true;
+                    } else {
+                      (elt as any)().checked = false;
+                    }
                   }
                 });
               } else {
                 this.resp.gradedcomments!.forEach(com1 => {
                   const elt = this.currentGradedComment4Question?.find(com2 => com2().id === com1.id);
                   if (elt !== undefined) {
-                    (elt as any)().checked = true;
-                  } else {
-                    (elt as any)().checked = false;
+                    if ((elt as any)() !== undefined) {
+                      (elt as any)().checked = true;
+                    } else {
+                      (elt as any)().checked = false;
+                    }
                   }
                 });
               }
@@ -2152,8 +2159,14 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     if (this.exam?.nbgrader === true) {
       const i = await this.db.getAlignImagesForPageNumbers(+this.examId!, [pageInscan + 1]);
       const pageNumber = pageInscan;
-      const image = JSON.parse(i[0].value, this.reviver);
-      const v = await this.loadImage(image.pages, pageNumber!);
+      let imageb64 = '';
+      if (i.length === 0) {
+        imageb64 = imagenoanswer;
+      } else {
+        const image = JSON.parse(i[0].value, this.reviver);
+        imageb64 = image.pages;
+      }
+      const v = await this.loadImage(imageb64, pageNumber!);
       return {
         i: v.image!,
         h: v.height!,
@@ -3474,7 +3487,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.deleted = false;
     } else {
       this.deleted = true;
-      console.warn('No valid predictions found for the current question index.');
     }
     this.dropdownOpen = false;
   }

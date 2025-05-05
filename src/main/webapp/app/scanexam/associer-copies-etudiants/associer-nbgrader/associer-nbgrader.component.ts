@@ -204,6 +204,8 @@ export class AssocierNbgraderComponent implements OnInit, AfterViewInit {
           this.currentStudent = +params.get('currentStudent')! - 1;
           this.getFilterStudent();
           this.filterLocalStudentList();
+          this.selectmostCloseStudent();
+
           this.blocked = false;
           console.timeEnd('loadpagesameexam');
         }
@@ -244,7 +246,9 @@ export class AssocierNbgraderComponent implements OnInit, AfterViewInit {
         this.predictionprecision = 1;
       } else {
         this.predictionprecision =
-          1 - distance / Math.max(this.recognizedStudent.firstname!.length + this.recognizedStudent.name!.length, sheets[0].name!.length);
+          1.0 -
+          (distance * 1.0) /
+            Math.max(this.recognizedStudent.firstname!.length + this.recognizedStudent.name!.length, sheets[0].name!.length);
       }
       this.showRecognizedStudent.set(
         this.recognizedStudent?.name +
@@ -253,7 +257,7 @@ export class AssocierNbgraderComponent implements OnInit, AfterViewInit {
           ' (' +
           this.recognizedStudent?.ine +
           ' [score=' +
-          Math.floor(this.predictionprecision) +
+          Math.floor(this.predictionprecision * 100) +
           ']',
       );
     }
@@ -576,8 +580,8 @@ export class AssocierNbgraderComponent implements OnInit, AfterViewInit {
     const result: any[] = [];
     this.getFilterStudent();
 
-    this.sheets.sort((sh1, sh2) => (sh1 < sh2 ? 1 : -1));
-    const sheets1 = this.sheets.filter((sh, index) => pagesToAnalyze.includes(index));
+    this.sheets.sort((sh1, sh2) => (sh1.pagemin! > sh2.pagemin! ? 1 : -1));
+    const sheets1 = this.sheets.filter(sh => pagesToAnalyze.includes(sh.pagemin!));
     let shpage = 0;
     for (const sh of sheets1) {
       const res: any = {};
@@ -589,10 +593,10 @@ export class AssocierNbgraderComponent implements OnInit, AfterViewInit {
       let predictionprecision = 1;
       if (distance !== 0) {
         predictionprecision =
-          1 - distance / Math.max(recognizedStudent.firstname!.length + recognizedStudent.name!.length, sh.name!.length);
+          1.0 - distance / Math.max(recognizedStudent.firstname!.length + recognizedStudent.name!.length, sh.name!.length);
       }
-      res.page = shpage * this.nbreFeuilleParCopie;
-      res.predictionprecision = predictionprecision;
+      res.page = sh.pagemin!;
+      res.predictionprecision = predictionprecision * 100;
       res.recognizedStudent = recognizedStudent;
       res.nbName = sh.name;
       result.push(res);
@@ -626,6 +630,7 @@ export class AssocierNbgraderComponent implements OnInit, AfterViewInit {
       ref.onClose.subscribe(() => {
         this.refreshStudentList().then(() => {
           this.blocked = false;
+          this.refreshLocalStudentList();
           this.countRemainingFreeSheets();
         });
       });
