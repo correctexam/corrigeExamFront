@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable object-shorthand */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable no-console */
@@ -53,6 +54,8 @@ import { Button, ButtonDirective } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { PredictionStudentResponseService } from '../mlt/prediction-studentresponse-service';
+import { IExam } from 'app/entities/exam/exam.model';
+import { imagenoanswer } from '../corrigequestion/noresponse';
 
 export interface Zone4SameCommentOrSameGrade {
   answers: Answer[];
@@ -143,6 +146,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   showImage: boolean[] = [];
   showImageVisible: boolean[] = [];
   examId: string | undefined;
+  exam?: IExam;
   qId: string | undefined;
   numberPagesInScan: number | undefined;
 
@@ -224,89 +228,91 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
       //      'answer/:examid/:questionno/:studentid',
       if (params.get('examid') !== null) {
         this.examId = params.get('examid')!;
-
-        this.pageOffset = 0;
-        if (params.get('commentid') !== null && this.router.url.includes('comparetextcomment')) {
-          this.http
-            .get<Zone4SameCommentOrSameGrade>(
-              this.applicationConfigService.getEndpointFor('api/getZone4TextComment/' + this.examId + '/' + params.get('commentid')),
-            )
-            .subscribe(res => {
-              this.zones4comments = res;
-              this.zones4comments.answers!.forEach((_, index) => {
-                this.clusters.get(0)?.push(index);
-              });
-              if (this.clusters.get(0) === undefined || this.clusters.get(0)!.length === 0) {
-                this.blocked = false;
-              }
-            });
-        } else if (params.get('commentid') !== null && this.router.url.includes('comparegradedcomment')) {
-          this.http
-            .get<Zone4SameCommentOrSameGrade>(
-              this.applicationConfigService.getEndpointFor('api/getZone4GradedComment/' + this.examId + '/' + params.get('commentid')),
-            )
-            .subscribe(res => {
-              this.zones4comments = res;
-              this.zones4comments.answers!.forEach((_, index) => {
-                this.clusters.get(0)?.push(index);
-              });
-              if (this.clusters.get(0) === undefined || this.clusters.get(0)!.length === 0) {
-                this.blocked = false;
-              }
-
-              // console.error(this.zones4comments)
-            });
-        } else if (params.get('commentid') !== null && this.router.url.includes('comparehybridcomment')) {
-          this.http
-            .get<Zone4SameCommentOrSameGrade>(
-              this.applicationConfigService.getEndpointFor(
-                'api/getZone4HybridComment/' + this.examId + '/' + params.get('commentid') + '/' + params.get('stepValue'),
-              ),
-            )
-            .subscribe(res => {
-              this.zones4comments = res;
-              this.zones4comments.answers!.forEach((_, index) => {
-                this.clusters.get(0)?.push(index);
-              });
-              if (this.clusters.get(0) === undefined || this.clusters.get(0)!.length === 0) {
-                this.blocked = false;
-              }
-
-              // console.error(this.zones4comments)
-            });
-        } else if (params.get('respid') !== null && this.router.url.includes('comparemark')) {
-          this.http
-            .get<Zone4SameCommentOrSameGrade>(
-              this.applicationConfigService.getEndpointFor('api/getZone4Mark/' + this.examId + '/' + params.get('respid')),
-            )
-            .subscribe(res => {
-              this.zones4comments = res;
-              this.zones4comments.answers!.forEach((_, index) => {
-                this.clusters.get(0)?.push(index);
-              });
-              if (this.clusters.get(0) === undefined || this.clusters.get(0)!.length === 0) {
-                this.blocked = false;
-              }
-            });
-        } else if (params.get('qid') !== null && this.router.url.includes('compareanswer')) {
-          this.qId = params.get('qid')!;
-          this.questionall = true;
-          this.http
-            .get<Zone4SameCommentOrSameGrade>(
-              this.applicationConfigService.getEndpointFor('api/getZone4Numero/' + this.examId + '/' + this.qId),
-            )
-            .subscribe(res => {
-              this.zones4comments = res;
-              const _cluster = this.preferenceService.getCluster4Question(this.examId + '_' + this.qId);
-              if (_cluster === null) {
+        this.examService.find(+this.examId).subscribe(exam1 => {
+          this.exam = exam1.body!;
+          this.pageOffset = 0;
+          if (params.get('commentid') !== null && this.router.url.includes('comparetextcomment')) {
+            this.http
+              .get<Zone4SameCommentOrSameGrade>(
+                this.applicationConfigService.getEndpointFor('api/getZone4TextComment/' + this.examId + '/' + params.get('commentid')),
+              )
+              .subscribe(res => {
+                this.zones4comments = res;
                 this.zones4comments.answers!.forEach((_, index) => {
                   this.clusters.get(0)?.push(index);
                 });
-              } else {
-                this.clusters = _cluster;
-              }
-            });
-        }
+                if (this.clusters.get(0) === undefined || this.clusters.get(0)!.length === 0) {
+                  this.blocked = false;
+                }
+              });
+          } else if (params.get('commentid') !== null && this.router.url.includes('comparegradedcomment')) {
+            this.http
+              .get<Zone4SameCommentOrSameGrade>(
+                this.applicationConfigService.getEndpointFor('api/getZone4GradedComment/' + this.examId + '/' + params.get('commentid')),
+              )
+              .subscribe(res => {
+                this.zones4comments = res;
+                this.zones4comments.answers!.forEach((_, index) => {
+                  this.clusters.get(0)?.push(index);
+                });
+                if (this.clusters.get(0) === undefined || this.clusters.get(0)!.length === 0) {
+                  this.blocked = false;
+                }
+
+                // console.error(this.zones4comments)
+              });
+          } else if (params.get('commentid') !== null && this.router.url.includes('comparehybridcomment')) {
+            this.http
+              .get<Zone4SameCommentOrSameGrade>(
+                this.applicationConfigService.getEndpointFor(
+                  'api/getZone4HybridComment/' + this.examId + '/' + params.get('commentid') + '/' + params.get('stepValue'),
+                ),
+              )
+              .subscribe(res => {
+                this.zones4comments = res;
+                this.zones4comments.answers!.forEach((_, index) => {
+                  this.clusters.get(0)?.push(index);
+                });
+                if (this.clusters.get(0) === undefined || this.clusters.get(0)!.length === 0) {
+                  this.blocked = false;
+                }
+
+                // console.error(this.zones4comments)
+              });
+          } else if (params.get('respid') !== null && this.router.url.includes('comparemark')) {
+            this.http
+              .get<Zone4SameCommentOrSameGrade>(
+                this.applicationConfigService.getEndpointFor('api/getZone4Mark/' + this.examId + '/' + params.get('respid')),
+              )
+              .subscribe(res => {
+                this.zones4comments = res;
+                this.zones4comments.answers!.forEach((_, index) => {
+                  this.clusters.get(0)?.push(index);
+                });
+                if (this.clusters.get(0) === undefined || this.clusters.get(0)!.length === 0) {
+                  this.blocked = false;
+                }
+              });
+          } else if (params.get('qid') !== null && this.router.url.includes('compareanswer')) {
+            this.qId = params.get('qid')!;
+            this.questionall = true;
+            this.http
+              .get<Zone4SameCommentOrSameGrade>(
+                this.applicationConfigService.getEndpointFor('api/getZone4Numero/' + this.examId + '/' + this.qId),
+              )
+              .subscribe(res => {
+                this.zones4comments = res;
+                const _cluster = this.preferenceService.getCluster4Question(this.examId + '_' + this.qId);
+                if (_cluster === null) {
+                  this.zones4comments.answers!.forEach((_, index) => {
+                    this.clusters.get(0)?.push(index);
+                  });
+                } else {
+                  this.clusters = _cluster;
+                }
+              });
+          }
+        });
       }
     });
   }
@@ -402,22 +408,40 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
   }
 
   async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
-    const imageToCrop: IImageCropFromZoneInput = {
-      examId: +this.examId!,
-      factor: +this.factor,
-      align: !this.noalign,
-      template: false,
-      indexDb: this.preferenceService.getPreference().cacheDb === 'indexdb',
-      page: pageInscan,
-      z: zone,
-    };
-    const crop = await firstValueFrom(this.alignImagesService.imageCropFromZone(imageToCrop));
-    this.computeScale(crop.width);
-    return {
-      i: new ImageData(new Uint8ClampedArray(crop.image), crop.width, crop.height),
-      h: crop.height,
-      w: crop.width,
-    };
+    if (this.exam?.nbgrader === undefined || this.exam?.nbgrader === false) {
+      const imageToCrop: IImageCropFromZoneInput = {
+        examId: +this.examId!,
+        factor: +this.factor,
+        align: !this.noalign,
+        template: false,
+        indexDb: this.preferenceService.getPreference().cacheDb === 'indexdb',
+        page: pageInscan,
+        z: zone,
+      };
+      const crop = await firstValueFrom(this.alignImagesService.imageCropFromZone(imageToCrop));
+      this.computeScale(crop.width);
+      return {
+        i: new ImageData(new Uint8ClampedArray(crop.image), crop.width, crop.height),
+        h: crop.height,
+        w: crop.width,
+      };
+    } else {
+      const i = await this.db.getAlignImagesForPageNumbers(+this.examId!, [pageInscan]);
+      const pageNumber = pageInscan;
+      let imageb64 = '';
+      if (i.length === 0) {
+        imageb64 = imagenoanswer;
+      } else {
+        const image = JSON.parse(i[0].value, this.reviver);
+        imageb64 = image.pages;
+      }
+      const v = await this.loadImage(imageb64, pageNumber!);
+      return {
+        i: v.image!,
+        h: v.height!,
+        w: v.width!,
+      };
+    }
   }
   computeScale(imageWidth: number): void {
     if (this.windowWidth < 991) {
@@ -846,5 +870,37 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     await this.reloadImage();
     this.reloadImageClassify();
     this.layoutsidebarVisible = false;
+  }
+
+  private reviver(key: any, value: any): any {
+    if (typeof value === 'object' && value !== null) {
+      if (value.dataType === 'Map') {
+        return new Map(value.value);
+      }
+    }
+    return value;
+  }
+
+  async loadImage(file: any, page1: number): Promise<any> {
+    return new Promise(resolve => {
+      const i = new Image();
+
+      // Add debugging to check when the image is loaded
+      i.onload = () => {
+        const editedImage: HTMLCanvasElement = <HTMLCanvasElement>document.createElement('canvas');
+        editedImage.width = i.width;
+        this.computeScale(i.width);
+        editedImage.height = i.height;
+        const ctx = editedImage.getContext('2d');
+        ctx!.drawImage(i, 0, 0);
+
+        const inputimage = ctx!.getImageData(0, 0, i.width, i.height);
+
+        resolve({ image: inputimage, page: page1, width: i.width, height: i.height });
+      };
+
+      // Set the image source and log it
+      i.src = file;
+    });
   }
 }
