@@ -276,11 +276,12 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit, CacheU
       }
     }
 
+    let qIndexSheet = 0;
     for (let questionIndex = 0; questionIndex < questionsDesc.length; questionIndex++) {
       const pageNumber = studentIndex * questionsDesc.length + questionIndex + 1;
       const textwithdiv = $.html();
       if (textwithdiv.includes(questionsDesc[questionIndex].anchor)) {
-        const score = await this.processSection(questionIndex, responses, textwithdiv, c, examId, pageNumber);
+        const score = await this.processSection(questionIndex, responses, textwithdiv, c, examId, pageNumber, qIndexSheet);
 
         const note = score.substring(0, score.indexOf('/') - 1);
         const notemax = score.substring(score.indexOf('/') + 1);
@@ -289,6 +290,7 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit, CacheU
           note: Number(note),
           notemax: Number(notemax),
         });
+        qIndexSheet = qIndexSheet + 1;
       }
     }
     return res;
@@ -301,12 +303,13 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit, CacheU
     cache: boolean,
     examId: number,
     pageNumber: number,
+    qIndexSheet: number,
   ): Promise<string> {
     const $ = await cheerio.load(text);
 
     let res = '';
     responses.forEach((e, i) => {
-      if (i === index) {
+      if (i === qIndexSheet) {
         e.element.forEach(e2 => {
           const e1 = $('[id="' + e2 + '"]').find('span.pull-right');
           if (e1.get().length > 0) {
