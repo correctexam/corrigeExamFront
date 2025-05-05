@@ -56,6 +56,7 @@ import { BlockUIModule } from 'primeng/blockui';
 import { PredictionStudentResponseService } from '../mlt/prediction-studentresponse-service';
 import { IExam } from 'app/entities/exam/exam.model';
 import { imagenoanswer } from '../corrigequestion/noresponse';
+import { IExamSheet } from 'app/entities/exam-sheet/exam-sheet.model';
 
 export interface Zone4SameCommentOrSameGrade {
   answers: Answer[];
@@ -671,29 +672,64 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
     });
   }
 
-  downloadAllHighQuality(): void {
+  async downloadAllHighQuality(): Promise<void> {
     const zip = new jszip();
     const img = zip.folder('images');
     const metadata = zip.folder('metadata');
+    const all = await firstValueFrom(this.questionService.getallcommentsandprediction4qId(+this.qId!));
+    metadata?.file('metadata.json', JSON.stringify(all));
 
-    let exportImageType = 'image/webp';
-    if (
-      this.preferenceService.getPreference().imageTypeExport !== undefined &&
-      ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
-    ) {
-      exportImageType = this.preferenceService.getPreference().imageTypeExport;
-    }
-    let _extension = '.webp';
-    if (exportImageType === 'image/png') {
-      _extension = '.png';
-    } else if (exportImageType === 'image/jpg') {
-      _extension = '.jpg';
-    }
-    const extension = _extension;
+    if (this.exam?.nbgrader === true) {
+      const _srs = await firstValueFrom(this.sheetService.query({ examId: +this.examId! }));
+      const srs: IExamSheet[] = _srs.body || [];
+      const _q = await firstValueFrom(this.questionService.find(+this.qId!));
+      // Query predictions for this question
+      const q = _q.body || undefined;
+      if (q !== undefined) {
+        let j = 1;
+        for (const sr of srs) {
+          const i = await this.db.getAlignImagesForPageNumbers(+this.examId!, [sr.pagemin! + q.zoneDTO!.pageNumber!]);
 
-    firstValueFrom(this.questionService.getallcommentsandprediction4qId(+this.qId!)).then(res => {
-      const all = res;
-      metadata?.file('metadata.json', JSON.stringify(all));
+          //        const pageNumber = 1;
+          let imageb64 = '';
+          if (i.length === 0) {
+            imageb64 = imagenoanswer;
+          } else {
+            const image = JSON.parse(i[0].value, this.reviver);
+            imageb64 = image.pages;
+          }
+          const idx = imageb64.indexOf('base64,') + 'base64,'.length; // or = 28 if you're sure about the prefix
+          const ext = imageb64.substring(0, idx);
+          let extension = '.webp';
+          if (ext === 'data:image/png;base64,') {
+            extension = '.png';
+          } else if (ext === 'data:image/jpg;base64,') {
+            extension = '.jpg';
+          }
+          const content = imageb64.substring(idx);
+
+          img!.file('reponse_' + q.numero + '_' + j + '_' + 1 + '_' + this.qId! + '_' + sr.id! + extension, content, { base64: true });
+          j++;
+        }
+        zip.generateAsync({ type: 'blob' }).then(content => {
+          FileSaver.saveAs(content, 'Exam' + this.examId + '.zip');
+        });
+      }
+    } else {
+      let exportImageType = 'image/webp';
+      if (
+        this.preferenceService.getPreference().imageTypeExport !== undefined &&
+        ['image/webp', 'image/png', 'image/jpg'].includes(this.preferenceService.getPreference().imageTypeExport)
+      ) {
+        exportImageType = this.preferenceService.getPreference().imageTypeExport;
+      }
+      let _extension = '.webp';
+      if (exportImageType === 'image/png') {
+        _extension = '.png';
+      } else if (exportImageType === 'image/jpg') {
+        _extension = '.jpg';
+      }
+      const extension = _extension;
 
       const obs = this.predictionStudentResponseService.downloadStudentResponsesFromQuestionIds(+this.examId!, +this.qId!);
       const ps: Promise<any>[] = [];
@@ -732,7 +768,7 @@ export class ComparestudentanswerComponent implements OnInit, AfterViewInit {
             );
           });
         });
-    });
+    }
   }
 
   dragStart(value: any): void {

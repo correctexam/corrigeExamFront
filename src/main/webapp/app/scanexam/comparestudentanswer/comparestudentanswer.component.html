@@ -31,7 +31,7 @@
     </button>
     <button
       pButton
-      [disabled]="!this.examId"
+      [disabled]="!this.examId || qId === undefined"
       type="submit"
       id="save-entity"
       data-cy="entityCreateSaveButton"
