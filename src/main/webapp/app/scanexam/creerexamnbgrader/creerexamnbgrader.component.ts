@@ -27,7 +27,7 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { PreferenceService } from '../preference-page/preference.service';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { IExam } from 'app/entities/exam/exam.model';
-import { firstValueFrom, filter } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { Template } from 'app/entities/template/template.model';
 import { CacheUploadNotification, CacheUploadService } from '../exam-detail/cacheUpload.service';
 
@@ -497,7 +497,6 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit, CacheU
             }
             studentIndex = studentIndex + 1;
           }
-          // eslint-disable-next-line arrow-body-style
           /* const result = Array.from(new Map(Object.entries(res)), ([key, value]) => {
             return {
             name: key,
@@ -528,7 +527,6 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit, CacheU
 
   showListFiles(filenames: string[]): void {
     this.translateService.get('scanexam.listfilesheader').subscribe(data1 => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const ref = this.dialogService.open(SheetSelectionComponent, {
         data: {
           filenames: filenames.map(e => {

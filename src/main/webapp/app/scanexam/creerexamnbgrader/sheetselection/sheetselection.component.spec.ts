@@ -2,15 +2,15 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { describe, expect } from '@jest/globals';
 
-import { CreerexamComponentNbGrader } from './creerexamnbgrader.component';
+import { SheetSelectionComponent } from './sheetselection.component';
 
 describe('CreerexamComponent', () => {
-  let component: CreerexamComponentNbGrader;
-  let fixture: ComponentFixture<CreerexamComponentNbGrader>;
+  let component: SheetSelectionComponent;
+  let fixture: ComponentFixture<SheetSelectionComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CreerexamComponentNbGrader],
+      imports: [SheetSelectionComponent],
     }).compileComponents();
   });
 
