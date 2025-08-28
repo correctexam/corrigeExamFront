@@ -1,29 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 import { LANGUAGES } from 'app/config/language.constants';
 import { FindLanguageFromKeyPipe } from '../../shared/language/find-language-from-key.pipe';
 import { AlertErrorComponent } from '../../shared/alert/alert-error.component';
-import { TranslateDirective } from '../../shared/language/translate.directive';
 import { NgIf, NgFor } from '@angular/common';
 
 @Component({
   selector: 'jhi-settings',
   templateUrl: './settings.component.html',
   standalone: true,
-  imports: [
-    NgIf,
-    TranslateDirective,
-    AlertErrorComponent,
-    FormsModule,
-    ReactiveFormsModule,
-    NgFor,
-    TranslateModule,
-    FindLanguageFromKeyPipe,
-  ],
+  imports: [NgIf, AlertErrorComponent, FormsModule, ReactiveFormsModule, NgFor, TranslateDirective, TranslatePipe, FindLanguageFromKeyPipe],
 })
 export class SettingsComponent implements OnInit {
   account!: Account;

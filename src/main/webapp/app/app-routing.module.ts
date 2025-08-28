@@ -27,6 +27,6 @@ export const APP_ROUTES: Route[] = [
     path: '',
     loadChildren: () => import(`./entities/entity-routing.module`).then(m => m.ENTITIES_ROUTES),
   },
-  navbarRoute,
+  ...navbarRoute,
   ...errorRoute,
 ];

@@ -12,13 +12,12 @@ import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.ser
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { NgIf, NgFor } from '@angular/common';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-student-update',
   templateUrl: './student-update.component.html',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, TranslateDirective, AlertErrorComponent, NgIf, NgFor, FaIconComponent],
+  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, NgIf, NgFor, FaIconComponent],
 })
 export class StudentUpdateComponent implements OnInit {
   isSaving = false;

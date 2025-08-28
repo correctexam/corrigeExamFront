@@ -4,7 +4,7 @@
       <h2
         id="jhi-hybrid-graded-comment-heading"
         data-cy="HybridGradedCommentCreateUpdateHeading"
-        jhiTranslate="gradeScopeIsticApp.hybridGradedComment.home.createOrEditLabel"
+        [translate]="'gradeScopeIsticApp.hybridGradedComment.home.createOrEditLabel'"
       >
         Créer ou éditer un Hybrid Graded Comment
       </h2>
@@ -13,7 +13,7 @@
         <jhi-alert-error></jhi-alert-error>
 
         <div class="row mb-3" *ngIf="editForm.controls.id.value !== null">
-          <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+          <label class="form-label" [translate]="'global.field.id'" for="field_id">ID</label>
           <input
             type="number"
             (mouseup)="$event.stopPropagation()"
@@ -27,12 +27,12 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.hybridGradedComment.text" for="field_text">Text</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.hybridGradedComment.text'" for="field_text">Text</label>
           <input type="text" class="form-control" name="text" id="field_text" data-cy="text" formControlName="text" />
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.hybridGradedComment.description" for="field_description"
+          <label class="form-label" [translate]="'gradeScopeIsticApp.hybridGradedComment.description'" for="field_description"
             >Description</label
           >
           <textarea
@@ -45,7 +45,7 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.hybridGradedComment.grade" for="field_grade">Grade</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.hybridGradedComment.grade'" for="field_grade">Grade</label>
           <input
             type="number"
             (mouseup)="$event.stopPropagation()"
@@ -58,12 +58,12 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.hybridGradedComment.relative" for="field_relative">Relative</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.hybridGradedComment.relative'" for="field_relative">Relative</label>
           <input type="checkbox" class="form-check" name="relative" id="field_relative" data-cy="relative" formControlName="relative" />
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.hybridGradedComment.step" for="field_step">Step</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.hybridGradedComment.step'" for="field_step">Step</label>
           <input
             type="number"
             (mouseup)="$event.stopPropagation()"
@@ -76,7 +76,7 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.hybridGradedComment.question" for="field_question">Question</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.hybridGradedComment.question'" for="field_question">Question</label>
           <select class="form-control" id="field_question" data-cy="question" name="question" formControlName="question">
             <option [value]="null"></option>
             <option [value]="questionOption" *ngFor="let questionOption of questionsSharedCollection">{{ questionOption.id }}</option>
@@ -86,7 +86,7 @@
 
       <div>
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span [translate]="'entity.action.cancel'">Annuler</span>
         </button>
 
         <button
@@ -96,7 +96,7 @@
           [disabled]="editForm.invalid || isSaving"
           class="btn btn-primary"
         >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
+          <fa-icon icon="save"></fa-icon>&nbsp;<span [translate]="'entity.action.save'">Sauvegarder</span>
         </button>
       </div>
     </form>

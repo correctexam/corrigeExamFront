@@ -11,8 +11,8 @@
         <h2
           id="jhi-course-heading"
           data-cy="CourseCreateUpdateHeading"
-          jhiTranslate="scanexam.creeexamcours"
-          [translateValues]="{ coursName: coursName }"
+          [translate]="'scanexam.creeexamcours'"
+          [translateParams]="{ coursName: coursName }"
         >
           Créer un examen pour le cours {{ coursName }}
         </h2>
@@ -26,7 +26,7 @@
           class="p-button p-button-primary"
           (click)="gotoUE()"
         >
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackue">Retourner au module</span>
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'scanexam.gobackue'">Retourner au module</span>
         </button>
         <button
           [disabled]="!this.courseid"
@@ -36,7 +36,7 @@
           class="p-button p-button-primary"
           (click)="gotToMd()"
         >
-          <fa-icon [icon]="faLink"></fa-icon>&nbsp;<span jhiTranslate="scanexam.mdtemplate">Modèle de sujet en markdown</span>
+          <fa-icon [icon]="faLink"></fa-icon>&nbsp;<span [translate]="'scanexam.mdtemplate'">Modèle de sujet en markdown</span>
         </button>
         <button
           [disabled]="!this.courseid"
@@ -46,7 +46,7 @@
           class="p-button p-button-primary"
           (click)="gotToAsciiDoc()"
         >
-          <fa-icon [icon]="faLink"></fa-icon>&nbsp;<span jhiTranslate="scanexam.asciidoctemplate">Modèle de sujet en asciidoc</span>
+          <fa-icon [icon]="faLink"></fa-icon>&nbsp;<span [translate]="'scanexam.asciidoctemplate'">Modèle de sujet en asciidoc</span>
         </button>
 
         <button
@@ -57,7 +57,7 @@
           class="p-button p-button-primary"
           (click)="downloadTemplateWord()"
         >
-          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span jhiTranslate="scanexam.wordtemplate">Modèle de sujet Word</span>
+          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span [translate]="'scanexam.wordtemplate'">Modèle de sujet Word</span>
         </button>
         <button
           [disabled]="!this.courseid"
@@ -67,7 +67,7 @@
           class="p-button p-button-primary"
           (click)="downloadTemplateOdt()"
         >
-          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span jhiTranslate="scanexam.odttemplate">Modèle de sujet LibreOffice</span>
+          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span [translate]="'scanexam.odttemplate'">Modèle de sujet LibreOffice</span>
         </button>
 
         <button
@@ -78,30 +78,30 @@
           class="p-button p-button-primary"
           (click)="downloadTemplateLatex()"
         >
-          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span jhiTranslate="scanexam.latextemplate">Modèle de sujet LaTeX</span>
+          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span [translate]="'scanexam.latextemplate'">Modèle de sujet LaTeX</span>
         </button>
       </div>
     </div>
     <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
       <div class="col-12 md:col-12">
         <div class="row">
-          <label class="form-label col-2" jhiTranslate="gradeScopeIsticApp.exam.name" for="field_name">Name</label>
+          <label class="form-label col-2" [translate]="'gradeScopeIsticApp.exam.name'" for="field_name">Name</label>
           <input type="text" class="form-control col-6" name="name" id="field_name" data-cy="name" formControlName="name" />
           <div class="col-2" *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('name')?.errors?.required" jhiTranslate="entity.validation.required">
+            <small class="form-text text-danger" *ngIf="editForm.get('name')?.errors?.required" [translate]="'entity.validation.required'">
               This field is required.
             </small>
           </div>
         </div>
 
         <div class="row">
-          <label class="form-label col-3" for="field_content" jhiTranslate="scanexam.enonceexam"></label>
+          <label class="form-label col-3" for="field_content" [translate]="'scanexam.enonceexam'"></label>
           <div class="col-6">
             <div *ngIf="editForm.get('content')!.value" class="form-text text-danger clearfix">
               <a
                 class="pull-start"
                 (click)="openFile(editForm.get('content')!.value, editForm.get('contentContentType')!.value)"
-                jhiTranslate="entity.action.open"
+                [translate]="'entity.action.open'"
                 >open</a
               ><br />
               <span class="pull-start"
@@ -121,7 +121,7 @@
               id="file_content"
               data-cy="content"
               (change)="setFileData($event, 'content', false)"
-              jhiTranslate="entity.action.addblob"
+              [translate]="'entity.action.addblob'"
             />
           </div>
           <input type="hidden" class="form-control" name="content" id="field_content" data-cy="content" formControlName="content" />
@@ -135,12 +135,12 @@
         </div>
 
         <div class="row">
-          <label class="form-label col-4" jhiTranslate="gradeScopeIsticApp.template.mark" for="field_mark">Mark</label>
+          <label class="form-label col-4" [translate]="'gradeScopeIsticApp.template.mark'" for="field_mark">Mark</label>
           <input type="checkbox" class="form-check col-1" name="mark" id="field_mark" data-cy="mark" formControlName="mark" />
         </div>
 
         <div class="row">
-          <label class="form-label col-4" jhiTranslate="gradeScopeIsticApp.template.caseBoxName" for="field_caseBoxName"
+          <label class="form-label col-4" [translate]="'gradeScopeIsticApp.template.caseBoxName'" for="field_caseBoxName"
             >Box for name</label
           >
           <input
@@ -154,7 +154,7 @@
         </div>
 
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="gotoUE()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span [translate]="'entity.action.cancel'">Cancel</span>
         </button>
 
         <button
@@ -164,11 +164,11 @@
           [disabled]="editForm.invalid || isSaving"
           class="p-button p-button-primary"
         >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+          <fa-icon icon="save"></fa-icon>&nbsp;<span [translate]="'entity.action.save'">Save</span>
         </button>
       </div>
     </form>
-    <div class="row err" *ngIf="errorParsingPdf" jhiTranslate="scanexam.pdferror"></div>
+    <div class="row err" *ngIf="errorParsingPdf" [translate]="'scanexam.pdferror'"></div>
 
     <div class="row" *ngIf="editForm.get(['content'])?.value !== null">
       <ngx-extended-pdf-viewer

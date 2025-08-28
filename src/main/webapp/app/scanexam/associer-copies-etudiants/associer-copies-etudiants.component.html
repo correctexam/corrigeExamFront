@@ -33,9 +33,9 @@
   <ng-keyboard-shortcuts [shortcuts]="shortcuts"></ng-keyboard-shortcuts>
 
   <p-drawer [(visible)]="layoutsidebarVisible">
-    <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
+    <h3 [translate]="'scanexam.layoutoptions'">Layout options</h3>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
+      <label [translate]="'scanexam.removealignement'">Supprimer alignement: </label>
       <p-toggleSwitch
         [(ngModel)]="noalign"
         (onChange)="loadImage()"
@@ -45,7 +45,7 @@
       ></p-toggleSwitch>
     </div>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <label jhiTranslate="scanexam.assistance">Assistance</label>
+      <label [translate]="'scanexam.assistance'">Assistance</label>
       <p-toggleSwitch
         [(ngModel)]="assisted"
         (onChange)="loadImage()"
@@ -55,7 +55,7 @@
       ></p-toggleSwitch>
     </div>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <label jhiTranslate="scanexam.debug">Debug</label>
+      <label [translate]="'scanexam.debug'">Debug</label>
       <p-toggleSwitch
         [(ngModel)]="debug"
         (onChange)="loadImage()"
@@ -65,7 +65,7 @@
       ></p-toggleSwitch>
     </div>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <label jhiTranslate="scanexam.boxname">Une case par lettre</label>
+      <label [translate]="'scanexam.boxname'">Une case par lettre</label>
       <p-toggleSwitch
         [(ngModel)]="boxname"
         (onChange)="updateExam()"
@@ -76,7 +76,7 @@
     </div>
 
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <label><span jhiTranslate="scanexam.zoomfactor"> Facteur d'agrandissement: </span>{{ factor }} </label>
+      <label><span [translate]="'scanexam.zoomfactor'"> Facteur d'agrandissement: </span>{{ factor }} </label>
       <p-slider
         [ngModel]="factor"
         [min]="1"
@@ -96,7 +96,7 @@
         [tooltipZIndex]="'3000'"
         [tooltipPosition]="'right'"
         (click)="cleanBinding()"
-        jhiTranslate="scanexam.removeallbinding"
+        [translate]="'scanexam.removeallbinding'"
       ></button>
     </div>
   </p-drawer>
@@ -107,7 +107,7 @@
   <div class="col-12">
     <div class="grid grid-nogutter">
       <div class="col-8">
-        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" jhiTranslate="scanexam.bindcopies">Associer étudiants/copies</h2>
+        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" [translate]="'scanexam.bindcopies'">Associer étudiants/copies</h2>
       </div>
       <div class="col-4 flex flex-row-reverse">
         <button
@@ -118,7 +118,7 @@
           class="p-button p-button-primary"
           (click)="gotoUE()"
         >
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam">Retourner à l'exam</span>
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'scanexam.gobackexam'">Retourner à l'exam</span>
         </button>
         <button
           [disabled]="!this.examId"
@@ -131,7 +131,7 @@
           [tooltipZIndex]="'3000'"
           [tooltipPosition]="'bottom'"
         >
-          <fa-icon icon="magnifying-glass-arrow-right"></fa-icon>&nbsp;<span jhiTranslate="scanexam.allbindings">Show all binding</span>
+          <fa-icon icon="magnifying-glass-arrow-right"></fa-icon>&nbsp;<span [translate]="'scanexam.allbindings'">Show all binding</span>
         </button>
       </div>
     </div>
@@ -150,12 +150,12 @@
         </div>
         <div class="col-10 d-flex justify-content-center">
           <div>
-            <span jhiTranslate="scanexam.selectedstudent">Etudiant(es) Séléctionné(es):</span> {{ selectionStudentsString() }}
+            <span [translate]="'scanexam.selectedstudent'">Etudiant(es) Séléctionné(es):</span> {{ selectionStudentsString() }}
             <button *ngIf="selectionStudents.length > 0" pButton icon="pi pi-times" (click)="unbindCurrentStudent()"></button>
 
             <BR />
             <ng-container *ngIf="assisted && recognizedStudent !== undefined">
-              <span><span jhiTranslate="scanexam.aistudent">Etudiant(es) Reconnu(es):</span> {{ showRecognizedStudent() }}</span>
+              <span><span [translate]="'scanexam.aistudent'">Etudiant(es) Reconnu(es):</span> {{ showRecognizedStudent() }}</span>
             </ng-container>
 
             <p-button
@@ -213,7 +213,7 @@
             <button
               pButton
               (click)="showGalleria()"
-              jhiTranslate="scanexam.showgalleria"
+              [translate]="'scanexam.showgalleria'"
               [pTooltip]="'scanexam.showFullPageTooltip' | translate"
               [tooltipPosition]="'bottom'"
             >
@@ -239,7 +239,7 @@
       </div>
       <div class="grid align-items-center">
         <div class="col-3">
-          <label jhiTranslate="scanexam.filterboundstudent">Filtrer les étudiants déjà affectées: </label>
+          <label [translate]="'scanexam.filterboundstudent'">Filtrer les étudiants déjà affectées: </label>
           <p-toggleSwitch
             [(ngModel)]="filterbindstudent"
             (onChange)="refreshLocalStudentList()"
@@ -273,7 +273,7 @@
                   style="padding: '0.0rem'"
                   pButton
                   (click)="selectStudents(table.value)"
-                  jhiTranslate="scanexam.associeretnext"
+                  [translate]="'scanexam.associeretnext'"
                   [pTooltip]="'scanexam.gotonextnonboundsheetTooltip' | translate"
                   [tooltipZIndex]="'3000'"
                   [tooltipPosition]="'left'"

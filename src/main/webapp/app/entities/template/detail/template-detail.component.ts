@@ -6,14 +6,13 @@ import { DataUtils } from 'app/core/util/data-util.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { AlertComponent } from '../../../shared/alert/alert.component';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'jhi-template-detail',
   templateUrl: './template-detail.component.html',
   standalone: true,
-  imports: [NgIf, TranslateDirective, AlertErrorComponent, AlertComponent, FaIconComponent, RouterLink],
+  imports: [NgIf, AlertErrorComponent, AlertComponent, FaIconComponent, RouterLink],
 })
 export class TemplateDetailComponent implements OnInit {
   template: ITemplate | null = null;

@@ -7,9 +7,13 @@ import { Injectable } from '@angular/core';
 import { v4 as uuid } from 'uuid';
 import { Subject, Observable } from 'rxjs';
 import { worker } from './workerimport';
-import { ICluster, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.component';
+import { IPage } from '../associer-copies-etudiants/associer-copies-etudiants.model';
+import { ICluster } from '../associer-copies-etudiants/associer-copies-etudiants.model';
+
+// import { ICluster, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.component';
 import { DoPredictionsInputDifferentPage, DoPredictionsInputSamePage, DoPredictionsOutput } from 'app/opencv.worker';
 import { IZone } from 'app/entities/zone/zone.model';
+import { IPreference } from '../preference-page/preference.service';
 
 export interface IImageAlignement {
   imageAligned?: ArrayBuffer;
@@ -20,31 +24,6 @@ export interface IImageAlignement {
   imagesDebugTracesWidth?: number;
   imagesDebugTracesHeight?: number;
   workerIndex?: number;
-}
-
-export interface IPreference {
-  qcm_min_width_shape: number;
-  qcm_min_height_shape: number;
-  qcm_epsilon: number;
-  qcm_differences_avec_case_blanche: number;
-  linelength: number;
-  repairsize: number;
-  dilatesize: number;
-  morphsize: number;
-  drawcontoursizeh: number;
-  drawcontoursizev: number;
-  minCircle: number;
-  maxCircle: number;
-  numberofpointToMatch: number;
-  numberofgoodpointToMatch: number;
-  defaultAlignAlgowithMarker: boolean;
-  removeHorizontalName: boolean;
-  pdfscale: number;
-  cacheDb: string;
-  imageTypeExport: string;
-  exportImageCompression: number;
-  maxNumberOfPredictionToShow: number;
-  warpPerspective: boolean;
 }
 
 export interface IImageAlignementInput {

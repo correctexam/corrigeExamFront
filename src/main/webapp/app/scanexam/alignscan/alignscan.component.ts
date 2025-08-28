@@ -10,7 +10,8 @@ import { faObjectUngroup } from '@fortawesome/free-solid-svg-icons';
 
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { CacheUploadService, CacheUploadNotification } from '../exam-detail/cacheUpload.service';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
+
 import { fromWorkerPool } from 'observable-webworker';
 import { Observable, Subscriber, firstValueFrom } from 'rxjs';
 import { worker1 } from '../services/workerimport';
@@ -33,7 +34,6 @@ import { Button } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { SliderModule } from 'primeng/slider';
-import { TranslateDirective } from '../../shared/language/translate.directive';
 import { DrawerModule } from 'primeng/drawer';
 import { NgIf, DecimalPipe } from '@angular/common';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -62,7 +62,7 @@ export interface IPage {
     ProgressSpinnerModule,
     NgIf,
     DrawerModule,
-    TranslateDirective,
+
     SliderModule,
     FormsModule,
     TooltipModule,
@@ -72,7 +72,8 @@ export interface IPage {
     InputNumberModule,
     ViewandreorderpagesComponent,
     DecimalPipe,
-    TranslateModule,
+    TranslateDirective,
+    TranslatePipe,
   ],
 })
 export class AlignScanComponent implements OnInit, CacheUploadNotification {

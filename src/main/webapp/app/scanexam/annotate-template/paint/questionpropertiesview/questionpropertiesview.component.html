@@ -34,7 +34,7 @@
               <jhi-alert-error></jhi-alert-error>
 
               <div class="row" *ngIf="canUpdateNumero">
-                <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.numero" for="field_numero">Numero</label>
+                <label class="form-label" [translate]="'gradeScopeIsticApp.question.numero'" for="field_numero">Numero</label>
                 <input
                   type="number"
                   (mouseup)="$event.stopPropagation()"
@@ -52,21 +52,21 @@
                   <small
                     class="form-text text-danger"
                     *ngIf="editForm.get('numero')?.errors?.required"
-                    jhiTranslate="entity.validation.required"
+                    [translate]="'entity.validation.required'"
                   >
                     This field is required.
                   </small>
                   <small
                     class="form-text text-danger"
                     [hidden]="!editForm.get('numero')?.errors?.number"
-                    jhiTranslate="entity.validation.number"
+                    [translate]="'entity.validation.number'"
                   >
                     This field should be a number.
                   </small>
                 </div>
               </div>
               <div class="row">
-                <label for="libelle" jhiTranslate="scanexam.libelle" style="display: block; margin-bottom: 4px">libelle</label>
+                <label for="libelle" [translate]="'scanexam.libelle'" style="display: block; margin-bottom: 4px">libelle</label>
                 <input
                   class="form-control"
                   id="libelle"
@@ -85,7 +85,7 @@
               </div>
 
               <div class="row">
-                <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.point" for="field_point">Point</label>
+                <label class="form-label" [translate]="'gradeScopeIsticApp.question.point'" for="field_point">Point</label>
                 <input
                   type="number"
                   (mouseup)="$event.stopPropagation()"
@@ -104,7 +104,7 @@
               </div>
 
               <div class="row">
-                <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.type" for="field_type">Type</label>
+                <label class="form-label" [translate]="'gradeScopeIsticApp.question.type'" for="field_type">Type</label>
                 <select
                   class="form-control"
                   id="field_type"
@@ -121,7 +121,7 @@
                 </select>
               </div>
               <div *ngIf="editForm.get(['typeId'])!.value === manualid" class="row">
-                <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.gradeType" for="field_gradeType">Grade Type</label>
+                <label class="form-label" [translate]="'gradeScopeIsticApp.question.gradeType'" for="field_gradeType">Grade Type</label>
                 <select
                   class="form-control"
                   name="gradeType"
@@ -141,7 +141,7 @@
 
               <!--Adding manuscrit html-->
               <div *ngIf="editForm.get(['typeId'])!.value === manuscritid" class="row">
-                <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.gradeType" for="field_gradeType">Grade Type</label>
+                <label class="form-label" [translate]="'gradeScopeIsticApp.question.gradeType'" for="field_gradeType">Grade Type</label>
                 <select
                   class="form-control"
                   name="gradeType"
@@ -160,7 +160,7 @@
               </div>
 
               <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value !== hybrid" class="row">
-                <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.step" for="field_reponsefausse">Pas </label>
+                <label class="form-label" [translate]="'gradeScopeIsticApp.question.step'" for="field_reponsefausse">Pas </label>
 
                 <p-listbox
                   [options]="pasPointResponseOptions"
@@ -179,7 +179,7 @@
               </div>
 
               <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value === hybrid" class="row">
-                <label class="form-label" jhiTranslate="gradeScopeIsticApp.question.defaultpoint" for="field_defaultpoint"
+                <label class="form-label" [translate]="'gradeScopeIsticApp.question.defaultpoint'" for="field_defaultpoint"
                   >Point par défault</label
                 >
                 <p-knob
@@ -199,7 +199,7 @@
               </div>
 
               <div *ngIf="editForm.get(['typeId'])!.value === qcmid" class="row">
-                <label for="validexp" jhiTranslate="scanexam.validanswerexpression" style="display: block; margin-bottom: 4px"
+                <label for="validexp" [translate]="'scanexam.validanswerexpression'" style="display: block; margin-bottom: 4px"
                   >Expression valide</label
                 >
                 <input
@@ -228,7 +228,7 @@
               </div>
 
               <div *ngIf="editForm.get(['typeId'])!.value === qcmid" class="row">
-                <label class="form-label" jhiTranslate="scanexam.invalidanswerpenalty" for="field_reponsefausse"
+                <label class="form-label" [translate]="'scanexam.invalidanswerpenalty'" for="field_reponsefausse"
                   >Pénalité si réponse fausse</label
                 >
 
@@ -249,7 +249,7 @@
               </div>
 
               <div *ngIf="editForm.get(['typeId'])!.value !== qcmid" class="row">
-                <label class="form-label" jhiTranslate="scanexam.randomcorrection" for="field_randomcorrection"
+                <label class="form-label" [translate]="'scanexam.randomcorrection'" for="field_randomcorrection"
                   >Correction en ordre aléatoire</label
                 >
 
@@ -268,7 +268,7 @@
               </div>
 
               <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value === hybrid" class="row">
-                <label class="form-label" jhiTranslate="scanexam.canexceedthemax" for="field_canexceedthemax"></label>
+                <label class="form-label" [translate]="'scanexam.canexceedthemax'" for="field_canexceedthemax"></label>
 
                 <p-toggleSwitch
                   formControlName="canExceedTheMax"
@@ -281,7 +281,7 @@
                 />
               </div>
               <div *ngIf="editForm.get(['typeId'])!.value !== qcmid && editForm.get(['gradeType'])!.value === hybrid" class="row">
-                <label class="form-label" jhiTranslate="scanexam.canbenegative" for="field_canbenegative"></label>
+                <label class="form-label" [translate]="'scanexam.canbenegative'" for="field_canbenegative"></label>
 
                 <p-toggleSwitch
                   name="canBeNegative"
@@ -301,7 +301,7 @@
                 "
                 class="row"
               >
-                <label class="form-label" jhiTranslate="scanexam.mustbeignoreinglobalscale" for="field_mustbeignoreinglobalscale"></label>
+                <label class="form-label" [translate]="'scanexam.mustbeignoreinglobalscale'" for="field_mustbeignoreinglobalscale"></label>
 
                 <p-toggleSwitch
                   name="mustBeIgnoreInGlobalScale"
@@ -316,7 +316,7 @@
           </form>
 
           <div *ngIf="disableGradeType" class="row">
-            <label class="form-label" jhiTranslate="scanexam.forceedit" for="field_forceedit"></label>
+            <label class="form-label" [translate]="'scanexam.forceedit'" for="field_forceedit"></label>
 
             <p-toggleSwitch
               [pTooltip]="'scanexam.forceeditTooltip' | translate"

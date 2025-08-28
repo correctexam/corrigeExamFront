@@ -10,12 +10,11 @@ import { HasAnyAuthorityDirective } from '../../shared/auth/has-any-authority.di
 import { FaStackComponent, FaIconComponent, FaStackItemSizeDirective } from '@fortawesome/angular-fontawesome';
 import { RouterLink } from '@angular/router';
 import { ButtonDirective } from 'primeng/button';
-import { TranslateDirective } from '../../shared/language/translate.directive';
-import { NgIf, NgFor } from '@angular/common';
 import { DragDropModule } from 'primeng/dragdrop';
 import { firstValueFrom } from 'rxjs';
 import { TooltipModule } from 'primeng/tooltip';
-import { TranslateModule } from '@ngx-translate/core';
+import { CommonModule } from '@angular/common';
+import { TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'jhi-mes-cours',
@@ -24,18 +23,17 @@ import { TranslateModule } from '@ngx-translate/core';
   providers: [CourseService],
   standalone: true,
   imports: [
-    NgIf,
-    TranslateDirective,
+    CommonModule,
     TooltipModule,
     DragDropModule,
-    NgFor,
     ButtonDirective,
     RouterLink,
     FaStackComponent,
     FaIconComponent,
     FaStackItemSizeDirective,
     HasAnyAuthorityDirective,
-    TranslateModule,
+    TranslateDirective,
+    TranslatePipe,
   ],
 })
 export class MesCoursComponent implements OnInit {

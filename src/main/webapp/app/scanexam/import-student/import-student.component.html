@@ -41,7 +41,7 @@
               class="p-button p-button-primary"
               (click)="gotoUE()"
             >
-              <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackue">Retourner au module</span>
+              <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'scanexam.gobackue'">Retourner au module</span>
             </button>
           </div>
         </div>
@@ -57,7 +57,9 @@
               [ngClass]="{ 'p-button-primary': this.courseid && canImport(), 'p-button-secondary': !this.courseid || !canImport() }"
               (click)="envoiEtudiants()"
             >
-              <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="scanexam.importfollowingstudent">Importer étudiants ci-dessous</span>
+              <fa-icon icon="save"></fa-icon>&nbsp;<span [translate]="'scanexam.importfollowingstudent'"
+                >Importer étudiants ci-dessous</span
+              >
             </button>
           </div>
           <div class="">
@@ -110,7 +112,7 @@
               data-cy="entityCreateSaveButton"
               class="p-button p-button-primary flex-initial flex align-items-center"
             >
-              <fa-icon icon="download"></fa-icon>&nbsp;<span jhiTranslate="scanexam.downloadtemplate">Download template</span>
+              <fa-icon icon="download"></fa-icon>&nbsp;<span [translate]="'scanexam.downloadtemplate'">Download template</span>
             </button>
           </div>
         </div>
@@ -125,7 +127,7 @@
               data-cy="entityCreateSaveButton"
               [disabled]="this.students.length === 0"
             >
-              <fa-icon icon="times"></fa-icon>&nbsp;<span jhiTranslate="scanexam.deleteStdListServer"></span>
+              <fa-icon icon="times"></fa-icon>&nbsp;<span [translate]="'scanexam.deleteStdListServer'"></span>
             </p-button>
           </div>
           <div class="">
@@ -138,7 +140,7 @@
               data-cy="entityCreateSaveButton"
               [disabled]="this.dataset.length === 0"
             >
-              <fa-icon icon="times"></fa-icon>&nbsp;<span jhiTranslate="scanexam.deleteStdLocalList"></span>
+              <fa-icon icon="times"></fa-icon>&nbsp;<span [translate]="'scanexam.deleteStdLocalList'"></span>
             </p-button>
           </div>
         </div>
@@ -148,12 +150,12 @@
           <ng-template pTemplate="header">
             <tr>
               <th></th>
-              <th jhiTranslate="scanexam.ine">INE</th>
-              <th jhiTranslate="scanexam.nom">NOM</th>
-              <th jhiTranslate="scanexam.prenom">PRENOM</th>
-              <th jhiTranslate="scanexam.mail">MAIL</th>
-              <th jhiTranslate="scanexam.groupe">GROUPE</th>
-              <th style="text-align: center; vertical-align: middle" jhiTranslate="scanexam.supprimer">SUPPRIMER</th>
+              <th [translate]="'scanexam.ine'">INE</th>
+              <th [translate]="'scanexam.nom'">NOM</th>
+              <th [translate]="'scanexam.prenom'">PRENOM</th>
+              <th [translate]="'scanexam.mail'">MAIL</th>
+              <th [translate]="'scanexam.groupe'">GROUPE</th>
+              <th style="text-align: center; vertical-align: middle" [translate]="'scanexam.supprimer'">SUPPRIMER</th>
             </tr>
             <tr>
               <td></td>

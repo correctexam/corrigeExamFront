@@ -13,7 +13,6 @@ import { ApplicationConfigService } from 'app/core/config/application-config.ser
 import { NgFor, NgIf } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { TranslateDirective } from '../../shared/language/translate.directive';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { ToastModule } from 'primeng/toast';
@@ -30,18 +29,7 @@ export interface WorstAndBestSolution {
   styleUrls: ['./voirreponsesstarunstarexam.component.scss'],
   providers: [ConfirmationService, MessageService],
   standalone: true,
-  imports: [
-    ToastModule,
-    BlockUIModule,
-    ProgressSpinnerModule,
-    TranslateDirective,
-    RouterLink,
-    FaIconComponent,
-    TableModule,
-    PrimeTemplate,
-    NgFor,
-    NgIf,
-  ],
+  imports: [ToastModule, BlockUIModule, ProgressSpinnerModule, RouterLink, FaIconComponent, TableModule, PrimeTemplate, NgFor, NgIf],
 })
 export class VoirReponsesStarUnstarComponent implements OnInit {
   examid: string | undefined;

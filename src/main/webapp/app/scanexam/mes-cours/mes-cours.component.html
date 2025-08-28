@@ -2,11 +2,11 @@
   <div *ngIf="showImage" class="wizard-image"></div>
   <div class="wizard-form">
     <div class="wizard-header">
-      <h3 jhiTranslate="scanexam.mescours">Mes cours</h3>
-      <p jhiTranslate="scanexam.slogan2">votre correction de copies assistée à l'aide du numérique</p>
+      <h3 [translate]="'scanexam.mescours'">Mes cours</h3>
+      <p [translate]="'scanexam.slogan2'">votre correction de copies assistée à l'aide du numérique</p>
     </div>
     <div id="form-total" pDroppable (onDrop)="drop(false)">
-      <h4 jhiTranslate="scanexam.coursnonarchive" [pTooltip]="'scanexam.coursnonarchiveTooltip' | translate" [tooltipPosition]="'left'">
+      <h4 [translate]="'scanexam.coursnonarchive'" [pTooltip]="'scanexam.coursnonarchiveTooltip' | translate" [tooltipPosition]="'left'">
         Cours actif
       </h4>
       <div class="inner" [style]="{ 'text-align': 'center' }">
@@ -37,7 +37,7 @@
       </div>
     </div>
     <div id="form-total1" pDroppable (onDrop)="drop(true)">
-      <h4 jhiTranslate="scanexam.coursarchive" [pTooltip]="'scanexam.coursarchiveTooltip' | translate" [tooltipPosition]="'left'">
+      <h4 [translate]="'scanexam.coursarchive'" [pTooltip]="'scanexam.coursarchiveTooltip' | translate" [tooltipPosition]="'left'">
         Cours archivée
       </h4>
       <div class="inner" [style]="{ 'text-align': 'center' }">

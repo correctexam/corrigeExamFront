@@ -7,7 +7,7 @@
         <!--<i class="pi pi-lock" style="font-size: 3rem"> </i>-->
         <p-progressSpinner></p-progressSpinner>
         <BR />
-        <div *ngIf="showavancement"><span jhiTranslate="scanexam.sheet">Copie</span> {{ currentCopieocr }} / {{ nbrecopieocr }}</div>
+        <div *ngIf="showavancement"><span [translate]="'scanexam.sheet'">Copie</span> {{ currentCopieocr }} / {{ nbrecopieocr }}</div>
       </div>
     </div>
   </p-blockUI>
@@ -22,9 +22,9 @@
     [resizable]="false"
   >
     <div class="flex flex-column gap-2">
-      <label htmlFor="keyboardshortcutlabel" jhiTranslate="scanexam.keyboardshortcutlabel">Raccourci clavier</label>
+      <label htmlFor="keyboardshortcutlabel" [translate]="'scanexam.keyboardshortcutlabel'">Raccourci clavier</label>
       <input pInputText id="keyboardshortcutlabel" aria-describedby="username-help" [(ngModel)]="currentKeyBoardShorcut" />
-      <small id="keyboardshortcutlabel-help" jhiTranslate="scanexam.keyboardshortcuthelp"
+      <small id="keyboardshortcutlabel-help" [translate]="'scanexam.keyboardshortcuthelp'"
         >Entrer votre raccourci clavier de la forme: ctrl + e ou shift + e (Vous pouvez voir les raccourci existant en cliquant sur
         F1)</small
       >
@@ -37,7 +37,7 @@
 
   <p-confirmDialog #cd icon="pi pi-exclamation-triangle">
     <ng-template pTemplate="header">
-      <h3 jhiTranslate="scanexam.confirmation"></h3>
+      <h3 [translate]="'scanexam.confirmation'"></h3>
     </ng-template>
     <ng-template pTemplate="footer">
       <button type="button" pButton icon="pi pi-times" [label]="'scanexam.no' | translate" (click)="onReject(cd)"></button>
@@ -178,9 +178,9 @@
   </p-drawer>
 
   <p-drawer [(visible)]="layoutsidebarVisible">
-    <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
+    <h3 [translate]="'scanexam.layoutoptions'">Layout options</h3>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
+      <label [translate]="'scanexam.removealignement'">Supprimer alignement: </label>
       <p-toggleSwitch
         class="float-end"
         [(ngModel)]="noalign"
@@ -191,7 +191,7 @@
       ></p-toggleSwitch>
     </div>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <label><span jhiTranslate="scanexam.zoomfactor"> Facteur agrandissement : </span>({{ factor }})</label>
+      <label><span [translate]="'scanexam.zoomfactor'"> Facteur agrandissement : </span>({{ factor }})</label>
       <p-slider
         *ngIf="noteSteps > 0"
         [ngModel]="factor"
@@ -206,7 +206,7 @@
       </p-slider>
     </div>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <label><span jhiTranslate="scanexam.pageshift">Décallage de page(s) : </span>({{ pageOffset }})</label>
+      <label><span [translate]="'scanexam.pageshift'">Décallage de page(s) : </span>({{ pageOffset }})</label>
       <p-slider
         [ngModel]="pageOffset"
         [min]="-5"
@@ -233,7 +233,7 @@
     </div>
 
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <label><span jhiTranslate="scanexam.scalefactor">Facteur d'échelle</span></label>
+      <label><span [translate]="'scanexam.scalefactor'">Facteur d'échelle</span></label>
 
       <p-selectButton
         [options]="scaleOptions"
@@ -259,7 +259,7 @@
     </div>
 
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <label><span jhiTranslate="scanexam.zenview">Zen view</span></label>
+      <label><span [translate]="'scanexam.zenview'">Zen view</span></label>
 
       <p-toggleSwitch
         [ngModel]="focusView"
@@ -271,10 +271,10 @@
   </p-drawer>
 
   <p-dialog [header]="'scanexam.shortcut' | translate" [(visible)]="shortcut" [style]="{ width: '50vw' }">
-    <span jhiTranslate="scanexam.shortcutdetail"></span>
+    <span [translate]="'scanexam.shortcutdetail'"></span>
     <BR />
     <BR />
-    <span jhiTranslate="scanexam.shortcutopenatstart"></span>
+    <span [translate]="'scanexam.shortcutopenatstart'"></span>
     <input type="checkbox" [(ngModel)]="shortcutvalue" (change)="changeStartPreference()" />
     <ng-template pTemplate="footer">
       <button type="button" pButton label="ok" (click)="shortcut = false"></button>
@@ -400,7 +400,7 @@
               pButton
               [disabled]="!examId && blocked"
               (click)="showGalleria()"
-              jhiTranslate="scanexam.showgalleria"
+              [translate]="'scanexam.showgalleria'"
               [pTooltip]="'scanexam.showFullPageTooltip' | translate"
               [tooltipPosition]="'bottom'"
             >
@@ -430,7 +430,9 @@
               (click)="gotoUE()"
               [disabled]="blocked"
             >
-              <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span class="sm:text-xs md:text-xs lg:text-base" jhiTranslate="scanexam.gobackexam"
+              <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span
+                class="sm:text-xs md:text-xs lg:text-base"
+                [translate]="'scanexam.gobackexam'"
                 >Retourner à l'exam</span
               >
             </button>
@@ -629,7 +631,7 @@
                     class="btn btn-primary w-full flex justify-between items-center px-4 py-3 text-lg font-medium relative"
                     (click)="initSimilarPrediction()"
                   >
-                    <span jhiTranslate="scanexam.displaySimilarAnswers">Afficher les réponses similaires</span>
+                    <span [translate]="'scanexam.displaySimilarAnswers'">Afficher les réponses similaires</span>
 
                     <fa-icon
                       [icon]="dropdownOpen ? 'chevron-up' : 'chevron-down'"
@@ -644,7 +646,7 @@
                       style="padding-right: 20px; padding-top: 15px; padding-left: 30px"
                     >
                       <div>
-                        <label class="text-gray-700 font-medium" jhiTranslate="scanexam.filterallexamsheets">
+                        <label class="text-gray-700 font-medium" [translate]="'scanexam.filterallexamsheets'">
                           Appliquer la recherche de texte sur les prédiction de l'ensemble des copies
                         </label>
                         <!--                          "
@@ -687,7 +689,7 @@
                         pButton
                         class="p-button-primary"
                         [disabled]="getSelectedCount() === 0"
-                        jhiTranslate="scanexam.applyNoteToSelected"
+                        [translate]="'scanexam.applyNoteToSelected'"
                         (click)="applySameNoteAndGrade()"
                         [pTooltip]="'scanexam.applyNoteToSelectedTooltip' | translate"
                       >
@@ -696,7 +698,7 @@
                       </button>
 
                       <div class="flex items-center p-2">
-                        <label class="text-gray-700 font-medium" jhiTranslate="scanexam.filterNoNoteStudents">
+                        <label class="text-gray-700 font-medium" [translate]="'scanexam.filterNoNoteStudents'">
                           Filtrer les questions déjà notées :
                         </label>
                         <!--                          "
@@ -711,7 +713,7 @@
                       <p-progressSpinner *ngIf="blocked" styleClass="w-2rem h-2rem"></p-progressSpinner>
 
                       <div class="flex items-center p-2">
-                        <label class="text-gray-700 font-medium" jhiTranslate="scanexam.synchrocomments">
+                        <label class="text-gray-700 font-medium" [translate]="'scanexam.synchrocomments'">
                           Activer la synchronistation des commentaires :
                         </label>
                         <!--                          "
@@ -728,14 +730,14 @@
                     <p
                       *ngIf="dropdownOpen && !toomuchsimilar && predictionstoShow().length === 0 && similarPredictionsSearched"
                       class="font-bold text-gray-700 text-xl px-4 py-3 border-b border-gray-300"
-                      jhiTranslate="scanexam.nosimilarResults"
+                      [translate]="'scanexam.nosimilarResults'"
                     >
                       Aucune réponse similaire trouvée
                     </p>
                     <p
                       *ngIf="dropdownOpen && toomuchsimilar && predictionstoShow().length === 0 && similarPredictionsSearched"
                       class="font-bold text-gray-700 text-xl px-4 py-3 border-b border-gray-300"
-                      jhiTranslate="scanexam.toomuchsimilarResults"
+                      [translate]="'scanexam.toomuchsimilarResults'"
                     >
                       Trop de réponses similaires trouvées
                     </p>
@@ -743,7 +745,7 @@
                     <p
                       *ngIf="dropdownOpen && predictionstoShow().length !== 0"
                       class="font-bold text-gray-700 text-xl px-4 py-3 border-b border-gray-300"
-                      jhiTranslate="scanexam.similarResults"
+                      [translate]="'scanexam.similarResults'"
                     >
                       Résultats Similaires
                     </p>
@@ -751,7 +753,7 @@
                     <!-- Checkbox to select all similar predictions -->
                     <div *ngIf="dropdownOpen && predictionstoShow().length !== 0" class="flex flex-col items-center">
                       <input type="checkbox" [checked]="isAllSelected()" (change)="toggleSelectAll($event)" class="w-14 h-14 mr-3 ml-3" />
-                      <label class="font-bold text-gray-700 text-l" jhiTranslate="scanexam.selectAllSimilar">Sélectionner tout</label>
+                      <label class="font-bold text-gray-700 text-l" [translate]="'scanexam.selectAllSimilar'">Sélectionner tout</label>
                     </div>
 
                     <!-- Liste des prédictions similaires -->
@@ -806,7 +808,7 @@
 
                                 <ng-template #noGrade>
                                   <div class="no-grade-container">
-                                    <span class="no-grade-message" jhiTranslate="scanexam.noGradeAvailable">⚠️ Pas de note disponible</span>
+                                    <span class="no-grade-message" [translate]="'scanexam.noGradeAvailable'">⚠️ Pas de note disponible</span>
                                   </div>
                                 </ng-template>
                               </div>
@@ -917,8 +919,8 @@
         >
           <div style="padding-bottom: 1rem"></div>
           <div class="d-flex justify-content-center">
-            <span jhiTranslate="scanexam.by">by </span> &nbsp; {{ this.resp?.correctedByInfo }}
-            <span jhiTranslate="scanexam.at">at</span> &nbsp; {{ this.resp?.lastModifiedDate | date: 'long' }}
+            <span [translate]="'scanexam.by'">by </span> &nbsp; {{ this.resp?.correctedByInfo }}
+            <span [translate]="'scanexam.at'">at</span> &nbsp; {{ this.resp?.lastModifiedDate | date: 'long' }}
           </div>
         </ng-container>
       </div>
@@ -981,7 +983,7 @@
               <BR />
             </div>
             <div class="flex-item">
-              <span jhiTranslate="scanexam.noteattribuee">Note attribuée : </span>
+              <span [translate]="'scanexam.noteattribuee'">Note attribuée : </span>
               <span
                 *ngIf="
                   (currentQuestion?.typeAlgoName === 'QCM' || currentQuestion?.gradeType !== 'HYBRID') &&
@@ -1015,7 +1017,7 @@
                 "
                 ><b> {{ currentNote | number: '1.0-2' }} / {{ questions![0].point! }}</b></span
               >
-              <span *ngIf="!resp?.id" jhiTranslate="scanexam.noneval">non évalué</span>
+              <span *ngIf="!resp?.id" [translate]="'scanexam.noneval'">non évalué</span>
               <span
                 *ngIf="resp?.id"
                 class="float-end"
@@ -1052,7 +1054,7 @@
             </div>
           </div>
           <div *ngIf="resp" style="padding-bottom: 0.4rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
-            <label jhiTranslate="scanexam.excellente">Excellente réponse: </label>
+            <label [translate]="'scanexam.excellente'">Excellente réponse: </label>
             <p-toggleSwitch
               [disabled]="blocked"
               class="float-end"
@@ -1064,7 +1066,7 @@
             ></p-toggleSwitch>
           </div>
           <div *ngIf="resp" style="padding-bottom: 0.4rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
-            <label jhiTranslate="scanexam.badanswer">Mauvaise réponse remarquable: </label>
+            <label [translate]="'scanexam.badanswer'">Mauvaise réponse remarquable: </label>
             <p-toggleSwitch
               [disabled]="blocked"
               class="float-end"
@@ -1195,14 +1197,14 @@
                     *ngIf="!checked(comment)"
                     class="p-button p-button-primary"
                     (click)="toggleTComment(comment)"
-                    jhiTranslate="scanexam.add"
+                    [translate]="'scanexam.add'"
                     >Ajouter</a
                   >
                   <a
                     *ngIf="checked(comment)"
                     class="p-button p-button-primary"
                     (click)="toggleTComment(comment)"
-                    jhiTranslate="scanexam.remove"
+                    [translate]="'scanexam.remove'"
                     >Retirer</a
                   >
                 </div>
@@ -1354,7 +1356,7 @@
                     >
                       <ng-template pTemplate="display">
                         <p class="card-text" *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT'">
-                          <span jhiTranslate="scanexam.noteassociecomment"> Note associée à ce commentaire : </span>
+                          <span [translate]="'scanexam.noteassociecomment'"> Note associée à ce commentaire : </span>
                           <span *ngIf="currentQuestion && currentQuestion?.gradeType === 'NEGATIVE'"> - </span
                           ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'POSITIVE'"> + </span>
                           <span *ngIf="questionStep > 0">{{ comment.grade! / questionStep }}</span>
@@ -1390,14 +1392,14 @@
                     *ngIf="!checked(comment)"
                     class="p-button p-button-primary"
                     (click)="toggleGComment(comment)"
-                    jhiTranslate="scanexam.add"
+                    [translate]="'scanexam.add'"
                     >Ajouter</a
                   >
                   <a
                     *ngIf="checked(comment)"
                     class="p-button p-button-primary"
                     (click)="toggleGComment(comment)"
-                    jhiTranslate="scanexam.remove"
+                    [translate]="'scanexam.remove'"
                     >Retirer</a
                   >
                 </div>
@@ -1567,7 +1569,7 @@
                           [allowEmpty]="false"
                           [unselectable]="false"
                         ></p-selectButton>
-                        <label class="form-label" jhiTranslate="scanexam.hybridcommentGrade" for="field_defaultpoint"
+                        <label class="form-label" [translate]="'scanexam.hybridcommentGrade'" for="field_defaultpoint"
                           >Point par défault</label
                         >
                         <p-knob
@@ -1609,11 +1611,11 @@
                       (onDeactivate)="closeEditComment(comment)"
                     >
                       <ng-template pTemplate="display">
-                        <span jhiTranslate="scanexam.hybridcommentStep"> Nombre de pas:</span>
+                        <span [translate]="'scanexam.hybridcommentStep'"> Nombre de pas:</span>
                         {{ comment.step }}
                       </ng-template>
                       <ng-template pTemplate="content">
-                        <label class="form-label" jhiTranslate="scanexam.hybridcommentStep" for="field_point">Pas</label>
+                        <label class="form-label" [translate]="'scanexam.hybridcommentStep'" for="field_point">Pas</label>
                         <input
                           type="number"
                           (mouseup)="$event.stopPropagation()"
@@ -1660,14 +1662,14 @@
                     *ngIf="comment.step === 1 && !checked(comment)"
                     class="p-button p-button-primary"
                     (click)="incrementHComment(comment)"
-                    jhiTranslate="scanexam.add"
+                    [translate]="'scanexam.add'"
                     >Ajouter</a
                   >
                   <a
                     *ngIf="comment.step === 1 && checked(comment)"
                     class="p-button p-button-primary"
                     (click)="incrementHComment(comment)"
-                    jhiTranslate="scanexam.remove"
+                    [translate]="'scanexam.remove'"
                     >Retirer</a
                   >
                   <a *ngIf="comment.step! > 1" class="p-button p-button-primary" (click)="incrementHComment(comment)">Incrémente</a>
@@ -1734,16 +1736,16 @@
           <div style="padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 0.8rem" class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
             <div class="card">
               <div class="card-body">
-                <h5 class="card-title" jhiTranslate="scanexam.newcomment">Nouveau commentaire</h5>
+                <h5 class="card-title" [translate]="'scanexam.newcomment'">Nouveau commentaire</h5>
                 <p class="card-text">
-                  <label jhiTranslate="scanexam.commenttitle">Titre :</label>
+                  <label [translate]="'scanexam.commenttitle'">Titre :</label>
                   <input type="text" pInputText [(ngModel)]="titreCommentaire" [style]="{ width: '100%' }" />
                   <BR />
-                  <label jhiTranslate="scanexam.commentdesc">Description :</label>
+                  <label [translate]="'scanexam.commentdesc'">Description :</label>
                   <textarea [style]="{ width: '100%' }" pInputTextarea [(ngModel)]="descCommentaire"></textarea>
                   <label
                     *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT' && currentQuestion?.gradeType !== 'HYBRID'"
-                    jhiTranslate="scanexam.commentnote"
+                    [translate]="'scanexam.commentnote'"
                     >Note :</label
                   >
                 </p>
@@ -1764,7 +1766,7 @@
                   </div>
                 </div>
                 <span *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT' && currentQuestion?.gradeType !== 'HYBRID'">
-                  <span jhiTranslate="scanexam.commentnotbind">Note associée à ce commentaire : </span
+                  <span [translate]="'scanexam.commentnotbind'">Note associée à ce commentaire : </span
                   ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'NEGATIVE'"> - </span
                   ><span *ngIf="questionStep > 0">{{ noteCommentaire / questionStep }}</span>
                   <span *ngIf="questionStep <= 0">{{ noteCommentaire }}</span></span
@@ -1784,7 +1786,7 @@
                 <label
                   class="form-label"
                   *ngIf="currentQuestion && currentQuestion?.gradeType === 'HYBRID'"
-                  jhiTranslate="scanexam.hybridcommentgrade"
+                  [translate]="'scanexam.hybridcommentgrade'"
                   for="field_defaultpoint"
                   >Point par défault</label
                 >
@@ -1819,7 +1821,7 @@
                 <label
                   *ngIf="currentQuestion?.gradeType === 'HYBRID'"
                   class="form-label"
-                  jhiTranslate="scanexam.hybridcommentStep"
+                  [translate]="'scanexam.hybridcommentStep'"
                   for="field_point"
                   >Pas</label
                 >
@@ -1838,7 +1840,9 @@
                   [pTooltip]="'scanexam.hybridcommentStepTooltip' | translate"
                   [tooltipPosition]="'left'"
                 />
-                <a class="p-button p-button-primary" (click)="addComment()" jhiTranslate="scanexam.commentaddapply">Ajouter et appliquer</a>
+                <a class="p-button p-button-primary" (click)="addComment()" [translate]="'scanexam.commentaddapply'"
+                  >Ajouter et appliquer</a
+                >
               </div>
             </div>
           </div>

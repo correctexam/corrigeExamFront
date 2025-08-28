@@ -3,14 +3,13 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Databases } from 'app/admin/metrics/metrics.model';
 import { filterNaN } from 'app/core/util/operators';
 import { NgIf, DecimalPipe } from '@angular/common';
-import { TranslateDirective } from '../../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-metrics-datasource',
   templateUrl: './metrics-datasource.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [TranslateDirective, NgIf, DecimalPipe],
+  imports: [NgIf, DecimalPipe],
 })
 export class MetricsDatasourceComponent {
   /**

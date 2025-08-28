@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
     <div *ngIf="courseGroup">
-      <h2 data-cy="courseGroupDetailsHeading"><span jhiTranslate="gradeScopeIsticApp.courseGroup.detail.title">Course Group</span></h2>
+      <h2 data-cy="courseGroupDetailsHeading"><span [translate]="'gradeScopeIsticApp.courseGroup.detail.title'">Course Group</span></h2>
 
       <hr />
 
@@ -10,22 +10,22 @@
       <jhi-alert></jhi-alert>
 
       <dl class="row-md jh-entity-details">
-        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dt><span [translate]="'global.field.id'">ID</span></dt>
         <dd>
           <span>{{ courseGroup.id }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.courseGroup.groupName">Group Name</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.courseGroup.groupName'">Group Name</span></dt>
         <dd>
           <span>{{ courseGroup.groupName }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.courseGroup.students">Students</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.courseGroup.students'">Students</span></dt>
         <dd>
           <span *ngFor="let students of courseGroup.students; let last = last">
             <a [routerLink]="['/student', students?.id, 'view']">{{ students.name }}</a
             >{{ last ? '' : ', ' }}
           </span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.courseGroup.course">Course</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.courseGroup.course'">Course</span></dt>
         <dd>
           <div *ngIf="courseGroup.courseId">
             <a [routerLink]="['/course', courseGroup.courseId, 'view']">{{ courseGroup.courseName }}</a>
@@ -34,11 +34,11 @@
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
       </button>
 
       <button type="button" [routerLink]="['/course-group', courseGroup.id, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
       </button>
     </div>
   </div>

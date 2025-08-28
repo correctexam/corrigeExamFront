@@ -27,7 +27,7 @@
       [pTooltip]="'scanexam.gotoCorrectionTooltip' | translate"
       [tooltipZIndex]="'3000'"
     >
-      <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackcorrection">Retourner à la correction</span>
+      <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'scanexam.gobackcorrection'">Retourner à la correction</span>
     </button>
     <button
       pButton
@@ -41,7 +41,7 @@
       [pTooltip]="'scanexam.downloadAllTooltip' | translate"
       [tooltipZIndex]="'3000'"
     >
-      <fa-icon icon="download"></fa-icon>&nbsp;<span jhiTranslate="scanexam.downloadimages">Download</span>
+      <fa-icon icon="download"></fa-icon>&nbsp;<span [translate]="'scanexam.downloadimages'">Download</span>
     </button>
     <button
       *ngIf="questionall"
@@ -56,7 +56,7 @@
       [tooltipPosition]="'bottom'"
       [tooltipZIndex]="'3000'"
     >
-      <fa-icon icon="circle-nodes"></fa-icon>&nbsp;<span jhiTranslate="scanexam.classify">Classify</span>
+      <fa-icon icon="circle-nodes"></fa-icon>&nbsp;<span [translate]="'scanexam.classify'">Classify</span>
     </button>
     <button
       pButton
@@ -71,13 +71,13 @@
       [tooltipPosition]="'bottom'"
       [tooltipZIndex]="'3000'"
     >
-      <fa-icon icon="object-ungroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.unclassify">Unclassify</span>
+      <fa-icon icon="object-ungroup"></fa-icon>&nbsp;<span [translate]="'scanexam.unclassify'">Unclassify</span>
     </button>
   </div>
   <p-drawer [(visible)]="layoutsidebarVisible">
-    <h3 *ngIf="questionall" jhiTranslate="scanexam.kmeanoptions">Kmean options</h3>
+    <h3 *ngIf="questionall" [translate]="'scanexam.kmeanoptions'">Kmean options</h3>
     <div *ngIf="questionall" style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <label><span jhiTranslate="scanexam.nbreCluster"> Nombre de cluster : </span>({{ nbreCluster }})</label>
+      <label><span [translate]="'scanexam.nbreCluster'"> Nombre de cluster : </span>({{ nbreCluster }})</label>
       <p-slider
         [ngModel]="nbreCluster"
         [min]="2"
@@ -92,7 +92,7 @@
     </div>
     <div *ngIf="questionall" style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <div class="flex flex-column gap-3">
-        <label for=""><span jhiTranslate="scanexam.algoClustering"> Algo de clustering : </span></label>
+        <label for=""><span [translate]="'scanexam.algoClustering'"> Algo de clustering : </span></label>
         <div *ngFor="let algo of algos" class="field-checkbox">
           <p-radioButton
             [inputId]="algo.key"
@@ -101,13 +101,13 @@
             [(ngModel)]="selectedAlgo"
             (onClick)="updateAlgoCluster($event)"
           ></p-radioButton>
-          <label [for]="algo" class="ml-2"><span [jhiTranslate]="algo.trans" [pTooltip]="algo.transTooltip | translate"></span></label>
+          <label [for]="algo" class="ml-2"><span [translate]="algo.trans" [pTooltip]="algo.transTooltip | translate"></span></label>
         </div>
       </div>
     </div>
-    <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
+    <h3 [translate]="'scanexam.layoutoptions'">Layout options</h3>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <label><span jhiTranslate="scanexam.nbreImagePerLigne"> Nombre de tuiles affichées par ligne : </span>({{ nbreColumn }})</label>
+      <label><span [translate]="'scanexam.nbreImagePerLigne'"> Nombre de tuiles affichées par ligne : </span>({{ nbreColumn }})</label>
       <p-selectButton
         [options]="nbreColumnOptions"
         [ngModel]="nbreColumn"
@@ -141,7 +141,7 @@
         (click)="applySameGradeAndComment4Cluster(k)"
         [pTooltip]="'scanexam.applysamegradetooltip' | translate"
       >
-        <fa-icon icon="object-ungroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.applysamegrade">Appliquer la même note</span>
+        <fa-icon icon="object-ungroup"></fa-icon>&nbsp;<span [translate]="'scanexam.applysamegrade'">Appliquer la même note</span>
       </button>
     </div>
     <ng-container *ngIf="k.value.length === 0">

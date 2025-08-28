@@ -3,10 +3,9 @@ import { Component, OnInit } from '@angular/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { UserService } from '../../../entities/user/user.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { PrimeTemplate } from 'primeng/api';
 import { PickListModule } from 'primeng/picklist';
-import { TranslateDirective } from 'app/shared/language/translate.directive';
 import { ButtonModule } from 'primeng/button';
 
 @Component({
@@ -14,7 +13,7 @@ import { ButtonModule } from 'primeng/button';
   templateUrl: './sheetselection.component.html',
   styleUrls: ['./sheetselection.component.scss'],
   standalone: true,
-  imports: [PickListModule, PrimeTemplate, TranslateModule, TranslateDirective, ButtonModule],
+  imports: [PickListModule, PrimeTemplate, TranslateDirective, TranslatePipe, ButtonModule],
 })
 export class SheetSelectionComponent implements OnInit {
   list1: any[] = [];

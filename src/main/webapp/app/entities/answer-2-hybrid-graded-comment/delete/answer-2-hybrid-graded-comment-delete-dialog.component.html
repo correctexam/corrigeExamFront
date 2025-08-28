@@ -1,6 +1,6 @@
 <form *ngIf="answer2HybridGradedComment" name="deleteForm" (ngSubmit)="confirmDelete(answer2HybridGradedComment.id!)">
   <div class="modal-header">
-    <h4 class="modal-title" data-cy="answer2HybridGradedCommentDeleteDialogHeading" jhiTranslate="entity.delete.title">
+    <h4 class="modal-title" data-cy="answer2HybridGradedCommentDeleteDialogHeading" [translate]="'entity.delete.title'">
       Confirmation de suppression
     </h4>
 
@@ -11,8 +11,8 @@
     <jhi-alert-error></jhi-alert-error>
     <p
       id="jhi-delete-answer2HybridGradedComment-heading"
-      jhiTranslate="gradeScopeIsticApp.answer2HybridGradedComment.delete.question"
-      [translateValues]="{ id: answer2HybridGradedComment.id }"
+      translate="gradeScopeIsticApp.answer2HybridGradedComment.delete.question"
+      [translateParams]="{ id: answer2HybridGradedComment.id }"
     >
       Êtes-vous certain de vouloir supprimer le Answer 2 Hybrid Graded Comment {{ answer2HybridGradedComment.id }} ?
     </p>
@@ -20,11 +20,11 @@
 
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancel()">
-      <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+      <fa-icon icon="ban"></fa-icon>&nbsp;<span [translate]="'entity.action.cancel'">Annuler</span>
     </button>
 
     <button id="jhi-confirm-delete-answer2HybridGradedComment" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-danger">
-      <fa-icon icon="times"></fa-icon>&nbsp;<span jhiTranslate="entity.action.delete">Supprimer</span>
+      <fa-icon icon="times"></fa-icon>&nbsp;<span [translate]="'entity.action.delete'">Supprimer</span>
     </button>
   </div>
 </form>

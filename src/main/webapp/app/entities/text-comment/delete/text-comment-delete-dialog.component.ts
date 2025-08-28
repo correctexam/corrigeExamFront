@@ -5,14 +5,14 @@ import { ITextComment } from '../text-comment.model';
 import { TextCommentService } from '../service/text-comment.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
+import { TranslateDirective } from '@ngx-translate/core';
 
 @Component({
   templateUrl: './text-comment-delete-dialog.component.html',
   standalone: true,
-  imports: [NgIf, FormsModule, TranslateDirective, AlertErrorComponent, FaIconComponent],
+  imports: [TranslateDirective, NgIf, FormsModule, AlertErrorComponent, FaIconComponent],
 })
 export class TextCommentDeleteDialogComponent {
   textComment?: ITextComment;

@@ -6,9 +6,8 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ExamSheetService } from '../../../entities/exam-sheet/service/exam-sheet.service';
 import { firstValueFrom } from 'rxjs';
 import { StudentService } from 'app/entities/student/service/student.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { TooltipModule } from 'primeng/tooltip';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 import { NgIf, NgClass, DecimalPipe } from '@angular/common';
 import { PrimeTemplate } from 'primeng/api';
 import { TableModule } from 'primeng/table';
@@ -18,7 +17,7 @@ import { TableModule } from 'primeng/table';
   templateUrl: './allbindings.component.html',
   styleUrls: ['./allbindings.component.scss'],
   standalone: true,
-  imports: [TableModule, PrimeTemplate, NgIf, TranslateDirective, NgClass, TooltipModule, DecimalPipe, TranslateModule],
+  imports: [TableModule, PrimeTemplate, NgIf, NgClass, TooltipModule, DecimalPipe, TranslateDirective, TranslatePipe],
 })
 export class AllbindingsComponent implements OnInit {
   students: any[] = [];

@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
     <div *ngIf="question">
-      <h2 data-cy="questionDetailsHeading"><span jhiTranslate="gradeScopeIsticApp.question.detail.title">Question</span></h2>
+      <h2 data-cy="questionDetailsHeading"><span [translate]="'gradeScopeIsticApp.question.detail.title'">Question</span></h2>
 
       <hr />
 
@@ -10,48 +10,48 @@
       <jhi-alert></jhi-alert>
 
       <dl class="row-md jh-entity-details">
-        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dt><span [translate]="'global.field.id'">ID</span></dt>
         <dd>
           <span>{{ question.id }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.question.numero">Numero</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.question.numero'">Numero</span></dt>
         <dd>
           <span>{{ question.numero }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.question.point">Point</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.question.point'">Point</span></dt>
         <dd>
           <span>{{ question.point }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.question.step">Step</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.question.step'">Step</span></dt>
         <dd>
           <span>{{ question.step }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.question.validExpression">Valid Expression</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.question.validExpression'">Valid Expression</span></dt>
         <dd>
           <span>{{ question.validExpression }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.question.libelle">Libelle</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.question.libelle'">Libelle</span></dt>
         <dd>
           <span>{{ question.libelle }}</span>
         </dd>
 
-        <dt><span jhiTranslate="gradeScopeIsticApp.question.gradeType">Grade Type</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.question.gradeType'">Grade Type</span></dt>
         <dd>
-          <span jhiTranslate="{{ 'gradeScopeIsticApp.GradeType.' + question.gradeType }}">{{ question.gradeType }}</span>
+          <span translate="{{ 'gradeScopeIsticApp.GradeType.' + question.gradeType }}">{{ question.gradeType }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.question.zone">Zone</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.question.zone'">Zone</span></dt>
         <dd>
           <div *ngIf="question.zoneId">
             <a [routerLink]="['/zone', question.zoneId, 'view']">{{ question.zoneId }}</a>
           </div>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.question.type">Type</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.question.type'">Type</span></dt>
         <dd>
           <div *ngIf="question.typeId">
             <a [routerLink]="['/question-type', question.typeId, 'view']">{{ question.typeAlgoName }}</a>
           </div>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.question.exam">Exam</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.question.exam'">Exam</span></dt>
         <dd>
           <div *ngIf="question.examId">
             <a [routerLink]="['/exam', question.examId, 'view']">{{ question.examName }}</a>
@@ -60,11 +60,11 @@
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
       </button>
 
       <button type="button" [routerLink]="['/question', question.id, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
       </button>
     </div>
   </div>

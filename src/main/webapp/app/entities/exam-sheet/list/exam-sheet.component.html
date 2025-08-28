@@ -1,11 +1,11 @@
 <div>
   <h2 id="page-heading" data-cy="ExamSheetHeading">
-    <span jhiTranslate="gradeScopeIsticApp.examSheet.home.title">Exam Sheets</span>
+    <span [translate]="'gradeScopeIsticApp.examSheet.home.title'">Exam Sheets</span>
 
     <div class="d-flex justify-content-end">
       <button class="btn btn-info me-2" (click)="loadPage()" [disabled]="isLoading">
         <fa-icon icon="sync" [animation]="'spin'"></fa-icon>
-        <span jhiTranslate="gradeScopeIsticApp.examSheet.home.refreshListLabel">Refresh List</span>
+        <span [translate]="'gradeScopeIsticApp.examSheet.home.refreshListLabel'">Refresh List</span>
       </button>
 
       <button
@@ -15,7 +15,7 @@
         [routerLink]="['/exam-sheet/new']"
       >
         <fa-icon icon="plus"></fa-icon>
-        <span jhiTranslate="gradeScopeIsticApp.examSheet.home.createLabel"> Create a new Exam Sheet </span>
+        <span [translate]="'gradeScopeIsticApp.examSheet.home.createLabel'"> Create a new Exam Sheet </span>
       </button>
     </div>
   </h2>
@@ -25,25 +25,25 @@
   <jhi-alert></jhi-alert>
 
   <div class="alert alert-warning" id="no-result" *ngIf="examSheets?.length === 0">
-    <span jhiTranslate="gradeScopeIsticApp.examSheet.home.notFound">No examSheets found</span>
+    <span [translate]="'gradeScopeIsticApp.examSheet.home.notFound'">No examSheets found</span>
   </div>
 
   <div class="table-responsive" id="entities" *ngIf="examSheets && examSheets.length > 0">
     <table class="table table-striped" aria-describedby="page-heading">
       <thead>
         <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="loadPage()">
-          <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
+          <th scope="col" jhiSortBy="id"><span [translate]="'global.field.id'">ID</span> <fa-icon icon="sort"></fa-icon></th>
           <th scope="col" jhiSortBy="name">
-            <span jhiTranslate="gradeScopeIsticApp.examSheet.name">Name</span> <fa-icon icon="sort"></fa-icon>
+            <span [translate]="'gradeScopeIsticApp.examSheet.name'">Name</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="pagemin">
-            <span jhiTranslate="gradeScopeIsticApp.examSheet.pagemin">Pagemin</span> <fa-icon icon="sort"></fa-icon>
+            <span [translate]="'gradeScopeIsticApp.examSheet.pagemin'">Pagemin</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="pagemax">
-            <span jhiTranslate="gradeScopeIsticApp.examSheet.pagemax">Pagemax</span> <fa-icon icon="sort"></fa-icon>
+            <span [translate]="'gradeScopeIsticApp.examSheet.pagemax'">Pagemax</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="scan.name">
-            <span jhiTranslate="gradeScopeIsticApp.examSheet.scan">Scan</span> <fa-icon icon="sort"></fa-icon>
+            <span [translate]="'gradeScopeIsticApp.examSheet.scan'">Scan</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col"></th>
         </tr>
@@ -70,7 +70,7 @@
                 data-cy="entityDetailsButton"
               >
                 <fa-icon icon="eye"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+                <span class="d-none d-md-inline" [translate]="'entity.action.view'">View</span>
               </button>
 
               <button
@@ -80,12 +80,12 @@
                 data-cy="entityEditButton"
               >
                 <fa-icon icon="pencil-alt"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+                <span class="d-none d-md-inline" [translate]="'entity.action.edit'">Edit</span>
               </button>
 
               <button type="submit" (click)="delete(examSheet)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
                 <fa-icon icon="times"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+                <span class="d-none d-md-inline" [translate]="'entity.action.delete'">Delete</span>
               </button>
             </div>
           </td>

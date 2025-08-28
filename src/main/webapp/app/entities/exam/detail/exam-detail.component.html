@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
     <div *ngIf="exam">
-      <h2 data-cy="examDetailsHeading"><span jhiTranslate="gradeScopeIsticApp.exam.detail.title">Exam</span></h2>
+      <h2 data-cy="examDetailsHeading"><span [translate]="'gradeScopeIsticApp.exam.detail.title'">Exam</span></h2>
 
       <hr />
 
@@ -10,51 +10,51 @@
       <jhi-alert></jhi-alert>
 
       <dl class="row-md jh-entity-details">
-        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dt><span [translate]="'global.field.id'">ID</span></dt>
         <dd>
           <span>{{ exam.id }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.exam.name">Name</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.exam.name'">Name</span></dt>
         <dd>
           <span>{{ exam.name }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.exam.template">Template</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.exam.template'">Template</span></dt>
         <dd>
           <div *ngIf="exam.templateId">
             <a [routerLink]="['/template', exam.templateId, 'view']">{{ exam.templateName }}</a>
           </div>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.exam.idzone">Idzone</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.exam.idzone'">Idzone</span></dt>
         <dd>
           <div *ngIf="exam.idzoneId">
             <a [routerLink]="['/zone', exam.idzoneId, 'view']">{{ exam.idzoneId }}</a>
           </div>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.exam.namezone">Namezone</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.exam.namezone'">Namezone</span></dt>
         <dd>
           <div *ngIf="exam.namezoneId">
             <a [routerLink]="['/zone', exam.namezoneId, 'view']">{{ exam.namezoneId }}</a>
           </div>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.exam.firstnamezone">Firstnamezone</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.exam.firstnamezone'">Firstnamezone</span></dt>
         <dd>
           <div *ngIf="exam.firstnamezoneId">
             <a [routerLink]="['/zone', exam.firstnamezoneId, 'view']">{{ exam.firstnamezoneId }}</a>
           </div>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.exam.notezone">Notezone</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.exam.notezone'">Notezone</span></dt>
         <dd>
           <div *ngIf="exam.notezoneId">
             <a [routerLink]="['/zone', exam.notezoneId, 'view']">{{ exam.notezoneId }}</a>
           </div>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.exam.scanfile">Scanfile</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.exam.scanfile'">Scanfile</span></dt>
         <dd>
           <div *ngIf="exam.scanfileId">
             <a [routerLink]="['/scan', exam.scanfileId, 'view']">{{ exam.scanfileName }}</a>
           </div>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.exam.course">Course</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.exam.course'">Course</span></dt>
         <dd>
           <div *ngIf="exam.courseId">
             <a [routerLink]="['/course', exam.courseId, 'view']">{{ exam.courseName }}</a>
@@ -63,11 +63,11 @@
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
       </button>
 
       <button type="button" [routerLink]="['/exam', exam.id, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
       </button>
     </div>
   </div>

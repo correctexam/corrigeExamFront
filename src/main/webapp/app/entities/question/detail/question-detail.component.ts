@@ -5,14 +5,13 @@ import { IQuestion } from '../question.model';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { AlertComponent } from '../../../shared/alert/alert.component';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'jhi-question-detail',
   templateUrl: './question-detail.component.html',
   standalone: true,
-  imports: [NgIf, TranslateDirective, AlertErrorComponent, AlertComponent, RouterLink, FaIconComponent],
+  imports: [NgIf, AlertErrorComponent, AlertComponent, RouterLink, FaIconComponent],
 })
 export class QuestionDetailComponent implements OnInit {
   question: IQuestion | null = null;

@@ -23,7 +23,7 @@
   </p-blockUI>
 
   <p-drawer [(visible)]="layoutsidebarVisible">
-    <h3 jhiTranslate="scanexam.downloadpdf">Téléchargement pdfs</h3>
+    <h3 [translate]="'scanexam.downloadpdf'">Téléchargement pdfs</h3>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <a (click)="downloadTemplate()">template.pdf</a>
     </div>
@@ -47,7 +47,7 @@
       </div>
       <div class="col-7">
         <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">
-          <span jhiTranslate="scanexam.chargerscan"> Charger ou mettre à jour un scan de copies pour l'exam : </span> {{ exam.name }}
+          <span [translate]="'scanexam.chargerscan'"> Charger ou mettre à jour un scan de copies pour l'exam : </span> {{ exam.name }}
         </h2>
       </div>
       <div class="col-4 flex flex-row-reverse">
@@ -61,7 +61,7 @@
           [tooltipPosition]="'bottom'"
           (click)="gotoUE()"
         >
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackue">Retourner au module</span>
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'scanexam.gobackue'">Retourner au module</span>
         </button>
         <button
           [disabled]="!this.examid"
@@ -73,7 +73,7 @@
           [tooltipPosition]="'bottom'"
           (click)="reloadScan = true"
         >
-          <fa-icon icon="refresh"></fa-icon>&nbsp;<span jhiTranslate="scanexam.reloadscan">Recharger un nouveau scan</span>
+          <fa-icon icon="refresh"></fa-icon>&nbsp;<span [translate]="'scanexam.reloadscan'">Recharger un nouveau scan</span>
         </button>
         <ng-container *ngIf="this.exam?.scanfileId !== undefined">
           <button
@@ -86,7 +86,7 @@
             [pTooltip]="'scanexam.initCacheProcessing' | translate"
             [tooltipPosition]="'bottom'"
           >
-            <fa-icon icon="retweet"></fa-icon>&nbsp;<span jhiTranslate="scanexam.rescan">Réanalyser à partie du pdf</span>
+            <fa-icon icon="retweet"></fa-icon>&nbsp;<span [translate]="'scanexam.rescan'">Réanalyser à partie du pdf</span>
           </button>
         </ng-container>
       </div>
@@ -98,7 +98,7 @@
           <div *ngIf="exam?.scanfileId" class="flex align-items-center justify-content-center font-bold border-round m-2">
             <label
               for="switch1"
-              jhiTranslate="scanexam.concatenation"
+              [translate]="'scanexam.concatenation'"
               [pTooltip]="'scanexam.concatenationTooltip' | translate"
               [tooltipPosition]="'bottom'"
               >Concaténation au scan déjà chargé:</label

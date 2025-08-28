@@ -9,16 +9,16 @@ import { FindLanguageFromKeyPipe } from '../../../shared/language/find-language-
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
 import { NgIf, NgFor } from '@angular/common';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
+import { TranslateDirective } from '@ngx-translate/core';
 
 @Component({
   selector: 'jhi-user-mgmt-update',
   templateUrl: './user-management-update.component.html',
   standalone: true,
   imports: [
+    TranslateDirective,
     FormsModule,
     ReactiveFormsModule,
-    TranslateDirective,
     NgIf,
     AlertErrorComponent,
     NgFor,

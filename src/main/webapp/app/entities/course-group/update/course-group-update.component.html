@@ -4,7 +4,7 @@
       <h2
         id="jhi-course-group-heading"
         data-cy="CourseGroupCreateUpdateHeading"
-        jhiTranslate="gradeScopeIsticApp.courseGroup.home.createOrEditLabel"
+        [translate]="'gradeScopeIsticApp.courseGroup.home.createOrEditLabel'"
       >
         Create or edit a Course Group
       </h2>
@@ -13,7 +13,7 @@
         <jhi-alert-error></jhi-alert-error>
 
         <div class="row mb-3" [hidden]="editForm.get('id')!.value == null">
-          <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+          <label class="form-label" [translate]="'global.field.id'" for="field_id">ID</label>
           <input
             type="number"
             (mouseup)="$event.stopPropagation()"
@@ -27,13 +27,13 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.courseGroup.groupName" for="field_groupName">Group Name</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.courseGroup.groupName'" for="field_groupName">Group Name</label>
           <input type="text" class="form-control" name="groupName" id="field_groupName" data-cy="groupName" formControlName="groupName" />
           <div *ngIf="editForm.get('groupName')!.invalid && (editForm.get('groupName')!.dirty || editForm.get('groupName')!.touched)">
             <small
               class="form-text text-danger"
               *ngIf="editForm.get('groupName')?.errors?.required"
-              jhiTranslate="entity.validation.required"
+              [translate]="'entity.validation.required'"
             >
               This field is required.
             </small>
@@ -41,7 +41,7 @@
         </div>
 
         <div class="row mb-3">
-          <label jhiTranslate="gradeScopeIsticApp.courseGroup.students" for="field_students">Students</label>
+          <label [translate]="'gradeScopeIsticApp.courseGroup.students'" for="field_students">Students</label>
           <select class="form-control" id="field_students" multiple name="students" formControlName="students">
             <option
               [ngValue]="getSelected(editForm.get('students')!.value, studentOption)"
@@ -53,7 +53,7 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.courseGroup.course" for="field_course">Course</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.courseGroup.course'" for="field_course">Course</label>
           <select class="form-control" id="field_course" name="course" formControlName="courseId">
             <option [ngValue]="null"></option>
             <option [ngValue]="courseOption.id" *ngFor="let courseOption of courses; trackBy: trackById">{{ courseOption.name }}</option>
@@ -63,7 +63,7 @@
 
       <div>
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span [translate]="'entity.action.cancel'">Cancel</span>
         </button>
 
         <button
@@ -73,7 +73,7 @@
           [disabled]="editForm.invalid || isSaving"
           class="btn btn-primary"
         >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+          <fa-icon icon="save"></fa-icon>&nbsp;<span [translate]="'entity.action.save'">Save</span>
         </button>
       </div>
     </form>

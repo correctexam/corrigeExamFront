@@ -4,7 +4,7 @@
       <h2
         id="jhi-student-response-heading"
         data-cy="StudentResponseCreateUpdateHeading"
-        jhiTranslate="gradeScopeIsticApp.studentResponse.home.createOrEditLabel"
+        [translate]="'gradeScopeIsticApp.studentResponse.home.createOrEditLabel'"
       >
         Create or edit a Student Response
       </h2>
@@ -13,7 +13,7 @@
         <jhi-alert-error></jhi-alert-error>
 
         <div class="row mb-3" [hidden]="editForm.get('id')!.value == null">
-          <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+          <label class="form-label" [translate]="'global.field.id'" for="field_id">ID</label>
           <input
             type="number"
             (mouseup)="$event.stopPropagation()"
@@ -27,7 +27,7 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.studentResponse.note" for="field_note">Note</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.studentResponse.note'" for="field_note">Note</label>
           <input
             type="number"
             (mouseup)="$event.stopPropagation()"
@@ -40,17 +40,17 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.studentResponse.star" for="field_star">Star</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.studentResponse.star'" for="field_star">Star</label>
           <input type="checkbox" class="form-check" name="star" id="field_star" data-cy="star" formControlName="star" />
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.studentResponse.worststar" for="field_worststar">Worststar</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.studentResponse.worststar'" for="field_worststar">Worststar</label>
           <input type="checkbox" class="form-check" name="worststar" id="field_worststar" data-cy="worststar" formControlName="worststar" />
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.studentResponse.question" for="field_question">Question</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.studentResponse.question'" for="field_question">Question</label>
           <select class="form-control" id="field_question" name="question" formControlName="questionId">
             <option [ngValue]="null"></option>
             <option [ngValue]="questionOption.id" *ngFor="let questionOption of questions; trackBy: trackById">
@@ -60,7 +60,7 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.studentResponse.sheet" for="field_sheet">Student Sheet</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.studentResponse.sheet'" for="field_sheet">Student Sheet</label>
           <select class="form-control" id="field_sheet" name="sheet" formControlName="sheetId">
             <option [ngValue]="null"></option>
             <option [ngValue]="sheetOption.id" *ngFor="let sheetOption of sheets; trackBy: trackById">{{ sheetOption.name }}</option>
@@ -70,7 +70,7 @@
 
       <div>
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span [translate]="'entity.action.cancel'">Cancel</span>
         </button>
 
         <button
@@ -80,7 +80,7 @@
           [disabled]="editForm.invalid || isSaving"
           class="btn btn-primary"
         >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+          <fa-icon icon="save"></fa-icon>&nbsp;<span [translate]="'entity.action.save'">Save</span>
         </button>
       </div>
     </form>

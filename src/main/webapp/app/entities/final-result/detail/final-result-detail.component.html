@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
     <div *ngIf="finalResult">
-      <h2 data-cy="finalResultDetailsHeading"><span jhiTranslate="gradeScopeIsticApp.finalResult.detail.title">Final Result</span></h2>
+      <h2 data-cy="finalResultDetailsHeading"><span [translate]="'gradeScopeIsticApp.finalResult.detail.title'">Final Result</span></h2>
 
       <hr />
 
@@ -10,21 +10,21 @@
       <jhi-alert></jhi-alert>
 
       <dl class="row-md jh-entity-details">
-        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dt><span [translate]="'global.field.id'">ID</span></dt>
         <dd>
           <span>{{ finalResult.id }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.finalResult.note">Note</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.finalResult.note'">Note</span></dt>
         <dd>
           <span>{{ finalResult.note }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.finalResult.student">Student</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.finalResult.student'">Student</span></dt>
         <dd>
           <div *ngIf="finalResult.studentId">
             <a [routerLink]="['/student', finalResult.studentId, 'view']">{{ finalResult.studentName }}</a>
           </div>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.finalResult.exam">Exam</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.finalResult.exam'">Exam</span></dt>
         <dd>
           <div *ngIf="finalResult.examId">
             <a [routerLink]="['/exam', finalResult.examId, 'view']">{{ finalResult.examName }}</a>
@@ -33,11 +33,11 @@
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
       </button>
 
       <button type="button" [routerLink]="['/final-result', finalResult.id, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
       </button>
     </div>
   </div>

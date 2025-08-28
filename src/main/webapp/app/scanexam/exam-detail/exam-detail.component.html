@@ -2,12 +2,12 @@
   <p-toast></p-toast>
   <p-dialog [header]="'scanexam.firsthelpTitle' | translate" [(visible)]="firsthelp" [style]="{ width: '90vw' }">
     <div style="display: flex; justify-content: space-around">
-      <span jhiTranslate="scanexam.firsthelpdetail"></span>
+      <span [translate]="'scanexam.firsthelpdetail'"></span>
     </div>
     <BR />
     <BR />
     <div style="display: flex; justify-content: flex-end; margin-right: 1rem">
-      <span jhiTranslate="scanexam.shortcutopenatstart"></span>&nbsp;
+      <span [translate]="'scanexam.shortcutopenatstart'"></span>&nbsp;
       <input type="checkbox" [(ngModel)]="firsthelpvalue" (change)="changeStartPreference()" />
     </div>
     <ng-template pTemplate="footer">
@@ -16,7 +16,7 @@
   </p-dialog>
 
   <p-dialog [header]="'scanexam.showInfoExamTitle' | translate" [(visible)]="showInfoExam" [style]="{ width: '50vw' }">
-    <span jhiTranslate="scanexam.infoExamDetails" [translateValues]="infoExamDetail"></span>
+    <span [translate]="'scanexam.infoExamDetails'" [translateParams]="infoExamDetail"></span>
     <ng-template pTemplate="footer">
       <button type="button" pButton label="ok" (click)="showInfoExam = false"></button>
     </ng-template>
@@ -83,7 +83,7 @@
               <fa-stack>
                 <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
                 <fa-icon [icon]="faPenToSquare" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
-              ><BR /> <span jhiTranslate="scanexam.annotatetemplate">Annoter template</span><span *ngIf="exam?.namezoneId">✅</span>
+              ><BR /> <span [translate]="'scanexam.annotatetemplate'">Annoter template</span><span *ngIf="exam?.namezoneId">✅</span>
             </button>
             <button
               [routerLink]="'/loadscan/' + this.examId"
@@ -99,7 +99,7 @@
               <fa-stack>
                 <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
                 <fa-icon [icon]="faCloudArrowUp" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
-              ><BR /> <span jhiTranslate="scanexam.loadscan">Charger scan étudiants</span> <span *ngIf="exam?.scanfileId">✅</span>
+              ><BR /> <span [translate]="'scanexam.loadscan'">Charger scan étudiants</span> <span *ngIf="exam?.scanfileId">✅</span>
             </button>
             <button
               [routerLink]="'/imagealign/' + this.examId"
@@ -116,7 +116,7 @@
               <fa-stack>
                 <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
                 <fa-icon [icon]="faDiagramPredecessor" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
-              ><BR /> <span jhiTranslate="scanexam.alignscan1">Redresser scan</span><span *ngIf="showAssociation">✅</span>
+              ><BR /> <span translate="scanexam.alignscan1">Redresser scan</span><span *ngIf="showAssociation">✅</span>
             </button>
 
             <button
@@ -134,7 +134,7 @@
               <fa-stack>
                 <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
                 <fa-icon [icon]="faPersonArrowDownToLine" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
-              ><BR /> <span jhiTranslate="scanexam.bindstudent">Associer copies/étudiants</span><span *ngIf="showCorrection">✅</span>
+              ><BR /> <span [translate]="'scanexam.bindstudent'">Associer copies/étudiants</span><span *ngIf="showCorrection">✅</span>
             </button>
           } @else {
             <button
@@ -152,7 +152,7 @@
               <fa-stack>
                 <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
                 <fa-icon [icon]="faPersonArrowDownToLine" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
-              ><BR /> <span jhiTranslate="scanexam.bindstudent">Associer copies/étudiants</span><span *ngIf="showCorrection">✅</span>
+              ><BR /> <span [translate]="'scanexam.bindstudent'">Associer copies/étudiants</span><span *ngIf="showCorrection">✅</span>
             </button>
           }
           <button
@@ -170,7 +170,7 @@
             <fa-stack>
               <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
               <fa-icon [icon]="faBookOpenReader" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
-            ><BR /> <span jhiTranslate="scanexam.correctsheet">Corriger copies</span><span *ngIf="correctionFinish">✅</span>
+            ><BR /> <span [translate]="'scanexam.correctsheet'">Corriger copies</span><span *ngIf="correctionFinish">✅</span>
           </button>
           <button
             [routerLink]="'/showresults/' + this.examId"
@@ -188,7 +188,7 @@
               <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
               <fa-icon [icon]="faSquarePollVertical" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
             ><BR />
-            <span jhiTranslate="scanexam.showresult"> Voir résultats</span>
+            <span [translate]="'scanexam.showresult'"> Voir résultats</span>
           </button>
         </div>
       </div>

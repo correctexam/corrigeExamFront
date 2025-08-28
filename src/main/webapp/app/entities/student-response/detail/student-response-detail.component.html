@@ -2,7 +2,7 @@
   <div class="col-8">
     <div *ngIf="studentResponse">
       <h2 data-cy="studentResponseDetailsHeading">
-        <span jhiTranslate="gradeScopeIsticApp.studentResponse.detail.title">Student Response</span>
+        <span [translate]="'gradeScopeIsticApp.studentResponse.detail.title'">Student Response</span>
       </h2>
 
       <hr />
@@ -12,42 +12,42 @@
       <jhi-alert></jhi-alert>
 
       <dl class="row-md jh-entity-details">
-        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dt><span [translate]="'global.field.id'">ID</span></dt>
         <dd>
           <span>{{ studentResponse.id }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.studentResponse.note">Note</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.studentResponse.note'">Note</span></dt>
         <dd>
           <span>{{ studentResponse.note }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.studentResponse.star">Star</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.studentResponse.star'">Star</span></dt>
         <dd>
           <span>{{ studentResponse.star }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.studentResponse.worststar">Worststar</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.studentResponse.worststar'">Worststar</span></dt>
         <dd>
           <span>{{ studentResponse.worststar }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.studentResponse.question">Question</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.studentResponse.question'">Question</span></dt>
         <dd>
           <div *ngIf="studentResponse.questionId">
             <a [routerLink]="['/question', studentResponse.questionId, 'view']">{{ studentResponse.questionNumero }}</a>
           </div>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.studentResponse.sheet">Student sheet</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.studentResponse.sheet'">Student sheet</span></dt>
         <dd>
           <div *ngIf="studentResponse.sheetId">
             <a [routerLink]="['/sheet', studentResponse.sheetId, 'view']">{{ studentResponse.sheetName }}</a>
           </div>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.studentResponse.textcomments">Textcomments</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.studentResponse.textcomments'">Textcomments</span></dt>
         <dd>
           <span *ngFor="let textcomments of studentResponse.textcomments; let last = last">
             <a [routerLink]="['/text-comment', textcomments?.id, 'view']">{{ textcomments.id }}</a
             >{{ last ? '' : ', ' }}
           </span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.studentResponse.gradedcomments">Gradedcomments</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.studentResponse.gradedcomments'">Gradedcomments</span></dt>
         <dd>
           <span *ngFor="let gradedcomments of studentResponse.gradedcomments; let last = last">
             <a [routerLink]="['/graded-comment', gradedcomments?.id, 'view']">{{ gradedcomments.id }}</a
@@ -57,11 +57,11 @@
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
       </button>
 
       <button type="button" [routerLink]="['/student-response', studentResponse.id, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
       </button>
     </div>
   </div>

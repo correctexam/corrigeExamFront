@@ -1,6 +1,6 @@
 <p-accordion value="0">
   <p-accordion-panel value="0">
-    <p-accordion-header jhiTranslate="scanexam.removeallperpage">{{ 'scanexam.removeallperpage' | translate }}</p-accordion-header>
+    <p-accordion-header [translate]="'scanexam.removeallperpage'">{{ 'scanexam.removeallperpage' | translate }}</p-accordion-header>
     <p-accordion-content>
       <div class="grid">
         <div *ngFor="let item of pagesnumber" class="col-1">
@@ -14,7 +14,7 @@
     </p-accordion-content>
   </p-accordion-panel>
   <p-accordion-panel value="1">
-    <p-accordion-header jhiTranslate="scanexam.rotateallperpage">{{ 'scanexam.rotateallperpage' | translate }}</p-accordion-header>
+    <p-accordion-header [translate]="'scanexam.rotateallperpage'">{{ 'scanexam.rotateallperpage' | translate }}</p-accordion-header>
     <p-accordion-content>
       <div class="grid">
         <div *ngFor="let item of pagesnumber" class="col-1">
@@ -28,10 +28,10 @@
     </p-accordion-content>
   </p-accordion-panel>
   <p-accordion-panel value="2">
-    <p-accordion-header jhiTranslate="scanexam.removeperpagenumber">{{ 'scanexam.removeperpagenumber' | translate }}</p-accordion-header>
+    <p-accordion-header [translate]="'scanexam.removeperpagenumber'">{{ 'scanexam.removeperpagenumber' | translate }}</p-accordion-header>
     <p-accordion-content>
       <div class="field">
-        <label for="numeropagedeletion" jhiTranslate="scanexam.pagenumbersample">Numero(s) de page (e.g. : 1;3-5;6)</label>
+        <label for="numeropagedeletion" [translate]="'scanexam.pagenumbersample'">Numero(s) de page (e.g. : 1;3-5;6)</label>
         <input
           [(ngModel)]="numeropagedeletion"
           id="numeropagedeletion"
@@ -47,7 +47,7 @@
     <p-accordion-header>{{ 'scanexam.rotateperpagenumber' | translate }}</p-accordion-header>
     <p-accordion-content>
       <div class="field">
-        <label for="numeropagerotation" jhiTranslate="scanexam.pagenumbersample">Numero(s) de page (e.g. : 1;3-5;6)</label>
+        <label for="numeropagerotation" [translate]="'scanexam.pagenumbersample'">Numero(s) de page (e.g. : 1;3-5;6)</label>
         <input
           [(ngModel)]="numeropagerotation"
           id="numeropagerotation"
@@ -63,7 +63,7 @@
     <p-accordion-header>{{ 'scanexam.insersionpage' | translate }}</p-accordion-header>
     <p-accordion-content>
       <div class="field">
-        <label for="numeropageinsertion" jhiTranslate="scanexam.pdfpagenumber">Numéro de page à insérer</label>
+        <label for="numeropageinsertion" [translate]="'scanexam.pdfpagenumber'">Numéro de page à insérer</label>
         <input
           [(ngModel)]="numeropageinsertion"
           id="numeropageinsertion"
@@ -72,7 +72,7 @@
         />
       </div>
       <div class="field">
-        <label for="numeropagedestination" jhiTranslate="scanexam.insertpagenumber">Numéro de page de destination</label>
+        <label for="numeropagedestination" [translate]="'scanexam.insertpagenumber'">Numéro de page de destination</label>
         <input
           [(ngModel)]="numeropagedestination"
           id="numeropagedestination"

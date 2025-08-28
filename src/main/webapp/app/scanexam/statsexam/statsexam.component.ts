@@ -3,7 +3,7 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Component, HostListener, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { IQuestion } from 'app/entities/question/question.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
@@ -23,7 +23,6 @@ import { ChartModule } from 'primeng/chart';
 import { CardModule } from 'primeng/card';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { NgIf, NgFor, NgStyle, KeyValuePipe } from '@angular/common';
-import { TranslateDirective } from '../../shared/language/translate.directive';
 import { PrimeTemplate } from 'primeng/api';
 import { GalleriaModule } from 'primeng/galleria';
 
@@ -48,7 +47,7 @@ const TRANSPARENT = 'rgba(255,255,255,0.0)';
   imports: [
     GalleriaModule,
     PrimeTemplate,
-    TranslateDirective,
+
     NgIf,
     FaIconComponent,
     CardModule,
@@ -65,7 +64,8 @@ const TRANSPARENT = 'rgba(255,255,255,0.0)';
     NgStyle,
     RouterLink,
     KeyValuePipe,
-    TranslateModule,
+    TranslateDirective,
+    TranslatePipe,
   ],
 })
 export class StatsExamComponent implements OnInit {

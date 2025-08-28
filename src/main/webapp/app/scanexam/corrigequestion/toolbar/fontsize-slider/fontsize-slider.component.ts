@@ -1,17 +1,16 @@
 import { Component } from '@angular/core';
 import { EventCanevascorrectionHandlerService } from 'app/scanexam/corrigequestion/event-canevascorrection-handler.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { TooltipModule } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { SliderModule } from 'primeng/slider';
-import { TranslateDirective } from '../../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-fontsize-slider',
   templateUrl: './fontsize-slider.component.html',
   styleUrls: ['./fontsize-slider.component.scss'],
   standalone: true,
-  imports: [TranslateDirective, SliderModule, FormsModule, TooltipModule, TranslateModule],
+  imports: [SliderModule, FormsModule, TooltipModule, TranslateDirective, TranslatePipe],
 })
 export class FontsizeSliderComponent {
   min = 15;

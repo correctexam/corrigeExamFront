@@ -5,14 +5,14 @@ import { IQuestion } from '../question.model';
 import { QuestionService } from '../service/question.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
+import { TranslateDirective } from '@ngx-translate/core';
 
 @Component({
   templateUrl: './question-delete-dialog.component.html',
   standalone: true,
-  imports: [NgIf, FormsModule, TranslateDirective, AlertErrorComponent, FaIconComponent],
+  imports: [TranslateDirective, NgIf, FormsModule, AlertErrorComponent, FaIconComponent],
 })
 export class QuestionDeleteDialogComponent {
   question?: IQuestion;

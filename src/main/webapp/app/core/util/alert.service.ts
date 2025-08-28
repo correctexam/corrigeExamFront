@@ -2,7 +2,8 @@ import { Injectable, SecurityContext, NgZone } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 
-import { translationNotFoundMessage } from 'app/config/translation.config';
+// import { translationNotFoundMessage } from 'app/config/translation.config';
+export const translationNotFoundMessage = 'translation-not-found';
 
 export type AlertType = 'success' | 'danger' | 'warning' | 'info';
 
@@ -30,7 +31,11 @@ export class AlertService {
   private alertId = 0;
   private alerts: Alert[] = [];
 
-  constructor(private sanitizer: DomSanitizer, private ngZone: NgZone, private translateService: TranslateService) {}
+  constructor(
+    private sanitizer: DomSanitizer,
+    private ngZone: NgZone,
+    private translateService: TranslateService,
+  ) {}
 
   clear(): void {
     this.alerts = [];

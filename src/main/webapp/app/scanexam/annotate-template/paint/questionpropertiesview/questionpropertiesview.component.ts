@@ -17,7 +17,7 @@ import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
 import { IHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-graded-comment.model';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { Button } from 'primeng/button';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -27,7 +27,6 @@ import { KnobModule } from 'primeng/knob';
 import { ListboxModule } from 'primeng/listbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
-import { TranslateDirective } from '../../../../shared/language/translate.directive';
 import { AlertErrorComponent } from '../../../../shared/alert/alert-error.component';
 import { NgIf, NgFor } from '@angular/common';
 import { CreateCommentsComponent } from '../../create-comments/create-comments.component';
@@ -66,7 +65,7 @@ export type EntityResponseType = HttpResponse<IQuestion>;
     FormsModule,
     ReactiveFormsModule,
     AlertErrorComponent,
-    TranslateDirective,
+
     TooltipModule,
     InputTextModule,
     NgFor,
@@ -77,7 +76,8 @@ export type EntityResponseType = HttpResponse<IQuestion>;
     CheckboxModule,
     ToggleSwitchModule,
     Button,
-    TranslateModule,
+    TranslateDirective,
+    TranslatePipe,
   ],
 })
 export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {

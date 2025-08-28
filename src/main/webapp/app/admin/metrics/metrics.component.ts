@@ -13,7 +13,6 @@ import { JvmThreadsComponent } from './blocks/jvm-threads/jvm-threads.component'
 import { JvmMemoryComponent } from './blocks/jvm-memory/jvm-memory.component';
 import { NgIf } from '@angular/common';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { TranslateDirective } from '../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-metrics',
@@ -21,7 +20,6 @@ import { TranslateDirective } from '../../shared/language/translate.directive';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
-    TranslateDirective,
     FaIconComponent,
     NgIf,
     JvmMemoryComponent,

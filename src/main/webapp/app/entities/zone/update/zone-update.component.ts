@@ -9,13 +9,12 @@ import { IZone, Zone } from '../zone.model';
 import { ZoneService } from '../service/zone.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-zone-update',
   templateUrl: './zone-update.component.html',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, TranslateDirective, AlertErrorComponent, FaIconComponent],
+  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, FaIconComponent],
 })
 export class ZoneUpdateComponent implements OnInit {
   isSaving = false;

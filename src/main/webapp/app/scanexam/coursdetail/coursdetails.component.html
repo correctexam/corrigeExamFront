@@ -1,11 +1,11 @@
 <p-dialog [header]="'scanexam.firsthelpTitle' | translate" [(visible)]="firsthelp" [style]="{ width: '90vw' }">
   <div style="display: flex; justify-content: space-around">
-    <span jhiTranslate="scanexam.firsthelpcoursedetail"></span>
+    <span [translate]="'scanexam.firsthelpcoursedetail'"></span>
   </div>
   <BR />
   <BR />
   <div style="display: flex; justify-content: flex-end; margin-right: 1rem">
-    <span jhiTranslate="scanexam.shortcutopenatstart"></span>&nbsp;
+    <span [translate]="'scanexam.shortcutopenatstart'"></span>&nbsp;
     <input type="checkbox" [(ngModel)]="firsthelpvalue" (change)="changeStartPreference()" />
   </div>
   <ng-template pTemplate="footer">
@@ -65,12 +65,12 @@
           <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
             <div class="card">
               <div class="card-body">
-                <h5 class="card-title" jhiTranslate="scanexam.courseexport">Export</h5>
+                <h5 class="card-title" [translate]="'scanexam.courseexport'">Export</h5>
 
                 <div class="card-text">
                   <label
                     for="switch1"
-                    jhiTranslate="scanexam.studentdata"
+                    [translate]="'scanexam.studentdata'"
                     [tooltipZIndex]="'3000'"
                     [pTooltip]="'scanexam.studentdatatooltip' | translate"
                     >données étudiantes:</label
@@ -84,7 +84,7 @@
                         (click)="exportCourse()"
                         [pTooltip]="'scanexam.courseexporttooltip' | translate"
                         [tooltipZIndex]="'3000'"
-                        jhiTranslate="scanexam.courseexport"
+                        [translate]="'scanexam.courseexport'"
                       >
                         Export
                       </button>
@@ -99,8 +99,8 @@
                           (click)="exportExam(exam.id!)"
                           [pTooltip]="'scanexam.exportexamtooltip' | translate"
                           [tooltipZIndex]="'3000'"
-                          jhiTranslate="scanexam.examexport"
-                          [translateValues]="{ examName: exam.name }"
+                          [translate]="'scanexam.examexport'"
+                          [translateParams]="{ examName: exam.name }"
                         >
                           Export {{ exam.name }}
                         </button>
@@ -121,7 +121,7 @@
           (newValue)="onCourseNameChanged($event)"
         >
         </jhi-usable-text-input>
-        <p jhiTranslate="scanexam.slogan">Vos exams accessibles en un clic</p>
+        <p [translate]="'scanexam.slogan'">Vos exams accessibles en un clic</p>
       </div>
       <div id="form-total" #formTotal>
         <div class="inner" [style]="{ 'text-align': 'center' }">

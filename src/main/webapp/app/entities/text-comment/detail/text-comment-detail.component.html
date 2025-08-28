@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
     <div *ngIf="textComment">
-      <h2 data-cy="textCommentDetailsHeading"><span jhiTranslate="gradeScopeIsticApp.textComment.detail.title">Text Comment</span></h2>
+      <h2 data-cy="textCommentDetailsHeading"><span [translate]="'gradeScopeIsticApp.textComment.detail.title'">Text Comment</span></h2>
 
       <hr />
 
@@ -10,23 +10,23 @@
       <jhi-alert></jhi-alert>
 
       <dl class="row-md jh-entity-details">
-        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dt><span [translate]="'global.field.id'">ID</span></dt>
         <dd>
           <span>{{ textComment.id }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.textComment.text">Text</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.textComment.text'">Text</span></dt>
         <dd>
           <span>{{ textComment.text }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.textComment.description">Description</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.textComment.description'">Description</span></dt>
         <dd>
           <span>{{ textComment.description }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.textComment.zonegeneratedid">Zonegeneratedid</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.textComment.zonegeneratedid'">Zonegeneratedid</span></dt>
         <dd>
           <span>{{ textComment.zonegeneratedid }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.textComment.question">Question</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.textComment.question'">Question</span></dt>
         <dd>
           <div *ngIf="textComment.questionId">
             <a [routerLink]="['/question', textComment.questionId, 'view']">{{ textComment.questionId }}</a>
@@ -35,11 +35,11 @@
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
       </button>
 
       <button type="button" [routerLink]="['/text-comment', textComment.id, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
       </button>
     </div>
   </div>

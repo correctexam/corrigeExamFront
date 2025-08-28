@@ -2,7 +2,7 @@
   <div class="col-8">
     <div *ngIf="answer2HybridGradedComment">
       <h2 data-cy="answer2HybridGradedCommentDetailsHeading">
-        <span jhiTranslate="gradeScopeIsticApp.answer2HybridGradedComment.detail.title">Answer 2 Hybrid Graded Comment</span>
+        <span translate="gradeScopeIsticApp.answer2HybridGradedComment.detail.title">Answer 2 Hybrid Graded Comment</span>
       </h2>
 
       <hr />
@@ -12,15 +12,15 @@
       <jhi-alert></jhi-alert>
 
       <dl class="row-md jh-entity-details">
-        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dt><span [translate]="'global.field.id'">ID</span></dt>
         <dd>
           <span>{{ answer2HybridGradedComment.id }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.answer2HybridGradedComment.stepValue">Step Value</span></dt>
+        <dt><span translate="gradeScopeIsticApp.answer2HybridGradedComment.stepValue">Step Value</span></dt>
         <dd>
           <span>{{ answer2HybridGradedComment.stepValue }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.answer2HybridGradedComment.hybridcomments">Hybridcomments</span></dt>
+        <dt><span translate="gradeScopeIsticApp.answer2HybridGradedComment.hybridcomments">Hybridcomments</span></dt>
         <dd>
           <div *ngIf="answer2HybridGradedComment.hybridcommentsId">
             <a [routerLink]="['/hybrid-graded-comment', answer2HybridGradedComment.hybridcommentsId, 'view']">{{
@@ -28,7 +28,7 @@
             }}</a>
           </div>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.answer2HybridGradedComment.studentResponse">Student Response</span></dt>
+        <dt><span translate="gradeScopeIsticApp.answer2HybridGradedComment.studentResponse">Student Response</span></dt>
         <dd>
           <div *ngIf="answer2HybridGradedComment.studentResponseId">
             <a [routerLink]="['/student-response', answer2HybridGradedComment.studentResponseId, 'view']">{{
@@ -39,7 +39,7 @@
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Retour</span>
       </button>
 
       <button
@@ -47,7 +47,7 @@
         [routerLink]="['/answer-2-hybrid-graded-comment', answer2HybridGradedComment.id, 'edit']"
         class="btn btn-primary"
       >
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Editer</span>
       </button>
     </div>
   </div>

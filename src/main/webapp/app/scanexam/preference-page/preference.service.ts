@@ -1,12 +1,36 @@
 import { Injectable } from '@angular/core';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { LocalStorageService } from 'ngx-webstorage';
-import { IPreference } from '../services/align-images.service';
 import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
 import { IHybridGradedComment, NewHybridGradedComment } from '../../entities/hybrid-graded-comment/hybrid-graded-comment.model';
 import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 import { IQuestion, IQuestionMark } from 'app/entities/question/question.model';
 import { v4 as uuid } from 'uuid';
+
+export interface IPreference {
+  qcm_min_width_shape: number;
+  qcm_min_height_shape: number;
+  qcm_epsilon: number;
+  qcm_differences_avec_case_blanche: number;
+  linelength: number;
+  repairsize: number;
+  dilatesize: number;
+  morphsize: number;
+  drawcontoursizeh: number;
+  drawcontoursizev: number;
+  minCircle: number;
+  maxCircle: number;
+  numberofpointToMatch: number;
+  numberofgoodpointToMatch: number;
+  defaultAlignAlgowithMarker: boolean;
+  removeHorizontalName: boolean;
+  pdfscale: number;
+  cacheDb: string;
+  imageTypeExport: string;
+  exportImageCompression: number;
+  maxNumberOfPredictionToShow: number;
+  warpPerspective: boolean;
+}
 
 interface IPreferenceForQuestion {
   point: number;
@@ -334,7 +358,7 @@ export class PreferenceService {
       let x: number;
       const j = Math.floor(Math.random() * i);
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      (x = o[--i]), (o[i] = o[j]), (o[j] = x);
+      ((x = o[--i]), (o[i] = o[j]), (o[j] = x));
       s.set(i, j);
     }
     return s;

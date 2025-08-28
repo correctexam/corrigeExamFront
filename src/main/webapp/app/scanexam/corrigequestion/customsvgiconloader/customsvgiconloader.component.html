@@ -9,7 +9,7 @@
     <div class="card">
       <div class="grid">
         <div class="col-6">
-          <h5 jhiTranslate="scanexam.uploadsvg">Upload SVG</h5>
+          <h5 [translate]="'scanexam.uploadsvg'">Upload SVG</h5>
           <p-fileupload
             #fileUpload
             name="svg"
@@ -24,10 +24,10 @@
             mode="advanced"
           ></p-fileupload>
 
-          <h5 jhiTranslate="scanexam.svgsource">SVG source</h5>
+          <h5 [translate]="'scanexam.svgsource'">SVG source</h5>
           <button
             [pTooltip]="'scanexam.svgloadtooltip' | translate"
-            jhiTranslate="scanexam.svgload"
+            [translate]="'scanexam.svgload'"
             [disabled]="value === undefined || value === ''"
             class="flex-grow-1 min-w-full primary p-button"
             (click)="importSvg()"
@@ -79,7 +79,7 @@
               class="p-button p-button-primary"
               (click)="exportSVG()"
               [pTooltip]="'scanexam.svgexporttooltip' | translate"
-              jhiTranslate="scanexam.svgexport"
+              [translate]="'scanexam.svgexport'"
             >
               Export
             </button>

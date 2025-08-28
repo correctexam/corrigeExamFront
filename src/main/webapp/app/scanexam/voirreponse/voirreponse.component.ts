@@ -10,7 +10,7 @@ import { db } from '../db/dbstudent';
 import { IExam } from '../../entities/exam/exam.model';
 // import { ICourse } from 'app/entities/course/course.model';
 import { IStudent } from '../../entities/student/student.model';
-import { ImageZone, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.component';
+import { ImageZone, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.model';
 import { IZone } from 'app/entities/zone/zone.model';
 import { QuestionService } from '../../entities/question/service/question.service';
 import { IQuestion } from '../../entities/question/question.model';
@@ -28,7 +28,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { SliderModule } from 'primeng/slider';
 import { FormsModule } from '@angular/forms';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { TranslateDirective } from '../../shared/language/translate.directive';
 import { NgIf, NgFor } from '@angular/common';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
@@ -40,17 +39,7 @@ import { ToastModule } from 'primeng/toast';
   styleUrls: ['./voirreponse.component.scss'],
   providers: [ConfirmationService, MessageService],
   standalone: true,
-  imports: [
-    ToastModule,
-    BlockUIModule,
-    ProgressSpinnerModule,
-    NgIf,
-    TranslateDirective,
-    NgFor,
-    ToggleSwitchModule,
-    FormsModule,
-    SliderModule,
-  ],
+  imports: [ToastModule, BlockUIModule, ProgressSpinnerModule, NgIf, NgFor, ToggleSwitchModule, FormsModule, SliderModule],
 })
 export class VoirReponseComponent implements OnInit, AfterViewInit {
   public href = '';

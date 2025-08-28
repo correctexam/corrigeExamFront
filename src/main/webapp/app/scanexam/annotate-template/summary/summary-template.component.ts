@@ -1,14 +1,13 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Question } from 'app/entities/question/question.model';
 import { NgFor, NgIf } from '@angular/common';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-summary-template',
   templateUrl: './summary-template.component.html',
   styleUrls: ['./summary-template.component.scss'],
   standalone: true,
-  imports: [TranslateDirective, NgFor, NgIf],
+  imports: [NgFor, NgIf],
 })
 export class SummaryTemplateComponent {
   @Input()

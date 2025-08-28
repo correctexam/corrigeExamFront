@@ -1,18 +1,18 @@
-<h3 id="cacheMetrics" jhiTranslate="metrics.cache.title">Cache statistics</h3>
+<h3 id="cacheMetrics" [translate]="'metrics.cache.title'">Cache statistics</h3>
 
 <div class="table-responsive" *ngIf="!updating && cacheMetrics">
   <table class="table table-striped" aria-describedby="cacheMetrics">
     <thead>
       <tr>
-        <th scope="col" jhiTranslate="metrics.cache.cachename">Cache name</th>
-        <th scope="col" class="text-end" jhiTranslate="metrics.cache.hits">Cache Hits</th>
-        <th scope="col" class="text-end" jhiTranslate="metrics.cache.misses">Cache Misses</th>
-        <th scope="col" class="text-end" jhiTranslate="metrics.cache.gets">Cache Gets</th>
-        <th scope="col" class="text-end" jhiTranslate="metrics.cache.puts">Cache Puts</th>
-        <th scope="col" class="text-end" jhiTranslate="metrics.cache.removals">Cache Removals</th>
-        <th scope="col" class="text-end" jhiTranslate="metrics.cache.evictions">Cache Evictions</th>
-        <th scope="col" class="text-end" jhiTranslate="metrics.cache.hitPercent">Cache Hit %</th>
-        <th scope="col" class="text-end" jhiTranslate="metrics.cache.missPercent">Cache Miss %</th>
+        <th scope="col" [translate]="'metrics.cache.cachename'">Cache name</th>
+        <th scope="col" class="text-end" [translate]="'metrics.cache.hits'">Cache Hits</th>
+        <th scope="col" class="text-end" [translate]="'metrics.cache.misses'">Cache Misses</th>
+        <th scope="col" class="text-end" [translate]="'metrics.cache.gets'">Cache Gets</th>
+        <th scope="col" class="text-end" [translate]="'metrics.cache.puts'">Cache Puts</th>
+        <th scope="col" class="text-end" [translate]="'metrics.cache.removals'">Cache Removals</th>
+        <th scope="col" class="text-end" [translate]="'metrics.cache.evictions'">Cache Evictions</th>
+        <th scope="col" class="text-end" [translate]="'metrics.cache.hitPercent'">Cache Hit %</th>
+        <th scope="col" class="text-end" [translate]="'metrics.cache.missPercent'">Cache Miss %</th>
       </tr>
     </thead>
     <tbody>

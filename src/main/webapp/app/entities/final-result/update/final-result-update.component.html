@@ -4,7 +4,7 @@
       <h2
         id="jhi-final-result-heading"
         data-cy="FinalResultCreateUpdateHeading"
-        jhiTranslate="gradeScopeIsticApp.finalResult.home.createOrEditLabel"
+        [translate]="'gradeScopeIsticApp.finalResult.home.createOrEditLabel'"
       >
         Create or edit a Final Result
       </h2>
@@ -13,7 +13,7 @@
         <jhi-alert-error></jhi-alert-error>
 
         <div class="row mb-3" [hidden]="editForm.get('id')!.value == null">
-          <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+          <label class="form-label" [translate]="'global.field.id'" for="field_id">ID</label>
           <input
             type="number"
             (mouseup)="$event.stopPropagation()"
@@ -27,7 +27,7 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.finalResult.note" for="field_note">Note</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.finalResult.note'" for="field_note">Note</label>
           <input
             type="number"
             (mouseup)="$event.stopPropagation()"
@@ -40,7 +40,7 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.finalResult.student" for="field_student">Student</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.finalResult.student'" for="field_student">Student</label>
           <select class="form-control" id="field_student" name="student" formControlName="studentId">
             <option [ngValue]="null"></option>
             <option [ngValue]="studentOption.id" *ngFor="let studentOption of students; trackBy: trackById">
@@ -50,7 +50,7 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.finalResult.exam" for="field_exam">Exam</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.finalResult.exam'" for="field_exam">Exam</label>
           <select class="form-control" id="field_exam" name="exam" formControlName="examId">
             <option [ngValue]="null"></option>
             <option [ngValue]="examOption.id" *ngFor="let examOption of exams; trackBy: trackById">{{ examOption.name }}</option>
@@ -60,7 +60,7 @@
 
       <div>
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span [translate]="'entity.action.cancel'">Cancel</span>
         </button>
 
         <button
@@ -70,7 +70,7 @@
           [disabled]="editForm.invalid || isSaving"
           class="btn btn-primary"
         >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+          <fa-icon icon="save"></fa-icon>&nbsp;<span [translate]="'entity.action.save'">Save</span>
         </button>
       </div>
     </form>

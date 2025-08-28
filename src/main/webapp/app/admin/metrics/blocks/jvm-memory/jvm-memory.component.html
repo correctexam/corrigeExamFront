@@ -1,4 +1,4 @@
-<h4 jhiTranslate="metrics.jvm.memory.title">Memory</h4>
+<h4 [translate]="'metrics.jvm.memory.title'">Memory</h4>
 
 <div *ngIf="!updating && jvmMemoryMetrics">
   <div *ngFor="let entry of jvmMemoryMetrics | keyvalue">

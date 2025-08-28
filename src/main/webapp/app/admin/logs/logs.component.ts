@@ -6,14 +6,14 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { SortByDirective } from '../../shared/sort/sort-by.directive';
 import { SortDirective } from '../../shared/sort/sort.directive';
 import { FormsModule } from '@angular/forms';
-import { TranslateDirective } from '../../shared/language/translate.directive';
 import { NgIf, NgFor, NgClass, SlicePipe } from '@angular/common';
+import { TranslateDirective } from '@ngx-translate/core';
 
 @Component({
   selector: 'jhi-logs',
   templateUrl: './logs.component.html',
   standalone: true,
-  imports: [NgIf, TranslateDirective, FormsModule, SortDirective, SortByDirective, FaIconComponent, NgFor, NgClass, SlicePipe],
+  imports: [TranslateDirective, NgIf, FormsModule, SortDirective, SortByDirective, FaIconComponent, NgFor, NgClass, SlicePipe],
 })
 export class LogsComponent implements OnInit {
   loggers?: Log[];

@@ -1,11 +1,11 @@
 <div>
   <h2 id="page-heading" data-cy="QuestionHeading">
-    <span jhiTranslate="gradeScopeIsticApp.question.home.title">Questions</span>
+    <span [translate]="'gradeScopeIsticApp.question.home.title'">Questions</span>
 
     <div class="d-flex justify-content-end">
       <button class="btn btn-info me-2" (click)="loadPage()" [disabled]="isLoading">
         <fa-icon icon="sync" [animation]="'spin'"></fa-icon>
-        <span jhiTranslate="gradeScopeIsticApp.question.home.refreshListLabel">Refresh List</span>
+        <span [translate]="'gradeScopeIsticApp.question.home.refreshListLabel'">Refresh List</span>
       </button>
 
       <button
@@ -15,7 +15,7 @@
         [routerLink]="['/question/new']"
       >
         <fa-icon icon="plus"></fa-icon>
-        <span jhiTranslate="gradeScopeIsticApp.question.home.createLabel"> Create a new Question </span>
+        <span [translate]="'gradeScopeIsticApp.question.home.createLabel'"> Create a new Question </span>
       </button>
     </div>
   </h2>
@@ -25,37 +25,37 @@
   <jhi-alert></jhi-alert>
 
   <div class="alert alert-warning" id="no-result" *ngIf="questions?.length === 0">
-    <span jhiTranslate="gradeScopeIsticApp.question.home.notFound">No questions found</span>
+    <span [translate]="'gradeScopeIsticApp.question.home.notFound'">No questions found</span>
   </div>
 
   <div class="table-responsive" id="entities" *ngIf="questions && questions.length > 0">
     <table class="table table-striped" aria-describedby="page-heading">
       <thead>
         <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="loadPage()">
-          <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
+          <th scope="col" jhiSortBy="id"><span [translate]="'global.field.id'">ID</span> <fa-icon icon="sort"></fa-icon></th>
           <th scope="col" jhiSortBy="numero">
-            <span jhiTranslate="gradeScopeIsticApp.question.numero">Numero</span> <fa-icon icon="sort"></fa-icon>
+            <span [translate]="'gradeScopeIsticApp.question.numero'">Numero</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="point">
-            <span jhiTranslate="gradeScopeIsticApp.question.point">Point</span> <fa-icon icon="sort"></fa-icon>
+            <span [translate]="'gradeScopeIsticApp.question.point'">Point</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="step">
-            <span jhiTranslate="gradeScopeIsticApp.question.step">Step</span> <fa-icon icon="sort"></fa-icon>
+            <span [translate]="'gradeScopeIsticApp.question.step'">Step</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="validExpression">
-            <span jhiTranslate="gradeScopeIsticApp.question.validExpression">Valid Expression</span> <fa-icon icon="sort"></fa-icon>
+            <span [translate]="'gradeScopeIsticApp.question.validExpression'">Valid Expression</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="gradeType">
-            <span jhiTranslate="gradeScopeIsticApp.question.gradeType">Grade Type</span> <fa-icon icon="sort"></fa-icon>
+            <span [translate]="'gradeScopeIsticApp.question.gradeType'">Grade Type</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="zone.id">
-            <span jhiTranslate="gradeScopeIsticApp.question.zone">Zone</span> <fa-icon icon="sort"></fa-icon>
+            <span [translate]="'gradeScopeIsticApp.question.zone'">Zone</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="type.algoName">
-            <span jhiTranslate="gradeScopeIsticApp.question.type">Type</span> <fa-icon icon="sort"></fa-icon>
+            <span [translate]="'gradeScopeIsticApp.question.type'">Type</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="exam.name">
-            <span jhiTranslate="gradeScopeIsticApp.question.exam">Exam</span> <fa-icon icon="sort"></fa-icon>
+            <span [translate]="'gradeScopeIsticApp.question.exam'">Exam</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col"></th>
         </tr>
@@ -69,7 +69,7 @@
           <td>{{ question.point }}</td>
           <td>{{ question.step }}</td>
           <td>{{ question.validExpression }}</td>
-          <td jhiTranslate="{{ 'gradeScopeIsticApp.GradeType.' + question.gradeType }}">{{ question.gradeType }}</td>
+          <td translate="{{ 'gradeScopeIsticApp.GradeType.' + question.gradeType }}">{{ question.gradeType }}</td>
           <td>
             <div *ngIf="question.zoneId">
               <a [routerLink]="['/zone', question.zoneId, 'view']">{{ question.zoneId }}</a>
@@ -89,17 +89,17 @@
             <div class="btn-group">
               <button type="submit" [routerLink]="['/question', question.id, 'view']" class="btn btn-info btn-sm">
                 <fa-icon icon="eye"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+                <span class="d-none d-md-inline" [translate]="'entity.action.view'">View</span>
               </button>
 
               <button type="submit" [routerLink]="['/question', question.id, 'edit']" class="btn btn-primary btn-sm">
                 <fa-icon icon="pencil-alt"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+                <span class="d-none d-md-inline" [translate]="'entity.action.edit'">Edit</span>
               </button>
 
               <button type="submit" (click)="delete(question)" class="btn btn-danger btn-sm">
                 <fa-icon icon="times"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+                <span class="d-none d-md-inline" [translate]="'entity.action.delete'">Delete</span>
               </button>
             </div>
           </td>

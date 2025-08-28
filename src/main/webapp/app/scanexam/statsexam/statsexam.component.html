@@ -20,7 +20,7 @@
 <div class="grid grid-nogutter">
   <div class="col-8">
     <h2>
-      <span jhiTranslate="scanexam.statexam"></span>
+      <span [translate]="'scanexam.statexam'"></span>
       <span *ngIf="infosQuestions.length !== 0">{{ infosQuestions[0].examName }}</span>
     </h2>
   </div>
@@ -33,7 +33,7 @@
       class="p-button p-button-primary"
       (click)="gotoResultat()"
     >
-      <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackresultat"></span>
+      <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'scanexam.gobackresultat'"></span>
     </button>
   </div>
 </div>
@@ -42,23 +42,23 @@
     <p-card [header]="'scanexam.statexam2' | translate">
       <div class="statsgenerales-container">
         <div class="statgenerale">
-          <span jhiTranslate="scanexam.nbrstudents"></span
+          <span [translate]="'scanexam.nbrstudents'"></span
           ><span>{{ this.studentsMarks.length }} ({{ this.nbStdABI }} {{ this.nbStdABI > 1 ? 'absences' : 'absence' }})</span>
         </div>
         <div class="statgenerale">
-          <span jhiTranslate="scanexam.average"></span><span>{{ this.getMeanExam().toFixed(2) }}/{{ this.getBaremeExam() }}</span>
+          <span [translate]="'scanexam.average'"></span><span>{{ this.getMeanExam().toFixed(2) }}/{{ this.getBaremeExam() }}</span>
         </div>
         <div class="statgenerale">
-          <span jhiTranslate="scanexam.ecarttype"></span><span>{{ this.getStdDeviationExam().toFixed(2) }}</span>
+          <span [translate]="'scanexam.ecarttype'"></span><span>{{ this.getStdDeviationExam().toFixed(2) }}</span>
         </div>
         <div class="statgenerale">
-          <span jhiTranslate="scanexam.mediane"></span> <span>{{ this.getMedianExam() }}/{{ this.getBaremeExam() }}</span>
+          <span [translate]="'scanexam.mediane'"></span> <span>{{ this.getMedianExam() }}/{{ this.getBaremeExam() }}</span>
         </div>
         <div class="statgenerale">
-          <span jhiTranslate="scanexam.notemax"></span><span>{{ this.getMaxMarkExam() }}/{{ this.getBaremeExam() }}</span>
+          <span [translate]="'scanexam.notemax'"></span><span>{{ this.getMaxMarkExam() }}/{{ this.getBaremeExam() }}</span>
         </div>
         <div class="statgenerale">
-          <span jhiTranslate="scanexam.notemin"></span><span>{{ this.getMinMarkExam() }}/{{ this.getBaremeExam() }}</span>
+          <span [translate]="'scanexam.notemin'"></span><span>{{ this.getMinMarkExam() }}/{{ this.getBaremeExam() }}</span>
         </div>
       </div>
     </p-card>
@@ -132,10 +132,10 @@
         >
           <ng-template pTemplate="header">
             <tr>
-              <th pSortableColumn="ine"><span jhiTranslate="scanexam.ine"></span><p-sortIcon field="ine"></p-sortIcon></th>
-              <th pSortableColumn="nom"><span jhiTranslate="scanexam.nom"></span> <p-sortIcon field="nom"></p-sortIcon></th>
-              <th pSortableColumn="prenom"><span jhiTranslate="scanexam.prenom"></span><p-sortIcon field="prenom"></p-sortIcon></th>
-              <th pSortableColumn="note"><span jhiTranslate="scanexam.note"></span><p-sortIcon field="note"></p-sortIcon></th>
+              <th pSortableColumn="ine"><span [translate]="'scanexam.ine'"></span><p-sortIcon field="ine"></p-sortIcon></th>
+              <th pSortableColumn="nom"><span [translate]="'scanexam.nom'"></span> <p-sortIcon field="nom"></p-sortIcon></th>
+              <th pSortableColumn="prenom"><span [translate]="'scanexam.prenom'"></span><p-sortIcon field="prenom"></p-sortIcon></th>
+              <th pSortableColumn="note"><span [translate]="'scanexam.note'"></span><p-sortIcon field="note"></p-sortIcon></th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-student>
@@ -165,10 +165,10 @@
         >
           <ng-template pTemplate="header">
             <tr>
-              <th pSortableColumn="ine"><span jhiTranslate="scanexam.ine"></span><p-sortIcon field="ine"></p-sortIcon></th>
-              <th pSortableColumn="nom"><span jhiTranslate="scanexam.nom"></span> <p-sortIcon field="nom"></p-sortIcon></th>
-              <th pSortableColumn="prenom"><span jhiTranslate="scanexam.prenom"></span><p-sortIcon field="prenom"></p-sortIcon></th>
-              <th pSortableColumn="note"><span jhiTranslate="scanexam.note"></span><p-sortIcon field="note"></p-sortIcon></th>
+              <th pSortableColumn="ine"><span [translate]="'scanexam.ine'"></span><p-sortIcon field="ine"></p-sortIcon></th>
+              <th pSortableColumn="nom"><span [translate]="'scanexam.nom'"></span> <p-sortIcon field="nom"></p-sortIcon></th>
+              <th pSortableColumn="prenom"><span [translate]="'scanexam.prenom'"></span><p-sortIcon field="prenom"></p-sortIcon></th>
+              <th pSortableColumn="note"><span [translate]="'scanexam.note'"></span><p-sortIcon field="note"></p-sortIcon></th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-student>
@@ -220,7 +220,7 @@
       </ng-template>
 
       <ng-template pTemplate="subheader" [ngIf]="etudiantSelec === null || etudiantSelec === undefined">
-        <span jhiTranslate="scanexam.noselectedstudent"></span>
+        <span [translate]="'scanexam.noselectedstudent'"></span>
       </ng-template>
       <ng-template pTemplate="content">
         <div *ngIf="etudiantSelec !== null && etudiantSelec !== undefined" class="progbar">

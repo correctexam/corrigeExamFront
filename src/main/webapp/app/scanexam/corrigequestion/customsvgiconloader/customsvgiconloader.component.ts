@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { FileUpload, FileUploadModule } from 'primeng/fileupload';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -8,7 +8,6 @@ import { PreferenceService } from '../../preference-page/preference.service';
 import { AvatarGroupModule } from 'primeng/avatargroup';
 import { OverlayBadgeModule } from 'primeng/overlaybadge';
 import { TextareaModule } from 'primeng/textarea';
-import { TranslateDirective } from 'app/shared/language/translate.directive';
 import { TooltipModule } from 'primeng/tooltip';
 import { saveAs } from 'file-saver';
 
@@ -20,8 +19,9 @@ import { saveAs } from 'file-saver';
   imports: [
     TooltipModule,
     TextareaModule,
+
     TranslateDirective,
-    TranslateModule,
+    TranslatePipe,
     FileUploadModule,
     FormsModule,
     NgIf,

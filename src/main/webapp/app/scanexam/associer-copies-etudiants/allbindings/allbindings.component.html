@@ -1,15 +1,15 @@
 <p-table [value]="students" [tableStyle]="{ 'min-width': '60rem' }">
   <ng-template pTemplate="header">
     <tr>
-      <th *ngIf="showName" [style]="columnstyle"><span jhiTranslate="scanexam.nom">Name</span></th>
-      <th *ngIf="showFirstname" [style]="columnstyle"><span jhiTranslate="scanexam.prenom">FirsName</span></th>
+      <th *ngIf="showName" [style]="columnstyle"><span [translate]="'scanexam.nom'">Name</span></th>
+      <th *ngIf="showFirstname" [style]="columnstyle"><span [translate]="'scanexam.prenom'">FirsName</span></th>
       <th *ngIf="showIne" [style]="columnstyle">INE</th>
-      <th *ngIf="showNbName" [style]="columnstyle"><span jhiTranslate="scanexam.nom">Name</span></th>
+      <th *ngIf="showNbName" [style]="columnstyle"><span [translate]="'scanexam.nom'">Name</span></th>
       <th pSortableColumn="recognizedStudentShow" style="width: 18%">
-        <span jhiTranslate="scanexam.recognizedstudent">Recognized Student</span> <p-sortIcon field="student"></p-sortIcon>
+        <span [translate]="'scanexam.recognizedstudent'">Recognized Student</span> <p-sortIcon field="student"></p-sortIcon>
       </th>
       <th pSortableColumn="predictionprecision" style="width: 4%">
-        <span jhiTranslate="scanexam.score">Probability</span> <p-sortIcon field="probability"></p-sortIcon>
+        <span [translate]="'scanexam.score'">Probability</span> <p-sortIcon field="probability"></p-sortIcon>
       </th>
       <th style="width: 3%"></th>
       <th style="width: 3%"></th>
@@ -37,7 +37,7 @@
           class="p-button p-button-primary"
           (click)="bindStudent(sheet.recognizedStudent, sheet.currentStudent, sheet)"
         >
-          <span jhiTranslate="scanexam.bind">bind</span>
+          <span [translate]="'scanexam.bind'">bind</span>
         </button>
       </td>
       <td>

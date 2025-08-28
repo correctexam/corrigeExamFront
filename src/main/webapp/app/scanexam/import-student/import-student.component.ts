@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { DataUtils } from 'app/core/util/data-util.service';
 import { ICourse } from 'app/entities/course/course.model';
@@ -19,7 +19,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
-import { TranslateDirective } from '../../shared/language/translate.directive';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { MessageModule } from 'primeng/message';
 import { NgIf, NgClass, NgFor } from '@angular/common';
@@ -60,7 +59,7 @@ interface MDWStudent {
     NgIf,
     MessageModule,
     FaIconComponent,
-    TranslateDirective,
+
     TooltipModule,
     NgClass,
     DialogModule,
@@ -72,7 +71,8 @@ interface MDWStudent {
     NgFor,
     InplaceModule,
     FileUploadModule,
-    TranslateModule,
+    TranslateDirective,
+    TranslatePipe,
   ],
 })
 export class ImportStudentComponent implements OnInit {

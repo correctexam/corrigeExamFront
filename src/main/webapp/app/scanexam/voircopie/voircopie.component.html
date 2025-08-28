@@ -29,8 +29,8 @@
     <div class="grid grid-nogutter">
       <div class="col-8">
         <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">
-          <span jhiTranslate="scanexam.votrecopie">Votre copie :</span>
-          <span *ngFor="let st of selectionStudents"> {{ st.name }} {{ st.firstname }}</span> (<span jhiTranslate="scanexam.note1"
+          <span [translate]="'scanexam.votrecopie'">Votre copie :</span>
+          <span *ngFor="let st of selectionStudents"> {{ st.name }} {{ st.firstname }}</span> (<span translate="scanexam.note1"
             >Note :</span
           >
           {{ note | async | number: '1.2-2' }})
@@ -44,7 +44,7 @@
           <button
             pButton
             (click)="showGalleria()"
-            jhiTranslate="scanexam.showgalleria"
+            [translate]="'scanexam.showgalleria'"
             [pTooltip]="'scanexam.showFullPageTooltip' | translate"
             [tooltipPosition]="'bottom'"
           >
@@ -91,7 +91,7 @@
               (questions![0].libelle === undefined || questions![0].libelle === '')
             "
           >
-            <span jhiTranslate="scanexam.question1">Question </span>{{ questionNumeros[questionindex] }}
+            <span translate="scanexam.question1">Question </span>{{ questionNumeros[questionindex] }}
           </h2>
         </div>
         <div class="d-flex justify-content-center" *ngFor="let k of questions; let i = index">
@@ -101,14 +101,14 @@
         </div>
         <div style="padding-top: 1rem; padding-bottom: 1rem"></div>
         <div class="d-flex justify-content-center">
-          <span jhiTranslate="scanexam.showsample"> Voir des exemples de solutions correctes pour cette question :</span>&nbsp;<span
+          <span [translate]="'scanexam.showsample'"> Voir des exemples de solutions correctes pour cette question :</span>&nbsp;<span
             *ngFor="let item of bestSolutions; let index = index"
             ><a target="_blank" [routerLink]="item">{{ index + 1 }}</a> <span *ngIf="index !== bestSolutions.length - 1">, </span></span
           >
-          <span *ngIf="bestSolutions.length === 0" jhiTranslate="scanexam.nogoodsolution">Aucune bonne solution identifiée</span>
+          <span *ngIf="bestSolutions.length === 0" [translate]="'scanexam.nogoodsolution'">Aucune bonne solution identifiée</span>
         </div>
         <div class="d-flex justify-content-center">
-          <a *ngIf="email !== ''" target="_blank" [href]="email" jhiTranslate="scanexam.echangemail"
+          <a *ngIf="email !== ''" target="_blank" [href]="email" [translate]="'scanexam.echangemail'"
             >Echange avec l'équipe pédagogique suite à une incompréhension de la correction</a
           >
         </div>
@@ -118,7 +118,7 @@
             *ngIf="correctionLink"
             target="_blank"
             [routerLink]="correctionLink"
-            jhiTranslate="scanexam.gotoCorrection"
+            [translate]="'scanexam.gotoCorrection'"
             [pTooltip]="'scanexam.gotoCorrectionTooltipView' | translate"
             >Aller à la vue correction</a
           >
@@ -128,7 +128,7 @@
       <div class="col-12 sm:col-12 md:col-12 lg:col-3 xl:col-2">
         <div class="grid grid-nogutter">
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
-            <span jhiTranslate="scanexam.noteattribuee">Note attribuée :</span>
+            <span [translate]="'scanexam.noteattribuee'">Note attribuée :</span>
             <span
               *ngIf="
                 questionStep > 0 &&
@@ -156,16 +156,16 @@
               >{{ resp!.note! / 100 | number: '1.0-2' }}</span
             >
             <span *ngIf="questions && questions.length > 0 && resp"> / {{ questions[0].point }} </span>
-            <span *ngIf="resp === undefined" jhiTranslate="scanexam.noneval">Non évalué</span>
+            <span *ngIf="resp === undefined" [translate]="'scanexam.noneval'">Non évalué</span>
 
             <!--  <p-button icon="pi pi-refresh"></p-button>-->
           </div>
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
-            <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
+            <label [translate]="'scanexam.removealignement'">Supprimer alignement: </label>
             <p-toggleSwitch [(ngModel)]="noalign" (onChange)="changeAlign()"></p-toggleSwitch>
           </div>
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
-            <label jhiTranslate="scanexam.zoomfactor">Facteur agrandissement: </label>
+            <label [translate]="'scanexam.zoomfactor'">Facteur agrandissement: </label>
             <p-slider *ngIf="noteSteps > 0" [(ngModel)]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImage()"> </p-slider>
           </div>
 
@@ -193,7 +193,7 @@
                   class="card-text"
                   *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT' && currentQuestion?.typeAlgoName !== 'QCM'"
                 >
-                  <span jhiTranslate="scanexam.noteassociecomment"> Note associée à ce commentaire :</span>
+                  <span [translate]="'scanexam.noteassociecomment'"> Note associée à ce commentaire :</span>
                   <span *ngIf="currentQuestion && currentQuestion?.gradeType === 'NEGATIVE'"> - </span
                   ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'POSITIVE'"> + </span>
                   <span *ngIf="questionStep > 0">{{ comment.grade! / questionStep }}</span>
@@ -217,13 +217,13 @@
                   <span *ngIf="comment.relative"> %</span>
                   <BR />
                   <span
-                    jhiTranslate="scanexam.hybridcommentStepCalcul"
+                    [translate]="'scanexam.hybridcommentStepCalcul'"
                     [pTooltip]="'scanexam.hybridcommentStepCalculTooltip' | translate"
                   ></span>
                   :
                   <span
-                    jhiTranslate="scanexam.hybridcommentStepCalculResult"
-                    [translateValues]="{
+                    [translate]="'scanexam.hybridcommentStepCalculResult'"
+                    [translateParams]="{
                       stepValue: comment.stepValue,
                       step: comment.step,
                       grade: comment.grade,

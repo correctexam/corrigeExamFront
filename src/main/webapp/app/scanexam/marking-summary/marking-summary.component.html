@@ -12,13 +12,13 @@
           (click)="cleanSheet()"
           [pTooltip]="'scanexam.cleanSheetTooltip' | translate"
         >
-          <fa-icon icon="trash-alt"></fa-icon>&nbsp;<span jhiTranslate="scanexam.cleanSheet"></span>
+          <fa-icon icon="trash-alt"></fa-icon>&nbsp;<span [translate]="'scanexam.cleanSheet'"></span>
         </button>
       </h1>
     </div>
     <div class="col-4">
       <button type="submit" class="p-button p-button-primary" (click)="goToExam()">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam"></span>
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'scanexam.gobackexam'"></span>
       </button>
     </div>
   </div>
@@ -56,7 +56,7 @@
                 [tooltipZIndex]="'3000'"
                 [pTooltip]="'scanexam.continuetooltip' | translate"
               >
-                <span jhiTranslate="scanexam.startcorrect"></span>
+                <span [translate]="'scanexam.startcorrect'"></span>
               </button>
               <button
                 [routerLink]="'/compareanswer/' + this.examId + '/' + q.id"
@@ -66,7 +66,7 @@
                 [tooltipZIndex]="'3000'"
                 [pTooltip]="'scanexam.voirtoutescopiestooltip' | translate"
               >
-                <span jhiTranslate="scanexam.voirtoutescopies"></span>
+                <span [translate]="'scanexam.voirtoutescopies'"></span>
               </button>
             </div>
 
@@ -86,7 +86,7 @@
                 [tooltipZIndex]="'3000'"
                 [pTooltip]="'scanexam.continuetooltip' | translate"
               >
-                <span jhiTranslate="scanexam.continue"></span>
+                <span [translate]="'scanexam.continue'"></span>
               </button>
               <button
                 [routerLink]="'/compareanswer/' + this.examId + '/' + q.id"
@@ -96,7 +96,7 @@
                 [tooltipZIndex]="'3000'"
                 [pTooltip]="'scanexam.voirtoutescopiestooltip' | translate"
               >
-                <span jhiTranslate="scanexam.voirtoutescopies"></span>
+                <span [translate]="'scanexam.voirtoutescopies'"></span>
               </button>
             </div>
             <div class="col" *ngIf="q.answeredSheets === dataExam.sheets.length">
@@ -108,7 +108,7 @@
                 [tooltipZIndex]="'3000'"
                 [pTooltip]="'scanexam.voirtooltip' | translate"
               >
-                <span jhiTranslate="scanexam.voir"></span>
+                <span [translate]="'scanexam.voir'"></span>
               </button>
               <button
                 [routerLink]="'/compareanswer/' + this.examId + '/' + q.id"
@@ -118,7 +118,7 @@
                 [tooltipZIndex]="'3000'"
                 [pTooltip]="'scanexam.voirtoutescopiestooltip' | translate"
               >
-                <span jhiTranslate="scanexam.voirtoutescopies"></span>
+                <span [translate]="'scanexam.voirtoutescopies'"></span>
               </button>
             </div>
           </div>

@@ -2,7 +2,7 @@
   <div class="col-8">
     <div *ngIf="hybridGradedComment">
       <h2 data-cy="hybridGradedCommentDetailsHeading">
-        <span jhiTranslate="gradeScopeIsticApp.hybridGradedComment.detail.title">Hybrid Graded Comment</span>
+        <span [translate]="'gradeScopeIsticApp.hybridGradedComment.detail.title'">Hybrid Graded Comment</span>
       </h2>
 
       <hr />
@@ -12,31 +12,31 @@
       <jhi-alert></jhi-alert>
 
       <dl class="row-md jh-entity-details">
-        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dt><span [translate]="'global.field.id'">ID</span></dt>
         <dd>
           <span>{{ hybridGradedComment.id }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.hybridGradedComment.text">Text</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.hybridGradedComment.text'">Text</span></dt>
         <dd>
           <span>{{ hybridGradedComment.text }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.hybridGradedComment.description">Description</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.hybridGradedComment.description'">Description</span></dt>
         <dd>
           <span>{{ hybridGradedComment.description }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.hybridGradedComment.grade">Grade</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.hybridGradedComment.grade'">Grade</span></dt>
         <dd>
           <span>{{ hybridGradedComment.grade }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.hybridGradedComment.relative">Relative</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.hybridGradedComment.relative'">Relative</span></dt>
         <dd>
           <span>{{ hybridGradedComment.relative }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.hybridGradedComment.step">Step</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.hybridGradedComment.step'">Step</span></dt>
         <dd>
           <span>{{ hybridGradedComment.step }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.hybridGradedComment.question">Question</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.hybridGradedComment.question'">Question</span></dt>
         <dd>
           <div *ngIf="hybridGradedComment.questionId">
             <a [routerLink]="['/question', hybridGradedComment.questionId, 'view']">{{ hybridGradedComment.questionId }}</a>
@@ -45,11 +45,11 @@
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Retour</span>
       </button>
 
       <button type="button" [routerLink]="['/hybrid-graded-comment', hybridGradedComment.id, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Editer</span>
       </button>
     </div>
   </div>

@@ -1,16 +1,18 @@
 <div *ngIf="account == null" class="grid grid-nogutter surface-section text-800">
   <div class="sm:col-12 md:col-12 lg:col-6 p-6 text-center md:text-left flex align-items-center">
     <section>
-      <span class="block text-6xl font-bold mb-1" jhiTranslate="home.titleu">Corriger vos copies plus efficacement ✔️</span>
-      <div class="text-6xl text-primary font-bold mb-3" jhiTranslate="home.subtitleu">un retour à vos étudiants en moins d'une journée</div>
-      <p class="mt-0 mb-4 text-700 line-height-3" jhiTranslate="home.slogan">
+      <span class="block text-6xl font-bold mb-1" [translate]="'home.titleu'">Corriger vos copies plus efficacement ✔️</span>
+      <div class="text-6xl text-primary font-bold mb-3" [translate]="'home.subtitleu'">
+        un retour à vos étudiants en moins d'une journée
+      </div>
+      <p class="mt-0 mb-4 text-700 line-height-3" [translate]="'home.slogan'">
         Scanner, corriger par lots, soyez assisté par de l'IA, faites un retour précis à vos étudiants, depuis un PC ou une tablette
       </p>
 
       <ng-template [ngIf]="CONNECTION_METHOD === CONNECTION_METHOD_LOCAL">
         <div>
           <p-button (click)="login()" pbutton pRipple class="mr-3">
-            <span class="p-button-label" jhiTranslate="home.login">Authentifiez vous</span><span class="p-ink"></span>
+            <span class="p-button-label" [translate]="'home.login'">Authentifiez vous</span><span class="p-ink"></span>
           </p-button>
           <button
             routerLink="account/register"
@@ -19,7 +21,7 @@
             type="button"
             class="p-element p-ripple p-button-outlined p-button p-component mr-3"
           >
-            <span class="p-button-label" jhiTranslate="home.register">Créer un compte</span><span class="p-ink"></span>
+            <span class="p-button-label" [translate]="'home.register'">Créer un compte</span><span class="p-ink"></span>
           </button>
         </div>
       </ng-template>
@@ -27,7 +29,7 @@
       <ng-template [ngIf]="CONNECTION_METHOD === CONNECTION_METHOD_SHIB">
         <div>
           <a href="/Shibboleth.sso/Login?target={{ SERVICE_URL }}/api/shib/redirection" class="p-element mr-3 p-button p-component">
-            <span class="p-button-label" jhiTranslate="home.login">Authentifiez vous</span><span class="p-ink"></span>
+            <span class="p-button-label" [translate]="'home.login'">Authentifiez vous</span><span class="p-ink"></span>
           </a>
         </div>
       </ng-template>
@@ -35,7 +37,7 @@
       <ng-template [ngIf]="CONNECTION_METHOD === CONNECTION_METHOD_CAS">
         <div>
           <a href="{{ CAS_SERVER_URL }}/login?service={{ SERVICE_URL }}" class="p-element mr-3 p-button p-component">
-            <span class="p-button-label" jhiTranslate="home.login">>Authentifiez vous</span><span class="p-ink"></span>
+            <span class="p-button-label" [translate]="'home.login'">>Authentifiez vous</span><span class="p-ink"></span>
           </a>
         </div>
       </ng-template>
@@ -57,12 +59,12 @@
         <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title" jhiTranslate="scanexam.courseimport">Import</h5>
+              <h5 class="card-title" [translate]="'scanexam.courseimport'">Import</h5>
 
               <div class="card-text">
                 <label
                   for="switch1"
-                  jhiTranslate="scanexam.studentdata"
+                  [translate]="'scanexam.studentdata'"
                   [tooltipZIndex]="'3000'"
                   [pTooltip]="'scanexam.studentdatatooltip' | translate"
                   >données étudiantes:</label
@@ -125,10 +127,10 @@
   </div>
   <div *ngIf="this.account?.authorities?.includes('ROLE_ADMIN')" class="row">
     <div class="col-md-12">
-      <h1 class="display-4"><span jhiTranslate="home.welcomeadmin">Bienvenue sur la page d'administration de cette application</span></h1>
+      <h1 class="display-4"><span [translate]="'home.welcomeadmin'">Bienvenue sur la page d'administration de cette application</span></h1>
 
-      <p class="lead" jhiTranslate="home.welcomeadminsub">Vous pouvez accéder aux données depuis le menu entité</p>
-      <p jhiTranslate="home.textadmin">Vous pouvez gérer les utilsiateurs et les services depuis le menu administration.</p>
+      <p class="lead" [translate]="'home.welcomeadminsub'">Vous pouvez accéder aux données depuis le menu entité</p>
+      <p [translate]="'home.textadmin'">Vous pouvez gérer les utilsiateurs et les services depuis le menu administration.</p>
       <jhi-mes-cours #mescours [showImage]="false"></jhi-mes-cours>
     </div>
   </div>

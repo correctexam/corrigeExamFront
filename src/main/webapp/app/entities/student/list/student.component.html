@@ -1,11 +1,11 @@
 <div>
   <h2 id="page-heading" data-cy="StudentHeading">
-    <span jhiTranslate="gradeScopeIsticApp.student.home.title">Students</span>
+    <span [translate]="'gradeScopeIsticApp.student.home.title'">Students</span>
 
     <div class="d-flex justify-content-end">
       <button class="btn btn-info me-2" (click)="loadPage()" [disabled]="isLoading">
         <fa-icon icon="sync" [animation]="'spin'"></fa-icon>
-        <span jhiTranslate="gradeScopeIsticApp.student.home.refreshListLabel">Refresh List</span>
+        <span [translate]="'gradeScopeIsticApp.student.home.refreshListLabel'">Refresh List</span>
       </button>
 
       <button
@@ -15,7 +15,7 @@
         [routerLink]="['/student/new']"
       >
         <fa-icon icon="plus"></fa-icon>
-        <span jhiTranslate="gradeScopeIsticApp.student.home.createLabel"> Create a new Student </span>
+        <span [translate]="'gradeScopeIsticApp.student.home.createLabel'"> Create a new Student </span>
       </button>
     </div>
   </h2>
@@ -25,28 +25,28 @@
   <jhi-alert></jhi-alert>
 
   <div class="alert alert-warning" id="no-result" *ngIf="students?.length === 0">
-    <span jhiTranslate="gradeScopeIsticApp.student.home.notFound">No students found</span>
+    <span [translate]="'gradeScopeIsticApp.student.home.notFound'">No students found</span>
   </div>
 
   <div class="table-responsive" id="entities" *ngIf="students && students.length > 0">
     <table class="table table-striped" aria-describedby="page-heading">
       <thead>
         <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="loadPage()">
-          <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
+          <th scope="col" jhiSortBy="id"><span [translate]="'global.field.id'">ID</span> <fa-icon icon="sort"></fa-icon></th>
           <th scope="col" jhiSortBy="name">
-            <span jhiTranslate="gradeScopeIsticApp.student.name">Name</span> <fa-icon icon="sort"></fa-icon>
+            <span [translate]="'gradeScopeIsticApp.student.name'">Name</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="firstname">
-            <span jhiTranslate="gradeScopeIsticApp.student.firstname">Firstname</span> <fa-icon icon="sort"></fa-icon>
+            <span [translate]="'gradeScopeIsticApp.student.firstname'">Firstname</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="ine">
-            <span jhiTranslate="gradeScopeIsticApp.student.ine">Ine</span> <fa-icon icon="sort"></fa-icon>
+            <span [translate]="'gradeScopeIsticApp.student.ine'">Ine</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="caslogin">
-            <span jhiTranslate="gradeScopeIsticApp.student.caslogin">Caslogin</span> <fa-icon icon="sort"></fa-icon>
+            <span [translate]="'gradeScopeIsticApp.student.caslogin'">Caslogin</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col" jhiSortBy="mail">
-            <span jhiTranslate="gradeScopeIsticApp.student.mail">Mail</span> <fa-icon icon="sort"></fa-icon>
+            <span [translate]="'gradeScopeIsticApp.student.mail'">Mail</span> <fa-icon icon="sort"></fa-icon>
           </th>
           <th scope="col"></th>
         </tr>
@@ -70,7 +70,7 @@
                 data-cy="entityDetailsButton"
               >
                 <fa-icon icon="eye"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+                <span class="d-none d-md-inline" [translate]="'entity.action.view'">View</span>
               </button>
 
               <button
@@ -80,12 +80,12 @@
                 data-cy="entityEditButton"
               >
                 <fa-icon icon="pencil-alt"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+                <span class="d-none d-md-inline" [translate]="'entity.action.edit'">Edit</span>
               </button>
 
               <button type="submit" (click)="delete(student)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
                 <fa-icon icon="times"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+                <span class="d-none d-md-inline" [translate]="'entity.action.delete'">Delete</span>
               </button>
             </div>
           </td>

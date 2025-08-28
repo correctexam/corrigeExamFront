@@ -11,8 +11,12 @@ export class MissingTranslationHandlerImpl implements MissingTranslationHandler 
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function translatePartialLoader(http: HttpClient): TranslateLoader {
-  return new TranslateHttpLoader(http, 'i18n/', `.json?_=${I18N_HASH}`);
+  // return new TranslateHttpLoader(http, 'i18n/', `.json?_=${I18N_HASH}`);
+  const t = new TranslateHttpLoader();
+
+  return t;
 }
 
 export function missingTranslationHandler(): MissingTranslationHandler {

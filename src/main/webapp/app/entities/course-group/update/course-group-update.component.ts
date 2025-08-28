@@ -15,7 +15,6 @@ import { CourseService } from 'app/entities/course/service/course.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { NgIf, NgFor } from '@angular/common';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 type SelectableEntity = IStudent | ICourse;
 
@@ -23,7 +22,7 @@ type SelectableEntity = IStudent | ICourse;
   selector: 'jhi-course-group-update',
   templateUrl: './course-group-update.component.html',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, TranslateDirective, AlertErrorComponent, NgIf, NgFor, FaIconComponent],
+  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, NgIf, NgFor, FaIconComponent],
 })
 export class CourseGroupUpdateComponent implements OnInit {
   isSaving = false;

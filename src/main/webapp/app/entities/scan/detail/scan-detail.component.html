@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
     <div *ngIf="scan">
-      <h2 data-cy="scanDetailsHeading"><span jhiTranslate="gradeScopeIsticApp.scan.detail.title">Scan</span></h2>
+      <h2 data-cy="scanDetailsHeading"><span [translate]="'gradeScopeIsticApp.scan.detail.title'">Scan</span></h2>
 
       <hr />
 
@@ -10,29 +10,29 @@
       <jhi-alert></jhi-alert>
 
       <dl class="row-md jh-entity-details">
-        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dt><span [translate]="'global.field.id'">ID</span></dt>
         <dd>
           <span>{{ scan.id }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.scan.name">Name</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.scan.name'">Name</span></dt>
         <dd>
           <span>{{ scan.name }}</span>
         </dd>
-        <dt><span jhiTranslate="gradeScopeIsticApp.scan.content">Content</span></dt>
+        <dt><span [translate]="'gradeScopeIsticApp.scan.content'">Content</span></dt>
         <dd>
           <div *ngIf="scan.content">
-            <a (click)="openFile(scan.content, scan.contentContentType)" jhiTranslate="entity.action.open">open</a>
+            <a (click)="openFile(scan.content, scan.contentContentType)" [translate]="'entity.action.open'">open</a>
             {{ scan.contentContentType }}, {{ byteSize(scan.content) }}
           </div>
         </dd>
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
       </button>
 
       <button type="button" [routerLink]="['/scan', scan.id, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
       </button>
     </div>
   </div>

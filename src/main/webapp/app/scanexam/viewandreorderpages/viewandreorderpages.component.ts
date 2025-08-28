@@ -16,7 +16,7 @@ import {
   ViewChildren,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 import { ExamService } from 'app/entities/exam/service/exam.service';
@@ -35,7 +35,6 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { NgIf, NgFor, NgClass, KeyValuePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SelectButtonModule } from 'primeng/selectbutton';
-import { TranslateDirective } from '../../shared/language/translate.directive';
 import { ButtonModule } from 'primeng/button';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { PageToRotateOrDeleteComponent } from './pagetorotateordelete/pagetorotateordelete.component';
@@ -60,7 +59,6 @@ import { MessageService } from 'primeng/api';
   styleUrls: ['./viewandreorderpages.component.scss'],
   standalone: true,
   imports: [
-    TranslateDirective,
     ButtonModule,
     SelectButtonModule,
     FormsModule,
@@ -72,7 +70,8 @@ import { MessageService } from 'primeng/api';
     TooltipModule,
     FaIconComponent,
     KeyValuePipe,
-    TranslateModule,
+    TranslateDirective,
+    TranslatePipe,
     ImageModule,
     DialogModule,
     NgxExtendedPdfViewerModule,
