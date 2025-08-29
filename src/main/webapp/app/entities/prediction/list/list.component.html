@@ -31,24 +31,26 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let prediction of predictions">
-        <td>{{ prediction.id }}</td>
-        <td>{{ prediction.questionId }}</td>
-        <td>{{ prediction.sheetId }}</td>
-        <td>{{ prediction.questionNumber }}</td>
-        <td>{{ prediction.text }}</td>
-        <td>
-          <button *ngIf="prediction.id !== undefined" type="button" class="btn btn-primary" (click)="view(prediction.id)">
-            <i class="fa fa-eye"></i> View
-          </button>
-          <button *ngIf="prediction.id !== undefined" type="button" class="btn btn-warning" (click)="edit(prediction.id)">
-            <i class="fa fa-pencil"></i> Edit
-          </button>
-          <button *ngIf="prediction.id !== undefined" type="button" class="btn btn-danger" (click)="delete(prediction.id)">
-            <i class="fa fa-trash"></i> Delete
-          </button>
-        </td>
-      </tr>
+      @for (prediction of predictions; track prediction) {
+        <tr>
+          <td>{{ prediction.id }}</td>
+          <td>{{ prediction.questionId }}</td>
+          <td>{{ prediction.sheetId }}</td>
+          <td>{{ prediction.questionNumber }}</td>
+          <td>{{ prediction.text }}</td>
+          <td>
+            @if (prediction.id !== undefined) {
+              <button type="button" class="btn btn-primary" (click)="view(prediction.id)"><i class="fa fa-eye"></i> View</button>
+            }
+            @if (prediction.id !== undefined) {
+              <button type="button" class="btn btn-warning" (click)="edit(prediction.id)"><i class="fa fa-pencil"></i> Edit</button>
+            }
+            @if (prediction.id !== undefined) {
+              <button type="button" class="btn btn-danger" (click)="delete(prediction.id)"><i class="fa fa-trash"></i> Delete</button>
+            }
+          </td>
+        </tr>
+      }
     </tbody>
   </table>
 </div>

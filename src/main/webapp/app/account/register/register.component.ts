@@ -7,13 +7,12 @@ import { EMAIL_ALREADY_USED_TYPE, LOGIN_ALREADY_USED_TYPE } from 'app/config/err
 import { RegisterService } from './register.service';
 import { RouterLink } from '@angular/router';
 import { PasswordStrengthBarComponent } from '../password/password-strength-bar/password-strength-bar.component';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'jhi-register',
   templateUrl: './register.component.html',
   standalone: true,
-  imports: [NgIf, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, RouterLink, TranslateDirective, TranslatePipe],
+  imports: [FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, RouterLink, TranslateDirective, TranslatePipe],
 })
 export class RegisterComponent implements AfterViewInit {
   @ViewChild('login', { static: false })

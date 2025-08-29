@@ -1,44 +1,44 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
-    <div *ngIf="finalResult">
-      <h2 data-cy="finalResultDetailsHeading"><span [translate]="'gradeScopeIsticApp.finalResult.detail.title'">Final Result</span></h2>
-
-      <hr />
-
-      <jhi-alert-error></jhi-alert-error>
-
-      <jhi-alert></jhi-alert>
-
-      <dl class="row-md jh-entity-details">
-        <dt><span [translate]="'global.field.id'">ID</span></dt>
-        <dd>
-          <span>{{ finalResult.id }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.finalResult.note'">Note</span></dt>
-        <dd>
-          <span>{{ finalResult.note }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.finalResult.student'">Student</span></dt>
-        <dd>
-          <div *ngIf="finalResult.studentId">
-            <a [routerLink]="['/student', finalResult.studentId, 'view']">{{ finalResult.studentName }}</a>
-          </div>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.finalResult.exam'">Exam</span></dt>
-        <dd>
-          <div *ngIf="finalResult.examId">
-            <a [routerLink]="['/exam', finalResult.examId, 'view']">{{ finalResult.examName }}</a>
-          </div>
-        </dd>
-      </dl>
-
-      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
-      </button>
-
-      <button type="button" [routerLink]="['/final-result', finalResult.id, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
-      </button>
-    </div>
+    @if (finalResult) {
+      <div>
+        <h2 data-cy="finalResultDetailsHeading"><span [translate]="'gradeScopeIsticApp.finalResult.detail.title'">Final Result</span></h2>
+        <hr />
+        <jhi-alert-error></jhi-alert-error>
+        <jhi-alert></jhi-alert>
+        <dl class="row-md jh-entity-details">
+          <dt><span [translate]="'global.field.id'">ID</span></dt>
+          <dd>
+            <span>{{ finalResult.id }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.finalResult.note'">Note</span></dt>
+          <dd>
+            <span>{{ finalResult.note }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.finalResult.student'">Student</span></dt>
+          <dd>
+            @if (finalResult.studentId) {
+              <div>
+                <a [routerLink]="['/student', finalResult.studentId, 'view']">{{ finalResult.studentName }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.finalResult.exam'">Exam</span></dt>
+          <dd>
+            @if (finalResult.examId) {
+              <div>
+                <a [routerLink]="['/exam', finalResult.examId, 'view']">{{ finalResult.examName }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
+        </button>
+        <button type="button" [routerLink]="['/final-result', finalResult.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
+        </button>
+      </div>
+    }
   </div>
 </div>

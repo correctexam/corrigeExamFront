@@ -7,14 +7,13 @@ import { GraphicalToolbarComponent } from './toolbar/toolbar.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { ButtonDirective } from 'primeng/button';
 import { FabricCanvasComponent } from './fabric-canvas/fabric-canvas.component';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'jhi-paint',
   templateUrl: './paint.component.html',
   styleUrls: ['./paint.component.scss'],
   standalone: true,
-  imports: [NgIf, FabricCanvasComponent, ButtonDirective, FaIconComponent, GraphicalToolbarComponent, QuestionpropertiesviewComponent],
+  imports: [FabricCanvasComponent, ButtonDirective, FaIconComponent, GraphicalToolbarComponent, QuestionpropertiesviewComponent],
 })
 export class PaintComponent {
   @Input()

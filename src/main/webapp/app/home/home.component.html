@@ -1,137 +1,142 @@
-<div *ngIf="account == null" class="grid grid-nogutter surface-section text-800">
-  <div class="sm:col-12 md:col-12 lg:col-6 p-6 text-center md:text-left flex align-items-center">
-    <section>
-      <span class="block text-6xl font-bold mb-1" [translate]="'home.titleu'">Corriger vos copies plus efficacement ✔️</span>
-      <div class="text-6xl text-primary font-bold mb-3" [translate]="'home.subtitleu'">
-        un retour à vos étudiants en moins d'une journée
-      </div>
-      <p class="mt-0 mb-4 text-700 line-height-3" [translate]="'home.slogan'">
-        Scanner, corriger par lots, soyez assisté par de l'IA, faites un retour précis à vos étudiants, depuis un PC ou une tablette
-      </p>
-
-      <ng-template [ngIf]="CONNECTION_METHOD === CONNECTION_METHOD_LOCAL">
-        <div>
-          <p-button (click)="login()" pbutton pRipple class="mr-3">
-            <span class="p-button-label" [translate]="'home.login'">Authentifiez vous</span><span class="p-ink"></span>
-          </p-button>
-          <button
-            routerLink="account/register"
-            pbutton
-            pripple
-            type="button"
-            class="p-element p-ripple p-button-outlined p-button p-component mr-3"
-          >
-            <span class="p-button-label" [translate]="'home.register'">Créer un compte</span><span class="p-ink"></span>
-          </button>
+@if (account == null) {
+  <div class="grid grid-nogutter surface-section text-800">
+    <div class="sm:col-12 md:col-12 lg:col-6 p-6 text-center md:text-left flex align-items-center">
+      <section>
+        <span class="block text-6xl font-bold mb-1" [translate]="'home.titleu'">Corriger vos copies plus efficacement ✔️</span>
+        <div class="text-6xl text-primary font-bold mb-3" [translate]="'home.subtitleu'">
+          un retour à vos étudiants en moins d'une journée
         </div>
-      </ng-template>
-
-      <ng-template [ngIf]="CONNECTION_METHOD === CONNECTION_METHOD_SHIB">
-        <div>
-          <a href="/Shibboleth.sso/Login?target={{ SERVICE_URL }}/api/shib/redirection" class="p-element mr-3 p-button p-component">
-            <span class="p-button-label" [translate]="'home.login'">Authentifiez vous</span><span class="p-ink"></span>
-          </a>
-        </div>
-      </ng-template>
-
-      <ng-template [ngIf]="CONNECTION_METHOD === CONNECTION_METHOD_CAS">
-        <div>
-          <a href="{{ CAS_SERVER_URL }}/login?service={{ SERVICE_URL }}" class="p-element mr-3 p-button p-component">
-            <span class="p-button-label" [translate]="'home.login'">>Authentifiez vous</span><span class="p-ink"></span>
-          </a>
-        </div>
-      </ng-template>
-    </section>
+        <p class="mt-0 mb-4 text-700 line-height-3" [translate]="'home.slogan'">
+          Scanner, corriger par lots, soyez assisté par de l'IA, faites un retour précis à vos étudiants, depuis un PC ou une tablette
+        </p>
+        @if (CONNECTION_METHOD === CONNECTION_METHOD_LOCAL) {
+          <div>
+            <p-button (click)="login()" pbutton pRipple class="mr-3">
+              <span class="p-button-label" [translate]="'home.login'">Authentifiez vous</span><span class="p-ink"></span>
+            </p-button>
+            <button
+              routerLink="account/register"
+              pbutton
+              pripple
+              type="button"
+              class="p-element p-ripple p-button-outlined p-button p-component mr-3"
+            >
+              <span class="p-button-label" [translate]="'home.register'">Créer un compte</span><span class="p-ink"></span>
+            </button>
+          </div>
+        }
+        @if (CONNECTION_METHOD === CONNECTION_METHOD_SHIB) {
+          <div>
+            <a href="/Shibboleth.sso/Login?target={{ SERVICE_URL }}/api/shib/redirection" class="p-element mr-3 p-button p-component">
+              <span class="p-button-label" [translate]="'home.login'">Authentifiez vous</span><span class="p-ink"></span>
+            </a>
+          </div>
+        }
+        @if (CONNECTION_METHOD === CONNECTION_METHOD_CAS) {
+          <div>
+            <a href="{{ CAS_SERVER_URL }}/login?service={{ SERVICE_URL }}" class="p-element mr-3 p-button p-component">
+              <span class="p-button-label" [translate]="'home.login'">>Authentifiez vous</span><span class="p-ink"></span>
+            </a>
+          </div>
+        }
+      </section>
+    </div>
+    <div class="sm:col-12 md:col-12 lg:col-6 overflow-hidden sm:hidden md:hidden lg:flex xl:flex">
+      <img
+        src="content/images/bannerright.jpg"
+        alt="Image"
+        class="md:ml-auto block md:h-full"
+        style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
+      />
+    </div>
   </div>
-  <div class="sm:col-12 md:col-12 lg:col-6 overflow-hidden sm:hidden md:hidden lg:flex xl:flex">
-    <img
-      src="content/images/bannerright.jpg"
-      alt="Image"
-      class="md:ml-auto block md:h-full"
-      style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
-    />
-  </div>
-</div>
+}
 <div *jhiHasAnyAuthority="'ROLE_USER'">
-  <div *ngIf="!this.account?.authorities?.includes('ROLE_ADMIN')">
-    <p-drawer [position]="'right'" [(visible)]="layoutsidebarVisible">
-      <div class="grid">
-        <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title" [translate]="'scanexam.courseimport'">Import</h5>
-
-              <div class="card-text">
-                <label
-                  for="switch1"
-                  [translate]="'scanexam.studentdata'"
-                  [tooltipZIndex]="'3000'"
-                  [pTooltip]="'scanexam.studentdatatooltip' | translate"
-                  >données étudiantes:</label
-                >
-                <p-toggleSwitch inputId="switch1" [(ngModel)]="includeStudentsData"></p-toggleSwitch>
-
-                <div class="flex align-content-center flex-wrap card-container">
-                  <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
-                    <p-fileUpload
-                      #fileUpload
-                      [chooseIcon]="''"
-                      [chooseStyleClass]="'p-button p-button-primary'"
-                      mode="basic"
-                      [auto]="true"
-                      [customUpload]="true"
-                      [pTooltip]="'scanexam.courseimporttooltip' | translate"
-                      [tooltipZIndex]="'3000'"
-                      [chooseLabel]="'scanexam.courseimport' | translate"
-                      name="import[]"
-                      accept="application/json"
-                      [maxFileSize]="2000000000"
-                      (uploadHandler)="onUpload($event, fileUpload)"
-                    ></p-fileUpload>
+  @if (!this.account?.authorities?.includes('ROLE_ADMIN')) {
+    <div>
+      <p-drawer [position]="'right'" [(visible)]="layoutsidebarVisible">
+        <div class="grid">
+          <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title" [translate]="'scanexam.courseimport'">Import</h5>
+                <div class="card-text">
+                  <label
+                    for="switch1"
+                    [translate]="'scanexam.studentdata'"
+                    [tooltipZIndex]="'3000'"
+                    [pTooltip]="'scanexam.studentdatatooltip' | translate"
+                    >données étudiantes:</label
+                  >
+                  <p-toggleSwitch inputId="switch1" [(ngModel)]="includeStudentsData"></p-toggleSwitch>
+                  <div class="flex align-content-center flex-wrap card-container">
+                    <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
+                      <p-fileUpload
+                        #fileUpload
+                        [chooseIcon]="''"
+                        [chooseStyleClass]="'p-button p-button-primary'"
+                        mode="basic"
+                        [auto]="true"
+                        [customUpload]="true"
+                        [pTooltip]="'scanexam.courseimporttooltip' | translate"
+                        [tooltipZIndex]="'3000'"
+                        [chooseLabel]="'scanexam.courseimport' | translate"
+                        name="import[]"
+                        accept="application/json"
+                        [maxFileSize]="2000000000"
+                        (uploadHandler)="onUpload($event, fileUpload)"
+                      ></p-fileUpload>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </p-drawer>
-
-    <p-dock [model]="dockItems" position="top" [styleClass]="'pdock'">
-      <ng-template pTemplate="item" let-item>
-        <a *ngIf="item.route" [routerLink]="item.route"
-          ><img
-            [src]="item.icon"
-            [alt]="item.label"
-            class="imageDock"
-            [tooltipZIndex]="'3000'"
-            [pTooltip]="item.title"
-            [appendTo]="'body'"
-            [tooltipPosition]="'top'"
-        /></a>
-        <a *ngIf="item.command1" (click)="item.command1()"
-          ><img
-            [src]="item.icon"
-            [alt]="item.label"
-            class="imageDock"
-            [tooltipZIndex]="'3000'"
-            [pTooltip]="item.title"
-            [tooltipPosition]="'top'"
-        /></a>
-        <!--        <a [routerLink]="item.route"
-          ><img [src]="item.icon" [alt]="item.label" class="imageDock" [tooltipZIndex]="'3000'" [pTooltip]="item.title"
-        /></a>-->
-      </ng-template>
-    </p-dock>
-    <jhi-mes-cours [showImage]="true"></jhi-mes-cours>
-  </div>
-  <div *ngIf="this.account?.authorities?.includes('ROLE_ADMIN')" class="row">
-    <div class="col-md-12">
-      <h1 class="display-4"><span [translate]="'home.welcomeadmin'">Bienvenue sur la page d'administration de cette application</span></h1>
-
-      <p class="lead" [translate]="'home.welcomeadminsub'">Vous pouvez accéder aux données depuis le menu entité</p>
-      <p [translate]="'home.textadmin'">Vous pouvez gérer les utilsiateurs et les services depuis le menu administration.</p>
-      <jhi-mes-cours #mescours [showImage]="false"></jhi-mes-cours>
+      </p-drawer>
+      <p-dock [model]="dockItems" position="top" [styleClass]="'pdock'">
+        <ng-template pTemplate="item" let-item>
+          @if (item.route) {
+            <a [routerLink]="item.route"
+              ><img
+                [src]="item.icon"
+                [alt]="item.label"
+                class="imageDock"
+                [tooltipZIndex]="'3000'"
+                [pTooltip]="item.title"
+                [appendTo]="'body'"
+                [tooltipPosition]="'top'"
+            /></a>
+          }
+          @if (item.command1) {
+            <a (click)="item.command1()"
+              ><img
+                [src]="item.icon"
+                [alt]="item.label"
+                class="imageDock"
+                [tooltipZIndex]="'3000'"
+                [pTooltip]="item.title"
+                [tooltipPosition]="'top'"
+            /></a>
+          }
+          <!--        <a [routerLink]="item.route"
+            ><img [src]="item.icon" [alt]="item.label" class="imageDock" [tooltipZIndex]="'3000'" [pTooltip]="item.title"
+          /></a>-->
+        </ng-template>
+      </p-dock>
+      <jhi-mes-cours [showImage]="true"></jhi-mes-cours>
     </div>
-  </div>
+  }
+  @if (this.account?.authorities?.includes('ROLE_ADMIN')) {
+    <div class="row">
+      <div class="col-md-12">
+        <h1 class="display-4">
+          <span [translate]="'home.welcomeadmin'">Bienvenue sur la page d'administration de cette application</span>
+        </h1>
+        <p class="lead" [translate]="'home.welcomeadminsub'">Vous pouvez accéder aux données depuis le menu entité</p>
+        <p [translate]="'home.textadmin'">Vous pouvez gérer les utilsiateurs et les services depuis le menu administration.</p>
+        <jhi-mes-cours #mescours [showImage]="false"></jhi-mes-cours>
+      </div>
+    </div>
+  }
 </div>

@@ -29,15 +29,13 @@
         <div class="row mb-3">
           <label class="form-label" [translate]="'gradeScopeIsticApp.questionType.algoName'" for="field_algoName">Algo Name</label>
           <input type="text" class="form-control" name="algoName" id="field_algoName" data-cy="algoName" formControlName="algoName" />
-          <div *ngIf="editForm.get('algoName')!.invalid && (editForm.get('algoName')!.dirty || editForm.get('algoName')!.touched)">
-            <small
-              class="form-text text-danger"
-              *ngIf="editForm.get('algoName')?.errors?.required"
-              [translate]="'entity.validation.required'"
-            >
-              This field is required.
-            </small>
-          </div>
+          @if (editForm.get('algoName')!.invalid && (editForm.get('algoName')!.dirty || editForm.get('algoName')!.touched)) {
+            <div>
+              @if (editForm.get('algoName')?.errors?.required) {
+                <small class="form-text text-danger" [translate]="'entity.validation.required'"> This field is required. </small>
+              }
+            </div>
+          }
         </div>
 
         <div class="row mb-3">

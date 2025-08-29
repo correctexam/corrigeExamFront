@@ -5,13 +5,12 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { PasswordResetFinishService } from './password-reset-finish.service';
 import { TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { PasswordStrengthBarComponent } from '../../password/password-strength-bar/password-strength-bar.component';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'jhi-password-reset-finish',
   templateUrl: './password-reset-finish.component.html',
   standalone: true,
-  imports: [NgIf, RouterLink, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, TranslateDirective, TranslatePipe],
+  imports: [RouterLink, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, TranslateDirective, TranslatePipe],
 })
 export class PasswordResetFinishComponent implements OnInit, AfterViewInit {
   @ViewChild('newPassword', { static: false })

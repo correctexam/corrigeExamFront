@@ -21,8 +21,14 @@
   </ng-template>
   <ng-template let-user pTemplate="item">
     <div>
-      {{ user.login }} (<span *ngIf="user.name">{{ user.name }}</span> <span *ngIf="user.firstname">{{ user.firstname }}</span
-      >)
+      {{ user.login }} (
+      @if (user.name) {
+        <span>{{ user.name }}</span>
+      }
+      @if (user.firstname) {
+        <span>{{ user.firstname }}</span>
+      }
+      )
     </div>
   </ng-template>
 </p-pickList>

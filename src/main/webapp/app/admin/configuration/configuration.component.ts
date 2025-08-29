@@ -6,13 +6,13 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { SortByDirective } from '../../shared/sort/sort-by.directive';
 import { SortDirective } from '../../shared/sort/sort.directive';
 import { FormsModule } from '@angular/forms';
-import { NgIf, NgFor, JsonPipe, KeyValuePipe } from '@angular/common';
+import { JsonPipe, KeyValuePipe } from '@angular/common';
 
 @Component({
   selector: 'jhi-configuration',
   templateUrl: './configuration.component.html',
   standalone: true,
-  imports: [NgIf, FormsModule, SortDirective, SortByDirective, FaIconComponent, NgFor, JsonPipe, KeyValuePipe],
+  imports: [FormsModule, SortDirective, SortByDirective, FaIconComponent, JsonPipe, KeyValuePipe],
 })
 export class ConfigurationComponent implements OnInit {
   allBeans!: Bean[];

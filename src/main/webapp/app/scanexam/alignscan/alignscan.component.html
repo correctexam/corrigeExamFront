@@ -31,7 +31,9 @@
         {{ percentavancement | number: '1.0-2' }} % <BR /> {{ message }} <BR />
 
         {{ submessage }}
-        <span *ngIf="submessage !== undefined && submessage.length > 0">{{ progress }} / 100</span>
+        @if (submessage !== undefined && submessage.length > 0) {
+          <span>{{ progress }} / 100</span>
+        }
         <BR />
       </div>
       <div class="col-4"></div>
@@ -127,7 +129,7 @@
         >
           <fa-icon [icon]="faObjectUngroup"></fa-icon>&nbsp;<span [translate]="'scanexam.partialalignscan'"> Alignement des scans</span>
         </button>
-        <ng-container *ngIf="nbPageAlignInCache > 0">
+        @if (nbPageAlignInCache > 0) {
           <button
             (click)="showVignette()"
             class="p-button p-button-primary"
@@ -138,7 +140,7 @@
           >
             <fa-icon icon="image"></fa-icon>&nbsp;<span [translate]="'scanexam.voirvignettealign'"> Vignettes des pages</span>
           </button>
-        </ng-container>
+        }
       </div>
     </div>
     <div class="col-12 md:col-12">
@@ -157,19 +159,16 @@
         [showButtons]="true"
       ></p-inputNumber>
     </div>
-    <jhi-viewandreorderpages
-      [alignPage]="true"
-      #viewpage
-      *ngIf="_showVignette && allowPartialAlign"
-      [examId]="+examId!"
-    ></jhi-viewandreorderpages>
+    @if (_showVignette && allowPartialAlign) {
+      <jhi-viewandreorderpages [alignPage]="true" #viewpage [examId]="+examId!"></jhi-viewandreorderpages>
+    }
   </div>
   <!--  <div  class="col-4 md:col-4 overflow-hidden sm:hidden md:hidden lg:hidden xl:flex">
-    <img
-      src="content/images/bannerright.jpg"
-      alt="Image"
-      class="md:ml-auto block md:h-full"
-      style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
+  <img
+    src="content/images/bannerright.jpg"
+    alt="Image"
+    class="md:ml-auto block md:h-full"
+    style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
     />
-  </div>-->
+</div>-->
 </div>

@@ -24,91 +24,100 @@
 
   <jhi-alert></jhi-alert>
 
-  <div class="alert alert-warning" id="no-result" *ngIf="finalResults?.length === 0">
-    <span [translate]="'gradeScopeIsticApp.finalResult.home.notFound'">No finalResults found</span>
-  </div>
-
-  <div class="table-responsive" id="entities" *ngIf="finalResults && finalResults.length > 0">
-    <table class="table table-striped" aria-describedby="page-heading">
-      <thead>
-        <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="loadPage()">
-          <th scope="col" jhiSortBy="id"><span [translate]="'global.field.id'">ID</span> <fa-icon icon="sort"></fa-icon></th>
-          <th scope="col" jhiSortBy="note">
-            <span [translate]="'gradeScopeIsticApp.finalResult.note'">Note</span> <fa-icon icon="sort"></fa-icon>
-          </th>
-          <th scope="col" jhiSortBy="student.name">
-            <span [translate]="'gradeScopeIsticApp.finalResult.student'">Student</span> <fa-icon icon="sort"></fa-icon>
-          </th>
-          <th scope="col" jhiSortBy="exam.name">
-            <span [translate]="'gradeScopeIsticApp.finalResult.exam'">Exam</span> <fa-icon icon="sort"></fa-icon>
-          </th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let finalResult of finalResults; trackBy: trackId" data-cy="entityTable">
-          <td>
-            <a [routerLink]="['/final-result', finalResult.id, 'view']">{{ finalResult.id }}</a>
-          </td>
-          <td>{{ finalResult.note }}</td>
-          <td>
-            <div *ngIf="finalResult.studentId">
-              <a [routerLink]="['/student', finalResult.studentId, 'view']">{{ finalResult.studentName }}</a>
-            </div>
-          </td>
-          <td>
-            <div *ngIf="finalResult.examId">
-              <a [routerLink]="['/exam', finalResult.examId, 'view']">{{ finalResult.examName }}</a>
-            </div>
-          </td>
-          <td class="text-end">
-            <div class="btn-group">
-              <button
-                type="submit"
-                [routerLink]="['/final-result', finalResult.id, 'view']"
-                class="btn btn-info btn-sm"
-                data-cy="entityDetailsButton"
-              >
-                <fa-icon icon="eye"></fa-icon>
-                <span class="d-none d-md-inline" [translate]="'entity.action.view'">View</span>
-              </button>
-
-              <button
-                type="submit"
-                [routerLink]="['/final-result', finalResult.id, 'edit']"
-                class="btn btn-primary btn-sm"
-                data-cy="entityEditButton"
-              >
-                <fa-icon icon="pencil-alt"></fa-icon>
-                <span class="d-none d-md-inline" [translate]="'entity.action.edit'">Edit</span>
-              </button>
-
-              <button type="submit" (click)="delete(finalResult)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                <fa-icon icon="times"></fa-icon>
-                <span class="d-none d-md-inline" [translate]="'entity.action.delete'">Delete</span>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div *ngIf="finalResults && finalResults.length > 0">
-    <div class="d-flex justify-content-center">
-      <jhi-item-count [params]="{ page: page, totalItems: totalItems, itemsPerPage: itemsPerPage }"></jhi-item-count>
+  @if (finalResults?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span [translate]="'gradeScopeIsticApp.finalResult.home.notFound'">No finalResults found</span>
     </div>
+  }
 
-    <div class="d-flex justify-content-center">
-      <ngb-pagination
-        [collectionSize]="totalItems"
-        [(page)]="ngbPaginationPage"
-        [pageSize]="itemsPerPage"
-        [maxSize]="5"
-        [rotate]="true"
-        [boundaryLinks]="true"
-        (pageChange)="loadPage($event)"
-      ></ngb-pagination>
+  @if (finalResults && finalResults.length > 0) {
+    <div class="table-responsive" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="loadPage()">
+            <th scope="col" jhiSortBy="id"><span [translate]="'global.field.id'">ID</span> <fa-icon icon="sort"></fa-icon></th>
+            <th scope="col" jhiSortBy="note">
+              <span [translate]="'gradeScopeIsticApp.finalResult.note'">Note</span> <fa-icon icon="sort"></fa-icon>
+            </th>
+            <th scope="col" jhiSortBy="student.name">
+              <span [translate]="'gradeScopeIsticApp.finalResult.student'">Student</span> <fa-icon icon="sort"></fa-icon>
+            </th>
+            <th scope="col" jhiSortBy="exam.name">
+              <span [translate]="'gradeScopeIsticApp.finalResult.exam'">Exam</span> <fa-icon icon="sort"></fa-icon>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (finalResult of finalResults; track trackId($index, finalResult)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/final-result', finalResult.id, 'view']">{{ finalResult.id }}</a>
+              </td>
+              <td>{{ finalResult.note }}</td>
+              <td>
+                @if (finalResult.studentId) {
+                  <div>
+                    <a [routerLink]="['/student', finalResult.studentId, 'view']">{{ finalResult.studentName }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (finalResult.examId) {
+                  <div>
+                    <a [routerLink]="['/exam', finalResult.examId, 'view']">{{ finalResult.examName }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <button
+                    type="submit"
+                    [routerLink]="['/final-result', finalResult.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" [translate]="'entity.action.view'">View</span>
+                  </button>
+                  <button
+                    type="submit"
+                    [routerLink]="['/final-result', finalResult.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" [translate]="'entity.action.edit'">Edit</span>
+                  </button>
+                  <button type="submit" (click)="delete(finalResult)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" [translate]="'entity.action.delete'">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
     </div>
-  </div>
+  }
+
+  @if (finalResults && finalResults.length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page, totalItems: totalItems, itemsPerPage: itemsPerPage }"></jhi-item-count>
+      </div>
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems"
+          [(page)]="ngbPaginationPage"
+          [pageSize]="itemsPerPage"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="loadPage($event)"
+        ></ngb-pagination>
+      </div>
+    </div>
+  }
 </div>

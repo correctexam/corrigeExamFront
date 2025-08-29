@@ -12,7 +12,7 @@ import { TabsModule } from 'primeng/tabs';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TooltipModule } from 'primeng/tooltip';
 import { HasAnyAuthorityDirective } from '../../shared/auth/has-any-authority.directive';
-import { NgIf, NgFor, PercentPipe } from '@angular/common';
+import { PercentPipe } from '@angular/common';
 
 @Component({
   selector: 'jhi-marking-summary',
@@ -20,13 +20,10 @@ import { NgIf, NgFor, PercentPipe } from '@angular/common';
   styleUrls: ['./marking-summary.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     HasAnyAuthorityDirective,
     TooltipModule,
     FaIconComponent,
-
     TabsModule,
-    NgFor,
     ButtonDirective,
     RouterLink,
     PercentPipe,

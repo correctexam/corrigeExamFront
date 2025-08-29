@@ -6,13 +6,13 @@ import { StudentService } from '../service/student.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
 import { FormsModule } from '@angular/forms';
-import { NgIf } from '@angular/common';
+
 import { TranslateDirective } from '@ngx-translate/core';
 
 @Component({
   templateUrl: './student-delete-dialog.component.html',
   standalone: true,
-  imports: [TranslateDirective, NgIf, FormsModule, AlertErrorComponent, FaIconComponent],
+  imports: [TranslateDirective, FormsModule, AlertErrorComponent, FaIconComponent],
 })
 export class StudentDeleteDialogComponent {
   student?: IStudent;

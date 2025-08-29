@@ -15,7 +15,7 @@ import { ExportResultService, formatDateTime } from '../exportresult.service';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TableModule } from 'primeng/table';
 import { ButtonDirective } from 'primeng/button';
-import { NgIf } from '@angular/common';
+
 import { CheckboxModule } from 'primeng/checkbox';
 import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
@@ -41,14 +41,12 @@ import { ToastModule } from 'primeng/toast';
     ConfirmDialogModule,
     DialogModule,
     PrimeTemplate,
-
     FormsModule,
     InputTextModule,
     FaIconComponent,
     TooltipModule,
     TextareaModule,
     CheckboxModule,
-    NgIf,
     ButtonDirective,
     RouterLink,
     TableModule,

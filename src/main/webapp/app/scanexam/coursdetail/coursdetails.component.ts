@@ -30,7 +30,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
-import { NgIf, NgFor } from '@angular/common';
+
 import { DockModule } from 'primeng/dock';
 import { ButtonDirective } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
@@ -64,7 +64,6 @@ export interface CacheDownloadNotification {
     PrimeTemplate,
     ButtonDirective,
     DockModule,
-    NgIf,
     RouterLink,
     TooltipModule,
     ConfirmDialogModule,
@@ -72,7 +71,6 @@ export interface CacheDownloadNotification {
     ProgressSpinnerModule,
     DrawerModule,
     ToggleSwitchModule,
-    NgFor,
     UsableTextInputComponent,
     FaStackComponent,
     FaIconComponent,

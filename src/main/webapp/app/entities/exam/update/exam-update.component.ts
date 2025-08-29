@@ -19,7 +19,7 @@ import { ScanService } from 'app/entities/scan/service/scan.service';
 import { ICourse } from 'app/entities/course/course.model';
 import { CourseService } from 'app/entities/course/service/course.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { NgIf, NgFor } from '@angular/common';
+
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
 
 type SelectableEntity = ITemplate | IZone | IScan | ICourse;
@@ -28,7 +28,7 @@ type SelectableEntity = ITemplate | IZone | IScan | ICourse;
   selector: 'jhi-exam-update',
   templateUrl: './exam-update.component.html',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, NgIf, NgFor, FaIconComponent],
+  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, FaIconComponent],
 })
 export class ExamUpdateComponent implements OnInit {
   isSaving = false;

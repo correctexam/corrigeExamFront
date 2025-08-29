@@ -2,13 +2,12 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'jhi-error',
   templateUrl: './error.component.html',
   standalone: true,
-  imports: [NgIf],
+  imports: [],
 })
 export class ErrorComponent implements OnInit, OnDestroy {
   errorMessage?: string;

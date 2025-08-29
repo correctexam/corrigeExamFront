@@ -8,23 +8,14 @@ import { UserManagementService } from '../service/user-management.service';
 import { FindLanguageFromKeyPipe } from '../../../shared/language/find-language-from-key.pipe';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
-import { NgIf, NgFor } from '@angular/common';
+
 import { TranslateDirective } from '@ngx-translate/core';
 
 @Component({
   selector: 'jhi-user-mgmt-update',
   templateUrl: './user-management-update.component.html',
   standalone: true,
-  imports: [
-    TranslateDirective,
-    FormsModule,
-    ReactiveFormsModule,
-    NgIf,
-    AlertErrorComponent,
-    NgFor,
-    FaIconComponent,
-    FindLanguageFromKeyPipe,
-  ],
+  imports: [TranslateDirective, FormsModule, ReactiveFormsModule, AlertErrorComponent, FaIconComponent, FindLanguageFromKeyPipe],
 })
 export class UserManagementUpdateComponent implements OnInit {
   user!: User;

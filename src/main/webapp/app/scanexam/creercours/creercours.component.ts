@@ -9,7 +9,7 @@ import { UserService } from 'app/entities/user/user.service';
 import { finalize, Observable } from 'rxjs';
 import { AccountService } from '../../core/auth/account.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { NgIf } from '@angular/common';
+
 import { AlertErrorComponent } from '../../shared/alert/alert-error.component';
 import { TranslateDirective } from '@ngx-translate/core';
 
@@ -18,7 +18,7 @@ import { TranslateDirective } from '@ngx-translate/core';
   templateUrl: './creercours.component.html',
   styleUrls: ['./creercours.component.scss'],
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, NgIf, FaIconComponent, TranslateDirective],
+  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, FaIconComponent, TranslateDirective],
 })
 export class CreercoursComponent implements OnInit {
   isSaving = false;

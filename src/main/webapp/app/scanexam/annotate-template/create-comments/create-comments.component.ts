@@ -21,22 +21,19 @@ import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { PrimeTemplate } from 'primeng/api';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { NgIf, NgFor } from '@angular/common';
+
 @Component({
   selector: 'jhi-create-comments',
   templateUrl: './create-comments.component.html',
   styleUrls: ['./create-comments.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
-    NgFor,
     FaIconComponent,
     InplaceModule,
     PrimeTemplate,
     FormsModule,
     InputTextModule,
     TextareaModule,
-
     RatingModule,
     SelectButtonModule,
     KnobModule,

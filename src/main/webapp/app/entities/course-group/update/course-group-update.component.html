@@ -29,26 +29,23 @@
         <div class="row mb-3">
           <label class="form-label" [translate]="'gradeScopeIsticApp.courseGroup.groupName'" for="field_groupName">Group Name</label>
           <input type="text" class="form-control" name="groupName" id="field_groupName" data-cy="groupName" formControlName="groupName" />
-          <div *ngIf="editForm.get('groupName')!.invalid && (editForm.get('groupName')!.dirty || editForm.get('groupName')!.touched)">
-            <small
-              class="form-text text-danger"
-              *ngIf="editForm.get('groupName')?.errors?.required"
-              [translate]="'entity.validation.required'"
-            >
-              This field is required.
-            </small>
-          </div>
+          @if (editForm.get('groupName')!.invalid && (editForm.get('groupName')!.dirty || editForm.get('groupName')!.touched)) {
+            <div>
+              @if (editForm.get('groupName')?.errors?.required) {
+                <small class="form-text text-danger" [translate]="'entity.validation.required'"> This field is required. </small>
+              }
+            </div>
+          }
         </div>
 
         <div class="row mb-3">
           <label [translate]="'gradeScopeIsticApp.courseGroup.students'" for="field_students">Students</label>
           <select class="form-control" id="field_students" multiple name="students" formControlName="students">
-            <option
-              [ngValue]="getSelected(editForm.get('students')!.value, studentOption)"
-              *ngFor="let studentOption of students; trackBy: trackById"
-            >
-              {{ studentOption.name }}
-            </option>
+            @for (studentOption of students; track trackById($index, studentOption)) {
+              <option [ngValue]="getSelected(editForm.get('students')!.value, studentOption)">
+                {{ studentOption.name }}
+              </option>
+            }
           </select>
         </div>
 
@@ -56,7 +53,9 @@
           <label class="form-label" [translate]="'gradeScopeIsticApp.courseGroup.course'" for="field_course">Course</label>
           <select class="form-control" id="field_course" name="course" formControlName="courseId">
             <option [ngValue]="null"></option>
-            <option [ngValue]="courseOption.id" *ngFor="let courseOption of courses; trackBy: trackById">{{ courseOption.name }}</option>
+            @for (courseOption of courses; track trackById($index, courseOption)) {
+              <option [ngValue]="courseOption.id">{{ courseOption.name }}</option>
+            }
           </select>
         </div>
       </div>

@@ -5,13 +5,12 @@ import { IExamSheet } from '../exam-sheet.model';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { AlertComponent } from '../../../shared/alert/alert.component';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'jhi-exam-sheet-detail',
   templateUrl: './exam-sheet-detail.component.html',
   standalone: true,
-  imports: [NgIf, AlertErrorComponent, AlertComponent, RouterLink, FaIconComponent],
+  imports: [AlertErrorComponent, AlertComponent, RouterLink, FaIconComponent],
 })
 export class ExamSheetDetailComponent implements OnInit {
   examSheet: IExamSheet | null = null;

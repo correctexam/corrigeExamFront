@@ -15,7 +15,7 @@ import { HttpResponse } from '@angular/common/http';
 import { TranslateDirective, TranslateService } from '@ngx-translate/core';
 import { Title } from '@angular/platform-browser';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
-import { NgIf } from '@angular/common';
+
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
@@ -35,7 +35,6 @@ import { ToastModule } from 'primeng/toast';
     FaIconComponent,
     FormsModule,
     ReactiveFormsModule,
-    NgIf,
     NgxExtendedPdfViewerModule,
   ],
 })

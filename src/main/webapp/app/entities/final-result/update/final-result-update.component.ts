@@ -12,7 +12,7 @@ import { StudentService } from 'app/entities/student/service/student.service';
 import { IExam } from 'app/entities/exam/exam.model';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { NgFor } from '@angular/common';
+
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
 
 type SelectableEntity = IStudent | IExam;
@@ -21,7 +21,7 @@ type SelectableEntity = IStudent | IExam;
   selector: 'jhi-final-result-update',
   templateUrl: './final-result-update.component.html',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, NgFor, FaIconComponent],
+  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, FaIconComponent],
 })
 export class FinalResultUpdateComponent implements OnInit {
   isSaving = false;

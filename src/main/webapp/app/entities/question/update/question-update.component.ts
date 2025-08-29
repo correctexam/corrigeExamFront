@@ -17,7 +17,7 @@ import { IExam } from 'app/entities/exam/exam.model';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { NgIf, NgFor } from '@angular/common';
+
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
 import { TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 
@@ -27,7 +27,7 @@ type SelectableEntity = IZone | IQuestionType | IExam;
   selector: 'jhi-question-update',
   templateUrl: './question-update.component.html',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, NgIf, NgFor, FaIconComponent, TranslateDirective, TranslatePipe],
+  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, FaIconComponent, TranslateDirective, TranslatePipe],
 })
 export class QuestionUpdateComponent implements OnInit {
   isSaving = false;

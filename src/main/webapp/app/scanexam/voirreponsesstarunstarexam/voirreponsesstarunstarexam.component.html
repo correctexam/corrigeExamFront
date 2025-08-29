@@ -38,22 +38,30 @@
               {{ question.numero }}
             </td>
             <td>
-              <span *ngFor="let item of question.bestSolutions; let index = index"
-                ><a target="_blank" [routerLink]="item">{{ index + 1 }}</a>
-                <span *ngIf="index !== question.bestSolutions.length - 1">, </span></span
-              >
-              <span *ngIf="question.bestSolutions.length === 0" [translate]="'scanexam.nogoodsolution'">
-                Aucune bonne réponse identifiée</span
-              >
+              @for (item of question.bestSolutions; track item; let index = $index) {
+                <span
+                  ><a target="_blank" [routerLink]="item">{{ index + 1 }}</a>
+                  @if (index !== question.bestSolutions.length - 1) {
+                    <span>, </span>
+                  }
+                </span>
+              }
+              @if (question.bestSolutions.length === 0) {
+                <span [translate]="'scanexam.nogoodsolution'"> Aucune bonne réponse identifiée</span>
+              }
             </td>
             <td>
-              <span *ngFor="let item of question.worstSolutions; let index = index"
-                ><a target="_blank" [routerLink]="item">{{ index + 1 }}</a>
-                <span *ngIf="index !== question.worstSolutions.length - 1">, </span></span
-              >
-              <span *ngIf="question.worstSolutions.length === 0" [translate]="'scanexam.nobadsolution'">
-                Aucune mauvaise réponse identifiée</span
-              >
+              @for (item of question.worstSolutions; track item; let index = $index) {
+                <span
+                  ><a target="_blank" [routerLink]="item">{{ index + 1 }}</a>
+                  @if (index !== question.worstSolutions.length - 1) {
+                    <span>, </span>
+                  }
+                </span>
+              }
+              @if (question.worstSolutions.length === 0) {
+                <span [translate]="'scanexam.nobadsolution'"> Aucune mauvaise réponse identifiée</span>
+              }
             </td>
           </tr>
         </ng-template>

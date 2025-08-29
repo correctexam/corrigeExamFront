@@ -21,7 +21,7 @@ import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { MessageModule } from 'primeng/message';
-import { NgIf, NgClass, NgFor } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
@@ -56,10 +56,8 @@ interface MDWStudent {
     BlockUIModule,
     ProgressSpinnerModule,
     ConfirmDialogModule,
-    NgIf,
     MessageModule,
     FaIconComponent,
-
     TooltipModule,
     NgClass,
     DialogModule,
@@ -68,7 +66,6 @@ interface MDWStudent {
     Button,
     TableModule,
     PrimeTemplate,
-    NgFor,
     InplaceModule,
     FileUploadModule,
     TranslateDirective,

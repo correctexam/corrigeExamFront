@@ -73,9 +73,11 @@
           <label class="form-label" [translate]="'gradeScopeIsticApp.textComment.question'" for="field_question">Question</label>
           <select class="form-control" id="field_question" name="question" formControlName="questionId">
             <option [ngValue]="null"></option>
-            <option [ngValue]="questionOption.id" *ngFor="let questionOption of questions; trackBy: trackById">
-              {{ questionOption.id }}
-            </option>
+            @for (questionOption of questions; track trackById($index, questionOption)) {
+              <option [ngValue]="questionOption.id">
+                {{ questionOption.id }}
+              </option>
+            }
           </select>
         </div>
       </div>

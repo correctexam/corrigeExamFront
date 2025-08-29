@@ -51,9 +51,11 @@
           >
           <select class="form-control" id="field_studentResponse" name="studentResponse" formControlName="studentResponseId">
             <option [ngValue]="null"></option>
-            <option [ngValue]="studentResponseOption.id" *ngFor="let studentResponseOption of studentresponses; trackBy: trackById">
-              {{ studentResponseOption.id }}
-            </option>
+            @for (studentResponseOption of studentresponses; track trackById($index, studentResponseOption)) {
+              <option [ngValue]="studentResponseOption.id">
+                {{ studentResponseOption.id }}
+              </option>
+            }
           </select>
         </div>
       </div>

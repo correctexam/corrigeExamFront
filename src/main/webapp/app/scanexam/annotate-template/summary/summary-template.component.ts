@@ -1,13 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Question } from 'app/entities/question/question.model';
-import { NgFor, NgIf } from '@angular/common';
 
 @Component({
   selector: 'jhi-summary-template',
   templateUrl: './summary-template.component.html',
   styleUrls: ['./summary-template.component.scss'],
   standalone: true,
-  imports: [NgFor, NgIf],
+  imports: [],
 })
 export class SummaryTemplateComponent {
   @Input()

@@ -2,13 +2,13 @@ import { Component, Input } from '@angular/core';
 
 import { JvmMetrics } from 'app/admin/metrics/metrics.model';
 import { NgbProgressbar } from '@ng-bootstrap/ng-bootstrap';
-import { NgIf, NgFor, DecimalPipe, KeyValuePipe } from '@angular/common';
+import { DecimalPipe, KeyValuePipe } from '@angular/common';
 
 @Component({
   selector: 'jhi-jvm-memory',
   templateUrl: './jvm-memory.component.html',
   standalone: true,
-  imports: [NgIf, NgFor, NgbProgressbar, DecimalPipe, KeyValuePipe],
+  imports: [NgbProgressbar, DecimalPipe, KeyValuePipe],
 })
 export class JvmMemoryComponent {
   /**

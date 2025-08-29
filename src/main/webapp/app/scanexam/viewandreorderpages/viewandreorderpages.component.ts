@@ -32,7 +32,7 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TooltipModule } from 'primeng/tooltip';
 import { DragDropModule } from 'primeng/dragdrop';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { NgIf, NgFor, NgClass, KeyValuePipe } from '@angular/common';
+import { NgClass, KeyValuePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { ButtonModule } from 'primeng/button';
@@ -62,9 +62,7 @@ import { MessageService } from 'primeng/api';
     ButtonModule,
     SelectButtonModule,
     FormsModule,
-    NgIf,
     ProgressSpinnerModule,
-    NgFor,
     NgClass,
     DragDropModule,
     TooltipModule,

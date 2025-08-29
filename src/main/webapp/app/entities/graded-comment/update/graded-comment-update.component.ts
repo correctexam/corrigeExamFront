@@ -12,14 +12,14 @@ import { GradedCommentService } from '../service/graded-comment.service';
 import { IQuestion } from 'app/entities/question/question.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { NgFor } from '@angular/common';
+
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
 
 @Component({
   selector: 'jhi-graded-comment-update',
   templateUrl: './graded-comment-update.component.html',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, NgFor, FaIconComponent],
+  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, FaIconComponent],
 })
 export class GradedCommentUpdateComponent implements OnInit {
   isSaving = false;

@@ -3,13 +3,15 @@
     <p-accordion-header [translate]="'scanexam.removeallperpage'">{{ 'scanexam.removeallperpage' | translate }}</p-accordion-header>
     <p-accordion-content>
       <div class="grid">
-        <div *ngFor="let item of pagesnumber" class="col-1">
-          <div class="text-center p-3 border-round-sm bg-primary font-bold">
-            <p-button (onClick)="removepagesperSheet(item)" [pTooltip]="'scanexam.removeallperpageTooltip' | translate: { page: item }"
-              >page {{ item }}</p-button
-            >
+        @for (item of pagesnumber; track item) {
+          <div class="col-1">
+            <div class="text-center p-3 border-round-sm bg-primary font-bold">
+              <p-button (onClick)="removepagesperSheet(item)" [pTooltip]="'scanexam.removeallperpageTooltip' | translate: { page: item }"
+                >page {{ item }}</p-button
+              >
+            </div>
           </div>
-        </div>
+        }
       </div>
     </p-accordion-content>
   </p-accordion-panel>
@@ -17,13 +19,15 @@
     <p-accordion-header [translate]="'scanexam.rotateallperpage'">{{ 'scanexam.rotateallperpage' | translate }}</p-accordion-header>
     <p-accordion-content>
       <div class="grid">
-        <div *ngFor="let item of pagesnumber" class="col-1">
-          <div class="text-center p-3 border-round-sm bg-primary font-bold">
-            <p-button (onClick)="rotatepagesperSheet(item)" [pTooltip]="'scanexam.rotateallperpageTooltip' | translate: { page: item }"
-              >page {{ item }}</p-button
-            >
+        @for (item of pagesnumber; track item) {
+          <div class="col-1">
+            <div class="text-center p-3 border-round-sm bg-primary font-bold">
+              <p-button (onClick)="rotatepagesperSheet(item)" [pTooltip]="'scanexam.rotateallperpageTooltip' | translate: { page: item }"
+                >page {{ item }}</p-button
+              >
+            </div>
           </div>
-        </div>
+        }
       </div>
     </p-accordion-content>
   </p-accordion-panel>

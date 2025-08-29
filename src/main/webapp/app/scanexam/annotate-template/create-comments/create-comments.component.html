@@ -1,414 +1,460 @@
 <div>
-  <div class="grid" *ngIf="_q && _q?.gradeType === 'DIRECT' && _q?.typeAlgoName !== 'QCM'">
-    <div *ngFor="let comment of currentTextComment4Question" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
-      <div class="card">
-        <div class="card-body">
-          <span *ngIf="couldDelete" class="float-end" (click)="removeTextComment(comment)">
-            <fa-icon icon="times"></fa-icon>
-          </span>
-          <div>
-            <p-inplace #texttitle [closable]="true">
-              <ng-template pTemplate="display">
-                <h5 class="card-title">{{ comment.text }}</h5>
-              </ng-template>
-              <ng-template pTemplate="content">
+  @if (_q && _q.gradeType === 'DIRECT' && _q.typeAlgoName !== 'QCM') {
+    <div class="grid">
+      @for (comment of currentTextComment4Question; track comment) {
+        <div class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
+          <div class="card">
+            <div class="card-body">
+              @if (couldDelete) {
+                <span class="float-end" (click)="removeTextComment(comment)">
+                  <fa-icon icon="times"></fa-icon>
+                </span>
+              }
+              <div>
+                <p-inplace #texttitle [closable]="true">
+                  <ng-template pTemplate="display">
+                    <h5 class="card-title">{{ comment.text }}</h5>
+                  </ng-template>
+                  <ng-template pTemplate="content">
+                    <input
+                      pInputText
+                      type="text"
+                      [(ngModel)]="comment.text"
+                      [style]="{ width: '80%' }"
+                      (change)="updateComment($event, comment, false, false)"
+                      (focusout)="texttitle.deactivate()"
+                      (keyup)="checkEnterOrEscape($event, texttitle)"
+                    />
+                  </ng-template>
+                </p-inplace>
+                <p-inplace #textdescription [closable]="true">
+                  <ng-template pTemplate="display">
+                    <p class="card-text formattedbr">{{ comment.description }}</p>
+                  </ng-template>
+                  <ng-template pTemplate="content">
+                    <textarea
+                      pInputTextarea
+                      type="text"
+                      [(ngModel)]="comment.description"
+                      (change)="updateComment($event, comment, false, false)"
+                      (focusout)="textdescription.deactivate()"
+                      (keyup)="checkEnterOrEscape($event, textdescription)"
+                      [style]="{ width: '80%' }"
+                    ></textarea>
+                  </ng-template>
+                </p-inplace>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (_q && _q.gradeType !== 'DIRECT' && _q.gradeType !== 'HYBRID' && _q.typeAlgoName !== 'QCM') {
+    <div class="grid">
+      @for (comment of currentGradedComment4Question; track comment) {
+        <div class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
+          <div class="card">
+            <div class="card-body">
+              @if (_q.typeAlgoName !== 'QCM' && couldDelete) {
+                <span class="float-end clickable" (click)="removeGradedComment(comment)"><fa-icon icon="times"></fa-icon></span>
+              }
+              <div>
+                @if (_q.typeAlgoName === 'QCM') {
+                  <div>
+                    <h5 class="card-title">{{ comment.text }}</h5>
+                    <p class="card-text">{{ comment.description }}</p>
+                  </div>
+                }
+                @if (_q.typeAlgoName !== 'QCM') {
+                  <div>
+                    <p-inplace #gradedtitle [closable]="true">
+                      <ng-template pTemplate="display">
+                        <h5 class="card-title">{{ comment.text }}</h5>
+                      </ng-template>
+                      <ng-template pTemplate="content">
+                        <input
+                          pInputText
+                          type="text"
+                          [(ngModel)]="comment.text"
+                          (focusout)="gradedtitle.deactivate()"
+                          (keyup)="checkEnterOrEscape($event, gradedtitle)"
+                          [style]="{ width: '80%' }"
+                          (change)="updateComment($event, comment, true, false)"
+                        />
+                      </ng-template>
+                    </p-inplace>
+                    <p-inplace #gradeddescription [closable]="true">
+                      <ng-template pTemplate="display">
+                        <p class="card-text formattedbr">{{ comment.description }}</p>
+                      </ng-template>
+                      <ng-template pTemplate="content">
+                        <textarea
+                          pInputTextarea
+                          type="text"
+                          [(ngModel)]="comment.description"
+                          (change)="updateComment($event, comment, true, false)"
+                          (focusout)="gradeddescription.deactivate()"
+                          (keyup)="checkEnterOrEscape($event, gradeddescription)"
+                          [style]="{ width: '80%' }"
+                        ></textarea>
+                      </ng-template>
+                    </p-inplace>
+                    <p-inplace [closable]="true">
+                      <ng-template pTemplate="display">
+                        @if (_q && ('NEGATIVE' === _q.gradeType || 'POSITIVE' === _q.gradeType)) {
+                          <p class="card-text">
+                            /fix This comparison appears to be unintentional because the types 'string' and 'null | undefined' have no
+                            overlap.
+                            <span [translate]="'scanexam.noteassociecomment'"> Note associée à ce commentaire : </span>
+                            @if (_q && _q.gradeType === 'NEGATIVE') {
+                              <span> - </span>
+                            }
+                            @if (_q && _q.gradeType === 'POSITIVE') {
+                              <span> + </span>
+                            }
+                            @if (questionStep > 0) {
+                              <span>{{ comment.grade! / questionStep }}</span>
+                            }
+                            @if (questionStep <= 0) {
+                              <span>{{ comment.grade! }}</span>
+                            }
+                          </p>
+                        }
+                      </ng-template>
+                      <ng-template pTemplate="content">
+                        @if (noteSteps > 0 && _q && (_q.gradeType === 'POSITIVE' || _q.gradeType === 'NEGATIVE')) {
+                          <p-rating
+                            [stars]="noteSteps"
+                            [(ngModel)]="comment.grade"
+                            (ngModelChange)="updateComment($event, comment, true, false)"
+                          ></p-rating>
+                        }
+                      </ng-template>
+                    </p-inplace>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+  @if (_q && _q.gradeType === 'HYBRID' && _q.typeAlgoName !== 'QCM') {
+    <div class="grid">
+      @for (comment of currentHybridGradedComment4Question; track comment) {
+        <div class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
+          <div class="card">
+            <div class="card-body">
+              @if (couldDelete) {
+                <span class="float-end clickable" (click)="removeHybridComment(comment)"><fa-icon icon="times"></fa-icon></span>
+              }
+              <div>
+                <div>
+                  <p-inplace #hybridtitle [closable]="true">
+                    <ng-template pTemplate="display">
+                      <h5 class="card-title">{{ comment.text }}</h5>
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <input
+                        pInputText
+                        type="text"
+                        [(ngModel)]="comment.text"
+                        [style]="{ width: '80%' }"
+                        (change)="updateComment($event, comment, true, true)"
+                        (focusout)="hybridtitle.deactivate()"
+                        (keyup)="checkEnterOrEscape($event, hybridtitle)"
+                      />
+                    </ng-template>
+                  </p-inplace>
+                  <p-inplace #hybriddescription [closable]="true">
+                    <ng-template pTemplate="display">
+                      <p class="card-text formattedbr">{{ comment.description }}</p>
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <textarea
+                        pInputTextarea
+                        type="text"
+                        [(ngModel)]="comment.description"
+                        (change)="updateComment($event, comment, true, true)"
+                        (focusout)="hybriddescription.deactivate()"
+                        (keyup)="checkEnterOrEscape($event, hybriddescription)"
+                        [style]="{ width: '80%' }"
+                      ></textarea>
+                    </ng-template>
+                  </p-inplace>
+                  <p-inplace [closable]="true">
+                    <ng-template pTemplate="display">
+                      @if (comment.grade !== null && comment.grade !== undefined && comment.grade > 0) {
+                        <span> + </span>
+                      }
+                      {{ comment.grade }}
+                      @if (!comment.relative) {
+                        <span> pt</span>
+                      }
+                      @if (comment.relative) {
+                        <span> %</span>
+                      }
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <p-selectButton
+                        [required]="true"
+                        [allowEmpty]="false"
+                        [unselectable]="false"
+                        [options]="relativeOptions"
+                        [(ngModel)]="comment.relative"
+                        optionLabel="label"
+                        optionValue="value"
+                        (onChange)="updateRelative($event, comment)"
+                      ></p-selectButton>
+                      <label class="form-label" [translate]="'scanexam.hybridcommentGrade'" for="field_defaultpoint"
+                        >Point par défault</label
+                      >
+                      @if (comment.relative) {
+                        <p-knob
+                          [min]="-100"
+                          [max]="100"
+                          [step]="5"
+                          [valueTemplate]="grade > 0 ? '+{value}%' : '{value}%'"
+                          name="hybridgrade"
+                          id="field_hybridgrade"
+                          data-cy="hybridgrade"
+                          [pTooltip]="'scanexam.hybridcommentGradeTooltip' | translate"
+                          [tooltipPosition]="'left'"
+                          [tooltipZIndex]="'3000'"
+                          [(ngModel)]="comment.grade"
+                          (onChange)="updateComment($event, comment, true, true)"
+                        ></p-knob>
+                      }
+                      @if (!comment.relative) {
+                        <p-knob
+                          [min]="_q !== undefined && _q.point ? -1 * _q.point : -5"
+                          [max]="_q !== undefined && _q.point ? _q.point : 5"
+                          [step]="0.25"
+                          [valueTemplate]="grade > 0 ? '+{value} pt' : '{value} pt'"
+                          name="hybridgrade"
+                          id="field_hybridgrade"
+                          data-cy="hybridgrade"
+                          [pTooltip]="'scanexam.hybridcommentGradeTooltip' | translate"
+                          [tooltipPosition]="'left'"
+                          [tooltipZIndex]="'3000'"
+                          (onChange)="updateComment($event, comment, true, true)"
+                          [(ngModel)]="comment.grade"
+                        ></p-knob>
+                      }
+                    </ng-template>
+                  </p-inplace>
+                  <p-inplace [closable]="true">
+                    <ng-template pTemplate="display">
+                      <span> Nombre de pas:</span>
+                      {{ comment.step }}
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <label class="form-label" [translate]="'scanexam.hybridcommentStep'" for="field_point">Pas</label>
+                      <input
+                        type="number"
+                        (mouseup)="$event.stopPropagation()"
+                        name="step"
+                        id="field_step"
+                        data-cy="step"
+                        [step]="1"
+                        [min]="1"
+                        [max]="12"
+                        [ngModel]="comment.step"
+                        (change)="updateCommentStep($event, comment, true, true)"
+                        [pTooltip]="'scanexam.hybridcommentStepTooltip' | translate"
+                        [tooltipPosition]="'left'"
+                      />
+                    </ng-template>
+                  </p-inplace>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (_q && _q.typeAlgoName !== 'QCM') {
+    <div class="grid">
+      <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title" [translate]="'scanexam.newcomment'">Nouveau commentaire</h5>
+            <p class="card-text">
+              <label [translate]="'scanexam.commenttitle'">Titre :</label>
+              <input type="text" pInputText [(ngModel)]="titreCommentaire" [style]="{ width: '100%' }" />
+              <BR />
+              <label [translate]="'scanexam.commentdesc'">Description :</label>
+              <textarea [style]="{ width: '100%' }" pInputTextarea [(ngModel)]="descCommentaire"></textarea>
+              @if (_q && _q.gradeType !== 'DIRECT' && _q.gradeType !== 'HYBRID') {
+                <label [translate]="'scanexam.commentnote'">Note :</label>
+              }
+              @if (noteSteps > 0 && _q && _q.gradeType !== 'DIRECT' && _q.gradeType !== 'HYBRID') {
+                <p-rating [stars]="noteSteps" [(ngModel)]="noteCommentaire" [style]="{ width: '100%' }"></p-rating>
+              }
+              @if (_q && _q.gradeType !== 'DIRECT' && _q.gradeType !== 'HYBRID') {
+                <span>
+                  <span [translate]="'scanexam.commentnotbind'">Note associée à ce commentaire : </span>
+                  @if (_q && _q.gradeType === 'NEGATIVE') {
+                    <span> - </span>
+                  }
+                  @if (questionStep > 0) {
+                    <span>{{ noteCommentaire / questionStep }}</span>
+                  }
+                  @if (questionStep <= 0) {
+                    <span>{{ noteCommentaire }}</span>
+                  }
+                </span>
+              }
+              @if (_q && _q.gradeType === 'HYBRID') {
+                <p-selectButton
+                  [required]="true"
+                  [allowEmpty]="false"
+                  [unselectable]="false"
+                  [options]="relativeOptions"
+                  [(ngModel)]="relative"
+                  optionLabel="label"
+                  optionValue="value"
+                  (onChange)="updateNewRelative($event)"
+                ></p-selectButton>
+              }
+              @if (_q && _q.gradeType === 'HYBRID') {
+                <label class="form-label" [translate]="'scanexam.hybridcommentgrade'" for="field_defaultpoint">Point par défault</label>
+              }
+              @if (_q && _q.gradeType === 'HYBRID' && relative) {
+                <p-knob
+                  [min]="-100"
+                  [max]="100"
+                  [step]="5"
+                  [valueTemplate]="grade > 0 ? '+{value}%' : '{value}%'"
+                  name="hybridgrade"
+                  id="field_hybridgrade"
+                  data-cy="hybridgrade"
+                  [pTooltip]="'scanexam.hybridcommentGradeTooltip' | translate"
+                  [tooltipPosition]="'left'"
+                  [tooltipZIndex]="'3000'"
+                  [(ngModel)]="grade"
+                ></p-knob>
+              }
+              @if (!relative && _q.gradeType === 'HYBRID') {
+                <p-knob
+                  [min]="_q !== undefined && _q.point ? -1 * _q.point : -5"
+                  [max]="_q !== undefined && _q.point ? _q.point : 5"
+                  [step]="0.25"
+                  [valueTemplate]="grade > 0 ? '+{value} pt' : '{value} pt'"
+                  name="hybridgrade"
+                  id="field_hybridgrade"
+                  data-cy="hybridgrade"
+                  [pTooltip]="'scanexam.hybridcommentGradeTooltip' | translate"
+                  [tooltipPosition]="'left'"
+                  [tooltipZIndex]="'3000'"
+                  [(ngModel)]="grade"
+                ></p-knob>
+              }
+              @if (_q.gradeType === 'HYBRID') {
+                <label class="form-label" [translate]="'scanexam.hybridcommentStep'" for="field_point">Pas</label>
+              }
+              @if (_q.gradeType === 'HYBRID') {
                 <input
-                  pInputText
-                  type="text"
-                  [(ngModel)]="comment.text"
-                  [style]="{ width: '80%' }"
-                  (change)="updateComment($event, comment, false, false)"
-                  (focusout)="texttitle.deactivate()"
-                  (keyup)="checkEnterOrEscape($event, texttitle)"
+                  type="number"
+                  (mouseup)="$event.stopPropagation()"
+                  name="step"
+                  id="field_step"
+                  data-cy="step"
+                  [step]="1"
+                  [min]="1"
+                  [max]="12"
+                  (change)="cancelEvent($event)"
+                  [ngModel]="step"
+                  [pTooltip]="'scanexam.hybridcommentStepTooltip' | translate"
+                  [tooltipPosition]="'left'"
                 />
-              </ng-template>
-            </p-inplace>
-            <p-inplace #textdescription [closable]="true">
-              <ng-template pTemplate="display">
-                <p class="card-text formattedbr">{{ comment.description }}</p>
-              </ng-template>
-              <ng-template pTemplate="content">
-                <textarea
-                  pInputTextarea
-                  type="text"
-                  [(ngModel)]="comment.description"
-                  (change)="updateComment($event, comment, false, false)"
-                  (focusout)="textdescription.deactivate()"
-                  (keyup)="checkEnterOrEscape($event, textdescription)"
-                  [style]="{ width: '80%' }"
-                ></textarea>
-              </ng-template>
-            </p-inplace>
+              }
+            </p>
+            <a class="p-button p-button-primary" (click)="addComment()" [translate]="'scanexam.commentadd'">Ajouter</a>
           </div>
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="grid" *ngIf="_q && _q?.gradeType !== 'DIRECT' && _q?.gradeType !== 'HYBRID' && _q?.typeAlgoName !== 'QCM'">
-    <div *ngFor="let comment of currentGradedComment4Question" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
-      <div class="card">
-        <div class="card-body">
-          <span *ngIf="_q?.typeAlgoName !== 'QCM' && couldDelete" class="float-end clickable" (click)="removeGradedComment(comment)"
-            ><fa-icon icon="times"></fa-icon
-          ></span>
-          <div>
-            <div *ngIf="_q?.typeAlgoName === 'QCM'">
-              <h5 class="card-title">{{ comment.text }}</h5>
-              <p class="card-text">{{ comment.description }}</p>
-            </div>
-
-            <div *ngIf="_q?.typeAlgoName !== 'QCM'">
-              <p-inplace #gradedtitle [closable]="true">
-                <ng-template pTemplate="display">
-                  <h5 class="card-title">{{ comment.text }}</h5>
-                </ng-template>
-                <ng-template pTemplate="content">
-                  <input
-                    pInputText
-                    type="text"
-                    [(ngModel)]="comment.text"
-                    (focusout)="gradedtitle.deactivate()"
-                    (keyup)="checkEnterOrEscape($event, gradedtitle)"
-                    [style]="{ width: '80%' }"
-                    (change)="updateComment($event, comment, true, false)"
-                  />
-                </ng-template>
-              </p-inplace>
-              <p-inplace #gradeddescription [closable]="true">
-                <ng-template pTemplate="display">
-                  <p class="card-text formattedbr">{{ comment.description }}</p>
-                </ng-template>
-                <ng-template pTemplate="content">
-                  <textarea
-                    pInputTextarea
-                    type="text"
-                    [(ngModel)]="comment.description"
-                    (change)="updateComment($event, comment, true, false)"
-                    (focusout)="gradeddescription.deactivate()"
-                    (keyup)="checkEnterOrEscape($event, gradeddescription)"
-                    [style]="{ width: '80%' }"
-                  ></textarea>
-                </ng-template>
-              </p-inplace>
-              <p-inplace [closable]="true">
-                <ng-template pTemplate="display">
-                  <p class="card-text" *ngIf="_q && _q?.gradeType !== 'DIRECT'">
-                    <span [translate]="'scanexam.noteassociecomment'"> Note associée à ce commentaire : </span>
-                    <span *ngIf="_q && _q?.gradeType === 'NEGATIVE'"> - </span><span *ngIf="_q && _q?.gradeType === 'POSITIVE'"> + </span>
-                    <span *ngIf="questionStep > 0">{{ comment.grade! / questionStep }}</span>
-                    <span *ngIf="questionStep <= 0">{{ comment.grade! }}</span>
-                  </p>
-                </ng-template>
-                <ng-template pTemplate="content">
-                  <p-rating
-                    *ngIf="noteSteps > 0 && _q && _q?.gradeType !== 'DIRECT'"
-                    [stars]="noteSteps"
-                    [(ngModel)]="comment.grade"
-                    (ngModelChange)="updateComment($event, comment, true, false)"
-                  ></p-rating>
-                </ng-template>
-              </p-inplace>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="grid" *ngIf="_q && _q?.gradeType === 'HYBRID' && _q?.typeAlgoName !== 'QCM'">
-    <div *ngFor="let comment of currentHybridGradedComment4Question" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
-      <div class="card">
-        <div class="card-body">
-          <span *ngIf="couldDelete" class="float-end clickable" (click)="removeHybridComment(comment)"
-            ><fa-icon icon="times"></fa-icon
-          ></span>
-          <div>
-            <div>
-              <p-inplace #hybridtitle [closable]="true">
-                <ng-template pTemplate="display">
-                  <h5 class="card-title">{{ comment.text }}</h5>
-                </ng-template>
-                <ng-template pTemplate="content">
-                  <input
-                    pInputText
-                    type="text"
-                    [(ngModel)]="comment.text"
-                    [style]="{ width: '80%' }"
-                    (change)="updateComment($event, comment, true, true)"
-                    (focusout)="hybridtitle.deactivate()"
-                    (keyup)="checkEnterOrEscape($event, hybridtitle)"
-                  />
-                </ng-template>
-              </p-inplace>
-              <p-inplace #hybriddescription [closable]="true">
-                <ng-template pTemplate="display">
-                  <p class="card-text formattedbr">{{ comment.description }}</p>
-                </ng-template>
-                <ng-template pTemplate="content">
-                  <textarea
-                    pInputTextarea
-                    type="text"
-                    [(ngModel)]="comment.description"
-                    (change)="updateComment($event, comment, true, true)"
-                    (focusout)="hybriddescription.deactivate()"
-                    (keyup)="checkEnterOrEscape($event, hybriddescription)"
-                    [style]="{ width: '80%' }"
-                  ></textarea>
-                </ng-template>
-              </p-inplace>
-
-              <p-inplace [closable]="true">
-                <ng-template pTemplate="display">
-                  <span *ngIf="comment.grade !== null && comment.grade !== undefined && comment.grade > 0"> + </span> {{ comment.grade }}
-                  <span *ngIf="!comment.relative"> pt</span> <span *ngIf="comment.relative"> %</span>
-                </ng-template>
-                <ng-template pTemplate="content">
-                  <p-selectButton
-                    [required]="true"
-                    [allowEmpty]="false"
-                    [unselectable]="false"
-                    [options]="relativeOptions"
-                    [(ngModel)]="comment.relative"
-                    optionLabel="label"
-                    optionValue="value"
-                    (onChange)="updateRelative($event, comment)"
-                  ></p-selectButton>
-                  <label class="form-label" [translate]="'scanexam.hybridcommentGrade'" for="field_defaultpoint">Point par défault</label>
-                  <p-knob
-                    *ngIf="comment.relative"
-                    [min]="-100"
-                    [max]="100"
-                    [step]="5"
-                    [valueTemplate]="grade > 0 ? '+{value}%' : '{value}%'"
-                    name="hybridgrade"
-                    id="field_hybridgrade"
-                    data-cy="hybridgrade"
-                    [pTooltip]="'scanexam.hybridcommentGradeTooltip' | translate"
-                    [tooltipPosition]="'left'"
+  }
+  @if (_q?.typeAlgoName !== 'QCM') {
+    <div class="grid">
+      <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title" [translate]="'scanexam.commentimportexport'">Import/Export</h5>
+            <div class="card-text">
+              <div class="flex align-content-center flex-wrap card-container">
+                <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
+                  <p-fileUpload
+                    #fileUpload
+                    [chooseIcon]="''"
+                    [chooseStyleClass]="'p-button p-button-primary'"
+                    mode="basic"
+                    [auto]="true"
+                    [customUpload]="true"
+                    [pTooltip]="'scanexam.commentimporttooltip' | translate"
                     [tooltipZIndex]="'3000'"
-                    [(ngModel)]="comment.grade"
-                    (onChange)="updateComment($event, comment, true, true)"
-                  ></p-knob>
-                  <p-knob
-                    *ngIf="!comment.relative"
-                    [min]="_q !== undefined && _q.point ? -1 * _q.point : -5"
-                    [max]="_q !== undefined && _q.point ? _q.point : 5"
-                    [step]="0.25"
-                    [valueTemplate]="grade > 0 ? '+{value} pt' : '{value} pt'"
-                    name="hybridgrade"
-                    id="field_hybridgrade"
-                    data-cy="hybridgrade"
-                    [pTooltip]="'scanexam.hybridcommentGradeTooltip' | translate"
-                    [tooltipPosition]="'left'"
+                    [chooseLabel]="'scanexam.commentimport' | translate"
+                    name="import[]"
+                    accept="application/json"
+                    [maxFileSize]="1000000"
+                    (uploadHandler)="onUpload($event, fileUpload)"
+                  ></p-fileUpload>
+                </div>
+                <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
+                  <button
+                    class="p-button p-button-primary"
+                    (click)="exportComment()"
+                    [pTooltip]="'scanexam.commentexporttooltip' | translate"
                     [tooltipZIndex]="'3000'"
-                    (onChange)="updateComment($event, comment, true, true)"
-                    [(ngModel)]="comment.grade"
-                  ></p-knob>
-                </ng-template>
-              </p-inplace>
-
-              <p-inplace [closable]="true">
-                <ng-template pTemplate="display">
-                  <span> Nombre de pas:</span>
-                  {{ comment.step }}
-                </ng-template>
-                <ng-template pTemplate="content">
-                  <label class="form-label" [translate]="'scanexam.hybridcommentStep'" for="field_point">Pas</label>
-                  <input
-                    type="number"
-                    (mouseup)="$event.stopPropagation()"
-                    name="step"
-                    id="field_step"
-                    data-cy="step"
-                    [step]="1"
-                    [min]="1"
-                    [max]="12"
-                    [ngModel]="comment.step"
-                    (change)="updateCommentStep($event, comment, true, true)"
-                    [pTooltip]="'scanexam.hybridcommentStepTooltip' | translate"
-                    [tooltipPosition]="'left'"
-                  />
-                </ng-template>
-              </p-inplace>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="grid" *ngIf="_q && _q?.typeAlgoName !== 'QCM'">
-    <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title" [translate]="'scanexam.newcomment'">Nouveau commentaire</h5>
-          <p class="card-text">
-            <label [translate]="'scanexam.commenttitle'">Titre :</label>
-            <input type="text" pInputText [(ngModel)]="titreCommentaire" [style]="{ width: '100%' }" />
-            <BR />
-            <label [translate]="'scanexam.commentdesc'">Description :</label>
-            <textarea [style]="{ width: '100%' }" pInputTextarea [(ngModel)]="descCommentaire"></textarea>
-            <label *ngIf="_q && _q?.gradeType !== 'DIRECT' && _q?.gradeType !== 'HYBRID'" [translate]="'scanexam.commentnote'"
-              >Note :</label
-            >
-            <p-rating
-              *ngIf="noteSteps > 0 && _q && _q?.gradeType !== 'DIRECT' && _q?.gradeType !== 'HYBRID'"
-              [stars]="noteSteps"
-              [(ngModel)]="noteCommentaire"
-              [style]="{ width: '100%' }"
-            ></p-rating>
-            <span *ngIf="_q && _q?.gradeType !== 'DIRECT' && _q?.gradeType !== 'HYBRID'">
-              <span [translate]="'scanexam.commentnotbind'">Note associée à ce commentaire : </span
-              ><span *ngIf="_q && _q?.gradeType === 'NEGATIVE'"> - </span
-              ><span *ngIf="questionStep > 0">{{ noteCommentaire / questionStep }}</span>
-              <span *ngIf="questionStep <= 0">{{ noteCommentaire }}</span></span
-            >
-
-            <p-selectButton
-              [required]="true"
-              [allowEmpty]="false"
-              [unselectable]="false"
-              *ngIf="_q && _q?.gradeType === 'HYBRID'"
-              [options]="relativeOptions"
-              [(ngModel)]="relative"
-              optionLabel="label"
-              optionValue="value"
-              (onChange)="updateNewRelative($event)"
-            ></p-selectButton>
-            <label
-              class="form-label"
-              *ngIf="_q && _q?.gradeType === 'HYBRID'"
-              [translate]="'scanexam.hybridcommentgrade'"
-              for="field_defaultpoint"
-              >Point par défault</label
-            >
-            <p-knob
-              *ngIf="_q && _q?.gradeType === 'HYBRID' && relative"
-              [min]="-100"
-              [max]="100"
-              [step]="5"
-              [valueTemplate]="grade > 0 ? '+{value}%' : '{value}%'"
-              name="hybridgrade"
-              id="field_hybridgrade"
-              data-cy="hybridgrade"
-              [pTooltip]="'scanexam.hybridcommentGradeTooltip' | translate"
-              [tooltipPosition]="'left'"
-              [tooltipZIndex]="'3000'"
-              [(ngModel)]="grade"
-            ></p-knob>
-            <p-knob
-              *ngIf="!relative && _q?.gradeType === 'HYBRID'"
-              [min]="_q !== undefined && _q.point ? -1 * _q.point : -5"
-              [max]="_q !== undefined && _q.point ? _q.point : 5"
-              [step]="0.25"
-              [valueTemplate]="grade > 0 ? '+{value} pt' : '{value} pt'"
-              name="hybridgrade"
-              id="field_hybridgrade"
-              data-cy="hybridgrade"
-              [pTooltip]="'scanexam.hybridcommentGradeTooltip' | translate"
-              [tooltipPosition]="'left'"
-              [tooltipZIndex]="'3000'"
-              [(ngModel)]="grade"
-            ></p-knob>
-            <label *ngIf="_q?.gradeType === 'HYBRID'" class="form-label" [translate]="'scanexam.hybridcommentStep'" for="field_point"
-              >Pas</label
-            >
-            <input
-              *ngIf="_q?.gradeType === 'HYBRID'"
-              type="number"
-              (mouseup)="$event.stopPropagation()"
-              name="step"
-              id="field_step"
-              data-cy="step"
-              [step]="1"
-              [min]="1"
-              [max]="12"
-              (change)="cancelEvent($event)"
-              [ngModel]="step"
-              [pTooltip]="'scanexam.hybridcommentStepTooltip' | translate"
-              [tooltipPosition]="'left'"
-            />
-          </p>
-
-          <a class="p-button p-button-primary" (click)="addComment()" [translate]="'scanexam.commentadd'">Ajouter</a>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div *ngIf="_q?.typeAlgoName !== 'QCM'" class="grid">
-    <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title" [translate]="'scanexam.commentimportexport'">Import/Export</h5>
-
-          <div class="card-text">
-            <div class="flex align-content-center flex-wrap card-container">
-              <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
-                <p-fileUpload
-                  #fileUpload
-                  [chooseIcon]="''"
-                  [chooseStyleClass]="'p-button p-button-primary'"
-                  mode="basic"
-                  [auto]="true"
-                  [customUpload]="true"
-                  [pTooltip]="'scanexam.commentimporttooltip' | translate"
-                  [tooltipZIndex]="'3000'"
-                  [chooseLabel]="'scanexam.commentimport' | translate"
-                  name="import[]"
-                  accept="application/json"
-                  [maxFileSize]="1000000"
-                  (uploadHandler)="onUpload($event, fileUpload)"
-                ></p-fileUpload>
-              </div>
-              <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
-                <button
-                  class="p-button p-button-primary"
-                  (click)="exportComment()"
-                  [pTooltip]="'scanexam.commentexporttooltip' | translate"
-                  [tooltipZIndex]="'3000'"
-                  [translate]="'scanexam.commentexport'"
-                >
-                  Export
-                </button>
-              </div>
-
-              <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
-                <button
-                  class="p-button p-button-primary"
-                  (click)="addDefault()"
-                  [pTooltip]="'scanexam.adddefaulttooltip' | translate"
-                  [tooltipZIndex]="'3000'"
-                  [translate]="'scanexam.adddefault'"
-                >
-                  Add Default
-                </button>
-              </div>
-              <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
-                <button
-                  class="p-button p-button-primary"
-                  (click)="saveDefault()"
-                  [pTooltip]="'scanexam.savedefaultcommenttooltip' | translate"
-                  [tooltipZIndex]="'3000'"
-                  [translate]="'scanexam.savedefaultcomment'"
-                >
-                  Save as default Default
-                </button>
-              </div>
-              <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
-                <button
-                  class="p-button p-button-primary"
-                  (click)="resetDefault()"
-                  [pTooltip]="'scanexam.resetdefaultcommenttooltip' | translate"
-                  [tooltipZIndex]="'3000'"
-                  [translate]="'scanexam.resetdefaultcomment'"
-                >
-                  Reset default
-                </button>
+                    [translate]="'scanexam.commentexport'"
+                  >
+                    Export
+                  </button>
+                </div>
+                <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
+                  <button
+                    class="p-button p-button-primary"
+                    (click)="addDefault()"
+                    [pTooltip]="'scanexam.adddefaulttooltip' | translate"
+                    [tooltipZIndex]="'3000'"
+                    [translate]="'scanexam.adddefault'"
+                  >
+                    Add Default
+                  </button>
+                </div>
+                <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
+                  <button
+                    class="p-button p-button-primary"
+                    (click)="saveDefault()"
+                    [pTooltip]="'scanexam.savedefaultcommenttooltip' | translate"
+                    [tooltipZIndex]="'3000'"
+                    [translate]="'scanexam.savedefaultcomment'"
+                  >
+                    Save as default Default
+                  </button>
+                </div>
+                <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
+                  <button
+                    class="p-button p-button-primary"
+                    (click)="resetDefault()"
+                    [pTooltip]="'scanexam.resetdefaultcommenttooltip' | translate"
+                    [tooltipZIndex]="'3000'"
+                    [translate]="'scanexam.resetdefaultcomment'"
+                  >
+                    Reset default
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  }
 </div>

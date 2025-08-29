@@ -43,7 +43,7 @@ import { HasAnyAuthorityDirective } from '../../shared/auth/has-any-authority.di
 import { PaginatorModule } from 'primeng/paginator';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonDirective } from 'primeng/button';
-import { NgFor, NgIf, AsyncPipe, DecimalPipe } from '@angular/common';
+import { AsyncPipe, DecimalPipe } from '@angular/common';
 import { GalleriaModule } from 'primeng/galleria';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
@@ -61,12 +61,9 @@ import { ToastModule } from 'primeng/toast';
     ProgressSpinnerModule,
     GalleriaModule,
     PrimeTemplate,
-
-    NgFor,
     ButtonDirective,
     TooltipModule,
     PaginatorModule,
-    NgIf,
     RouterLink,
     HasAnyAuthorityDirective,
     ToggleSwitchModule,

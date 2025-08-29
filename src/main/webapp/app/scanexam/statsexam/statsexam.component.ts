@@ -22,7 +22,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ChartModule } from 'primeng/chart';
 import { CardModule } from 'primeng/card';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { NgIf, NgFor, NgStyle, KeyValuePipe } from '@angular/common';
+import { NgStyle, KeyValuePipe } from '@angular/common';
 import { PrimeTemplate } from 'primeng/api';
 import { GalleriaModule } from 'primeng/galleria';
 
@@ -47,12 +47,9 @@ const TRANSPARENT = 'rgba(255,255,255,0.0)';
   imports: [
     GalleriaModule,
     PrimeTemplate,
-
-    NgIf,
     FaIconComponent,
     CardModule,
     ChartModule,
-    NgFor,
     TooltipModule,
     KnobModule,
     FormsModule,

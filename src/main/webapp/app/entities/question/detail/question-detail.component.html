@@ -1,71 +1,72 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
-    <div *ngIf="question">
-      <h2 data-cy="questionDetailsHeading"><span [translate]="'gradeScopeIsticApp.question.detail.title'">Question</span></h2>
-
-      <hr />
-
-      <jhi-alert-error></jhi-alert-error>
-
-      <jhi-alert></jhi-alert>
-
-      <dl class="row-md jh-entity-details">
-        <dt><span [translate]="'global.field.id'">ID</span></dt>
-        <dd>
-          <span>{{ question.id }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.question.numero'">Numero</span></dt>
-        <dd>
-          <span>{{ question.numero }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.question.point'">Point</span></dt>
-        <dd>
-          <span>{{ question.point }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.question.step'">Step</span></dt>
-        <dd>
-          <span>{{ question.step }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.question.validExpression'">Valid Expression</span></dt>
-        <dd>
-          <span>{{ question.validExpression }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.question.libelle'">Libelle</span></dt>
-        <dd>
-          <span>{{ question.libelle }}</span>
-        </dd>
-
-        <dt><span [translate]="'gradeScopeIsticApp.question.gradeType'">Grade Type</span></dt>
-        <dd>
-          <span translate="{{ 'gradeScopeIsticApp.GradeType.' + question.gradeType }}">{{ question.gradeType }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.question.zone'">Zone</span></dt>
-        <dd>
-          <div *ngIf="question.zoneId">
-            <a [routerLink]="['/zone', question.zoneId, 'view']">{{ question.zoneId }}</a>
-          </div>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.question.type'">Type</span></dt>
-        <dd>
-          <div *ngIf="question.typeId">
-            <a [routerLink]="['/question-type', question.typeId, 'view']">{{ question.typeAlgoName }}</a>
-          </div>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.question.exam'">Exam</span></dt>
-        <dd>
-          <div *ngIf="question.examId">
-            <a [routerLink]="['/exam', question.examId, 'view']">{{ question.examName }}</a>
-          </div>
-        </dd>
-      </dl>
-
-      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
-      </button>
-
-      <button type="button" [routerLink]="['/question', question.id, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
-      </button>
-    </div>
+    @if (question) {
+      <div>
+        <h2 data-cy="questionDetailsHeading"><span [translate]="'gradeScopeIsticApp.question.detail.title'">Question</span></h2>
+        <hr />
+        <jhi-alert-error></jhi-alert-error>
+        <jhi-alert></jhi-alert>
+        <dl class="row-md jh-entity-details">
+          <dt><span [translate]="'global.field.id'">ID</span></dt>
+          <dd>
+            <span>{{ question.id }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.question.numero'">Numero</span></dt>
+          <dd>
+            <span>{{ question.numero }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.question.point'">Point</span></dt>
+          <dd>
+            <span>{{ question.point }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.question.step'">Step</span></dt>
+          <dd>
+            <span>{{ question.step }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.question.validExpression'">Valid Expression</span></dt>
+          <dd>
+            <span>{{ question.validExpression }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.question.libelle'">Libelle</span></dt>
+          <dd>
+            <span>{{ question.libelle }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.question.gradeType'">Grade Type</span></dt>
+          <dd>
+            <span translate="{{ 'gradeScopeIsticApp.GradeType.' + question.gradeType }}">{{ question.gradeType }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.question.zone'">Zone</span></dt>
+          <dd>
+            @if (question.zoneId) {
+              <div>
+                <a [routerLink]="['/zone', question.zoneId, 'view']">{{ question.zoneId }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.question.type'">Type</span></dt>
+          <dd>
+            @if (question.typeId) {
+              <div>
+                <a [routerLink]="['/question-type', question.typeId, 'view']">{{ question.typeAlgoName }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.question.exam'">Exam</span></dt>
+          <dd>
+            @if (question.examId) {
+              <div>
+                <a [routerLink]="['/exam', question.examId, 'view']">{{ question.examName }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
+        </button>
+        <button type="button" [routerLink]="['/question', question.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
+        </button>
+      </div>
+    }
   </div>
 </div>

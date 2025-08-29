@@ -25,11 +25,13 @@
         <div class="row mb-3">
           <label class="form-label" [translate]="'gradeScopeIsticApp.student.name'" for="field_name">Name</label>
           <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" />
-          <div *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('name')?.errors?.required" [translate]="'entity.validation.required'">
-              This field is required.
-            </small>
-          </div>
+          @if (editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)) {
+            <div>
+              @if (editForm.get('name')?.errors?.required) {
+                <small class="form-text text-danger" [translate]="'entity.validation.required'"> This field is required. </small>
+              }
+            </div>
+          }
         </div>
 
         <div class="row mb-3">
@@ -40,11 +42,13 @@
         <div class="row mb-3">
           <label class="form-label" [translate]="'gradeScopeIsticApp.student.ine'" for="field_ine">Ine</label>
           <input type="text" class="form-control" name="ine" id="field_ine" data-cy="ine" formControlName="ine" />
-          <div *ngIf="editForm.get('ine')!.invalid && (editForm.get('ine')!.dirty || editForm.get('ine')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('ine')?.errors?.required" [translate]="'entity.validation.required'">
-              This field is required.
-            </small>
-          </div>
+          @if (editForm.get('ine')!.invalid && (editForm.get('ine')!.dirty || editForm.get('ine')!.touched)) {
+            <div>
+              @if (editForm.get('ine')?.errors?.required) {
+                <small class="form-text text-danger" [translate]="'entity.validation.required'"> This field is required. </small>
+              }
+            </div>
+          }
         </div>
 
         <div class="row mb-3">
@@ -60,12 +64,11 @@
         <div class="row mb-3">
           <label [translate]="'gradeScopeIsticApp.student.examSheets'" for="field_examSheets">Exam Sheets</label>
           <select class="form-control" id="field_examSheets" data-cy="examSheets" multiple name="examSheets" formControlName="examSheets">
-            <option
-              [ngValue]="getSelectedExamSheet(examSheetOption, editForm.get('examSheets')!.value)"
-              *ngFor="let examSheetOption of examSheetsSharedCollection; trackBy: trackExamSheetById"
-            >
-              {{ examSheetOption.name }}
-            </option>
+            @for (examSheetOption of examSheetsSharedCollection; track trackExamSheetById($index, examSheetOption)) {
+              <option [ngValue]="getSelectedExamSheet(examSheetOption, editForm.get('examSheets')!.value)">
+                {{ examSheetOption.name }}
+              </option>
+            }
           </select>
         </div>
       </div>

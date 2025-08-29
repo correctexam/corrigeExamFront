@@ -43,21 +43,25 @@
           [tooltipZIndex]="'3000'"
         />
       </div>
-      <div *ngIf="!currentStudentMail" class="col-12">
-        <label [translate]="'scanexam.envoiabi'">Envoi du mail aux absents:</label>
-        <p-checkbox
-          [binary]="true"
-          [(ngModel)]="mailabi"
-          [style]="{ width: '100%' }"
-          [pTooltip]="'scanexam.envoiemailAbsentTooltip' | translate"
-          [tooltipPosition]="'top'"
-          [tooltipZIndex]="'3000'"
-        />
-      </div>
-      <div class="col-12" *ngIf="mailabi">
-        <label [translate]="'scanexam.mailabibody'">Corps du mail:</label>
-        <textarea [style]="{ width: '100%', height: '6rem' }" type="text" [(ngModel)]="mailabiBody" pInputTextarea></textarea>
-      </div>
+      @if (!currentStudentMail) {
+        <div class="col-12">
+          <label [translate]="'scanexam.envoiabi'">Envoi du mail aux absents:</label>
+          <p-checkbox
+            [binary]="true"
+            [(ngModel)]="mailabi"
+            [style]="{ width: '100%' }"
+            [pTooltip]="'scanexam.envoiemailAbsentTooltip' | translate"
+            [tooltipPosition]="'top'"
+            [tooltipZIndex]="'3000'"
+          />
+        </div>
+      }
+      @if (mailabi) {
+        <div class="col-12">
+          <label [translate]="'scanexam.mailabibody'">Corps du mail:</label>
+          <textarea [style]="{ width: '100%', height: '6rem' }" type="text" [(ngModel)]="mailabiBody" pInputTextarea></textarea>
+        </div>
+      }
     </div>
 
     <ng-template pTemplate="footer">
@@ -133,57 +137,61 @@
           <fa-icon [icon]="faFileCsv"></fa-icon>&nbsp;<span [translate]="'scanexam.exportcsv'">Export CSV</span>
         </button>
 
-        <a
-          class="mylink p-button p-button-primary"
-          pButton
-          [routerLink]="'/statistics/' + this.examid"
-          type="button"
-          *ngIf="this.examid"
-          [pTooltip]="'scanexam.voirStatistiquesTooltip' | translate"
-          [tooltipPosition]="'top'"
-          [tooltipZIndex]="'3000'"
-        >
-          <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span [translate]="'scanexam.showstat'">Show statistics</span>
-        </a>
-        <a
-          *ngIf="!this.examid"
-          class="disabled mylink p-button p-button-primary"
-          type="button"
-          pButton
-          [pTooltip]="'scanexam.voirStatistiquesTooltip' | translate"
-          [tooltipPosition]="'top'"
-          [tooltipZIndex]="'3000'"
-        >
-          <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span [translate]="'scanexam.showstat'">Show statistics</span>
-        </a>
-
-        <a
-          class="p-button mylink p-button-primary"
-          pButton
-          [routerLink]="'/voirreponsesstarunstar/' + this.examid"
-          type="button"
-          *ngIf="this.examid"
-          [pTooltip]="'scanexam.voirReponsesRepresentativeTooltip' | translate"
-          [tooltipPosition]="'top'"
-          [tooltipZIndex]="'3000'"
-        >
-          <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span [translate]="'scanexam.showanswer'"
-            >Show representative answers</span
+        @if (this.examid) {
+          <a
+            class="mylink p-button p-button-primary"
+            pButton
+            [routerLink]="'/statistics/' + this.examid"
+            type="button"
+            [pTooltip]="'scanexam.voirStatistiquesTooltip' | translate"
+            [tooltipPosition]="'top'"
+            [tooltipZIndex]="'3000'"
           >
-        </a>
-        <a
-          *ngIf="!this.examid"
-          class="disabled mylink p-button p-button-primary"
-          pButton
-          type="button"
-          [pTooltip]="'scanexam.voirReponsesRepresentativeTooltip' | translate"
-          [tooltipPosition]="'top'"
-          [tooltipZIndex]="'3000'"
-        >
-          <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span [translate]="'scanexam.showanswer'"
-            >Show representative answers</span
-          ></a
-        >
+            <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span [translate]="'scanexam.showstat'">Show statistics</span>
+          </a>
+        }
+        @if (!this.examid) {
+          <a
+            class="disabled mylink p-button p-button-primary"
+            type="button"
+            pButton
+            [pTooltip]="'scanexam.voirStatistiquesTooltip' | translate"
+            [tooltipPosition]="'top'"
+            [tooltipZIndex]="'3000'"
+          >
+            <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span [translate]="'scanexam.showstat'">Show statistics</span>
+          </a>
+        }
+
+        @if (this.examid) {
+          <a
+            class="p-button mylink p-button-primary"
+            pButton
+            [routerLink]="'/voirreponsesstarunstar/' + this.examid"
+            type="button"
+            [pTooltip]="'scanexam.voirReponsesRepresentativeTooltip' | translate"
+            [tooltipPosition]="'top'"
+            [tooltipZIndex]="'3000'"
+          >
+            <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span [translate]="'scanexam.showanswer'"
+              >Show representative answers</span
+            >
+          </a>
+        }
+        @if (!this.examid) {
+          <a
+            class="disabled mylink p-button p-button-primary"
+            pButton
+            type="button"
+            [pTooltip]="'scanexam.voirReponsesRepresentativeTooltip' | translate"
+            [tooltipPosition]="'top'"
+            [tooltipZIndex]="'3000'"
+          >
+            <fa-icon [icon]="fatemperaturethreequarters"></fa-icon>&nbsp;<span [translate]="'scanexam.showanswer'"
+              >Show representative answers</span
+            ></a
+          >
+        }
       </div>
     </div>
     <div class="col-12 md:col-12">
@@ -208,71 +216,103 @@
             <td>{{ student.nom }}</td>
             <td>{{ student.prenom }}</td>
             <td>{{ student.mail }}</td>
-            <td *ngIf="student.abi === 0">{{ student.note }}</td>
-            <td *ngIf="student.abi > 0">0</td>
-            <td *ngIf="student.studentNumber">
-              <a
-                [pTooltip]="'scanexam.showresultLienProfTooltip' | translate"
-                [tooltipPosition]="'top'"
-                [tooltipZIndex]="'3000'"
-                href="{{ 'answer/' + exam?.id + '/1' + '/' + student.studentNumber }}"
-                translate="scanexam.correction1"
-                >correction</a
-              >
-            </td>
-            <td *ngIf="student.abi == 1">ABI</td>
-            <td *ngIf="student.abi == 2">ABJ</td>
-            <td *ngIf="student.abi === 0">
-              <a
-                *ngIf="student.mail != 'anonymous@anonymous.fr'"
-                [pTooltip]="'scanexam.showresultLienEleveTooltip' | translate"
-                [tooltipPosition]="'top'"
-                [tooltipZIndex]="'3000'"
-                target="_blank"
-                href="{{ 'copie/' + student.uuid + '/1' }}"
-                [translate]="'scanexam.lien'"
-                >link</a
-              >
-            </td>
-            <td *ngIf="student.abi == 1">ABI</td>
-            <td *ngIf="student.abi == 2">ABJ</td>
-            <td *ngIf="student.abi === 0">
-              <a
-                [pTooltip]="'scanexam.showresultLienPdfTooltip' | translate"
-                [tooltipPosition]="'top'"
-                [tooltipZIndex]="'3000'"
-                target="_blank"
-                href="{{ 'exportpdf/' + examid! + '/' + student.uuid }}"
-                [translate]="'scanexam.pdf'"
-                >pdf</a
-              >
-            </td>
-            <td *ngIf="student.abi == 1">ABI</td>
-            <td *ngIf="student.abi == 2">ABJ</td>
-            <td *ngIf="!student.abi">
-              <button
-                *ngIf="student.mail != 'anonymous@anonymous.fr'"
-                type="submit"
-                id="save-entity"
-                data-cy="entityCreateSaveButton"
-                class="p-button p-button-primary mr-5"
-                [pTooltip]="'scanexam.sendirectemail' | translate"
-                [tooltipPosition]="'left'"
-                (click)="showEmailSt(student)"
-              >
-                <fa-icon icon="envelope"></fa-icon>
-              </button>
-            </td>
-            <td *ngIf="student.abi > 0"></td>
-            <td *ngIf="student.abi === 0"></td>
-            <td *ngIf="student.abi > 0">
-              <p-toggleSwitch
-                [trueValue]="2"
-                [falseValue]="1"
-                [(ngModel)]="student.abi"
-                (onChange)="updateStudentABJ(student)"
-              ></p-toggleSwitch>
-            </td>
+            @if (student.abi === 0) {
+              <td>{{ student.note }}</td>
+            }
+            @if (student.abi > 0) {
+              <td>0</td>
+            }
+            @if (student.studentNumber) {
+              <td>
+                <a
+                  [pTooltip]="'scanexam.showresultLienProfTooltip' | translate"
+                  [tooltipPosition]="'top'"
+                  [tooltipZIndex]="'3000'"
+                  href="{{ 'answer/' + exam?.id + '/1' + '/' + student.studentNumber }}"
+                  translate="scanexam.correction1"
+                  >correction</a
+                >
+              </td>
+            }
+            @if (student.abi == 1) {
+              <td>ABI</td>
+            }
+            @if (student.abi == 2) {
+              <td>ABJ</td>
+            }
+            @if (student.abi === 0) {
+              <td>
+                @if (student.mail != 'anonymous@anonymous.fr') {
+                  <a
+                    [pTooltip]="'scanexam.showresultLienEleveTooltip' | translate"
+                    [tooltipPosition]="'top'"
+                    [tooltipZIndex]="'3000'"
+                    target="_blank"
+                    href="{{ 'copie/' + student.uuid + '/1' }}"
+                    [translate]="'scanexam.lien'"
+                    >link</a
+                  >
+                }
+              </td>
+            }
+            @if (student.abi == 1) {
+              <td>ABI</td>
+            }
+            @if (student.abi == 2) {
+              <td>ABJ</td>
+            }
+            @if (student.abi === 0) {
+              <td>
+                <a
+                  [pTooltip]="'scanexam.showresultLienPdfTooltip' | translate"
+                  [tooltipPosition]="'top'"
+                  [tooltipZIndex]="'3000'"
+                  target="_blank"
+                  href="{{ 'exportpdf/' + examid! + '/' + student.uuid }}"
+                  [translate]="'scanexam.pdf'"
+                  >pdf</a
+                >
+              </td>
+            }
+            @if (student.abi == 1) {
+              <td>ABI</td>
+            }
+            @if (student.abi == 2) {
+              <td>ABJ</td>
+            }
+            @if (!student.abi) {
+              <td>
+                @if (student.mail != 'anonymous@anonymous.fr') {
+                  <button
+                    type="submit"
+                    id="save-entity"
+                    data-cy="entityCreateSaveButton"
+                    class="p-button p-button-primary mr-5"
+                    [pTooltip]="'scanexam.sendirectemail' | translate"
+                    [tooltipPosition]="'left'"
+                    (click)="showEmailSt(student)"
+                  >
+                    <fa-icon icon="envelope"></fa-icon>
+                  </button>
+                }
+              </td>
+            }
+            @if (student.abi > 0) {
+              <td></td>
+            }
+            @if (student.abi === 0) {
+              <td></td>
+            }
+            @if (student.abi > 0) {
+              <td>
+                <p-toggleSwitch
+                  [trueValue]="2"
+                  [falseValue]="1"
+                  [(ngModel)]="student.abi"
+                  (onChange)="updateStudentABJ(student)"
+                ></p-toggleSwitch>
+              </td>
+            }
           </tr>
         </ng-template>
       </p-table>

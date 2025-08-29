@@ -87,34 +87,38 @@
         <div class="row">
           <label class="form-label col-2" [translate]="'gradeScopeIsticApp.exam.name'" for="field_name">Name</label>
           <input type="text" class="form-control col-6" name="name" id="field_name" data-cy="name" formControlName="name" />
-          <div class="col-2" *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('name')?.errors?.required" [translate]="'entity.validation.required'">
-              This field is required.
-            </small>
-          </div>
+          @if (editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)) {
+            <div class="col-2">
+              @if (editForm.get('name')?.errors?.required) {
+                <small class="form-text text-danger" [translate]="'entity.validation.required'"> This field is required. </small>
+              }
+            </div>
+          }
         </div>
 
         <div class="row">
           <label class="form-label col-3" for="field_content" [translate]="'scanexam.enonceexam'"></label>
           <div class="col-6">
-            <div *ngIf="editForm.get('content')!.value" class="form-text text-danger clearfix">
-              <a
-                class="pull-start"
-                (click)="openFile(editForm.get('content')!.value, editForm.get('contentContentType')!.value)"
-                [translate]="'entity.action.open'"
-                >open</a
-              ><br />
-              <span class="pull-start"
-                >{{ editForm.get('contentContentType')!.value }}, {{ byteSize(editForm.get('content')!.value) }}</span
-              >
-              <button
-                type="button"
-                (click)="editForm.patchValue({ content: null }); editForm.patchValue({ contentContentType: null })"
-                class="btn btn-secondary btn-xs pull-end"
-              >
-                <fa-icon icon="times"></fa-icon>
-              </button>
-            </div>
+            @if (editForm.get('content')!.value) {
+              <div class="form-text text-danger clearfix">
+                <a
+                  class="pull-start"
+                  (click)="openFile(editForm.get('content')!.value, editForm.get('contentContentType')!.value)"
+                  [translate]="'entity.action.open'"
+                  >open</a
+                ><br />
+                <span class="pull-start"
+                  >{{ editForm.get('contentContentType')!.value }}, {{ byteSize(editForm.get('content')!.value) }}</span
+                >
+                <button
+                  type="button"
+                  (click)="editForm.patchValue({ content: null }); editForm.patchValue({ contentContentType: null })"
+                  class="btn btn-secondary btn-xs pull-end"
+                >
+                  <fa-icon icon="times"></fa-icon>
+                </button>
+              </div>
+            }
             <input
               type="file"
               accept=".pdf"
@@ -168,19 +172,23 @@
         </button>
       </div>
     </form>
-    <div class="row err" *ngIf="errorParsingPdf" [translate]="'scanexam.pdferror'"></div>
+    @if (errorParsingPdf) {
+      <div class="row err" [translate]="'scanexam.pdferror'"></div>
+    }
 
-    <div class="row" *ngIf="editForm.get(['content'])?.value !== null">
-      <ngx-extended-pdf-viewer
-        [base64Src]="editForm.get(['content'])!.value"
-        [textLayer]="false"
-        [sidebarVisible]="false"
-        [height]="'95%'"
-        [showToolbar]="false"
-        (pdfLoadingFailed)="onPdfError()"
-        (pdfLoaded)="onPdfLoaded()"
-      ></ngx-extended-pdf-viewer>
-    </div>
+    @if (editForm.get(['content'])?.value !== null) {
+      <div class="row">
+        <ngx-extended-pdf-viewer
+          [base64Src]="editForm.get(['content'])!.value"
+          [textLayer]="false"
+          [sidebarVisible]="false"
+          [height]="'95%'"
+          [showToolbar]="false"
+          (pdfLoadingFailed)="onPdfError()"
+          (pdfLoaded)="onPdfLoaded()"
+        ></ngx-extended-pdf-viewer>
+      </div>
+    }
   </div>
   <div class="lg:col-4 xl:col-4 overflow-hidden sm:hidden md:hidden lg:flex xl:flex">
     <img

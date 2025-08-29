@@ -3,14 +3,14 @@ import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, Reactive
 
 import { PasswordResetInitService } from './password-reset-init.service';
 import { TranslateDirective, TranslatePipe } from '@ngx-translate/core';
-import { NgIf } from '@angular/common';
+
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
 
 @Component({
   selector: 'jhi-password-reset-init',
   templateUrl: './password-reset-init.component.html',
   standalone: true,
-  imports: [AlertErrorComponent, NgIf, FormsModule, ReactiveFormsModule, TranslateDirective, TranslatePipe],
+  imports: [AlertErrorComponent, FormsModule, ReactiveFormsModule, TranslateDirective, TranslatePipe],
 })
 export class PasswordResetInitComponent implements AfterViewInit {
   @ViewChild('email', { static: false })

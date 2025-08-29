@@ -12,19 +12,21 @@
       <div>
         <jhi-alert-error></jhi-alert-error>
 
-        <div class="row mb-3" *ngIf="editForm.controls.id.value !== null">
-          <label class="form-label" [translate]="'global.field.id'" for="field_id">ID</label>
-          <input
-            type="number"
-            (mouseup)="$event.stopPropagation()"
-            class="form-control"
-            name="id"
-            id="field_id"
-            data-cy="id"
-            formControlName="id"
-            [readonly]="true"
-          />
-        </div>
+        @if (editForm.controls.id.value !== null) {
+          <div class="row mb-3">
+            <label class="form-label" [translate]="'global.field.id'" for="field_id">ID</label>
+            <input
+              type="number"
+              (mouseup)="$event.stopPropagation()"
+              class="form-control"
+              name="id"
+              id="field_id"
+              data-cy="id"
+              formControlName="id"
+              [readonly]="true"
+            />
+          </div>
+        }
 
         <div class="row mb-3">
           <label class="form-label" [translate]="'gradeScopeIsticApp.hybridGradedComment.text'" for="field_text">Text</label>
@@ -79,7 +81,9 @@
           <label class="form-label" [translate]="'gradeScopeIsticApp.hybridGradedComment.question'" for="field_question">Question</label>
           <select class="form-control" id="field_question" data-cy="question" name="question" formControlName="question">
             <option [value]="null"></option>
-            <option [value]="questionOption" *ngFor="let questionOption of questionsSharedCollection">{{ questionOption.id }}</option>
+            @for (questionOption of questionsSharedCollection; track questionOption) {
+              <option [value]="questionOption">{{ questionOption.id }}</option>
+            }
           </select>
         </div>
       </div>

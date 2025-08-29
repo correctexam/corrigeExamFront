@@ -93,7 +93,7 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { QuestionpropertiesviewComponent } from '../annotate-template/paint/questionpropertiesview/questionpropertiesview.component';
 import { DrawerModule } from 'primeng/drawer';
 import { KeyboardshortcutComponent } from './keyboardshortcut/keyboardshortcut.component';
-import { NgIf, NgFor, DecimalPipe, DatePipe } from '@angular/common';
+import { DecimalPipe, DatePipe } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Button, ButtonDirective } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -135,7 +135,6 @@ interface CommentAction {
     SwipeDirective,
     ToastModule,
     DialogModule,
-
     FormsModule,
     InputTextModule,
     Button,
@@ -143,7 +142,6 @@ interface CommentAction {
     PrimeTemplate,
     ButtonDirective,
     KeyboardShortcutsModule,
-    NgIf,
     KeyboardshortcutComponent,
     DrawerModule,
     QuestionpropertiesviewComponent,
@@ -163,7 +161,6 @@ interface CommentAction {
     GalleriaModule,
     ProgressBarModule,
     PaginatorModule,
-    NgFor,
     GraphicalToolbarCorrectionComponent,
     InplaceModule,
     TextareaModule,

@@ -3,7 +3,7 @@ import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-transl
 import { FileUpload, FileUploadModule } from 'primeng/fileupload';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { KeyValuePipe, NgFor, NgIf } from '@angular/common';
+import { KeyValuePipe } from '@angular/common';
 import { PreferenceService } from '../../preference-page/preference.service';
 import { AvatarGroupModule } from 'primeng/avatargroup';
 import { OverlayBadgeModule } from 'primeng/overlaybadge';
@@ -19,13 +19,10 @@ import { saveAs } from 'file-saver';
   imports: [
     TooltipModule,
     TextareaModule,
-
     TranslateDirective,
     TranslatePipe,
     FileUploadModule,
     FormsModule,
-    NgIf,
-    NgFor,
     KeyValuePipe,
     AvatarGroupModule,
     OverlayBadgeModule,

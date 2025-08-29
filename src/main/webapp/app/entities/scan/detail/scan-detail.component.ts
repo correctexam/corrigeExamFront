@@ -6,13 +6,12 @@ import { DataUtils } from 'app/core/util/data-util.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { AlertComponent } from '../../../shared/alert/alert.component';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
-import { NgIf } from '@angular/common';
 
 @Component({
   standalone: true,
   selector: 'jhi-scan-detail',
   templateUrl: './scan-detail.component.html',
-  imports: [NgIf, AlertErrorComponent, AlertComponent, FaIconComponent, RouterLink],
+  imports: [AlertErrorComponent, AlertComponent, FaIconComponent, RouterLink],
 })
 export class ScanDetailComponent implements OnInit {
   scan: IScan | null = null;

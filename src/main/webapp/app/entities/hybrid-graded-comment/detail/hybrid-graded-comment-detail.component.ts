@@ -3,7 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { IHybridGradedComment } from '../hybrid-graded-comment.model';
 import { DataUtils } from 'app/core/util/data-util.service';
-import { NgIf } from '@angular/common';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertErrorComponent } from 'app/shared/alert/alert-error.component';
@@ -11,7 +11,7 @@ import { AlertComponent } from 'app/shared/alert/alert.component';
 
 @Component({
   standalone: true,
-  imports: [FontAwesomeModule, AlertErrorComponent, NgIf, FormsModule, ReactiveFormsModule, RouterLink, AlertComponent],
+  imports: [FontAwesomeModule, AlertErrorComponent, FormsModule, ReactiveFormsModule, RouterLink, AlertComponent],
 
   selector: 'jhi-hybrid-graded-comment-detail',
   templateUrl: './hybrid-graded-comment-detail.component.html',

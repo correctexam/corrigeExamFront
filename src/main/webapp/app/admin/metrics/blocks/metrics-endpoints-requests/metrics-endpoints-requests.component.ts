@@ -1,13 +1,13 @@
 import { Component, Input } from '@angular/core';
 
 import { Services } from 'app/admin/metrics/metrics.model';
-import { NgIf, NgFor, DecimalPipe, KeyValuePipe } from '@angular/common';
+import { DecimalPipe, KeyValuePipe } from '@angular/common';
 
 @Component({
   selector: 'jhi-metrics-endpoints-requests',
   templateUrl: './metrics-endpoints-requests.component.html',
   standalone: true,
-  imports: [NgIf, NgFor, DecimalPipe, KeyValuePipe],
+  imports: [DecimalPipe, KeyValuePipe],
 })
 export class MetricsEndpointsRequestsComponent {
   /**

@@ -53,9 +53,11 @@
           <label class="form-label" [translate]="'gradeScopeIsticApp.studentResponse.question'" for="field_question">Question</label>
           <select class="form-control" id="field_question" name="question" formControlName="questionId">
             <option [ngValue]="null"></option>
-            <option [ngValue]="questionOption.id" *ngFor="let questionOption of questions; trackBy: trackById">
-              {{ questionOption.numero }}
-            </option>
+            @for (questionOption of questions; track trackById($index, questionOption)) {
+              <option [ngValue]="questionOption.id">
+                {{ questionOption.numero }}
+              </option>
+            }
           </select>
         </div>
 
@@ -63,7 +65,9 @@
           <label class="form-label" [translate]="'gradeScopeIsticApp.studentResponse.sheet'" for="field_sheet">Student Sheet</label>
           <select class="form-control" id="field_sheet" name="sheet" formControlName="sheetId">
             <option [ngValue]="null"></option>
-            <option [ngValue]="sheetOption.id" *ngFor="let sheetOption of sheets; trackBy: trackById">{{ sheetOption.name }}</option>
+            @for (sheetOption of sheets; track trackById($index, sheetOption)) {
+              <option [ngValue]="sheetOption.id">{{ sheetOption.name }}</option>
+            }
           </select>
         </div>
       </div>

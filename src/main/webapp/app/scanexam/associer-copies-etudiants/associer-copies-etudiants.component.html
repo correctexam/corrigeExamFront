@@ -151,20 +151,23 @@
         <div class="col-10 d-flex justify-content-center">
           <div>
             <span [translate]="'scanexam.selectedstudent'">Etudiant(es) Séléctionné(es):</span> {{ selectionStudentsString() }}
-            <button *ngIf="selectionStudents.length > 0" pButton icon="pi pi-times" (click)="unbindCurrentStudent()"></button>
+            @if (selectionStudents.length > 0) {
+              <button pButton icon="pi pi-times" (click)="unbindCurrentStudent()"></button>
+            }
 
             <BR />
-            <ng-container *ngIf="assisted && recognizedStudent !== undefined">
+            @if (assisted && recognizedStudent !== undefined) {
               <span><span [translate]="'scanexam.aistudent'">Etudiant(es) Reconnu(es):</span> {{ showRecognizedStudent() }}</span>
-            </ng-container>
+            }
 
-            <p-button
-              [pTooltip]="'scanexam.validaterecognizedTooltip' | translate"
-              (onClick)="selectRecogniezStudent()"
-              [style.padding]="'0.1rem'"
-              *ngIf="assisted && recognizedStudent !== undefined && predictionprecision > 0.07"
-              >✔️</p-button
-            >
+            @if (assisted && recognizedStudent !== undefined && predictionprecision > 0.07) {
+              <p-button
+                [pTooltip]="'scanexam.validaterecognizedTooltip' | translate"
+                (onClick)="selectRecogniezStudent()"
+                [style.padding]="'0.1rem'"
+                >✔️</p-button
+              >
+            }
           </div>
         </div>
         <div class="col-1"></div>
@@ -226,15 +229,29 @@
       <div class="canvas-wrapper foo">
         <table [style]="{ 'min-width': '60rem' }">
           <tr>
-            <td [style]="columnstyle" *ngIf="nameImageImg"><img style="max-width: 100%" [src]="nameImageImg" /></td>
-            <td [style]="columnstyle" *ngIf="firstnameImageImg"><img style="max-width: 100%" [src]="firstnameImageImg" /></td>
-            <td [style]="columnstyle" *ngIf="ineImageImg"><img style="max-width: 100%" [src]="ineImageImg" /></td>
+            @if (nameImageImg) {
+              <td [style]="columnstyle"><img style="max-width: 100%" [src]="nameImageImg" /></td>
+            }
+            @if (firstnameImageImg) {
+              <td [style]="columnstyle"><img style="max-width: 100%" [src]="firstnameImageImg" /></td>
+            }
+            @if (ineImageImg) {
+              <td [style]="columnstyle"><img style="max-width: 100%" [src]="ineImageImg" /></td>
+            }
           </tr>
-          <tr *ngIf="debug">
-            <td [style]="columnstyle" *ngIf="nameImageImgDebug"><img style="max-width: 100%" [src]="nameImageImgDebug" /></td>
-            <td [style]="columnstyle" *ngIf="firstnameImageImgDebug"><img style="max-width: 100%" [src]="firstnameImageImgDebug" /></td>
-            <td [style]="columnstyle" *ngIf="ineImageImgDebug"><img style="max-width: 100%" [src]="ineImageImgDebug" /></td>
-          </tr>
+          @if (debug) {
+            <tr>
+              @if (nameImageImgDebug) {
+                <td [style]="columnstyle"><img style="max-width: 100%" [src]="nameImageImgDebug" /></td>
+              }
+              @if (firstnameImageImgDebug) {
+                <td [style]="columnstyle"><img style="max-width: 100%" [src]="firstnameImageImgDebug" /></td>
+              }
+              @if (ineImageImgDebug) {
+                <td [style]="columnstyle"><img style="max-width: 100%" [src]="ineImageImgDebug" /></td>
+              }
+            </tr>
+          }
         </table>
       </div>
       <div class="grid align-items-center">

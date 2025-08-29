@@ -28,7 +28,7 @@ import { ListboxModule } from 'primeng/listbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
 import { AlertErrorComponent } from '../../../../shared/alert/alert-error.component';
-import { NgIf, NgFor } from '@angular/common';
+
 import { CreateCommentsComponent } from '../../create-comments/create-comments.component';
 import { DrawerModule } from 'primeng/drawer';
 
@@ -61,14 +61,11 @@ export type EntityResponseType = HttpResponse<IQuestion>;
   imports: [
     DrawerModule,
     CreateCommentsComponent,
-    NgIf,
     FormsModule,
     ReactiveFormsModule,
     AlertErrorComponent,
-
     TooltipModule,
     InputTextModule,
-    NgFor,
     ListboxModule,
     KnobModule,
     KeyFilterModule,

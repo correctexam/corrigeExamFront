@@ -13,7 +13,7 @@ import { ButtonDirective } from 'primeng/button';
 import { DragDropModule } from 'primeng/dragdrop';
 import { firstValueFrom } from 'rxjs';
 import { TooltipModule } from 'primeng/tooltip';
-import { CommonModule } from '@angular/common';
+
 import { TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 
 @Component({
@@ -23,7 +23,6 @@ import { TranslateDirective, TranslatePipe } from '@ngx-translate/core';
   providers: [CourseService],
   standalone: true,
   imports: [
-    CommonModule,
     TooltipModule,
     DragDropModule,
     ButtonDirective,

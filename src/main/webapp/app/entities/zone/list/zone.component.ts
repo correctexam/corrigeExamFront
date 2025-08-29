@@ -12,7 +12,7 @@ import { ZoneDeleteDialogComponent } from '../delete/zone-delete-dialog.componen
 import { ItemCountComponent } from '../../../shared/pagination/item-count.component';
 import { SortByDirective } from '../../../shared/sort/sort-by.directive';
 import { SortDirective } from '../../../shared/sort/sort.directive';
-import { NgIf, NgFor } from '@angular/common';
+
 import { AlertComponent } from '../../../shared/alert/alert.component';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
@@ -26,10 +26,8 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
     RouterLink,
     AlertErrorComponent,
     AlertComponent,
-    NgIf,
     SortDirective,
     SortByDirective,
-    NgFor,
     ItemCountComponent,
     NgbPagination,
   ],

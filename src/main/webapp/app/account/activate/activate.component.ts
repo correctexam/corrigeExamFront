@@ -3,13 +3,12 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { mergeMap } from 'rxjs/operators';
 
 import { ActivateService } from './activate.service';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'jhi-activate',
   templateUrl: './activate.component.html',
   standalone: true,
-  imports: [NgIf, RouterLink],
+  imports: [RouterLink],
 })
 export class ActivateComponent implements OnInit {
   error = false;

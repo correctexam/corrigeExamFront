@@ -5,13 +5,12 @@ import { IStudent } from '../student.model';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { AlertComponent } from '../../../shared/alert/alert.component';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
-import { NgIf, NgFor } from '@angular/common';
 
 @Component({
   selector: 'jhi-student-detail',
   templateUrl: './student-detail.component.html',
   standalone: true,
-  imports: [NgIf, AlertErrorComponent, AlertComponent, NgFor, RouterLink, FaIconComponent],
+  imports: [AlertErrorComponent, AlertComponent, RouterLink, FaIconComponent],
 })
 export class StudentDetailComponent implements OnInit {
   student: IStudent | null = null;

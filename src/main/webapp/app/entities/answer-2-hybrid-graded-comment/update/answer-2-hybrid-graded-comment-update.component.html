@@ -12,19 +12,21 @@
       <div>
         <jhi-alert-error></jhi-alert-error>
 
-        <div class="row mb-3" *ngIf="editForm.controls.id.value !== null">
-          <label class="form-label" [translate]="'global.field.id'" for="field_id">ID</label>
-          <input
-            type="number"
-            (mouseup)="$event.stopPropagation()"
-            class="form-control"
-            name="id"
-            id="field_id"
-            data-cy="id"
-            formControlName="id"
-            [readonly]="true"
-          />
-        </div>
+        @if (editForm.controls.id.value !== null) {
+          <div class="row mb-3">
+            <label class="form-label" [translate]="'global.field.id'" for="field_id">ID</label>
+            <input
+              type="number"
+              (mouseup)="$event.stopPropagation()"
+              class="form-control"
+              name="id"
+              id="field_id"
+              data-cy="id"
+              formControlName="id"
+              [readonly]="true"
+            />
+          </div>
+        }
 
         <div class="row mb-3">
           <label class="form-label" translate="gradeScopeIsticApp.answer2HybridGradedComment.stepValue" for="field_stepValue"
@@ -54,9 +56,11 @@
             [compareWith]="compareHybridGradedComment"
           >
             <option [ngValue]="null"></option>
-            <option [ngValue]="hybridGradedCommentOption" *ngFor="let hybridGradedCommentOption of hybridGradedCommentsSharedCollection">
-              {{ hybridGradedCommentOption.text }}
-            </option>
+            @for (hybridGradedCommentOption of hybridGradedCommentsSharedCollection; track hybridGradedCommentOption) {
+              <option [ngValue]="hybridGradedCommentOption">
+                {{ hybridGradedCommentOption.text }}
+              </option>
+            }
           </select>
         </div>
 
@@ -72,9 +76,11 @@
             formControlName="studentResponse"
           >
             <option [ngValue]="null"></option>
-            <option [ngValue]="studentResponseOption" *ngFor="let studentResponseOption of studentResponsesSharedCollection">
-              {{ studentResponseOption.id }}
-            </option>
+            @for (studentResponseOption of studentResponsesSharedCollection; track studentResponseOption) {
+              <option [ngValue]="studentResponseOption">
+                {{ studentResponseOption.id }}
+              </option>
+            }
           </select>
         </div>
       </div>

@@ -7,13 +7,12 @@ import { Account } from 'app/core/auth/account.model';
 import { LANGUAGES } from 'app/config/language.constants';
 import { FindLanguageFromKeyPipe } from '../../shared/language/find-language-from-key.pipe';
 import { AlertErrorComponent } from '../../shared/alert/alert-error.component';
-import { NgIf, NgFor } from '@angular/common';
 
 @Component({
   selector: 'jhi-settings',
   templateUrl: './settings.component.html',
   standalone: true,
-  imports: [NgIf, AlertErrorComponent, FormsModule, ReactiveFormsModule, NgFor, TranslateDirective, TranslatePipe, FindLanguageFromKeyPipe],
+  imports: [AlertErrorComponent, FormsModule, ReactiveFormsModule, TranslateDirective, TranslatePipe, FindLanguageFromKeyPipe],
 })
 export class SettingsComponent implements OnInit {
   account!: Account;

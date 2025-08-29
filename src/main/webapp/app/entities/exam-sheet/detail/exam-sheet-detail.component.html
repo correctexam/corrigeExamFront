@@ -1,46 +1,44 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
-    <div *ngIf="examSheet">
-      <h2 data-cy="examSheetDetailsHeading"><span [translate]="'gradeScopeIsticApp.examSheet.detail.title'">Exam Sheet</span></h2>
-
-      <hr />
-
-      <jhi-alert-error></jhi-alert-error>
-
-      <jhi-alert></jhi-alert>
-
-      <dl class="row-md jh-entity-details">
-        <dt><span [translate]="'global.field.id'">ID</span></dt>
-        <dd>
-          <span>{{ examSheet.id }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.examSheet.name'">Name</span></dt>
-        <dd>
-          <span>{{ examSheet.name }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.examSheet.pagemin'">Pagemin</span></dt>
-        <dd>
-          <span>{{ examSheet.pagemin }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.examSheet.pagemax'">Pagemax</span></dt>
-        <dd>
-          <span>{{ examSheet.pagemax }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.examSheet.scan'">Scan</span></dt>
-        <dd>
-          <div *ngIf="examSheet.scanId">
-            <a [routerLink]="['/scan', examSheet.scanId, 'view']">{{ examSheet.scanName }}</a>
-          </div>
-        </dd>
-      </dl>
-
-      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
-      </button>
-
-      <button type="button" [routerLink]="['/exam-sheet', examSheet.id, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
-      </button>
-    </div>
+    @if (examSheet) {
+      <div>
+        <h2 data-cy="examSheetDetailsHeading"><span [translate]="'gradeScopeIsticApp.examSheet.detail.title'">Exam Sheet</span></h2>
+        <hr />
+        <jhi-alert-error></jhi-alert-error>
+        <jhi-alert></jhi-alert>
+        <dl class="row-md jh-entity-details">
+          <dt><span [translate]="'global.field.id'">ID</span></dt>
+          <dd>
+            <span>{{ examSheet.id }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.examSheet.name'">Name</span></dt>
+          <dd>
+            <span>{{ examSheet.name }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.examSheet.pagemin'">Pagemin</span></dt>
+          <dd>
+            <span>{{ examSheet.pagemin }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.examSheet.pagemax'">Pagemax</span></dt>
+          <dd>
+            <span>{{ examSheet.pagemax }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.examSheet.scan'">Scan</span></dt>
+          <dd>
+            @if (examSheet.scanId) {
+              <div>
+                <a [routerLink]="['/scan', examSheet.scanId, 'view']">{{ examSheet.scanName }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
+        </button>
+        <button type="button" [routerLink]="['/exam-sheet', examSheet.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
+        </button>
+      </div>
+    }
   </div>
 </div>

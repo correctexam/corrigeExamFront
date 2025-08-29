@@ -1,45 +1,45 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
-    <div *ngIf="courseGroup">
-      <h2 data-cy="courseGroupDetailsHeading"><span [translate]="'gradeScopeIsticApp.courseGroup.detail.title'">Course Group</span></h2>
-
-      <hr />
-
-      <jhi-alert-error></jhi-alert-error>
-
-      <jhi-alert></jhi-alert>
-
-      <dl class="row-md jh-entity-details">
-        <dt><span [translate]="'global.field.id'">ID</span></dt>
-        <dd>
-          <span>{{ courseGroup.id }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.courseGroup.groupName'">Group Name</span></dt>
-        <dd>
-          <span>{{ courseGroup.groupName }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.courseGroup.students'">Students</span></dt>
-        <dd>
-          <span *ngFor="let students of courseGroup.students; let last = last">
-            <a [routerLink]="['/student', students?.id, 'view']">{{ students.name }}</a
-            >{{ last ? '' : ', ' }}
-          </span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.courseGroup.course'">Course</span></dt>
-        <dd>
-          <div *ngIf="courseGroup.courseId">
-            <a [routerLink]="['/course', courseGroup.courseId, 'view']">{{ courseGroup.courseName }}</a>
-          </div>
-        </dd>
-      </dl>
-
-      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
-      </button>
-
-      <button type="button" [routerLink]="['/course-group', courseGroup.id, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
-      </button>
-    </div>
+    @if (courseGroup) {
+      <div>
+        <h2 data-cy="courseGroupDetailsHeading"><span [translate]="'gradeScopeIsticApp.courseGroup.detail.title'">Course Group</span></h2>
+        <hr />
+        <jhi-alert-error></jhi-alert-error>
+        <jhi-alert></jhi-alert>
+        <dl class="row-md jh-entity-details">
+          <dt><span [translate]="'global.field.id'">ID</span></dt>
+          <dd>
+            <span>{{ courseGroup.id }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.courseGroup.groupName'">Group Name</span></dt>
+          <dd>
+            <span>{{ courseGroup.groupName }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.courseGroup.students'">Students</span></dt>
+          <dd>
+            @for (students of courseGroup.students; track students; let last = $last) {
+              <span>
+                <a [routerLink]="['/student', students?.id, 'view']">{{ students.name }}</a
+                >{{ last ? '' : ', ' }}
+              </span>
+            }
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.courseGroup.course'">Course</span></dt>
+          <dd>
+            @if (courseGroup.courseId) {
+              <div>
+                <a [routerLink]="['/course', courseGroup.courseId, 'view']">{{ courseGroup.courseName }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
+        </button>
+        <button type="button" [routerLink]="['/course-group', courseGroup.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
+        </button>
+      </div>
+    }
   </div>
 </div>

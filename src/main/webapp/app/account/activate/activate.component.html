@@ -3,14 +3,18 @@
     <div class="col-md-8">
       <h1 [translate]="'activate.title'">Activation</h1>
 
-      <div class="alert alert-success" *ngIf="success">
-        <span [translate]="'activate.messages.success'"><strong>Your user account has been activated.</strong> Please </span>
-        <a class="alert-link" routerLink="/login" [translate]="'global.messages.info.authenticated.link'">sign in</a>.
-      </div>
+      @if (success) {
+        <div class="alert alert-success">
+          <span [translate]="'activate.messages.success'"><strong>Your user account has been activated.</strong> Please </span>
+          <a class="alert-link" routerLink="/login" [translate]="'global.messages.info.authenticated.link'">sign in</a>.
+        </div>
+      }
 
-      <div class="alert alert-danger" *ngIf="error" [translate]="'activate.messages.error'">
-        <strong>Your user could not be activated.</strong> Please use the registration form to sign up.
-      </div>
+      @if (error) {
+        <div class="alert alert-danger" [translate]="'activate.messages.error'">
+          <strong>Your user could not be activated.</strong> Please use the registration form to sign up.
+        </div>
+      }
     </div>
   </div>
 </div>

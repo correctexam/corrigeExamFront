@@ -23,7 +23,7 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { AllbindingsComponent } from '../allbindings/allbindings.component';
 import { Title } from '@angular/platform-browser';
 import { PaginatorModule } from 'primeng/paginator';
-import { NgIf, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { ButtonDirective, Button } from 'primeng/button';
 import { SliderModule } from 'primeng/slider';
@@ -53,7 +53,6 @@ import { QuestionService } from 'app/entities/question/service/question.service'
     PrimeTemplate,
     KeyboardShortcutsModule,
     DrawerModule,
-
     ToggleSwitchModule,
     FormsModule,
     TooltipModule,
@@ -61,7 +60,6 @@ import { QuestionService } from 'app/entities/question/service/question.service'
     ButtonDirective,
     FaIconComponent,
     Button,
-    NgIf,
     PaginatorModule,
     ListboxModule,
     NgClass,

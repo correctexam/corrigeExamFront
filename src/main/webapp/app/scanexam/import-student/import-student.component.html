@@ -15,20 +15,24 @@
   <div class="">
     <div class="grid flex">
       <div class="sm:col-12 md:col-6 lg:col-6 xl:col-6">
-        <p-message *ngIf="!canImport()" [severity]="$any('warn')" [text]="'scanexam.listestudentvalid' | translate"></p-message>
-        <p-message *ngIf="!canImport()" [severity]="$any('warn')" [text]="'scanexam.listestudentvaliddetail' | translate"></p-message>
-        <p-message
-          *ngIf="!canImportSameColSize()"
-          [severity]="$any('warn')"
-          [text]="'scanexam.liststderrorcolsize' | translate"
-        ></p-message>
-        <p-message *ngIf="!canImportUniqueMails()" [severity]="$any('warn')" [text]="'scanexam.liststderroremails' | translate"></p-message>
-        <p-message *ngIf="!canImportUniqueINE()" [severity]="$any('warn')" [text]="'scanexam.liststderrorINE' | translate"></p-message>
-        <p-message
-          *ngIf="canImport() && hasDataSet()"
-          severity="info"
-          [text]="'scanexam.clickbuttonsauveretudiant' | translate"
-        ></p-message>
+        @if (!canImport()) {
+          <p-message [severity]="$any('warn')" [text]="'scanexam.listestudentvalid' | translate"></p-message>
+        }
+        @if (!canImport()) {
+          <p-message [severity]="$any('warn')" [text]="'scanexam.listestudentvaliddetail' | translate"></p-message>
+        }
+        @if (!canImportSameColSize()) {
+          <p-message [severity]="$any('warn')" [text]="'scanexam.liststderrorcolsize' | translate"></p-message>
+        }
+        @if (!canImportUniqueMails()) {
+          <p-message [severity]="$any('warn')" [text]="'scanexam.liststderroremails' | translate"></p-message>
+        }
+        @if (!canImportUniqueINE()) {
+          <p-message [severity]="$any('warn')" [text]="'scanexam.liststderrorINE' | translate"></p-message>
+        }
+        @if (canImport() && hasDataSet()) {
+          <p-message severity="info" [text]="'scanexam.clickbuttonsauveretudiant' | translate"></p-message>
+        }
       </div>
       <div class="sm:col-12 md:col-6 lg:col-6 xl:col-6">
         <div class="md:flex lg:flex xl:flex md:flex-row-reverse lg:flex-row-reverse">
@@ -181,131 +185,140 @@
                 </button>
               </td>
             </tr>
-            <tr *ngFor="let st of dataset; let index = index">
-              <td>
-                {{ index + 1 }}
-              </td>
-
-              <td>
-                <input
-                  style="width: 90%"
-                  [tooltipZIndex]="'3000'"
-                  [pTooltip]="'scanexam.donneesaimporte' | translate"
-                  [(ngModel)]="st.ine"
-                  type="text"
-                />
-              </td>
-              <td>
-                <input
-                  style="width: 90%"
-                  [tooltipZIndex]="'3000'"
-                  [pTooltip]="'scanexam.donneesaimporte' | translate"
-                  [(ngModel)]="st.nom"
-                  type="text"
-                />
-              </td>
-              <td>
-                <input
-                  style="width: 90%"
-                  [tooltipZIndex]="'3000'"
-                  [pTooltip]="'scanexam.donneesaimporte' | translate"
-                  [(ngModel)]="st.prenom"
-                  type="text"
-                />
-              </td>
-              <td>
-                <input
-                  style="width: 90%"
-                  [tooltipZIndex]="'3000'"
-                  [pTooltip]="'scanexam.donneesaimporte' | translate"
-                  [(ngModel)]="st.mail"
-                  type="text"
-                />
-              </td>
-              <td>
-                <input
-                  style="width: 90%"
-                  [tooltipZIndex]="'3000'"
-                  [pTooltip]="'scanexam.donneesaimporte' | translate"
-                  [(ngModel)]="st.groupe"
-                  type="text"
-                />
-              </td>
-              <td style="text-align: center; vertical-align: middle">
-                <button
-                  class="btn btn-danger"
-                  (click)="removeNonImported(index)"
-                  tooltipPosition="left"
-                  tooltipZIndex="3000"
-                  [pTooltip]="'scanexam.deleteRowStdList' | translate"
-                >
-                  <fa-icon icon="times"></fa-icon>
-                </button>
-              </td>
-            </tr>
+            @for (st of dataset; track st; let index = $index) {
+              <tr>
+                <td>
+                  {{ index + 1 }}
+                </td>
+                <td>
+                  <input
+                    style="width: 90%"
+                    [tooltipZIndex]="'3000'"
+                    [pTooltip]="'scanexam.donneesaimporte' | translate"
+                    [(ngModel)]="st.ine"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    style="width: 90%"
+                    [tooltipZIndex]="'3000'"
+                    [pTooltip]="'scanexam.donneesaimporte' | translate"
+                    [(ngModel)]="st.nom"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    style="width: 90%"
+                    [tooltipZIndex]="'3000'"
+                    [pTooltip]="'scanexam.donneesaimporte' | translate"
+                    [(ngModel)]="st.prenom"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    style="width: 90%"
+                    [tooltipZIndex]="'3000'"
+                    [pTooltip]="'scanexam.donneesaimporte' | translate"
+                    [(ngModel)]="st.mail"
+                    type="text"
+                  />
+                </td>
+                <td>
+                  <input
+                    style="width: 90%"
+                    [tooltipZIndex]="'3000'"
+                    [pTooltip]="'scanexam.donneesaimporte' | translate"
+                    [(ngModel)]="st.groupe"
+                    type="text"
+                  />
+                </td>
+                <td style="text-align: center; vertical-align: middle">
+                  <button
+                    class="btn btn-danger"
+                    (click)="removeNonImported(index)"
+                    tooltipPosition="left"
+                    tooltipZIndex="3000"
+                    [pTooltip]="'scanexam.deleteRowStdList' | translate"
+                  >
+                    <fa-icon icon="times"></fa-icon>
+                  </button>
+                </td>
+              </tr>
+            }
           </ng-template>
-          <ng-template pTemplate="body" ngFor let-ii="index" let-student [ngForOf]="students">
-            <tr [ngClass]="{ alreadyimported: true }">
-              <td>
-                {{ students.indexOf(student) + 1 }}
-              </td>
-              <td>
-                <p-inplace [closable]="true">
-                  <ng-template pTemplate="display">
-                    <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.ine }}</span>
-                  </ng-template>
-                  <ng-template pTemplate="content">
-                    <input style="width: 90%" type="text" [(ngModel)]="student.ine" (change)="updateStudentINE(student)" pInputText />
-                  </ng-template>
-                </p-inplace>
-              </td>
-              <td>
-                <p-inplace [closable]="true">
-                  <ng-template pTemplate="display">
-                    <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.nom }}</span>
-                  </ng-template>
-                  <ng-template pTemplate="content">
-                    <input style="width: 90%" type="text" [(ngModel)]="student.nom" (change)="updateStudent(student)" pInputText />
-                  </ng-template>
-                </p-inplace>
-              </td>
-              <td>
-                <p-inplace [closable]="true">
-                  <ng-template pTemplate="display">
-                    <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.prenom }}</span>
-                  </ng-template>
-                  <ng-template pTemplate="content">
-                    <input type="text" style="width: 90%" [(ngModel)]="student.prenom" (change)="updateStudent(student)" pInputText />
-                  </ng-template>
-                </p-inplace>
-              </td>
-              <td>
-                <p-inplace [closable]="true">
-                  <ng-template pTemplate="display">
-                    <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.mail }}</span>
-                  </ng-template>
-                  <ng-template pTemplate="content">
-                    <input type="text" style="width: 90%" [(ngModel)]="student.mail" (change)="updateStudent(student)" pInputText />
-                  </ng-template>
-                </p-inplace>
-              </td>
-              <td>
-                <p-inplace [closable]="true">
-                  <ng-template pTemplate="display">
-                    <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.groupe }}</span>
-                  </ng-template>
-                  <ng-template pTemplate="content">
-                    <input type="text" style="width: 90%" [(ngModel)]="student.groupe" (change)="updateStudentgroup(student)" pInputText />
-                  </ng-template>
-                </p-inplace>
-              </td>
-              <td style="text-align: center; vertical-align: middle">
-                <button class="btn btn-danger" (click)="removeStudent(student)">
-                  <fa-icon icon="times"></fa-icon>
-                </button>
-              </td>
-            </tr>
-          </ng-template>
+          @for (student of students; track student; let ii = $index) {
+            <ng-template pTemplate="body" let-ii="index" let-student [ngForOf]="students">
+              <tr [ngClass]="{ alreadyimported: true }">
+                <td>
+                  {{ students.indexOf(student) + 1 }}
+                </td>
+                <td>
+                  <p-inplace [closable]="true">
+                    <ng-template pTemplate="display">
+                      <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.ine }}</span>
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <input style="width: 90%" type="text" [(ngModel)]="student.ine" (change)="updateStudentINE(student)" pInputText />
+                    </ng-template>
+                  </p-inplace>
+                </td>
+                <td>
+                  <p-inplace [closable]="true">
+                    <ng-template pTemplate="display">
+                      <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.nom }}</span>
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <input style="width: 90%" type="text" [(ngModel)]="student.nom" (change)="updateStudent(student)" pInputText />
+                    </ng-template>
+                  </p-inplace>
+                </td>
+                <td>
+                  <p-inplace [closable]="true">
+                    <ng-template pTemplate="display">
+                      <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.prenom }}</span>
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <input type="text" style="width: 90%" [(ngModel)]="student.prenom" (change)="updateStudent(student)" pInputText />
+                    </ng-template>
+                  </p-inplace>
+                </td>
+                <td>
+                  <p-inplace [closable]="true">
+                    <ng-template pTemplate="display">
+                      <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.mail }}</span>
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <input type="text" style="width: 90%" [(ngModel)]="student.mail" (change)="updateStudent(student)" pInputText />
+                    </ng-template>
+                  </p-inplace>
+                </td>
+                <td>
+                  <p-inplace [closable]="true">
+                    <ng-template pTemplate="display">
+                      <span [tooltipZIndex]="'3000'" [pTooltip]="'scanexam.donneesdejaimporte' | translate">{{ student.groupe }}</span>
+                    </ng-template>
+                    <ng-template pTemplate="content">
+                      <input
+                        type="text"
+                        style="width: 90%"
+                        [(ngModel)]="student.groupe"
+                        (change)="updateStudentgroup(student)"
+                        pInputText
+                      />
+                    </ng-template>
+                  </p-inplace>
+                </td>
+                <td style="text-align: center; vertical-align: middle">
+                  <button class="btn btn-danger" (click)="removeStudent(student)">
+                    <fa-icon icon="times"></fa-icon>
+                  </button>
+                </td>
+              </tr>
+            </ng-template>
+          }
         </p-table>
       </div>
     </div>

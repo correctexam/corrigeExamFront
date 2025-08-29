@@ -1,55 +1,53 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
-    <div *ngIf="student">
-      <h2 data-cy="studentDetailsHeading"><span [translate]="'gradeScopeIsticApp.student.detail.title'">Student</span></h2>
-
-      <hr />
-
-      <jhi-alert-error></jhi-alert-error>
-
-      <jhi-alert></jhi-alert>
-
-      <dl class="row-md jh-entity-details">
-        <dt><span [translate]="'global.field.id'">ID</span></dt>
-        <dd>
-          <span>{{ student.id }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.student.name'">Name</span></dt>
-        <dd>
-          <span>{{ student.name }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.student.firstname'">Firstname</span></dt>
-        <dd>
-          <span>{{ student.firstname }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.student.ine'">Ine</span></dt>
-        <dd>
-          <span>{{ student.ine }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.student.caslogin'">Caslogin</span></dt>
-        <dd>
-          <span>{{ student.caslogin }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.student.mail'">Mail</span></dt>
-        <dd>
-          <span>{{ student.mail }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.student.examSheets'">Exam Sheets</span></dt>
-        <dd>
-          <span *ngFor="let examSheets of student.examSheets; let last = last">
-            <a [routerLink]="['/exam-sheet', examSheets?.id, 'view']">{{ examSheets.name }}</a
-            >{{ last ? '' : ', ' }}
-          </span>
-        </dd>
-      </dl>
-
-      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
-      </button>
-
-      <button type="button" [routerLink]="['/student', student.id, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
-      </button>
-    </div>
+    @if (student) {
+      <div>
+        <h2 data-cy="studentDetailsHeading"><span [translate]="'gradeScopeIsticApp.student.detail.title'">Student</span></h2>
+        <hr />
+        <jhi-alert-error></jhi-alert-error>
+        <jhi-alert></jhi-alert>
+        <dl class="row-md jh-entity-details">
+          <dt><span [translate]="'global.field.id'">ID</span></dt>
+          <dd>
+            <span>{{ student.id }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.student.name'">Name</span></dt>
+          <dd>
+            <span>{{ student.name }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.student.firstname'">Firstname</span></dt>
+          <dd>
+            <span>{{ student.firstname }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.student.ine'">Ine</span></dt>
+          <dd>
+            <span>{{ student.ine }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.student.caslogin'">Caslogin</span></dt>
+          <dd>
+            <span>{{ student.caslogin }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.student.mail'">Mail</span></dt>
+          <dd>
+            <span>{{ student.mail }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.student.examSheets'">Exam Sheets</span></dt>
+          <dd>
+            @for (examSheets of student.examSheets; track examSheets; let last = $last) {
+              <span>
+                <a [routerLink]="['/exam-sheet', examSheets?.id, 'view']">{{ examSheets.name }}</a
+                >{{ last ? '' : ', ' }}
+              </span>
+            }
+          </dd>
+        </dl>
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
+        </button>
+        <button type="button" [routerLink]="['/student', student.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
+        </button>
+      </div>
+    }
   </div>
 </div>

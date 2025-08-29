@@ -6,14 +6,14 @@ import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 import { PasswordService } from './password.service';
 import { PasswordStrengthBarComponent } from './password-strength-bar/password-strength-bar.component';
-import { NgIf, AsyncPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'jhi-password',
   templateUrl: './password.component.html',
   standalone: true,
-  imports: [NgIf, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, AsyncPipe, TranslateDirective, TranslatePipe],
+  imports: [FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, AsyncPipe, TranslateDirective, TranslatePipe],
 })
 export class PasswordComponent implements OnInit {
   doNotMatch = false;

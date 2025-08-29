@@ -6,14 +6,14 @@ import { UserManagementService } from '../service/user-management.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
 import { FormsModule } from '@angular/forms';
-import { NgIf } from '@angular/common';
+
 import { TranslateDirective } from '@ngx-translate/core';
 
 @Component({
   selector: 'jhi-user-mgmt-delete-dialog',
   templateUrl: './user-management-delete-dialog.component.html',
   standalone: true,
-  imports: [TranslateDirective, NgIf, FormsModule, AlertErrorComponent, FaIconComponent],
+  imports: [TranslateDirective, FormsModule, AlertErrorComponent, FaIconComponent],
 })
 export class UserManagementDeleteDialogComponent {
   user?: User;

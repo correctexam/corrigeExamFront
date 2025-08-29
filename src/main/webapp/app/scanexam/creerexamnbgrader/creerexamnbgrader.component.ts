@@ -12,7 +12,7 @@ import { TemplateService } from '../../entities/template/service/template.servic
 import { TranslateDirective, TranslateService } from '@ngx-translate/core';
 import { Title } from '@angular/platform-browser';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
-import { CommonModule, NgFor, NgIf } from '@angular/common';
+
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
@@ -43,12 +43,10 @@ class Response {
   providers: [MessageService, ConfirmationService, DialogService],
   standalone: true,
   imports: [
-    CommonModule,
     ToastModule,
     BlockUIModule,
     ProgressSpinnerModule,
     TranslateDirective,
-
     FaIconComponent,
     FormsModule,
     ReactiveFormsModule,

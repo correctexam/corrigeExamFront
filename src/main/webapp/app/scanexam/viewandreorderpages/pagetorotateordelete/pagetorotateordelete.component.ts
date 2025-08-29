@@ -27,7 +27,7 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TooltipModule } from 'primeng/tooltip';
 import { DragDropModule } from 'primeng/dragdrop';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { NgIf, NgFor, NgClass, KeyValuePipe } from '@angular/common';
+import { NgClass, KeyValuePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { ButtonModule } from 'primeng/button';
@@ -46,7 +46,6 @@ import { ViewandreorderpagesComponent } from '../viewandreorderpages.component';
     SelectButtonModule,
     FormsModule,
     ProgressSpinnerModule,
-    NgFor,
     DragDropModule,
     TooltipModule,
     TranslateDirective,

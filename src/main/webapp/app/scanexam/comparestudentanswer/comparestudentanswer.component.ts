@@ -35,7 +35,7 @@ import { PreferenceService } from '../preference-page/preference.service';
 import { AlignImagesService, IImageCropFromZoneInput } from '../services/align-images.service';
 import { IComments } from '../../entities/comments/comments.model';
 import { HttpClient } from '@angular/common/http';
-import { KeyValue, Location, NgIf, NgFor, NgClass, DecimalPipe, KeyValuePipe } from '@angular/common';
+import { KeyValue, Location, NgClass, DecimalPipe, KeyValuePipe } from '@angular/common';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import jszip from 'jszip';
 import * as FileSaver from 'file-saver';
@@ -101,12 +101,9 @@ export interface ClusterDTO {
     TooltipModule,
     ButtonDirective,
     FaIconComponent,
-
-    NgIf,
     DrawerModule,
     SliderModule,
     FormsModule,
-    NgFor,
     RadioButtonModule,
     SelectButtonModule,
     NgClass,

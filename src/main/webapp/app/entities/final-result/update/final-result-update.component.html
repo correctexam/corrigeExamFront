@@ -43,9 +43,11 @@
           <label class="form-label" [translate]="'gradeScopeIsticApp.finalResult.student'" for="field_student">Student</label>
           <select class="form-control" id="field_student" name="student" formControlName="studentId">
             <option [ngValue]="null"></option>
-            <option [ngValue]="studentOption.id" *ngFor="let studentOption of students; trackBy: trackById">
-              {{ studentOption.name }}
-            </option>
+            @for (studentOption of students; track trackById($index, studentOption)) {
+              <option [ngValue]="studentOption.id">
+                {{ studentOption.name }}
+              </option>
+            }
           </select>
         </div>
 
@@ -53,7 +55,9 @@
           <label class="form-label" [translate]="'gradeScopeIsticApp.finalResult.exam'" for="field_exam">Exam</label>
           <select class="form-control" id="field_exam" name="exam" formControlName="examId">
             <option [ngValue]="null"></option>
-            <option [ngValue]="examOption.id" *ngFor="let examOption of exams; trackBy: trackById">{{ examOption.name }}</option>
+            @for (examOption of exams; track trackById($index, examOption)) {
+              <option [ngValue]="examOption.id">{{ examOption.name }}</option>
+            }
           </select>
         </div>
       </div>

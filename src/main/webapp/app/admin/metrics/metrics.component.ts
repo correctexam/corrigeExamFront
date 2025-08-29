@@ -11,7 +11,7 @@ import { MetricsGarbageCollectorComponent } from './blocks/metrics-garbagecollec
 import { MetricsSystemComponent } from './blocks/metrics-system/metrics-system.component';
 import { JvmThreadsComponent } from './blocks/jvm-threads/jvm-threads.component';
 import { JvmMemoryComponent } from './blocks/jvm-memory/jvm-memory.component';
-import { NgIf } from '@angular/common';
+
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 
 @Component({
@@ -21,7 +21,6 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
   standalone: true,
   imports: [
     FaIconComponent,
-    NgIf,
     JvmMemoryComponent,
     JvmThreadsComponent,
     MetricsSystemComponent,

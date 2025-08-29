@@ -10,14 +10,14 @@ import { CommentsService } from '../service/comments.service';
 import { IStudentResponse } from 'app/entities/student-response/student-response.model';
 import { StudentResponseService } from 'app/entities/student-response/service/student-response.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { NgFor } from '@angular/common';
+
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
 
 @Component({
   selector: 'jhi-comments-update',
   templateUrl: './comments-update.component.html',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, NgFor, FaIconComponent],
+  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, FaIconComponent],
 })
 export class CommentsUpdateComponent implements OnInit {
   isSaving = false;

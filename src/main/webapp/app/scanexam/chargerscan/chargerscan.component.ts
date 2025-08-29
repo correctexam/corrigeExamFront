@@ -38,7 +38,7 @@ import { FileUpload, FileUploadModule } from 'primeng/fileupload';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TooltipModule } from 'primeng/tooltip';
-import { NgIf } from '@angular/common';
+
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
@@ -91,7 +91,6 @@ const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
     BlockUIModule,
     ProgressSpinnerModule,
     ProgressBarModule,
-    NgIf,
     TooltipModule,
     FaIconComponent,
     ToggleSwitchModule,

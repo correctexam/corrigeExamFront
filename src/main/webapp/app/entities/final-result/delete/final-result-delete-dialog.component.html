@@ -1,29 +1,26 @@
-<form *ngIf="finalResult" name="deleteForm" (ngSubmit)="confirmDelete(finalResult.id!)">
-  <div class="modal-header">
-    <h4 class="modal-title" data-cy="finalResultDeleteDialogHeading" [translate]="'entity.delete.title'">Confirm delete operation</h4>
-
-    <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="cancel()">&times;</button>
-  </div>
-
-  <div class="modal-body">
-    <jhi-alert-error></jhi-alert-error>
-
-    <p
-      id="jhi-delete-finalResult-heading"
-      [translate]="'gradeScopeIsticApp.finalResult.delete.question'"
-      [translateParams]="{ id: finalResult.id }"
-    >
-      Are you sure you want to delete this Final Result?
-    </p>
-  </div>
-
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancel()">
-      <fa-icon icon="ban"></fa-icon>&nbsp;<span [translate]="'entity.action.cancel'">Cancel</span>
-    </button>
-
-    <button id="jhi-confirm-delete-finalResult" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-danger">
-      <fa-icon icon="times"></fa-icon>&nbsp;<span [translate]="'entity.action.delete'">Delete</span>
-    </button>
-  </div>
-</form>
+@if (finalResult) {
+  <form name="deleteForm" (ngSubmit)="confirmDelete(finalResult.id!)">
+    <div class="modal-header">
+      <h4 class="modal-title" data-cy="finalResultDeleteDialogHeading" [translate]="'entity.delete.title'">Confirm delete operation</h4>
+      <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true" (click)="cancel()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <jhi-alert-error></jhi-alert-error>
+      <p
+        id="jhi-delete-finalResult-heading"
+        [translate]="'gradeScopeIsticApp.finalResult.delete.question'"
+        [translateParams]="{ id: finalResult.id }"
+      >
+        Are you sure you want to delete this Final Result?
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancel()">
+        <fa-icon icon="ban"></fa-icon>&nbsp;<span [translate]="'entity.action.cancel'">Cancel</span>
+      </button>
+      <button id="jhi-confirm-delete-finalResult" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-danger">
+        <fa-icon icon="times"></fa-icon>&nbsp;<span [translate]="'entity.action.delete'">Delete</span>
+      </button>
+    </div>
+  </form>
+}

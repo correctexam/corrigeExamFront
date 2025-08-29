@@ -28,7 +28,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { SliderModule } from 'primeng/slider';
 import { FormsModule } from '@angular/forms';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { NgIf, NgFor } from '@angular/common';
+
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { ToastModule } from 'primeng/toast';
@@ -39,7 +39,7 @@ import { ToastModule } from 'primeng/toast';
   styleUrls: ['./voirreponse.component.scss'],
   providers: [ConfirmationService, MessageService],
   standalone: true,
-  imports: [ToastModule, BlockUIModule, ProgressSpinnerModule, NgIf, NgFor, ToggleSwitchModule, FormsModule, SliderModule],
+  imports: [ToastModule, BlockUIModule, ProgressSpinnerModule, ToggleSwitchModule, FormsModule, SliderModule],
 })
 export class VoirReponseComponent implements OnInit, AfterViewInit {
   public href = '';

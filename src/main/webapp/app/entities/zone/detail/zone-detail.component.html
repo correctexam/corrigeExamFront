@@ -1,48 +1,44 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
-    <div *ngIf="zone">
-      <h2 data-cy="zoneDetailsHeading"><span [translate]="'gradeScopeIsticApp.zone.detail.title'">Zone</span></h2>
-
-      <hr />
-
-      <jhi-alert-error></jhi-alert-error>
-
-      <jhi-alert></jhi-alert>
-
-      <dl class="row-md jh-entity-details">
-        <dt><span [translate]="'global.field.id'">ID</span></dt>
-        <dd>
-          <span>{{ zone.id }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.zone.pageNumber'">Page Number</span></dt>
-        <dd>
-          <span>{{ zone.pageNumber }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.zone.xInit'">X Init</span></dt>
-        <dd>
-          <span>{{ zone.xInit }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.zone.yInit'">Y Init</span></dt>
-        <dd>
-          <span>{{ zone.yInit }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.zone.width'">Width</span></dt>
-        <dd>
-          <span>{{ zone.width }}</span>
-        </dd>
-        <dt><span [translate]="'gradeScopeIsticApp.zone.height'">Height</span></dt>
-        <dd>
-          <span>{{ zone.height }}</span>
-        </dd>
-      </dl>
-
-      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
-      </button>
-
-      <button type="button" [routerLink]="['/zone', zone.id, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
-      </button>
-    </div>
+    @if (zone) {
+      <div>
+        <h2 data-cy="zoneDetailsHeading"><span [translate]="'gradeScopeIsticApp.zone.detail.title'">Zone</span></h2>
+        <hr />
+        <jhi-alert-error></jhi-alert-error>
+        <jhi-alert></jhi-alert>
+        <dl class="row-md jh-entity-details">
+          <dt><span [translate]="'global.field.id'">ID</span></dt>
+          <dd>
+            <span>{{ zone.id }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.zone.pageNumber'">Page Number</span></dt>
+          <dd>
+            <span>{{ zone.pageNumber }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.zone.xInit'">X Init</span></dt>
+          <dd>
+            <span>{{ zone.xInit }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.zone.yInit'">Y Init</span></dt>
+          <dd>
+            <span>{{ zone.yInit }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.zone.width'">Width</span></dt>
+          <dd>
+            <span>{{ zone.width }}</span>
+          </dd>
+          <dt><span [translate]="'gradeScopeIsticApp.zone.height'">Height</span></dt>
+          <dd>
+            <span>{{ zone.height }}</span>
+          </dd>
+        </dl>
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
+        </button>
+        <button type="button" [routerLink]="['/zone', zone.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'entity.action.edit'">Edit</span>
+        </button>
+      </div>
+    }
   </div>
 </div>

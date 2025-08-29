@@ -5,14 +5,14 @@ import { Router, RouterLink } from '@angular/router';
 import { LoginService } from 'app/login/login.service';
 import { AccountService } from 'app/core/auth/account.service';
 import { TranslateDirective, TranslatePipe } from '@ngx-translate/core';
-import { NgIf } from '@angular/common';
+
 import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'jhi-login',
   templateUrl: './login.component.html',
   standalone: true,
-  imports: [TranslateDirective, NgIf, FormsModule, ReactiveFormsModule, RouterLink, TranslatePipe, ButtonModule],
+  imports: [TranslateDirective, FormsModule, ReactiveFormsModule, RouterLink, TranslatePipe, ButtonModule],
 })
 export class LoginComponent implements OnInit, AfterViewInit {
   @ViewChild('username', { static: false })

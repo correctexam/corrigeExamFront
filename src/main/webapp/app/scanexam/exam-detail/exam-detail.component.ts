@@ -33,7 +33,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
-import { CommonModule, NgIf } from '@angular/common';
+
 import { DockModule } from 'primeng/dock';
 import { ButtonDirective } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
@@ -47,14 +47,11 @@ import { ToastModule } from 'primeng/toast';
   providers: [ConfirmationService, MessageService],
   standalone: true,
   imports: [
-    CommonModule,
     ToastModule,
     DialogModule,
-
     FormsModule,
     PrimeTemplate,
     ButtonDirective,
-    NgIf,
     RouterLink,
     TooltipModule,
     ConfirmDialogModule,

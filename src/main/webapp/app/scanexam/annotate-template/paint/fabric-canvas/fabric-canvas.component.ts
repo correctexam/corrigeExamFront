@@ -25,7 +25,7 @@ import { PreferenceService } from 'app/scanexam/preference-page/preference.servi
 //  suppressScrollX: true,
 // };
 import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer';
-import { DOCUMENT, NgIf } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { SummaryTemplateComponent } from '../../summary/summary-template.component';
@@ -44,7 +44,7 @@ export type CustomZone = IZone & { type: DrawingTools };
     //    },
   ],
   standalone: true,
-  imports: [SummaryTemplateComponent, BlockUIModule, ProgressSpinnerModule, NgIf, NgxExtendedPdfViewerModule],
+  imports: [SummaryTemplateComponent, BlockUIModule, ProgressSpinnerModule, NgxExtendedPdfViewerModule],
 })
 export class FabricCanvasComponent implements OnInit, OnDestroy {
   @Input()
