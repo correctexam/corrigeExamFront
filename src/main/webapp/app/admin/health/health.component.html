@@ -27,7 +27,7 @@
                 <span
                   class="badge"
                   [ngClass]="getBadgeClass(componentHealth.value!.status)"
-                  translate="{{ 'health.status.' + componentHealth.value!.status }}"
+                  [translate]="'health.status.' + componentHealth.value!.status"
                 >
                   {{ componentHealth.value!.status }}
                 </span>

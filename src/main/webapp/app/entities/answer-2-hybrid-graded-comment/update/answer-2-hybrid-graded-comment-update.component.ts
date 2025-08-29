@@ -11,11 +11,15 @@ import { IHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-
 import { HybridGradedCommentService } from 'app/entities/hybrid-graded-comment/service/hybrid-graded-comment.service';
 import { IStudentResponse } from 'app/entities/student-response/student-response.model';
 import { StudentResponseService } from 'app/entities/student-response/service/student-response.service';
+import { AlertErrorComponent } from 'app/shared/alert/alert-error.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'jhi-answer-2-hybrid-graded-comment-update',
   templateUrl: './answer-2-hybrid-graded-comment-update.component.html',
   standalone: true,
+  imports: [AlertErrorComponent, FormsModule, FaIconComponent, ReactiveFormsModule],
 })
 export class Answer2HybridGradedCommentUpdateComponent implements OnInit {
   isSaving = false;

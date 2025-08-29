@@ -3,7 +3,7 @@
     @if (answer2HybridGradedComment) {
       <div>
         <h2 data-cy="answer2HybridGradedCommentDetailsHeading">
-          <span translate="gradeScopeIsticApp.answer2HybridGradedComment.detail.title">Answer 2 Hybrid Graded Comment</span>
+          <span [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.detail.title'">Answer 2 Hybrid Graded Comment</span>
         </h2>
         <hr />
         <jhi-alert-error></jhi-alert-error>
@@ -13,11 +13,11 @@
           <dd>
             <span>{{ answer2HybridGradedComment.id }}</span>
           </dd>
-          <dt><span translate="gradeScopeIsticApp.answer2HybridGradedComment.stepValue">Step Value</span></dt>
+          <dt><span [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.stepValue'">Step Value</span></dt>
           <dd>
             <span>{{ answer2HybridGradedComment.stepValue }}</span>
           </dd>
-          <dt><span translate="gradeScopeIsticApp.answer2HybridGradedComment.hybridcomments">Hybridcomments</span></dt>
+          <dt><span [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.hybridcomments'">Hybridcomments</span></dt>
           <dd>
             @if (answer2HybridGradedComment.hybridcommentsId) {
               <div>
@@ -27,7 +27,7 @@
               </div>
             }
           </dd>
-          <dt><span translate="gradeScopeIsticApp.answer2HybridGradedComment.studentResponse">Student Response</span></dt>
+          <dt><span [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.studentResponse'">Student Response</span></dt>
           <dd>
             @if (answer2HybridGradedComment.studentResponseId) {
               <div>

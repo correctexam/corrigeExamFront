@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
   template: `
     @if (ribbonEnv$ | async; as ribbonEnv) {
       <div class="ribbon">
-        <a href="" translate="global.ribbon.{{ ribbonEnv }}">{{ ribbonEnv }}</a>
+        <a href="" [translate]="'global.ribbon.{{ ribbonEnv }}'">{{ ribbonEnv }}</a>
       </div>
     }
   `,

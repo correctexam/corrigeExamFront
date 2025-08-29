@@ -10,7 +10,7 @@
       <div class="col-12 sm:col-12 md:col-12 lg:col-9 xl:col-10">
         <div class="d-flex justify-content-center">
           @if (questionNumeros.length > questionindex) {
-            <h2><span translate="scanexam.question1">Question </span>{{ questionNumeros[questionindex] }}</h2>
+            <h2><span [translate]="'scanexam.question1'">Question </span>{{ questionNumeros[questionindex] }}</h2>
           }
         </div>
         @for (k of questions; track k; let i = $index) {

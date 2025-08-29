@@ -33,7 +33,7 @@
           @for (st of selectionStudents; track st) {
             <span> {{ st.name }} {{ st.firstname }}</span>
           }
-          (<span translate="scanexam.note1">Note :</span> {{ note | async | number: '1.2-2' }})
+          (<span [translate]="'scanexam.note1'">Note :</span> {{ note | async | number: '1.2-2' }})
         </h2>
       </div>
       <div class="col-4 flex flex-row-reverse"></div>
@@ -89,7 +89,7 @@
             questions!.length > 0 &&
             (questions![0].libelle === undefined || questions![0].libelle === '')
           ) {
-            <h2><span translate="scanexam.question1">Question </span>{{ questionNumeros[questionindex] }}</h2>
+            <h2><span [translate]="'scanexam.question1'">Question </span>{{ questionNumeros[questionindex] }}</h2>
           }
         </div>
         @for (k of questions; track k; let i = $index) {

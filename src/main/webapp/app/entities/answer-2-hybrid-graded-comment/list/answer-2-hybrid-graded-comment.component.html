@@ -1,11 +1,11 @@
 <div>
   <h2 id="page-heading" data-cy="Answer2HybridGradedCommentHeading">
-    <span translate="gradeScopeIsticApp.answer2HybridGradedComment.home.title">Answer2HybridGradedComments</span>
+    <span [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.home.title'">Answer2HybridGradedComments</span>
 
     <div class="d-flex justify-content-end">
       <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
         <fa-icon icon="sync" [animation]="'spin'"></fa-icon>
-        <span translate="gradeScopeIsticApp.answer2HybridGradedComment.home.refreshListLabel">Actualiser la liste</span>
+        <span [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.home.refreshListLabel'">Actualiser la liste</span>
       </button>
 
       <button
@@ -15,7 +15,7 @@
         [routerLink]="['/answer-2-hybrid-graded-comment/new']"
       >
         <fa-icon icon="plus"></fa-icon>
-        <span translate="gradeScopeIsticApp.answer2HybridGradedComment.home.createLabel">
+        <span [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.home.createLabel'">
           Créer un nouveau Answer 2 Hybrid Graded Comment
         </span>
       </button>
@@ -28,7 +28,7 @@
 
   @if (answer2HybridGradedComments?.length === 0) {
     <div class="alert alert-warning" id="no-result">
-      <span translate="gradeScopeIsticApp.answer2HybridGradedComment.home.notFound">Aucun Answer 2 Hybrid Graded Comment trouvé</span>
+      <span [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.home.notFound'">Aucun Answer 2 Hybrid Graded Comment trouvé</span>
     </div>
   }
 
@@ -45,19 +45,19 @@
             </th>
             <th scope="col" jhiSortBy="stepValue">
               <div class="d-flex">
-                <span translate="gradeScopeIsticApp.answer2HybridGradedComment.stepValue">Step Value</span>
+                <span [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.stepValue'">Step Value</span>
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="hybridcomments.text">
               <div class="d-flex">
-                <span translate="gradeScopeIsticApp.answer2HybridGradedComment.hybridcomments">Hybridcomments</span>
+                <span [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.hybridcomments'">Hybridcomments</span>
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="studentResponse.id">
               <div class="d-flex">
-                <span translate="gradeScopeIsticApp.answer2HybridGradedComment.studentResponse">Student Response</span>
+                <span [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.studentResponse'">Student Response</span>
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>

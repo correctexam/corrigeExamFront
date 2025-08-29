@@ -4,7 +4,7 @@
       <h2
         id="jhi-answer-2-hybrid-graded-comment-heading"
         data-cy="Answer2HybridGradedCommentCreateUpdateHeading"
-        translate="gradeScopeIsticApp.answer2HybridGradedComment.home.createOrEditLabel"
+        [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.home.createOrEditLabel'"
       >
         Créer ou éditer un Answer 2 Hybrid Graded Comment
       </h2>
@@ -29,7 +29,7 @@
         }
 
         <div class="row mb-3">
-          <label class="form-label" translate="gradeScopeIsticApp.answer2HybridGradedComment.stepValue" for="field_stepValue"
+          <label class="form-label" [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.stepValue'" for="field_stepValue"
             >Step Value</label
           >
           <input
@@ -44,7 +44,7 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" translate="gradeScopeIsticApp.answer2HybridGradedComment.hybridcomments" for="field_hybridcomments"
+          <label class="form-label" [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.hybridcomments'" for="field_hybridcomments"
             >Hybridcomments</label
           >
           <select
@@ -65,7 +65,10 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" translate="gradeScopeIsticApp.answer2HybridGradedComment.studentResponse" for="field_studentResponse"
+          <label
+            class="form-label"
+            [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.studentResponse'"
+            for="field_studentResponse"
             >Student Response</label
           >
           <select

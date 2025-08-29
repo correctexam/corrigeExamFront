@@ -1,8 +1,8 @@
 import { Component, NgZone, OnInit } from '@angular/core';
 import { HttpHeaders } from '@angular/common/http';
-import { ActivatedRoute, Data, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, Data, ParamMap, Router, RouterLink } from '@angular/router';
 import { combineLatest, filter, Observable, switchMap, tap } from 'rxjs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 
 import { IAnswer2HybridGradedComment } from '../answer-2-hybrid-graded-comment.model';
 
@@ -16,11 +16,17 @@ import {
   SORT,
   TOTAL_COUNT_RESPONSE_HEADER,
 } from 'app/entities/hybrid-graded-comment/list/hybrid-graded-comment.component';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { AlertErrorComponent } from 'app/shared/alert/alert-error.component';
+import { AlertComponent } from 'app/shared/alert/alert.component';
+import { ItemCountComponent } from 'app/shared/pagination/item-count.component';
+import { SortDirective } from 'app/shared/sort/sort.directive';
 
 @Component({
   selector: 'jhi-answer-2-hybrid-graded-comment',
   templateUrl: './answer-2-hybrid-graded-comment.component.html',
   standalone: true,
+  imports: [FaIconComponent, AlertErrorComponent, AlertComponent, RouterLink, ItemCountComponent, NgbPagination, SortDirective],
 })
 export class Answer2HybridGradedCommentComponent implements OnInit {
   answer2HybridGradedComments?: IAnswer2HybridGradedComment[];

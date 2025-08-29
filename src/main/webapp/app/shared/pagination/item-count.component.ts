@@ -6,7 +6,7 @@ import { TranslateDirective } from '@ngx-translate/core';
  */
 @Component({
   selector: 'jhi-item-count',
-  template: ` <div translate="global.item-count" [translateParams]="{ first: first, second: second, total: total }"></div> `,
+  template: ` <div [translate]="'global.item-count'" [translateParams]="{ first: first, second: second, total: total }"></div> `,
   standalone: true,
   imports: [TranslateDirective],
 })

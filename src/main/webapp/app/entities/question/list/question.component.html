@@ -73,7 +73,7 @@
               <td>{{ question.point }}</td>
               <td>{{ question.step }}</td>
               <td>{{ question.validExpression }}</td>
-              <td translate="{{ 'gradeScopeIsticApp.GradeType.' + question.gradeType }}">{{ question.gradeType }}</td>
+              <td [translate]="'gradeScopeIsticApp.GradeType.' + question.gradeType">{{ question.gradeType }}</td>
               <td>
                 @if (question.zoneId) {
                   <div>
