@@ -2,14 +2,14 @@
   <div class="d-flex justify-content-center">
     <div class="col-md-8">
       @if (account) {
-        <h2 [translate]="'settings.title'" [translateParams]="{ username: account.login }">
+        <h2 [innerHTML]="'settings.title' | translate: { username: account.login }">
           User settings for [<strong>{{ account.login }}</strong
           >]
         </h2>
       }
 
       @if (success) {
-        <div class="alert alert-success" [translate]="'settings.messages.success'">
+        <div class="alert alert-success" [innerHTML]="'settings.messages.success' | translate">
           <strong>Settings saved!</strong>
         </div>
       }

@@ -4,31 +4,31 @@
       <h1 [translate]="'register.title'" data-cy="registerTitle">Registration</h1>
 
       @if (success) {
-        <div class="alert alert-success" [translate]="'register.messages.success'">
+        <div class="alert alert-success" [innerHTML]="'register.messages.success' | translate">
           <strong>Registration saved!</strong> Please check your email for confirmation.
         </div>
       }
 
       @if (error) {
-        <div class="alert alert-danger" [translate]="'register.messages.error.fail'">
+        <div class="alert alert-danger" [innerHTML]="'register.messages.error.fail' | translate">
           <strong>Registration failed!</strong> Please try again later.
         </div>
       }
 
       @if (errorUserExists) {
-        <div class="alert alert-danger" [translate]="'register.messages.error.userexists'">
+        <div class="alert alert-danger" [innerHTML]="'register.messages.error.userexists' | translate">
           <strong>Login name already registered!</strong> Please choose another one.
         </div>
       }
 
       @if (errorEmailExists) {
-        <div class="alert alert-danger" [translate]="'register.messages.error.emailexists'">
+        <div class="alert alert-danger" [innerHTML]="'register.messages.error.emailexists' | translate">
           <strong>Email is already in use!</strong> Please choose another one.
         </div>
       }
 
       @if (doNotMatch) {
-        <div class="alert alert-danger" [translate]="'global.messages.error.dontmatch'">
+        <div class="alert alert-danger" [innerHTML]="'global.messages.error.dontmatch' | translate">
           The password and its confirmation do not match!
         </div>
       }

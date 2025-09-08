@@ -5,13 +5,13 @@
 
       @if (success) {
         <div class="alert alert-success">
-          <span [translate]="'activate.messages.success'"><strong>Your user account has been activated.</strong> Please </span>
+          <span [innerHTML]="'activate.messages.success' | translate"><strong>Your user account has been activated.</strong> Please </span>
           <a class="alert-link" routerLink="/login" [translate]="'global.messages.info.authenticated.link'">sign in</a>.
         </div>
       }
 
       @if (error) {
-        <div class="alert alert-danger" [translate]="'activate.messages.error'">
+        <div class="alert alert-danger" [innerHTML]="'activate.messages.error' | translate">
           <strong>Your user could not be activated.</strong> Please use the registration form to sign up.
         </div>
       }
