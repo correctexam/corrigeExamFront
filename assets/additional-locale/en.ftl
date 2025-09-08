@@ -15,5 +15,9 @@
 # Additional translations
 unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
 pdfjs-infinite-scroll-button-label = Infinite scroll
-pdfjs-find-multiple-checkbox-label = match each word
-pdfjs-find-regexp-checkbox-label = regular expression
+pdfjs-find-multiple-checkbox-label = Match Each Word
+pdfjs-find-regexp-checkbox-label = Regular Expression
+pdfjs-editor-movePageUp-button = Move Page Up
+pdfjs-editor-movePageUp-button-label = Move Page Up
+pdfjs-editor-movePageDown-button = Move Page Down
+pdfjs-editor-movePageDown-button-label = Move Page Down

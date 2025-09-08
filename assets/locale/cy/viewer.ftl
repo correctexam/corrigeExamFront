@@ -324,6 +324,25 @@ pdfjs-highlight-floating-button1 =
     .title = Amlygu
     .aria-label = Amlygu
 pdfjs-highlight-floating-button-label = Amlygu
+pdfjs-editor-signature-button =
+    .title = Ychwanegu llofnod
+pdfjs-editor-signature-button-label = Ychwanegu llofnod
+
+## Default editor aria labels
+
+# “Highlight” is a noun, the string is used on the editor for highlights.
+pdfjs-editor-highlight-editor =
+    .aria-label = Golygydd amlygu
+# “Drawing” is a noun, the string is used on the editor for drawings.
+pdfjs-editor-ink-editor =
+    .aria-label = Golygydd lluniadu
+# Used when a signature editor is selected/hovered.
+# Variables:
+#   $description (String) - a string describing/labeling the signature.
+pdfjs-editor-signature-editor1 =
+    .aria-description = Golygydd llofnod: { $description }
+pdfjs-editor-stamp-editor =
+    .aria-label = Golygydd delweddau
 
 ## Remove button for the various kind of editor.
 
@@ -335,6 +354,8 @@ pdfjs-editor-remove-stamp-button =
     .title = Dileu delwedd
 pdfjs-editor-remove-highlight-button =
     .title = Tynnu amlygiad
+pdfjs-editor-remove-signature-button =
+    .title = Dileu llofnod
 
 ##
 
@@ -351,6 +372,20 @@ pdfjs-editor-stamp-add-image-button-label = Ychwanegu delwedd
 pdfjs-editor-free-highlight-thickness-input = Trwch
 pdfjs-editor-free-highlight-thickness-title =
     .title = Newid trwch wrth amlygu eitemau heblaw testun
+pdfjs-editor-add-signature-container =
+    .aria-label = Rheolyddion llofnodion a llofnodion wedi'u cadw
+pdfjs-editor-signature-add-signature-button =
+    .title = Ychwanegu llofnod newydd
+pdfjs-editor-signature-add-signature-button-label = Ychwanegu llofnod newydd
+# Used on the button to use an already saved signature.
+# Variables:
+#   $description (String) - a string describing/labeling the signature.
+pdfjs-editor-add-saved-signature-button =
+    .title = Llofnod wedi'i gadw: { $description }
+# .default-content is used as a placeholder in an empty text editor.
+pdfjs-free-text2 =
+    .aria-label = Golygydd Testun
+    .default-content = Cychwyn teipio…
 pdfjs-free-text =
     .aria-label = Golygydd Testun
 pdfjs-free-text-default-content = Cychwyn teipio…
@@ -361,8 +396,9 @@ pdfjs-ink-canvas =
 
 ## Alt-text dialog
 
-# Alternative text (alt text) helps when people can't see the image.
 pdfjs-editor-alt-text-button-label = Testun amgen (alt)
+pdfjs-editor-alt-text-edit-button =
+    .aria-label = Golygu testun amgen
 pdfjs-editor-alt-text-edit-button-label = Golygu testun amgen
 pdfjs-editor-alt-text-dialog-label = Dewisiadau
 pdfjs-editor-alt-text-dialog-description = Mae testun amgen (testun alt) yn helpu pan na all pobl weld y ddelwedd neu pan nad yw'n llwytho.
@@ -376,6 +412,9 @@ pdfjs-editor-alt-text-decorative-tooltip = Marcio fel addurniadol
 # .placeholder: This is a placeholder for the alt text input area
 pdfjs-editor-alt-text-textarea =
     .placeholder = Er enghraifft, “Mae dyn ifanc yn eistedd wrth fwrdd i fwyta pryd bwyd”
+# Alternative text (alt text) helps when people can't see the image.
+pdfjs-editor-alt-text-button =
+    .aria-label = Testun amgen (alt)
 
 ## Editor resizers
 ## This is used in an aria label to help to understand the role of the resizer.
@@ -444,7 +483,7 @@ pdfjs-editor-new-alt-text-textarea =
 pdfjs-editor-new-alt-text-description = Disgrifiad byr ar gyfer pobl sydd ddim yn gallu gweld y ddelwedd neu pan nad yw'r ddelwedd yn llwytho.
 # This is a required legal disclaimer that refers to the automatically created text inside the alt text box above this text. It disappears if the text is edited by a human.
 pdfjs-editor-new-alt-text-disclaimer1 = Cafodd y testun amgen hwn ei greu'n awtomatig a gall fod yn anghywir.
-pdfjs-editor-new-alt-text-disclaimer-learn-more-url = Dysgu rhagor
+pdfjs-editor-new-alt-text-disclaimer-learn-more-url = Rhagor
 pdfjs-editor-new-alt-text-create-automatically-button-label = Creu testun amgen yn awtomatig
 pdfjs-editor-new-alt-text-not-now-button = Nid nawr
 pdfjs-editor-new-alt-text-error-title = Methu â chreu testun amgen yn awtomatig
@@ -453,14 +492,19 @@ pdfjs-editor-new-alt-text-error-close-button = Cau
 # Variables:
 #   $totalSize (Number) - the total size (in MB) of the AI model.
 #   $downloadedSize (Number) - the downloaded size (in MB) of the AI model.
-#   $percent (Number) - the percentage of the downloaded size.
 pdfjs-editor-new-alt-text-ai-model-downloading-progress = Wrthi'n llwytho i lawr model AI testun amgen ( { $downloadedSize } o { $totalSize } MB)
     .aria-valuetext = Wrthi'n llwytho i lawr model AI testun amgen ( { $downloadedSize } o { $totalSize } MB)
 # This is a button that users can click to edit the alt text they have already added.
+pdfjs-editor-new-alt-text-added-button =
+    .aria-label = Ychwanegwyd testun amgen
 pdfjs-editor-new-alt-text-added-button-label = Ychwanegwyd testun amgen
 # This is a button that users can click to open the alt text editor and add alt text when it is not present.
+pdfjs-editor-new-alt-text-missing-button =
+    .aria-label = Testun amgen coll
 pdfjs-editor-new-alt-text-missing-button-label = Testun amgen coll
 # This is a button that opens up the alt text modal where users should review the alt text that was automatically generated.
+pdfjs-editor-new-alt-text-to-review-button =
+    .aria-label = Adolygu'r testun amgen
 pdfjs-editor-new-alt-text-to-review-button-label = Adolygu'r testun amgen
 # "Created automatically" is a prefix that will be added to the beginning of any alt text that has been automatically generated. After the colon, the user will see/hear the actual alt text description. If the alt text has been edited by a human, this prefix will not appear.
 # Variables:
@@ -488,26 +532,131 @@ pdfjs-editor-alt-text-settings-show-dialog-button-label = Dangoswch y golygydd t
 pdfjs-editor-alt-text-settings-show-dialog-description = Yn eich helpu i wneud yn siŵr bod gan eich holl ddelweddau destun amgen.
 pdfjs-editor-alt-text-settings-close-button = Cau
 
-# Translations for ngx-extended-pdf-viewer additions only available in en-US
-unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
-pdfjs-infinite-scroll-button-label = Infinite scroll
-pdfjs-find-multiple-checkbox-label = match each word
-pdfjs-find-regexp-checkbox-label = regular expression
-pdfjs-free-text2 =
-    .aria-label = Text Editor
-    .default-content = Start typing…
-pdfjs-editor-undo-bar-message-highlight = Highlight removed
-pdfjs-editor-undo-bar-message-freetext = Text removed
-pdfjs-editor-undo-bar-message-ink = Drawing removed
-pdfjs-editor-undo-bar-message-stamp = Image removed
+## "Annotations removed" bar
+
+pdfjs-editor-undo-bar-message-highlight = Tynnwyd yr amlygu
+pdfjs-editor-undo-bar-message-freetext = Tynnwyd y testun
+pdfjs-editor-undo-bar-message-ink = Tynnwyd y lluniad
+pdfjs-editor-undo-bar-message-stamp = Tynnwyd y ddelwedd
+pdfjs-editor-undo-bar-message-signature = Llofnod wedi'i dynnu
+# Variables:
+#   $count (Number) - the number of removed annotations.
 pdfjs-editor-undo-bar-message-multiple =
     { $count ->
-        [one] { $count } annotation removed
-       *[other] { $count } annotations removed
+        [zero] { $count } anodiad wedi'u tynnu
+        [one] { $count } anodiad wedi'i dynnu
+        [two] { $count } anodiad wedi'u tynnu
+        [few] { $count } anodiad wedi'u tynnu
+        [many] { $count } anodiad wedi'u tynnu
+       *[other] { $count } anodiad wedi'u tynnu
     }
 pdfjs-editor-undo-bar-undo-button =
-    .title = Undo
-pdfjs-editor-undo-bar-undo-button-label = Undo
+    .title = Dadwneud
+pdfjs-editor-undo-bar-undo-button-label = Dadwneud
 pdfjs-editor-undo-bar-close-button =
+    .title = Cau
+pdfjs-editor-undo-bar-close-button-label = Cau
+
+## Add a signature dialog
+
+pdfjs-editor-add-signature-dialog-label = Mae'r modd hwn yn caniatáu i'r defnyddiwr greu llofnod i'w ychwanegu at ddogfen PDF. Gall y defnyddiwr olygu'r enw (sydd hefyd yn gweithredu fel y testun amgen), ac yn ddewisol cadw'r llofnod i'w ddefnyddio dro ar ôl tro.
+pdfjs-editor-add-signature-dialog-title = Ychwanegu llofnod
+
+## Tab names
+
+# Type is a verb (you can type your name as signature)
+pdfjs-editor-add-signature-type-button = Math
+    .title = Math
+# Draw is a verb (you can draw your signature)
+pdfjs-editor-add-signature-draw-button = Lluniadu
+    .title = Lluniadu
+pdfjs-editor-add-signature-image-button = Delwedd
+    .title = Delwedd
+
+## Tab panels
+
+pdfjs-editor-add-signature-type-input =
+    .aria-label = Teipiwch eich llofnod
+    .placeholder = Teipiwch eich llofnod
+pdfjs-editor-add-signature-draw-placeholder = Lluniwch eich llofnod
+pdfjs-editor-add-signature-draw-thickness-range-label = Trwch
+# Variables:
+#   $thickness (Number) - the thickness (in pixels) of the line used to draw a signature.
+pdfjs-editor-add-signature-draw-thickness-range =
+    .title = Trwch y llinell: { $thickness }
+pdfjs-editor-add-signature-image-placeholder = Llusgwch ffeil yma i'w llwytho
+pdfjs-editor-add-signature-image-browse-link =
+    { PLATFORM() ->
+        [macos] Neu ddewis ffeiliau delwedd
+       *[other] Neu bori ffeiliau delwedd
+    }
+
+## Controls
+
+pdfjs-editor-add-signature-description-label = Disgrifiad (testun amgen)
+pdfjs-editor-add-signature-description-input =
+    .title = Disgrifiad (testun amgen)
+pdfjs-editor-add-signature-description-default-when-drawing = Llofnod
+pdfjs-editor-add-signature-clear-button-label = Diddymu llofnod
+pdfjs-editor-add-signature-clear-button =
+    .title = Diddymu llofnod
+pdfjs-editor-add-signature-save-checkbox = Cadw llofnod
+pdfjs-editor-add-signature-save-warning-message = Rydych chi wedi cyrraedd y terfyn o 5 llofnod sydd wedi'u cadw. Tynnwch un i gadw rhagor
+pdfjs-editor-add-signature-image-upload-error-title = Methu llwytho'r ddelwedd.
+pdfjs-editor-add-signature-image-upload-error-description = Gwiriwch eich cysylltiad rhwydwaith neu rhowch gynnig ar ddelwedd arall.
+pdfjs-editor-add-signature-error-close-button = Cau
+
+## Dialog buttons
+
+pdfjs-editor-add-signature-cancel-button = Diddymu
+pdfjs-editor-add-signature-add-button = Ychwanegu
+pdfjs-editor-edit-signature-update-button = Diweddaru
+
+## Main menu for adding/removing signatures
+
+pdfjs-editor-delete-signature-button1 =
+    .title = Tynnu llofnod sydd wedi'i gadw
+pdfjs-editor-delete-signature-button-label1 = Tynnwch y llofnod sydd wedi'i gadw
+
+## Editor toolbar
+
+pdfjs-editor-add-signature-edit-button-label = Golygu disgrifiad
+
+## Edit signature description dialog
+
+pdfjs-editor-edit-signature-dialog-title = Golygu disgrifiad
+
+# Translations for ngx-extended-pdf-viewer additions only available in en-US
+pdfjs-editor-color-picker-free-text-input =
+    .title = Change text color
+pdfjs-editor-color-picker-ink-input =
+    .title = Change drawing color
+pdfjs-editor-highlight-added-alert = Highlight added
+pdfjs-editor-freetext-added-alert = Text added
+pdfjs-editor-ink-added-alert = Drawing added
+pdfjs-editor-stamp-added-alert = Image added
+pdfjs-editor-signature-added-alert = Signature added
+pdfjs-editor-add-signature-image-no-data-error-title = Can’t convert this image into a signature
+pdfjs-editor-add-signature-image-no-data-error-description = Please try uploading a different image.
+pdfjs-editor-edit-comment-actions-button-label = Actions
+pdfjs-editor-edit-comment-actions-button =
+    .title = Actions
+pdfjs-editor-edit-comment-close-button-label = Close
+pdfjs-editor-edit-comment-close-button =
     .title = Close
-pdfjs-editor-undo-bar-close-button-label = Close
+pdfjs-editor-edit-comment-actions-edit-button-label = Edit
+pdfjs-editor-edit-comment-actions-delete-button-label = Delete
+pdfjs-editor-edit-comment-manager-text-input =
+    .placeholder = Enter your comment
+pdfjs-editor-edit-comment-manager-cancel-button = Cancel
+pdfjs-editor-edit-comment-manager-save-button = Save
+pdfjs-editor-edit-comment-button =
+    .title = Edit comment
+unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
+pdfjs-infinite-scroll-button-label = Infinite scroll
+pdfjs-find-multiple-checkbox-label = Match Each Word
+pdfjs-find-regexp-checkbox-label = Regular Expression
+pdfjs-editor-movePageUp-button = Move Page Up
+pdfjs-editor-movePageUp-button-label = Move Page Up
+pdfjs-editor-movePageDown-button = Move Page Down
+pdfjs-editor-movePageDown-button-label = Move Page Down
