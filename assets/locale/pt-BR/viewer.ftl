@@ -316,6 +316,25 @@ pdfjs-highlight-floating-button1 =
     .title = Destaque
     .aria-label = Destaque
 pdfjs-highlight-floating-button-label = Destaque
+pdfjs-editor-signature-button =
+    .title = Adicionar assinatura
+pdfjs-editor-signature-button-label = Adicionar assinatura
+
+## Default editor aria labels
+
+# “Highlight” is a noun, the string is used on the editor for highlights.
+pdfjs-editor-highlight-editor =
+    .aria-label = Editor de destaque
+# “Drawing” is a noun, the string is used on the editor for drawings.
+pdfjs-editor-ink-editor =
+    .aria-label = Editor de desenho
+# Used when a signature editor is selected/hovered.
+# Variables:
+#   $description (String) - a string describing/labeling the signature.
+pdfjs-editor-signature-editor1 =
+    .aria-description = Editor de assinatura: { $description }
+pdfjs-editor-stamp-editor =
+    .aria-label = Editor de imagem
 
 ## Remove button for the various kind of editor.
 
@@ -327,6 +346,8 @@ pdfjs-editor-remove-stamp-button =
     .title = Remover imagem
 pdfjs-editor-remove-highlight-button =
     .title = Remover destaque
+pdfjs-editor-remove-signature-button =
+    .title = Remover assinatura
 
 ##
 
@@ -343,6 +364,20 @@ pdfjs-editor-stamp-add-image-button-label = Adicionar imagem
 pdfjs-editor-free-highlight-thickness-input = Espessura
 pdfjs-editor-free-highlight-thickness-title =
     .title = Mudar espessura ao destacar itens que não são texto
+pdfjs-editor-add-signature-container =
+    .aria-label = Controles de assinatura e assinaturas salvas
+pdfjs-editor-signature-add-signature-button =
+    .title = Adicionar nova assinatura
+pdfjs-editor-signature-add-signature-button-label = Adicionar nova assinatura
+# Used on the button to use an already saved signature.
+# Variables:
+#   $description (String) - a string describing/labeling the signature.
+pdfjs-editor-add-saved-signature-button =
+    .title = Assinatura salva: { $description }
+# .default-content is used as a placeholder in an empty text editor.
+pdfjs-free-text2 =
+    .aria-label = Editor de texto
+    .default-content = Comece a digitar…
 pdfjs-free-text =
     .aria-label = Editor de texto
 pdfjs-free-text-default-content = Comece digitando…
@@ -353,8 +388,9 @@ pdfjs-ink-canvas =
 
 ## Alt-text dialog
 
-# Alternative text (alt text) helps when people can't see the image.
 pdfjs-editor-alt-text-button-label = Texto alternativo
+pdfjs-editor-alt-text-edit-button =
+    .aria-label = Editar texto alternativo
 pdfjs-editor-alt-text-edit-button-label = Editar texto alternativo
 pdfjs-editor-alt-text-dialog-label = Escolha uma opção
 pdfjs-editor-alt-text-dialog-description = O texto alternativo ajuda quando uma imagem não aparece ou não é carregada.
@@ -368,6 +404,9 @@ pdfjs-editor-alt-text-decorative-tooltip = Marcado como decorativa
 # .placeholder: This is a placeholder for the alt text input area
 pdfjs-editor-alt-text-textarea =
     .placeholder = Por exemplo, “Um jovem senta-se à mesa para comer uma refeição”
+# Alternative text (alt text) helps when people can't see the image.
+pdfjs-editor-alt-text-button =
+    .aria-label = Texto alternativo
 
 ## Editor resizers
 ## This is used in an aria label to help to understand the role of the resizer.
@@ -431,7 +470,7 @@ pdfjs-editor-new-alt-text-dialog-edit-label = Editar texto alternativo (descriç
 # Modal header positioned above a text box where users can add the alt text.
 pdfjs-editor-new-alt-text-dialog-add-label = Adicionar texto alternativo (descrição da imagem)
 pdfjs-editor-new-alt-text-textarea =
-    .placeholder = Escreva sua descrição aqui…
+    .placeholder = Você pode escrever uma descrição aqui…
 # This text refers to the alt text box above this description. It offers a definition of alt text.
 pdfjs-editor-new-alt-text-description = Descrição curta para pessoas que não conseguem ver a imagem ou quando a imagem não é carregada.
 # This is a required legal disclaimer that refers to the automatically created text inside the alt text box above this text. It disappears if the text is edited by a human.
@@ -445,14 +484,19 @@ pdfjs-editor-new-alt-text-error-close-button = Fechar
 # Variables:
 #   $totalSize (Number) - the total size (in MB) of the AI model.
 #   $downloadedSize (Number) - the downloaded size (in MB) of the AI model.
-#   $percent (Number) - the percentage of the downloaded size.
 pdfjs-editor-new-alt-text-ai-model-downloading-progress = Baixando modelo de inteligência artificial de texto alternativo ({ $downloadedSize } de { $totalSize } MB)
     .aria-valuetext = Baixando modelo de inteligência artificial de texto alternativo ({ $downloadedSize } de { $totalSize } MB)
 # This is a button that users can click to edit the alt text they have already added.
+pdfjs-editor-new-alt-text-added-button =
+    .aria-label = Texto alternativo adicionado
 pdfjs-editor-new-alt-text-added-button-label = Texto alternativo adicionado
 # This is a button that users can click to open the alt text editor and add alt text when it is not present.
-pdfjs-editor-new-alt-text-missing-button-label = Falta texto alternativo
+pdfjs-editor-new-alt-text-missing-button =
+    .aria-label = Sem texto alternativo
+pdfjs-editor-new-alt-text-missing-button-label = Sem texto alternativo
 # This is a button that opens up the alt text modal where users should review the alt text that was automatically generated.
+pdfjs-editor-new-alt-text-to-review-button =
+    .aria-label = Revisar texto alternativo
 pdfjs-editor-new-alt-text-to-review-button-label = Revisar texto alternativo
 # "Created automatically" is a prefix that will be added to the beginning of any alt text that has been automatically generated. After the colon, the user will see/hear the actual alt text description. If the alt text has been edited by a human, this prefix will not appear.
 # Variables:
@@ -480,27 +524,128 @@ pdfjs-editor-alt-text-settings-show-dialog-button-label = Mostrar o editor de te
 pdfjs-editor-alt-text-settings-show-dialog-description = Ajuda a assegurar que todas as suas imagens tenham texto alternativo.
 pdfjs-editor-alt-text-settings-close-button = Fechar
 
-# Additional translations for ngx-extended-pdf-viewer (pt)
-unverified-signature-warning = Este arquivo PDF contém uma assinatura digital. O visualizador de PDF não pode verificar se a assinatura é válida. Faça download do arquivo e abra-o no Acrobat Reader para verificar se a assinatura é válida.
-# Translations for ngx-extended-pdf-viewer additions only available in en-US
-pdfjs-infinite-scroll-button-label = Infinite scroll
-pdfjs-find-multiple-checkbox-label = match each word
-pdfjs-find-regexp-checkbox-label = regular expression
-pdfjs-free-text2 =
-    .aria-label = Text Editor
-    .default-content = Start typing…
-pdfjs-editor-undo-bar-message-highlight = Highlight removed
-pdfjs-editor-undo-bar-message-freetext = Text removed
-pdfjs-editor-undo-bar-message-ink = Drawing removed
-pdfjs-editor-undo-bar-message-stamp = Image removed
+## "Annotations removed" bar
+
+pdfjs-editor-undo-bar-message-highlight = Destaque removido
+pdfjs-editor-undo-bar-message-freetext = Texto removido
+pdfjs-editor-undo-bar-message-ink = Desenho removido
+pdfjs-editor-undo-bar-message-stamp = Imagem removida
+pdfjs-editor-undo-bar-message-signature = Assinatura removida
+# Variables:
+#   $count (Number) - the number of removed annotations.
 pdfjs-editor-undo-bar-message-multiple =
     { $count ->
-        [one] { $count } annotation removed
-       *[other] { $count } annotations removed
+        [one] { $count } anotação removida
+       *[other] { $count } anotações removidas
     }
 pdfjs-editor-undo-bar-undo-button =
-    .title = Undo
-pdfjs-editor-undo-bar-undo-button-label = Undo
+    .title = Desfazer
+pdfjs-editor-undo-bar-undo-button-label = Desfazer
 pdfjs-editor-undo-bar-close-button =
+    .title = Fechar
+pdfjs-editor-undo-bar-close-button-label = Fechar
+
+## Add a signature dialog
+
+pdfjs-editor-add-signature-dialog-label = Esta janela permite ao usuário criar uma assinatura para adicionar a um documento PDF. O usuário pode editar o nome (que também serve como texto alternativo) e, opcionalmente, salvar a assinatura usar novamente.
+pdfjs-editor-add-signature-dialog-title = Adicionar uma assinatura
+
+## Tab names
+
+# Type is a verb (you can type your name as signature)
+pdfjs-editor-add-signature-type-button = Digitar
+    .title = Digitar
+# Draw is a verb (you can draw your signature)
+pdfjs-editor-add-signature-draw-button = Desenhar
+    .title = Desenhar
+pdfjs-editor-add-signature-image-button = Imagem
+    .title = Imagem
+
+## Tab panels
+
+pdfjs-editor-add-signature-type-input =
+    .aria-label = Digite sua assinatura
+    .placeholder = Digite sua assinatura
+pdfjs-editor-add-signature-draw-placeholder = Desenhe sua assinatura
+pdfjs-editor-add-signature-draw-thickness-range-label = Espessura
+# Variables:
+#   $thickness (Number) - the thickness (in pixels) of the line used to draw a signature.
+pdfjs-editor-add-signature-draw-thickness-range =
+    .title = Espessura do desenho: { $thickness }
+pdfjs-editor-add-signature-image-placeholder = Arraste um arquivo aqui para enviar
+pdfjs-editor-add-signature-image-browse-link =
+    { PLATFORM() ->
+        [macos] Ou escolha arquivos de imagem
+       *[other] Ou escolha arquivos de imagem
+    }
+
+## Controls
+
+pdfjs-editor-add-signature-description-label = Descrição (texto alternativo)
+pdfjs-editor-add-signature-description-input =
+    .title = Descrição (texto alternativo)
+pdfjs-editor-add-signature-description-default-when-drawing = Assinatura
+pdfjs-editor-add-signature-clear-button-label = Limpar assinatura
+pdfjs-editor-add-signature-clear-button =
+    .title = Limpar assinatura
+pdfjs-editor-add-signature-save-checkbox = Salvar assinatura
+pdfjs-editor-add-signature-save-warning-message = Você atingiu o limite de 5 assinaturas salvas. Remova uma para salvar mais.
+pdfjs-editor-add-signature-image-upload-error-title = Não foi possível enviar a imagem
+pdfjs-editor-add-signature-image-upload-error-description = Verifique sua conexão de rede ou tente outra imagem.
+pdfjs-editor-add-signature-error-close-button = Fechar
+
+## Dialog buttons
+
+pdfjs-editor-add-signature-cancel-button = Cancelar
+pdfjs-editor-add-signature-add-button = Adicionar
+pdfjs-editor-edit-signature-update-button = Atualizar
+
+## Main menu for adding/removing signatures
+
+pdfjs-editor-delete-signature-button1 =
+    .title = Remover assinatura salva
+pdfjs-editor-delete-signature-button-label1 = Remover assinatura salva
+
+## Editor toolbar
+
+pdfjs-editor-add-signature-edit-button-label = Mudar descrição
+
+## Edit signature description dialog
+
+pdfjs-editor-edit-signature-dialog-title = Mudar descrição
+
+# Additional translations for ngx-extended-pdf-viewer (pt)
+unverified-signature-warning = Este arquivo PDF contém uma assinatura digital. O visualizador de PDF não pode verificar se a assinatura é válida. Faça download do arquivo e abra-o no Acrobat Reader para verificar se a assinatura é válida.
+pdfjs-infinite-scroll-button-label = Rolagem infinita
+pdfjs-find-multiple-checkbox-label = Corresponder a cada palavra
+pdfjs-find-regexp-checkbox-label = Expressão regular
+pdfjs-editor-movePageUp-button = Mover página para cima
+pdfjs-editor-movePageUp-button-label = Mover página para cima
+pdfjs-editor-movePageDown-button = Mover página para baixo
+pdfjs-editor-movePageDown-button-label = Mover página para baixo
+# Translations for ngx-extended-pdf-viewer additions only available in en-US
+pdfjs-editor-color-picker-free-text-input =
+    .title = Change text color
+pdfjs-editor-color-picker-ink-input =
+    .title = Change drawing color
+pdfjs-editor-highlight-added-alert = Highlight added
+pdfjs-editor-freetext-added-alert = Text added
+pdfjs-editor-ink-added-alert = Drawing added
+pdfjs-editor-stamp-added-alert = Image added
+pdfjs-editor-signature-added-alert = Signature added
+pdfjs-editor-add-signature-image-no-data-error-title = Can’t convert this image into a signature
+pdfjs-editor-add-signature-image-no-data-error-description = Please try uploading a different image.
+pdfjs-editor-edit-comment-actions-button-label = Actions
+pdfjs-editor-edit-comment-actions-button =
+    .title = Actions
+pdfjs-editor-edit-comment-close-button-label = Close
+pdfjs-editor-edit-comment-close-button =
     .title = Close
-pdfjs-editor-undo-bar-close-button-label = Close
+pdfjs-editor-edit-comment-actions-edit-button-label = Edit
+pdfjs-editor-edit-comment-actions-delete-button-label = Delete
+pdfjs-editor-edit-comment-manager-text-input =
+    .placeholder = Enter your comment
+pdfjs-editor-edit-comment-manager-cancel-button = Cancel
+pdfjs-editor-edit-comment-manager-save-button = Save
+pdfjs-editor-edit-comment-button =
+    .title = Edit comment

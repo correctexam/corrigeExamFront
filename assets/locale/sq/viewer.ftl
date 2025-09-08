@@ -118,6 +118,9 @@ pdfjs-document-properties-keywords = Fjalëkyçe:
 pdfjs-document-properties-creation-date = Datë Krijimi:
 pdfjs-document-properties-modification-date = Datë Ndryshimi:
 # Variables:
+#   $dateObj (Date) - the creation/modification date and time of the PDF file
+pdfjs-document-properties-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
+# Variables:
 #   $date (Date) - the creation/modification date of the PDF file
 #   $time (Time) - the creation/modification time of the PDF file
 pdfjs-document-properties-date-string = { $date }, { $time }
@@ -274,6 +277,9 @@ pdfjs-annotation-date-string = { $date }, { $time }
 # Some common types are e.g.: "Check", "Text", "Comment", "Note"
 pdfjs-text-annotation-type =
     .alt = [Nënvizim { $type }]
+# Variables:
+#   $dateObj (Date) - the modification date and time of the annotation
+pdfjs-annotation-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
 
 ## Password
 
@@ -301,6 +307,25 @@ pdfjs-highlight-floating-button1 =
     .title = Theksim
     .aria-label = Theksim
 pdfjs-highlight-floating-button-label = Theksim
+pdfjs-editor-signature-button =
+    .title = Shtoni nënshkrim
+pdfjs-editor-signature-button-label = Shtoni nënshkrim
+
+## Default editor aria labels
+
+# “Highlight” is a noun, the string is used on the editor for highlights.
+pdfjs-editor-highlight-editor =
+    .aria-label = Përpunues theksimesh
+# “Drawing” is a noun, the string is used on the editor for drawings.
+pdfjs-editor-ink-editor =
+    .aria-label = Përpunues vizatimesh
+# Used when a signature editor is selected/hovered.
+# Variables:
+#   $description (String) - a string describing/labeling the signature.
+pdfjs-editor-signature-editor1 =
+    .aria-description = Përpunues nënshkrimesh: { $description }
+pdfjs-editor-stamp-editor =
+    .aria-label = Përpunues figurash
 
 ## Remove button for the various kind of editor.
 
@@ -312,6 +337,8 @@ pdfjs-editor-remove-stamp-button =
     .title = Hiq figurë
 pdfjs-editor-remove-highlight-button =
     .title = Hiqe theksimin
+pdfjs-editor-remove-signature-button =
+    .title = Hiqe nënshkrimin
 
 ##
 
@@ -328,6 +355,20 @@ pdfjs-editor-stamp-add-image-button-label = Shtoni figurë
 pdfjs-editor-free-highlight-thickness-input = Trashësi
 pdfjs-editor-free-highlight-thickness-title =
     .title = Ndryshoni trashësinë kur theksoni objekte tjetër nga tekst
+pdfjs-editor-add-signature-container =
+    .aria-label = Kontrolle nënshkrimesh dhe nënshkrime të ruajtur
+pdfjs-editor-signature-add-signature-button =
+    .title = Shtoni nënshkrim të ri
+pdfjs-editor-signature-add-signature-button-label = Shtoni nënshkrim të ri
+# Used on the button to use an already saved signature.
+# Variables:
+#   $description (String) - a string describing/labeling the signature.
+pdfjs-editor-add-saved-signature-button =
+    .title = Nënshkrim i ruajtur: { $description }
+# .default-content is used as a placeholder in an empty text editor.
+pdfjs-free-text2 =
+    .aria-label = Përpunues Tekstesh
+    .default-content = Filloni të shtypni…
 pdfjs-free-text =
     .aria-label = Përpunues Tekstesh
 pdfjs-free-text-default-content = Filloni të shtypni…
@@ -338,8 +379,9 @@ pdfjs-ink-canvas =
 
 ## Alt-text dialog
 
-# Alternative text (alt text) helps when people can't see the image.
 pdfjs-editor-alt-text-button-label = Tekst alternativ
+pdfjs-editor-alt-text-edit-button =
+    .aria-label = Përpunoni tekst alternativ
 pdfjs-editor-alt-text-edit-button-label = Përpunoni tekst alternativ
 pdfjs-editor-alt-text-dialog-label = Zgjidhni një mundësi
 pdfjs-editor-alt-text-dialog-description = Teksti alt (tekst alternativ) vjen në ndihmë kur njerëzit s’mund të shohin figurën, ose kur ajo nuk ngarkohet.
@@ -353,6 +395,9 @@ pdfjs-editor-alt-text-decorative-tooltip = Iu vu shenjë si dekorative
 # .placeholder: This is a placeholder for the alt text input area
 pdfjs-editor-alt-text-textarea =
     .placeholder = Për shembull, “Një djalosh ulet në një tryezë të hajë”
+# Alternative text (alt text) helps when people can't see the image.
+pdfjs-editor-alt-text-button =
+    .aria-label = Tekst alternativ
 
 ## Editor resizers
 ## This is used in an aria label to help to understand the role of the resizer.
@@ -430,14 +475,19 @@ pdfjs-editor-new-alt-text-error-close-button = Mbylle
 # Variables:
 #   $totalSize (Number) - the total size (in MB) of the AI model.
 #   $downloadedSize (Number) - the downloaded size (in MB) of the AI model.
-#   $percent (Number) - the percentage of the downloaded size.
 pdfjs-editor-new-alt-text-ai-model-downloading-progress = Po shkarkohet model IA teksti alternativ ({ $downloadedSize } nga { $totalSize } MB)
     .aria-valuetext = Po shkarkohet model IA teksti alternativ ({ $downloadedSize } nga { $totalSize } MB)
 # This is a button that users can click to edit the alt text they have already added.
+pdfjs-editor-new-alt-text-added-button =
+    .aria-label = U shtua tekst alternativ
 pdfjs-editor-new-alt-text-added-button-label = U shtua tekst alternativ
 # This is a button that users can click to open the alt text editor and add alt text when it is not present.
-pdfjs-editor-new-alt-text-missing-button-label = Mungon teskt alternativ
+pdfjs-editor-new-alt-text-missing-button =
+    .aria-label = Mungon tekst alternativ
+pdfjs-editor-new-alt-text-missing-button-label = Mungon tekst alternativ
 # This is a button that opens up the alt text modal where users should review the alt text that was automatically generated.
+pdfjs-editor-new-alt-text-to-review-button =
+    .aria-label = Shqyrtoni tekst alternativ
 pdfjs-editor-new-alt-text-to-review-button-label = Shqyrtoni tekst alternativ
 # "Created automatically" is a prefix that will be added to the beginning of any alt text that has been automatically generated. After the colon, the user will see/hear the actual alt text description. If the alt text has been edited by a human, this prefix will not appear.
 # Variables:
@@ -465,6 +515,96 @@ pdfjs-editor-alt-text-settings-show-dialog-button-label = Shfaq menjëherë për
 pdfjs-editor-alt-text-settings-show-dialog-description = Ju ndihmon të siguroheni se krejt figurat tuaja kanë tekst alternativ.
 pdfjs-editor-alt-text-settings-close-button = Mbylle
 
+## "Annotations removed" bar
+
+pdfjs-editor-undo-bar-message-highlight = U hoq theksimi
+pdfjs-editor-undo-bar-message-freetext = U hoq tekst
+pdfjs-editor-undo-bar-message-ink = U hoq vizatim
+pdfjs-editor-undo-bar-message-stamp = U hoq figurë
+pdfjs-editor-undo-bar-message-signature = Nënshkrimi u hoq
+# Variables:
+#   $count (Number) - the number of removed annotations.
+pdfjs-editor-undo-bar-message-multiple =
+    { $count ->
+        [one] U hoq { $count } shënim
+       *[other] U hoqën { $count } shënime
+    }
+pdfjs-editor-undo-bar-undo-button =
+    .title = Zhbëje
+pdfjs-editor-undo-bar-undo-button-label = Zhbëje
+pdfjs-editor-undo-bar-close-button =
+    .title = Mbylle
+pdfjs-editor-undo-bar-close-button-label = Mbylle
+
+## Add a signature dialog
+
+pdfjs-editor-add-signature-dialog-label = Kjo dritare modale i lejon përdoruesit të krijojë një nënshkrim për ta shtuar te një dokument PDF. Përdoruesi mund të përpunojë emrin (i cili shërben edhe si tekst alternativ) dhe, nëse do, ta ruajë nënshkrimin, për ta përdorur prapë.
+pdfjs-editor-add-signature-dialog-title = Shtoni një nënshkrim
+
+## Tab names
+
+# Type is a verb (you can type your name as signature)
+pdfjs-editor-add-signature-type-button = Lloj
+    .title = Lloj
+# Draw is a verb (you can draw your signature)
+pdfjs-editor-add-signature-draw-button = Vizatoni
+    .title = Vizatoni
+pdfjs-editor-add-signature-image-button = Figurë
+    .title = Figurë
+
+## Tab panels
+
+pdfjs-editor-add-signature-type-input =
+    .aria-label = Shtypni nënshkrimin tuaj
+    .placeholder = Shtypni nënshkrimin tuaj
+pdfjs-editor-add-signature-draw-placeholder = Vizatoni nënshkrimin tuaj
+pdfjs-editor-add-signature-draw-thickness-range-label = Trashësi
+# Variables:
+#   $thickness (Number) - the thickness (in pixels) of the line used to draw a signature.
+pdfjs-editor-add-signature-draw-thickness-range =
+    .title = Trashësi vizatimi: { $thickness }
+pdfjs-editor-add-signature-image-placeholder = Tërhiqni këtu një kartelë për ngarkim
+pdfjs-editor-add-signature-image-browse-link =
+    { PLATFORM() ->
+        [macos] Ose zgjidhni kartelë figure
+       *[other] Ose zgjidhni kartelë figure
+    }
+
+## Controls
+
+pdfjs-editor-add-signature-description-label = Përshkrim (tekst alternativ)
+pdfjs-editor-add-signature-description-input =
+    .title = Përshkrim (tekst alternativ)
+pdfjs-editor-add-signature-description-default-when-drawing = Nënshkrim
+pdfjs-editor-add-signature-clear-button-label = Spastroje nënshkrimin
+pdfjs-editor-add-signature-clear-button =
+    .title = Spastroje nënshkrimin
+pdfjs-editor-add-signature-save-checkbox = Ruaje nënshkrimin
+pdfjs-editor-add-signature-save-warning-message = Keni mbërritur në kufirin e 5 nënshkrimeve të ruajtura. Që të ruani tjetër, hiqni një.
+pdfjs-editor-add-signature-image-upload-error-title = S’u ngarkua dot figurë
+pdfjs-editor-add-signature-image-upload-error-description = Kontrolloni lidhjen tuaj në rrjet, ose provoni figurë tjetër.
+pdfjs-editor-add-signature-error-close-button = Mbylle
+
+## Dialog buttons
+
+pdfjs-editor-add-signature-cancel-button = Anuloje
+pdfjs-editor-add-signature-add-button = Shtoje
+pdfjs-editor-edit-signature-update-button = Përditësoje
+
+## Main menu for adding/removing signatures
+
+pdfjs-editor-delete-signature-button1 =
+    .title = Hiqe nënshkrimin e ruajtur
+pdfjs-editor-delete-signature-button-label1 = Hiqe nënshkrimin e ruajtur
+
+## Editor toolbar
+
+pdfjs-editor-add-signature-edit-button-label = Përpunoni përshkrimin
+
+## Edit signature description dialog
+
+pdfjs-editor-edit-signature-dialog-title = Përpunoni përshkrimin
+
 # Translations for ngx-extended-pdf-viewer additions only available in en-US
 pdfjs-spread-none-button =
     .title = Do not join page spreads
@@ -475,27 +615,36 @@ pdfjs-spread-odd-button-label = Odd Spreads
 pdfjs-spread-even-button =
     .title = Join page spreads starting with even-numbered pages
 pdfjs-spread-even-button-label = Even Spreads
-pdfjs-document-properties-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
-pdfjs-annotation-date-time-string = { DATETIME($dateObj, dateStyle: "short", timeStyle: "medium") }
+pdfjs-editor-color-picker-free-text-input =
+    .title = Change text color
+pdfjs-editor-color-picker-ink-input =
+    .title = Change drawing color
+pdfjs-editor-highlight-added-alert = Highlight added
+pdfjs-editor-freetext-added-alert = Text added
+pdfjs-editor-ink-added-alert = Drawing added
+pdfjs-editor-stamp-added-alert = Image added
+pdfjs-editor-signature-added-alert = Signature added
+pdfjs-editor-add-signature-image-no-data-error-title = Can’t convert this image into a signature
+pdfjs-editor-add-signature-image-no-data-error-description = Please try uploading a different image.
+pdfjs-editor-edit-comment-actions-button-label = Actions
+pdfjs-editor-edit-comment-actions-button =
+    .title = Actions
+pdfjs-editor-edit-comment-close-button-label = Close
+pdfjs-editor-edit-comment-close-button =
+    .title = Close
+pdfjs-editor-edit-comment-actions-edit-button-label = Edit
+pdfjs-editor-edit-comment-actions-delete-button-label = Delete
+pdfjs-editor-edit-comment-manager-text-input =
+    .placeholder = Enter your comment
+pdfjs-editor-edit-comment-manager-cancel-button = Cancel
+pdfjs-editor-edit-comment-manager-save-button = Save
+pdfjs-editor-edit-comment-button =
+    .title = Edit comment
 unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
 pdfjs-infinite-scroll-button-label = Infinite scroll
-pdfjs-find-multiple-checkbox-label = match each word
-pdfjs-find-regexp-checkbox-label = regular expression
-pdfjs-free-text2 =
-    .aria-label = Text Editor
-    .default-content = Start typing…
-pdfjs-editor-undo-bar-message-highlight = Highlight removed
-pdfjs-editor-undo-bar-message-freetext = Text removed
-pdfjs-editor-undo-bar-message-ink = Drawing removed
-pdfjs-editor-undo-bar-message-stamp = Image removed
-pdfjs-editor-undo-bar-message-multiple =
-    { $count ->
-        [one] { $count } annotation removed
-       *[other] { $count } annotations removed
-    }
-pdfjs-editor-undo-bar-undo-button =
-    .title = Undo
-pdfjs-editor-undo-bar-undo-button-label = Undo
-pdfjs-editor-undo-bar-close-button =
-    .title = Close
-pdfjs-editor-undo-bar-close-button-label = Close
+pdfjs-find-multiple-checkbox-label = Match Each Word
+pdfjs-find-regexp-checkbox-label = Regular Expression
+pdfjs-editor-movePageUp-button = Move Page Up
+pdfjs-editor-movePageUp-button-label = Move Page Up
+pdfjs-editor-movePageDown-button = Move Page Down
+pdfjs-editor-movePageDown-button-label = Move Page Down

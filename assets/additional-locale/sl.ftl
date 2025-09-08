@@ -14,3 +14,10 @@
 
 # Additional translations
 unverified-signature-warning = Dokument vsebuje digitalni podpis. PDF viewer ne more preveriti veljavnost podpisa. Prosimo prenesite dokument in veljavnost podpisa preverite v programu Acrobat Reader.
+pdfjs-infinite-scroll-button-label = Neskončno drsenje
+pdfjs-find-multiple-checkbox-label = Najdi vsako besedo
+pdfjs-find-regexp-checkbox-label = Regularni izraz
+pdfjs-editor-movePageUp-button = Premakni stran navzgor
+pdfjs-editor-movePageUp-button-label = Premakni stran navzgor
+pdfjs-editor-movePageDown-button = Premakni stran navzdol
+pdfjs-editor-movePageDown-button-label = Premakni stran navzdol

@@ -317,6 +317,9 @@ pdfjs-highlight-floating-button1 =
     .aria-label = نمایاں کرو
 pdfjs-highlight-floating-button-label = نمایاں کرو
 
+## Default editor aria labels
+
+
 ## Remove button for the various kind of editor.
 
 pdfjs-editor-remove-ink-button =
@@ -353,7 +356,6 @@ pdfjs-ink-canvas =
 
 ## Alt-text dialog
 
-# Alternative text (alt text) helps when people can't see the image.
 pdfjs-editor-alt-text-button-label = Alt متن
 pdfjs-editor-alt-text-edit-button-label = alt متن وِچ ترمیم کرو
 pdfjs-editor-alt-text-dialog-label = ہِک اختیار چُݨو
@@ -368,6 +370,9 @@ pdfjs-editor-alt-text-decorative-tooltip = آرائشی دے طور تے نشا�
 # .placeholder: This is a placeholder for the alt text input area
 pdfjs-editor-alt-text-textarea =
     .placeholder = مثال دے طور تے، "ہِک جؤان کھاݨاں کھاوݨ کِیتے میز اُتّے ٻیٹھا ہِے"
+# Alternative text (alt text) helps when people can't see the image.
+pdfjs-editor-alt-text-button =
+    .aria-label = Alt متن
 
 ## Editor resizers
 ## This is used in an aria label to help to understand the role of the resizer.
@@ -445,14 +450,19 @@ pdfjs-editor-new-alt-text-error-close-button = بند کرو
 # Variables:
 #   $totalSize (Number) - the total size (in MB) of the AI model.
 #   $downloadedSize (Number) - the downloaded size (in MB) of the AI model.
-#   $percent (Number) - the percentage of the downloaded size.
 pdfjs-editor-new-alt-text-ai-model-downloading-progress = آلٹ عبارت اے آئی ماڈل({ $totalSize }ایم بی دے { $downloadedSize }) ڈاؤن لوڈ تھیندا پئے
     .aria-valuetext = آلٹ عبارت اے آئی ماڈل({ $totalSize }ایم بی دے { $downloadedSize }) ڈاؤن لوڈ تھیندا پئے
 # This is a button that users can click to edit the alt text they have already added.
+pdfjs-editor-new-alt-text-added-button =
+    .aria-label = آلٹ عبارت شامل تھی ڳئی
 pdfjs-editor-new-alt-text-added-button-label = آلٹ عبارت شامل تھی ڳئی
 # This is a button that users can click to open the alt text editor and add alt text when it is not present.
+pdfjs-editor-new-alt-text-missing-button =
+    .aria-label = متبادل عبارت غائب ہے
 pdfjs-editor-new-alt-text-missing-button-label = متبادل عبارت غائب ہے
 # This is a button that opens up the alt text modal where users should review the alt text that was automatically generated.
+pdfjs-editor-new-alt-text-to-review-button =
+    .aria-label = alt متن تے نظرثانی کرو
 pdfjs-editor-new-alt-text-to-review-button-label = alt متن تے نظرثانی کرو
 # "Created automatically" is a prefix that will be added to the beginning of any alt text that has been automatically generated. After the colon, the user will see/hear the actual alt text description. If the alt text has been edited by a human, this prefix will not appear.
 # Variables:
@@ -480,26 +490,145 @@ pdfjs-editor-alt-text-settings-show-dialog-button-label = تصویر شامل ک
 pdfjs-editor-alt-text-settings-show-dialog-description = ایہ تہاکوں یقینی بݨاوݨ وچ مدد کریندے جو تہاݙیاں ساریاں تصویراں وچ آلٹ عبارت ہے۔
 pdfjs-editor-alt-text-settings-close-button = بند کرو
 
+## "Annotations removed" bar
+
+pdfjs-editor-undo-bar-undo-button =
+    .title = کیتا اݨ کیتا
+pdfjs-editor-undo-bar-undo-button-label = کیتا اݨ کیتا
+pdfjs-editor-undo-bar-close-button =
+    .title = بند کرو
+pdfjs-editor-undo-bar-close-button-label = بند کرو
+
+## Add a signature dialog
+
+
+## Tab names
+
+
+## Tab panels
+
+
+## Controls
+
+
+## Dialog buttons
+
+
+## Main menu for adding/removing signatures
+
+
+## Editor toolbar
+
+
+## Edit signature description dialog
+
+
+# Additional translations for ngx-extended-pdf-viewer (sk)
+unverified-signature-warning = Tento PDF súbor obsahuje digitálny podpis. PDF prehliadač nemôže overiť, či je podpis platný. Stiahnite si súbor a otvorte ho v Acrobat Reader na overenie platnosti podpisu.
+pdfjs-infinite-scroll-button-label = Nekonečné posúvanie
+pdfjs-find-multiple-checkbox-label = Nájsť každé slovo
+pdfjs-find-regexp-checkbox-label = Regulárny výraz
+pdfjs-editor-movePageUp-button = Presunúť stránku nahor
+pdfjs-editor-movePageUp-button-label = Presunúť stránku nahor
+pdfjs-editor-movePageDown-button = Presunúť stránku nadol
+pdfjs-editor-movePageDown-button-label = Presunúť stránku nadol
 # Translations for ngx-extended-pdf-viewer additions only available in en-US
-unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
-pdfjs-infinite-scroll-button-label = Infinite scroll
-pdfjs-find-multiple-checkbox-label = match each word
-pdfjs-find-regexp-checkbox-label = regular expression
+pdfjs-editor-color-picker-free-text-input =
+    .title = Change text color
+pdfjs-editor-color-picker-ink-input =
+    .title = Change drawing color
+pdfjs-editor-signature-button =
+    .title = Add signature
+pdfjs-editor-signature-button-label = Add signature
+pdfjs-editor-highlight-editor =
+    .aria-label = Highlight editor
+pdfjs-editor-ink-editor =
+    .aria-label = Drawing editor
+pdfjs-editor-signature-editor1 =
+    .aria-description = Signature editor: { $description }
+pdfjs-editor-stamp-editor =
+    .aria-label = Image editor
+pdfjs-editor-remove-signature-button =
+    .title = Remove signature
+pdfjs-editor-add-signature-container =
+    .aria-label = Signature controls and saved signatures
+pdfjs-editor-signature-add-signature-button =
+    .title = Add new signature
+pdfjs-editor-signature-add-signature-button-label = Add new signature
+pdfjs-editor-add-saved-signature-button =
+    .title = Saved signature: { $description }
 pdfjs-free-text2 =
     .aria-label = Text Editor
     .default-content = Start typing…
+pdfjs-editor-highlight-added-alert = Highlight added
+pdfjs-editor-freetext-added-alert = Text added
+pdfjs-editor-ink-added-alert = Drawing added
+pdfjs-editor-stamp-added-alert = Image added
+pdfjs-editor-signature-added-alert = Signature added
 pdfjs-editor-undo-bar-message-highlight = Highlight removed
 pdfjs-editor-undo-bar-message-freetext = Text removed
 pdfjs-editor-undo-bar-message-ink = Drawing removed
 pdfjs-editor-undo-bar-message-stamp = Image removed
+pdfjs-editor-undo-bar-message-signature = Signature removed
 pdfjs-editor-undo-bar-message-multiple =
     { $count ->
         [one] { $count } annotation removed
        *[other] { $count } annotations removed
     }
-pdfjs-editor-undo-bar-undo-button =
-    .title = Undo
-pdfjs-editor-undo-bar-undo-button-label = Undo
-pdfjs-editor-undo-bar-close-button =
+pdfjs-editor-add-signature-dialog-label = This modal allows the user to create a signature to add to a PDF document. The user can edit the name (which also serves as the alt text), and optionally save the signature for repeated use.
+pdfjs-editor-add-signature-dialog-title = Add a signature
+pdfjs-editor-add-signature-type-button = Type
+    .title = Type
+pdfjs-editor-add-signature-draw-button = Draw
+    .title = Draw
+pdfjs-editor-add-signature-image-button = Image
+    .title = Image
+pdfjs-editor-add-signature-type-input =
+    .aria-label = Type your signature
+    .placeholder = Type your signature
+pdfjs-editor-add-signature-draw-placeholder = Draw your signature
+pdfjs-editor-add-signature-draw-thickness-range-label = Thickness
+pdfjs-editor-add-signature-draw-thickness-range =
+    .title = Drawing thickness: { $thickness }
+pdfjs-editor-add-signature-image-placeholder = Drag a file here to upload
+pdfjs-editor-add-signature-image-browse-link =
+    { PLATFORM() ->
+        [macos] Or choose image files
+       *[other] Or browse image files
+    }
+pdfjs-editor-add-signature-description-label = Description (alt text)
+pdfjs-editor-add-signature-description-input =
+    .title = Description (alt text)
+pdfjs-editor-add-signature-description-default-when-drawing = Signature
+pdfjs-editor-add-signature-clear-button-label = Clear signature
+pdfjs-editor-add-signature-clear-button =
+    .title = Clear signature
+pdfjs-editor-add-signature-save-checkbox = Save signature
+pdfjs-editor-add-signature-save-warning-message = You’ve reached the limit of 5 saved signatures. Remove one to save more.
+pdfjs-editor-add-signature-image-upload-error-title = Couldn’t upload image
+pdfjs-editor-add-signature-image-upload-error-description = Check your network connection or try another image.
+pdfjs-editor-add-signature-image-no-data-error-title = Can’t convert this image into a signature
+pdfjs-editor-add-signature-image-no-data-error-description = Please try uploading a different image.
+pdfjs-editor-add-signature-error-close-button = Close
+pdfjs-editor-add-signature-cancel-button = Cancel
+pdfjs-editor-add-signature-add-button = Add
+pdfjs-editor-delete-signature-button1 =
+    .title = Remove saved signature
+pdfjs-editor-delete-signature-button-label1 = Remove saved signature
+pdfjs-editor-add-signature-edit-button-label = Edit description
+pdfjs-editor-edit-signature-dialog-title = Edit description
+pdfjs-editor-edit-signature-update-button = Update
+pdfjs-editor-edit-comment-actions-button-label = Actions
+pdfjs-editor-edit-comment-actions-button =
+    .title = Actions
+pdfjs-editor-edit-comment-close-button-label = Close
+pdfjs-editor-edit-comment-close-button =
     .title = Close
-pdfjs-editor-undo-bar-close-button-label = Close
+pdfjs-editor-edit-comment-actions-edit-button-label = Edit
+pdfjs-editor-edit-comment-actions-delete-button-label = Delete
+pdfjs-editor-edit-comment-manager-text-input =
+    .placeholder = Enter your comment
+pdfjs-editor-edit-comment-manager-cancel-button = Cancel
+pdfjs-editor-edit-comment-manager-save-button = Save
+pdfjs-editor-edit-comment-button =
+    .title = Edit comment
