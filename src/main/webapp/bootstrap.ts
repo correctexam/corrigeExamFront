@@ -44,16 +44,22 @@ if (!DEBUG_INFO_ENABLED) {
   enableProdMode();
 }
 
+let frontUrl = FRONT_URL;
+if (frontUrl === undefined || frontUrl === null || frontUrl === '') {
+  frontUrl = '/';
+}
+
 bootstrapApplication(MainComponent, {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideHttpClient(withInterceptorsFromDi()),
     provideTranslateService({
-      loader: provideTranslateHttpLoader({ prefix: '/i18n/', suffix: `.json?_=${I18N_HASH}` }),
+      loader: provideTranslateHttpLoader({ prefix: frontUrl + 'i18n/', suffix: `.json?_=${I18N_HASH}` }),
       fallbackLang: 'en',
       lang: 'fr',
     }),
+
     provideAppInitializer(() => {
       const translate = inject(TranslateService);
       translate.use(translate.getBrowserLang() || 'en');
