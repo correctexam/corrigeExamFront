@@ -11,6 +11,7 @@ import { AccountService } from 'app/core/auth/account.service';
 import { PasswordComponent } from './password.component';
 import { PasswordService } from './password.service';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('PasswordComponent', () => {
   let comp: PasswordComponent;
@@ -19,7 +20,7 @@ describe('PasswordComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, PasswordComponent],
+      imports: [ReactiveFormsModule, FormsModule, PasswordComponent, TranslateModule.forRoot()],
       declarations: [],
       providers: [FormBuilder, AccountService, provideHttpClient(), provideHttpClientTesting()],
     })

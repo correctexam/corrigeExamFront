@@ -8,6 +8,7 @@ import { shareReplay, tap, catchError } from 'rxjs/operators';
 import { StateStorageService } from 'app/core/auth/state-storage.service';
 import { ApplicationConfigService } from '../config/application-config.service';
 import { Account } from 'app/core/auth/account.model';
+// import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({ providedIn: 'root' })
 export class AccountService {
@@ -21,7 +22,7 @@ export class AccountService {
     private stateStorageService: StateStorageService,
     private router: Router,
     private applicationConfigService: ApplicationConfigService,
-    //    private translateService: TranslateService,
+    //        private translateService: TranslateService,
   ) {}
 
   save(account: Account): Observable<any> {
@@ -57,7 +58,7 @@ export class AccountService {
           // unless user have chose other language in the current session
           if (!this.sessionStorageService.retrieve('locale')) {
             // TODO
-            //     this.translateService.use(account.langKey);
+            //                 this.translateService.use(account.langKey);
           }
 
           this.navigateToStoredUrl();

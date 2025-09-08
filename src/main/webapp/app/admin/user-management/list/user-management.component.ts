@@ -17,6 +17,7 @@ import { DatePipe } from '@angular/common';
 import { AlertComponent } from '../../../shared/alert/alert.component';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'jhi-user-mgmt',
@@ -51,10 +52,16 @@ export class UserManagementComponent implements OnInit {
     private router: Router,
     private modalService: NgbModal,
     private zone: NgZone,
+    private translateService: TranslateService,
   ) {}
 
   ngOnInit(): void {
-    this.accountService.identity().subscribe(account => (this.currentAccount = account));
+    this.accountService.identity().subscribe(account => {
+      this.currentAccount = account;
+      if (account?.langKey) {
+        this.translateService.use(account.langKey);
+      }
+    });
     this.handleNavigation();
   }
 

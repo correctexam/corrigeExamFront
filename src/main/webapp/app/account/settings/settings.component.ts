@@ -35,6 +35,10 @@ export class SettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.accountService.identity().subscribe(account => {
+      if (account?.langKey) {
+        this.translateService.use(account.langKey);
+      }
+
       if (account) {
         this.settingsForm.patchValue({
           firstName: account.firstName,

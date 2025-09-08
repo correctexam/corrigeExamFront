@@ -4,7 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 
 import { LoginService } from 'app/login/login.service';
 import { AccountService } from 'app/core/auth/account.service';
-import { TranslateDirective, TranslatePipe } from '@ngx-translate/core';
+import { TranslateDirective, TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { ButtonModule } from 'primeng/button';
 
@@ -30,6 +30,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
     private router: Router,
     private fb: UntypedFormBuilder,
     private zone: NgZone,
+    private translateService: TranslateService,
   ) {
     this.loginForm = this.fb.group({
       username: [null, [Validators.required]],
@@ -40,8 +41,11 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     // if already authenticated then navigate to home page
-    this.accountService.identity().subscribe(() => {
+    this.accountService.identity().subscribe(account => {
       if (this.accountService.isAuthenticated()) {
+        if (account?.langKey) {
+          this.translateService.use(account.langKey);
+        }
         this.zone.run(() => {
           this.router.navigate(['']);
         });

@@ -58,7 +58,11 @@ export class MainComponent implements OnInit {
 
   ngOnInit(): void {
     // try to log in automatically
-    this.accountService.identity().subscribe();
+    this.accountService.identity().subscribe(account => {
+      if (account?.langKey) {
+        this.translateService.use(account.langKey);
+      }
+    });
     this.focusViewService.registerFocusView().subscribe((b: boolean) => {
       this.focusview = b;
     });

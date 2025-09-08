@@ -55,7 +55,7 @@ describe('CourseGroup routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).toBeCalledWith(123);
+      expect(service.find).toHaveBeenCalledWith(123);
       expect(resultCourseGroup).toEqual({ id: 123 });
     });
 
@@ -70,7 +70,7 @@ describe('CourseGroup routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).not.toBeCalled();
+      expect(service.find).not.toHaveBeenCalled();
       expect(resultCourseGroup).toEqual(new CourseGroup());
     });
 
@@ -85,7 +85,7 @@ describe('CourseGroup routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).toBeCalledWith(123);
+      expect(service.find).toHaveBeenCalledWith(123);
       expect(resultCourseGroup).toEqual(undefined);
       expect(mockRouter.navigate).toHaveBeenCalledWith(['404']);
     });

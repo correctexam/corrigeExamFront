@@ -7,7 +7,7 @@ import { Account } from 'app/core/auth/account.model';
 import { PasswordService } from './password.service';
 import { PasswordStrengthBarComponent } from './password-strength-bar/password-strength-bar.component';
 import { AsyncPipe } from '@angular/common';
-import { TranslateDirective, TranslatePipe } from '@ngx-translate/core';
+import { TranslateDirective, TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'jhi-password',
@@ -26,6 +26,7 @@ export class PasswordComponent implements OnInit {
     private passwordService: PasswordService,
     private accountService: AccountService,
     private fb: UntypedFormBuilder,
+    private translateService: TranslateService,
   ) {
     this.passwordForm = this.fb.group({
       currentPassword: ['', [Validators.required]],
@@ -36,6 +37,11 @@ export class PasswordComponent implements OnInit {
 
   ngOnInit(): void {
     this.account$ = this.accountService.identity();
+    this.account$.subscribe(account => {
+      if (account?.langKey) {
+        this.translateService.use(account.langKey);
+      }
+    });
   }
 
   changePassword(): void {

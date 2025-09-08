@@ -125,6 +125,5 @@ bootstrapApplication(MainComponent, {
     //  },
   ],
 })
-  // eslint-disable-next-line no-console
   .then(() => console.error('Application started'))
   .catch(err => console.error(err));

@@ -12,6 +12,7 @@ import { AccountService } from 'app/core/auth/account.service';
 
 import { UserManagementComponent } from './user-management.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('User Management Component', () => {
   let comp: UserManagementComponent;
@@ -31,7 +32,7 @@ describe('User Management Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [UserManagementComponent],
+      imports: [UserManagementComponent, TranslateModule.forRoot()],
       declarations: [],
       providers: [
         provideHttpClient(),

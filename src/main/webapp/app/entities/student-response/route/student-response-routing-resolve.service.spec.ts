@@ -55,7 +55,7 @@ describe('StudentResponse routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).toBeCalledWith(123);
+      expect(service.find).toHaveBeenCalledWith(123);
       expect(resultStudentResponse).toEqual({ id: 123 });
     });
 
@@ -70,7 +70,7 @@ describe('StudentResponse routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).not.toBeCalled();
+      expect(service.find).not.toHaveBeenCalled();
       expect(resultStudentResponse).toEqual(new StudentResponse());
     });
 
@@ -85,7 +85,7 @@ describe('StudentResponse routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).toBeCalledWith(123);
+      expect(service.find).toHaveBeenCalledWith(123);
       expect(resultStudentResponse).toEqual(undefined);
       expect(mockRouter.navigate).toHaveBeenCalledWith(['404']);
     });

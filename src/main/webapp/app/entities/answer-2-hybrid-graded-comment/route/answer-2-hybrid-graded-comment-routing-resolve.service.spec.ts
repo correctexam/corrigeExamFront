@@ -55,7 +55,7 @@ describe('Answer2HybridGradedComment routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).toBeCalledWith(123);
+      expect(service.find).toHaveBeenCalledWith(123);
       expect(resultAnswer2HybridGradedComment).toEqual({ id: 123 });
     });
 
@@ -70,7 +70,7 @@ describe('Answer2HybridGradedComment routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).not.toBeCalled();
+      expect(service.find).not.toHaveBeenCalled();
       expect(resultAnswer2HybridGradedComment).toEqual(null);
     });
 
@@ -85,7 +85,7 @@ describe('Answer2HybridGradedComment routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).toBeCalledWith(123);
+      expect(service.find).toHaveBeenCalledWith(123);
       expect(resultAnswer2HybridGradedComment).toEqual(undefined);
       expect(mockRouter.navigate).toHaveBeenCalledWith(['404']);
     });

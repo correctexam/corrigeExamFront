@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/member-ordering */
-/* eslint-disable prefer-const */
-/* eslint-disable no-console */
-
 import { IStudent } from 'app/entities/student/student.model';
 
 export interface IPage {
