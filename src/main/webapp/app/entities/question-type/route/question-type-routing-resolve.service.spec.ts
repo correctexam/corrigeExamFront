@@ -54,7 +54,7 @@ describe('QuestionType routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).toBeCalledWith(123);
+      expect(service.find).toHaveBeenCalledWith(123);
       expect(resultQuestionType).toEqual({ id: 123 });
     });
 
@@ -69,7 +69,7 @@ describe('QuestionType routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).not.toBeCalled();
+      expect(service.find).not.toHaveBeenCalled();
       expect(resultQuestionType).toEqual(new QuestionType());
     });
 
@@ -84,7 +84,7 @@ describe('QuestionType routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).toBeCalledWith(123);
+      expect(service.find).toHaveBeenCalledWith(123);
       expect(resultQuestionType).toEqual(undefined);
       expect(mockRouter.navigate).toHaveBeenCalledWith(['404']);
     });

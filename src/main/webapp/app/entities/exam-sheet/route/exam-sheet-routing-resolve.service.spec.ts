@@ -56,7 +56,7 @@ describe('ExamSheet routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).toBeCalledWith(123);
+      expect(service.find).toHaveBeenCalledWith(123);
       expect(resultExamSheet).toEqual({ id: 123 });
     });
 
@@ -71,7 +71,7 @@ describe('ExamSheet routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).not.toBeCalled();
+      expect(service.find).not.toHaveBeenCalled();
       expect(resultExamSheet).toEqual(new ExamSheet());
     });
 
@@ -86,7 +86,7 @@ describe('ExamSheet routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).toBeCalledWith(123);
+      expect(service.find).toHaveBeenCalledWith(123);
       expect(resultExamSheet).toEqual(undefined);
       expect(mockRouter.navigate).toHaveBeenCalledWith(['404']);
     });

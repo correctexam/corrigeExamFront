@@ -54,7 +54,7 @@ describe('GradedComment routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).toBeCalledWith(123);
+      expect(service.find).toHaveBeenCalledWith(123);
       expect(resultGradedComment).toEqual({ id: 123 });
     });
 
@@ -69,7 +69,7 @@ describe('GradedComment routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).not.toBeCalled();
+      expect(service.find).not.toHaveBeenCalled();
       expect(resultGradedComment).toEqual(new GradedComment());
     });
 
@@ -84,7 +84,7 @@ describe('GradedComment routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).toBeCalledWith(123);
+      expect(service.find).toHaveBeenCalledWith(123);
       expect(resultGradedComment).toEqual(undefined);
       expect(mockRouter.navigate).toHaveBeenCalledWith(['404']);
     });

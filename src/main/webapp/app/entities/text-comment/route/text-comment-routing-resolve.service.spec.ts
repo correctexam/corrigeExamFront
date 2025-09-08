@@ -55,7 +55,7 @@ describe('TextComment routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).toBeCalledWith(123);
+      expect(service.find).toHaveBeenCalledWith(123);
       expect(resultTextComment).toEqual({ id: 123 });
     });
 
@@ -70,7 +70,7 @@ describe('TextComment routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).not.toBeCalled();
+      expect(service.find).not.toHaveBeenCalled();
       expect(resultTextComment).toEqual(new TextComment());
     });
 
@@ -85,7 +85,7 @@ describe('TextComment routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).toBeCalledWith(123);
+      expect(service.find).toHaveBeenCalledWith(123);
       expect(resultTextComment).toEqual(undefined);
       expect(mockRouter.navigate).toHaveBeenCalledWith(['404']);
     });

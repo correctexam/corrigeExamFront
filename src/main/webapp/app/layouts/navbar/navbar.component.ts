@@ -171,7 +171,6 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   changeLanguage(languageKey: string): void {
-    console.error('change language to ', languageKey);
     this.sessionStorageService.store('locale', languageKey);
 
     this.translateService.use(languageKey);

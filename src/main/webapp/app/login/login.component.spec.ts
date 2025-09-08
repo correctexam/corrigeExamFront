@@ -14,6 +14,7 @@ import { LoginService } from './login.service';
 import { LoginComponent } from './login.component';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('LoginComponent', () => {
   let comp: LoginComponent;
@@ -24,7 +25,7 @@ describe('LoginComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, LoginComponent],
+      imports: [ReactiveFormsModule, FormsModule, LoginComponent, TranslateModule.forRoot()],
       declarations: [],
       providers: [
         provideHttpClient(),

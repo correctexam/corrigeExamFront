@@ -53,7 +53,7 @@ describe('FinalResult routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).toBeCalledWith(123);
+      expect(service.find).toHaveBeenCalledWith(123);
       expect(resultFinalResult).toEqual({ id: 123 });
     });
 
@@ -68,7 +68,7 @@ describe('FinalResult routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).not.toBeCalled();
+      expect(service.find).not.toHaveBeenCalled();
       expect(resultFinalResult).toEqual(new FinalResult());
     });
 
@@ -83,7 +83,7 @@ describe('FinalResult routing resolve service', () => {
       });
 
       // THEN
-      expect(service.find).toBeCalledWith(123);
+      expect(service.find).toHaveBeenCalledWith(123);
       expect(resultFinalResult).toEqual(undefined);
       expect(mockRouter.navigate).toHaveBeenCalledWith(['404']);
     });
