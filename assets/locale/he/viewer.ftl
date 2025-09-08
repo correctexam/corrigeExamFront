@@ -293,7 +293,7 @@ pdfjs-annotation-date-time-string = { DATETIME($dateObj, dateStyle: "short", tim
 ## Password
 
 pdfjs-password-label = נא להכניס את הססמה לפתיחת קובץ PDF זה.
-pdfjs-password-invalid = ססמה שגויה. נא לנסות שנית.
+pdfjs-password-invalid = ססמה שגויה. נא לנסות שוב.
 pdfjs-password-ok-button = אישור
 pdfjs-password-cancel-button = ביטול
 pdfjs-web-fonts-disabled = גופני רשת מנוטרלים: לא ניתן להשתמש בגופני PDF מוטבעים.
@@ -316,6 +316,25 @@ pdfjs-highlight-floating-button1 =
     .title = סימון
     .aria-label = סימון
 pdfjs-highlight-floating-button-label = סימון
+pdfjs-editor-signature-button =
+    .title = הוספת חתימה
+pdfjs-editor-signature-button-label = הוספת חתימה
+
+## Default editor aria labels
+
+# “Highlight” is a noun, the string is used on the editor for highlights.
+pdfjs-editor-highlight-editor =
+    .aria-label = עורך סימונים
+# “Drawing” is a noun, the string is used on the editor for drawings.
+pdfjs-editor-ink-editor =
+    .aria-label = עורך ציורים
+# Used when a signature editor is selected/hovered.
+# Variables:
+#   $description (String) - a string describing/labeling the signature.
+pdfjs-editor-signature-editor1 =
+    .aria-description = עורך החתימות: { $description }
+pdfjs-editor-stamp-editor =
+    .aria-label = עורך תמונות
 
 ## Remove button for the various kind of editor.
 
@@ -326,7 +345,9 @@ pdfjs-editor-remove-freetext-button =
 pdfjs-editor-remove-stamp-button =
     .title = הסרת תמונה
 pdfjs-editor-remove-highlight-button =
-    .title = הסרת הדגשה
+    .title = הסרת סימון
+pdfjs-editor-remove-signature-button =
+    .title = הסרת חתימה
 
 ##
 
@@ -342,7 +363,21 @@ pdfjs-editor-stamp-add-image-button-label = הוספת תמונה
 # This refers to the thickness of the line used for free highlighting (not bound to text)
 pdfjs-editor-free-highlight-thickness-input = עובי
 pdfjs-editor-free-highlight-thickness-title =
-    .title = שינוי עובי בעת הדגשת פריטים שאינם טקסט
+    .title = שינוי עובי בעת סימון פריטים שאינם טקסט
+pdfjs-editor-add-signature-container =
+    .aria-label = פקדי חתימה וחתימות שמורות
+pdfjs-editor-signature-add-signature-button =
+    .title = הוספת חתימה חדשה
+pdfjs-editor-signature-add-signature-button-label = הוספת חתימה חדשה
+# Used on the button to use an already saved signature.
+# Variables:
+#   $description (String) - a string describing/labeling the signature.
+pdfjs-editor-add-saved-signature-button =
+    .title = חתימה שמורה: { $description }
+# .default-content is used as a placeholder in an empty text editor.
+pdfjs-free-text2 =
+    .aria-label = עורך טקסט
+    .default-content = נא להתחיל להקליד…
 pdfjs-free-text =
     .aria-label = עורך טקסט
 pdfjs-free-text-default-content = להתחיל להקליד…
@@ -353,8 +388,9 @@ pdfjs-ink-canvas =
 
 ## Alt-text dialog
 
-# Alternative text (alt text) helps when people can't see the image.
 pdfjs-editor-alt-text-button-label = טקסט חלופי
+pdfjs-editor-alt-text-edit-button =
+    .aria-label = עריכת טקסט חלופי
 pdfjs-editor-alt-text-edit-button-label = עריכת טקסט חלופי
 pdfjs-editor-alt-text-dialog-label = בחירת אפשרות
 pdfjs-editor-alt-text-dialog-description = טקסט חלופי עוזר כשאנשים לא יכולים לראות את התמונה או כשהיא לא נטענת.
@@ -368,6 +404,9 @@ pdfjs-editor-alt-text-decorative-tooltip = מסומן כדקורטיבי
 # .placeholder: This is a placeholder for the alt text input area
 pdfjs-editor-alt-text-textarea =
     .placeholder = לדוגמה, ״גבר צעיר מתיישב ליד שולחן לאכול ארוחה״
+# Alternative text (alt text) helps when people can't see the image.
+pdfjs-editor-alt-text-button =
+    .aria-label = טקסט חלופי
 
 ## Editor resizers
 ## This is used in an aria label to help to understand the role of the resizer.
@@ -400,7 +439,7 @@ pdfjs-editor-resizer-middle-left =
 ## Color picker
 
 # This means "Color used to highlight text"
-pdfjs-editor-highlight-colorpicker-label = צבע הדגשה
+pdfjs-editor-highlight-colorpicker-label = צבע סימון
 pdfjs-editor-colorpicker-button =
     .title = שינוי צבע
 pdfjs-editor-colorpicker-dropdown =
@@ -445,14 +484,19 @@ pdfjs-editor-new-alt-text-error-close-button = סגירה
 # Variables:
 #   $totalSize (Number) - the total size (in MB) of the AI model.
 #   $downloadedSize (Number) - the downloaded size (in MB) of the AI model.
-#   $percent (Number) - the percentage of the downloaded size.
 pdfjs-editor-new-alt-text-ai-model-downloading-progress = בתהליך הורדת מודל AI של טקסט חלופי ({ $downloadedSize } מתוך { $totalSize } מ״ב)
     .aria-valuetext = בתהליך הורדת מודל AI של טקסט חלופי ({ $downloadedSize } מתוך { $totalSize } מ״ב)
 # This is a button that users can click to edit the alt text they have already added.
-pdfjs-editor-new-alt-text-added-button-label = טקסט חלופי נוסף
+pdfjs-editor-new-alt-text-added-button =
+    .aria-label = נוסף טקסט חלופי
+pdfjs-editor-new-alt-text-added-button-label = נוסף טקסט חלופי
 # This is a button that users can click to open the alt text editor and add alt text when it is not present.
+pdfjs-editor-new-alt-text-missing-button =
+    .aria-label = חסר טקסט חלופי
 pdfjs-editor-new-alt-text-missing-button-label = חסר טקסט חלופי
 # This is a button that opens up the alt text modal where users should review the alt text that was automatically generated.
+pdfjs-editor-new-alt-text-to-review-button =
+    .aria-label = סקירת טקסט חלופי
 pdfjs-editor-new-alt-text-to-review-button-label = סקירת טקסט חלופי
 # "Created automatically" is a prefix that will be added to the beginning of any alt text that has been automatically generated. After the colon, the user will see/hear the actual alt text description. If the alt text has been edited by a human, this prefix will not appear.
 # Variables:
@@ -480,26 +524,127 @@ pdfjs-editor-alt-text-settings-show-dialog-button-label = הצגת עורך טק
 pdfjs-editor-alt-text-settings-show-dialog-description = מסייע לך לוודא שלכל התמונות שלך יש טקסט חלופי.
 pdfjs-editor-alt-text-settings-close-button = סגירה
 
-# Translations for ngx-extended-pdf-viewer additions only available in en-US
-unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
-pdfjs-infinite-scroll-button-label = Infinite scroll
-pdfjs-find-multiple-checkbox-label = match each word
-pdfjs-find-regexp-checkbox-label = regular expression
-pdfjs-free-text2 =
-    .aria-label = Text Editor
-    .default-content = Start typing…
-pdfjs-editor-undo-bar-message-highlight = Highlight removed
-pdfjs-editor-undo-bar-message-freetext = Text removed
-pdfjs-editor-undo-bar-message-ink = Drawing removed
-pdfjs-editor-undo-bar-message-stamp = Image removed
+## "Annotations removed" bar
+
+pdfjs-editor-undo-bar-message-highlight = הסימון הוסר
+pdfjs-editor-undo-bar-message-freetext = הטקסט הוסר
+pdfjs-editor-undo-bar-message-ink = הציור הוסר
+pdfjs-editor-undo-bar-message-stamp = התמונה הוסרה
+pdfjs-editor-undo-bar-message-signature = החתימה הוסרה
+# Variables:
+#   $count (Number) - the number of removed annotations.
 pdfjs-editor-undo-bar-message-multiple =
     { $count ->
-        [one] { $count } annotation removed
-       *[other] { $count } annotations removed
+        [one] הערה אחת הוסרה
+       *[other] { $count } הערות הוסרו
     }
 pdfjs-editor-undo-bar-undo-button =
-    .title = Undo
-pdfjs-editor-undo-bar-undo-button-label = Undo
+    .title = ביטול פעולה
+pdfjs-editor-undo-bar-undo-button-label = ביטול פעלה
 pdfjs-editor-undo-bar-close-button =
+    .title = סגירה
+pdfjs-editor-undo-bar-close-button-label = סגירה
+
+## Add a signature dialog
+
+pdfjs-editor-add-signature-dialog-label = מודל זה מאפשר למשתמש ליצור חתימה להוספה למסמך PDF. המשתמש יכול לערוך את השם (שמשמש גם כטקסט האלטרנטיבי), ובאופן אופציונלי לשמור את החתימה לשימוש חוזר.
+pdfjs-editor-add-signature-dialog-title = הוספת חתימה
+
+## Tab names
+
+# Type is a verb (you can type your name as signature)
+pdfjs-editor-add-signature-type-button = הקלדה
+    .title = הקלדה
+# Draw is a verb (you can draw your signature)
+pdfjs-editor-add-signature-draw-button = ציור
+    .title = ציור
+pdfjs-editor-add-signature-image-button = תמונה
+    .title = תמונה
+
+## Tab panels
+
+pdfjs-editor-add-signature-type-input =
+    .aria-label = נא להקליד את החתימה שלך
+    .placeholder = נא להקליד את החתימה שלך
+pdfjs-editor-add-signature-draw-placeholder = נא לצייר את החתימה שלך
+pdfjs-editor-add-signature-draw-thickness-range-label = עובי
+# Variables:
+#   $thickness (Number) - the thickness (in pixels) of the line used to draw a signature.
+pdfjs-editor-add-signature-draw-thickness-range =
+    .title = עובי הציור: { $thickness }
+pdfjs-editor-add-signature-image-placeholder = יש לגרור לכאן קובץ להעלאה
+pdfjs-editor-add-signature-image-browse-link =
+    { PLATFORM() ->
+        [macos] או לבחור בקובצי תמונה
+       *[other] או לעיין בקובצי תמונה
+    }
+
+## Controls
+
+pdfjs-editor-add-signature-description-label = תיאור (טקסט חלופי)
+pdfjs-editor-add-signature-description-input =
+    .title = תיאור (טקסט חלופי)
+pdfjs-editor-add-signature-description-default-when-drawing = חתימה
+pdfjs-editor-add-signature-clear-button-label = ניקוי חתימה
+pdfjs-editor-add-signature-clear-button =
+    .title = ניקוי חתימה
+pdfjs-editor-add-signature-save-checkbox = שמירת החתימה
+pdfjs-editor-add-signature-save-warning-message = הגעת למגבלה של 5 חתימות שמורות. יש להסיר אחד כדי לשמור עוד.
+pdfjs-editor-add-signature-image-upload-error-title = לא ניתן להעלות את התמונה
+pdfjs-editor-add-signature-image-upload-error-description = נא לבדוק את החיבור שלך לרשת או לנסות תמונה אחרת.
+pdfjs-editor-add-signature-error-close-button = סגירה
+
+## Dialog buttons
+
+pdfjs-editor-add-signature-cancel-button = ביטול
+pdfjs-editor-add-signature-add-button = הוספה
+pdfjs-editor-edit-signature-update-button = עדכון
+
+## Main menu for adding/removing signatures
+
+pdfjs-editor-delete-signature-button1 =
+    .title = הסרת חתימה שמורה
+pdfjs-editor-delete-signature-button-label1 = הסרת חתימה שמורה
+
+## Editor toolbar
+
+pdfjs-editor-add-signature-edit-button-label = עריכת תיאור
+
+## Edit signature description dialog
+
+pdfjs-editor-edit-signature-dialog-title = עריכת תיאור
+
+# Translations for ngx-extended-pdf-viewer additions only available in en-US
+pdfjs-editor-color-picker-free-text-input =
+    .title = Change text color
+pdfjs-editor-color-picker-ink-input =
+    .title = Change drawing color
+pdfjs-editor-highlight-added-alert = Highlight added
+pdfjs-editor-freetext-added-alert = Text added
+pdfjs-editor-ink-added-alert = Drawing added
+pdfjs-editor-stamp-added-alert = Image added
+pdfjs-editor-signature-added-alert = Signature added
+pdfjs-editor-add-signature-image-no-data-error-title = Can’t convert this image into a signature
+pdfjs-editor-add-signature-image-no-data-error-description = Please try uploading a different image.
+pdfjs-editor-edit-comment-actions-button-label = Actions
+pdfjs-editor-edit-comment-actions-button =
+    .title = Actions
+pdfjs-editor-edit-comment-close-button-label = Close
+pdfjs-editor-edit-comment-close-button =
     .title = Close
-pdfjs-editor-undo-bar-close-button-label = Close
+pdfjs-editor-edit-comment-actions-edit-button-label = Edit
+pdfjs-editor-edit-comment-actions-delete-button-label = Delete
+pdfjs-editor-edit-comment-manager-text-input =
+    .placeholder = Enter your comment
+pdfjs-editor-edit-comment-manager-cancel-button = Cancel
+pdfjs-editor-edit-comment-manager-save-button = Save
+pdfjs-editor-edit-comment-button =
+    .title = Edit comment
+unverified-signature-warning = This PDF file contains a digital signature. The PDF viewer can't verify if the signature is valid. Please download the file and open it in Acrobat Reader to verify the signature is valid.
+pdfjs-infinite-scroll-button-label = Infinite scroll
+pdfjs-find-multiple-checkbox-label = Match Each Word
+pdfjs-find-regexp-checkbox-label = Regular Expression
+pdfjs-editor-movePageUp-button = Move Page Up
+pdfjs-editor-movePageUp-button-label = Move Page Up
+pdfjs-editor-movePageDown-button = Move Page Down
+pdfjs-editor-movePageDown-button-label = Move Page Down
