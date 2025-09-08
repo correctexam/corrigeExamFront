@@ -1,5 +1,5 @@
 import { Component, ElementRef, Input, Renderer2 } from '@angular/core';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
+import { TranslateDirective } from '@ngx-translate/core';
 
 @Component({
   selector: 'jhi-password-strength-bar',

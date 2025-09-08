@@ -4,16 +4,15 @@ import { MarkingExamStateDTO, ExamService } from 'app/entities/exam/service/exam
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { HttpClient } from '@angular/common/http';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { Title } from '@angular/platform-browser';
 import { PreferenceService } from '../preference-page/preference.service';
 import { ButtonDirective } from 'primeng/button';
 import { TabsModule } from 'primeng/tabs';
-import { TranslateDirective } from '../../shared/language/translate.directive';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TooltipModule } from 'primeng/tooltip';
 import { HasAnyAuthorityDirective } from '../../shared/auth/has-any-authority.directive';
-import { NgIf, NgFor, PercentPipe } from '@angular/common';
+import { PercentPipe } from '@angular/common';
 
 @Component({
   selector: 'jhi-marking-summary',
@@ -21,17 +20,15 @@ import { NgIf, NgFor, PercentPipe } from '@angular/common';
   styleUrls: ['./marking-summary.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     HasAnyAuthorityDirective,
     TooltipModule,
     FaIconComponent,
-    TranslateDirective,
     TabsModule,
-    NgFor,
     ButtonDirective,
     RouterLink,
     PercentPipe,
-    TranslateModule,
+    TranslateDirective,
+    TranslatePipe,
   ],
 })
 export class MarkingSummaryComponent implements OnInit {

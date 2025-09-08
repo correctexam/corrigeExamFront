@@ -10,15 +10,14 @@ import { TextCommentService } from '../service/text-comment.service';
 import { IQuestion } from 'app/entities/question/question.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { NgFor } from '@angular/common';
+
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-text-comment-update',
   templateUrl: './text-comment-update.component.html',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, TranslateDirective, AlertErrorComponent, NgFor, FaIconComponent],
+  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, FaIconComponent],
 })
 export class TextCommentUpdateComponent implements OnInit {
   isSaving = false;

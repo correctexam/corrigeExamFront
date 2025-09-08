@@ -1,70 +1,84 @@
 <div class="wizard-v2-content">
-  <div *ngIf="showImage" class="wizard-image"></div>
+  @if (showImage) {
+    <div class="wizard-image"></div>
+  }
   <div class="wizard-form">
     <div class="wizard-header">
-      <h3 jhiTranslate="scanexam.mescours">Mes cours</h3>
-      <p jhiTranslate="scanexam.slogan2">votre correction de copies assistée à l'aide du numérique</p>
+      <h3 [translate]="'scanexam.mescours'">Mes cours</h3>
+      <p [translate]="'scanexam.slogan2'">votre correction de copies assistée à l'aide du numérique</p>
     </div>
     <div id="form-total" pDroppable (onDrop)="drop(false)">
-      <h4 jhiTranslate="scanexam.coursnonarchive" [pTooltip]="'scanexam.coursnonarchiveTooltip' | translate" [tooltipPosition]="'left'">
+      <h4 [translate]="'scanexam.coursnonarchive'" [pTooltip]="'scanexam.coursnonarchiveTooltip' | translate" [tooltipPosition]="'left'">
         Cours actif
       </h4>
       <div class="inner" [style]="{ 'text-align': 'center' }">
-        <button
-          pDraggable
-          *ngFor="let course of coursesnonarchived()"
-          [style]="{ marginBottom: '1em', margin: '1em' }"
-          class="p-element p-ripple button80"
-          pButton
-          pRipple
-          type="button"
-          [routerLink]="'course/' + course.id"
-          (onDragStart)="dragStart(course)"
-          (onDragEnd)="dragEnd()"
-        >
-          <fa-stack>
-            <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
-            <fa-icon [icon]="faGraduationCap" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
-          ><BR /> <span>{{ course.name }}</span
-          ><span *jhiHasAnyAuthority="'ROLE_ADMIN'"
-            >(
-            <span *ngFor="let prof of course.profs; let index = index; let isFirst = first"
-              ><span *ngIf="!isFirst">, </span>{{ prof.login }}</span
-            >
-            )</span
+        @for (course of coursesnonarchived(); track course) {
+          <button
+            pDraggable
+            [style]="{ marginBottom: '1em', margin: '1em' }"
+            class="p-element p-ripple button80"
+            pButton
+            pRipple
+            type="button"
+            [routerLink]="'course/' + course.id"
+            (onDragStart)="dragStart(course)"
+            (onDragEnd)="dragEnd()"
           >
-        </button>
+            <fa-stack>
+              <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
+              <fa-icon [icon]="faGraduationCap" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
+            ><BR /> <span>{{ course.name }}</span
+            ><span *jhiHasAnyAuthority="'ROLE_ADMIN'"
+              >(
+              @for (prof of course.profs; track prof; let index = $index; let isFirst = $first) {
+                <span>
+                  @if (!isFirst) {
+                    <span>, </span>
+                  }
+                  {{ prof.login }}</span
+                >
+              }
+              )</span
+            >
+          </button>
+        }
       </div>
     </div>
     <div id="form-total1" pDroppable (onDrop)="drop(true)">
-      <h4 jhiTranslate="scanexam.coursarchive" [pTooltip]="'scanexam.coursarchiveTooltip' | translate" [tooltipPosition]="'left'">
+      <h4 [translate]="'scanexam.coursarchive'" [pTooltip]="'scanexam.coursarchiveTooltip' | translate" [tooltipPosition]="'left'">
         Cours archivée
       </h4>
       <div class="inner" [style]="{ 'text-align': 'center' }">
-        <button
-          pDraggable
-          *ngFor="let course of coursesarchived()"
-          [style]="{ marginBottom: '1em', margin: '1em' }"
-          class="p-element p-ripple button80"
-          pButton
-          pRipple
-          type="button"
-          [routerLink]="'course/' + course.id"
-          (onDragStart)="dragStart(course)"
-          (onDragEnd)="dragEnd()"
-        >
-          <fa-stack>
-            <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
-            <fa-icon [icon]="faGraduationCap" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
-          ><BR /> <span>{{ course.name }}</span
-          ><span *jhiHasAnyAuthority="'ROLE_ADMIN'"
-            >(
-            <span *ngFor="let prof of course.profs; let index = index; let isFirst = first"
-              ><span *ngIf="!isFirst">, </span>{{ prof.login }}</span
-            >
-            )</span
+        @for (course of coursesarchived(); track course) {
+          <button
+            pDraggable
+            [style]="{ marginBottom: '1em', margin: '1em' }"
+            class="p-element p-ripple button80"
+            pButton
+            pRipple
+            type="button"
+            [routerLink]="'course/' + course.id"
+            (onDragStart)="dragStart(course)"
+            (onDragEnd)="dragEnd()"
           >
-        </button>
+            <fa-stack>
+              <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
+              <fa-icon [icon]="faGraduationCap" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
+            ><BR /> <span>{{ course.name }}</span
+            ><span *jhiHasAnyAuthority="'ROLE_ADMIN'"
+              >(
+              @for (prof of course.profs; track prof; let index = $index; let isFirst = $first) {
+                <span>
+                  @if (!isFirst) {
+                    <span>, </span>
+                  }
+                  {{ prof.login }}</span
+                >
+              }
+              )</span
+            >
+          </button>
+        }
       </div>
     </div>
   </div>

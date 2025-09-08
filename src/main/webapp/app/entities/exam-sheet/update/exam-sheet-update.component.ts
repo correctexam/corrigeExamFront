@@ -10,15 +10,14 @@ import { ExamSheetService } from '../service/exam-sheet.service';
 import { IScan } from 'app/entities/scan/scan.model';
 import { ScanService } from 'app/entities/scan/service/scan.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { NgIf, NgFor } from '@angular/common';
+
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-exam-sheet-update',
   templateUrl: './exam-sheet-update.component.html',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, TranslateDirective, AlertErrorComponent, NgIf, NgFor, FaIconComponent],
+  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, FaIconComponent],
 })
 export class ExamSheetUpdateComponent implements OnInit {
   isSaving = false;

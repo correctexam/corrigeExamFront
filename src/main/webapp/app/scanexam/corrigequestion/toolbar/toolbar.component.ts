@@ -4,9 +4,9 @@ import { faUserGraduate, faHashtag, faEraser, faHandPointer, faTrash, faPencil }
 import { DrawingTools } from 'app/scanexam/annotate-template/paint/models';
 import { EventCanevascorrectionHandlerService } from '../event-canevascorrection-handler.service';
 import { ConfirmationService } from 'primeng/api';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { KeyValuePipe, NgClass, NgFor } from '@angular/common';
+import { KeyValuePipe, NgClass } from '@angular/common';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 import { CustomSvgIconLoaderComponent } from '../customsvgiconloader/customsvgiconloader.component';
@@ -18,8 +18,8 @@ import { PreferenceService } from '../../preference-page/preference.service';
   templateUrl: './toolbar.component.html',
   styleUrls: ['./toolbar.component.scss'],
   standalone: true,
-  imports: [NgClass, FaIconComponent, TranslateModule, NgFor, KeyValuePipe],
-  providers: [DialogService],
+  imports: [NgClass, FaIconComponent, TranslatePipe, KeyValuePipe],
+  providers: [DialogService, TranslateService],
 })
 export class GraphicalToolbarCorrectionComponent {
   faNote = faUserGraduate;

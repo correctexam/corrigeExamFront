@@ -5,28 +5,30 @@
     <p-progressSpinner></p-progressSpinner>
   </p-blockUI>
 
-  <div class="canvas-wrapper foo" *ngIf="processpdf">
-    <ngx-extended-pdf-viewer
-      [src]="content"
-      style="flex: 1 1 90%"
-      #viewer
-      [height]="'89vh'"
-      [page]="1"
-      [handTool]="false"
-      [showHandToolButton]="false"
-      [textLayer]="false"
-      [(scrollMode)]="scrollMode"
-      [handTool]="false"
-      [showToolbar]="false"
-      [showSecondaryToolbarButton]="false"
-      [sidebarVisible]="false"
-      (pageRender)="pageRender()"
-      (pageRendered)="pageRendered($event)"
-      backgroundColor="#ffffff"
-      [zoom]="'page-width'"
-      [minZoom]="0.5"
-      [maxZoom]="3"
-      (textLayerRendered)="foo($event)"
-    ></ngx-extended-pdf-viewer>
-  </div>
+  @if (processpdf) {
+    <div class="canvas-wrapper foo">
+      <ngx-extended-pdf-viewer
+        [src]="content"
+        style="flex: 1 1 90%"
+        #viewer
+        [height]="'89vh'"
+        [page]="1"
+        [handTool]="false"
+        [showHandToolButton]="false"
+        [textLayer]="false"
+        [(scrollMode)]="scrollMode"
+        [handTool]="false"
+        [showToolbar]="false"
+        [showSecondaryToolbarButton]="false"
+        [sidebarVisible]="false"
+        (pageRender)="pageRender()"
+        (pageRendered)="pageRendered($event)"
+        backgroundColor="#ffffff"
+        [zoom]="'page-width'"
+        [minZoom]="0.5"
+        [maxZoom]="3"
+        (textLayerRendered)="foo($event)"
+      ></ngx-extended-pdf-viewer>
+    </div>
+  }
 </div>

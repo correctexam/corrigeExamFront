@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
     <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2 id="jhi-zone-heading" data-cy="ZoneCreateUpdateHeading" jhiTranslate="gradeScopeIsticApp.zone.home.createOrEditLabel">
+      <h2 id="jhi-zone-heading" data-cy="ZoneCreateUpdateHeading" [translate]="'gradeScopeIsticApp.zone.home.createOrEditLabel'">
         Create or edit a Zone
       </h2>
 
@@ -9,7 +9,7 @@
         <jhi-alert-error></jhi-alert-error>
 
         <div class="row mb-3" [hidden]="editForm.get('id')!.value == null">
-          <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+          <label class="form-label" [translate]="'global.field.id'" for="field_id">ID</label>
           <input
             type="number"
             (mouseup)="$event.stopPropagation()"
@@ -36,7 +36,7 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.zone.xInit" for="field_xInit">X Init</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.zone.xInit'" for="field_xInit">X Init</label>
           <input
             type="number"
             (mouseup)="$event.stopPropagation()"
@@ -49,7 +49,7 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.zone.yInit" for="field_yInit">Y Init</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.zone.yInit'" for="field_yInit">Y Init</label>
           <input
             type="number"
             (mouseup)="$event.stopPropagation()"
@@ -62,7 +62,7 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.zone.width" for="field_width">Width</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.zone.width'" for="field_width">Width</label>
           <input
             type="number"
             (mouseup)="$event.stopPropagation()"
@@ -75,7 +75,7 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.zone.height" for="field_height">Height</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.zone.height'" for="field_height">Height</label>
           <input
             type="number"
             (mouseup)="$event.stopPropagation()"
@@ -90,7 +90,7 @@
 
       <div>
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span [translate]="'entity.action.cancel'">Cancel</span>
         </button>
 
         <button
@@ -100,7 +100,7 @@
           [disabled]="editForm.invalid || isSaving"
           class="btn btn-primary"
         >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+          <fa-icon icon="save"></fa-icon>&nbsp;<span [translate]="'entity.action.save'">Save</span>
         </button>
       </div>
     </form>

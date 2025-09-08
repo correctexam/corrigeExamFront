@@ -1,8 +1,10 @@
 <!--<jhi-page-ribbon></jhi-page-ribbon>-->
 
-<div *ngIf="!focusview">
-  <router-outlet name="navbar"></router-outlet>
-</div>
+@if (!focusview) {
+  <div>
+    <router-outlet name="navbar"></router-outlet>
+  </div>
+}
 <ng-keyboard-shortcuts-help [key]="'f1'" [closeKey]="'escape'" [title]="helptitle!"></ng-keyboard-shortcuts-help>
 
 <div class="">
@@ -10,5 +12,7 @@
     <router-outlet></router-outlet>
   </div>
 
-  <jhi-footer *ngIf="!focusview"></jhi-footer>
+  @if (!focusview) {
+    <jhi-footer></jhi-footer>
+  }
 </div>

@@ -11,7 +11,7 @@ import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
 import { EntityArrayResponseType, HybridGradedCommentService } from '../service/hybrid-graded-comment.service';
 import { HybridGradedCommentDeleteDialogComponent } from '../delete/hybrid-graded-comment-delete-dialog.component';
 import { DataUtils } from 'app/core/util/data-util.service';
-import { NgFor, NgIf } from '@angular/common';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertErrorComponent } from 'app/shared/alert/alert-error.component';
@@ -32,9 +32,7 @@ export const PAGE_HEADER = 'page';
   standalone: true,
   imports: [
     FontAwesomeModule,
-    NgFor,
     AlertErrorComponent,
-    NgIf,
     FormsModule,
     ReactiveFormsModule,
     RouterLink,

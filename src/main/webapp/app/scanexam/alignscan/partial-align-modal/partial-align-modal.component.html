@@ -1,13 +1,13 @@
 <div class="field col-12 md:col-12 lg:col-3 xl:col-3">
-  <label for="startPage" jhiTranslate="scanexam.partialalignscanstartpage">startPage</label>
+  <label for="startPage" [translate]="'scanexam.partialalignscanstartpage'">startPage</label>
   <p-inputNumber inputId="startPage" [(ngModel)]="startPage" [min]="1"> </p-inputNumber>
 </div>
 <div class="field col-12 md:col-12 lg:col-3 xl:col-3">
-  <label for="endPage" jhiTranslate="scanexam.partialalignscanendpage">endPage</label>
+  <label for="endPage" [translate]="'scanexam.partialalignscanendpage'">endPage</label>
   <p-inputNumber inputId="endPage" [(ngModel)]="endPage" [min]="1"> </p-inputNumber>
 </div>
 <div class="field col-12 md:col-12 lg:col-3 xl:col-3">
-  <label for="showmapping" jhiTranslate="scanexam.showmapping">voir le mapping</label>
+  <label for="showmapping" [translate]="'scanexam.showmapping'">voir le mapping</label>
   <p-checkbox
     inputId="showmapping"
     [(ngModel)]="showmapping"
@@ -19,5 +19,5 @@
 </div>
 
 <div class="field col-12 md:col-12 lg:col-3 xl:col-3">
-  <button class="p-button p-button-primary" (click)="process()" jhiTranslate="scanexam.partialalignscanprocess">Process</button>
+  <button class="p-button p-button-primary" (click)="process()" [translate]="'scanexam.partialalignscanprocess'">Process</button>
 </div>

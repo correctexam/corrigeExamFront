@@ -27,7 +27,7 @@
       [pTooltip]="'scanexam.gotoCorrectionTooltip' | translate"
       [tooltipZIndex]="'3000'"
     >
-      <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackcorrection">Retourner à la correction</span>
+      <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'scanexam.gobackcorrection'">Retourner à la correction</span>
     </button>
     <button
       pButton
@@ -41,73 +41,83 @@
       [pTooltip]="'scanexam.downloadAllTooltip' | translate"
       [tooltipZIndex]="'3000'"
     >
-      <fa-icon icon="download"></fa-icon>&nbsp;<span jhiTranslate="scanexam.downloadimages">Download</span>
+      <fa-icon icon="download"></fa-icon>&nbsp;<span [translate]="'scanexam.downloadimages'">Download</span>
     </button>
-    <button
-      *ngIf="questionall"
-      pButton
-      [disabled]="!this.examId"
-      type="submit"
-      id="classify-entity"
-      data-cy="entityCreateSaveButton"
-      class="p-button-primary"
-      (click)="classifyAll()"
-      [pTooltip]="'scanexam.classifytooltip' | translate"
-      [tooltipPosition]="'bottom'"
-      [tooltipZIndex]="'3000'"
-    >
-      <fa-icon icon="circle-nodes"></fa-icon>&nbsp;<span jhiTranslate="scanexam.classify">Classify</span>
-    </button>
-    <button
-      pButton
-      *ngIf="questionall"
-      [disabled]="!this.examId"
-      type="submit"
-      id="classify-entity"
-      data-cy="entityCreateSaveButton"
-      class="p-button-primary"
-      (click)="unclassifyAll()"
-      [pTooltip]="'scanexam.unclassifytooltip' | translate"
-      [tooltipPosition]="'bottom'"
-      [tooltipZIndex]="'3000'"
-    >
-      <fa-icon icon="object-ungroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.unclassify">Unclassify</span>
-    </button>
-  </div>
-  <p-drawer [(visible)]="layoutsidebarVisible">
-    <h3 *ngIf="questionall" jhiTranslate="scanexam.kmeanoptions">Kmean options</h3>
-    <div *ngIf="questionall" style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <label><span jhiTranslate="scanexam.nbreCluster"> Nombre de cluster : </span>({{ nbreCluster }})</label>
-      <p-slider
-        [ngModel]="nbreCluster"
-        [min]="2"
-        [max]="15"
-        [step]="1"
-        (onChange)="updateNbrCluster($event)"
-        [pTooltip]="'scanexam.nbreClusterTooltip' | translate"
+    @if (questionall) {
+      <button
+        pButton
+        [disabled]="!this.examId"
+        type="submit"
+        id="classify-entity"
+        data-cy="entityCreateSaveButton"
+        class="p-button-primary"
+        (click)="classifyAll()"
+        [pTooltip]="'scanexam.classifytooltip' | translate"
         [tooltipPosition]="'bottom'"
         [tooltipZIndex]="'3000'"
       >
-      </p-slider>
-    </div>
-    <div *ngIf="questionall" style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <div class="flex flex-column gap-3">
-        <label for=""><span jhiTranslate="scanexam.algoClustering"> Algo de clustering : </span></label>
-        <div *ngFor="let algo of algos" class="field-checkbox">
-          <p-radioButton
-            [inputId]="algo.key"
-            name="algo"
-            [value]="algo"
-            [(ngModel)]="selectedAlgo"
-            (onClick)="updateAlgoCluster($event)"
-          ></p-radioButton>
-          <label [for]="algo" class="ml-2"><span [jhiTranslate]="algo.trans" [pTooltip]="algo.transTooltip | translate"></span></label>
+        <fa-icon icon="circle-nodes"></fa-icon>&nbsp;<span [translate]="'scanexam.classify'">Classify</span>
+      </button>
+    }
+    @if (questionall) {
+      <button
+        pButton
+        [disabled]="!this.examId"
+        type="submit"
+        id="classify-entity"
+        data-cy="entityCreateSaveButton"
+        class="p-button-primary"
+        (click)="unclassifyAll()"
+        [pTooltip]="'scanexam.unclassifytooltip' | translate"
+        [tooltipPosition]="'bottom'"
+        [tooltipZIndex]="'3000'"
+      >
+        <fa-icon icon="object-ungroup"></fa-icon>&nbsp;<span [translate]="'scanexam.unclassify'">Unclassify</span>
+      </button>
+    }
+  </div>
+  <p-drawer [(visible)]="layoutsidebarVisible">
+    @if (questionall) {
+      <h3 [translate]="'scanexam.kmeanoptions'">Kmean options</h3>
+    }
+    @if (questionall) {
+      <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+        <label><span [translate]="'scanexam.nbreCluster'"> Nombre de cluster : </span>({{ nbreCluster }})</label>
+        <p-slider
+          [ngModel]="nbreCluster"
+          [min]="2"
+          [max]="15"
+          [step]="1"
+          (onChange)="updateNbrCluster($event)"
+          [pTooltip]="'scanexam.nbreClusterTooltip' | translate"
+          [tooltipPosition]="'bottom'"
+          [tooltipZIndex]="'3000'"
+        >
+        </p-slider>
+      </div>
+    }
+    @if (questionall) {
+      <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+        <div class="flex flex-column gap-3">
+          <label for=""><span [translate]="'scanexam.algoClustering'"> Algo de clustering : </span></label>
+          @for (algo of algos; track algo) {
+            <div class="field-checkbox">
+              <p-radioButton
+                [inputId]="algo.key"
+                name="algo"
+                [value]="algo"
+                [(ngModel)]="selectedAlgo"
+                (onClick)="updateAlgoCluster($event)"
+              ></p-radioButton>
+              <label [for]="algo" class="ml-2"><span [translate]="algo.trans" [pTooltip]="algo.transTooltip | translate"></span></label>
+            </div>
+          }
         </div>
       </div>
-    </div>
-    <h3 jhiTranslate="scanexam.layoutoptions">Layout options</h3>
+    }
+    <h3 [translate]="'scanexam.layoutoptions'">Layout options</h3>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <label><span jhiTranslate="scanexam.nbreImagePerLigne"> Nombre de tuiles affichées par ligne : </span>({{ nbreColumn }})</label>
+      <label><span [translate]="'scanexam.nbreImagePerLigne'"> Nombre de tuiles affichées par ligne : </span>({{ nbreColumn }})</label>
       <p-selectButton
         [options]="nbreColumnOptions"
         [ngModel]="nbreColumn"
@@ -119,32 +129,35 @@
     </div>
   </p-drawer>
   <ng-container>
-    <ng-container *ngFor="let k of zones4comments?.answers; let i = index">
-      <ng-container *ngFor="let z of zones4comments?.zones; let j = index">
+    @for (k of zones4comments?.answers; track k; let i = $index) {
+      @for (z of zones4comments?.zones; track z; let j = $index) {
         <canvas style="display: none" alt="Image 1" #nomImage></canvas>
-      </ng-container>
-    </ng-container>
+      }
+    }
   </ng-container>
 </div>
 <div #pnl class="grid justify-center">
-  <ng-container *ngFor="let k of clusters | keyvalue">
-    <div *ngIf="clusters.size > 1" class="md:col-12 col-12">
-      <h1>Cluster {{ k.key }}</h1>
-      <button
-        *ngIf="questionall"
-        pButton
-        [disabled]="!this.examId"
-        type="submit"
-        id="classify-entity"
-        data-cy="entityCreateSaveButton"
-        class="p-button-primary"
-        (click)="applySameGradeAndComment4Cluster(k)"
-        [pTooltip]="'scanexam.applysamegradetooltip' | translate"
-      >
-        <fa-icon icon="object-ungroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.applysamegrade">Appliquer la même note</span>
-      </button>
-    </div>
-    <ng-container *ngIf="k.value.length === 0">
+  @for (k of clusters | keyvalue; track k) {
+    @if (clusters.size > 1) {
+      <div class="md:col-12 col-12">
+        <h1>Cluster {{ k.key }}</h1>
+        @if (questionall) {
+          <button
+            pButton
+            [disabled]="!this.examId"
+            type="submit"
+            id="classify-entity"
+            data-cy="entityCreateSaveButton"
+            class="p-button-primary"
+            (click)="applySameGradeAndComment4Cluster(k)"
+            [pTooltip]="'scanexam.applysamegradetooltip' | translate"
+          >
+            <fa-icon icon="object-ungroup"></fa-icon>&nbsp;<span [translate]="'scanexam.applysamegrade'">Appliquer la même note</span>
+          </button>
+        }
+      </div>
+    }
+    @if (k.value.length === 0) {
       <div [ngClass]="colonneStyle">
         <div class="card" [style]="'width: 100%;height: 100%;position: static;'" pDroppable (onDrop)="dropVoid(k.key)">
           <div class="card-container yellow-container overflow-hidden">
@@ -155,8 +168,8 @@
           </div>
         </div>
       </div>
-    </ng-container>
-    <ng-container *ngFor="let value of k.value">
+    }
+    @for (value of k.value; track value) {
       <div [ngClass]="colonneStyle">
         <div
           class="card"
@@ -172,55 +185,90 @@
             (click)="goToCopie($event, (zones4comments?.answers)![value].pagemin, (zones4comments?.answers)![value].pagemax)"
           >
             <div class="flex flex-column">
-              <div *ngFor="let z of zones4comments?.zones; let j = index">
-                <canvas [id]="'canvas ' + value" #nomImageVisible></canvas>
-              </div>
+              @for (z of zones4comments?.zones; track z; let j = $index) {
+                <div>
+                  <canvas [id]="'canvas ' + value" #nomImageVisible></canvas>
+                </div>
+              }
             </div>
             <div class="card-content">
-              <p *ngIf="!pointisNan((zones4comments?.answers)![value], zones4comments)">
-                Note:
-                <span *ngIf="zones4comments !== undefined && zones4comments.step > 0 && zones4comments.gradeType !== 'HYBRID'"
-                  ><b>{{ zones4comments.answers![value].note / zones4comments.step }}/{{ zones4comments.point }}</b></span
-                >
-                <span *ngIf="zones4comments !== undefined && zones4comments.step <= 0 && zones4comments.gradeType != 'HYBRID'"
-                  ><b *ngIf="zones4comments.point !== 0">{{ zones4comments.answers![value].note }}/{{ zones4comments.point }}</b></span
-                >
-                <span *ngIf="zones4comments !== undefined && zones4comments.gradeType === 'HYBRID'"
-                  ><b *ngIf="zones4comments.point !== 0"
-                    >{{ zones4comments.answers![value].note / 100 | number: '1.0-2' }}/{{ zones4comments.point }}</b
-                  ></span
-                >
-              </p>
-              <p *ngFor="let item of getGradedComments((zones4comments?.answers)![value]); let index = index">
-                Commentaire {{ index + 1 }}:
-                <b
-                  >{{ item.text }}
-                  <span *ngIf="item.grade && zones4comments !== undefined && zones4comments?.algoName !== 'QCM'"
-                    >( <span *ngIf="zones4comments?.gradeType === 'NEGATIVE'">-</span> {{ item.grade! / zones4comments.step! }}pt)</span
-                  >
-                </b>
-              </p>
-              <p *ngFor="let item of getHybridGradedComments((zones4comments?.answers)![value]); let index = index">
-                Commentaire {{ index + 1 }}:
-                <b
-                  >{{ item.text }}
-                  <span *ngIf="item.step && item.step > 1"
-                    >({{ getHybridGradedCommentsValue((zones4comments?.answers)![value], item) }} / {{ item?.step }})</span
-                  >
-
-                  <span *ngIf="item.grade && zones4comments !== undefined && zones4comments?.algoName !== 'QCM'"
-                    >( <span *ngIf="item.grade > 0">+ </span> {{ item.grade! | number: '1.0-2' }} <span *ngIf="item.relative">%</span
-                    ><span *ngIf="!item.relative"> pt</span> )</span
-                  >
-                </b>
-              </p>
-              <p *ngFor="let item of getTextComments((zones4comments?.answers)![value]); let index = index">
-                Commentaire{{ index + 1 }}: <b>{{ item.text }}</b>
-              </p>
+              @if (!pointisNan((zones4comments?.answers)![value], zones4comments)) {
+                <p>
+                  Note:
+                  @if (zones4comments !== undefined && zones4comments.step > 0 && zones4comments.gradeType !== 'HYBRID') {
+                    <span
+                      ><b>{{ zones4comments.answers![value].note / zones4comments.step }}/{{ zones4comments.point }}</b></span
+                    >
+                  }
+                  @if (zones4comments !== undefined && zones4comments.step <= 0 && zones4comments.gradeType != 'HYBRID') {
+                    <span>
+                      @if (zones4comments.point !== 0) {
+                        <b>{{ zones4comments.answers![value].note }}/{{ zones4comments.point }}</b>
+                      }
+                    </span>
+                  }
+                  @if (zones4comments !== undefined && zones4comments.gradeType === 'HYBRID') {
+                    <span>
+                      @if (zones4comments.point !== 0) {
+                        <b>{{ zones4comments.answers![value].note / 100 | number: '1.0-2' }}/{{ zones4comments.point }}</b>
+                      }
+                    </span>
+                  }
+                </p>
+              }
+              @for (item of getGradedComments((zones4comments?.answers)![value]); track item; let index = $index) {
+                <p>
+                  Commentaire {{ index + 1 }}:
+                  <b
+                    >{{ item.text }}
+                    @if (item.grade && zones4comments !== undefined && zones4comments.algoName !== 'QCM') {
+                      <span
+                        >(
+                        @if (zones4comments.gradeType === 'NEGATIVE') {
+                          <span>-</span>
+                        }
+                        {{ item.grade! / zones4comments.step! }}pt)</span
+                      >
+                    }
+                  </b>
+                </p>
+              }
+              @for (item of getHybridGradedComments((zones4comments?.answers)![value]); track item; let index = $index) {
+                <p>
+                  Commentaire {{ index + 1 }}:
+                  <b
+                    >{{ item.text }}
+                    @if (item.step && item.step > 1) {
+                      <span>({{ getHybridGradedCommentsValue((zones4comments?.answers)![value], item) }} / {{ item?.step }})</span>
+                    }
+                    @if (item.grade && zones4comments !== undefined && zones4comments.algoName !== 'QCM') {
+                      <span
+                        >(
+                        @if (item.grade > 0) {
+                          <span>+ </span>
+                        }
+                        {{ item.grade! | number: '1.0-2' }}
+                        @if (item.relative) {
+                          <span>%</span>
+                        }
+                        @if (!item.relative) {
+                          <span> pt</span>
+                        }
+                        )</span
+                      >
+                    }
+                  </b>
+                </p>
+              }
+              @for (item of getTextComments((zones4comments?.answers)![value]); track item; let index = $index) {
+                <p>
+                  Commentaire{{ index + 1 }}: <b>{{ item.text }}</b>
+                </p>
+              }
             </div>
           </div>
         </div>
       </div>
-    </ng-container>
-  </ng-container>
+    }
+  }
 </div>

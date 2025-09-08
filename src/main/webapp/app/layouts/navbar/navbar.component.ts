@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, NgZone, OnDestroy, OnInit, Renderer2, RendererFactory2 } from '@angular/core';
 import { ActivatedRoute, ActivatedRouteSnapshot, Router, RouterLink, RouterLinkActive, Scroll } from '@angular/router';
-import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
+import { LangChangeEvent, TranslateDirective, TranslateService } from '@ngx-translate/core';
 import { SessionStorageService } from 'ngx-webstorage';
 
 import { VERSION, CAS_SERVER_URL, SERVICE_URL, CONNECTION_METHOD } from 'app/app.constants';
@@ -14,13 +14,12 @@ import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { PreferencePageComponent } from '../../scanexam/preference-page/preference-page.component';
 import { KeyboardShortcutsModule, ShortcutInput } from 'ng-keyboard-shortcuts';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { CommonModule, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ActiveMenuDirective } from './active-menu.directive';
 import { FindLanguageFromKeyPipe } from 'app/shared/language/find-language-from-key.pipe';
 import { HasAnyAuthorityDirective } from 'app/shared/auth/has-any-authority.directive';
 import { Title } from '@angular/platform-browser';
-import { TranslateDirective } from 'app/shared/language/translate.directive';
 
 @Component({
   standalone: true,
@@ -28,8 +27,6 @@ import { TranslateDirective } from 'app/shared/language/translate.directive';
   templateUrl: './navbar.component.html',
   imports: [
     CommonModule,
-    TranslateDirective,
-    NgIf,
     RouterLink,
     KeyboardShortcutsModule,
     NgbModule,
@@ -38,6 +35,7 @@ import { TranslateDirective } from 'app/shared/language/translate.directive';
     FindLanguageFromKeyPipe,
     HasAnyAuthorityDirective,
     FontAwesomeModule,
+    TranslateDirective,
   ],
 
   styleUrls: ['./navbar.component.scss'],
@@ -56,6 +54,8 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   data: any;
   shortcuts: ShortcutInput[] = [];
 
+  langChangeSubscription: any;
+
   // duplicate in home.component.ts
   public readonly CONNECTION_METHOD_LOCAL = 'local';
   public readonly CONNECTION_METHOD_CAS = 'cas';
@@ -67,8 +67,8 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   private renderer: Renderer2;
 
   constructor(
-    private loginService: LoginService,
     private translateService: TranslateService,
+    private loginService: LoginService,
     private sessionStorageService: SessionStorageService,
     private accountService: AccountService,
     private profileService: ProfileService,
@@ -98,10 +98,16 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
 
-    this.translateService.onLangChange.subscribe((langChangeEvent: LangChangeEvent) => {
-      //    this.updateTitle();
-      // dayjs.locale(langChangeEvent.lang);
+    this.langChangeSubscription = this.translateService.onLangChange.subscribe((langChangeEvent: LangChangeEvent) => {
+      //        console.error('foo',langChangeEvent)
+
+      this.updateTitle();
       this.renderer.setAttribute(document.querySelector('html'), 'lang', langChangeEvent.lang);
+      //      this.setHtmlLangAttribute(langChangeEvent.lang);
+      //      this.translateService.reloadLang(langChangeEvent.lang);
+      //        window.location.reload();
+
+      //      this.translateService.use(langChangeEvent.lang);
     });
 
     this.entitiesNavbarItems = EntityNavbarItems;
@@ -165,7 +171,9 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   changeLanguage(languageKey: string): void {
+    console.error('change language to ', languageKey);
     this.sessionStorageService.store('locale', languageKey);
+
     this.translateService.use(languageKey);
     this.updateDocumentation(this.data);
   }
@@ -207,6 +215,8 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.ref) {
       this.ref.close();
     }
+    // Clean up subscription to prevent memory leaks
+    this.langChangeSubscription?.unsubscribe();
   }
 
   private getPageTitle(routeSnapshot: ActivatedRouteSnapshot): string {
@@ -224,5 +234,10 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     //    console.error('set title main')
     this.translateService.get(pageTitle).subscribe(title => this.titleService.setTitle(title));
+  }
+  private setHtmlLangAttribute(lang: string): void {
+    if (lang && typeof document !== 'undefined') {
+      document.documentElement.setAttribute('lang', lang);
+    }
   }
 }

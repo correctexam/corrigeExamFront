@@ -13,26 +13,22 @@ import { UserManagementDeleteDialogComponent } from '../delete/user-management-d
 import { ItemCountComponent } from '../../../shared/pagination/item-count.component';
 import { SortByDirective } from '../../../shared/sort/sort-by.directive';
 import { SortDirective } from '../../../shared/sort/sort.directive';
-import { NgIf, NgFor, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { AlertComponent } from '../../../shared/alert/alert.component';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-user-mgmt',
   templateUrl: './user-management.component.html',
   standalone: true,
   imports: [
-    TranslateDirective,
     FaIconComponent,
     RouterLink,
     AlertErrorComponent,
     AlertComponent,
-    NgIf,
     SortDirective,
     SortByDirective,
-    NgFor,
     ItemCountComponent,
     NgbPagination,
     DatePipe,

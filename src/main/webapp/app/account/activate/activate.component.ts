@@ -3,14 +3,13 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { mergeMap } from 'rxjs/operators';
 
 import { ActivateService } from './activate.service';
-import { NgIf } from '@angular/common';
-import { TranslateDirective } from '../../shared/language/translate.directive';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'jhi-activate',
   templateUrl: './activate.component.html',
   standalone: true,
-  imports: [TranslateDirective, NgIf, RouterLink],
+  imports: [RouterLink, TranslatePipe],
 })
 export class ActivateComponent implements OnInit {
   error = false;

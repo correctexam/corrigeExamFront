@@ -1,7 +1,11 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
     <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2 id="jhi-comments-heading" data-cy="CommentsCreateUpdateHeading" jhiTranslate="gradeScopeIsticApp.comments.home.createOrEditLabel">
+      <h2
+        id="jhi-comments-heading"
+        data-cy="CommentsCreateUpdateHeading"
+        [translate]="'gradeScopeIsticApp.comments.home.createOrEditLabel'"
+      >
         Create or edit a Comments
       </h2>
 
@@ -9,7 +13,7 @@
         <jhi-alert-error></jhi-alert-error>
 
         <div class="row mb-3" [hidden]="editForm.get('id')!.value == null">
-          <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+          <label class="form-label" [translate]="'global.field.id'" for="field_id">ID</label>
           <input
             type="number"
             (mouseup)="$event.stopPropagation()"
@@ -23,7 +27,7 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.comments.zonegeneratedid" for="field_zonegeneratedid"
+          <label class="form-label" [translate]="'gradeScopeIsticApp.comments.zonegeneratedid'" for="field_zonegeneratedid"
             >Zonegeneratedid</label
           >
           <input
@@ -37,26 +41,28 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.comments.jsonData" for="field_jsonData">Json Data</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.comments.jsonData'" for="field_jsonData">Json Data</label>
           <input type="text" class="form-control" name="jsonData" id="field_jsonData" data-cy="jsonData" formControlName="jsonData" />
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.comments.studentResponse" for="field_studentResponse"
+          <label class="form-label" [translate]="'gradeScopeIsticApp.comments.studentResponse'" for="field_studentResponse"
             >Student Response</label
           >
           <select class="form-control" id="field_studentResponse" name="studentResponse" formControlName="studentResponseId">
             <option [ngValue]="null"></option>
-            <option [ngValue]="studentResponseOption.id" *ngFor="let studentResponseOption of studentresponses; trackBy: trackById">
-              {{ studentResponseOption.id }}
-            </option>
+            @for (studentResponseOption of studentresponses; track trackById($index, studentResponseOption)) {
+              <option [ngValue]="studentResponseOption.id">
+                {{ studentResponseOption.id }}
+              </option>
+            }
           </select>
         </div>
       </div>
 
       <div>
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span [translate]="'entity.action.cancel'">Cancel</span>
         </button>
 
         <button
@@ -66,7 +72,7 @@
           [disabled]="editForm.invalid || isSaving"
           class="btn btn-primary"
         >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+          <fa-icon icon="save"></fa-icon>&nbsp;<span [translate]="'entity.action.save'">Save</span>
         </button>
       </div>
     </form>

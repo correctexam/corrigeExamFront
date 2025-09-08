@@ -3,15 +3,14 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Thread, ThreadState } from 'app/admin/metrics/metrics.model';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { NgIf, NgFor, NgClass } from '@angular/common';
-import { TranslateDirective } from '../../../../shared/language/translate.directive';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'jhi-thread-modal',
   templateUrl: './metrics-modal-threads.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [TranslateDirective, NgIf, FaIconComponent, NgFor, NgClass],
+  imports: [FaIconComponent, NgClass],
 })
 export class MetricsModalThreadsComponent implements OnInit {
   ThreadState = ThreadState;

@@ -31,17 +31,19 @@
         {{ percentavancement | number: '1.0-2' }} % <BR /> {{ message }} <BR />
 
         {{ submessage }}
-        <span *ngIf="submessage !== undefined && submessage.length > 0">{{ progress }} / 100</span>
+        @if (submessage !== undefined && submessage.length > 0) {
+          <span>{{ progress }} / 100</span>
+        }
         <BR />
       </div>
       <div class="col-4"></div>
     </div>
   </p-blockUI>
   <p-drawer [(visible)]="layoutsidebarVisible">
-    <h3 jhiTranslate="scanexam.alignoptions">Layout options</h3>
+    <h3 [translate]="'scanexam.alignoptions'">Layout options</h3>
 
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <label><span jhiTranslate="scanexam.nbreCore"> Nombre de coeur: </span>&nbsp; <span> </span> ({{ nbreCore }})</label>
+      <label><span [translate]="'scanexam.nbreCore'"> Nombre de coeur: </span>&nbsp; <span> </span> ({{ nbreCore }})</label>
       <p-slider
         [(ngModel)]="nbreCore"
         [min]="1"
@@ -55,7 +57,7 @@
     </div>
 
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <label><span jhiTranslate="scanexam.stepPage"> Step ProcessImage: </span>&nbsp; <span> </span> ({{ stepPage }})</label>
+      <label><span [translate]="'scanexam.stepPage'"> Step ProcessImage: </span>&nbsp; <span> </span> ({{ stepPage }})</label>
       <p-slider
         [(ngModel)]="stepPage"
         [min]="50"
@@ -68,7 +70,7 @@
       </p-slider>
     </div>
 
-    <h3 jhiTranslate="scanexam.downloadpdf">Téléchargement pdfs</h3>
+    <h3 [translate]="'scanexam.downloadpdf'">Téléchargement pdfs</h3>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <a (click)="downloadTemplate()">template.pdf</a>
     </div>
@@ -91,7 +93,7 @@
         ></p-button>
       </div>
       <div class="col-12 md:col-3">
-        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" jhiTranslate="scanexam.align">Aligner scans</h2>
+        <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading" [translate]="'scanexam.align'">Aligner scans</h2>
       </div>
       <div class="col-12 md:col-8 flex flex-row-reverse">
         <button
@@ -104,7 +106,7 @@
           [pTooltip]="'scanexam.gotoexamtooltip' | translate"
           [tooltipPosition]="'bottom'"
         >
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam">Retourner à l'exam</span>
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'scanexam.gobackexam'">Retourner à l'exam</span>
         </button>
 
         <button
@@ -115,7 +117,7 @@
           [tooltipZIndex]="'3000'"
           [tooltipPosition]="'bottom'"
         >
-          <fa-icon [icon]="faObjectGroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.alignscan"> Alignement des scans</span>
+          <fa-icon [icon]="faObjectGroup"></fa-icon>&nbsp;<span [translate]="'scanexam.alignscan'"> Alignement des scans</span>
         </button>
         <button
           (click)="show()"
@@ -125,9 +127,9 @@
           [tooltipZIndex]="'3000'"
           [tooltipPosition]="'bottom'"
         >
-          <fa-icon [icon]="faObjectUngroup"></fa-icon>&nbsp;<span jhiTranslate="scanexam.partialalignscan"> Alignement des scans</span>
+          <fa-icon [icon]="faObjectUngroup"></fa-icon>&nbsp;<span [translate]="'scanexam.partialalignscan'"> Alignement des scans</span>
         </button>
-        <ng-container *ngIf="nbPageAlignInCache > 0">
+        @if (nbPageAlignInCache > 0) {
           <button
             (click)="showVignette()"
             class="p-button p-button-primary"
@@ -136,20 +138,20 @@
             [tooltipZIndex]="'3000'"
             [tooltipPosition]="'bottom'"
           >
-            <fa-icon icon="image"></fa-icon>&nbsp;<span jhiTranslate="scanexam.voirvignettealign"> Vignettes des pages</span>
+            <fa-icon icon="image"></fa-icon>&nbsp;<span [translate]="'scanexam.voirvignettealign'"> Vignettes des pages</span>
           </button>
-        </ng-container>
+        }
       </div>
     </div>
     <div class="col-12 md:col-12">
-      <h5 jhiTranslate="scanexam.alignscanalgo">Algorithme d'alignement</h5>
+      <h5 [translate]="'scanexam.alignscanalgo'">Algorithme d'alignement</h5>
       <p-selectButton [options]="alignementOptions" [(ngModel)]="alignement" optionLabel="label" optionValue="value">
         <ng-template #item let-item>
-          <span [tooltipPosition]="'bottom'" [pTooltip]="item.tooltip | translate" [jhiTranslate]="item.label"></span>
+          <span [tooltipPosition]="'bottom'" [pTooltip]="item.tooltip | translate" [translate]="item.label"></span>
         </ng-template>
       </p-selectButton>
 
-      <h5 jhiTranslate="scanexam.alignscanbrpage">Nombre de page à utiliser dans le template d'exam</h5>
+      <h5 [translate]="'scanexam.alignscanbrpage'">Nombre de page à utiliser dans le template d'exam</h5>
       <p-inputNumber
         [pTooltip]="'scanexam.nbrepageintemplateTooltip' | translate"
         [tooltipPosition]="'right'"
@@ -157,19 +159,16 @@
         [showButtons]="true"
       ></p-inputNumber>
     </div>
-    <jhi-viewandreorderpages
-      [alignPage]="true"
-      #viewpage
-      *ngIf="_showVignette && allowPartialAlign"
-      [examId]="+examId!"
-    ></jhi-viewandreorderpages>
+    @if (_showVignette && allowPartialAlign) {
+      <jhi-viewandreorderpages [alignPage]="true" #viewpage [examId]="+examId!"></jhi-viewandreorderpages>
+    }
   </div>
   <!--  <div  class="col-4 md:col-4 overflow-hidden sm:hidden md:hidden lg:hidden xl:flex">
-    <img
-      src="content/images/bannerright.jpg"
-      alt="Image"
-      class="md:ml-auto block md:h-full"
-      style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
+  <img
+    src="content/images/bannerright.jpg"
+    alt="Image"
+    class="md:ml-auto block md:h-full"
+    style="clip-path: polygon(8% 0, 100% 0%, 100% 100%, 0 100%)"
     />
-  </div>-->
+</div>-->
 </div>

@@ -1,13 +1,15 @@
 <div>
   <div class="d-flex justify-content-center">
     <div class="col-lg-6 col-md-8 col-sm-10">
-      <h1 jhiTranslate="login.title" data-cy="loginTitle">Sign in</h1>
-      <div class="alert alert-danger" *ngIf="authenticationError" jhiTranslate="login.messages.error.authentication" data-cy="loginError">
-        <strong>Failed to sign in!</strong> Please check your credentials and try again.
-      </div>
+      <h1 [translate]="'login.title'" data-cy="loginTitle">Sign in</h1>
+      @if (authenticationError) {
+        <div class="alert alert-danger" [innerHTML]="'login.messages.error.authentication' | translate" data-cy="loginError">
+          <strong>Failed to sign in!</strong> Please check your credentials and try again.
+        </div>
+      }
       <form class="form" role="form" (ngSubmit)="login()" [formGroup]="loginForm">
         <div class="mb-3">
-          <label class="username-label" for="username" jhiTranslate="global.form.username.label">Login</label>
+          <label class="username-label" for="username" [translate]="'global.form.username.label'">Login</label>
           <input
             type="text"
             class="form-control"
@@ -21,7 +23,7 @@
         </div>
 
         <div class="mb-3">
-          <label for="password" jhiTranslate="login.form.password">Password</label>
+          <label for="password" [translate]="'login.form.password'">Password</label>
           <input
             type="password"
             class="form-control"
@@ -36,31 +38,35 @@
         <div class="form-check">
           <label class="form-check-label" for="rememberMe">
             <input class="form-check-input" type="checkbox" name="rememberMe" id="rememberMe" formControlName="rememberMe" />
-            <span jhiTranslate="login.form.rememberme">Remember me</span>
+            <span [translate]="'login.form.rememberme'">Remember me</span>
           </label>
         </div>
 
-        <button type="submit" class="p-button p-button-primary" jhiTranslate="login.form.button" data-cy="submit">Sign in</button>
+        <button type="submit" class="p-button p-button-primary" [translate]="'login.form.button'" data-cy="submit">Sign in</button>
       </form>
       <div class="mt-3 alert alert-warning">
-        <a class="alert-link" routerLink="/account/reset/request" jhiTranslate="login.password.forgot" data-cy="forgetYourPasswordSelector"
+        <a class="alert-link" routerLink="/account/reset/request" [translate]="'login.password.forgot'" data-cy="forgetYourPasswordSelector"
           >Did you forget your password?</a
         >
       </div>
-      <div *ngIf="canclean" class="mt-3 alert alert-warning">
-        <span jhiTranslate="scanexam.cleancachesessionstart"> </span>
-        <a class="alert-link" (click)="cleanCache()" jhiTranslate="scanexam.cleancachesessionhere" data-cy="cleanCacheSelector"
-          >Problème pour vous connecter, (un petit nettoyage du cache locale pour cette application)
-        </a>
-        <span jhiTranslate="scanexam.cleancachesessionend"> </span>
-      </div>
-      <div *ngIf="!canclean" class="mt-3 alert alert-warning">
-        <span jhiTranslate="scanexam.cleancachesessiondone"></span>
-      </div>
+      @if (canclean) {
+        <div class="mt-3 alert alert-warning">
+          <span [translate]="'scanexam.cleancachesessionstart'"> </span>
+          <a class="alert-link" (click)="cleanCache()" [translate]="'scanexam.cleancachesessionhere'" data-cy="cleanCacheSelector"
+            >Problème pour vous connecter, (un petit nettoyage du cache locale pour cette application)
+          </a>
+          <span [translate]="'scanexam.cleancachesessionend'"> </span>
+        </div>
+      }
+      @if (!canclean) {
+        <div class="mt-3 alert alert-warning">
+          <span [translate]="'scanexam.cleancachesessiondone'"></span>
+        </div>
+      }
 
       <div class="alert alert-warning">
-        <span jhiTranslate="global.messages.info.register.noaccount">You don't have an account yet?</span>
-        <a class="alert-link" routerLink="/account/register" jhiTranslate="global.messages.info.register.link">Register a new account</a>
+        <span [translate]="'global.messages.info.register.noaccount'">You don't have an account yet?</span>
+        <a class="alert-link" routerLink="/account/register" [translate]="'global.messages.info.register.link'">Register a new account</a>
       </div>
     </div>
   </div>

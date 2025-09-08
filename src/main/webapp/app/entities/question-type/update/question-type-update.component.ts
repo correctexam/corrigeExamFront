@@ -8,15 +8,14 @@ import { finalize } from 'rxjs/operators';
 import { IQuestionType, QuestionType } from '../question-type.model';
 import { QuestionTypeService } from '../service/question-type.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { NgIf } from '@angular/common';
+
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-question-type-update',
   templateUrl: './question-type-update.component.html',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, TranslateDirective, AlertErrorComponent, NgIf, FaIconComponent],
+  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, FaIconComponent],
 })
 export class QuestionTypeUpdateComponent implements OnInit {
   isSaving = false;

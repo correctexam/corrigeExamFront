@@ -7,7 +7,6 @@ import { TemplateService } from '../../entities/template/service/template.servic
 import { TranslateService } from '@ngx-translate/core';
 import { Title } from '@angular/platform-browser';
 import { PaintComponent } from './paint/paint.component';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'jhi-annotate-template',
@@ -15,7 +14,7 @@ import { NgIf } from '@angular/common';
   styleUrls: ['./annotate-template.component.scss'],
   providers: [ConfirmationService],
   standalone: true,
-  imports: [NgIf, PaintComponent],
+  imports: [PaintComponent],
 })
 export class AnnotateTemplateComponent implements OnInit {
   examId = '';

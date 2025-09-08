@@ -1,14 +1,15 @@
 <div class="d-flex container">
-  <label><span jhiTranslate="scanexam.colour">couleur : </span></label>
+  <label><span [translate]="'scanexam.colour'">couleur : </span></label>
 
-  <div
-    *ngFor="let colour of colours; index as i"
-    [ngStyle]="{ 'background-color': colour }"
-    [ngClass]="{ selected: colour === selectedColour }"
-    class="colour-picker ml-1 mb-1"
-    (click)="onSelect(colour)"
-    [tooltipPosition]="'bottom'"
-    [pTooltip]="'scanexam.colourTooltip' | translate"
-    [tooltipZIndex]="'3000'"
-  ></div>
+  @for (colour of colours; track colour; let i = $index) {
+    <div
+      [ngStyle]="{ 'background-color': colour }"
+      [ngClass]="{ selected: colour === selectedColour }"
+      class="colour-picker ml-1 mb-1"
+      (click)="onSelect(colour)"
+      [tooltipPosition]="'bottom'"
+      [pTooltip]="'scanexam.colourTooltip' | translate"
+      [tooltipZIndex]="'3000'"
+    ></div>
+  }
 </div>

@@ -1,11 +1,11 @@
 <div>
   <h2 id="page-heading" data-cy="ExamHeading">
-    <span jhiTranslate="gradeScopeIsticApp.exam.home.title">Exams</span>
+    <span [translate]="'gradeScopeIsticApp.exam.home.title'">Exams</span>
 
     <div class="d-flex justify-content-end">
       <button class="btn btn-info me-2" (click)="loadPage()" [disabled]="isLoading">
         <fa-icon icon="sync" [animation]="'spin'"></fa-icon>
-        <span jhiTranslate="gradeScopeIsticApp.exam.home.refreshListLabel">Refresh List</span>
+        <span [translate]="'gradeScopeIsticApp.exam.home.refreshListLabel'">Refresh List</span>
       </button>
 
       <button
@@ -15,7 +15,7 @@
         [routerLink]="['/exam/new']"
       >
         <fa-icon icon="plus"></fa-icon>
-        <span jhiTranslate="gradeScopeIsticApp.exam.home.createLabel"> Create a new Exam </span>
+        <span [translate]="'gradeScopeIsticApp.exam.home.createLabel'"> Create a new Exam </span>
       </button>
     </div>
   </h2>
@@ -24,121 +24,140 @@
 
   <jhi-alert></jhi-alert>
 
-  <div class="alert alert-warning" id="no-result" *ngIf="exams?.length === 0">
-    <span jhiTranslate="gradeScopeIsticApp.exam.home.notFound">No exams found</span>
-  </div>
-
-  <div class="table-responsive" id="entities" *ngIf="exams && exams.length > 0">
-    <table class="table table-striped" aria-describedby="page-heading">
-      <thead>
-        <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="loadPage()">
-          <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
-          <th scope="col" jhiSortBy="name">
-            <span jhiTranslate="gradeScopeIsticApp.exam.name">Name</span> <fa-icon icon="sort"></fa-icon>
-          </th>
-          <th scope="col" jhiSortBy="template.name">
-            <span jhiTranslate="gradeScopeIsticApp.exam.template">Template</span> <fa-icon icon="sort"></fa-icon>
-          </th>
-          <th scope="col" jhiSortBy="idzone.id">
-            <span jhiTranslate="gradeScopeIsticApp.exam.idzone">Idzone</span> <fa-icon icon="sort"></fa-icon>
-          </th>
-          <th scope="col" jhiSortBy="namezone.id">
-            <span jhiTranslate="gradeScopeIsticApp.exam.namezone">Namezone</span> <fa-icon icon="sort"></fa-icon>
-          </th>
-          <th scope="col" jhiSortBy="firstnamezone.id">
-            <span jhiTranslate="gradeScopeIsticApp.exam.firstnamezone">Firstnamezone</span> <fa-icon icon="sort"></fa-icon>
-          </th>
-          <th scope="col" jhiSortBy="notezone.id">
-            <span jhiTranslate="gradeScopeIsticApp.exam.notezone">Notezone</span> <fa-icon icon="sort"></fa-icon>
-          </th>
-          <th scope="col" jhiSortBy="scanfile.name">
-            <span jhiTranslate="gradeScopeIsticApp.exam.scanfile">Scanfile</span> <fa-icon icon="sort"></fa-icon>
-          </th>
-          <th scope="col" jhiSortBy="course.name">
-            <span jhiTranslate="gradeScopeIsticApp.exam.course">Course</span> <fa-icon icon="sort"></fa-icon>
-          </th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let exam of exams; trackBy: trackId" data-cy="entityTable">
-          <td>
-            <a [routerLink]="['/exam', exam.id, 'view']">{{ exam.id }}</a>
-          </td>
-          <td>{{ exam.name }}</td>
-          <td>
-            <div *ngIf="exam.templateId">
-              <a [routerLink]="['/template', exam.templateId, 'view']">{{ exam.templateName }}</a>
-            </div>
-          </td>
-          <td>
-            <div *ngIf="exam.idzoneId">
-              <a [routerLink]="['/zone', exam.idzoneId, 'view']">{{ exam.idzoneId }}</a>
-            </div>
-          </td>
-          <td>
-            <div *ngIf="exam.namezoneId">
-              <a [routerLink]="['/zone', exam.namezoneId, 'view']">{{ exam.namezoneId }}</a>
-            </div>
-          </td>
-          <td>
-            <div *ngIf="exam.firstnamezoneId">
-              <a [routerLink]="['/zone', exam.firstnamezoneId, 'view']">{{ exam.firstnamezoneId }}</a>
-            </div>
-          </td>
-          <td>
-            <div *ngIf="exam.notezoneId">
-              <a [routerLink]="['/zone', exam.notezoneId, 'view']">{{ exam.notezoneId }}</a>
-            </div>
-          </td>
-          <td>
-            <div *ngIf="exam.scanfileId">
-              <a [routerLink]="['/scan', exam.scanfileId, 'view']">{{ exam.scanfileName }}</a>
-            </div>
-          </td>
-          <td>
-            <div *ngIf="exam.courseId">
-              <a [routerLink]="['/course', exam.courseId, 'view']">{{ exam.courseName }}</a>
-            </div>
-          </td>
-          <td class="text-end">
-            <div class="btn-group">
-              <button type="submit" [routerLink]="['/exam', exam.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                <fa-icon icon="eye"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
-              </button>
-
-              <button type="submit" [routerLink]="['/exam', exam.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                <fa-icon icon="pencil-alt"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
-              </button>
-
-              <button type="submit" (click)="delete(exam)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                <fa-icon icon="times"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div *ngIf="exams && exams.length > 0">
-    <div class="d-flex justify-content-center">
-      <jhi-item-count [params]="{ page: page, totalItems: totalItems, itemsPerPage: itemsPerPage }"></jhi-item-count>
+  @if (exams?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span [translate]="'gradeScopeIsticApp.exam.home.notFound'">No exams found</span>
     </div>
+  }
 
-    <div class="d-flex justify-content-center">
-      <ngb-pagination
-        [collectionSize]="totalItems"
-        [(page)]="ngbPaginationPage"
-        [pageSize]="itemsPerPage"
-        [maxSize]="5"
-        [rotate]="true"
-        [boundaryLinks]="true"
-        (pageChange)="loadPage($event)"
-      ></ngb-pagination>
+  @if (exams && exams.length > 0) {
+    <div class="table-responsive" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="loadPage()">
+            <th scope="col" jhiSortBy="id"><span [translate]="'global.field.id'">ID</span> <fa-icon icon="sort"></fa-icon></th>
+            <th scope="col" jhiSortBy="name">
+              <span [translate]="'gradeScopeIsticApp.exam.name'">Name</span> <fa-icon icon="sort"></fa-icon>
+            </th>
+            <th scope="col" jhiSortBy="template.name">
+              <span [translate]="'gradeScopeIsticApp.exam.template'">Template</span> <fa-icon icon="sort"></fa-icon>
+            </th>
+            <th scope="col" jhiSortBy="idzone.id">
+              <span [translate]="'gradeScopeIsticApp.exam.idzone'">Idzone</span> <fa-icon icon="sort"></fa-icon>
+            </th>
+            <th scope="col" jhiSortBy="namezone.id">
+              <span [translate]="'gradeScopeIsticApp.exam.namezone'">Namezone</span> <fa-icon icon="sort"></fa-icon>
+            </th>
+            <th scope="col" jhiSortBy="firstnamezone.id">
+              <span [translate]="'gradeScopeIsticApp.exam.firstnamezone'">Firstnamezone</span> <fa-icon icon="sort"></fa-icon>
+            </th>
+            <th scope="col" jhiSortBy="notezone.id">
+              <span [translate]="'gradeScopeIsticApp.exam.notezone'">Notezone</span> <fa-icon icon="sort"></fa-icon>
+            </th>
+            <th scope="col" jhiSortBy="scanfile.name">
+              <span [translate]="'gradeScopeIsticApp.exam.scanfile'">Scanfile</span> <fa-icon icon="sort"></fa-icon>
+            </th>
+            <th scope="col" jhiSortBy="course.name">
+              <span [translate]="'gradeScopeIsticApp.exam.course'">Course</span> <fa-icon icon="sort"></fa-icon>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (exam of exams; track trackId($index, exam)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/exam', exam.id, 'view']">{{ exam.id }}</a>
+              </td>
+              <td>{{ exam.name }}</td>
+              <td>
+                @if (exam.templateId) {
+                  <div>
+                    <a [routerLink]="['/template', exam.templateId, 'view']">{{ exam.templateName }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (exam.idzoneId) {
+                  <div>
+                    <a [routerLink]="['/zone', exam.idzoneId, 'view']">{{ exam.idzoneId }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (exam.namezoneId) {
+                  <div>
+                    <a [routerLink]="['/zone', exam.namezoneId, 'view']">{{ exam.namezoneId }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (exam.firstnamezoneId) {
+                  <div>
+                    <a [routerLink]="['/zone', exam.firstnamezoneId, 'view']">{{ exam.firstnamezoneId }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (exam.notezoneId) {
+                  <div>
+                    <a [routerLink]="['/zone', exam.notezoneId, 'view']">{{ exam.notezoneId }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (exam.scanfileId) {
+                  <div>
+                    <a [routerLink]="['/scan', exam.scanfileId, 'view']">{{ exam.scanfileName }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (exam.courseId) {
+                  <div>
+                    <a [routerLink]="['/course', exam.courseId, 'view']">{{ exam.courseName }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <button type="submit" [routerLink]="['/exam', exam.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" [translate]="'entity.action.view'">View</span>
+                  </button>
+                  <button type="submit" [routerLink]="['/exam', exam.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" [translate]="'entity.action.edit'">Edit</span>
+                  </button>
+                  <button type="submit" (click)="delete(exam)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" [translate]="'entity.action.delete'">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
     </div>
-  </div>
+  }
+
+  @if (exams && exams.length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page, totalItems: totalItems, itemsPerPage: itemsPerPage }"></jhi-item-count>
+      </div>
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems"
+          [(page)]="ngbPaginationPage"
+          [pageSize]="itemsPerPage"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="loadPage($event)"
+        ></ngb-pagination>
+      </div>
+    </div>
+  }
 </div>

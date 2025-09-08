@@ -1,7 +1,6 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateDirective, TranslateModule } from '@ngx-translate/core';
 
-import { TranslateDirective } from 'app/shared/language/translate.directive';
 import { describe, expect } from '@jest/globals';
 
 import { ItemCountComponent } from './item-count.component';

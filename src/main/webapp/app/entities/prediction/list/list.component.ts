@@ -2,15 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { PredictionService } from 'app/entities/prediction/service/prediction.service';
 import { Router } from '@angular/router';
 import { IPrediction } from '../prediction.model';
-import { NgIf, NgFor } from '@angular/common';
+
 import { forkJoin, firstValueFrom } from 'rxjs';
-import { TranslateDirective } from 'app/shared/language/translate.directive';
 
 @Component({
   selector: 'app-prediction-list',
   templateUrl: './list.component.html',
   standalone: true,
-  imports: [TranslateDirective, NgFor, NgIf],
+  imports: [],
 })
 export class PredictionListComponent implements OnInit {
   predictions: IPrediction[] = []; // Array to store predictions

@@ -8,7 +8,7 @@ import { HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse } from '@angu
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Validators, UntypedFormBuilder, UntypedFormGroup, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { DataUtils } from 'app/core/util/data-util.service';
 import { EventManager } from 'app/core/util/event-manager.service';
 import { ExamService } from 'app/entities/exam/service/exam.service';
@@ -38,8 +38,7 @@ import { FileUpload, FileUploadModule } from 'primeng/fileupload';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TooltipModule } from 'primeng/tooltip';
-import { TranslateDirective } from '../../shared/language/translate.directive';
-import { NgIf } from '@angular/common';
+
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
@@ -92,8 +91,6 @@ const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
     BlockUIModule,
     ProgressSpinnerModule,
     ProgressBarModule,
-    NgIf,
-    TranslateDirective,
     TooltipModule,
     FaIconComponent,
     ToggleSwitchModule,
@@ -101,9 +98,9 @@ const calculateState = (upload: Upload, event: HttpEvent<unknown>): Upload => {
     FileUploadModule,
     ViewandreorderpagesComponent,
     NgxExtendedPdfViewerModule,
-    TranslateModule,
     ButtonModule,
     DrawerModule,
+    TranslatePipe,
   ],
 })
 export class ChargerscanComponent implements OnInit, OnDestroy {

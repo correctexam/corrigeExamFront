@@ -29,11 +29,11 @@
     <div class="grid grid-nogutter">
       <div class="col-8">
         <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">
-          <span jhiTranslate="scanexam.votrecopie">Votre copie :</span>
-          <span *ngFor="let st of selectionStudents"> {{ st.name }} {{ st.firstname }}</span> (<span jhiTranslate="scanexam.note1"
-            >Note :</span
-          >
-          {{ note | async | number: '1.2-2' }})
+          <span [translate]="'scanexam.votrecopie'">Votre copie :</span>
+          @for (st of selectionStudents; track st) {
+            <span> {{ st.name }} {{ st.firstname }}</span>
+          }
+          (<span [translate]="'scanexam.note1'">Note :</span> {{ note | async | number: '1.2-2' }})
         </h2>
       </div>
       <div class="col-4 flex flex-row-reverse"></div>
@@ -44,7 +44,7 @@
           <button
             pButton
             (click)="showGalleria()"
-            jhiTranslate="scanexam.showgalleria"
+            [translate]="'scanexam.showgalleria'"
             [pTooltip]="'scanexam.showFullPageTooltip' | translate"
             [tooltipPosition]="'bottom'"
           >
@@ -72,168 +72,215 @@
     <div class="grid grid-nogutter" style="padding-bottom: 1rem; padding-top: 1rem">
       <div class="col-12 sm:col-12 md:col-12 lg:col-9 xl:col-10">
         <div class="d-flex justify-content-center">
-          <h2
-            *ngIf="
-              questionNumeros.length > questionindex &&
-              questions !== undefined &&
-              questions!.length > 0 &&
-              questions![0].libelle !== undefined &&
-              questions![0].libelle !== ''
-            "
-          >
-            {{ questions![0].libelle }}
-          </h2>
-          <h2
-            *ngIf="
-              questionNumeros.length > questionindex &&
-              questions !== undefined &&
-              questions!.length > 0 &&
-              (questions![0].libelle === undefined || questions![0].libelle === '')
-            "
-          >
-            <span jhiTranslate="scanexam.question1">Question </span>{{ questionNumeros[questionindex] }}
-          </h2>
+          @if (
+            questionNumeros.length > questionindex &&
+            questions !== undefined &&
+            questions!.length > 0 &&
+            questions![0].libelle !== undefined &&
+            questions![0].libelle !== ''
+          ) {
+            <h2>
+              {{ questions![0].libelle }}
+            </h2>
+          }
+          @if (
+            questionNumeros.length > questionindex &&
+            questions !== undefined &&
+            questions!.length > 0 &&
+            (questions![0].libelle === undefined || questions![0].libelle === '')
+          ) {
+            <h2><span [translate]="'scanexam.question1'">Question </span>{{ questionNumeros[questionindex] }}</h2>
+          }
         </div>
-        <div class="d-flex justify-content-center" *ngFor="let k of questions; let i = index">
-          <div>
-            <canvas [hidden]="!showImage[i]" #nomImage></canvas>
+        @for (k of questions; track k; let i = $index) {
+          <div class="d-flex justify-content-center">
+            <div>
+              <canvas [hidden]="!showImage[i]" #nomImage></canvas>
+            </div>
           </div>
-        </div>
+        }
         <div style="padding-top: 1rem; padding-bottom: 1rem"></div>
         <div class="d-flex justify-content-center">
-          <span jhiTranslate="scanexam.showsample"> Voir des exemples de solutions correctes pour cette question :</span>&nbsp;<span
-            *ngFor="let item of bestSolutions; let index = index"
-            ><a target="_blank" [routerLink]="item">{{ index + 1 }}</a> <span *ngIf="index !== bestSolutions.length - 1">, </span></span
-          >
-          <span *ngIf="bestSolutions.length === 0" jhiTranslate="scanexam.nogoodsolution">Aucune bonne solution identifiée</span>
+          <span [translate]="'scanexam.showsample'"> Voir des exemples de solutions correctes pour cette question :</span>&nbsp;
+          @for (item of bestSolutions; track item; let index = $index) {
+            <span
+              ><a target="_blank" [routerLink]="item">{{ index + 1 }}</a>
+              @if (index !== bestSolutions.length - 1) {
+                <span>, </span>
+              }
+            </span>
+          }
+          @if (bestSolutions.length === 0) {
+            <span [translate]="'scanexam.nogoodsolution'">Aucune bonne solution identifiée</span>
+          }
         </div>
         <div class="d-flex justify-content-center">
-          <a *ngIf="email !== ''" target="_blank" [href]="email" jhiTranslate="scanexam.echangemail"
-            >Echange avec l'équipe pédagogique suite à une incompréhension de la correction</a
-          >
+          @if (email !== '') {
+            <a target="_blank" [href]="email" [translate]="'scanexam.echangemail'"
+              >Echange avec l'équipe pédagogique suite à une incompréhension de la correction</a
+            >
+          }
         </div>
         <div style="padding-top: 1rem; padding-bottom: 1rem"></div>
         <div *jhiHasAnyAuthority="['ROLE_USER', 'ROLE_ADMIN']" class="d-flex justify-content-center">
-          <a
-            *ngIf="correctionLink"
-            target="_blank"
-            [routerLink]="correctionLink"
-            jhiTranslate="scanexam.gotoCorrection"
-            [pTooltip]="'scanexam.gotoCorrectionTooltipView' | translate"
-            >Aller à la vue correction</a
-          >
+          @if (correctionLink) {
+            <a
+              target="_blank"
+              [routerLink]="correctionLink"
+              [translate]="'scanexam.gotoCorrection'"
+              [pTooltip]="'scanexam.gotoCorrectionTooltipView' | translate"
+              >Aller à la vue correction</a
+            >
+          }
         </div>
       </div>
 
       <div class="col-12 sm:col-12 md:col-12 lg:col-3 xl:col-2">
         <div class="grid grid-nogutter">
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
-            <span jhiTranslate="scanexam.noteattribuee">Note attribuée :</span>
-            <span
-              *ngIf="
-                questionStep > 0 &&
-                questions &&
-                questions.length > 0 &&
-                (questions[0].gradeType !== 'HYBRID' || questions[0].typeAlgoName === 'QCM') &&
-                resp
-              "
-              >{{ currentNote / questionStep }}</span
-            >
-            <span
-              *ngIf="
-                questionStep <= 0 &&
-                questions &&
-                questions.length > 0 &&
-                (questions[0].gradeType !== 'HYBRID' || questions[0].typeAlgoName === 'QCM') &&
-                resp
-              "
-              >{{ currentNote }}</span
-            >
-            <span
-              *ngIf="
-                questions && questions.length > 0 && questions[0].gradeType === 'HYBRID' && questions[0].typeAlgoName !== 'QCM' && resp
-              "
-              >{{ resp!.note! / 100 | number: '1.0-2' }}</span
-            >
-            <span *ngIf="questions && questions.length > 0 && resp"> / {{ questions[0].point }} </span>
-            <span *ngIf="resp === undefined" jhiTranslate="scanexam.noneval">Non évalué</span>
+            <span [translate]="'scanexam.noteattribuee'">Note attribuée :</span>
+            @if (
+              questionStep > 0 &&
+              questions &&
+              questions.length > 0 &&
+              (questions[0].gradeType !== 'HYBRID' || questions[0].typeAlgoName === 'QCM') &&
+              resp
+            ) {
+              <span>{{ currentNote / questionStep }}</span>
+            }
+            @if (
+              questionStep <= 0 &&
+              questions &&
+              questions.length > 0 &&
+              (questions[0].gradeType !== 'HYBRID' || questions[0].typeAlgoName === 'QCM') &&
+              resp
+            ) {
+              <span>{{ currentNote }}</span>
+            }
+            @if (questions && questions.length > 0 && questions[0].gradeType === 'HYBRID' && questions[0].typeAlgoName !== 'QCM' && resp) {
+              <span>{{ resp!.note! / 100 | number: '1.0-2' }}</span>
+            }
+            @if (questions && questions.length > 0 && resp) {
+              <span> / {{ questions[0].point }} </span>
+            }
+            @if (resp === undefined) {
+              <span [translate]="'scanexam.noneval'">Non évalué</span>
+            }
 
             <!--  <p-button icon="pi pi-refresh"></p-button>-->
           </div>
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
-            <label jhiTranslate="scanexam.removealignement">Supprimer alignement: </label>
+            <label [translate]="'scanexam.removealignement'">Supprimer alignement: </label>
             <p-toggleSwitch [(ngModel)]="noalign" (onChange)="changeAlign()"></p-toggleSwitch>
           </div>
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
-            <label jhiTranslate="scanexam.zoomfactor">Facteur agrandissement: </label>
-            <p-slider *ngIf="noteSteps > 0" [(ngModel)]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImage()"> </p-slider>
+            <label [translate]="'scanexam.zoomfactor'">Facteur agrandissement: </label>
+            @if (noteSteps > 0) {
+              <p-slider [(ngModel)]="factor" [min]="1" [max]="2" [step]="0.1" (onChange)="reloadImage()"> </p-slider>
+            }
           </div>
 
-          <div class="grid" *ngIf="currentQuestion && currentQuestion?.gradeType === 'DIRECT' && currentQuestion?.typeAlgoName !== 'QCM'">
-            <div *ngFor="let comment of currentTextComment4Question | sort: 'checked'" class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
-              <div class="card" [style]="getStyle(comment)">
-                <div class="card-body">
-                  <h5 class="card-title">{{ comment.text }}</h5>
-                  <p class="card-text">{{ comment.description }}</p>
+          @if (currentQuestion && currentQuestion.gradeType === 'DIRECT' && currentQuestion.typeAlgoName !== 'QCM') {
+            <div class="grid">
+              @for (comment of currentTextComment4Question | sort: 'checked'; track comment) {
+                <div class="sm:col-3 md:col-3 lg:col-12 xl:col-12">
+                  <div class="card" [style]="getStyle(comment)">
+                    <div class="card-body">
+                      <h5 class="card-title">{{ comment.text }}</h5>
+                      <p class="card-text">{{ comment.description }}</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              }
             </div>
-          </div>
-          <div
-            *ngIf="
-              (currentQuestion && currentQuestion?.gradeType !== 'DIRECT' && currentQuestion?.gradeType !== 'HYBRID') ||
-              currentQuestion?.typeAlgoName === 'QCM'
-            "
-          >
-            <div *ngFor="let comment of currentGradedComment4Question | sort: 'checked'" class="card" [style]="getStyle(comment)">
-              <div class="card-body">
-                <h5 class="card-title">{{ comment.text }}</h5>
-                <p class="card-text">{{ comment.description }}</p>
-                <p
-                  class="card-text"
-                  *ngIf="currentQuestion && currentQuestion?.gradeType !== 'DIRECT' && currentQuestion?.typeAlgoName !== 'QCM'"
-                >
-                  <span jhiTranslate="scanexam.noteassociecomment"> Note associée à ce commentaire :</span>
-                  <span *ngIf="currentQuestion && currentQuestion?.gradeType === 'NEGATIVE'"> - </span
-                  ><span *ngIf="currentQuestion && currentQuestion?.gradeType === 'POSITIVE'"> + </span>
-                  <span *ngIf="questionStep > 0">{{ comment.grade! / questionStep }}</span>
-                  <span *ngIf="questionStep <= 0">{{ comment.grade! }}</span>
-                </p>
-              </div>
+          }
+          @if (
+            (currentQuestion && currentQuestion.gradeType !== 'DIRECT' && currentQuestion.gradeType !== 'HYBRID') ||
+            currentQuestion?.typeAlgoName === 'QCM'
+          ) {
+            <div>
+              @for (comment of currentGradedComment4Question | sort: 'checked'; track comment) {
+                <div class="card" [style]="getStyle(comment)">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ comment.text }}</h5>
+                    <p class="card-text">{{ comment.description }}</p>
+                    @if (currentQuestion && currentQuestion.gradeType !== 'DIRECT' && currentQuestion.typeAlgoName !== 'QCM') {
+                      <p class="card-text">
+                        <span [translate]="'scanexam.noteassociecomment'"> Note associée à ce commentaire :</span>
+                        @if (currentQuestion && currentQuestion.gradeType === 'NEGATIVE') {
+                          <span> - </span>
+                        }
+                        @if (currentQuestion && currentQuestion.gradeType === 'POSITIVE') {
+                          <span> + </span>
+                        }
+                        @if (questionStep > 0) {
+                          <span>{{ comment.grade! / questionStep }}</span>
+                        }
+                        @if (questionStep <= 0) {
+                          <span>{{ comment.grade! }}</span>
+                        }
+                      </p>
+                    }
+                  </div>
+                </div>
+              }
             </div>
-          </div>
-          <div *ngIf="(currentQuestion && currentQuestion?.gradeType === 'HYBRID') || currentQuestion?.typeAlgoName !== 'QCM'">
-            <div *ngFor="let comment of currentHybridGradedComment4Question" class="card">
-              <div class="card-body">
-                <h5 class="card-title">{{ comment.text }}</h5>
-                <p class="card-text">{{ comment.description }}</p>
-                <p *ngIf="comment.step && comment.step === 1">
-                  <span *ngIf="comment.grade !== null && comment.grade !== undefined && comment.grade >= 0"> +</span> {{ comment.grade }}
-                  <span *ngIf="!comment.relative"> pt</span> <span *ngIf="comment.relative"> %</span>
-                </p>
-                <p *ngIf="comment.step && comment.step > 1">
-                  <span *ngIf="comment.grade !== null && comment.grade !== undefined && comment.grade >= 0"> +</span>
-                  {{ (comment.grade! * comment.stepValue!) / comment.step! | number: '0.0-2' }} <span *ngIf="!comment.relative"> pt</span>
-                  <span *ngIf="comment.relative"> %</span>
-                  <BR />
-                  <span
-                    jhiTranslate="scanexam.hybridcommentStepCalcul"
-                    [pTooltip]="'scanexam.hybridcommentStepCalculTooltip' | translate"
-                  ></span>
-                  :
-                  <span
-                    jhiTranslate="scanexam.hybridcommentStepCalculResult"
-                    [translateValues]="{
-                      stepValue: comment.stepValue,
-                      step: comment.step,
-                      grade: comment.grade,
-                      ptsorprcts: comment.relative ? '%' : 'pt',
-                    }"
-                  ></span>
-                </p>
-              </div>
+          }
+          @if ((currentQuestion && currentQuestion.gradeType === 'HYBRID') || currentQuestion?.typeAlgoName !== 'QCM') {
+            <div>
+              @for (comment of currentHybridGradedComment4Question; track comment) {
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ comment.text }}</h5>
+                    <p class="card-text">{{ comment.description }}</p>
+                    @if (comment.step && comment.step === 1) {
+                      <p>
+                        @if (comment.grade !== null && comment.grade !== undefined && comment.grade >= 0) {
+                          <span> +</span>
+                        }
+                        {{ comment.grade }}
+                        @if (!comment.relative) {
+                          <span> pt</span>
+                        }
+                        @if (comment.relative) {
+                          <span> %</span>
+                        }
+                      </p>
+                    }
+                    @if (comment.step && comment.step > 1) {
+                      <p>
+                        @if (comment.grade !== null && comment.grade !== undefined && comment.grade >= 0) {
+                          <span> +</span>
+                        }
+                        {{ (comment.grade! * comment.stepValue!) / comment.step! | number: '0.0-2' }}
+                        @if (!comment.relative) {
+                          <span> pt</span>
+                        }
+                        @if (comment.relative) {
+                          <span> %</span>
+                        }
+                        <BR />
+                        <span
+                          [translate]="'scanexam.hybridcommentStepCalcul'"
+                          [pTooltip]="'scanexam.hybridcommentStepCalculTooltip' | translate"
+                        ></span>
+                        :
+                        <span
+                          [translate]="'scanexam.hybridcommentStepCalculResult'"
+                          [translateParams]="{
+                            stepValue: comment.stepValue,
+                            step: comment.step,
+                            grade: comment.grade,
+                            ptsorprcts: comment.relative ? '%' : 'pt',
+                          }"
+                        ></span>
+                      </p>
+                    }
+                  </div>
+                </div>
+              }
             </div>
-          </div>
+          }
         </div>
       </div>
     </div>

@@ -2,15 +2,14 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { HealthKey, HealthDetails } from '../health.model';
-import { TranslateModule } from '@ngx-translate/core';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
-import { NgIf, NgFor, KeyValuePipe } from '@angular/common';
+import { TranslateDirective, TranslatePipe } from '@ngx-translate/core';
+import { KeyValuePipe } from '@angular/common';
 
 @Component({
   selector: 'jhi-health-modal',
   templateUrl: './health-modal.component.html',
   standalone: true,
-  imports: [NgIf, TranslateDirective, NgFor, KeyValuePipe, TranslateModule],
+  imports: [KeyValuePipe, TranslateDirective, TranslatePipe],
 })
 export class HealthModalComponent {
   health?: { key: HealthKey; value: HealthDetails };

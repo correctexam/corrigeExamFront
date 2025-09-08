@@ -9,46 +9,46 @@
       <fa-icon [icon]="faHandPointer"></fa-icon>
     </div>
     <!--<div
-      title="Straight Line"
-      class="toolbox-item ml-1 mt-1"
-      [ngClass]="{ selected: selected === 'LINE' }"
-      (click)="select(DrawingTools.LINE)"
+    title="Straight Line"
+    class="toolbox-item ml-1 mt-1"
+    [ngClass]="{ selected: selected === 'LINE' }"
+    (click)="select(DrawingTools.LINE)"
     >
-      <img src="content/images/toolbar-images/line.png" />
-    </div>
-    <div
-      title="Dashed line"
-      class="toolbox-item ml-1 mt-1"
-      [ngClass]="{ selected: selected === 'DASHED_LINE' }"
-      (click)="select(DrawingTools.DASHED_LINE)"
+    <img src="content/images/toolbar-images/line.png" />
+  </div>
+  <div
+    title="Dashed line"
+    class="toolbox-item ml-1 mt-1"
+    [ngClass]="{ selected: selected === 'DASHED_LINE' }"
+    (click)="select(DrawingTools.DASHED_LINE)"
     >
-      <img src="content/images/toolbar-images/dashed-line.png" />
-    </div>
-    <div
-      title="Ellipse"
-      class="toolbox-item ml-1 mt-1"
-      [ngClass]="{ selected: selected === 'ELLIPSE' }"
-      (click)="select(DrawingTools.ELLIPSE)"
+    <img src="content/images/toolbar-images/dashed-line.png" />
+  </div>
+  <div
+    title="Ellipse"
+    class="toolbox-item ml-1 mt-1"
+    [ngClass]="{ selected: selected === 'ELLIPSE' }"
+    (click)="select(DrawingTools.ELLIPSE)"
     >
-      <img src="content/images/toolbar-images/ellipse.png" />
-    </div>
-    <div
-      title="Rectangle"
-      class="toolbox-item ml-1 mt-1"
-      [ngClass]="{ selected: selected === 'RECTANGLE' }"
-      (click)="select(DrawingTools.RECTANGLE)"
+    <img src="content/images/toolbar-images/ellipse.png" />
+  </div>
+  <div
+    title="Rectangle"
+    class="toolbox-item ml-1 mt-1"
+    [ngClass]="{ selected: selected === 'RECTANGLE' }"
+    (click)="select(DrawingTools.RECTANGLE)"
     >
-      <img src="/content/images/toolbar-images/rectangle.png" />
-    </div>-->
+    <img src="/content/images/toolbar-images/rectangle.png" />
+  </div>-->
 
     <!--<div
-      title="Polygon, first line drag, additionals click, click center to finish"
-      class="toolbox-item ml-1 mt-1"
-      [ngClass]="{ selected: selected === 'POLYGON' }"
-      (click)="select(DrawingTools.POLYGON)"
-    >
-      <img src="/content/images/toolbar-images/polygon.png" />
-    </div>-->
+  title="Polygon, first line drag, additionals click, click center to finish"
+  class="toolbox-item ml-1 mt-1"
+  [ngClass]="{ selected: selected === 'POLYGON' }"
+  (click)="select(DrawingTools.POLYGON)"
+  >
+  <img src="/content/images/toolbar-images/polygon.png" />
+</div>-->
     <div
       [title]="'scanexam.freedrawing' | translate"
       class="toolbox-item ml-1 mt-1"
@@ -69,13 +69,13 @@
       <img src="content/images/toolbar-images/fill.png" />
     </div>
     <!--<div
-      title="Fill/paint with colour"
-      class="toolbox-item ml-1 mt-1"
-      [ngClass]="{ selected: selected === 'FILL' }"
-      (click)="select(DrawingTools.FILL)"
-    >
-      <img src="/content/images/toolbar-images/fill.png" />
-    </div>-->
+title="Fill/paint with colour"
+class="toolbox-item ml-1 mt-1"
+[ngClass]="{ selected: selected === 'FILL' }"
+(click)="select(DrawingTools.FILL)"
+>
+<img src="/content/images/toolbar-images/fill.png" />
+</div>-->
     <div class="ml-1 mt-1" style="width: 30px; height: 30px"></div>
 
     <div
@@ -98,15 +98,13 @@
   </div>
   <div class="grid grid-nogutter">
     <div class="d-flex flex-wrap mb-1">
-      <div
-        *ngFor="let item of customcomments | keyvalue"
-        class="toolbox-item ml-1 mt-1"
-        [ngClass]="{ selected: eventService.svgselect === item.key }"
-      >
-        <div class="max-w-1rem max-h-1rem">
-          <img class="" [src]="getSVGImageUrl(item.value)" width="30px" height="30px" (click)="selectSVG(item.key)" />
+      @for (item of customcomments | keyvalue; track item) {
+        <div class="toolbox-item ml-1 mt-1" [ngClass]="{ selected: eventService.svgselect === item.key }">
+          <div class="max-w-1rem max-h-1rem">
+            <img class="" [src]="getSVGImageUrl(item.value)" width="30px" height="30px" (click)="selectSVG(item.key)" />
+          </div>
         </div>
-      </div>
+      }
     </div>
   </div>
 </div>

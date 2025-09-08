@@ -34,7 +34,7 @@ import {
 } from '../services/align-images.service';
 import { IExam } from '../../entities/exam/exam.model';
 // import { IStudent } from '../../entities/student/student.model';
-import { ImageZone, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.component';
+import { ImageZone, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.model';
 import { IZone } from 'app/entities/zone/zone.model';
 import { QuestionService } from '../../entities/question/service/question.service';
 import { IQuestion } from '../../entities/question/question.model';
@@ -48,7 +48,7 @@ import { IGradedComment } from '../../entities/graded-comment/graded-comment.mod
 import { GradedCommentService } from '../../entities/graded-comment/service/graded-comment.service';
 import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
 import { PredictionService } from 'app/entities/prediction/service/prediction.service';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { IQCMSolution } from '../../qcm';
 import { Observable, Subscriber, Subscription, debounceTime, distinctUntilChanged, firstValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
@@ -93,12 +93,11 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { QuestionpropertiesviewComponent } from '../annotate-template/paint/questionpropertiesview/questionpropertiesview.component';
 import { DrawerModule } from 'primeng/drawer';
 import { KeyboardshortcutComponent } from './keyboardshortcut/keyboardshortcut.component';
-import { NgIf, NgFor, DecimalPipe, DatePipe } from '@angular/common';
+import { DecimalPipe, DatePipe } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Button, ButtonDirective } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { TranslateDirective } from '../../shared/language/translate.directive';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { SwipeDirective } from '../swipe.directive';
@@ -136,7 +135,6 @@ interface CommentAction {
     SwipeDirective,
     ToastModule,
     DialogModule,
-    TranslateDirective,
     FormsModule,
     InputTextModule,
     Button,
@@ -144,7 +142,6 @@ interface CommentAction {
     PrimeTemplate,
     ButtonDirective,
     KeyboardShortcutsModule,
-    NgIf,
     KeyboardshortcutComponent,
     DrawerModule,
     QuestionpropertiesviewComponent,
@@ -164,14 +161,14 @@ interface CommentAction {
     GalleriaModule,
     ProgressBarModule,
     PaginatorModule,
-    NgFor,
     GraphicalToolbarCorrectionComponent,
     InplaceModule,
     TextareaModule,
     KnobModule,
     DecimalPipe,
     DatePipe,
-    TranslateModule,
+    TranslateDirective,
+    TranslatePipe,
     CommentSortPipe,
     CheckboxModule,
     SliderModule,

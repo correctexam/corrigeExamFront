@@ -1,3 +1,5 @@
-<div *ngIf="pdf !== undefined">
-  <jhi-paint [content]="pdf" [exam]="this.exam"></jhi-paint>
-</div>
+@if (pdf !== undefined) {
+  <div>
+    <jhi-paint [content]="pdf" [exam]="this.exam"></jhi-paint>
+  </div>
+}

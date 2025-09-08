@@ -21,7 +21,7 @@ import { ApplicationConfigService } from 'app/core/config/application-config.ser
 import { AccountService } from '../../core/auth/account.service';
 import { MessageService } from 'primeng/api';
 import { CacheDownloadNotification, CacheUploadNotification, CacheUploadService } from './cacheUpload.service';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { firstValueFrom } from 'rxjs';
 import { PreferenceService } from '../preference-page/preference.service';
@@ -33,11 +33,10 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
-import { CommonModule, NgIf } from '@angular/common';
+
 import { DockModule } from 'primeng/dock';
 import { ButtonDirective } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
-import { TranslateDirective } from '../../shared/language/translate.directive';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 
@@ -48,14 +47,11 @@ import { ToastModule } from 'primeng/toast';
   providers: [ConfirmationService, MessageService],
   standalone: true,
   imports: [
-    CommonModule,
     ToastModule,
     DialogModule,
-    TranslateDirective,
     FormsModule,
     PrimeTemplate,
     ButtonDirective,
-    NgIf,
     RouterLink,
     TooltipModule,
     ConfirmDialogModule,
@@ -65,7 +61,8 @@ import { ToastModule } from 'primeng/toast';
     FaStackComponent,
     FaIconComponent,
     FaStackItemSizeDirective,
-    TranslateModule,
+    TranslateDirective,
+    TranslatePipe,
     DockModule,
   ],
 })

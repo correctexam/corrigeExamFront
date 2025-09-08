@@ -14,15 +14,21 @@
   (onMoveAllToSource)="moveToSource($event)"
 >
   <ng-template pTemplate="sourceHeader">
-    <span style="font-weight: bold" [jhiTranslate]="'scanexam.profdispo'"> </span>
+    <span style="font-weight: bold" [translate]="'scanexam.profdispo'"> </span>
   </ng-template>
   <ng-template pTemplate="targetHeader">
-    <span style="font-weight: bold" [jhiTranslate]="'scanexam.profshared'"> </span>
+    <span style="font-weight: bold" [translate]="'scanexam.profshared'"> </span>
   </ng-template>
   <ng-template let-user pTemplate="item">
     <div>
-      {{ user.login }} (<span *ngIf="user.name">{{ user.name }}</span> <span *ngIf="user.firstname">{{ user.firstname }}</span
-      >)
+      {{ user.login }} (
+      @if (user.name) {
+        <span>{{ user.name }}</span>
+      }
+      @if (user.firstname) {
+        <span>{{ user.firstname }}</span>
+      }
+      )
     </div>
   </ng-template>
 </p-pickList>

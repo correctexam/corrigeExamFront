@@ -1,6 +1,6 @@
 <p-confirmDialog #cd icon="pi pi-exclamation-triangle">
   <ng-template pTemplate="header">
-    <h3 jhiTranslate="scanexam.confirmremove"></h3>
+    <h3 [translate]="'scanexam.confirmremove'"></h3>
   </ng-template>
   <ng-template pTemplate="footer">
     <button type="button" pButton icon="pi pi-times" [label]="'scanexam.no' | translate" (click)="onReject(cd)"></button>

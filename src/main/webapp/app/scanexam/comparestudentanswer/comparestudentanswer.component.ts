@@ -14,7 +14,7 @@ import {
   ViewChildren,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { CourseService } from 'app/entities/course/service/course.service';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 import { ExamService } from 'app/entities/exam/service/exam.service';
@@ -28,14 +28,14 @@ import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { IZone } from 'app/entities/zone/zone.model';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { ICluster, IImageCluster, ImageZone } from '../associer-copies-etudiants/associer-copies-etudiants.component';
+import { ICluster, IImageCluster, ImageZone } from '../associer-copies-etudiants/associer-copies-etudiants.model';
 // import { EventCanevascorrectionHandlerService } from '../corrigequestion/event-canevascorrection-handler.service';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { PreferenceService } from '../preference-page/preference.service';
 import { AlignImagesService, IImageCropFromZoneInput } from '../services/align-images.service';
 import { IComments } from '../../entities/comments/comments.model';
 import { HttpClient } from '@angular/common/http';
-import { KeyValue, Location, NgIf, NgFor, NgClass, DecimalPipe, KeyValuePipe } from '@angular/common';
+import { KeyValue, Location, NgClass, DecimalPipe, KeyValuePipe } from '@angular/common';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import jszip from 'jszip';
 import * as FileSaver from 'file-saver';
@@ -47,7 +47,6 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { FormsModule } from '@angular/forms';
 import { SliderModule } from 'primeng/slider';
 import { DrawerModule } from 'primeng/drawer';
-import { TranslateDirective } from '../../shared/language/translate.directive';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TooltipModule } from 'primeng/tooltip';
 import { Button, ButtonDirective } from 'primeng/button';
@@ -102,19 +101,17 @@ export interface ClusterDTO {
     TooltipModule,
     ButtonDirective,
     FaIconComponent,
-    TranslateDirective,
-    NgIf,
     DrawerModule,
     SliderModule,
     FormsModule,
-    NgFor,
     RadioButtonModule,
     SelectButtonModule,
     NgClass,
     DragDropModule,
     DecimalPipe,
     KeyValuePipe,
-    TranslateModule,
+    TranslateDirective,
+    TranslatePipe,
   ],
 })
 export class ComparestudentanswerComponent implements OnInit, AfterViewInit {

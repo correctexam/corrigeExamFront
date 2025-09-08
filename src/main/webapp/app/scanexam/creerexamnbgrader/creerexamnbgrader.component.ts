@@ -9,12 +9,11 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { CourseService } from '../../entities/course/service/course.service';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { TemplateService } from '../../entities/template/service/template.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateDirective, TranslateService } from '@ngx-translate/core';
 import { Title } from '@angular/platform-browser';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
-import { NgFor, NgIf } from '@angular/common';
+
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { TranslateDirective } from '../../shared/language/translate.directive';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { ToastModule } from 'primeng/toast';
@@ -51,8 +50,6 @@ class Response {
     FaIconComponent,
     FormsModule,
     ReactiveFormsModule,
-    NgIf,
-    NgFor,
     NgxExtendedPdfViewerModule,
   ],
 })

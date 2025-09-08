@@ -4,7 +4,7 @@
       <h2
         id="jhi-answer-2-hybrid-graded-comment-heading"
         data-cy="Answer2HybridGradedCommentCreateUpdateHeading"
-        jhiTranslate="gradeScopeIsticApp.answer2HybridGradedComment.home.createOrEditLabel"
+        [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.home.createOrEditLabel'"
       >
         Créer ou éditer un Answer 2 Hybrid Graded Comment
       </h2>
@@ -12,22 +12,24 @@
       <div>
         <jhi-alert-error></jhi-alert-error>
 
-        <div class="row mb-3" *ngIf="editForm.controls.id.value !== null">
-          <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
-          <input
-            type="number"
-            (mouseup)="$event.stopPropagation()"
-            class="form-control"
-            name="id"
-            id="field_id"
-            data-cy="id"
-            formControlName="id"
-            [readonly]="true"
-          />
-        </div>
+        @if (editForm.controls.id.value !== null) {
+          <div class="row mb-3">
+            <label class="form-label" [translate]="'global.field.id'" for="field_id">ID</label>
+            <input
+              type="number"
+              (mouseup)="$event.stopPropagation()"
+              class="form-control"
+              name="id"
+              id="field_id"
+              data-cy="id"
+              formControlName="id"
+              [readonly]="true"
+            />
+          </div>
+        }
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.answer2HybridGradedComment.stepValue" for="field_stepValue"
+          <label class="form-label" [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.stepValue'" for="field_stepValue"
             >Step Value</label
           >
           <input
@@ -42,7 +44,7 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.answer2HybridGradedComment.hybridcomments" for="field_hybridcomments"
+          <label class="form-label" [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.hybridcomments'" for="field_hybridcomments"
             >Hybridcomments</label
           >
           <select
@@ -54,14 +56,19 @@
             [compareWith]="compareHybridGradedComment"
           >
             <option [ngValue]="null"></option>
-            <option [ngValue]="hybridGradedCommentOption" *ngFor="let hybridGradedCommentOption of hybridGradedCommentsSharedCollection">
-              {{ hybridGradedCommentOption.text }}
-            </option>
+            @for (hybridGradedCommentOption of hybridGradedCommentsSharedCollection; track hybridGradedCommentOption) {
+              <option [ngValue]="hybridGradedCommentOption">
+                {{ hybridGradedCommentOption.text }}
+              </option>
+            }
           </select>
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.answer2HybridGradedComment.studentResponse" for="field_studentResponse"
+          <label
+            class="form-label"
+            [translate]="'gradeScopeIsticApp.answer2HybridGradedComment.studentResponse'"
+            for="field_studentResponse"
             >Student Response</label
           >
           <select
@@ -72,16 +79,18 @@
             formControlName="studentResponse"
           >
             <option [ngValue]="null"></option>
-            <option [ngValue]="studentResponseOption" *ngFor="let studentResponseOption of studentResponsesSharedCollection">
-              {{ studentResponseOption.id }}
-            </option>
+            @for (studentResponseOption of studentResponsesSharedCollection; track studentResponseOption) {
+              <option [ngValue]="studentResponseOption">
+                {{ studentResponseOption.id }}
+              </option>
+            }
           </select>
         </div>
       </div>
 
       <div>
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span [translate]="'entity.action.cancel'">Annuler</span>
         </button>
 
         <button
@@ -91,7 +100,7 @@
           [disabled]="editForm.invalid || isSaving"
           class="btn btn-primary"
         >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
+          <fa-icon icon="save"></fa-icon>&nbsp;<span [translate]="'entity.action.save'">Sauvegarder</span>
         </button>
       </div>
     </form>

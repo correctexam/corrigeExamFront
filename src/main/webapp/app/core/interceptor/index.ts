@@ -12,7 +12,6 @@ export const httpInterceptorProviders = [
     multi: true,
   },
   {
-    provide: HTTP_INTERCEPTORS,
     useClass: AuthExpiredInterceptor,
     multi: true,
   },

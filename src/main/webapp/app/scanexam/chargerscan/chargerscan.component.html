@@ -14,22 +14,28 @@
           </div>
         </div>
 
-        <span *ngIf="message !== undefined && message.length > 0">{{ message }}</span>
+        @if (message !== undefined && message.length > 0) {
+          <span>{{ message }}</span>
+        }
         <BR />
-        <span *ngIf="submessage !== undefined && submessage.length > 0">{{ submessage }}</span>
+        @if (submessage !== undefined && submessage.length > 0) {
+          <span>{{ submessage }}</span>
+        }
       </div>
       <div class="col-4"></div>
     </div>
   </p-blockUI>
 
   <p-drawer [(visible)]="layoutsidebarVisible">
-    <h3 jhiTranslate="scanexam.downloadpdf">Téléchargement pdfs</h3>
+    <h3 [translate]="'scanexam.downloadpdf'">Téléchargement pdfs</h3>
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <a (click)="downloadTemplate()">template.pdf</a>
     </div>
-    <div *ngIf="this.exam?.scanfileId !== undefined" style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
-      <a (click)="downloadScan()">scan.pdf</a>
-    </div>
+    @if (this.exam && this.exam.scanfileId !== undefined) {
+      <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+        <a (click)="downloadScan()">scan.pdf</a>
+      </div>
+    }
   </p-drawer>
 
   <div class="sm:col-12 md:col-12 lg:col-12">
@@ -47,7 +53,7 @@
       </div>
       <div class="col-7">
         <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">
-          <span jhiTranslate="scanexam.chargerscan"> Charger ou mettre à jour un scan de copies pour l'exam : </span> {{ exam.name }}
+          <span [translate]="'scanexam.chargerscan'"> Charger ou mettre à jour un scan de copies pour l'exam : </span> {{ exam.name }}
         </h2>
       </div>
       <div class="col-4 flex flex-row-reverse">
@@ -61,7 +67,7 @@
           [tooltipPosition]="'bottom'"
           (click)="gotoUE()"
         >
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackue">Retourner au module</span>
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'scanexam.gobackue'">Retourner au module</span>
         </button>
         <button
           [disabled]="!this.examid"
@@ -73,9 +79,9 @@
           [tooltipPosition]="'bottom'"
           (click)="reloadScan = true"
         >
-          <fa-icon icon="refresh"></fa-icon>&nbsp;<span jhiTranslate="scanexam.reloadscan">Recharger un nouveau scan</span>
+          <fa-icon icon="refresh"></fa-icon>&nbsp;<span [translate]="'scanexam.reloadscan'">Recharger un nouveau scan</span>
         </button>
-        <ng-container *ngIf="this.exam?.scanfileId !== undefined">
+        @if (this.exam && this.exam.scanfileId !== undefined) {
           <button
             [disabled]="!this.examid"
             type="submit"
@@ -86,54 +92,57 @@
             [pTooltip]="'scanexam.initCacheProcessing' | translate"
             [tooltipPosition]="'bottom'"
           >
-            <fa-icon icon="retweet"></fa-icon>&nbsp;<span jhiTranslate="scanexam.rescan">Réanalyser à partie du pdf</span>
+            <fa-icon icon="retweet"></fa-icon>&nbsp;<span [translate]="'scanexam.rescan'">Réanalyser à partie du pdf</span>
           </button>
-        </ng-container>
+        }
       </div>
     </div>
-    <div *ngIf="reloadScan || pageInTemplate === 0 || pageAlreadyScan === 0">
-      <div class="col-12 md:col-12">
-        <!--            <p-toggleButton [(ngModel)]="merge" onLabel="Concatenation" offLabel="Remplacement"></p-toggleButton>-->
-        <div class="flex flex-row flex-wrap card-container">
-          <div *ngIf="exam?.scanfileId" class="flex align-items-center justify-content-center font-bold border-round m-2">
-            <label
-              for="switch1"
-              jhiTranslate="scanexam.concatenation"
-              [pTooltip]="'scanexam.concatenationTooltip' | translate"
-              [tooltipPosition]="'bottom'"
-              >Concaténation au scan déjà chargé:</label
-            >
-          </div>
-
-          <div *ngIf="exam?.scanfileId" class="flex align-items-center justify-content-center font-bold text-white border-round m-2">
-            <p-toggleSwitch inputId="switch1" [(ngModel)]="merge"></p-toggleSwitch>
-          </div>
-          <div class="flex align-items-center justify-content-center border-round m-2">
-            <p-fileUpload
-              #fileUpload
-              [chooseIcon]="''"
-              [chooseStyleClass]="'p-button p-button-primary'"
-              mode="basic"
-              [auto]="true"
-              [customUpload]="true"
-              [pTooltip]="'scanexam.pdfupload' | translate"
-              tooltipPosition="bottom"
-              [tooltipZIndex]="'3000'"
-              [chooseLabel]="'scanexam.pdfchoisirfichier' | translate"
-              name="import[]"
-              accept="application/pdf"
-              [maxFileSize]="2000000000"
-              (uploadHandler)="onUpload($event, fileUpload)"
-            ></p-fileUpload>
+    @if (reloadScan || pageInTemplate === 0 || pageAlreadyScan === 0) {
+      <div>
+        <div class="col-12 md:col-12">
+          <!--            <p-toggleButton [(ngModel)]="merge" onLabel="Concatenation" offLabel="Remplacement"></p-toggleButton>-->
+          <div class="flex flex-row flex-wrap card-container">
+            @if (this.exam && exam.scanfileId) {
+              <div class="flex align-items-center justify-content-center font-bold border-round m-2">
+                <label
+                  for="switch1"
+                  [translate]="'scanexam.concatenation'"
+                  [pTooltip]="'scanexam.concatenationTooltip' | translate"
+                  [tooltipPosition]="'bottom'"
+                  >Concaténation au scan déjà chargé:</label
+                >
+              </div>
+            }
+            @if (this.exam && exam.scanfileId) {
+              <div class="flex align-items-center justify-content-center font-bold text-white border-round m-2">
+                <p-toggleSwitch inputId="switch1" [(ngModel)]="merge"></p-toggleSwitch>
+              </div>
+            }
+            <div class="flex align-items-center justify-content-center border-round m-2">
+              <p-fileUpload
+                #fileUpload
+                [chooseIcon]="''"
+                [chooseStyleClass]="'p-button p-button-primary'"
+                mode="basic"
+                [auto]="true"
+                [customUpload]="true"
+                [pTooltip]="'scanexam.pdfupload' | translate"
+                tooltipPosition="bottom"
+                [tooltipZIndex]="'3000'"
+                [chooseLabel]="'scanexam.pdfchoisirfichier' | translate"
+                name="import[]"
+                accept="application/pdf"
+                [maxFileSize]="2000000000"
+                (uploadHandler)="onUpload($event, fileUpload)"
+              ></p-fileUpload>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <jhi-viewandreorderpages
-      #viewpage
-      *ngIf="showVignette && !reloadScan && examid && pageInTemplate > 0 && pageAlreadyScan > 0"
-      [examId]="+examid!"
-    ></jhi-viewandreorderpages>
+    }
+    @if (showVignette && !reloadScan && examid && pageInTemplate > 0 && pageAlreadyScan > 0) {
+      <jhi-viewandreorderpages #viewpage [examId]="+examid!"></jhi-viewandreorderpages>
+    }
   </div>
   @if (showPdfViewer) {
     <div class="canvas-wrapper foo">

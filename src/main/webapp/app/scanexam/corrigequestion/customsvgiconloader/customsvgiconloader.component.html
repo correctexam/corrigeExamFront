@@ -9,7 +9,7 @@
     <div class="card">
       <div class="grid">
         <div class="col-6">
-          <h5 jhiTranslate="scanexam.uploadsvg">Upload SVG</h5>
+          <h5 [translate]="'scanexam.uploadsvg'">Upload SVG</h5>
           <p-fileupload
             #fileUpload
             name="svg"
@@ -24,10 +24,10 @@
             mode="advanced"
           ></p-fileupload>
 
-          <h5 jhiTranslate="scanexam.svgsource">SVG source</h5>
+          <h5 [translate]="'scanexam.svgsource'">SVG source</h5>
           <button
             [pTooltip]="'scanexam.svgloadtooltip' | translate"
-            jhiTranslate="scanexam.svgload"
+            [translate]="'scanexam.svgload'"
             [disabled]="value === undefined || value === ''"
             class="flex-grow-1 min-w-full primary p-button"
             (click)="importSvg()"
@@ -39,20 +39,24 @@
             <textarea class="flex-grow-1 min-w-full" rows="5" cols="30" pTextarea [(ngModel)]="value"></textarea>
           </div>
         </div>
-        <div class="col-6" *ngIf="value">
-          <div class="flex flex-column min-h-full">
-            <div class="flex flex-grow-1 min-h-full align-items-center justify-content-center">
-              <img class="max-w-3rem" [src]="getSVGImageUrl(value!)" />
+        @if (value) {
+          <div class="col-6">
+            <div class="flex flex-column min-h-full">
+              <div class="flex flex-grow-1 min-h-full align-items-center justify-content-center">
+                <img class="max-w-3rem" [src]="getSVGImageUrl(value!)" />
+              </div>
             </div>
           </div>
-        </div>
+        }
       </div>
       <div class="col-12">
         <div class="grid">
-          <div *ngFor="let item of customcomments() | keyvalue" class="col-1">
-            <img class="max-w-2rem" [src]="getSVGImageUrl(item.value)" />
-            <p-overlay-badge severity="danger" class="inline-flex" value="X" (click)="removeCustomSVG(item.key)"> </p-overlay-badge>
-          </div>
+          @for (item of customcomments() | keyvalue; track item) {
+            <div class="col-1">
+              <img class="max-w-2rem" [src]="getSVGImageUrl(item.value)" />
+              <p-overlay-badge severity="danger" class="inline-flex" value="X" (click)="removeCustomSVG(item.key)"> </p-overlay-badge>
+            </div>
+          }
         </div>
       </div>
 
@@ -79,7 +83,7 @@
               class="p-button p-button-primary"
               (click)="exportSVG()"
               [pTooltip]="'scanexam.svgexporttooltip' | translate"
-              jhiTranslate="scanexam.svgexport"
+              [translate]="'scanexam.svgexport'"
             >
               Export
             </button>

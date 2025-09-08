@@ -14,7 +14,7 @@ import {
   ViewChildren,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 import { ExamService } from 'app/entities/exam/service/exam.service';
@@ -27,10 +27,9 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { TooltipModule } from 'primeng/tooltip';
 import { DragDropModule } from 'primeng/dragdrop';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { NgIf, NgFor, NgClass, KeyValuePipe } from '@angular/common';
+import { NgClass, KeyValuePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SelectButtonModule } from 'primeng/selectbutton';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 import { ButtonModule } from 'primeng/button';
 import { DialogService, DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { AccordionModule } from 'primeng/accordion';
@@ -47,10 +46,10 @@ import { ViewandreorderpagesComponent } from '../viewandreorderpages.component';
     SelectButtonModule,
     FormsModule,
     ProgressSpinnerModule,
-    NgFor,
     DragDropModule,
     TooltipModule,
-    TranslateModule,
+    TranslateDirective,
+    TranslatePipe,
   ],
 })
 export class PageToRotateOrDeleteComponent implements OnInit {

@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
     <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2 id="jhi-student-heading" data-cy="StudentCreateUpdateHeading" jhiTranslate="gradeScopeIsticApp.student.home.createOrEditLabel">
+      <h2 id="jhi-student-heading" data-cy="StudentCreateUpdateHeading" [translate]="'gradeScopeIsticApp.student.home.createOrEditLabel'">
         Create or edit a Student
       </h2>
 
@@ -9,7 +9,7 @@
         <jhi-alert-error></jhi-alert-error>
 
         <div class="row mb-3" [hidden]="editForm.get('id')!.value == null">
-          <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+          <label class="form-label" [translate]="'global.field.id'" for="field_id">ID</label>
           <input
             type="number"
             (mouseup)="$event.stopPropagation()"
@@ -23,56 +23,59 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.student.name" for="field_name">Name</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.student.name'" for="field_name">Name</label>
           <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" />
-          <div *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('name')?.errors?.required" jhiTranslate="entity.validation.required">
-              This field is required.
-            </small>
-          </div>
+          @if (editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)) {
+            <div>
+              @if (editForm.get('name')?.errors?.required) {
+                <small class="form-text text-danger" [translate]="'entity.validation.required'"> This field is required. </small>
+              }
+            </div>
+          }
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.student.firstname" for="field_firstname">Firstname</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.student.firstname'" for="field_firstname">Firstname</label>
           <input type="text" class="form-control" name="firstname" id="field_firstname" data-cy="firstname" formControlName="firstname" />
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.student.ine" for="field_ine">Ine</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.student.ine'" for="field_ine">Ine</label>
           <input type="text" class="form-control" name="ine" id="field_ine" data-cy="ine" formControlName="ine" />
-          <div *ngIf="editForm.get('ine')!.invalid && (editForm.get('ine')!.dirty || editForm.get('ine')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('ine')?.errors?.required" jhiTranslate="entity.validation.required">
-              This field is required.
-            </small>
-          </div>
+          @if (editForm.get('ine')!.invalid && (editForm.get('ine')!.dirty || editForm.get('ine')!.touched)) {
+            <div>
+              @if (editForm.get('ine')?.errors?.required) {
+                <small class="form-text text-danger" [translate]="'entity.validation.required'"> This field is required. </small>
+              }
+            </div>
+          }
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.student.caslogin" for="field_caslogin">Caslogin</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.student.caslogin'" for="field_caslogin">Caslogin</label>
           <input type="text" class="form-control" name="caslogin" id="field_caslogin" data-cy="caslogin" formControlName="caslogin" />
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.student.mail" for="field_mail">Mail</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.student.mail'" for="field_mail">Mail</label>
           <input type="text" class="form-control" name="mail" id="field_mail" data-cy="mail" formControlName="mail" />
         </div>
 
         <div class="row mb-3">
-          <label jhiTranslate="gradeScopeIsticApp.student.examSheets" for="field_examSheets">Exam Sheets</label>
+          <label [translate]="'gradeScopeIsticApp.student.examSheets'" for="field_examSheets">Exam Sheets</label>
           <select class="form-control" id="field_examSheets" data-cy="examSheets" multiple name="examSheets" formControlName="examSheets">
-            <option
-              [ngValue]="getSelectedExamSheet(examSheetOption, editForm.get('examSheets')!.value)"
-              *ngFor="let examSheetOption of examSheetsSharedCollection; trackBy: trackExamSheetById"
-            >
-              {{ examSheetOption.name }}
-            </option>
+            @for (examSheetOption of examSheetsSharedCollection; track trackExamSheetById($index, examSheetOption)) {
+              <option [ngValue]="getSelectedExamSheet(examSheetOption, editForm.get('examSheets')!.value)">
+                {{ examSheetOption.name }}
+              </option>
+            }
           </select>
         </div>
       </div>
 
       <div>
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span [translate]="'entity.action.cancel'">Cancel</span>
         </button>
 
         <button
@@ -82,7 +85,7 @@
           [disabled]="editForm.invalid || isSaving"
           class="btn btn-primary"
         >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+          <fa-icon icon="save"></fa-icon>&nbsp;<span [translate]="'entity.action.save'">Save</span>
         </button>
       </div>
     </form>

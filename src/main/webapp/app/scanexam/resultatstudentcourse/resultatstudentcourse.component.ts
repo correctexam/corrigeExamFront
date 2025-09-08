@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { MessageService, PrimeTemplate } from 'primeng/api';
 import { ConfirmationService } from 'primeng/api';
@@ -15,14 +15,13 @@ import { ExportResultService, formatDateTime } from '../exportresult.service';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TableModule } from 'primeng/table';
 import { ButtonDirective } from 'primeng/button';
-import { NgIf } from '@angular/common';
+
 import { CheckboxModule } from 'primeng/checkbox';
 import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
-import { TranslateDirective } from '../../shared/language/translate.directive';
 import { DialogModule } from 'primeng/dialog';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -42,19 +41,18 @@ import { ToastModule } from 'primeng/toast';
     ConfirmDialogModule,
     DialogModule,
     PrimeTemplate,
-    TranslateDirective,
     FormsModule,
     InputTextModule,
     FaIconComponent,
     TooltipModule,
     TextareaModule,
     CheckboxModule,
-    NgIf,
     ButtonDirective,
     RouterLink,
     TableModule,
     ToggleSwitchModule,
-    TranslateModule,
+    TranslateDirective,
+    TranslatePipe,
   ],
 })
 export class ResultatStudentcourseComponent implements OnInit {

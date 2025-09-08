@@ -1,11 +1,11 @@
 <p-dialog [header]="'scanexam.firsthelpTitle' | translate" [(visible)]="firsthelp" [style]="{ width: '90vw' }">
   <div style="display: flex; justify-content: space-around">
-    <span jhiTranslate="scanexam.firsthelpcoursedetail"></span>
+    <span [innerHTML]="'scanexam.firsthelpcoursedetail' | translate"></span>
   </div>
   <BR />
   <BR />
   <div style="display: flex; justify-content: flex-end; margin-right: 1rem">
-    <span jhiTranslate="scanexam.shortcutopenatstart"></span>&nbsp;
+    <span [translate]="'scanexam.shortcutopenatstart'"></span>&nbsp;
     <input type="checkbox" [(ngModel)]="firsthelpvalue" (change)="changeStartPreference()" />
   </div>
   <ng-template pTemplate="footer">
@@ -16,25 +16,29 @@
 <div>
   <p-dock [styleClass]="'pdock'" [model]="dockItems" position="top">
     <ng-template pTemplate="item" let-item>
-      <a *ngIf="item.route" [routerLink]="item.route"
-        ><img
-          [src]="item.icon"
-          [alt]="item.label"
-          class="imageDock"
-          [tooltipZIndex]="'3000'"
-          [pTooltip]="item.title"
-          [appendTo]="'body'"
-          [tooltipPosition]="'top'"
-      /></a>
-      <a *ngIf="item.command1" (click)="item.command1()"
-        ><img
-          [src]="item.icon"
-          [alt]="item.label"
-          class="imageDock"
-          [tooltipZIndex]="'3000'"
-          [pTooltip]="item.title"
-          [tooltipPosition]="'top'"
-      /></a>
+      @if (item.route) {
+        <a [routerLink]="item.route"
+          ><img
+            [src]="item.icon"
+            [alt]="item.label"
+            class="imageDock"
+            [tooltipZIndex]="'3000'"
+            [pTooltip]="item.title"
+            [appendTo]="'body'"
+            [tooltipPosition]="'top'"
+        /></a>
+      }
+      @if (item.command1) {
+        <a (click)="item.command1()"
+          ><img
+            [src]="item.icon"
+            [alt]="item.label"
+            class="imageDock"
+            [tooltipZIndex]="'3000'"
+            [pTooltip]="item.title"
+            [tooltipPosition]="'top'"
+        /></a>
+      }
     </ng-template>
   </p-dock>
   <p-confirmDialog
@@ -52,7 +56,9 @@
           <p-progressSpinner></p-progressSpinner>
 
           <BR />
-          <div *ngIf="message !== undefined && message.length > 0">{{ message }} <BR /></div>
+          @if (message !== undefined && message.length > 0) {
+            <div>{{ message }} <BR /></div>
+          }
         </div>
         <div class="col-4"></div>
       </div>
@@ -65,12 +71,12 @@
           <div class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
             <div class="card">
               <div class="card-body">
-                <h5 class="card-title" jhiTranslate="scanexam.courseexport">Export</h5>
+                <h5 class="card-title" [translate]="'scanexam.courseexport'">Export</h5>
 
                 <div class="card-text">
                   <label
                     for="switch1"
-                    jhiTranslate="scanexam.studentdata"
+                    [translate]="'scanexam.studentdata'"
                     [tooltipZIndex]="'3000'"
                     [pTooltip]="'scanexam.studentdatatooltip' | translate"
                     >données étudiantes:</label
@@ -84,28 +90,27 @@
                         (click)="exportCourse()"
                         [pTooltip]="'scanexam.courseexporttooltip' | translate"
                         [tooltipZIndex]="'3000'"
-                        jhiTranslate="scanexam.courseexport"
+                        [translate]="'scanexam.courseexport'"
                       >
                         Export
                       </button>
                     </div>
-                    <ng-container *ngIf="exams !== undefined && exams !== null && exams.length > 1">
-                      <div
-                        *ngFor="let exam of exams"
-                        class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2"
-                      >
-                        <button
-                          class="p-button p-button-primary"
-                          (click)="exportExam(exam.id!)"
-                          [pTooltip]="'scanexam.exportexamtooltip' | translate"
-                          [tooltipZIndex]="'3000'"
-                          jhiTranslate="scanexam.examexport"
-                          [translateValues]="{ examName: exam.name }"
-                        >
-                          Export {{ exam.name }}
-                        </button>
-                      </div>
-                    </ng-container>
+                    @if (exams !== undefined && exams !== null && exams.length > 1) {
+                      @for (exam of exams; track exam) {
+                        <div class="flex align-items-center justify-content-center font-bold text-gray-900 border-round m-2">
+                          <button
+                            class="p-button p-button-primary"
+                            (click)="exportExam(exam.id!)"
+                            [pTooltip]="'scanexam.exportexamtooltip' | translate"
+                            [tooltipZIndex]="'3000'"
+                            [translate]="'scanexam.examexport'"
+                            [translateParams]="{ examName: exam.name }"
+                          >
+                            Export {{ exam.name }}
+                          </button>
+                        </div>
+                      }
+                    }
                   </div>
                 </div>
               </div>
@@ -121,25 +126,26 @@
           (newValue)="onCourseNameChanged($event)"
         >
         </jhi-usable-text-input>
-        <p jhiTranslate="scanexam.slogan">Vos exams accessibles en un clic</p>
+        <p [translate]="'scanexam.slogan'">Vos exams accessibles en un clic</p>
       </div>
       <div id="form-total" #formTotal>
         <div class="inner" [style]="{ 'text-align': 'center' }">
-          <button
-            *ngFor="let exam of exams"
-            [style]="{ marginBottom: '1em', margin: '1em' }"
-            class="p-element p-ripple button80"
-            pButton
-            pRipple
-            type="button"
-            [routerLink]="'/exam/' + exam.id"
-          >
-            <fa-stack>
-              <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
-              <fa-icon [icon]="faBookOpenReader" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
-            ><BR />
-            <span>{{ exam.name }}</span>
-          </button>
+          @for (exam of exams; track exam) {
+            <button
+              [style]="{ marginBottom: '1em', margin: '1em' }"
+              class="p-element p-ripple button80"
+              pButton
+              pRipple
+              type="button"
+              [routerLink]="'/exam/' + exam.id"
+            >
+              <fa-stack>
+                <fa-icon [icon]="farCircle" stackItemSize="2x"></fa-icon>
+                <fa-icon [icon]="faBookOpenReader" stackItemSize="1x" [inverse]="false"></fa-icon> </fa-stack
+              ><BR />
+              <span>{{ exam.name }}</span>
+            </button>
+          }
         </div>
       </div>
     </div>

@@ -12,7 +12,7 @@ import { db } from '../db/dbstudent';
 import { IExam } from '../../entities/exam/exam.model';
 // import { ICourse } from 'app/entities/course/course.model';
 import { IStudent } from '../../entities/student/student.model';
-import { ImageZone, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.component';
+import { ImageZone, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.model';
 import { IZone } from 'app/entities/zone/zone.model';
 import { QuestionService } from '../../entities/question/service/question.service';
 import { IQuestion } from '../../entities/question/question.model';
@@ -30,7 +30,7 @@ import { IExamSheet } from '../../entities/exam-sheet/exam-sheet.model';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { HttpClient } from '@angular/common/http';
 import { CacheUploadService } from '../exam-detail/cacheUpload.service';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateDirective, TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import { IHybridGradedCommentWithStepValue } from '../../entities/hybrid-graded-comment/hybrid-graded-comment.model';
 import { HybridGradedCommentService } from 'app/entities/hybrid-graded-comment/service/hybrid-graded-comment.service';
@@ -43,8 +43,7 @@ import { HasAnyAuthorityDirective } from '../../shared/auth/has-any-authority.di
 import { PaginatorModule } from 'primeng/paginator';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonDirective } from 'primeng/button';
-import { NgFor, NgIf, AsyncPipe, DecimalPipe } from '@angular/common';
-import { TranslateDirective } from '../../shared/language/translate.directive';
+import { AsyncPipe, DecimalPipe } from '@angular/common';
 import { GalleriaModule } from 'primeng/galleria';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
@@ -62,12 +61,9 @@ import { ToastModule } from 'primeng/toast';
     ProgressSpinnerModule,
     GalleriaModule,
     PrimeTemplate,
-    TranslateDirective,
-    NgFor,
     ButtonDirective,
     TooltipModule,
     PaginatorModule,
-    NgIf,
     RouterLink,
     HasAnyAuthorityDirective,
     ToggleSwitchModule,
@@ -75,7 +71,8 @@ import { ToastModule } from 'primeng/toast';
     SliderModule,
     AsyncPipe,
     DecimalPipe,
-    TranslateModule,
+    TranslateDirective,
+    TranslatePipe,
     ArraySortPipe,
   ],
 })

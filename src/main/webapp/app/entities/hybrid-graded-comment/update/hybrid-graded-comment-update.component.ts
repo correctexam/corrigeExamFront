@@ -13,13 +13,13 @@ import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
 import { IQuestion } from 'app/entities/question/question.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { NgFor, NgIf } from '@angular/common';
+
 import { AlertErrorComponent } from 'app/shared/alert/alert-error.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   standalone: true,
-  imports: [FontAwesomeModule, NgFor, AlertErrorComponent, NgIf, FormsModule, ReactiveFormsModule],
+  imports: [FontAwesomeModule, AlertErrorComponent, FormsModule, ReactiveFormsModule],
   selector: 'jhi-hybrid-graded-comment-update',
   templateUrl: './hybrid-graded-comment-update.component.html',
 })

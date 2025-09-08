@@ -4,7 +4,7 @@
   <div class="container-fluid">
     <a class="navbar-brand logo" routerLink="/" (click)="collapseNavbar()">
       <span class="logo-img"></span>
-      <span jhiTranslate="global.title" class="navbar-title">correctExam</span>
+      <span [translate]="'global.title'" class="navbar-title">correctExam</span>
       <span class="navbar-version">{{ version }}</span>
     </a>
     <a
@@ -25,7 +25,7 @@
           <a class="nav-link" routerLink="/" (click)="collapseNavbar()">
             <span>
               <fa-icon icon="home"></fa-icon>
-              <span jhiTranslate="global.menu.home">Home</span>
+              <span [translate]="'global.menu.home'">Home</span>
             </span>
           </a>
         </li>
@@ -33,7 +33,7 @@
           <a class="nav-link" [href]="documentationHref" (click)="collapseNavbar()" target="_blank">
             <span>
               <fa-icon icon="book"></fa-icon>
-              <span jhiTranslate="scanexam.documentation">documentation</span>
+              <span [translate]="'scanexam.documentation'">documentation</span>
             </span>
           </a>
         </li>
@@ -57,7 +57,7 @@
           >
             <span>
               <fa-icon icon="th-list"></fa-icon>
-              <span jhiTranslate="global.menu.entities.main">Entities</span>
+              <span [translate]="'global.menu.entities.main'">Entities</span>
             </span>
           </a>
           <ul *jhiHasAnyAuthority="'ROLE_ADMIN'" class="dropdown-menu" ngbDropdownMenu aria-labelledby="entity-menu">
@@ -70,7 +70,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.entities.course">Course</span>
+                <span [translate]="'global.menu.entities.course'">Course</span>
               </a>
             </li>
             <li>
@@ -82,7 +82,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.entities.courseGroup">Course Group</span>
+                <span [translate]="'global.menu.entities.courseGroup'">Course Group</span>
               </a>
             </li>
             <li>
@@ -94,7 +94,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.entities.student">Student</span>
+                <span [translate]="'global.menu.entities.student'">Student</span>
               </a>
             </li>
             <li>
@@ -106,7 +106,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.entities.exam">Exam</span>
+                <span [translate]="'global.menu.entities.exam'">Exam</span>
               </a>
             </li>
             <li>
@@ -118,7 +118,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.entities.template">Template</span>
+                <span [translate]="'global.menu.entities.template'">Template</span>
               </a>
             </li>
             <li>
@@ -130,7 +130,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.entities.question">Question</span>
+                <span [translate]="'global.menu.entities.question'">Question</span>
               </a>
             </li>
             <li>
@@ -142,7 +142,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.entities.examSheet">Exam Sheet</span>
+                <span [translate]="'global.menu.entities.examSheet'">Exam Sheet</span>
               </a>
             </li>
             <li>
@@ -154,7 +154,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.entities.scan">Scan</span>
+                <span [translate]="'global.menu.entities.scan'">Scan</span>
               </a>
             </li>
             <li>
@@ -166,7 +166,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.entities.finalResult">Final Result</span>
+                <span [translate]="'global.menu.entities.finalResult'">Final Result</span>
               </a>
             </li>
             <li>
@@ -178,7 +178,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.entities.studentResponse">Student Response</span>
+                <span [translate]="'global.menu.entities.studentResponse'">Student Response</span>
               </a>
             </li>
             <li>
@@ -190,7 +190,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.entities.comments">Comments</span>
+                <span [translate]="'global.menu.entities.comments'">Comments</span>
               </a>
             </li>
             <li>
@@ -202,7 +202,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.entities.zone">Zone</span>
+                <span [translate]="'global.menu.entities.zone'">Zone</span>
               </a>
             </li>
             <li>
@@ -214,7 +214,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.entities.questionType">Question Type</span>
+                <span [translate]="'global.menu.entities.questionType'">Question Type</span>
               </a>
             </li>
             <li>
@@ -226,7 +226,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.entities.textComment">Text Comment</span>
+                <span [translate]="'global.menu.entities.textComment'">Text Comment</span>
               </a>
             </li>
             <li>
@@ -238,7 +238,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.entities.gradedComment">Graded Comment</span>
+                <span [translate]="'global.menu.entities.gradedComment'">Graded Comment</span>
               </a>
             </li>
             <li>
@@ -250,7 +250,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.entities.prediction">Prédiction</span>
+                <span [translate]="'global.menu.entities.prediction'">Prédiction</span>
               </a>
             </li>
             <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
@@ -267,7 +267,7 @@
           <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="admin-menu" data-cy="adminMenu">
             <span>
               <fa-icon icon="users-cog"></fa-icon>
-              <span jhiTranslate="global.menu.admin.main">Administration</span>
+              <span [translate]="'global.menu.admin.main'">Administration</span>
             </span>
           </a>
           <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="admin-menu">
@@ -279,7 +279,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="users" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.admin.userManagement">User management</span>
+                <span [translate]="'global.menu.admin.userManagement'">User management</span>
               </a>
             </li>
             <li>
@@ -290,7 +290,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="tachometer-alt" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.admin.metrics">Metrics</span>
+                <span [translate]="'global.menu.admin.metrics'">Metrics</span>
               </a>
             </li>
             <li>
@@ -301,7 +301,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="heart" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.admin.health">Health</span>
+                <span [translate]="'global.menu.admin.health'">Health</span>
               </a>
             </li>
             <li>
@@ -312,7 +312,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="cogs" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.admin.configuration">Configuration</span>
+                <span [translate]="'global.menu.admin.configuration'">Configuration</span>
               </a>
             </li>
             <li>
@@ -323,7 +323,7 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="tasks" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.admin.logs">Logs</span>
+                <span [translate]="'global.menu.admin.logs'">Logs</span>
               </a>
             </li>
             <li *ngIf="openAPIEnabled">
@@ -334,14 +334,14 @@
                 (click)="collapseNavbar()"
               >
                 <fa-icon icon="book" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.admin.apidocs">API</span>
+                <span [translate]="'global.menu.admin.apidocs'">API</span>
               </a>
             </li>
             <!-- jhipster-needle-add-element-to-admin-menu - JHipster will add entities to the admin menu here -->
             <li *ngIf="!inProduction">
               <a class="dropdown-item" href="./h2-console/" target="_tab" (click)="collapseNavbar()">
                 <fa-icon icon="database" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.admin.database">Database</span>
+                <span [translate]="'global.menu.admin.database'">Database</span>
               </a>
             </li>
           </ul>
@@ -350,7 +350,7 @@
           <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="languagesnavBarDropdown">
             <span>
               <fa-icon icon="flag"></fa-icon>
-              <span jhiTranslate="global.menu.language">Language</span>
+              <span [translate]="'global.menu.language'">Language</span>
             </span>
           </a>
           <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="languagesnavBarDropdown">
@@ -375,7 +375,7 @@
           <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="account-menu" data-cy="accountMenu">
             <span *ngIf="!account?.imageUrl">
               <fa-icon icon="user"></fa-icon>
-              <span jhiTranslate="global.menu.account.main">Account</span>
+              <span [translate]="'global.menu.account.main'">Account</span>
             </span>
             <span *ngIf="account?.imageUrl">
               <img [src]="account!.imageUrl" class="profile-image rounded-circle" alt="Avatar" />
@@ -391,7 +391,7 @@
                 data-cy="settings"
               >
                 <fa-icon icon="wrench" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.account.settings">Settings</span>
+                <span [translate]="'global.menu.account.settings'">Settings</span>
               </a>
             </li>
             <li *ngSwitchCase="true">
@@ -403,26 +403,26 @@
                 data-cy="passwordItem"
               >
                 <fa-icon icon="lock" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.account.password">Password</span>
+                <span [translate]="'global.menu.account.password'">Password</span>
               </a>
             </li>
             <li *ngSwitchCase="true">
               <a class="dropdown-item" (click)="logout()" id="logout" data-cy="logout">
                 <fa-icon icon="sign-out-alt" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.account.logout">Sign out</span>
+                <span [translate]="'global.menu.account.logout'">Sign out</span>
               </a>
             </li>
             <li *ngSwitchCase="true">
               <a class="dropdown-item" (click)="showPreference()" id="preference" data-cy="preference">
                 <fa-icon icon="wrench" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="scanexam.preference">Pref</span>
+                <span [translate]="'scanexam.preference'">Pref</span>
               </a>
             </li>
 
             <li *ngSwitchCase="false">
               <a class="dropdown-item" (click)="login()" id="login" data-cy="login">
                 <fa-icon icon="sign-in-alt" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.account.login">Sign in</span>
+                <span [translate]="'global.menu.account.login'">Sign in</span>
               </a>
             </li>
             <!--            You can create an account only if connection mode is local-->
@@ -437,7 +437,7 @@
                     data-cy="register"
                   >
                     <fa-icon icon="user-plus" [fixedWidth]="true"></fa-icon>
-                    <span jhiTranslate="global.menu.account.register">Register</span>
+                    <span [translate]="'global.menu.account.register'">Register</span>
                   </a>
                 </li>
               </div>

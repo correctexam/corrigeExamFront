@@ -4,13 +4,12 @@ import { NgbModal, NgbProgressbar } from '@ng-bootstrap/ng-bootstrap';
 import { Thread, ThreadState } from 'app/admin/metrics/metrics.model';
 import { MetricsModalThreadsComponent } from '../metrics-modal-threads/metrics-modal-threads.component';
 import { DecimalPipe } from '@angular/common';
-import { TranslateDirective } from '../../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-jvm-threads',
   templateUrl: './jvm-threads.component.html',
   standalone: true,
-  imports: [TranslateDirective, NgbProgressbar, DecimalPipe],
+  imports: [NgbProgressbar, DecimalPipe],
 })
 export class JvmThreadsComponent {
   threadStats = {

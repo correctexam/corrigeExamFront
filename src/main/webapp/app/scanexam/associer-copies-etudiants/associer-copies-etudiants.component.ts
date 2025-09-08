@@ -22,21 +22,20 @@ import { Listbox, ListboxModule } from 'primeng/listbox';
 import { PreferenceService } from '../preference-page/preference.service';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { ShortcutInput, KeyboardShortcutsModule } from 'ng-keyboard-shortcuts';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import { DoPredictionsInputSamePage } from 'app/opencv.worker';
 import { DialogService } from 'primeng/dynamicdialog';
 import { AllbindingsComponent } from './allbindings/allbindings.component';
 import { Title } from '@angular/platform-browser';
 import { PaginatorModule } from 'primeng/paginator';
-import { NgIf, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { ButtonDirective, Button } from 'primeng/button';
 import { SliderModule } from 'primeng/slider';
 import { TooltipModule } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { TranslateDirective } from '../../shared/language/translate.directive';
 import { DrawerModule } from 'primeng/drawer';
 import { GalleriaModule } from 'primeng/galleria';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -45,33 +44,6 @@ import { ToastModule } from 'primeng/toast';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { MLTService } from '../mlt/mlt.service';
 import { TemplateService } from 'app/entities/template/service/template.service';
-
-export interface IPage {
-  image?: ImageData;
-  page?: number;
-  width?: number;
-  height?: number;
-}
-
-export interface ICluster {
-  images: IImageCluster[];
-  nbrCluster: number;
-}
-
-export interface IImageCluster {
-  image: ArrayBuffer;
-  imageIndex: number;
-  studentIndex: number;
-  width?: number;
-  height?: number;
-}
-
-export interface ImageZone {
-  t?: ImageData;
-  i: ImageData;
-  w: number;
-  h: number;
-}
 
 interface PredictResult {
   recognizedStudent?: IStudent;
@@ -99,7 +71,6 @@ interface PredictResult {
     PrimeTemplate,
     KeyboardShortcutsModule,
     DrawerModule,
-    TranslateDirective,
     ToggleSwitchModule,
     FormsModule,
     TooltipModule,
@@ -107,11 +78,11 @@ interface PredictResult {
     ButtonDirective,
     FaIconComponent,
     Button,
-    NgIf,
     PaginatorModule,
     ListboxModule,
     NgClass,
-    TranslateModule,
+    TranslateDirective,
+    TranslatePipe,
     ProgressBarModule,
   ],
 })

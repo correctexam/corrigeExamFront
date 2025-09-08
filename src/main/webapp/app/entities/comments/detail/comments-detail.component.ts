@@ -5,14 +5,12 @@ import { IComments } from '../comments.model';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { AlertComponent } from '../../../shared/alert/alert.component';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'jhi-comments-detail',
   templateUrl: './comments-detail.component.html',
   standalone: true,
-  imports: [NgIf, TranslateDirective, AlertErrorComponent, AlertComponent, RouterLink, FaIconComponent],
+  imports: [AlertErrorComponent, AlertComponent, RouterLink, FaIconComponent],
 })
 export class CommentsDetailComponent implements OnInit {
   comments: IComments | null = null;

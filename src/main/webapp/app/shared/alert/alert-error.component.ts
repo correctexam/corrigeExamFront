@@ -7,13 +7,13 @@ import { AlertError } from './alert-error.model';
 import { Alert, AlertService } from 'app/core/util/alert.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
-import { NgFor, NgClass, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'jhi-alert-error',
   templateUrl: './alert-error.component.html',
   standalone: true,
-  imports: [NgFor, NgClass, NgIf, NgbAlert],
+  imports: [NgClass, NgbAlert],
 })
 export class AlertErrorComponent implements OnDestroy {
   alerts: Alert[] = [];

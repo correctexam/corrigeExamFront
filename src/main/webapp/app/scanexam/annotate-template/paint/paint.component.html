@@ -1,11 +1,10 @@
 <div class="flex ml-0 mr-0">
-  <div class="" *ngIf="exam !== undefined">
-    <jhi-fabric-canvas [exam]="exam" [content]="content" [numeroEvent]="numero"></jhi-fabric-canvas>
-  </div>
-  <div
-    class="flex flex-column flex-grow-1 top-0 right-0 p-1 m-2"
-    style="overflow-y: auto; overflow-x: hidden; max-height: 87vh; position: sticky; top: 0"
-  >
+  @if (exam !== undefined) {
+    <div class="">
+      <jhi-fabric-canvas [exam]="exam" [content]="content" [numeroEvent]="numero"></jhi-fabric-canvas>
+    </div>
+  }
+  <div class="flex flex-column flex-grow-1 top-0 right-0 p-1 m-2">
     <button
       style="overflow: visible"
       type="submit"
@@ -14,9 +13,9 @@
       pButton
       data-cy="entityDetailsBackButton"
     >
-      <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+      <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
     </button>
-    <div class="templateForm">
+    <div class="templateForm" style="overflow-y: auto; overflow-x: hidden; max-height: 87vh; position: sticky; top: 0">
       <h3>Palette</h3>
       <hr />
       <jhi-graphical-toolbar></jhi-graphical-toolbar>
@@ -26,24 +25,24 @@
 </div>
 <!--
 <div class="flex ml-0 mr-0">
-<p-splitter [panelSizes]="[25, 75]" >
-  <ng-template pTemplate>
-    <div class="">
-      <jhi-fabric-canvas [exam]="exam" [content]="content" [numeroEvent]="numero"></jhi-fabric-canvas>
-    </div>
-  </ng-template>
-  <ng-template pTemplate>
-    <div class="flex flex-column flex-grow-1 top-0 right-0 p-1 m-2">
-      <button type="submit" (click)="previousState()" class="right-0 btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-      </button>
-      <div class="templateForm">
-        <h3>Palette</h3>
-        <hr />
-        <jhi-graphical-toolbar></jhi-graphical-toolbar>
-        <jhi-questionpropertiesview (updatenumero)="updateNumero($event)"></jhi-questionpropertiesview>
+  <p-splitter [panelSizes]="[25, 75]" >
+    <ng-template pTemplate>
+      <div class="">
+        <jhi-fabric-canvas [exam]="exam" [content]="content" [numeroEvent]="numero"></jhi-fabric-canvas>
       </div>
-    </div>
-  </ng-template>
-</p-splitter>
+    </ng-template>
+    <ng-template pTemplate>
+      <div class="flex flex-column flex-grow-1 top-0 right-0 p-1 m-2">
+        <button type="submit" (click)="previousState()" class="right-0 btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'entity.action.back'">Back</span>
+        </button>
+        <div class="templateForm">
+          <h3>Palette</h3>
+          <hr />
+          <jhi-graphical-toolbar></jhi-graphical-toolbar>
+          <jhi-questionpropertiesview (updatenumero)="updateNumero($event)"></jhi-questionpropertiesview>
+        </div>
+      </div>
+    </ng-template>
+  </p-splitter>
 </div>-->

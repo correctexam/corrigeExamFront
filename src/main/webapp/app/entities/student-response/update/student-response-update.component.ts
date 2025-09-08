@@ -17,9 +17,8 @@ import { TextCommentService } from 'app/entities/text-comment/service/text-comme
 import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
 import { GradedCommentService } from 'app/entities/graded-comment/service/graded-comment.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { NgFor } from '@angular/common';
+
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 type SelectableEntity = IQuestion | IExamSheet;
 
@@ -27,7 +26,7 @@ type SelectableEntity = IQuestion | IExamSheet;
   selector: 'jhi-student-response-update',
   templateUrl: './student-response-update.component.html',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, TranslateDirective, AlertErrorComponent, NgFor, FaIconComponent],
+  imports: [FormsModule, ReactiveFormsModule, AlertErrorComponent, FaIconComponent],
 })
 export class StudentResponseUpdateComponent implements OnInit {
   isSaving = false;

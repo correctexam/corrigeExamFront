@@ -16,7 +16,7 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { ApplicationConfigService } from '../../core/config/application-config.service';
 import { DialogService } from 'primeng/dynamicdialog';
 import { SharecourseComponent } from '../sharecourse/sharecourse.component';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslatePipe, TranslateDirective } from '@ngx-translate/core';
 import { firstValueFrom, scan } from 'rxjs';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { PreferenceService } from '../preference-page/preference.service';
@@ -30,11 +30,10 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
-import { NgIf, NgFor } from '@angular/common';
+
 import { DockModule } from 'primeng/dock';
 import { ButtonDirective } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
-import { TranslateDirective } from '../../shared/language/translate.directive';
 import { DialogModule } from 'primeng/dialog';
 
 export interface CacheUploadNotification {
@@ -61,12 +60,10 @@ export interface CacheDownloadNotification {
   standalone: true,
   imports: [
     DialogModule,
-    TranslateDirective,
     FormsModule,
     PrimeTemplate,
     ButtonDirective,
     DockModule,
-    NgIf,
     RouterLink,
     TooltipModule,
     ConfirmDialogModule,
@@ -74,12 +71,12 @@ export interface CacheDownloadNotification {
     ProgressSpinnerModule,
     DrawerModule,
     ToggleSwitchModule,
-    NgFor,
     UsableTextInputComponent,
     FaStackComponent,
     FaIconComponent,
     FaStackItemSizeDirective,
-    TranslateModule,
+    TranslatePipe,
+    TranslateDirective,
   ],
 })
 export class CoursdetailsComponent implements OnInit {

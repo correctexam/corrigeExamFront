@@ -2,16 +2,15 @@ import { Component, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { PasswordResetInitService } from './password-reset-init.service';
-import { TranslateModule } from '@ngx-translate/core';
-import { NgIf } from '@angular/common';
+import { TranslateDirective, TranslatePipe } from '@ngx-translate/core';
+
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-password-reset-init',
   templateUrl: './password-reset-init.component.html',
   standalone: true,
-  imports: [TranslateDirective, AlertErrorComponent, NgIf, FormsModule, ReactiveFormsModule, TranslateModule],
+  imports: [AlertErrorComponent, FormsModule, ReactiveFormsModule, TranslateDirective, TranslatePipe],
 })
 export class PasswordResetInitComponent implements AfterViewInit {
   @ViewChild('email', { static: false })

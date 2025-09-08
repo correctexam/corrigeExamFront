@@ -17,20 +17,19 @@ import { faHouseSignal } from '@fortawesome/free-solid-svg-icons';
 import { Listbox, ListboxModule } from 'primeng/listbox';
 import { PreferenceService } from '../../preference-page/preference.service';
 import { ShortcutInput, KeyboardShortcutsModule } from 'ng-keyboard-shortcuts';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import { DialogService } from 'primeng/dynamicdialog';
 import { AllbindingsComponent } from '../allbindings/allbindings.component';
 import { Title } from '@angular/platform-browser';
 import { PaginatorModule } from 'primeng/paginator';
-import { NgIf, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { ButtonDirective, Button } from 'primeng/button';
 import { SliderModule } from 'primeng/slider';
 import { TooltipModule } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 import { DrawerModule } from 'primeng/drawer';
 import { GalleriaModule } from 'primeng/galleria';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -54,7 +53,6 @@ import { QuestionService } from 'app/entities/question/service/question.service'
     PrimeTemplate,
     KeyboardShortcutsModule,
     DrawerModule,
-    TranslateDirective,
     ToggleSwitchModule,
     FormsModule,
     TooltipModule,
@@ -62,11 +60,11 @@ import { QuestionService } from 'app/entities/question/service/question.service'
     ButtonDirective,
     FaIconComponent,
     Button,
-    NgIf,
     PaginatorModule,
     ListboxModule,
     NgClass,
-    TranslateModule,
+    TranslateDirective,
+    TranslatePipe,
     ProgressBarModule,
   ],
 })

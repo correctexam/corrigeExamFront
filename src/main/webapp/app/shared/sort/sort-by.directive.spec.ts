@@ -7,19 +7,23 @@ import { fas, faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-i
 
 import { SortByDirective } from './sort-by.directive';
 import { SortDirective } from './sort.directive';
-import { NgIf } from '@angular/common';
 
 @Component({
   template: `
     <table>
       <thead>
         <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="transition($event)">
-          <th jhiSortBy="name">ID<fa-icon *ngIf="sortAllowed" [icon]="'sort'"></fa-icon></th>
+          <th jhiSortBy="name">
+            ID
+            @if (sortAllowed) {
+              <fa-icon [icon]="'sort'"></fa-icon>
+            }
+          </th>
         </tr>
       </thead>
     </table>
   `,
-  imports: [FaIconComponent, SortDirective, SortByDirective, NgIf],
+  imports: [FaIconComponent, SortDirective, SortByDirective],
   standalone: true,
 })
 class TestSortByDirectiveComponent {

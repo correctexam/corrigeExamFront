@@ -5,14 +5,14 @@ import { IComments } from '../comments.model';
 import { CommentsService } from '../service/comments.service';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { AlertErrorComponent } from '../../../shared/alert/alert-error.component';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 import { FormsModule } from '@angular/forms';
-import { NgIf } from '@angular/common';
+
+import { TranslateDirective } from '@ngx-translate/core';
 
 @Component({
   templateUrl: './comments-delete-dialog.component.html',
   standalone: true,
-  imports: [NgIf, FormsModule, TranslateDirective, AlertErrorComponent, FaIconComponent],
+  imports: [TranslateDirective, FormsModule, AlertErrorComponent, FaIconComponent],
 })
 export class CommentsDeleteDialogComponent {
   comments?: IComments;

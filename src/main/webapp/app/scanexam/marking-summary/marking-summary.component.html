@@ -1,194 +1,215 @@
-<div *ngIf="examId === -1">{{ 'scanexam.errorExamId' | translate }}</div>
-<div *ngIf="errorMsg !== undefined">{{ errorMsg | translate }}</div>
-<div *ngIf="examId !== -1 && errorMsg === undefined">
-  <div class="grid">
-    <div class="col-8">
-      <h1>
-        {{ 'scanexam.titleSummary' | translate }} {{ dataExam.nameExam }}
-        <button
-          *jhiHasAnyAuthority="'ROLE_ADMIN'"
-          type="submit"
-          class="p-button"
-          (click)="cleanSheet()"
-          [pTooltip]="'scanexam.cleanSheetTooltip' | translate"
-        >
-          <fa-icon icon="trash-alt"></fa-icon>&nbsp;<span jhiTranslate="scanexam.cleanSheet"></span>
+@if (examId === -1) {
+  <div>{{ 'scanexam.errorExamId' | translate }}</div>
+}
+@if (errorMsg !== undefined) {
+  <div>{{ errorMsg | translate }}</div>
+}
+@if (examId !== -1 && errorMsg === undefined) {
+  <div>
+    <div class="grid">
+      <div class="col-8">
+        <h1>
+          {{ 'scanexam.titleSummary' | translate }} {{ dataExam.nameExam }}
+          <button
+            *jhiHasAnyAuthority="'ROLE_ADMIN'"
+            type="submit"
+            class="p-button"
+            (click)="cleanSheet()"
+            [pTooltip]="'scanexam.cleanSheetTooltip' | translate"
+          >
+            <fa-icon icon="trash-alt"></fa-icon>&nbsp;<span [translate]="'scanexam.cleanSheet'"></span>
+          </button>
+        </h1>
+      </div>
+      <div class="col-4">
+        <button type="submit" class="p-button p-button-primary" (click)="goToExam()">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'scanexam.gobackexam'"></span>
         </button>
-      </h1>
+      </div>
     </div>
-    <div class="col-4">
-      <button type="submit" class="p-button p-button-primary" (click)="goToExam()">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="scanexam.gobackexam"></span>
-      </button>
-    </div>
+    <br />
+    <p-tabs value="0">
+      <p-tablist>
+        <p-tab value="0">{{ 'scanexam.questions' | translate }}</p-tab>
+        <p-tab value="1">{{ 'scanexam.sheets' | translate }}</p-tab>
+      </p-tablist>
+      <p-tabpanels>
+        <p-tabpanel value="0">
+          <div class="container">
+            @for (q of dataExam.questions; track q) {
+              <div class="row row-striped">
+                <div class="col align-self-center">
+                  {{ 'scanexam.questionLow' | translate }} {{ q.numero }}
+                  @if (q.libelle !== undefined && q.libelle !== '') {
+                    <span>(</span>
+                  }
+                  {{ q.libelle }}
+                  @if (q.libelle !== undefined && q.libelle !== '') {
+                    <span>)</span>
+                  }
+                </div>
+                <div class="col align-self-center">
+                  {{ q.answeredSheets }} / {{ dataExam.sheets.length }} ({{ q.answeredSheets / dataExam.sheets.length | percent }})
+                </div>
+                @if (q.answeredSheets === 0) {
+                  <div class="col">
+                    <button
+                      [routerLink]="
+                        '/answer/' +
+                        this.examId +
+                        '/' +
+                        (questionNumeros.indexOf(q.numero) + 1) +
+                        '/' +
+                        (q.firstUnmarkedSheet / pageInTemplate + 1)
+                      "
+                      class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3 justify-content-center"
+                      pButton
+                      type="button"
+                      [tooltipZIndex]="'3000'"
+                      [pTooltip]="'scanexam.continuetooltip' | translate"
+                    >
+                      <span [translate]="'scanexam.startcorrect'"></span>
+                    </button>
+                    <button
+                      [routerLink]="'/compareanswer/' + this.examId + '/' + q.id"
+                      class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3 justify-content-center"
+                      pButton
+                      type="button"
+                      [tooltipZIndex]="'3000'"
+                      [pTooltip]="'scanexam.voirtoutescopiestooltip' | translate"
+                    >
+                      <span [translate]="'scanexam.voirtoutescopies'"></span>
+                    </button>
+                  </div>
+                }
+                @if (q.answeredSheets !== 0 && q.answeredSheets < dataExam.sheets.length) {
+                  <div class="col">
+                    <button
+                      [routerLink]="
+                        '/answer/' +
+                        this.examId +
+                        '/' +
+                        (questionNumeros.indexOf(q.numero) + 1) +
+                        '/' +
+                        (q.firstUnmarkedSheet / pageInTemplate + 1)
+                      "
+                      class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3 justify-content-center"
+                      pButton
+                      type="button"
+                      [tooltipZIndex]="'3000'"
+                      [pTooltip]="'scanexam.continuetooltip' | translate"
+                    >
+                      <span [translate]="'scanexam.continue'"></span>
+                    </button>
+                    <button
+                      [routerLink]="'/compareanswer/' + this.examId + '/' + q.id"
+                      class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3 justify-content-center"
+                      pButton
+                      type="button"
+                      [tooltipZIndex]="'3000'"
+                      [pTooltip]="'scanexam.voirtoutescopiestooltip' | translate"
+                    >
+                      <span [translate]="'scanexam.voirtoutescopies'"></span>
+                    </button>
+                  </div>
+                }
+                @if (q.answeredSheets === dataExam.sheets.length) {
+                  <div class="col">
+                    <button
+                      [routerLink]="'/answer/' + this.examId + '/' + (questionNumeros.indexOf(q.numero) + 1) + '/' + '1'"
+                      class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3 justify-content-center"
+                      pButton
+                      type="button"
+                      [tooltipZIndex]="'3000'"
+                      [pTooltip]="'scanexam.voirtooltip' | translate"
+                    >
+                      <span [translate]="'scanexam.voir'"></span>
+                    </button>
+                    <button
+                      [routerLink]="'/compareanswer/' + this.examId + '/' + q.id"
+                      class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3 justify-content-center"
+                      pButton
+                      type="button"
+                      [tooltipZIndex]="'3000'"
+                      [pTooltip]="'scanexam.voirtoutescopiestooltip' | translate"
+                    >
+                      <span [translate]="'scanexam.voirtoutescopies'"></span>
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+            <div class="row row-striped">
+              <div class="col align-self-center fw-bold">
+                <p class="font-weight-bold">{{ 'scanexam.total' | translate }}</p>
+              </div>
+              <div class="col align-self-center fw-bold">
+                <p class="font-weight-bold">
+                  {{ getTotalAnswered() }} / {{ dataExam.sheets.length * dataExam.questions.length }} ({{
+                    getTotalAnswered() / (dataExam.sheets.length * dataExam.questions.length) | percent
+                  }})
+                </p>
+              </div>
+              <div class="col"></div>
+            </div>
+          </div>
+        </p-tabpanel>
+        <p-tabpanel value="1">
+          <div class="container">
+            @for (s of dataExam.sheets; track s; let index = $index) {
+              <div class="row row-striped">
+                <div class="col align-self-center">{{ 'scanexam.sheet' | translate }} {{ index + 1 }}</div>
+                <div class="col align-self-center">
+                  {{ s.answeredSheets }} / {{ dataExam.questions.length }} ({{ s.answeredSheets / dataExam.questions.length | percent }})
+                </div>
+                @if (s.answeredSheets < dataExam.questions.length) {
+                  <div class="col">
+                    <button
+                      [routerLink]="'/answer/' + this.examId + '/' + s.firstUnmarkedQuestion + '/' + (index + 1)"
+                      class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
+                      pButton
+                      type="button"
+                      [tooltipPosition]="'left'"
+                      [pTooltip]="'scanexam.voircopieTooltip' | translate"
+                      [tooltipZIndex]="'3000'"
+                    >
+                      <span>{{ 'scanexam.continue' | translate }}</span>
+                    </button>
+                  </div>
+                }
+                @if (s.answeredSheets === dataExam.questions.length) {
+                  <div class="col">
+                    <button
+                      [routerLink]="'/answer/' + this.examId + '/' + '1' + '/' + (index + 1)"
+                      class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
+                      pButton
+                      type="button"
+                      [tooltipPosition]="'right'"
+                      [pTooltip]="'scanexam.voircopieTooltip' | translate"
+                      [tooltipZIndex]="'3000'"
+                    >
+                      <span>{{ 'scanexam.voir' | translate }}</span>
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+            <div class="row row-striped">
+              <div class="col align-self-center fw-bold">
+                <p class="font-weight-bold">{{ 'scanexam.total' | translate }}</p>
+              </div>
+              <div class="col align-self-center fw-bold">
+                <p class="font-weight-bold">
+                  {{ getTotalAnswered() }} / {{ dataExam.sheets.length * dataExam.questions.length }} ({{
+                    getTotalAnswered() / (dataExam.sheets.length * dataExam.questions.length) | percent
+                  }})
+                </p>
+              </div>
+              <div class="col"></div>
+            </div>
+          </div>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
   </div>
-  <br />
-
-  <p-tabs value="0">
-    <p-tablist>
-      <p-tab value="0">{{ 'scanexam.questions' | translate }}</p-tab>
-      <p-tab value="1">{{ 'scanexam.sheets' | translate }}</p-tab>
-    </p-tablist>
-    <p-tabpanels>
-      <p-tabpanel value="0">
-        <div class="container">
-          <div class="row row-striped" *ngFor="let q of dataExam.questions">
-            <div class="col align-self-center">
-              {{ 'scanexam.questionLow' | translate }} {{ q.numero }} <span *ngIf="q.libelle !== undefined && q.libelle !== ''">(</span
-              >{{ q.libelle }}<span *ngIf="q.libelle !== undefined && q.libelle !== ''">)</span>
-            </div>
-            <div class="col align-self-center">
-              {{ q.answeredSheets }} / {{ dataExam.sheets.length }} ({{ q.answeredSheets / dataExam.sheets.length | percent }})
-            </div>
-            <div class="col" *ngIf="q.answeredSheets === 0">
-              <button
-                [routerLink]="
-                  '/answer/' +
-                  this.examId +
-                  '/' +
-                  (questionNumeros.indexOf(q.numero) + 1) +
-                  '/' +
-                  (q.firstUnmarkedSheet / pageInTemplate + 1)
-                "
-                class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3 justify-content-center"
-                pButton
-                type="button"
-                [tooltipZIndex]="'3000'"
-                [pTooltip]="'scanexam.continuetooltip' | translate"
-              >
-                <span jhiTranslate="scanexam.startcorrect"></span>
-              </button>
-              <button
-                [routerLink]="'/compareanswer/' + this.examId + '/' + q.id"
-                class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3 justify-content-center"
-                pButton
-                type="button"
-                [tooltipZIndex]="'3000'"
-                [pTooltip]="'scanexam.voirtoutescopiestooltip' | translate"
-              >
-                <span jhiTranslate="scanexam.voirtoutescopies"></span>
-              </button>
-            </div>
-
-            <div class="col" *ngIf="q.answeredSheets !== 0 && q.answeredSheets < dataExam.sheets.length">
-              <button
-                [routerLink]="
-                  '/answer/' +
-                  this.examId +
-                  '/' +
-                  (questionNumeros.indexOf(q.numero) + 1) +
-                  '/' +
-                  (q.firstUnmarkedSheet / pageInTemplate + 1)
-                "
-                class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3 justify-content-center"
-                pButton
-                type="button"
-                [tooltipZIndex]="'3000'"
-                [pTooltip]="'scanexam.continuetooltip' | translate"
-              >
-                <span jhiTranslate="scanexam.continue"></span>
-              </button>
-              <button
-                [routerLink]="'/compareanswer/' + this.examId + '/' + q.id"
-                class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3 justify-content-center"
-                pButton
-                type="button"
-                [tooltipZIndex]="'3000'"
-                [pTooltip]="'scanexam.voirtoutescopiestooltip' | translate"
-              >
-                <span jhiTranslate="scanexam.voirtoutescopies"></span>
-              </button>
-            </div>
-            <div class="col" *ngIf="q.answeredSheets === dataExam.sheets.length">
-              <button
-                [routerLink]="'/answer/' + this.examId + '/' + (questionNumeros.indexOf(q.numero) + 1) + '/' + '1'"
-                class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3 justify-content-center"
-                pButton
-                type="button"
-                [tooltipZIndex]="'3000'"
-                [pTooltip]="'scanexam.voirtooltip' | translate"
-              >
-                <span jhiTranslate="scanexam.voir"></span>
-              </button>
-              <button
-                [routerLink]="'/compareanswer/' + this.examId + '/' + q.id"
-                class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3 justify-content-center"
-                pButton
-                type="button"
-                [tooltipZIndex]="'3000'"
-                [pTooltip]="'scanexam.voirtoutescopiestooltip' | translate"
-              >
-                <span jhiTranslate="scanexam.voirtoutescopies"></span>
-              </button>
-            </div>
-          </div>
-
-          <div class="row row-striped">
-            <div class="col align-self-center fw-bold">
-              <p class="font-weight-bold">{{ 'scanexam.total' | translate }}</p>
-            </div>
-            <div class="col align-self-center fw-bold">
-              <p class="font-weight-bold">
-                {{ getTotalAnswered() }} / {{ dataExam.sheets.length * dataExam.questions.length }} ({{
-                  getTotalAnswered() / (dataExam.sheets.length * dataExam.questions.length) | percent
-                }})
-              </p>
-            </div>
-            <div class="col"></div>
-          </div>
-        </div>
-      </p-tabpanel>
-
-      <p-tabpanel value="1">
-        <div class="container">
-          <div class="row row-striped" *ngFor="let s of dataExam.sheets; let index = index">
-            <div class="col align-self-center">{{ 'scanexam.sheet' | translate }} {{ index + 1 }}</div>
-            <div class="col align-self-center">
-              {{ s.answeredSheets }} / {{ dataExam.questions.length }} ({{ s.answeredSheets / dataExam.questions.length | percent }})
-            </div>
-            <div class="col" *ngIf="s.answeredSheets < dataExam.questions.length">
-              <button
-                [routerLink]="'/answer/' + this.examId + '/' + s.firstUnmarkedQuestion + '/' + (index + 1)"
-                class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
-                pButton
-                type="button"
-                [tooltipPosition]="'left'"
-                [pTooltip]="'scanexam.voircopieTooltip' | translate"
-                [tooltipZIndex]="'3000'"
-              >
-                <span>{{ 'scanexam.continue' | translate }}</span>
-              </button>
-            </div>
-            <div class="col" *ngIf="s.answeredSheets === dataExam.questions.length">
-              <button
-                [routerLink]="'/answer/' + this.examId + '/' + '1' + '/' + (index + 1)"
-                class="p-element p-ripple sm:w-full md:w-6 lg:w-4 xl:w-3"
-                pButton
-                type="button"
-                [tooltipPosition]="'right'"
-                [pTooltip]="'scanexam.voircopieTooltip' | translate"
-                [tooltipZIndex]="'3000'"
-              >
-                <span>{{ 'scanexam.voir' | translate }}</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="row row-striped">
-            <div class="col align-self-center fw-bold">
-              <p class="font-weight-bold">{{ 'scanexam.total' | translate }}</p>
-            </div>
-            <div class="col align-self-center fw-bold">
-              <p class="font-weight-bold">
-                {{ getTotalAnswered() }} / {{ dataExam.sheets.length * dataExam.questions.length }} ({{
-                  getTotalAnswered() / (dataExam.sheets.length * dataExam.questions.length) | percent
-                }})
-              </p>
-            </div>
-            <div class="col"></div>
-          </div>
-        </div>
-      </p-tabpanel>
-    </p-tabpanels>
-  </p-tabs>
-</div>
+}

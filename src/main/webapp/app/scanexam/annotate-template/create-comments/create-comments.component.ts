@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
 import { GradedCommentService } from 'app/entities/graded-comment/service/graded-comment.service';
@@ -16,34 +16,31 @@ import { TooltipModule } from 'primeng/tooltip';
 import { KnobModule } from 'primeng/knob';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { RatingModule } from 'primeng/rating';
-import { TranslateDirective } from '../../../shared/language/translate.directive';
 import { TextareaModule } from 'primeng/textarea';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { PrimeTemplate } from 'primeng/api';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { NgIf, NgFor } from '@angular/common';
+
 @Component({
   selector: 'jhi-create-comments',
   templateUrl: './create-comments.component.html',
   styleUrls: ['./create-comments.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
-    NgFor,
     FaIconComponent,
     InplaceModule,
     PrimeTemplate,
     FormsModule,
     InputTextModule,
     TextareaModule,
-    TranslateDirective,
     RatingModule,
     SelectButtonModule,
     KnobModule,
     TooltipModule,
     FileUploadModule,
-    TranslateModule,
+    TranslateDirective,
+    TranslatePipe,
   ],
 })
 export class CreateCommentsComponent implements OnInit {

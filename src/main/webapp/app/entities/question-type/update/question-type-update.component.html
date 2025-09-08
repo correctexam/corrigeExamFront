@@ -4,7 +4,7 @@
       <h2
         id="jhi-question-type-heading"
         data-cy="QuestionTypeCreateUpdateHeading"
-        jhiTranslate="gradeScopeIsticApp.questionType.home.createOrEditLabel"
+        [translate]="'gradeScopeIsticApp.questionType.home.createOrEditLabel'"
       >
         Create or edit a Question Type
       </h2>
@@ -13,7 +13,7 @@
         <jhi-alert-error></jhi-alert-error>
 
         <div class="row mb-3" [hidden]="editForm.get('id')!.value == null">
-          <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+          <label class="form-label" [translate]="'global.field.id'" for="field_id">ID</label>
           <input
             type="number"
             (mouseup)="$event.stopPropagation()"
@@ -27,26 +27,24 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.questionType.algoName" for="field_algoName">Algo Name</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.questionType.algoName'" for="field_algoName">Algo Name</label>
           <input type="text" class="form-control" name="algoName" id="field_algoName" data-cy="algoName" formControlName="algoName" />
-          <div *ngIf="editForm.get('algoName')!.invalid && (editForm.get('algoName')!.dirty || editForm.get('algoName')!.touched)">
-            <small
-              class="form-text text-danger"
-              *ngIf="editForm.get('algoName')?.errors?.required"
-              jhiTranslate="entity.validation.required"
-            >
-              This field is required.
-            </small>
-          </div>
+          @if (editForm.get('algoName')!.invalid && (editForm.get('algoName')!.dirty || editForm.get('algoName')!.touched)) {
+            <div>
+              @if (editForm.get('algoName')?.errors?.required) {
+                <small class="form-text text-danger" [translate]="'entity.validation.required'"> This field is required. </small>
+              }
+            </div>
+          }
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.questionType.endpoint" for="field_endpoint">Endpoint</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.questionType.endpoint'" for="field_endpoint">Endpoint</label>
           <input type="text" class="form-control" name="endpoint" id="field_endpoint" data-cy="endpoint" formControlName="endpoint" />
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gradeScopeIsticApp.questionType.jsFunction" for="field_jsFunction">Js Function</label>
+          <label class="form-label" [translate]="'gradeScopeIsticApp.questionType.jsFunction'" for="field_jsFunction">Js Function</label>
           <input
             type="text"
             class="form-control"
@@ -60,7 +58,7 @@
 
       <div>
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span [translate]="'entity.action.cancel'">Cancel</span>
         </button>
 
         <button
@@ -70,7 +68,7 @@
           [disabled]="editForm.invalid || isSaving"
           class="btn btn-primary"
         >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+          <fa-icon icon="save"></fa-icon>&nbsp;<span [translate]="'entity.action.save'">Save</span>
         </button>
       </div>
     </form>

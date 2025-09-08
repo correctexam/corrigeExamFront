@@ -1,11 +1,11 @@
 <div class="entity-list">
-  <h2 jhiTranslate="global.menu.entities.list.predictionlist">Prediction List</h2>
+  <h2 [translate]="'global.menu.entities.list.predictionlist'">Prediction List</h2>
   <div class="mb-3">
     <input #questionId type="number" class="form-control w-25 d-inline me-2" placeholder="Enter Exam ID" />
     <button
       type="button"
       class="btn btn-danger"
-      jhiTranslate="global.menu.entities.list.delpredictionbyid"
+      [translate]="'global.menu.entities.list.delpredictionbyid'"
       (click)="deleteByQuestion(questionId.value)"
     >
       <i class="fa fa-trash"></i> Delete All Predictions for Exam
@@ -13,7 +13,7 @@
     <button
       type="button"
       class="btn btn-danger"
-      jhiTranslate="global.menu.entities.list.delallpredictions"
+      [translate]="'global.menu.entities.list.delallpredictions'"
       (click)="deleteAllPredictions()"
     >
       <i class="fa fa-trash"></i> Delete All Predictions
@@ -22,33 +22,35 @@
   <table class="table table-striped">
     <thead>
       <tr>
-        <th jhiTranslate="global.menu.entities.list.id">ID</th>
-        <th jhiTranslate="global.menu.entities.list.questionid">Id de Question</th>
-        <th jhiTranslate="global.menu.entities.list.studentnumber">Numero de page</th>
-        <th jhiTranslate="global.menu.entities.list.questionnumber">Numero de Question</th>
-        <th jhiTranslate="global.menu.entities.list.predictiontext">Prediction Text</th>
-        <th jhiTranslate="global.menu.entities.list.actions">Actions</th>
+        <th [translate]="'global.menu.entities.list.id'">ID</th>
+        <th [translate]="'global.menu.entities.list.questionid'">Id de Question</th>
+        <th [translate]="'global.menu.entities.list.studentnumber'">Numero de page</th>
+        <th [translate]="'global.menu.entities.list.questionnumber'">Numero de Question</th>
+        <th [translate]="'global.menu.entities.list.predictiontext'">Prediction Text</th>
+        <th [translate]="'global.menu.entities.list.actions'">Actions</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let prediction of predictions">
-        <td>{{ prediction.id }}</td>
-        <td>{{ prediction.questionId }}</td>
-        <td>{{ prediction.sheetId }}</td>
-        <td>{{ prediction.questionNumber }}</td>
-        <td>{{ prediction.text }}</td>
-        <td>
-          <button *ngIf="prediction.id !== undefined" type="button" class="btn btn-primary" (click)="view(prediction.id)">
-            <i class="fa fa-eye"></i> View
-          </button>
-          <button *ngIf="prediction.id !== undefined" type="button" class="btn btn-warning" (click)="edit(prediction.id)">
-            <i class="fa fa-pencil"></i> Edit
-          </button>
-          <button *ngIf="prediction.id !== undefined" type="button" class="btn btn-danger" (click)="delete(prediction.id)">
-            <i class="fa fa-trash"></i> Delete
-          </button>
-        </td>
-      </tr>
+      @for (prediction of predictions; track prediction) {
+        <tr>
+          <td>{{ prediction.id }}</td>
+          <td>{{ prediction.questionId }}</td>
+          <td>{{ prediction.sheetId }}</td>
+          <td>{{ prediction.questionNumber }}</td>
+          <td>{{ prediction.text }}</td>
+          <td>
+            @if (prediction.id !== undefined) {
+              <button type="button" class="btn btn-primary" (click)="view(prediction.id)"><i class="fa fa-eye"></i> View</button>
+            }
+            @if (prediction.id !== undefined) {
+              <button type="button" class="btn btn-warning" (click)="edit(prediction.id)"><i class="fa fa-pencil"></i> Edit</button>
+            }
+            @if (prediction.id !== undefined) {
+              <button type="button" class="btn btn-danger" (click)="delete(prediction.id)"><i class="fa fa-trash"></i> Delete</button>
+            }
+          </td>
+        </tr>
+      }
     </tbody>
   </table>
 </div>

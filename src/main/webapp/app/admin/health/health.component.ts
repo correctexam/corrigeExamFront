@@ -5,16 +5,15 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HealthService } from './health.service';
 import { Health, HealthDetails, HealthStatus } from './health.model';
 import { HealthModalComponent } from './modal/health-modal.component';
-import { TranslateModule } from '@ngx-translate/core';
-import { NgIf, NgFor, NgClass, KeyValuePipe } from '@angular/common';
+import { TranslateDirective, TranslatePipe } from '@ngx-translate/core';
+import { NgClass, KeyValuePipe, CommonModule } from '@angular/common';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { TranslateDirective } from '../../shared/language/translate.directive';
 
 @Component({
   selector: 'jhi-health',
   templateUrl: './health.component.html',
   standalone: true,
-  imports: [TranslateDirective, FaIconComponent, NgIf, NgFor, NgClass, KeyValuePipe, TranslateModule],
+  imports: [CommonModule, FaIconComponent, NgClass, KeyValuePipe, TranslateDirective, TranslatePipe],
 })
 export class HealthComponent implements OnInit {
   health?: Health;
