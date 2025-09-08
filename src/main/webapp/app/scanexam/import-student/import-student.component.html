@@ -250,7 +250,7 @@
             }
           </ng-template>
           @for (student of students; track student; let ii = $index) {
-            <ng-template pTemplate="body" let-ii="index" let-student [ngForOf]="students">
+            <ng-template pTemplate="body">
               <tr [ngClass]="{ alreadyimported: true }">
                 <td>
                   {{ students.indexOf(student) + 1 }}

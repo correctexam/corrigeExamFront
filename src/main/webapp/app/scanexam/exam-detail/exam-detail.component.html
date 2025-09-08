@@ -2,7 +2,7 @@
   <p-toast></p-toast>
   <p-dialog [header]="'scanexam.firsthelpTitle' | translate" [(visible)]="firsthelp" [style]="{ width: '90vw' }">
     <div style="display: flex; justify-content: space-around">
-      <span [translate]="'scanexam.firsthelpdetail'"></span>
+      <span [innerHTML]="'scanexam.firsthelpdetail' | translate"></span>
     </div>
     <BR />
     <BR />
@@ -16,7 +16,7 @@
   </p-dialog>
 
   <p-dialog [header]="'scanexam.showInfoExamTitle' | translate" [(visible)]="showInfoExam" [style]="{ width: '50vw' }">
-    <span [translate]="'scanexam.infoExamDetails'" [translateParams]="infoExamDetail"></span>
+    <div [innerHTML]="'scanexam.infoExamDetails' | translate: infoExamDetail"></div>
     <ng-template pTemplate="footer">
       <button type="button" pButton label="ok" (click)="showInfoExam = false"></button>
     </ng-template>
