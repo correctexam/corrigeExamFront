@@ -1,3 +1,4 @@
+import { map } from 'rxjs/operators';
 /* eslint-disable no-console */
 /* eslint-disable spaced-comment */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
@@ -126,6 +127,12 @@ addEventListener('message', e => {
         dbs.set(e.data.payload.examId, db1);
       }
       db1.addNonAligneImage(_sqlite3, e.data);
+      break;
+    }
+    case 'cleanOutDatedCached': {
+      console.error('cleanOutDatedCached', e.data);
+      cleanOutdatedCache(e.data);
+
       break;
     }
 
@@ -480,6 +487,32 @@ addEventListener('message', e => {
   }
 });
 
+async function cleanOutdatedCache(data: any) {
+  try {
+    console.error('cleanOutdatedCache for ', data);
+
+    const examIds = data.payload.examIds;
+    const cacheNames: string[] = examIds.map((id: number) => '' + id + '.sqlite3');
+    const cacheJournalNames = examIds.map((id: number) => '' + id + '.sqlite3-journal');
+    cacheNames.push(...cacheJournalNames);
+    if (navigator.storage.getDirectory !== undefined) {
+      const root = await navigator.storage.getDirectory();
+      const keys = (root as any).keys();
+      let next = await keys.next();
+      while (next.value) {
+        if (next.value.endsWith('.sqlite3') || (next.value.endsWith('.sqlite3-journal') && !cacheNames.includes(next.value))) {
+          await root.removeEntry(next.value);
+        }
+        next = await keys.next();
+      }
+    }
+  } finally {
+    postMessage({
+      msg: data.msg,
+      uid: data.uid,
+    });
+  }
+}
 /*
   addTemplate(elt: AlignImage ): Promise<number>;
   countNonAlignWithPageNumber(examId:number, pageInscan:number): Promise<number>;
@@ -623,9 +656,9 @@ class DB {
         const keys = (root as any).keys();
         let next = await keys.next();
         while (next.value !== undefined) {
-          if (next.value.endsWith('.sqlite3')) {
+          if (next.value === this.examName + '.sqlite3') {
             await root.removeEntry(next.value);
-          } else if (next.value.endsWith('sqlite3-journal')) {
+          } else if (next.value === this.examName + 'sqlite3-journal') {
             await root.removeEntry(next.value);
           }
           next = await keys.next();

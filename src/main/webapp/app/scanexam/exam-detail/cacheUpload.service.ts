@@ -316,7 +316,7 @@ export class CacheUploadService {
       let data: Blob = (await firstValueFrom(this.getCache(examId + 'indexdb.json'))) as Blob;
       if (data.size === 0) {
         data = await firstValueFrom(this.getCache(examId + '_exam_template_indexdb.json'));
-
+        console.error('data', data, showFailMessage);
         if (data.size === 0) {
           if (showFailMessage) {
             messageService.add({

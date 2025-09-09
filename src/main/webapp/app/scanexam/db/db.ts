@@ -34,6 +34,21 @@ export interface NonAlignImage {
   value: string;
 }
 
+export async function cleanOutDatedCached(examIds: number[]) {
+  const databasesNamedToKeep = examIds.map(id => 'correctExam' + id);
+  const databases = await Dexie.getDatabaseNames();
+  const databasesToRemove = databases.filter(dbname => dbname.startsWith('correctExam') && !databasesNamedToKeep.includes(dbname));
+  for (let i = 0; i < databasesToRemove.length; i++) {
+    try {
+      await Dexie.delete(databasesToRemove[i]);
+      // eslint-disable-next-line no-console
+      console.log('remove old database', databasesToRemove[i]);
+    } catch (e) {
+      console.error('unable to remove old database', databasesToRemove[i], e);
+    }
+  }
+}
+
 export class ExamIndexDB extends Dexie {
   private exams!: Table<Exam, number>;
   private templates!: Table<Template, number>;
@@ -393,6 +408,10 @@ export class AppDB implements CacheService {
   /* async populate() {
   } */
 
+  cleanOutDatedCached(examIds: number[]): Promise<void> {
+    return cleanOutDatedCached(examIds);
+  }
+
   async resetDatabase(examId: number): Promise<void> {
     let db1 = this.dbs.get(examId);
     if (db1 === undefined) {
@@ -730,6 +749,7 @@ export class AppDB implements CacheService {
 }
 
 export interface CacheService {
+  cleanOutDatedCached(examIds: number[]): Promise<void>;
   resetDatabase(examId: number): Promise<void>;
   removeExam(examId: number): Promise<void>;
   removeElementForExam(examId: number): Promise<void>;

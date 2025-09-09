@@ -17,6 +17,11 @@ export class CacheServiceImpl implements CacheService {
       (this.service as SqliteCacheService).load();
     }
   }
+
+  cleanOutDatedCached(examIds: number[]): Promise<void> {
+    return this.service.cleanOutDatedCached(examIds);
+  }
+
   getNonAlignImagesForPageNumbers(examId: number, pages: number[]): Promise<ImageDB[]> {
     return this.service.getNonAlignImagesForPageNumbers(examId, pages);
   }

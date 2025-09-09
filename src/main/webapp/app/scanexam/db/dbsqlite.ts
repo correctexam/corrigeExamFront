@@ -201,6 +201,14 @@ export class SqliteCacheService implements CacheService {
     workersqllite.postMessage({ msg: 'load', uid: '0' });
   }
 
+  async cleanOutDatedCached(examIds: number[]) {
+    const el1 = {
+      examIds: examIds,
+    };
+    console.error('cleanOutDatedCached', el1);
+    return this._dispatch<void>('cleanOutDatedCached', el1).toPromise();
+  }
+
   async addAligneImage(elt: ImageDB) {
     const enc = new TextEncoder(); // always utf-8
     const el1 = {

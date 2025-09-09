@@ -190,7 +190,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
                 });
               } else {
                 if (this.exam?.scanfileId) {
-                  this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, false);
+                  this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, true);
                 } else {
                   this.blocked = false;
                 }
@@ -309,10 +309,12 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
       this.confirmationService.confirm({
         message: data,
         accept: () => {
+          this.blocked = true;
           this.examService.delete(this.exam!.id!).subscribe(() => {
             this.db
               .removeElementForExam(+this.examId)
               .then(() => {
+                this.blocked = false;
                 this.router.navigateByUrl('/course/' + this.course!.id);
               })
               .catch(() => {
