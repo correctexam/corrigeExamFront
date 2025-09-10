@@ -11,7 +11,7 @@ import { faSquarePollVertical as faSquarePollVertical } from '@fortawesome/free-
 import { faPenToSquare as faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { CourseService } from '../../entities/course/service/course.service';
 import { ICourse } from '../../entities/course/course.model';
-import { IExam } from '../../entities/exam/exam.model';
+import { IExam, getExamIdentifier } from '../../entities/exam/exam.model';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ConfirmationService, PrimeTemplate } from 'primeng/api';
@@ -179,7 +179,12 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
                     this.checkIfAlreadyAlign().then(res => {
                       if (res && this.exam?.scanfileId) {
                         this.showAssociation = true;
-                        this.initTemplate();
+                        this.checkNewCacheAvailable().then(res1 => {
+                          this.initTemplate();
+                          if (res1) {
+                            this.confirmDownloadNewCache();
+                          }
+                        });
                       } else {
                         this.blocked = false;
                       }
@@ -208,6 +213,14 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
         });
       }
     });
+  }
+
+  async checkNewCacheAvailable(): Promise<boolean> {
+    const p = await this.db.getExamTimestamp(+this.examId);
+    const localts = p !== undefined ? p : 0;
+    const s = await firstValueFrom(this.examService.getExamTimestamp(+this.examId));
+    const serverts = s.body !== undefined ? s.body : 0;
+    return serverts > localts;
   }
 
   async checkIfAlreadyAlign(): Promise<boolean> {
@@ -370,6 +383,21 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     this.progress = v;
   }
 
+  confirmDownloadNewCache(): any {
+    this.translateService.get('scanexam.confirmdownloadnewcache').subscribe(data1 => {
+      this.confirmationService.confirm({
+        message: data1,
+        accept: () => {
+          this.blocked = true;
+          this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, true);
+        },
+        reject: () => {
+          this.blocked = false;
+        },
+      });
+    });
+  }
+
   confirmDownload(): any {
     this.translateService.get('scanexam.confirmdownloadcache').subscribe(data1 => {
       this.confirmationService.confirm({
@@ -377,6 +405,9 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
         accept: () => {
           this.blocked = true;
           this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, true);
+        },
+        reject: () => {
+          this.blocked = false;
         },
       });
     });

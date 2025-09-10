@@ -112,6 +112,7 @@
     "uploadstudentsheetencours": "Carregamento do PDF da prova de um estudante da disciplina para o servidor",
     "uploadstudentsheetencoursdetail": "(Pode demorar um pouco)",
     "confirmdownloadcache": "Tem certeza de querer descarregar a memória tampão do servidor para o navegador? Esta ação apagará sua base local de imagens previamente alinhadas deste dispositivo.",
+    "confirmdownloadnewcache": "Um cache mais atualizado está disponível no servidor. Deseja baixar o cache do servidor para o navegador? Isso excluirá sua base de imagens local neste equipamento que você alinhou ou baixou anteriormente.",
     "downloadcacheok": "Descarregar um arquivo a partir o servidor",
     "downloadcacheokc": "Descarregamento da memória tampão a partir o servidor",
     "downloadcacheokdetail": "Importação da base de dados local bem-sucedida",

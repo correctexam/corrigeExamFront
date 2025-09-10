@@ -374,7 +374,7 @@ export class CreerexamComponentNbGrader implements OnInit, AfterViewInit, CacheU
       templateId: template1.body?.id,
     };
     const exam1 = await firstValueFrom(this.examService.create(exam));
-    await this.cacheServiceImpl.addExam(exam1.body!.id!);
+    await this.cacheServiceImpl.addExam(exam1.body!.id!, new Date());
     // template.content = this.editForm.get(['content'])!.value;
     // const t = await firstValueFrom( this.templateService.create(template))
     const htmlfilesToProcess: string[] = [];

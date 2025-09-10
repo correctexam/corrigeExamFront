@@ -1,4 +1,3 @@
-import { map } from 'rxjs/operators';
 /* eslint-disable no-console */
 /* eslint-disable spaced-comment */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
@@ -130,7 +129,6 @@ addEventListener('message', e => {
       break;
     }
     case 'cleanOutDatedCached': {
-      console.error('cleanOutDatedCached', e.data);
       cleanOutdatedCache(e.data);
 
       break;
@@ -402,6 +400,18 @@ addEventListener('message', e => {
       db1.addTemplate(_sqlite3, e.data);
       break;
     }
+
+    case 'getExamTimestamp': {
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.payload.examId);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.payload.examId, db1);
+      }
+      db1.getExamTimestamp(_sqlite3, e.data);
+      break;
+    }
+
     case 'countNonAlignWithPageNumber': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
@@ -553,6 +563,12 @@ class DB {
       this.db.exec('CREATE TABLE IF NOT EXISTS template(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
       this.db.exec('CREATE TABLE IF NOT EXISTS align(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
       this.db.exec('CREATE TABLE IF NOT EXISTS nonalign(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
+      this.db.exec('create table IF NOT EXISTS exam(id INTEGER NOT NULL PRIMARY KEY, DT datetime default current_timestamp)');
+      this.db.exec({
+        sql: 'INSERT OR IGNORE INTO exam(id) VALUES (?)',
+        bind: [1],
+      });
+
       //  this.db.exec('CREATE UNIQUE INDEX templatepage ON template(page)');
       //   this.db.exec('CREATE UNIQUE INDEX alignpage ON align(page)');
       //  this.db.exec('CREATE UNIQUE INDEX nonalignpage ON nonalign(page)');
@@ -1337,7 +1353,7 @@ class DB {
     }
   }
 
-  // addExam(examId:number): Promise<number>;
+  // addExam(examId:number): initemptyDbPromise<number>;
 
   addExam(sqlite3: any, data: any) {
     try {
@@ -1347,6 +1363,21 @@ class DB {
         msg: data.msg,
         uid: data.uid,
       });
+    }
+  }
+
+  getExamTimestamp(sqlite3: any, data: any) {
+    //        const payload = data.payload;
+    this.initDb(sqlite3);
+    try {
+      const timestamp = this.db.selectValue('select DT from exam where id=1');
+      postMessage({
+        msg: data.msg,
+        uid: data.uid,
+        payload: new Date(timestamp).getTime(),
+      });
+    } finally {
+      this.close();
     }
   }
 

@@ -5,6 +5,7 @@ import { ExportOptions, ImportOptions } from 'dexie-export-import';
 
 export interface Exam {
   id?: number;
+  creationDate?: number;
 }
 
 export interface Template {
@@ -56,8 +57,8 @@ export class ExamIndexDB extends Dexie {
   private nonAlignImages!: Table<NonAlignImage, number>;
 
   constructor(private examId: number) {
-    //    super('ngdexieliveQuery');
     super('correctExam' + examId);
+    // console.error('create database correctExam' + examId);
     this.version(3).stores({
       exams: '++id',
       templates: '++id, examId, [examId+pageNumber]',
@@ -379,10 +380,20 @@ export class ExamIndexDB extends Dexie {
   async getAlignSortByPageNumber() {
     return await this.alignImages.where({ examId: this.examId }).sortBy('pageNumber');
   }
-  async addExam() {
+  async addExam(d: Date) {
     return await this.exams.add({
       id: this.examId,
+      creationDate: d ? d.getTime() : new Date().getTime(),
     });
+  }
+
+  async getExamTimestamp(): Promise<number> {
+    const e = await this.exams
+      .where({
+        id: this.examId,
+      })
+      .first();
+    return e?.creationDate ?? 0;
   }
 
   async addTemplate(elt: AlignImage) {
@@ -659,13 +670,22 @@ export class AppDB implements CacheService {
     }
     return db1.getAlignSortByPageNumber();
   }
-  async addExam(examId: number): Promise<number> {
+  async addExam(examId: number, d: Date): Promise<number> {
     let db1 = this.dbs.get(examId);
     if (db1 === undefined) {
       db1 = new ExamIndexDB(examId);
       this.dbs.set(examId, db1);
     }
-    return db1.addExam();
+    return db1.addExam(d);
+  }
+
+  async getExamTimestamp(examId: number): Promise<number> {
+    let db1 = this.dbs.get(examId);
+    if (db1 === undefined) {
+      db1 = new ExamIndexDB(examId);
+      this.dbs.set(examId, db1);
+    }
+    return db1.getExamTimestamp();
   }
 
   async addTemplate(elt: AlignImage): Promise<number> {
@@ -779,7 +799,7 @@ export interface CacheService {
 
   getNonAlignSortByPageNumber(examId: number): Promise<ImageDB[]>;
   getAlignSortByPageNumber(examId: number): Promise<ImageDB[]>;
-  addExam(examId: number): Promise<number>;
+  addExam(examId: number, d: Date): Promise<number>;
   addTemplate(elt: AlignImage): Promise<number>;
   countNonAlignWithPageNumber(examId: number, pageInscan: number): Promise<number>;
   countAlignWithPageNumber(examId: number, pageInscan: number): Promise<number>;
@@ -790,6 +810,7 @@ export interface CacheService {
   removePageNonAlignForExamForPagesAndReorder(examId: number, pages: number[]): Promise<void>;
   moveTemplatePages(examId: number, pageNumber: number, lastPage: number): Promise<void>;
   removePageTemplateForExamForPage(examId: number, lastPage: number): Promise<void>;
+  getExamTimestamp(examId: number): Promise<number>;
 }
 
 export const db = new AppDB();

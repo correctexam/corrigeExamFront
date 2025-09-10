@@ -112,6 +112,7 @@
     "uploadcacheencoursdetail": "(This may take a while)",
 
     "confirmdownloadcache": "Are sure you want to download the cache from the server to the browser. This will remove your local image database to that equipment previously aligned.",
+    "confirmdownloadnewcache": "A more up-to-date cache is available on the server. Do you want to download the cache from the server to the browser? This will delete your local image database on this device that you have previously aligned or downloaded.",
     "downloadcacheok": "Download file from server",
     "downloadcacheokdetail": "Import from local database successful",
     "downloadcacheko": "Download file from server",
