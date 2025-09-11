@@ -27,7 +27,6 @@ import { HasAnyAuthorityDirective } from '../shared/auth/has-any-authority.direc
 
 import { ButtonModule } from 'primeng/button';
 import { ExamService } from 'app/entities/exam/service/exam.service';
-import { CacheService } from '../scanexam/db/db';
 import { CacheServiceImpl } from 'app/scanexam/db/CacheServiceImpl';
 
 interface Upload {

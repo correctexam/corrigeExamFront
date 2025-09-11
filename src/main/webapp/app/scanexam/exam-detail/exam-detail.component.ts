@@ -11,7 +11,7 @@ import { faSquarePollVertical as faSquarePollVertical } from '@fortawesome/free-
 import { faPenToSquare as faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { CourseService } from '../../entities/course/service/course.service';
 import { ICourse } from '../../entities/course/course.model';
-import { IExam, getExamIdentifier } from '../../entities/exam/exam.model';
+import { IExam } from '../../entities/exam/exam.model';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ConfirmationService, PrimeTemplate } from 'primeng/api';
