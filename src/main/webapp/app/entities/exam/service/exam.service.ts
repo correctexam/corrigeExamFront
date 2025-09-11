@@ -75,6 +75,12 @@ export class ExamService {
     });
   }
 
+  getExamTimestamp(id: number): Observable<HttpResponse<any>> {
+    return this.http.get(this.applicationConfigService.getEndpointFor('api') + '/getCacheTimeStamp' + `/${id}`, {
+      observe: 'response',
+    });
+  }
+
   addExamToCollectionIfMissing(examCollection: IExam[], ...examsToCheck: (IExam | null | undefined)[]): IExam[] {
     const exams: IExam[] = examsToCheck.filter(isPresent);
     if (exams.length > 0) {

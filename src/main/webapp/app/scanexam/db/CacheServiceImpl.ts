@@ -17,6 +17,11 @@ export class CacheServiceImpl implements CacheService {
       (this.service as SqliteCacheService).load();
     }
   }
+
+  cleanOutDatedCached(examIds: number[]): Promise<void> {
+    return this.service.cleanOutDatedCached(examIds);
+  }
+
   getNonAlignImagesForPageNumbers(examId: number, pages: number[]): Promise<ImageDB[]> {
     return this.service.getNonAlignImagesForPageNumbers(examId, pages);
   }
@@ -104,9 +109,14 @@ export class CacheServiceImpl implements CacheService {
   getAlignSortByPageNumber(examId: number): Promise<ImageDB[]> {
     return this.service.getAlignSortByPageNumber(examId);
   }
-  addExam(examId: number): Promise<number> {
-    return this.service.addExam(examId);
+  addExam(examId: number, d: Date): Promise<number> {
+    return this.service.addExam(examId, d);
   }
+
+  getExamTimestamp(examId: number): Promise<number> {
+    return this.service.getExamTimestamp(examId);
+  }
+
   addTemplate(elt: AlignImage): Promise<number> {
     return this.service.addTemplate(elt);
   }

@@ -329,7 +329,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   private async saveData(): Promise<any> {
     // Change if partial update
     if (!this.partialAlign) {
-      await this.db.addExam(+this.examId);
+      await this.db.addExam(+this.examId, new Date());
     }
 
     this.translateService.get('scanexam.exportcacheencours').subscribe(res => (this.message = '' + res));

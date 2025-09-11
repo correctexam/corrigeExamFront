@@ -201,6 +201,13 @@ export class SqliteCacheService implements CacheService {
     workersqllite.postMessage({ msg: 'load', uid: '0' });
   }
 
+  async cleanOutDatedCached(examIds: number[]) {
+    const el1 = {
+      examIds: examIds,
+    };
+    return this._dispatch<void>('cleanOutDatedCached', el1).toPromise();
+  }
+
   async addAligneImage(elt: ImageDB) {
     const enc = new TextEncoder(); // always utf-8
     const el1 = {
@@ -334,11 +341,19 @@ export class SqliteCacheService implements CacheService {
       examId: examId,
     }).toPromise();
   }
-  addExam(examId: number): Promise<any> {
+  addExam(examId: number, d: Date): Promise<any> {
     return this._dispatch('addExam', {
+      examId: examId,
+      d: d,
+    }).toPromise();
+  }
+
+  getExamTimestamp(examId: number): Promise<any> {
+    return this._dispatch('getExamTimestamp', {
       examId: examId,
     }).toPromise();
   }
+
   addTemplate(elt: AlignImage): Promise<any> {
     const enc = new TextEncoder(); // always utf-8
 

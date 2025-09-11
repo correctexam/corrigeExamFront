@@ -302,7 +302,10 @@ export class CoursdetailsComponent implements OnInit {
         message: data,
         accept: () => {
           if (this.course !== undefined) {
+            this.blocked = true;
             this.courseService.delete(this.course.id!).subscribe(e => {
+              this.blocked = false;
+
               this.router.navigateByUrl('/');
             });
           }

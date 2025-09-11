@@ -112,6 +112,7 @@
     "uploadstudentsheetencours": "Upload du pdf de la copie d'un étudiant vers le serveur en cours",
     "uploadstudentsheetencoursdetail": "(Cela peut prendre un peu de temps)",
     "confirmdownloadcache": "Êtes-vous sûr de vouloir télécharger le cache du serveur vers le navigateur ? Cela supprimera votre base d'images locale à cet équipement préalablement alignées.",
+    "confirmdownloadnewcache": "Un cache plus à jour est disponible sur le serveur. Voulez-vous télécharger le cache du serveur vers le navigateur ? Cela supprimera votre base d'images locale à cet équipement que vous avez préalablement alignées ou téléchargées.",
     "downloadcacheok": "Télécharger un fichier depuis le serveur",
     "downloadcacheokc": "Téléchargement du cache depuis le serveur",
     "downloadcacheokdetail": "Import de la base de données locale réussi",

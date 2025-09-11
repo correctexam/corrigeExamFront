@@ -128,6 +128,11 @@ addEventListener('message', e => {
       db1.addNonAligneImage(_sqlite3, e.data);
       break;
     }
+    case 'cleanOutDatedCached': {
+      cleanOutdatedCache(e.data);
+
+      break;
+    }
 
     case 'resetDatabase': {
       let db1 = dbs.get(e.data.payload.examId);
@@ -395,6 +400,18 @@ addEventListener('message', e => {
       db1.addTemplate(_sqlite3, e.data);
       break;
     }
+
+    case 'getExamTimestamp': {
+      let db1 = dbs.get(e.data.payload.examId);
+      if (db1 === undefined) {
+        db1 = new DB(e.data.payload.examId);
+        db1.initemptyDb(_sqlite3);
+        dbs.set(e.data.payload.examId, db1);
+      }
+      db1.getExamTimestamp(_sqlite3, e.data);
+      break;
+    }
+
     case 'countNonAlignWithPageNumber': {
       let db1 = dbs.get(e.data.payload.examId);
       if (db1 === undefined) {
@@ -480,6 +497,32 @@ addEventListener('message', e => {
   }
 });
 
+async function cleanOutdatedCache(data: any) {
+  try {
+    console.error('cleanOutdatedCache for ', data);
+
+    const examIds = data.payload.examIds;
+    const cacheNames: string[] = examIds.map((id: number) => '' + id + '.sqlite3');
+    const cacheJournalNames = examIds.map((id: number) => '' + id + '.sqlite3-journal');
+    cacheNames.push(...cacheJournalNames);
+    if (navigator.storage.getDirectory !== undefined) {
+      const root = await navigator.storage.getDirectory();
+      const keys = (root as any).keys();
+      let next = await keys.next();
+      while (next.value) {
+        if (next.value.endsWith('.sqlite3') || (next.value.endsWith('.sqlite3-journal') && !cacheNames.includes(next.value))) {
+          await root.removeEntry(next.value);
+        }
+        next = await keys.next();
+      }
+    }
+  } finally {
+    postMessage({
+      msg: data.msg,
+      uid: data.uid,
+    });
+  }
+}
 /*
   addTemplate(elt: AlignImage ): Promise<number>;
   countNonAlignWithPageNumber(examId:number, pageInscan:number): Promise<number>;
@@ -520,6 +563,12 @@ class DB {
       this.db.exec('CREATE TABLE IF NOT EXISTS template(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
       this.db.exec('CREATE TABLE IF NOT EXISTS align(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
       this.db.exec('CREATE TABLE IF NOT EXISTS nonalign(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
+      this.db.exec('create table IF NOT EXISTS exam(id INTEGER NOT NULL PRIMARY KEY, DT datetime default current_timestamp)');
+      this.db.exec({
+        sql: 'INSERT OR IGNORE INTO exam(id) VALUES (?)',
+        bind: [1],
+      });
+
       //  this.db.exec('CREATE UNIQUE INDEX templatepage ON template(page)');
       //   this.db.exec('CREATE UNIQUE INDEX alignpage ON align(page)');
       //  this.db.exec('CREATE UNIQUE INDEX nonalignpage ON nonalign(page)');
@@ -623,9 +672,9 @@ class DB {
         const keys = (root as any).keys();
         let next = await keys.next();
         while (next.value !== undefined) {
-          if (next.value.endsWith('.sqlite3')) {
+          if (next.value === this.examName + '.sqlite3') {
             await root.removeEntry(next.value);
-          } else if (next.value.endsWith('sqlite3-journal')) {
+          } else if (next.value === this.examName + 'sqlite3-journal') {
             await root.removeEntry(next.value);
           }
           next = await keys.next();
@@ -1304,7 +1353,7 @@ class DB {
     }
   }
 
-  // addExam(examId:number): Promise<number>;
+  // addExam(examId:number): initemptyDbPromise<number>;
 
   addExam(sqlite3: any, data: any) {
     try {
@@ -1314,6 +1363,21 @@ class DB {
         msg: data.msg,
         uid: data.uid,
       });
+    }
+  }
+
+  getExamTimestamp(sqlite3: any, data: any) {
+    //        const payload = data.payload;
+    this.initDb(sqlite3);
+    try {
+      const timestamp = this.db.selectValue('select DT from exam where id=1');
+      postMessage({
+        msg: data.msg,
+        uid: data.uid,
+        payload: new Date(timestamp).getTime(),
+      });
+    } finally {
+      this.close();
     }
   }
 

@@ -26,6 +26,9 @@ import { DrawerModule } from 'primeng/drawer';
 import { HasAnyAuthorityDirective } from '../shared/auth/has-any-authority.directive';
 
 import { ButtonModule } from 'primeng/button';
+import { ExamService } from 'app/entities/exam/service/exam.service';
+import { CacheService } from '../scanexam/db/db';
+import { CacheServiceImpl } from 'app/scanexam/db/CacheServiceImpl';
 
 interface Upload {
   progress: number;
@@ -117,6 +120,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     private loginService: LoginService,
     private zone: NgZone,
     private http: HttpClient,
+    private examService: ExamService,
+    private db: CacheServiceImpl,
   ) {}
 
   ngOnInit(): void {
@@ -153,7 +158,19 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.accountService
       .getAuthenticationState()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(account => (this.account = account));
+      .subscribe(account => {
+        this.account = account;
+        if (account) {
+          this.examService.query().subscribe(res => {
+            if (res.body) {
+              const examIds = res.body.map(exam => (exam.id ? exam.id : 0));
+              this.db.cleanOutDatedCached(examIds).then(() => {
+                console.log('cleanOutDatedCached done');
+              });
+            }
+          });
+        }
+      });
 
     this.translateService.get('home.creercours').subscribe(() => {
       this.initCmpt();
