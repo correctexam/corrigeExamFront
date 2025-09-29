@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Signal, signal } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
@@ -77,7 +77,7 @@ export class ImportStudentComponent implements OnInit {
   protected dataset: Std[] = [];
   protected blocked = false;
   protected courseid: string | undefined = undefined;
-  protected students: Std[] = [];
+  protected students = signal<Std[]>([]);
   private course: ICourse | undefined;
   /** The ongoing list of students to process and add */
   private emailsToAdd: string[][] | undefined = undefined;
@@ -330,7 +330,7 @@ export class ImportStudentComponent implements OnInit {
    */
   private getNonEmptyPropValues(prop: keyof Std): string[] {
     // Checking all the inputs together
-    const data = [...this.dataset, ...this.students, this.firstLine];
+    const data = [...this.dataset, ...this.students(), this.firstLine];
     return data.map(e => e[prop]).filter((str): str is string => typeof str === 'string' && str.length > 0);
   }
 
@@ -419,7 +419,7 @@ export class ImportStudentComponent implements OnInit {
 
   loadEtudiants(): void {
     this.http.get<Array<Std>>(this.applicationConfigService.getEndpointFor('api/getstudentcours/' + this.courseid)).subscribe(s => {
-      this.students = s;
+      this.students.update(() => [...s]);
     });
   }
 }
