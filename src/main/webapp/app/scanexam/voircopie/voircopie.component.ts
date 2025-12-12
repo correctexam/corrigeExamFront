@@ -139,7 +139,6 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   constructor(
     protected applicationConfigService: ApplicationConfigService,
     private http: HttpClient,
-
     public examService: ExamService,
     public studentService: StudentService,
     protected activatedRoute: ActivatedRoute,
@@ -331,6 +330,7 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
       this.router.navigateByUrl('/copie/' + this.uuid + '/' + q);
     }
   }
+
   @HostListener('window:keydown.shift.ArrowRight', ['$event'])
   nextQuestion(event: KeyboardEvent): void {
     event.preventDefault();
@@ -551,7 +551,13 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
           width: finalW,
           height: finalH,
         })
-        .subscribe(res => resolve({ i: new ImageData(new Uint8ClampedArray(res), finalW, finalH), w: finalW, h: finalH }));
+        .subscribe(res =>
+          resolve({
+            i: new ImageData(new Uint8ClampedArray(res), finalW, finalH),
+            w: finalW,
+            h: finalH,
+          }),
+        );
     });
   }
 
@@ -615,44 +621,28 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
       const examName = this.exam!.name!;
       const questionNumero = this.questions![0].numero!;
       const url = window.location.href;
-      const ten = `Dear Prof,%0D%0A
-My name is ${firsName} ${lastName},%0D%0A
-I have the exam ${examName}. Looking at the answer key for this question ${questionNumero} available here (${url}), I could not understand my mistake.%0D%0A
-%0D%0A%0D%0A
-///EXPLAIN YOUR PROBLEM///%0D%0A
-%0D%0A%0D%0A
-Thank you in advance for the time taken to answer this email.%0D%0A
-Best regards,%0D%0A
-${firsName}
-`;
-      const tfr = `Bonjour,%0D%0A
-je m'appelle ${firsName} ${lastName},%0D%0A
-J'ai passé l'examen ${examName}. En regardant le corrigé de la question ${questionNumero} accessible ici (${url}), je ne comprends pas mon erreur.%0D%0A
-%0D%0A%0D%0A
-///EXPLIQUER VOTRE PROBLEME///%0D%0A
-%0D%0A%0D%0A
-Merci par avance pour le temps pris pour répondre à cet email.%0D%0A
-Cordialement,%0D%0A
-${firsName}
-`;
+      let emailSubject: string;
+      let emailBody: string;
 
       if (this.translateService.currentLang === 'fr') {
-        this.email =
-          'mailto:' +
-          emails.filter(e => e !== undefined && e !== '').join(',') +
-          "?subject=Retour sur l'examen " +
-          this.exam!.name +
-          '&body=' +
-          tfr;
+        emailSubject = "Retour sur l'examen ";
+        emailBody = frenchMessageBody(firsName, lastName, examName, questionNumero, url);
+      } else if (this.translateService.currentLang === 'pt') {
+        emailSubject = 'Esclarecimentos sobre a avaliacao ';
+        emailBody = portugueseMessageBody(firsName, lastName, examName, questionNumero, url);
       } else {
-        this.email =
-          'mailto:' +
-          emails.filter(e => e !== undefined && e !== '').join(',') +
-          '?subject=Feedback on your ewam ' +
-          this.exam!.name +
-          '&body=' +
-          ten;
+        emailSubject = 'Review of the on your exam ';
+        emailBody = englishMessageBody(firsName, lastName, examName, questionNumero, url);
       }
+
+      this.email =
+        'mailto:' +
+        emails.filter(e => e !== undefined && e !== '').join(',') +
+        '?subject=' +
+        emailSubject +
+        this.exam!.name +
+        '&body=' +
+        emailBody;
     } else {
       this.email = '';
     }
@@ -687,4 +677,47 @@ ${firsName}
   showGalleria(): void {
     this.displayBasic = true;
   }
+}
+
+function englishMessageBody(firsName: string, lastName: string, examName: string, questionNumero: number, url: string) {
+  return `Dear Prof,%0D%0A
+My name is ${firsName} ${lastName},%0D%0A
+I have the exam ${examName}. Looking at the answer key for this question ${questionNumero} available here (${url}), I could not understand my mistake.%0D%0A
+%0D%0A%0D%0A
+///EXPLAIN YOUR PROBLEM///%0D%0A
+%0D%0A%0D%0A
+Thank you in advance for the time taken to answer this email.%0D%0A
+Best regards,%0D%0A
+${firsName}
+`;
+}
+
+function frenchMessageBody(firsName: string, lastName: string, examName: string, questionNumero: number, url: string) {
+  return `Bonjour,%0D%0A
+je m'appelle ${firsName} ${lastName},%0D%0A
+J'ai passé l'examen ${examName}. En regardant le corrigé de la question ${questionNumero} accessible ici (${url}), je ne comprends pas mon erreur.%0D%0A
+%0D%0A%0D%0A
+///EXPLIQUER VOTRE PROBLEME///%0D%0A
+%0D%0A%0D%0A
+Merci par avance pour le temps pris pour répondre à cet email.%0D%0A
+Cordialement,%0D%0A
+${firsName}
+`;
+}
+
+function portugueseMessageBody(firsName: string, lastName: string, examName: string, questionNumero: number, url: string) {
+  return `Caro professor, %0D%0A
+
+Eu me chamo ${firsName} ${lastName}  e fiz a prova ${examName}.
+Após uma ampla e detalhada análise da correção da questão ${questionNumero}, disponível aqui (${url}), eu não consegui entender o meu erro.%0D%0A
+
+%0D%0A%0D%0A
+///EXPLIQUE SEU PROBLEMA///%0D%0A
+%0D%0A%0D%0A
+
+Desde já agradeço pelo tempo dedicado a responder este email.%0D%0A
+
+Atenciosamente,%0D%0A
+${firsName}
+`;
 }
