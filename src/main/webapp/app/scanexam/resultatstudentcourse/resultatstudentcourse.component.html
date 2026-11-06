@@ -216,7 +216,7 @@
             <td>{{ student.nom }}</td>
             <td>{{ student.prenom }}</td>
             <td>{{ student.mail }}</td>
-            @if (student.abi === 0) {
+            @if (student.abi !== 2 && student.abi !== 1) {
               <td>{{ student.note }}</td>
             }
             @if (student.abi > 0) {
@@ -236,11 +236,9 @@
             }
             @if (student.abi == 1) {
               <td>ABI</td>
-            }
-            @if (student.abi == 2) {
+            } @else if (student.abi == 2) {
               <td>ABJ</td>
-            }
-            @if (student.abi === 0) {
+            } @else {
               <td>
                 @if (student.mail != 'anonymous@anonymous.fr') {
                   <a
@@ -261,7 +259,7 @@
             @if (student.abi == 2) {
               <td>ABJ</td>
             }
-            @if (student.abi === 0) {
+            @if (student.abi !== 1 && student.abi !== 2) {
               <td>
                 <a
                   [pTooltip]="'scanexam.showresultLienPdfTooltip' | translate"

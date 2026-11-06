@@ -151,6 +151,13 @@
         </ng-template>
       </p-selectButton>
 
+      <h5 [translate]="'scanexam.alignmentserver'">Lieu de l'alignement</h5>
+      <p-selectButton [options]="serverAlignOptions" [(ngModel)]="alignementServer" optionLabel="label" optionValue="value">
+        <ng-template #item let-item>
+          <span [tooltipPosition]="'bottom'" [pTooltip]="item.tooltip | translate" [translate]="item.label"></span>
+        </ng-template>
+      </p-selectButton>
+
       <h5 [translate]="'scanexam.alignscanbrpage'">Nombre de page à utiliser dans le template d'exam</h5>
       <p-inputNumber
         [pTooltip]="'scanexam.nbrepageintemplateTooltip' | translate"

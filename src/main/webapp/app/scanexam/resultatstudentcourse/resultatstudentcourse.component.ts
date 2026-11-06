@@ -211,6 +211,7 @@ export class ResultatStudentcourseComponent implements OnInit {
     this.blocked = true;
     this.http.get(this.applicationConfigService.getEndpointFor('api/showResult/' + this.examid)).subscribe(s => {
       this.studentsresult = s as any;
+      console.error(s);
 
       this.blocked = false;
     });

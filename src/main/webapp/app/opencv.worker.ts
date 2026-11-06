@@ -357,10 +357,9 @@ function cropZone(i: ImageData, zone: IZone, factor: number): any {
   }
 
   let rect = new cv.Rect(initX1, initY1, finalW1, finalH1);
-  let dst = new cv.Mat();
 
   let src = cv.matFromImageData(i);
-  dst = roi(src, rect, dst);
+  const dst = roi(src, rect, undefined);
   src.delete();
   return dst;
 }
@@ -973,11 +972,10 @@ function groupImagePerContoursLengthAndNbreContours(p: { msg: any; payload: IClu
 function imageCrop(p: { msg: any; payload: any; uid: string }): void {
   // You can try more different parameters
   let rect = new cv.Rect(p.payload.x, p.payload.y, p.payload.width, p.payload.height);
-  let dst = new cv.Mat();
   const imageSrc = new ImageData(new Uint8ClampedArray(p.payload.image), p.payload.imageWidth, p.payload.imageHeight);
 
   let src = cv.matFromImageData(imageSrc);
-  dst = roi(src, rect, dst);
+  const dst = roi(src, rect, undefined);
   const res: Transferable = imageDataFromMat(dst).data.buffer;
 
   // put [res]
@@ -1025,6 +1023,7 @@ function imageDataFromMat(mat: any): any {
     case cv.CV_8UC4:
       break;
     default:
+      img.delete();
       throw new Error('Bad number of channels (Source image must have 1, 3 or 4 channels)');
   }
   const clampedArray = new ImageData(new Uint8ClampedArray(img.data), img.cols, img.rows);
@@ -1595,7 +1594,9 @@ function getLinesFromImage(p: { msg: any; payload: any; uid: string }): any {
     const paddedEnd = Math.min(gray.rows, end + PAD);
     const rect = new cv.Rect(0, paddedStart, gray.cols, paddedEnd - paddedStart);
     //    const line = gray.rowRange(paddedStart, paddedEnd).clone();
-    const line = gray.roi(rect).clone();
+    const roiTmp = gray.roi(rect);
+    const line = roiTmp.clone();
+    roiTmp.delete();
     lines.push(line);
   });
 

@@ -59,6 +59,7 @@ function imageDataFromMat(mat: any): any {
     case cv.CV_8UC4:
       break;
     default:
+      img.delete();
       throw new Error('Bad number of channels (Source image must have 1, 3 or 4 channels)');
   }
   const clampedArray = new ImageData(new Uint8ClampedArray(img.data), img.cols, img.rows);
@@ -111,7 +112,6 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
     // You can try more different parameters
     cv.resize(_srcE, srcE, dsize1, 0, 0, cv.INTER_AREA);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let mat1 = new cv.Mat(src.rows, src.cols, src.type(), [255, 255, 255, 255]);
     // debugImage(imageDataFromMat(mat1))
     // debugImage(imageDataFromMat(srcE))
@@ -185,6 +185,7 @@ export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }
     grayE.delete();
     srcE.delete();
     _srcE.delete();
+    mat1.delete();
 
     if (dstE !== srcE) {
       dstE.delete();
@@ -287,6 +288,8 @@ export function detectFormes(img: any, nomsFormes: string[] = [], preference: IP
     if (nomsFormes.includes(res.nom)) {
       // affiche(img,forme=forme)
       formes.push(res.forme);
+    } else {
+      res.forme.delete();
     }
   }
 
@@ -317,6 +320,9 @@ export function detectFormes(img: any, nomsFormes: string[] = [], preference: IP
   todelete.forEach(x => {
     x.delete();
   });
+  thrash.delete();
+  contours.delete();
+  hierarchy.delete();
 
   return res;
 }
@@ -339,6 +345,8 @@ function detectFormesQCM(img: any, nomsFormes: string[] = [], preference: IPrefe
     if (nomsFormes.includes(res.nom)) {
       // affiche(img,forme=forme)
       formes.push(res.forme);
+    } else {
+      res.forme.delete();
     }
   }
 
@@ -369,6 +377,9 @@ function detectFormesQCM(img: any, nomsFormes: string[] = [], preference: IPrefe
   todelete.forEach(x => {
     x.delete();
   });
+  thrash.delete();
+  contours.delete();
+  hierarchy.delete();
 
   return res;
 }
@@ -437,8 +448,6 @@ function trouveCases(img: any, preference: IPreference): any {
 }
 
 export function decoupe(img: any, pos: any, dims: any): any {
-  let dst = new cv.Mat();
-
   let x = pos.x;
   let y = pos.y;
   let width = dims.w;
@@ -463,7 +472,7 @@ export function decoupe(img: any, pos: any, dims: any): any {
   if (width <= 0 || height <= 0) {
     return img;
   } else {
-    dst = img.roi(rect);
+    const dst = img.roi(rect);
     return dst;
   }
 }
@@ -625,12 +634,13 @@ function computeDecallage(casesvideseleves: any, casesvidesexamtemplate: any): a
 }
 
 function applyTranslation(src1: any, decalage: any): any {
-  let dst = new cv.Mat();
   if (decalage.x !== 0 || decalage.y !== 0) {
-    let M = cv.matFromArray(2, 3, cv.CV_64FC1, [1, 0, -decalage.x, 0, 1, -decalage.y]);
+    const dst = new cv.Mat();
+    const M = cv.matFromArray(2, 3, cv.CV_64FC1, [1, 0, -decalage.x, 0, 1, -decalage.y]);
     let dsize = new cv.Size(src1.cols, src1.rows);
     // You can try more different parameters
     cv.warpAffine(src1, dst, M, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
+    M.delete();
     return dst;
   } else {
     return src1;
@@ -682,14 +692,17 @@ export function diffGrayAvecCaseBlanche(img_case: any): number {
   }
 
   if (finalrect !== undefined) {
-    let dst = new cv.Mat();
-    dst = thresh.roi(finalrect);
+    const dst = thresh.roi(finalrect);
     let nonzerorationforeleve = cv.countNonZero(dst) / (finalrect.width * finalrect.height);
     dst.delete();
     thresh.delete();
+    contours.delete();
+    hierarchy.delete();
     return nonzerorationforeleve;
   } else {
     thresh.delete();
+    contours.delete();
+    hierarchy.delete();
     return 0;
   }
 }
