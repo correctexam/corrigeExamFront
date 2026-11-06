@@ -150,6 +150,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
         this.examId = params.get('examid')!;
         this.examService.find(+this.examId).subscribe(ex => {
           this.exam = ex.body!;
+          console.error(this.exam);
           this.updateTitle();
           this.courseService.find(this.exam.courseId!).subscribe(
             e => (this.course = e.body!),

@@ -102,20 +102,21 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
   }
 
   private async endInit(): Promise<void> {
-    if (this.exam.namezoneId !== undefined) {
+    if (this.exam.namezoneId !== undefined && this.exam.namezoneId !== null) {
       const z = await firstValueFrom(this.zoneService.find(this.exam.namezoneId));
       const ezone = z.body as CustomZone;
       ezone.type = DrawingTools.NOMBOX;
       this.renderZone(ezone);
       // });
     }
-    if (this.exam.firstnamezoneId !== undefined) {
+    if (this.exam.firstnamezoneId !== undefined && this.exam.firstnamezoneId !== null) {
       const z = await firstValueFrom(this.zoneService.find(this.exam.firstnamezoneId));
       const ezone = z.body as CustomZone;
       ezone.type = DrawingTools.PRENOMBOX;
       this.renderZone(ezone);
     }
-    if (this.exam.idzoneId !== undefined) {
+
+    if (this.exam.idzoneId !== undefined && this.exam.idzoneId !== null) {
       const z = await firstValueFrom(this.zoneService.find(this.exam.idzoneId));
       const ezone = z.body as CustomZone;
       ezone.type = DrawingTools.INEBOX;
