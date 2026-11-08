@@ -152,7 +152,13 @@
       </p-selectButton>
 
       <h5 [translate]="'scanexam.alignmentserver'">Lieu de l'alignement</h5>
-      <p-selectButton [options]="serverAlignOptions" [(ngModel)]="alignementServer" optionLabel="label" optionValue="value">
+      <p-selectButton
+        [options]="serverAlignOptions"
+        [(ngModel)]="alignementServer"
+        optionLabel="label"
+        optionValue="value"
+        [disabled]="serverAlignOptionsDisable()"
+      >
         <ng-template #item let-item>
           <span [tooltipPosition]="'bottom'" [pTooltip]="item.tooltip | translate" [translate]="item.label"></span>
         </ng-template>

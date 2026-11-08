@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/member-ordering */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService, PrimeTemplate } from 'primeng/api';
@@ -119,6 +119,8 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     { label: 'scanexam.local', value: false, tooltip: 'scanexam.localtooltip' },
     { label: 'scanexam.server', value: true, tooltip: 'scanexam.servertooltip' },
   ];
+  serverAlignOptionsDisable = signal(false);
+
   blocked = false;
   observable: Observable<IImageAlignementInput> | undefined;
   observer: Subscriber<IImageAlignementInput> | undefined;
@@ -189,6 +191,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   }
 
   ngOnInit(): void {
+    this.serverAlignOptionsDisable.set(this.alignement === 'off' || this.preferenceService.getPreference().cacheDb === 'indexdb');
     this.activatedRoute.paramMap.subscribe(params => {
       if (params.get('examid') !== null) {
         this.examId = params.get('examid')!;
