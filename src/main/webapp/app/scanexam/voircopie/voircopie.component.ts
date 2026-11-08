@@ -648,7 +648,7 @@ ${firsName}
         this.email =
           'mailto:' +
           emails.filter(e => e !== undefined && e !== '').join(',') +
-          '?subject=Feedback on your ewam ' +
+          '?subject=Feedback on your exam ' +
           this.exam!.name +
           '&body=' +
           ten;
