@@ -9,7 +9,7 @@ import { faObjectGroup } from '@fortawesome/free-solid-svg-icons';
 import { faObjectUngroup } from '@fortawesome/free-solid-svg-icons';
 
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { CacheUploadService, CacheUploadNotification } from '../exam-detail/cacheUpload.service';
+import { CacheUploadService, CacheUploadNotification, CacheDownloadNotification } from '../exam-detail/cacheUpload.service';
 import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import {
   ScanAlignService,
@@ -84,7 +84,7 @@ export interface IPage {
     TranslatePipe,
   ],
 })
-export class AlignScanComponent implements OnInit, CacheUploadNotification {
+export class AlignScanComponent implements OnInit, CacheUploadNotification, CacheDownloadNotification {
   faObjectGroup = faObjectGroup as IconProp;
   faObjectUngroup = faObjectUngroup as IconProp;
   examId = '';
@@ -177,6 +177,15 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     private scanAlignService: ScanAlignService,
     private titleService: Title,
   ) {}
+  setShowAssociation(v: boolean): void {
+    console.error('setShowAssociation not implemented', v);
+  }
+  setShowAlignement(v: boolean): void {
+    console.error('setShowAlignement not implemented', v);
+  }
+  setShowCorrection(v: boolean): void {
+    console.error('setShowCorrection not implemented', v);
+  }
   setMessage(v: string): void {
     this.message = v;
   }
@@ -346,6 +355,18 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     });
   }
 
+  private async saveInitialData(): Promise<any> {
+    // Change if partial update
+    if (!this.partialAlign) {
+      await this.db.addExam(+this.examId, new Date());
+    }
+
+    this.translateService.get('scanexam.exportcacheencours').subscribe(res => (this.message = '' + res));
+    const value = await this.db.countNonAlignImage(+this.examId);
+    await this.cacheUploadService.exportCache(+this.examId, this.translateService, this.messageService, value, this);
+    this.blocked = false;
+  }
+
   private async saveData(): Promise<any> {
     // Change if partial update
     if (!this.partialAlign) {
@@ -478,12 +499,14 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
    * puis rapatriement des pages alignées depuis le cache serveur vers le cache local.
    */
   public async processServer(): Promise<void> {
+    await this.saveInitialData();
     const pages: number[] = [];
     if (this.partialAlign) {
       for (let i = +this.startPage; i <= +this.endPage; i++) {
         pages.push(i);
       }
     } else {
+      console.error(+this.startPage, this.numberPagesInScan);
       for (let i = +this.startPage; i <= +this.numberPagesInScan; i++) {
         pages.push(i);
       }
@@ -540,7 +563,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
 
     // Rapatrie les pages alignées depuis le cache serveur vers le cache local
     // (format identique à l'alignement local : background getAlignPage renvoie `value`).
-    for (const page of pages) {
+    /*    for (const page of pages) {
       try {
         const value: string = (await firstValueFrom(this.cacheUploadService.getAlignImage(+this.examId, page))) as string;
         if (value && value.length > 0) {
@@ -549,8 +572,10 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
       } catch (e) {
         console.error('récupération page alignée (serveur) échouée pour la page', page, e);
       }
-    }
-    await this.saveData();
+    }*/
+    await this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, false);
+
+    //    await this.saveData();
   }
 
   private reviver(key: any, value: any): any {
