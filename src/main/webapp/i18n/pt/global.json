@@ -18,7 +18,7 @@
         "finalResult": "Final Result",
         "studentResponse": "Resposta ao Estudante",
         "comments": "Comentários",
-        "zone": "Zona",
+        "zone": "Região",
         "questionType": "Tipo de Questão",
         "textComment": "Texto de comentário",
         "gradedComment": "Comentário com nota",
@@ -42,7 +42,7 @@
         "configuration": "Configuração",
         "logs": "Logs",
         "apidocs": "API",
-        "database": "Base de données",
+        "database": "Base de dados",
         "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)"
       },
       "language": "Idioma"
@@ -56,8 +56,8 @@
       "newpassword.placeholder": "Nova senha",
       "confirmpassword.label": "Confirmação da nova senha",
       "confirmpassword.placeholder": "Confirmação da nova senha",
-      "email.label": "Email",
-      "email.placeholder": "Seu email"
+      "email.label": "E-mail",
+      "email.placeholder": "Seu e-mail"
     },
     "messages": {
       "info": {

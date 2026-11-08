@@ -21,9 +21,9 @@
       "name": "Nome da avaliação:",
       "template": "Modelo de avaliação",
       "idzone": "Idzone",
-      "namezone": "Zona do sobrenome",
-      "firstnamezone": "Zona do nome",
-      "notezone": "Zona da nota",
+      "namezone": "Região do sobrenome",
+      "firstnamezone": "Região do nome",
+      "notezone": "Região da nota",
       "scanfile": "Documento digitalizado dos estudantes",
       "question": "Questão",
       "course": "Disciplina"
