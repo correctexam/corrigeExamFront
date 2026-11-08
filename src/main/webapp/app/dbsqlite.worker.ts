@@ -890,6 +890,7 @@ class DB {
       try {
         // Then write the Blob object directly:
         await wtr.write(blob);
+        console.error('imported file', this.examName + '.sqlite3', blob.size);
       } finally {
         // And safely close the file stream writer:
         await wtr.close();
