@@ -11,6 +11,16 @@ import { faObjectUngroup } from '@fortawesome/free-solid-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { CacheUploadService, CacheUploadNotification } from '../exam-detail/cacheUpload.service';
 import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
+import {
+  ScanAlignService,
+  ScanRequestPayload,
+  ScanStatusDto,
+  SERVER_ALIGN_CORNER_SQUARE_SIZE,
+  SERVER_ALIGN_HEIGHTRESOLUTION,
+  SERVER_ALIGN_MIN_RADIUS,
+  pagesToManage,
+  serverAlgoFromMode,
+} from '../services/scan-align.service';
 
 import { fromWorkerPool } from 'observable-webworker';
 import { Observable, Subscriber, firstValueFrom } from 'rxjs';
@@ -103,6 +113,12 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     { label: 'Off', value: false },
     { label: 'On', value: true },
   ];
+  /** Aligner côté serveur (worker externe) au lieu du navigateur (OpenCV Wasm). */
+  alignementServer = false;
+  serverAlignOptions: any = [
+    { label: 'scanexam.local', value: false, tooltip: 'scanexam.localtooltip' },
+    { label: 'scanexam.server', value: true, tooltip: 'scanexam.servertooltip' },
+  ];
   blocked = false;
   observable: Observable<IImageAlignementInput> | undefined;
   observer: Subscriber<IImageAlignementInput> | undefined;
@@ -156,6 +172,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
     protected zoneService: ZoneService,
     protected templateService: TemplateService,
     protected scanService: ScanService,
+    private scanAlignService: ScanAlignService,
     private titleService: Title,
   ) {}
   setMessage(v: string): void {
@@ -374,6 +391,10 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
   }
 
   public async exportAsImage(): Promise<void> {
+    if (this.alignementServer && this.alignement !== 'off') {
+      await this.processServer();
+      return;
+    }
     const pagesnumber: number[] = [];
 
     if (this.partialAlign) {
@@ -447,6 +468,86 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification {
       this.aligneImages(page);
       return;
     }
+  }
+
+  /**
+   * Alignement exécuté côté serveur (worker externe) : POST /api/scansalign, suivi SSE,
+   * puis rapatriement des pages alignées depuis le cache serveur vers le cache local.
+   */
+  public async processServer(): Promise<void> {
+    const pages: number[] = [];
+    if (this.partialAlign) {
+      for (let i = +this.startPage; i <= +this.endPage; i++) {
+        pages.push(i);
+      }
+    } else {
+      for (let i = +this.startPage; i <= +this.numberPagesInScan; i++) {
+        pages.push(i);
+      }
+    }
+
+    this.translateService.get('scanexam.alignementserveur').subscribe(res => (this.message = '' + res));
+    this.percentavancement = 0;
+    this.submessage = '';
+
+    const payload: ScanRequestPayload = {
+      pages_to_manage: pagesToManage(pages),
+      exam_id: +this.examId,
+      template_id: this.exam!.templateId!,
+      scan_id: this.exam!.scanfileId!,
+      algo: serverAlgoFromMode(this.alignement),
+      heightresolution: SERVER_ALIGN_HEIGHTRESOLUTION,
+      corner_square_size: SERVER_ALIGN_CORNER_SQUARE_SIZE,
+      min_radius: SERVER_ALIGN_MIN_RADIUS,
+    };
+
+    await firstValueFrom(this.scanAlignService.launch(payload));
+
+    // Le flux SSE est un hot stream qui ne se termine jamais seul : on le ferme
+    // une fois toutes les pages demandées arrivées à un statut terminal.
+    await new Promise<void>(resolve => {
+      const done = new Set<number>();
+      const expected = pages.length;
+      const source = this.scanAlignService.streamProgress(+this.examId);
+
+      source.onmessage = (ev: MessageEvent) => {
+        let dto: ScanStatusDto;
+        console.error(ev.data);
+        try {
+          dto = JSON.parse(ev.data);
+        } catch {
+          return;
+        }
+        const terminal = dto.status === 'DONE' || dto.status === 'SUCCESS' || dto.status === 'finished' || dto.progress >= 100;
+        if (terminal) {
+          done.add(dto.page);
+          //          applyProgress();
+          this.percentavancement = dto.progress;
+          this.submessage = this.translateService.instant('scanexam.aveserver', { page: done.size, total: expected });
+          if (terminal) {
+            source.close();
+            resolve();
+          }
+        }
+      };
+      source.onerror = () => {
+        // L'EventSource se reconnecte automatiquement ; on ne conclut pas ici.
+      };
+    });
+
+    // Rapatrie les pages alignées depuis le cache serveur vers le cache local
+    // (format identique à l'alignement local : background getAlignPage renvoie `value`).
+    for (const page of pages) {
+      try {
+        const value: string = (await firstValueFrom(this.cacheUploadService.getAlignImage(+this.examId, page))) as string;
+        if (value && value.length > 0) {
+          await this.db.addAligneImage({ examId: +this.examId, pageNumber: page, value });
+        }
+      } catch (e) {
+        console.error('récupération page alignée (serveur) échouée pour la page', page, e);
+      }
+    }
+    await this.saveData();
   }
 
   private reviver(key: any, value: any): any {

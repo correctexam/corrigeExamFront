@@ -280,6 +280,7 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       case cv.CV_8UC4:
         break;
       default:
+        mat.delete();
         throw new Error('Bad number of channels (Source image must have 1, 3 or 4 channels)');
     }
     const clampedArray = new ImageData(new Uint8ClampedArray(img.data), img.cols, img.rows);
@@ -480,11 +481,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
     numberofpointToMatch: number,
     numberofgoodpointToMatch: number,
   ): boolean {
-    let im1Graydst = new cv.Mat();
-    im1Graydst = this.roi(im1Gray, zone1);
-
-    let im2Graydst = new cv.Mat();
-    im2Graydst = this.roi(im2Gray, zone1);
+    const im1Graydst = this.roi(im1Gray, zone1);
+    const im2Graydst = this.roi(im2Gray, zone1);
 
     let keypoints1 = new cv.KeyPointVector();
     let keypoints2 = new cv.KeyPointVector();
@@ -785,9 +783,8 @@ export class WorkerPoolAlignWorker implements DoTransferableWorkUnit<IImageAlign
       }
 
       let rect1 = new cv.Rect(x - r3, y - r3, width1, height1);
-      let dstrect2 = new cv.Mat();
+      const dstrect2 = this.roi(srcMat1, rect1);
       let dstrect1 = new cv.Mat();
-      dstrect2 = this.roi(srcMat1, rect1);
       cv.threshold(dstrect2, dstrect1, 0, 255, cv.THRESH_OTSU + cv.THRESH_BINARY);
       if (cv.countNonZero(dstrect1) < seuil) {
         goodpointsx.push(x);
