@@ -510,7 +510,8 @@ async function cleanOutdatedCache(data: any) {
       const keys = (root as any).keys();
       let next = await keys.next();
       while (next.value) {
-        if (next.value.endsWith('.sqlite3') || (next.value.endsWith('.sqlite3-journal') && !cacheNames.includes(next.value))) {
+        if ((next.value.endsWith('.sqlite3') || next.value.endsWith('.sqlite3-journal')) && !cacheNames.includes('' + next.value)) {
+          console.error('removing file', cacheNames, '' + next.value);
           await root.removeEntry(next.value);
         }
         next = await keys.next();
@@ -885,6 +886,7 @@ class DB {
       let next = await keys.next();
       while (next.value !== undefined) {
         if (next.value === this.examName + '.sqlite3') {
+          console.error('removing file', this.examName + '.sqlite3');
           await root.removeEntry(this.examName + '.sqlite3');
         } else if (next.value === this.examName + '.sqlite3-journal') {
           await root.removeEntry(this.examName + '.sqlite3-journal');
