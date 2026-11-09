@@ -28,11 +28,11 @@
         <p-progressSpinner></p-progressSpinner>
 
         <BR />
-        {{ percentavancement | number: '1.0-2' }} % <BR /> {{ message }} <BR />
+        {{ percentavancement() | number: '1.0-2' }} % <BR /> {{ message() }} <BR />
 
-        {{ submessage }}
-        @if (submessage !== undefined && submessage.length > 0) {
-          <span>{{ progress }} / 100</span>
+        {{ submessage() }}
+        @if (submessage !== undefined && submessage().length > 0) {
+          <span>{{ progress() }} / 100</span>
         }
         <BR />
       </div>

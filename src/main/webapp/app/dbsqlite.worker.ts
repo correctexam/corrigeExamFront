@@ -564,6 +564,15 @@ class DB {
       this.db.exec('CREATE TABLE IF NOT EXISTS align(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
       this.db.exec('CREATE TABLE IF NOT EXISTS nonalign(page INTEGER NOT NULL PRIMARY KEY,imageData CLOB NOT NULL)');
       this.db.exec('create table IF NOT EXISTS exam(id INTEGER NOT NULL PRIMARY KEY, DT datetime default current_timestamp)');
+      this.db.exec(
+        'CREATE TRIGGER  IF NOT EXISTS  ttemplate  AFTER UPDATE ON template BEGIN UPDATE exam SET DT = CURRENT_TIMESTAMP WHERE id = 1; END;',
+      );
+      this.db.exec(
+        'CREATE TRIGGER  IF NOT EXISTS talign   AFTER UPDATE ON align BEGIN UPDATE exam SET DT = CURRENT_TIMESTAMP WHERE id = 1; END;',
+      );
+      this.db.exec(
+        'CREATE TRIGGER IF NOT EXISTS tnonalign   AFTER UPDATE ON nonalign BEGIN UPDATE exam SET DT = CURRENT_TIMESTAMP WHERE id = 1; END;',
+      );
       this.db.exec({
         sql: 'INSERT OR IGNORE INTO exam(id) VALUES (?)',
         bind: [1],

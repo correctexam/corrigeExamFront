@@ -75,8 +75,8 @@ export class ExamService {
     });
   }
 
-  getExamTimestamp(id: number): Observable<HttpResponse<any>> {
-    return this.http.get(this.applicationConfigService.getEndpointFor('api') + '/getCacheTimeStamp' + `/${id}`, {
+  getExamTimestamp(id: number, cacheType: string): Observable<HttpResponse<any>> {
+    return this.http.get(this.applicationConfigService.getEndpointFor('api') + '/getCacheTimeStamp' + `/${id}/${cacheType}`, {
       observe: 'response',
     });
   }

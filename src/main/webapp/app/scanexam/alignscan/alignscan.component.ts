@@ -95,7 +95,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
   // Change if partial update
   currentPageAlign = 1;
 
-  percentavancement = 0;
+  percentavancement = signal(0);
 
   partialAlign = false;
   startPage = 1;
@@ -126,9 +126,9 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
   observer: Subscriber<IImageAlignementInput> | undefined;
 
   allowPartialAlign = false;
-  message = '';
-  submessage = '';
-  progress = 0;
+  message = signal('');
+  submessage = signal('');
+  progress = signal(0);
   scale = 2;
   nbPageAlignInCache = 0;
   activeIndex = 1;
@@ -187,16 +187,16 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
     console.error('setShowCorrection not implemented', v);
   }
   setMessage(v: string): void {
-    this.message = v;
+    this.message.set(v);
   }
   setSubMessage(v: string): void {
-    this.submessage = v;
+    this.submessage.set(v);
   }
   setBlocked(v: boolean): void {
     this.blocked = v;
   }
   setProgress(v: number): void {
-    this.progress = v;
+    this.progress.set(v);
   }
 
   ngOnInit(): void {
@@ -295,7 +295,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
 
   public async load(): Promise<void> {
     const numberPagesInScan = await this.db.countNonAlignImage(+this.examId);
-
+    console.error('numberPagesInScan', numberPagesInScan);
     if (numberPagesInScan !== 0) {
       if (this.partialAlign) {
         if (this.endPage < numberPagesInScan) {
@@ -317,19 +317,28 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
   async process(debug: boolean): Promise<void> {
     this.showMapping = debug;
     this._showVignette = false;
-    this.translateService.get('scanexam.alignementencours').subscribe(res => (this.message = '' + res));
+    this.translateService.get('scanexam.alignementencours').subscribe(res => this.message.set('' + res));
 
     this.blocked = true;
     // Change if partial update
-    if (this.partialAlign) {
-      await this.removeElementForPages(+this.examId, this.startPage, this.endPage);
-    } else {
-      await this.removeElement(+this.examId);
-    }
-    await this.load();
-    await this.loadTemplatePage();
 
-    await this.exportAsImage();
+    if (this.alignementServer && this.alignement !== 'off') {
+      await this.load();
+      await this.processServer();
+      return;
+    } else {
+      await this.load();
+
+      if (this.partialAlign) {
+        await this.removeElementForPages(+this.examId, this.startPage, this.endPage);
+      } else {
+        await this.removeElement(+this.examId);
+      }
+      await this.loadTemplatePage();
+
+      await this.processClient();
+      return;
+    }
   }
   async loadTemplatePage(): Promise<void> {
     return new Promise(resolve => {
@@ -361,10 +370,10 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
       await this.db.addExam(+this.examId, new Date());
     }
 
-    this.translateService.get('scanexam.exportcacheencours').subscribe(res => (this.message = '' + res));
+    this.translateService.get('scanexam.exportcacheencours').subscribe(res => this.message.set('' + res));
     const value = await this.db.countNonAlignImage(+this.examId);
     await this.cacheUploadService.exportCache(+this.examId, this.translateService, this.messageService, value, this);
-    this.blocked = false;
+    console.error('cacheUploadService.exportCache done');
   }
 
   private async saveData(): Promise<any> {
@@ -373,7 +382,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
       await this.db.addExam(+this.examId, new Date());
     }
 
-    this.translateService.get('scanexam.exportcacheencours').subscribe(res => (this.message = '' + res));
+    this.translateService.get('scanexam.exportcacheencours').subscribe(res => this.message.set('' + res));
     this.db.countNonAlignImage(+this.examId).then(value => {
       this.cacheUploadService.exportCache(+this.examId, this.translateService, this.messageService, value, this).then(() => {
         this.blocked = false;
@@ -388,7 +397,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
         this.startPage = 1;
         this.processpage = [];
         this.currentPageAlign = 1;
-        this.percentavancement = 0;
+        this.percentavancement.set(0);
         this.endPage = value;
         this.numberPagesInScan = value;
         this.db.countAlignImage(+this.examId).then(e => (this.nbPageAlignInCache = e));
@@ -414,11 +423,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
     this.router.navigateByUrl('/exam/' + this.examId);
   }
 
-  public async exportAsImage(): Promise<void> {
-    if (this.alignementServer && this.alignement !== 'off') {
-      await this.processServer();
-      return;
-    }
+  public async processClient(): Promise<void> {
     const pagesnumber: number[] = [];
 
     if (this.partialAlign) {
@@ -450,8 +455,9 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
       await PromisePool.for(numbers)
         .withConcurrency(this.nbreCore)
         .onTaskFinished((user, pool) => {
-          this.percentavancement =
-            (j * this.stepPage * 100) / pagesnumber.length + (pool.processedPercentage() * numbers.length) / pagesnumber.length;
+          this.percentavancement.set(
+            (j * this.stepPage * 100) / pagesnumber.length + (pool.processedPercentage() * numbers.length) / pagesnumber.length,
+          );
         })
         .process(
           async page =>
@@ -499,22 +505,21 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
    * puis rapatriement des pages alignées depuis le cache serveur vers le cache local.
    */
   public async processServer(): Promise<void> {
-    await this.saveInitialData();
+    //    await this.saveInitialData();
     const pages: number[] = [];
     if (this.partialAlign) {
       for (let i = +this.startPage; i <= +this.endPage; i++) {
         pages.push(i);
       }
     } else {
-      console.error(+this.startPage, this.numberPagesInScan);
       for (let i = +this.startPage; i <= +this.numberPagesInScan; i++) {
         pages.push(i);
       }
     }
 
-    this.translateService.get('scanexam.alignementserveur').subscribe(res => (this.message = '' + res));
-    this.percentavancement = 0;
-    this.submessage = '';
+    this.translateService.get('scanexam.alignementserveur').subscribe(res => this.message.set('' + res));
+    this.percentavancement.set(0);
+    this.submessage.set('');
 
     const payload: ScanRequestPayload = {
       pages_to_manage: pagesToManage(pages),
@@ -538,23 +543,41 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
 
       source.onmessage = (ev: MessageEvent) => {
         let dto: ScanStatusDto;
-        console.error(ev.data);
         try {
           dto = JSON.parse(ev.data);
         } catch {
           return;
         }
+
         const terminal = dto.status === 'DONE' || dto.status === 'SUCCESS' || dto.status === 'finished' || dto.progress >= 100;
+        done.add(dto.page);
+        this.percentavancement.set(dto.progress);
+        this.progress.set(dto.progress);
+        this.submessage.set(this.translateService.instant('scanexam.aveserver', { page: done.size, total: expected }));
         if (terminal) {
-          done.add(dto.page);
-          //          applyProgress();
-          this.percentavancement = dto.progress;
-          this.submessage = this.translateService.instant('scanexam.aveserver', { page: done.size, total: expected });
-          if (terminal) {
-            source.close();
+          source.close();
+          this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, false).then(async () => {
+            this.blocked = false;
+
+            if (this.showMapping) {
+              this.displayBasic = true;
+            } else {
+              this._showVignette = true;
+            }
+            this.partialAlign = false;
+            this.showMapping = false;
+            this.startPage = 1;
+            this.processpage = [];
+            this.currentPageAlign = 1;
+            this.percentavancement.set(0);
+            this.endPage = await this.db.countNonAlignImage(+this.examId);
+            this.numberPagesInScan = this.endPage;
+            this.nbPageAlignInCache = await this.db.countAlignImage(+this.examId);
+
             resolve();
-          }
+          });
         }
+        //      }
       };
       source.onerror = () => {
         // L'EventSource se reconnecte automatiquement ; on ne conclut pas ici.
@@ -573,7 +596,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
         console.error('récupération page alignée (serveur) échouée pour la page', page, e);
       }
     }*/
-    await this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, false);
 
     //    await this.saveData();
   }
@@ -686,7 +708,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
     downloadLink.setAttribute('download', filename);
     document.body.appendChild(downloadLink);
     this.blocked = false;
-    this.message = '';
+    this.message.set('');
     downloadLink.click();
   }
 
@@ -700,7 +722,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
     downloadLink.setAttribute('download', filename);
     document.body.appendChild(downloadLink);
     this.blocked = false;
-    this.message = '';
+    this.message.set('');
     downloadLink.click();
   }
 }
