@@ -27,7 +27,7 @@
     "localtooltip": "Align in the browser with OpenCV (Wasm)",
     "servertooltip": "Align on the server via the external worker",
     "alignementserveur": "Server alignment in progress...",
-    "aveserver": "Page {page} / {total} aligned on the server",
+    "aveserver": "Page {{page}} / {{total}} aligned on the server",
     "selectmove": "Select and move shapes/texts",
     "erase": "Erase shape/text on click",
     "nom": "NAME",

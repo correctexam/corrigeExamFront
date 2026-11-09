@@ -218,9 +218,13 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
 
   async checkNewCacheAvailable(): Promise<boolean> {
     const p = await this.db.getExamTimestamp(+this.examId);
+    console.error(p);
     const localts = p !== undefined ? p : 0;
-    const s = await firstValueFrom(this.examService.getExamTimestamp(+this.examId));
+
+    const s = await firstValueFrom(this.examService.getExamTimestamp(+this.examId, this.preferenceService.getPreference().cacheDb));
     const serverts = s.body !== undefined ? s.body : 0;
+    console.error(serverts);
+
     return serverts > localts;
   }
 
