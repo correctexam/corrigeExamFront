@@ -225,7 +225,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     const serverts = s.body !== undefined ? s.body : 0;
     console.error(serverts);
 
-    return serverts > localts;
+    return +serverts > +localts;
   }
 
   async checkIfAlreadyAlign(): Promise<boolean> {
