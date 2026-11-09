@@ -123,7 +123,7 @@ export class StatsExamComponent implements OnInit {
   protected images: any[] = [];
   private noalign = false;
   private nbreFeuilleParCopie: number | undefined;
-  protected libelles: any;
+  protected libelles: any = [];
   constructor(
     private applicationConfigService: ApplicationConfigService,
     private http: HttpClient,
