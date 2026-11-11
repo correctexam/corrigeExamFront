@@ -1,4 +1,5 @@
-import { Directive, OnInit, ElementRef, Renderer2, Input } from '@angular/core';
+import { Directive, OnInit, ElementRef, Renderer2, Input, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
 
 @Directive({
@@ -8,6 +9,9 @@ import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
 export class ActiveMenuDirective implements OnInit {
   @Input() jhiActiveMenu?: string;
 
+  // completes the subscriptions to application-wide observables when the component is destroyed
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(
     private el: ElementRef,
     private renderer: Renderer2,
@@ -15,7 +19,7 @@ export class ActiveMenuDirective implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.translateService.onLangChange.subscribe((event: LangChangeEvent) => {
+    this.translateService.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((event: LangChangeEvent) => {
       this.updateActiveFlag(event.lang);
     });
 

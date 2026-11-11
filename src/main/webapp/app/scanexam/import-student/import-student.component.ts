@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
@@ -86,6 +87,9 @@ export class ImportStudentComponent implements OnInit {
   /** A boolean value for showing or hiding a modal popup for editing the email domain */
   protected mustSpecifyDomain: boolean = false;
 
+  // completes the subscriptions to application-wide observables when the component is destroyed
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(
     protected applicationConfigService: ApplicationConfigService,
     private http: HttpClient,
@@ -108,7 +112,7 @@ export class ImportStudentComponent implements OnInit {
           e => {
             this.course = e.body!;
             this.updateTitle();
-            this.translate.onLangChange.subscribe(() => {
+            this.translate.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
               this.updateTitle();
             });
           },

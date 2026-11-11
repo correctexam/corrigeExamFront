@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable prefer-const */
 /* eslint-disable no-console */
-import { AfterViewInit, Component, HostListener, OnInit, ViewChild, effect, signal } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnInit, ViewChild, effect, signal, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ZoneService } from '../../entities/zone/service/zone.service';
 import { CourseService } from 'app/entities/course/service/course.service';
@@ -198,6 +199,9 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
 
   shortcuts: ShortcutInput[] = [];
 
+  // completes the subscriptions to application-wide observables when the component is destroyed
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(
     public examService: ExamService,
     public examsheetService: ExamSheetService,
@@ -258,7 +262,7 @@ export class AssocierCopiesEtudiantsComponent implements OnInit, AfterViewInit {
                 this.boxname = this.exam.templateNameBoxCase;
               }
               this.updateTitle();
-              this.translateService.onLangChange.subscribe(() => {
+              this.translateService.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
                 this.updateTitle();
               });
 

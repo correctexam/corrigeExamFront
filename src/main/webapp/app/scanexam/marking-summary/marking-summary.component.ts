@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MarkingExamStateDTO, ExamService } from 'app/entities/exam/service/exam.service';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
@@ -42,6 +43,9 @@ export class MarkingSummaryComponent implements OnInit {
   public pageInTemplate = 1;
   public errorMsg: string | undefined = undefined;
 
+  // completes the subscriptions to application-wide observables when the component is destroyed
+  private readonly destroyRef = inject(DestroyRef);
+
   public constructor(
     private activatedRoute: ActivatedRoute,
     private examService: ExamService,
@@ -84,7 +88,7 @@ export class MarkingSummaryComponent implements OnInit {
             }
 
             this.updateTitle();
-            this.translateService.onLangChange.subscribe(() => {
+            this.translateService.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
               this.updateTitle();
             });
 

@@ -5,7 +5,8 @@
 
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import { HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse } from '@angular/common/http';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Validators, UntypedFormBuilder, UntypedFormGroup, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -185,6 +186,9 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
   pageWithQCM: number[] = [];
   showVignette = true;
   layoutsidebarVisible = false;
+  // completes the subscriptions to application-wide observables when the component is destroyed
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(
     private translate: TranslateService,
     private messageService: MessageService,
@@ -234,7 +238,7 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
           this.exam = c.body!;
           // this.exam.scanfileId;
           this.updateTitle();
-          this.translateService.onLangChange.subscribe(() => {
+          this.translateService.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
             this.updateTitle();
           });
         });

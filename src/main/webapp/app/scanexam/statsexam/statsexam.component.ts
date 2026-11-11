@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable guard-for-in */
 import { HttpClient, HttpResponse } from '@angular/common/http';
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
@@ -124,6 +125,9 @@ export class StatsExamComponent implements OnInit {
   private noalign = false;
   private nbreFeuilleParCopie: number | undefined;
   protected libelles: any = [];
+  // completes the subscriptions to application-wide observables when the component is destroyed
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(
     private applicationConfigService: ApplicationConfigService,
     private http: HttpClient,
@@ -155,7 +159,7 @@ export class StatsExamComponent implements OnInit {
           this.performInfoQuestionsQuery();
         });
 
-        this.translateService.onLangChange.subscribe(() => {
+        this.translateService.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
           this.updateTitle();
           this.performInfoQuestionsQuery();
         });

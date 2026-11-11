@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 // import { faCoffee } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 import { faMotorcycle as fasMotorcycle } from '@fortawesome/free-solid-svg-icons';
@@ -97,6 +98,9 @@ export class CoursdetailsComponent implements OnInit {
   firsthelp = false;
   firsthelpvalue = true;
 
+  // completes the subscriptions to application-wide observables when the component is destroyed
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(
     protected applicationConfigService: ApplicationConfigService,
 
@@ -124,7 +128,7 @@ export class CoursdetailsComponent implements OnInit {
         this.translateService.get('scanexam.creerexam').subscribe(() => {
           this.initCmpt();
         });
-        this.translateService.onLangChange.subscribe(() => {
+        this.translateService.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
           this.initCmpt();
           this.updateTitle();
         });

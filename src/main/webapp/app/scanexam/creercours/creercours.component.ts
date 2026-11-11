@@ -1,5 +1,6 @@
 import { HttpResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UntypedFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Course, ICourse } from 'app/entities/course/course.model';
@@ -28,6 +29,9 @@ export class CreercoursComponent implements OnInit {
   login: string | undefined;
   editForm: any;
 
+  // completes the subscriptions to application-wide observables when the component is destroyed
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(
     protected courseService: CourseService,
     protected userService: UserService,
@@ -44,9 +48,12 @@ export class CreercoursComponent implements OnInit {
 
   ngOnInit(): void {
     this.createFromForm();
-    this.accountService.getAuthenticationState().subscribe(e => {
-      this.login = e?.login;
-    });
+    this.accountService
+      .getAuthenticationState()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(e => {
+        this.login = e?.login;
+      });
   }
 
   previousState(): void {

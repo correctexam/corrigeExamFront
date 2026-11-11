@@ -18,7 +18,10 @@ import {
   WritableSignal,
   effect,
   LOCALE_ID,
+  DestroyRef,
+  inject,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { CourseService } from 'app/entities/course/service/course.service';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
@@ -313,6 +316,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   developementMode: boolean = true;
 
+  // completes the subscriptions to application-wide observables when the component is destroyed
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(
     public examService: ExamService,
     public courseService: CourseService,
@@ -357,6 +363,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     this.shortcutvalue = this.preferenceService.showKeyboardShortcuts();
     this.minimizeComment = this.preferenceService.minimizeComments();
 
+    // subscribed once: inside manageParam it was added again for every copy/question navigated
+    this.translateService.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.updateTitle());
     this.activatedRoute.paramMap.subscribe(params => {
       this.manageParam(params);
     });
@@ -425,9 +433,6 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             this.numberPagesInScan = await this.db.countAlignImage(+this.examId!);
           }
           this.updateTitle();
-          this.translateService.onLangChange.subscribe(() => {
-            this.updateTitle();
-          });
 
           const b = await firstValueFrom(this.questionService.query({ examId: this.exam!.id }));
 
@@ -3601,9 +3606,14 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   setupSearchListener() {
-    this.searchSubscription = this.searchControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe(value => {
-      this.filterSearchedPredictions(value ?? '');
-    });
+    // called each time the prediction dropdown is opened: replace the previous listener
+    // instead of stacking them (each one ran the filter again on every keystroke)
+    this.searchSubscription?.unsubscribe();
+    this.searchSubscription = this.searchControl.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe(value => {
+        this.filterSearchedPredictions(value ?? '');
+      });
   }
 
   dofilterByText() {

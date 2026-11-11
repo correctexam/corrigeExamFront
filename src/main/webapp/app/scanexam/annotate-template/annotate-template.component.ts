@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { IExam } from 'app/entities/exam/exam.model';
 import { ExamService } from 'app/entities/exam/service/exam.service';
@@ -22,6 +23,9 @@ export class AnnotateTemplateComponent implements OnInit {
   pdf: any;
   dockItems!: any[];
 
+  // completes the subscriptions to application-wide observables when the component is destroyed
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(
     private examService: ExamService,
     private templateService: TemplateService,
@@ -38,7 +42,7 @@ export class AnnotateTemplateComponent implements OnInit {
           if (data.body !== null) {
             this.exam = data.body;
             this.updateTitle();
-            this.translateService.onLangChange.subscribe(() => {
+            this.translateService.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
               this.updateTitle();
             });
             this.templateService.getPdf(this.exam.templateId!).subscribe(t => {
