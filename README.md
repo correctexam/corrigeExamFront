@@ -17,7 +17,16 @@ Main feature are:
 
 # Technical stack
 
-This application front was generated using JHipster 7.7.0, you can find documentation and help at [https://www.jhipster.tech](https://www.jhipster.tech).
+- Angular 20 (standalone components), TypeScript strict, RxJS 7, PrimeNG 20 + Bootstrap 5
+- OpenCV.js (WebAssembly), TensorFlow.js and ONNX Runtime for scan alignment and handwriting recognition, executed in Web Workers
+- Dexie (IndexedDB) and SQLite Wasm for the local caches
+- Jest for unit tests, Cypress for end-to-end tests
+- Node.js >= 22.9 (see `engines` in `package.json`)
+- Back-end: [corrigeExamBack](https://github.com/correctexam/corrigeExamBack) (Quarkus)
+
+The project was initially generated with JHipster 7.7.0 and has since been upgraded manually; the JHipster sections below are kept for reference. Documentation and help: [https://www.jhipster.tech](https://www.jhipster.tech).
+
+Rules for AI coding assistants are in [`.cursorrules`](.cursorrules).
 
 Note on the project could be found [here](https://hackmd.diverse-team.fr/s/HkFi-Um-c)
 
