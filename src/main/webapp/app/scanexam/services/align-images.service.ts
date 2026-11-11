@@ -122,7 +122,11 @@ export class AlignImagesService {
       this.worker.onmessage = ({ data }) => {
         if (this.subjects.has(data.uid)) {
           // console.log( ' receive message '  + data.uid)
-
+          if (data.error !== undefined) {
+            // the worker could not process the request (OpenCV failure...): fail instead of waiting forever
+            this.subjects.get(data.uid)?.error(new Error(data.error));
+            return;
+          }
           this.subjects.get(data.uid)?.next(data.payload);
           this.subjects.get(data.uid)?.complete();
         } else {

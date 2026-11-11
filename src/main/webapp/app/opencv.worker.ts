@@ -267,24 +267,41 @@ addEventListener('message', e => {
       break;
     }
     case 'imageCrop':
-      return imageCrop(e.data);
+      return runSafely(e.data, imageCrop);
     case 'doPredictions':
       return doPredictions(e.data);
     case 'imageCropFromZone':
       return imageCropFromZone(e.data);
 
     case 'groupImagePerContoursLength':
-      return groupImagePerContoursLength(e.data);
+      return runSafely(e.data, groupImagePerContoursLength);
     case 'groupImagePerContoursLengthAndNbreContours':
-      return groupImagePerContoursLengthAndNbreContours(e.data);
+      return runSafely(e.data, groupImagePerContoursLengthAndNbreContours);
     case 'qcmresolution':
-      return doQCMResolution(e.data);
+      return runSafely(e.data, doQCMResolution);
     case 'getLinesFromImage':
-      return getLinesFromImage(e.data);
+      return runSafely(e.data, getLinesFromImage);
     default:
       break;
   }
 });
+
+/**
+ * Answers a request with an error, so that the caller (AlignImagesService) does not wait forever.
+ * The service turns `error` into an error of the request observable.
+ */
+function replyError(p: { msg: any; uid: string }, e: unknown): void {
+  console.error('opencv worker: ' + p.msg + ' failed', e);
+  postMessage({ msg: p.msg, uid: p.uid, error: e instanceof Error ? e.message : String(e) });
+}
+
+function runSafely<T extends { msg: any; uid: string }>(p: T, handler: (p: T) => unknown): void {
+  try {
+    handler(p);
+  } catch (e) {
+    replyError(p, e);
+  }
+}
 
 let db: AppDB | undefined;
 
@@ -367,9 +384,7 @@ function cropZone(i: ImageData, zone: IZone, factor: number): any {
   });
 }
 function imageCropFromZone(p: { msg: any; payload: any; uid: string }): void {
-  imageCropFromZoneAsync(p).catch(e => {
-    console.error('imageCropFromZone failed', e);
-  });
+  imageCropFromZoneAsync(p).catch(e => replyError(p, e));
 }
 async function imageCropFromZoneAsync(p: { msg: any; payload: any; uid: string }): Promise<void> {
   const p1 = p.payload;
@@ -403,11 +418,7 @@ function isDoPredictionsInputSamePage(
 }
 
 function doPredictions(p: { msg: any; payload: DoPredictionsInputSamePage | DoPredictionsInputDifferentPage; uid: string }): void {
-  doPredictionsAsync(p)
-    .then(() => {})
-    .catch(e => {
-      console.error(e);
-    });
+  doPredictionsAsync(p).catch(e => replyError(p, e));
 }
 async function doPredictionsAsync(p: {
   msg: any;
