@@ -22,6 +22,7 @@ import { IZone } from './entities/zone/zone.model';
 import { AlignImage, AppDB, NonAlignImage, Template } from './scanexam/db/db';
 import { Observable, Subject, firstValueFrom } from 'rxjs';
 import { v4 as uuid } from 'uuid';
+import { CvScope, withCvScope } from './shared/opencv/cv-scope';
 
 // import { IImageCropFromZoneInput, IImageCropFromZoneOutput } from './scanexam/services/align-images.service';
 
@@ -356,15 +357,19 @@ function cropZone(i: ImageData, zone: IZone, factor: number): any {
     initY1 = 0;
   }
 
-  let rect = new cv.Rect(initX1, initY1, finalW1, finalH1);
+  const rect = new cv.Rect(initX1, initY1, finalW1, finalH1);
 
-  let src = cv.matFromImageData(i);
-  const dst = roi(src, rect, undefined);
-  src.delete();
-  return dst;
+  // The ROI shares the (ref-counted) buffer of src: deleting src does not invalidate it.
+  // The returned Mat is owned by the caller.
+  return withCvScope(scope => {
+    const src = scope.track(cv.matFromImageData(i));
+    return roi(src, rect, undefined);
+  });
 }
 function imageCropFromZone(p: { msg: any; payload: any; uid: string }): void {
-  imageCropFromZoneAsync(p);
+  imageCropFromZoneAsync(p).catch(e => {
+    console.error('imageCropFromZone failed', e);
+  });
 }
 async function imageCropFromZoneAsync(p: { msg: any; payload: any; uid: string }): Promise<void> {
   const p1 = p.payload;
@@ -378,17 +383,16 @@ async function imageCropFromZoneAsync(p: { msg: any; payload: any; uid: string }
   if (i !== undefined) {
     const l = await loadImage(i);
 
-    const z1 = cropZone(l, p1.z, p1.factor);
-    const buffer = imageDataFromMat(z1).data.buffer;
-
-    const output: any = {
-      image: buffer,
-      page: p1.page,
-      width: z1.size().width,
-      height: z1.size().height,
-    };
+    const output: any = withCvScope(scope => {
+      const z1 = scope.track(cropZone(l, p1.z, p1.factor));
+      return {
+        image: imageDataFromMat(z1).data.buffer,
+        page: p1.page,
+        width: z1.size().width,
+        height: z1.size().height,
+      };
+    });
     source.target.postMessage({ msg: p.msg, payload: output, uid: p.uid }, [output.image]);
-    z1.delete();
   }
 }
 
@@ -423,214 +427,221 @@ async function doPredictionsAsync(p: {
       const i = await getScanImage(p1.align, pageToAnalyze, p1.examId, p1.indexDb);
       console.timeLog('analysePage', 'after getScan');
       if (i !== undefined) {
-        console.timeLog('analysePage', 'before loadImage');
-        const l = await loadImage(i);
-        console.timeLog('analysePage', 'after loadImage');
+        // Every native object allocated for this page is released in the finally block,
+        // including when the name analysis fails (`continue` below).
+        const scope = new CvScope();
+        try {
+          console.timeLog('analysePage', 'before loadImage');
+          const l = await loadImage(i);
+          console.timeLog('analysePage', 'after loadImage');
 
-        let z1: any;
-        let z2: any;
-        let z3: any;
+          let z1: any;
+          let z2: any;
+          let z3: any;
 
-        let pageZone = 0;
-        console.timeLog('analysePage', 'before cropZone');
-        if (p1.nameZone) {
-          z1 = cropZone(l, p1.nameZone, p1.factor);
-          pageZone = p1.nameZone.pageNumber!;
-        }
-        if (p1.firstnameZone) {
-          z2 = cropZone(l, p1.firstnameZone, p1.factor);
-          pageZone = p1.firstnameZone.pageNumber!;
-        }
-        if (p1.ineZone) {
-          z3 = cropZone(l, p1.ineZone, p1.factor);
-          pageZone = p1.ineZone.pageNumber!;
-        }
-        console.timeLog('analysePage', 'after cropZone');
-
-        const output: DoPredictionsOutput = {
-          page: pageToAnalyze - pageZone,
-          resultPrediction: [],
-        };
-        let z1Buffer: ArrayBuffer | undefined;
-        let z2Buffer: ArrayBuffer | undefined;
-        let z3Buffer: ArrayBuffer | undefined;
-
-        if (z1) {
-          z1Buffer = imageDataFromMat(z1).data.buffer;
-          output.nameZoneW = z1.size().width;
-          output.nameZoneH = z1.size().height;
-          if (z1Buffer) {
-            opts.push(z1Buffer);
+          let pageZone = 0;
+          console.timeLog('analysePage', 'before cropZone');
+          if (p1.nameZone) {
+            z1 = scope.track(cropZone(l, p1.nameZone, p1.factor));
+            pageZone = p1.nameZone.pageNumber!;
           }
-        }
-        if (z2) {
-          z2Buffer = imageDataFromMat(z2).data.buffer;
-          output.firstnameZoneW = z2.size().width;
-          output.firstnameZoneH = z2.size().height;
-          if (z2Buffer) {
-            opts.push(z2Buffer);
+          if (p1.firstnameZone) {
+            z2 = scope.track(cropZone(l, p1.firstnameZone, p1.factor));
+            pageZone = p1.firstnameZone.pageNumber!;
           }
-        }
-        if (z3) {
-          z3Buffer = imageDataFromMat(z3).data.buffer;
-          output.ineZoneW = z3.size().width;
-          output.ineZoneH = z3.size().height;
-
-          if (z3Buffer) {
-            opts.push(z3Buffer);
+          if (p1.ineZone) {
+            z3 = scope.track(cropZone(l, p1.ineZone, p1.factor));
+            pageZone = p1.ineZone.pageNumber!;
           }
-        }
+          console.timeLog('analysePage', 'after cropZone');
 
-        output.nameZone = z1Buffer;
-        output.firstnameZone = z2Buffer;
-        output.ineZone = z3Buffer;
-        if (p1.assist) {
-          try {
-            // Load Template
-            console.timeLog('analysePage', 'before template load');
-            const t = await getTemplateImage(p1.pageTemplate, p1.examId, p1.indexDb);
-            console.timeLog('analysePage', 'after template load');
-            if (t !== undefined) {
-              console.timeLog('analysePage', 'before template image load');
-              const ti = await loadImage(t);
-              console.timeLog('analysePage', 'after template image load');
-              let z1t: any;
-              let z2t: any;
-              let z3t: any;
-              let predictname: any;
-              let predictfirstname: any;
-              let predictine: any;
-              console.timeLog('analysePage', 'before cropZone template');
+          const output: DoPredictionsOutput = {
+            page: pageToAnalyze - pageZone,
+            resultPrediction: [],
+          };
+          let z1Buffer: ArrayBuffer | undefined;
+          let z2Buffer: ArrayBuffer | undefined;
+          let z3Buffer: ArrayBuffer | undefined;
 
-              if (p1.nameZone) {
-                z1t = cropZone(ti, p1.nameZone, p1.factor);
-              }
-              if (p1.firstnameZone) {
-                z2t = cropZone(ti, p1.firstnameZone, p1.factor);
-              }
-              if (p1.ineZone) {
-                z3t = cropZone(ti, p1.ineZone, p1.factor);
-              }
-              console.timeLog('analysePage', 'after cropZone template');
-
-              console.timeLog('analysePage', 'before doPredidction4zone name');
-
-              if (z1 !== undefined && z1t !== undefined) {
-                predictname = await doPredidction4zone(true, z1, z1t, p1.preferences, p1.looking4missing, p1.removeHorizontal, p1.debug!);
-                //            output.name = res1.solution[0] as string;
-                //            output.namePrecision = +res1.solution[1];
-                z1t.delete();
-                if (predictname.debug) {
-                  const z1BufferDebug = imageDataFromMat(predictname.debug).data.buffer;
-                  if (z1BufferDebug) {
-                    opts.push(z1BufferDebug);
-                    output.nameZoneDebug = z1BufferDebug;
-                  }
-                  predictname.debug.delete();
-                }
-              }
-              console.timeLog('analysePage', 'after doPredidction4zone name');
-              console.timeLog('analysePage', 'before doPredidction4zone firstname');
-              if (z2 !== undefined && z2t !== undefined) {
-                predictfirstname = await doPredidction4zone(
-                  true,
-                  z2,
-                  z2t,
-                  p1.preferences,
-                  p1.looking4missing,
-                  p1.removeHorizontal,
-                  p1.debug!,
-                );
-                //            output.firstname = res2.solution[0] as string;
-                //            output.firstnamePrecision = +res2.solution[1];
-                z2t.delete();
-                if (predictfirstname.debug) {
-                  const z2BufferDebug = imageDataFromMat(predictfirstname.debug).data.buffer;
-                  if (z2BufferDebug) {
-                    opts.push(z2BufferDebug);
-                    output.firstnameZoneDebug = z2BufferDebug;
-                  }
-                  predictfirstname.debug.delete();
-                }
-              }
-              console.timeLog('analysePage', 'after doPredidction4zone firstname');
-              console.timeLog('analysePage', 'before doPredidction4zone ine');
-
-              if (z3 !== undefined && z3t !== undefined) {
-                predictine = await doPredidction4zone(false, z3, z3t, p1.preferences, p1.looking4missing, p1.removeHorizontal, p1.debug!);
-                //            output.ine = res3.solution[0] as string;
-                //            output.inePrecision = +res3.solution[1];
-                z3t.delete();
-                if (predictine.debug) {
-                  const z3BufferDebug = imageDataFromMat(predictine.debug).data.buffer;
-                  if (z3BufferDebug) {
-                    opts.push(z3BufferDebug);
-                    output.ineZoneDebug = z3BufferDebug;
-                  }
-                  predictine.debug.delete();
-                }
-              }
-              console.timeLog('analysePage', 'after doPredidction4zone ine');
-              console.timeLog('analysePage', 'before computescore');
-
-              if (predictname?.solution?.length > 0 && predictfirstname?.solution?.length > 0) {
-                const predictnamelength: number = predictname.solution.length;
-                const predictfirstnamelength: number = predictfirstname.solution.length;
-                const cand = p1.candidates.filter(
-                  c => Math.abs(predictnamelength - c.name!.length) <= 2 && Math.abs(predictfirstnamelength - c.firstname!.length) <= 2,
-                );
-                statCAndPerPage.set(output.page, new Map());
-                cand.forEach(c => {
-                  const c1 = { ...c };
-                  const sizedistance =
-                    Math.abs(predictnamelength - c.name!.length) + Math.abs(predictfirstnamelength - c.firstname!.length);
-                  c1.score = 1000 / Math.pow(2, sizedistance);
-                  c1.proba = computeStatPredict(c1, predictname, predictfirstname, predictine);
-                  statCAndPerPage.get(output.page)?.set(c1.id!, c1);
-                });
-                const res = Array.from(statCAndPerPage.get(output.page)!.values()).sort(
-                  (a, b) => b.proba! * b.score! - a.proba! * a.score!,
-                );
-                let finalres = [];
-                if (res.length > 2) {
-                  finalres = [res[0], res[1], res[2]];
-                } else {
-                  finalres = res;
-                }
-                output.resultPrediction = finalres;
-              } else if (predictname?.solution?.length > 0) {
-                const predictnamelength: number = predictname.solution.length;
-                const cand = p1.candidates.filter(c => Math.abs(predictnamelength - c.name!.length) <= 2);
-                statCAndPerPage.set(output.page, new Map());
-                cand.forEach(c => {
-                  const c1 = { ...c };
-                  const sizedistance = Math.abs(predictnamelength - c.name!.length);
-                  c1.score = 1000 / Math.pow(2, sizedistance);
-                  c1.proba = computeStatPredict(c1, predictname, predictfirstname, predictine);
-                  statCAndPerPage.get(output.page)?.set(c1.id!, c1);
-                });
-                const res = Array.from(statCAndPerPage.get(output.page)!.values()).sort(
-                  (a, b) => b.proba! * b.score! - a.proba! * a.score!,
-                );
-                let finalres = [];
-                if (res.length > 2) {
-                  finalres = [res[0], res[1], res[2]];
-                } else {
-                  finalres = res;
-                }
-                output.resultPrediction = finalres;
-              }
-              console.timeLog('analysePage', 'after computescore');
+          if (z1) {
+            z1Buffer = imageDataFromMat(z1).data.buffer;
+            output.nameZoneW = z1.size().width;
+            output.nameZoneH = z1.size().height;
+            if (z1Buffer) {
+              opts.push(z1Buffer);
             }
-          } catch (exp: any) {
-            console.error('could not perform name analysis', exp);
-            continue;
           }
+          if (z2) {
+            z2Buffer = imageDataFromMat(z2).data.buffer;
+            output.firstnameZoneW = z2.size().width;
+            output.firstnameZoneH = z2.size().height;
+            if (z2Buffer) {
+              opts.push(z2Buffer);
+            }
+          }
+          if (z3) {
+            z3Buffer = imageDataFromMat(z3).data.buffer;
+            output.ineZoneW = z3.size().width;
+            output.ineZoneH = z3.size().height;
+
+            if (z3Buffer) {
+              opts.push(z3Buffer);
+            }
+          }
+
+          output.nameZone = z1Buffer;
+          output.firstnameZone = z2Buffer;
+          output.ineZone = z3Buffer;
+          if (p1.assist) {
+            try {
+              // Load Template
+              console.timeLog('analysePage', 'before template load');
+              const t = await getTemplateImage(p1.pageTemplate, p1.examId, p1.indexDb);
+              console.timeLog('analysePage', 'after template load');
+              if (t !== undefined) {
+                console.timeLog('analysePage', 'before template image load');
+                const ti = await loadImage(t);
+                console.timeLog('analysePage', 'after template image load');
+                let z1t: any;
+                let z2t: any;
+                let z3t: any;
+                let predictname: any;
+                let predictfirstname: any;
+                let predictine: any;
+                console.timeLog('analysePage', 'before cropZone template');
+
+                if (p1.nameZone) {
+                  z1t = scope.track(cropZone(ti, p1.nameZone, p1.factor));
+                }
+                if (p1.firstnameZone) {
+                  z2t = scope.track(cropZone(ti, p1.firstnameZone, p1.factor));
+                }
+                if (p1.ineZone) {
+                  z3t = scope.track(cropZone(ti, p1.ineZone, p1.factor));
+                }
+                console.timeLog('analysePage', 'after cropZone template');
+
+                console.timeLog('analysePage', 'before doPredidction4zone name');
+
+                if (z1 !== undefined && z1t !== undefined) {
+                  predictname = await doPredidction4zone(true, z1, z1t, p1.preferences, p1.looking4missing, p1.removeHorizontal, p1.debug!);
+                  //            output.name = res1.solution[0] as string;
+                  //            output.namePrecision = +res1.solution[1];
+                  scope.release(z1t);
+                  if (predictname.debug) {
+                    scope.track(predictname.debug);
+                    const z1BufferDebug = imageDataFromMat(predictname.debug).data.buffer;
+                    if (z1BufferDebug) {
+                      opts.push(z1BufferDebug);
+                      output.nameZoneDebug = z1BufferDebug;
+                    }
+                    scope.release(predictname.debug);
+                  }
+                }
+                console.timeLog('analysePage', 'after doPredidction4zone name');
+                console.timeLog('analysePage', 'before doPredidction4zone firstname');
+                if (z2 !== undefined && z2t !== undefined) {
+                  predictfirstname = await doPredidction4zone(
+                    true,
+                    z2,
+                    z2t,
+                    p1.preferences,
+                    p1.looking4missing,
+                    p1.removeHorizontal,
+                    p1.debug!,
+                  );
+                  //            output.firstname = res2.solution[0] as string;
+                  //            output.firstnamePrecision = +res2.solution[1];
+                  scope.release(z2t);
+                  if (predictfirstname.debug) {
+                    scope.track(predictfirstname.debug);
+                    const z2BufferDebug = imageDataFromMat(predictfirstname.debug).data.buffer;
+                    if (z2BufferDebug) {
+                      opts.push(z2BufferDebug);
+                      output.firstnameZoneDebug = z2BufferDebug;
+                    }
+                    scope.release(predictfirstname.debug);
+                  }
+                }
+                console.timeLog('analysePage', 'after doPredidction4zone firstname');
+                console.timeLog('analysePage', 'before doPredidction4zone ine');
+
+                if (z3 !== undefined && z3t !== undefined) {
+                  predictine = await doPredidction4zone(false, z3, z3t, p1.preferences, p1.looking4missing, p1.removeHorizontal, p1.debug!);
+                  //            output.ine = res3.solution[0] as string;
+                  //            output.inePrecision = +res3.solution[1];
+                  scope.release(z3t);
+                  if (predictine.debug) {
+                    scope.track(predictine.debug);
+                    const z3BufferDebug = imageDataFromMat(predictine.debug).data.buffer;
+                    if (z3BufferDebug) {
+                      opts.push(z3BufferDebug);
+                      output.ineZoneDebug = z3BufferDebug;
+                    }
+                    scope.release(predictine.debug);
+                  }
+                }
+                console.timeLog('analysePage', 'after doPredidction4zone ine');
+                console.timeLog('analysePage', 'before computescore');
+
+                if (predictname?.solution?.length > 0 && predictfirstname?.solution?.length > 0) {
+                  const predictnamelength: number = predictname.solution.length;
+                  const predictfirstnamelength: number = predictfirstname.solution.length;
+                  const cand = p1.candidates.filter(
+                    c => Math.abs(predictnamelength - c.name!.length) <= 2 && Math.abs(predictfirstnamelength - c.firstname!.length) <= 2,
+                  );
+                  statCAndPerPage.set(output.page, new Map());
+                  cand.forEach(c => {
+                    const c1 = { ...c };
+                    const sizedistance =
+                      Math.abs(predictnamelength - c.name!.length) + Math.abs(predictfirstnamelength - c.firstname!.length);
+                    c1.score = 1000 / Math.pow(2, sizedistance);
+                    c1.proba = computeStatPredict(c1, predictname, predictfirstname, predictine);
+                    statCAndPerPage.get(output.page)?.set(c1.id!, c1);
+                  });
+                  const res = Array.from(statCAndPerPage.get(output.page)!.values()).sort(
+                    (a, b) => b.proba! * b.score! - a.proba! * a.score!,
+                  );
+                  let finalres = [];
+                  if (res.length > 2) {
+                    finalres = [res[0], res[1], res[2]];
+                  } else {
+                    finalres = res;
+                  }
+                  output.resultPrediction = finalres;
+                } else if (predictname?.solution?.length > 0) {
+                  const predictnamelength: number = predictname.solution.length;
+                  const cand = p1.candidates.filter(c => Math.abs(predictnamelength - c.name!.length) <= 2);
+                  statCAndPerPage.set(output.page, new Map());
+                  cand.forEach(c => {
+                    const c1 = { ...c };
+                    const sizedistance = Math.abs(predictnamelength - c.name!.length);
+                    c1.score = 1000 / Math.pow(2, sizedistance);
+                    c1.proba = computeStatPredict(c1, predictname, predictfirstname, predictine);
+                    statCAndPerPage.get(output.page)?.set(c1.id!, c1);
+                  });
+                  const res = Array.from(statCAndPerPage.get(output.page)!.values()).sort(
+                    (a, b) => b.proba! * b.score! - a.proba! * a.score!,
+                  );
+                  let finalres = [];
+                  if (res.length > 2) {
+                    finalres = [res[0], res[1], res[2]];
+                  } else {
+                    finalres = res;
+                  }
+                  output.resultPrediction = finalres;
+                }
+                console.timeLog('analysePage', 'after computescore');
+              }
+            } catch (exp: any) {
+              console.error('could not perform name analysis', exp);
+              continue;
+            }
+          }
+          outputs.push(output);
+        } finally {
+          scope.dispose();
         }
-        outputs.push(output);
-        z1?.delete();
-        z2?.delete();
-        z3?.delete();
       }
       console.timeEnd('analysePage');
     }
@@ -721,26 +732,23 @@ function doPredidction4zone(
   removeHorizontal: boolean,
   debug: boolean,
 ): Promise<any> {
-  let graynomTemplate = new cv.Mat();
-  cv.cvtColor(srcTemplate, graynomTemplate, cv.COLOR_RGBA2GRAY, 0);
-  const casesTemplate = trouveCases(graynomTemplate, preference);
+  const { casePosition, caseDimension } = withCvScope(scope => {
+    const graynomTemplate = scope.track(new cv.Mat());
+    cv.cvtColor(srcTemplate, graynomTemplate, cv.COLOR_RGBA2GRAY, 0);
+    const casesTemplate = trouveCases(graynomTemplate, preference);
+    casesTemplate.cases.forEach((c: any) => scope.track(c));
+    casesTemplate.img_cases.forEach((c: any) => scope.track(c));
 
-  const casesTemplateSorted = casesTemplate.cases.sort(__comparePositionX);
-  const casePosition = [];
-  const caseDimension = [];
-  for (let k = 0; k < casesTemplateSorted.length; k++) {
-    const forme = casesTemplateSorted[k];
-    const dim = getDimensions(forme);
-    caseDimension.push(dim);
-    const pos = getPosition(forme);
-    casePosition.push(pos);
-  }
-  for (let k = 0; k < casesTemplate.cases.length; k++) {
-    casesTemplate.cases[k].delete();
-  }
-  for (let k = 0; k < casesTemplate.img_cases.length; k++) {
-    casesTemplate.img_cases[k].delete();
-  }
+    const casesTemplateSorted = casesTemplate.cases.sort(__comparePositionX);
+    const positions = [];
+    const dimensions = [];
+    for (let k = 0; k < casesTemplateSorted.length; k++) {
+      const forme = casesTemplateSorted[k];
+      dimensions.push(getDimensions(forme));
+      positions.push(getPosition(forme));
+    }
+    return { casePosition: positions, caseDimension: dimensions };
+  });
 
   const posX = casePosition.map(p => p.x);
   let distAverageX = [];
@@ -760,16 +768,54 @@ function doPredidction4zone(
     h: caseDimension.map(d => d.h).reduce((a, b) => a + b, 0) / caseDimension.length,
   };
 
-  graynomTemplate.delete();
-
   return fprediction(src, looking4missing, removeHorizontal, letter, preference, dimAverage, posXAverage, debug);
 
   //  return fprediction(src, candidates, looking4missing, removeHorizontal, letter, preference, dimAverage, posXAverage, debug);
 }
 
+/**
+ * Computes the cumulated length and the number of external contours longer than
+ * `minLongContour` in an image. All native objects are released, even on failure.
+ */
+function computeContourStats(imageSrc: ImageData, minLongContour: number): { length: number; count: number } {
+  return withCvScope(scope => {
+    const src = scope.track(cv.matFromImageData(imageSrc));
+    const gray = scope.track(new cv.Mat());
+    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+    cv.threshold(gray, gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
+
+    // Appliquer Canny Edge Detection
+    const edges = scope.track(new cv.Mat());
+    const threshold1 = 100;
+    const threshold2 = 200;
+    const apertureSize = 3;
+    cv.Canny(gray, edges, threshold1, threshold2, apertureSize);
+
+    // Trouver les contours dans l'image
+    const contours = scope.track(new cv.MatVector());
+    const hierarchy = scope.track(new cv.Mat());
+    cv.findContours(edges, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+
+    let length = 0;
+    let count = 0;
+    for (let ic = 0; ic < contours.size(); ic++) {
+      // MatVector.get() returns a new Mat that must be deleted as well
+      const contour = scope.track(contours.get(ic));
+      const contourLength = cv.arcLength(contour, true);
+      scope.release(contour);
+      if (contourLength > minLongContour) {
+        length = length + contourLength;
+        count = count + 1;
+      }
+    }
+    return { length, count };
+  });
+}
+
 function groupImagePerContoursLength(p: { msg: any; payload: ICluster; uid: string }): void {
   if (p.payload.images.length === 0) {
     postMessage({ msg: p.msg, payload: [], uid: p.uid });
+    return;
   }
   const nbrImage = p.payload.images[p.payload.images.length - 1].studentIndex + 1;
   const minLongContour = 3;
@@ -778,7 +824,7 @@ function groupImagePerContoursLength(p: { msg: any; payload: ICluster; uid: stri
   const attempts = 5;
   const crite = new cv.TermCriteria(cv.TermCriteria_EPS + cv.TermCriteria_MAX_ITER, 1000, 0.001);
 
-  const contourLengths = [];
+  const contourLengths: number[] = [];
 
   // Charger l'image en utilisant OpenCV.js
   for (let i = 0; i < nbrImage; i++) {
@@ -792,84 +838,49 @@ function groupImagePerContoursLength(p: { msg: any; payload: ICluster; uid: stri
         p.payload.images[i * nbreImagePerStudent + ij].height,
       );
 
-      let src = cv.matFromImageData(imageSrc);
-      const gray = new cv.Mat();
-      cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
-      //let dsize = new cv.Size(_gray.size().width *1, _gray.size().height *1);
-      // You can try more different parameters
-      //const gray = new cv.Mat();
-      //cv.resize(_gray, gray, dsize, 0, 0, cv.INTER_AREA);
-
-      cv.threshold(gray, gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
-
-      // Appliquer Canny Edge Detection
-      const edges = new cv.Mat();
-      const threshold1 = 100;
-      const threshold2 = 200;
-      const apertureSize = 3;
-      cv.Canny(gray, edges, threshold1, threshold2, apertureSize);
-
-      // Trouver les contours dans l'image
-      const contours = new cv.MatVector();
-      const hierarchy = new cv.Mat();
-
-      cv.findContours(edges, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-      for (let ic = 0; ic < contours.size(); ic++) {
-        const contour = contours.get(ic);
-        const length = cv.arcLength(contour, true);
-        if (length > minLongContour) {
-          contourLength = contourLength + length;
-          nbreContour = nbreContour + 1;
-        }
-      }
-
-      src.delete();
-      //_gray.delete();
-      gray.delete();
-      edges.delete();
-      contours.delete();
-      hierarchy.delete();
+      const stats = computeContourStats(imageSrc, minLongContour);
+      contourLength = contourLength + stats.length;
+      nbreContour = nbreContour + stats.count;
     }
     contourLengths.push(contourLength);
   }
   // Appliquer l'algorithme de k-means pour regrouper les longueurs des contours
   // const criteria = { criteria: cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, maxCount: 100, epsilon: 0.01 };
-  const labels = new cv.Mat();
-  const centers = new cv.Mat();
-  const data = cv.matFromArray(contourLengths.length, 1, cv.CV_32F, contourLengths);
+  const res = withCvScope(scope => {
+    const labels = scope.track(new cv.Mat());
+    const centers = scope.track(new cv.Mat());
+    const data = scope.track(cv.matFromArray(contourLengths.length, 1, cv.CV_32F, contourLengths));
 
-  cv.kmeans(data, numClusters, labels, crite, attempts, cv.KMEANS_PP_CENTERS, centers);
-  // Exemple : Afficher les résultats du regroupement k-means
+    cv.kmeans(data, numClusters, labels, crite, attempts, cv.KMEANS_PP_CENTERS, centers);
+    // Exemple : Afficher les résultats du regroupement k-means
 
-  let order: number[] = [];
+    let order: number[] = [];
 
-  for (let k = 0; k < numClusters; k++) {
-    order.push(centers.data32F[k]);
-  }
-  order.sort(function (a, b) {
-    return a - b;
+    for (let k = 0; k < numClusters; k++) {
+      order.push(centers.data32F[k]);
+    }
+    order.sort(function (a, b) {
+      return a - b;
+    });
+
+    let mapping = new Map<number, number>();
+    for (let k = 0; k < numClusters; k++) {
+      mapping.set(centers.data32F.indexOf(order[k]), k);
+    }
+
+    const clusters: number[] = [];
+    for (let k = 0; k < nbrImage; k++) {
+      clusters.push(mapping.get(labels.data32S[k])!);
+    }
+    return clusters;
   });
-
-  let mapping = new Map<number, number>();
-  for (let k = 0; k < numClusters; k++) {
-    mapping.set(centers.data32F.indexOf(order[k]), k);
-  }
-
-  let res: number[] = [];
-  for (let k = 0; k < nbrImage; k++) {
-    res.push(mapping.get(labels.data32S[k])!);
-  }
   postMessage({ msg: p.msg, payload: res, uid: p.uid });
-
-  // Libérer les ressources
-  labels.delete();
-  centers.delete();
-  data.delete();
 }
 
 function groupImagePerContoursLengthAndNbreContours(p: { msg: any; payload: ICluster; uid: string }): void {
   if (p.payload.images.length === 0) {
     postMessage({ msg: p.msg, payload: [], uid: p.uid });
+    return;
   }
   const nbrImage = p.payload.images[p.payload.images.length - 1].studentIndex + 1;
   const minLongContour = 3;
@@ -878,7 +889,7 @@ function groupImagePerContoursLengthAndNbreContours(p: { msg: any; payload: IClu
   const attempts = 5;
   const crite = new cv.TermCriteria(cv.TermCriteria_EPS + cv.TermCriteria_MAX_ITER, 1000, 0.001);
 
-  const contourLengths = [];
+  const contourLengths: number[] = [];
 
   // Charger l'image en utilisant OpenCV.js
   for (let i = 0; i < nbrImage; i++) {
@@ -892,96 +903,60 @@ function groupImagePerContoursLengthAndNbreContours(p: { msg: any; payload: IClu
         p.payload.images[i * nbreImagePerStudent + ij].height,
       );
 
-      let src = cv.matFromImageData(imageSrc);
-      const gray = new cv.Mat();
-      cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
-      //let dsize = new cv.Size(_gray.size().width *1, _gray.size().height *1);
-      // You can try more different parameters
-      //const gray = new cv.Mat();
-      //cv.resize(_gray, gray, dsize, 0, 0, cv.INTER_AREA);
-
-      cv.threshold(gray, gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
-
-      // Appliquer Canny Edge Detection
-      const edges = new cv.Mat();
-      const threshold1 = 100;
-      const threshold2 = 200;
-      const apertureSize = 3;
-      cv.Canny(gray, edges, threshold1, threshold2, apertureSize);
-
-      // Trouver les contours dans l'image
-      const contours = new cv.MatVector();
-      const hierarchy = new cv.Mat();
-
-      cv.findContours(edges, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-      for (let ic = 0; ic < contours.size(); ic++) {
-        const contour = contours.get(ic);
-        const length = cv.arcLength(contour, true);
-        if (length > minLongContour) {
-          contourLength = contourLength + length;
-          nbreContour = nbreContour + 1;
-        }
-      }
-
-      src.delete();
-      //_gray.delete();
-      gray.delete();
-      edges.delete();
-      contours.delete();
-      hierarchy.delete();
+      const stats = computeContourStats(imageSrc, minLongContour);
+      contourLength = contourLength + stats.length;
+      nbreContour = nbreContour + stats.count;
     }
     contourLengths.push(contourLength);
     contourLengths.push(nbreContour);
   }
   // Appliquer l'algorithme de k-means pour regrouper les longueurs des contours
   // const criteria = { criteria: cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, maxCount: 100, epsilon: 0.01 };
-  const labels = new cv.Mat();
-  const centers = new cv.Mat();
-  const data = cv.matFromArray(contourLengths.length / 2, 2, cv.CV_32F, contourLengths);
+  const res = withCvScope(scope => {
+    const labels = scope.track(new cv.Mat());
+    const centers = scope.track(new cv.Mat());
+    const data = scope.track(cv.matFromArray(contourLengths.length / 2, 2, cv.CV_32F, contourLengths));
 
-  cv.kmeans(data, numClusters, labels, crite, attempts, cv.KMEANS_PP_CENTERS, centers);
-  // Exemple : Afficher les résultats du regroupement k-means
+    cv.kmeans(data, numClusters, labels, crite, attempts, cv.KMEANS_PP_CENTERS, centers);
+    // Exemple : Afficher les résultats du regroupement k-means
 
-  let order: number[] = [];
+    let order: number[] = [];
 
-  for (let k = 0; k < numClusters; k++) {
-    order.push(centers.data32F[k * 2 + 1]);
-    //        order.push(centers.data32F[k]);
-  }
-  order.sort(function (a, b) {
-    return a - b;
+    for (let k = 0; k < numClusters; k++) {
+      order.push(centers.data32F[k * 2 + 1]);
+      //        order.push(centers.data32F[k]);
+    }
+    order.sort(function (a, b) {
+      return a - b;
+    });
+
+    let mapping = new Map<number, number>();
+    for (let k = 0; k < numClusters; k++) {
+      mapping.set((centers.data32F.indexOf(order[k]) - 1) / 2, k);
+    }
+
+    const clusters: number[] = [];
+    for (let k = 0; k < nbrImage; k++) {
+      clusters.push(mapping.get(labels.data32S[k])!);
+    }
+    return clusters;
   });
-
-  let mapping = new Map<number, number>();
-  for (let k = 0; k < numClusters; k++) {
-    mapping.set((centers.data32F.indexOf(order[k]) - 1) / 2, k);
-  }
-
-  let res: number[] = [];
-  for (let k = 0; k < nbrImage; k++) {
-    res.push(mapping.get(labels.data32S[k])!);
-  }
   postMessage({ msg: p.msg, payload: res, uid: p.uid });
-
-  // Libérer les ressources
-  labels.delete();
-  centers.delete();
-  data.delete();
 }
 
 function imageCrop(p: { msg: any; payload: any; uid: string }): void {
   // You can try more different parameters
-  let rect = new cv.Rect(p.payload.x, p.payload.y, p.payload.width, p.payload.height);
+  const rect = new cv.Rect(p.payload.x, p.payload.y, p.payload.width, p.payload.height);
   const imageSrc = new ImageData(new Uint8ClampedArray(p.payload.image), p.payload.imageWidth, p.payload.imageHeight);
 
-  let src = cv.matFromImageData(imageSrc);
-  const dst = roi(src, rect, undefined);
-  const res: Transferable = imageDataFromMat(dst).data.buffer;
+  const res: Transferable = withCvScope(scope => {
+    const src = scope.track(cv.matFromImageData(imageSrc));
+    const dst = scope.track(roi(src, rect, undefined));
+    return imageDataFromMat(dst).data.buffer;
+  });
 
   // put [res]
   source.target.postMessage({ msg: p.msg, payload: res, uid: p.uid }, [res]);
-  dst.delete();
-  src.delete();
 }
 
 let _letterModel: MLModel | undefined;
@@ -1005,30 +980,29 @@ function getModel(letter: boolean): MLModel {
  * This function is to convert again from cv.Mat to ImageData
  */
 function imageDataFromMat(mat: any): any {
-  // convert the mat type to cv.CV_8U
-  const img = new cv.Mat();
-  const depth = mat.type() % 8;
-  const scale = depth <= cv.CV_8S ? 1.0 : depth <= cv.CV_32S ? 1.0 / 256.0 : 255.0;
-  const shift = depth === cv.CV_8S || depth === cv.CV_16S ? 128.0 : 0.0;
-  mat.convertTo(img, cv.CV_8U, scale, shift);
+  return withCvScope(scope => {
+    // convert the mat type to cv.CV_8U
+    const img = scope.track(new cv.Mat());
+    const depth = mat.type() % 8;
+    const scale = depth <= cv.CV_8S ? 1.0 : depth <= cv.CV_32S ? 1.0 / 256.0 : 255.0;
+    const shift = depth === cv.CV_8S || depth === cv.CV_16S ? 128.0 : 0.0;
+    mat.convertTo(img, cv.CV_8U, scale, shift);
 
-  // convert the img type to cv.CV_8UC4
-  switch (img.type()) {
-    case cv.CV_8UC1:
-      cv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);
-      break;
-    case cv.CV_8UC3:
-      cv.cvtColor(img, img, cv.COLOR_RGB2RGBA);
-      break;
-    case cv.CV_8UC4:
-      break;
-    default:
-      img.delete();
-      throw new Error('Bad number of channels (Source image must have 1, 3 or 4 channels)');
-  }
-  const clampedArray = new ImageData(new Uint8ClampedArray(img.data), img.cols, img.rows);
-  img.delete();
-  return clampedArray;
+    // convert the img type to cv.CV_8UC4
+    switch (img.type()) {
+      case cv.CV_8UC1:
+        cv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);
+        break;
+      case cv.CV_8UC3:
+        cv.cvtColor(img, img, cv.COLOR_RGB2RGBA);
+        break;
+      case cv.CV_8UC4:
+        break;
+      default:
+        throw new Error('Bad number of channels (Source image must have 1, 3 or 4 channels)');
+    }
+    return new ImageData(new Uint8ClampedArray(img.data), img.cols, img.rows);
+  });
 }
 
 async function fprediction(
@@ -1047,42 +1021,47 @@ async function fprediction(
 
   const res = extractImageNew(src, removeHorizontal, lookingForMissingLetter, preference, dimAverage, posXAverage);
 
-  const predict = [];
-  for (let i = 0; i < res.letter.length; i++) {
-    let res1 = m.predict(imageDataFromMat(res.letter[i][1]));
-    if (onlyletter) {
-      if (res1[0] === '1') {
-        res1[0] = 'i';
-      }
-      if (res1[0] === '0') {
-        res1[0] = 'o';
-      }
-      if (res1[0] === '5') {
-        res1[0] = 's';
-      }
-      if (res1[0] === '3') {
-        res1[0] = 'b';
-      }
-      if (res1[0] === '9') {
-        res1[0] = 'g';
-      }
-    } //angular.io/guide/build#configuring-commonjs-dependencies
-    predict.push(res1);
-  }
-  for (let i = 0; i < res.letter.length; i++) {
-    res.letter[i][1].delete();
-  }
+  // extractImageNew transfers ownership of the letters and of invert_final to us
+  const scope = new CvScope();
+  res.letter.forEach((l: any) => scope.track(l[1]));
+  scope.track(res.invert_final);
+  try {
+    const predict = [];
+    for (let i = 0; i < res.letter.length; i++) {
+      let res1 = m.predict(imageDataFromMat(res.letter[i][1]));
+      if (onlyletter) {
+        if (res1[0] === '1') {
+          res1[0] = 'i';
+        }
+        if (res1[0] === '0') {
+          res1[0] = 'o';
+        }
+        if (res1[0] === '5') {
+          res1[0] = 's';
+        }
+        if (res1[0] === '3') {
+          res1[0] = 'b';
+        }
+        if (res1[0] === '9') {
+          res1[0] = 'g';
+        }
+      } //angular.io/guide/build#configuring-commonjs-dependencies
+      predict.push(res1);
+    }
 
-  if (debug) {
-    return {
-      debug: res.invert_final,
-      solution: predict,
-    };
-  } else {
-    res.invert_final.delete();
-    return {
-      solution: predict,
-    };
+    if (debug) {
+      return {
+        // ownership of the debug image is transferred to the caller
+        debug: scope.keep(res.invert_final),
+        solution: predict,
+      };
+    } else {
+      return {
+        solution: predict,
+      };
+    }
+  } finally {
+    scope.dispose();
   }
 }
 
@@ -1151,311 +1130,302 @@ function extractImageNew(
   const drawcontoursizeh = preference.drawcontoursizeh;
   const drawcontoursizev = preference.drawcontoursizev;
 
-  //  let src = cv.imread(inputid);
-  let dst = src.clone();
-  let gray = new cv.Mat();
-  cv.cvtColor(src, gray, cv.COLOR_BGR2GRAY, 0);
-  let thresh = new cv.Mat();
-  cv.threshold(gray, thresh, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
-  const anchor = new cv.Point(-1, -1);
-  if (removeHorizonzalAndVertical) {
-    // Step 1 remove vertical lines
-    let remove_vertical = new cv.Mat();
-    let ksize2 = new cv.Size(1, linelength);
-    // You can try more different parameters
-    // const anchor  = new cv.Point(-1, -1);
-    let vertical_kernel = cv.getStructuringElement(cv.MORPH_RECT, ksize2, anchor);
+  return withCvScope(scope => {
+    //  let src = cv.imread(inputid);
+    const dst = scope.track(src.clone());
+    const gray = scope.track(new cv.Mat());
+    cv.cvtColor(src, gray, cv.COLOR_BGR2GRAY, 0);
+    const thresh = scope.track(new cv.Mat());
+    cv.threshold(gray, thresh, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
+    const anchor = new cv.Point(-1, -1);
+    if (removeHorizonzalAndVertical) {
+      // Step 1 remove vertical lines
+      const remove_vertical = scope.track(new cv.Mat());
+      let ksize2 = new cv.Size(1, linelength);
+      // You can try more different parameters
+      // const anchor  = new cv.Point(-1, -1);
+      const vertical_kernel = scope.track(cv.getStructuringElement(cv.MORPH_RECT, ksize2, anchor));
+      cv.morphologyEx(
+        thresh,
+        remove_vertical,
+        cv.MORPH_OPEN,
+        vertical_kernel,
+        anchor,
+        2,
+        cv.BORDER_CONSTANT,
+        cv.morphologyDefaultBorderValue(),
+      );
+      const contours2 = scope.track(new cv.MatVector());
+      const hierarchy2 = scope.track(new cv.Mat());
+      cv.findContours(remove_vertical, contours2, hierarchy2, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+      let fillColor = new cv.Scalar(255, 255, 255);
+      cv.drawContours(dst, contours2, -1, fillColor, drawcontoursizev);
+
+      // Step 1 remove horizontal lines
+
+      const remove_horizontal = scope.track(new cv.Mat());
+      let ksize3 = new cv.Size(linelength, 1);
+      // You can try more different parameters
+      const horizontal_kernel = scope.track(cv.getStructuringElement(cv.MORPH_RECT, ksize3, anchor));
+      let anchor1 = new cv.Point(-1, -1);
+      cv.morphologyEx(
+        thresh,
+        remove_horizontal,
+        cv.MORPH_OPEN,
+        horizontal_kernel,
+        anchor1,
+        2,
+        cv.BORDER_CONSTANT,
+        cv.morphologyDefaultBorderValue(),
+      );
+      const contours3 = scope.track(new cv.MatVector());
+      const hierarchy3 = scope.track(new cv.Mat());
+      cv.findContours(remove_horizontal, contours3, hierarchy3, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+      let fillColor1 = new cv.Scalar(255, 255, 255);
+      cv.drawContours(dst, contours3, -1, fillColor1, drawcontoursizeh);
+      scope.release(remove_vertical);
+      scope.release(contours2);
+      scope.release(hierarchy2);
+      scope.release(vertical_kernel);
+      scope.release(remove_horizontal);
+      scope.release(contours3);
+      scope.release(hierarchy3);
+      scope.release(horizontal_kernel);
+    }
+
+    // Step 3 Repair kernel
+    let ksize4 = new cv.Size(repairsize, repairsize);
+    const repair_kernel = scope.track(cv.getStructuringElement(cv.MORPH_ELLIPSE, ksize4, anchor));
+    const mask = scope.track(new cv.Mat());
+    let dtype = -1;
+    // 1. Create a Mat which is full of zeros
+    const img = scope.track(cv.Mat.ones(src.rows, src.cols, cv.CV_8UC3));
+    img.setTo(new cv.Scalar(255, 255, 255));
+    cv.cvtColor(img, img, cv.COLOR_BGR2GRAY, 0);
+    // 2. Create a Mat which is full of ones
+    // let mat = cv.Mat.ones(rows, cols, type);
+    const gray1 = scope.track(new cv.Mat());
+    cv.cvtColor(dst, gray1, cv.COLOR_BGR2GRAY, 0);
+    // let img = cv.zeros(src.rows, src.cols, cv.CV_8UC3);
+    const dst1 = scope.track(new cv.Mat());
+    cv.subtract(img, gray1, dst1, mask, dtype);
+    //cv.subtract(img, dst, dst1);
+    const dilate = scope.track(new cv.Mat());
+    cv.dilate(dst1, dilate, repair_kernel, anchor, dilatesize, cv.BORDER_CONSTANT, cv.morphologyDefaultBorderValue());
+
+    const pre_result = scope.track(new cv.Mat());
+    const result = scope.track(new cv.Mat());
+
+    cv.bitwise_and(dilate, thresh, pre_result);
     cv.morphologyEx(
-      thresh,
-      remove_vertical,
-      cv.MORPH_OPEN,
-      vertical_kernel,
+      pre_result,
+      result,
+      cv.MORPH_CLOSE,
+      repair_kernel,
       anchor,
-      2,
+      morphsize,
       cv.BORDER_CONSTANT,
       cv.morphologyDefaultBorderValue(),
     );
-    let contours2 = new cv.MatVector();
-    let hierarchy2 = new cv.Mat();
-    cv.findContours(remove_vertical, contours2, hierarchy2, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-    let fillColor = new cv.Scalar(255, 255, 255);
-    cv.drawContours(dst, contours2, -1, fillColor, drawcontoursizev);
+    const final = scope.track(new cv.Mat());
 
-    // Step 1 remove horizontal lines
+    cv.bitwise_and(result, thresh, final);
+    const invert_final = scope.track(new cv.Mat());
 
-    let remove_horizontal = new cv.Mat();
-    let ksize3 = new cv.Size(linelength, 1);
-    // You can try more different parameters
-    let horizontal_kernel = cv.getStructuringElement(cv.MORPH_RECT, ksize3, anchor);
-    let anchor1 = new cv.Point(-1, -1);
-    cv.morphologyEx(
-      thresh,
-      remove_horizontal,
-      cv.MORPH_OPEN,
-      horizontal_kernel,
-      anchor1,
-      2,
-      cv.BORDER_CONSTANT,
-      cv.morphologyDefaultBorderValue(),
+    cv.subtract(img, final, invert_final, mask, dtype);
+
+    //        cv.threshold(src, src, 177, 200, cv.THRESH_BINARY);
+    const contours = scope.track(new cv.MatVector());
+    const hierarchy = scope.track(new cv.Mat());
+    const test = scope.track(new cv.Mat());
+
+    cv.adaptiveThreshold(invert_final, test, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 3, 2);
+
+    cv.findContours(test, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE);
+    const letters = new Map();
+    let rects: any[] = [];
+
+    for (let ct = 0; ct < contours.size(); ct++) {
+      // MatVector.get() returns a new Mat that must be deleted as well
+      const cnt = scope.track(contours.get(ct));
+      // You can try more different parameters
+      const rect = cv.boundingRect(cnt);
+      scope.release(cnt);
+      if (rect.width > 12 || rect.height > 12) {
+        rects.push(rect);
+      }
+    }
+
+    rects = rects.filter(
+      r => Math.abs(r.width - dimAverage.w) / dimAverage.w < 0.8 && Math.abs(r.height - dimAverage.h) / dimAverage.h < 0.7,
     );
-    let contours3 = new cv.MatVector();
-    let hierarchy3 = new cv.Mat();
-    cv.findContours(remove_horizontal, contours3, hierarchy3, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-    let fillColor1 = new cv.Scalar(255, 255, 255);
-    cv.drawContours(dst, contours3, -1, fillColor1, drawcontoursizeh);
-    remove_vertical.delete();
-    contours2.delete();
-    hierarchy2.delete();
-    vertical_kernel.delete();
-    remove_horizontal.delete();
-    contours3.delete();
-    hierarchy3.delete();
-    horizontal_kernel.delete();
-  }
 
-  // Step 3 Repair kernel
-  let ksize4 = new cv.Size(repairsize, repairsize);
-  let repair_kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, ksize4, anchor);
-  let mask = new cv.Mat();
-  let dtype = -1;
-  // 1. Create a Mat which is full of zeros
-  let img = new cv.Mat.ones(src.rows, src.cols, cv.CV_8UC3);
-  img.setTo(new cv.Scalar(255, 255, 255));
-  cv.cvtColor(img, img, cv.COLOR_BGR2GRAY, 0);
-  // 2. Create a Mat which is full of ones
-  // let mat = cv.Mat.ones(rows, cols, type);
-  let gray1 = new cv.Mat();
-  cv.cvtColor(dst, gray1, cv.COLOR_BGR2GRAY, 0);
-  // let img = cv.zeros(src.rows, src.cols, cv.CV_8UC3);
-  let dst1 = new cv.Mat();
-  cv.subtract(img, gray1, dst1, mask, dtype);
-  //cv.subtract(img, dst, dst1);
-  let dilate = new cv.Mat();
-  cv.dilate(dst1, dilate, repair_kernel, anchor, dilatesize, cv.BORDER_CONSTANT, cv.morphologyDefaultBorderValue());
+    rects.forEach(e => {
+      const diffw = e.width - dimAverage.w;
+      if (diffw > 0) {
+        e.x = e.x + diffw / 2;
+        e.width = dimAverage.w;
+      }
+      const diffh = e.height - dimAverage.h;
+      if (diffh > 0) {
+        e.y = e.y + diffh / 2;
+        e.height = dimAverage.h;
+      }
+    });
 
-  let pre_result = new cv.Mat();
-  let result = new cv.Mat();
+    let merge = mergeRect(rects);
+    let kk = 0;
+    while (merge !== null && kk < 200) {
+      rects = rects.filter(rect => rect !== merge.toRemove1 && rect !== merge.toRemove2);
+      const e = merge.u;
+      const diffw = e.width - dimAverage.w;
+      if (diffw > 0) {
+        e.x = e.x + diffw / 2;
+        e.width = dimAverage.w;
+      }
+      const diffh = e.height - dimAverage.h;
+      if (diffh > 0) {
+        e.y = e.y + diffh / 2;
+        e.height = dimAverage.h;
+      }
 
-  cv.bitwise_and(dilate, thresh, pre_result);
-  cv.morphologyEx(
-    pre_result,
-    result,
-    cv.MORPH_CLOSE,
-    repair_kernel,
-    anchor,
-    morphsize,
-    cv.BORDER_CONSTANT,
-    cv.morphologyDefaultBorderValue(),
-  );
-  let final = new cv.Mat();
-
-  cv.bitwise_and(result, thresh, final);
-  let invert_final = new cv.Mat();
-
-  cv.subtract(img, final, invert_final, mask, dtype);
-
-  //        cv.threshold(src, src, 177, 200, cv.THRESH_BINARY);
-  let contours = new cv.MatVector();
-  let hierarchy = new cv.Mat();
-  let test = new cv.Mat();
-
-  cv.adaptiveThreshold(invert_final, test, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 3, 2);
-
-  cv.findContours(test, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE);
-  const letters = new Map();
-  let rects: any[] = [];
-
-  for (let ct = 0; ct < contours.size(); ct++) {
-    let cnt = contours.get(ct);
-    // You can try more different parameters
-    let rect = cv.boundingRect(cnt);
-    if (rect.width > 12 || rect.height > 12) {
-      rects.push(rect);
-    }
-  }
-
-  rects = rects.filter(
-    r => Math.abs(r.width - dimAverage.w) / dimAverage.w < 0.8 && Math.abs(r.height - dimAverage.h) / dimAverage.h < 0.7,
-  );
-
-  rects.forEach(e => {
-    const diffw = e.width - dimAverage.w;
-    if (diffw > 0) {
-      e.x = e.x + diffw / 2;
-      e.width = dimAverage.w;
-    }
-    const diffh = e.height - dimAverage.h;
-    if (diffh > 0) {
-      e.y = e.y + diffh / 2;
-      e.height = dimAverage.h;
-    }
-  });
-
-  let merge = mergeRect(rects);
-  let kk = 0;
-  while (merge !== null && kk < 200) {
-    rects = rects.filter(rect => rect !== merge.toRemove1 && rect !== merge.toRemove2);
-    const e = merge.u;
-    const diffw = e.width - dimAverage.w;
-    if (diffw > 0) {
-      e.x = e.x + diffw / 2;
-      e.width = dimAverage.w;
-    }
-    const diffh = e.height - dimAverage.h;
-    if (diffh > 0) {
-      e.y = e.y + diffh / 2;
-      e.height = dimAverage.h;
+      rects.push(e);
+      merge = mergeRect(rects);
+      kk = kk + 1;
     }
 
-    rects.push(e);
-    merge = mergeRect(rects);
-    kk = kk + 1;
-  }
-
-  /*
+    /*
   rects.forEach(e=> {
     e.x = e.x-4
     e.width = e.width+8
     e.y = e.y -4
     e.height = e.height+8
   })*/
-  rects.forEach(e => {
-    e.x = e.x - 2;
-    e.width = e.width + 4;
-    e.y = e.y - 2;
-    e.height = e.height + 4;
-  });
-  rects.sort((a, b) => {
-    if (a.x < b.x) {
-      return -1;
-    } else {
-      return 1;
-    }
-  });
-
-  const rectToRemove: number[] = [];
-  if (rects.length > 2) {
-    for (let kr = 0; kr < rects.length - 1; kr++) {
-      if (rects[kr + 1].x - rects[kr].x < 1.5 * posXAverage) {
-        // console.error('no hole')
-      } else if (rects[kr + 1].x - rects[kr].x < 2.5 * posXAverage) {
-        // console.error('only one hole')
-      } else {
-        //TODO to remvove
-        //         console.error('only two hole')
-        rectToRemove.push(kr + 1);
-      }
-    }
-  }
-  //  console.error(rectToRemove)
-  rects = rects.filter((rect, index) => !rectToRemove.includes(index));
-
-  const newrects: any[] = [];
-  if (lookingForMissingLetter && rects.length > 1) {
-    //TODO Improve based on averageDistance on template
-    const maxDistance = dimAverage.w;
-    //    const dstavg = (lettersf[lettersf.length - 1][0].x - lettersf[0][0].x) / lettersf.length;
-    let maxHauteur = 0;
-    let maxLargeur = 0;
-    let minY = 800;
-    const nbrMissing = [];
-    for (let i = 0; i < rects.length - 1; i++) {
-      let diffXt = rects[i + 1].x - rects[i].x;
-      if (diffXt > 2 * maxDistance) {
-        nbrMissing.push(i);
-      }
-      if (rects[i].y < minY) {
-        minY = rects[i].y;
-      }
-      if (rects[i].height > maxHauteur) {
-        maxHauteur = rects[i].height;
-      }
-      if (rects[i].width > maxLargeur) {
-        maxLargeur = rects[i].width;
-      }
-    }
-    nbrMissing.forEach(n => {
-      let x = rects[n].x + posXAverage;
-      let rect = new cv.Rect(x, minY, maxLargeur, maxHauteur);
-      newrects.push(rect);
+    rects.forEach(e => {
+      e.x = e.x - 2;
+      e.width = e.width + 4;
+      e.y = e.y - 2;
+      e.height = e.height + 4;
     });
-  }
+    rects.sort((a, b) => {
+      if (a.x < b.x) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
 
-  rects = rects.concat(newrects);
-  rects.sort((a, b) => {
-    if (a.x < b.x) {
-      return -1;
-    } else {
-      return 1;
+    const rectToRemove: number[] = [];
+    if (rects.length > 2) {
+      for (let kr = 0; kr < rects.length - 1; kr++) {
+        if (rects[kr + 1].x - rects[kr].x < 1.5 * posXAverage) {
+          // console.error('no hole')
+        } else if (rects[kr + 1].x - rects[kr].x < 2.5 * posXAverage) {
+          // console.error('only one hole')
+        } else {
+          //TODO to remvove
+          //         console.error('only two hole')
+          rectToRemove.push(kr + 1);
+        }
+      }
     }
-  });
+    //  console.error(rectToRemove)
+    rects = rects.filter((rect, index) => !rectToRemove.includes(index));
 
-  // TODO interect on rect
-  rects.forEach(rect => {
-    let rectangleColor = new cv.Scalar(0, 0, 0);
-    let point1 = new cv.Point(rect.x, rect.y);
-    let point2 = new cv.Point(rect.x + rect.width, rect.y + rect.height);
-    let dst4 = new cv.Mat();
-    let dst2 = new cv.Mat();
-    let dst3 = new cv.Mat();
-    let s = new cv.Scalar(255, 255, 255, 255);
-
-    dst4 = roi(invert_final, rect, dst4); // You can try more different parameters
-
-    const ratioOrig = dimAverage.w / dimAverage.h;
-    const ratioRect = dst4.size().width / dst4.size().height;
-    let dsize = new cv.Size(28, 28);
-
-    if (ratioOrig < ratioRect) {
-      let height = Math.floor((26.0 * ratioOrig) / ratioRect);
-      dsize = new cv.Size(26, height + 1);
-    } else {
-      let width = Math.floor((26.0 * ratioRect) / ratioOrig);
-      dsize = new cv.Size(width + 1, 26);
+    const newrects: any[] = [];
+    if (lookingForMissingLetter && rects.length > 1) {
+      //TODO Improve based on averageDistance on template
+      const maxDistance = dimAverage.w;
+      //    const dstavg = (lettersf[lettersf.length - 1][0].x - lettersf[0][0].x) / lettersf.length;
+      let maxHauteur = 0;
+      let maxLargeur = 0;
+      let minY = 800;
+      const nbrMissing = [];
+      for (let i = 0; i < rects.length - 1; i++) {
+        let diffXt = rects[i + 1].x - rects[i].x;
+        if (diffXt > 2 * maxDistance) {
+          nbrMissing.push(i);
+        }
+        if (rects[i].y < minY) {
+          minY = rects[i].y;
+        }
+        if (rects[i].height > maxHauteur) {
+          maxHauteur = rects[i].height;
+        }
+        if (rects[i].width > maxLargeur) {
+          maxLargeur = rects[i].width;
+        }
+      }
+      nbrMissing.forEach(n => {
+        let x = rects[n].x + posXAverage;
+        let rect = new cv.Rect(x, minY, maxLargeur, maxHauteur);
+        newrects.push(rect);
+      });
     }
 
-    const bordertopBottom = (28 - dsize.height) / 2;
-    const borderleftRight = (28 - dsize.width) / 2;
-    cv.resize(dst4, dst2, dsize, 0, 0, cv.INTER_AREA);
-    let dst5 = dst2.clone();
-    cv.copyMakeBorder(dst5, dst3, bordertopBottom, bordertopBottom, borderleftRight, borderleftRight, cv.BORDER_CONSTANT, s);
+    rects = rects.concat(newrects);
+    rects.sort((a, b) => {
+      if (a.x < b.x) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
 
-    letters.set(rect, dst3);
+    // TODO interect on rect
+    rects.forEach(rect => {
+      let rectangleColor = new cv.Scalar(0, 0, 0);
+      let point1 = new cv.Point(rect.x, rect.y);
+      let point2 = new cv.Point(rect.x + rect.width, rect.y + rect.height);
+      // roi() returns a new Mat header: no need to pre-allocate dst4 (it used to leak)
+      const dst4 = scope.track(roi(invert_final, rect, undefined)); // You can try more different parameters
+      const dst2 = scope.track(new cv.Mat());
+      const dst3 = scope.track(new cv.Mat());
+      let s = new cv.Scalar(255, 255, 255, 255);
 
-    dst5.delete();
-    dst4.delete();
-    dst2.delete();
-    cv.rectangle(invert_final, point1, point2, rectangleColor, 2, cv.LINE_AA, 0);
+      const ratioOrig = dimAverage.w / dimAverage.h;
+      const ratioRect = dst4.size().width / dst4.size().height;
+      let dsize = new cv.Size(28, 28);
+
+      if (ratioOrig < ratioRect) {
+        let height = Math.floor((26.0 * ratioOrig) / ratioRect);
+        dsize = new cv.Size(26, height + 1);
+      } else {
+        let width = Math.floor((26.0 * ratioRect) / ratioOrig);
+        dsize = new cv.Size(width + 1, 26);
+      }
+
+      const bordertopBottom = (28 - dsize.height) / 2;
+      const borderleftRight = (28 - dsize.width) / 2;
+      cv.resize(dst4, dst2, dsize, 0, 0, cv.INTER_AREA);
+      const dst5 = scope.track(dst2.clone());
+      cv.copyMakeBorder(dst5, dst3, bordertopBottom, bordertopBottom, borderleftRight, borderleftRight, cv.BORDER_CONSTANT, s);
+
+      letters.set(rect, dst3);
+
+      scope.release(dst5);
+      scope.release(dst4);
+      scope.release(dst2);
+      cv.rectangle(invert_final, point1, point2, rectangleColor, 2, cv.LINE_AA, 0);
+    });
+
+    let lettersf = [...letters];
+    lettersf.sort((a, b) => {
+      if (a[0].x < b[0].x) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+
+    // Success: ownership of the letters and of invert_final is transferred to the caller.
+    // Every other intermediate Mat is released by the scope.
+    lettersf.forEach(l => scope.keep(l[1]));
+    return {
+      letter: lettersf,
+      invert_final: scope.keep(invert_final),
+    };
   });
-
-  gray.delete();
-  thresh.delete();
-  test.delete();
-  repair_kernel.delete();
-  mask.delete();
-  img.delete();
-  gray1.delete();
-  dst1.delete();
-  dilate.delete();
-  dst.delete();
-  pre_result.delete();
-  result.delete();
-  final.delete();
-  contours.delete();
-  hierarchy.delete();
-  let lettersf = [...letters];
-  lettersf.sort((a, b) => {
-    if (a[0].x < b[0].x) {
-      return -1;
-    } else {
-      return 1;
-    }
-  });
-
-  return {
-    letter: lettersf,
-    invert_final: invert_final,
-  };
 }
 
 function union(rect1: any, rect2: any): any {
@@ -1527,101 +1497,104 @@ function mergeRect(rects: any[]): any {
 function getLinesFromImage(p: { msg: any; payload: any; uid: string }): any {
   const image = p.payload.image;
   // console.error(image);
-  // Convert image to OpenCV Mat
-  const src = cv.matFromImageData(image);
-  const gray = new cv.Mat();
-  cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
-  src.delete();
+  const res: any = withCvScope(scope => {
+    // Convert image to OpenCV Mat
+    const src = scope.track(cv.matFromImageData(image));
+    const gray = scope.track(new cv.Mat());
+    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+    scope.release(src);
 
-  // Binarization
-  const binary = new cv.Mat();
-  cv.threshold(gray, binary, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
+    // Binarization
+    const binary = scope.track(new cv.Mat());
+    cv.threshold(gray, binary, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
 
-  // Calculate horizontal projection
-  const horizontalProjection: any[] = [];
-  for (let row = 0; row < binary.rows; row++) {
-    let sum = 0;
-    const rowData = binary.ucharPtr(row);
-    for (let col = 0; col < binary.cols; col++) {
-      sum += rowData[col];
+    // Calculate horizontal projection
+    const horizontalProjection: any[] = [];
+    for (let row = 0; row < binary.rows; row++) {
+      let sum = 0;
+      const rowData = binary.ucharPtr(row);
+      for (let col = 0; col < binary.cols; col++) {
+        sum += rowData[col];
+      }
+      horizontalProjection.push(sum);
     }
-    horizontalProjection.push(sum);
-  }
 
-  // Detect line boundaries
-  const threshold = Math.max(...horizontalProjection) * 0.05;
-  const lineBoundaries: any[] = [];
-  let inLine = false,
-    start = 0;
+    // Detect line boundaries
+    const threshold = Math.max(...horizontalProjection) * 0.05;
+    const lineBoundaries: any[] = [];
+    let inLine = false,
+      start = 0;
 
-  horizontalProjection.forEach((value, i) => {
-    if (value > threshold && !inLine) {
-      start = i;
-      inLine = true;
-    } else if (value <= threshold && inLine) {
-      lineBoundaries.push([start, i]);
-      inLine = false;
-    }
+    horizontalProjection.forEach((value, i) => {
+      if (value > threshold && !inLine) {
+        start = i;
+        inLine = true;
+      } else if (value <= threshold && inLine) {
+        lineBoundaries.push([start, i]);
+        inLine = false;
+      }
+    });
+
+    // Merge nearby boundaries
+    const merged: any[] = [];
+    const MERGE_THRESHOLD = 2;
+    lineBoundaries.forEach(([currStart, currEnd]) => {
+      if (currEnd - currStart < 2) {
+        return;
+      }
+
+      const last = merged[merged.length - 1];
+      if (last && currStart - last[1] <= MERGE_THRESHOLD) {
+        merged[merged.length - 1][1] = currEnd;
+      } else {
+        merged.push([currStart, currEnd]);
+      }
+    });
+
+    // Extract line images
+    const lines: any[] = [];
+    const PAD = 8;
+    merged.forEach(([start1, end]) => {
+      // Calculate region sum using projection values
+      const regionSum = horizontalProjection.slice(start1, end).reduce((acc, val) => acc + val, 0);
+
+      if (regionSum < 1000) {
+        return;
+      }
+      const paddedStart = Math.max(0, start1 - PAD);
+      const paddedEnd = Math.min(gray.rows, end + PAD);
+      const rect = new cv.Rect(0, paddedStart, gray.cols, paddedEnd - paddedStart);
+      //    const line = gray.rowRange(paddedStart, paddedEnd).clone();
+      const roiTmp = scope.track(gray.roi(rect));
+      const line = scope.track(roiTmp.clone());
+      scope.release(roiTmp);
+      lines.push(line);
+    });
+
+    // Cleanup
+    scope.release(gray);
+    scope.release(binary);
+    const lineImages: any = {};
+    // Convert lines to base64
+    const widths: number[] = [];
+    const heights: number[] = [];
+    const linesbase64 = lines.map(line => {
+      // const buffer = new cv.Mat();
+      //    console.error(line)
+      // console.error(line.height)
+      const i = imageDataFromMat(line);
+      widths.push(line.size().width);
+      heights.push(line.size().height);
+      scope.release(line);
+
+      const buffer = i.data.buffer;
+      return buffer;
+    });
+    lineImages.linesbase64 = linesbase64;
+    lineImages.widths = widths;
+    lineImages.heights = heights;
+    return lineImages;
   });
-
-  // Merge nearby boundaries
-  const merged: any[] = [];
-  const MERGE_THRESHOLD = 2;
-  lineBoundaries.forEach(([currStart, currEnd]) => {
-    if (currEnd - currStart < 2) {
-      return;
-    }
-
-    const last = merged[merged.length - 1];
-    if (last && currStart - last[1] <= MERGE_THRESHOLD) {
-      merged[merged.length - 1][1] = currEnd;
-    } else {
-      merged.push([currStart, currEnd]);
-    }
-  });
-
-  // Extract line images
-  const lines: any[] = [];
-  const PAD = 8;
-  merged.forEach(([start1, end]) => {
-    // Calculate region sum using projection values
-    const regionSum = horizontalProjection.slice(start1, end).reduce((acc, val) => acc + val, 0);
-
-    if (regionSum < 1000) {
-      return;
-    }
-    const paddedStart = Math.max(0, start1 - PAD);
-    const paddedEnd = Math.min(gray.rows, end + PAD);
-    const rect = new cv.Rect(0, paddedStart, gray.cols, paddedEnd - paddedStart);
-    //    const line = gray.rowRange(paddedStart, paddedEnd).clone();
-    const roiTmp = gray.roi(rect);
-    const line = roiTmp.clone();
-    roiTmp.delete();
-    lines.push(line);
-  });
-
-  // Cleanup
-  gray.delete();
-  binary.delete();
-  const res: any = {};
-  // Convert lines to base64
-  const widths: number[] = [];
-  const heights: number[] = [];
-  const linesbase64 = lines.map(line => {
-    // const buffer = new cv.Mat();
-    //    console.error(line)
-    // console.error(line.height)
-    const i = imageDataFromMat(line);
-    widths.push(line.size().width);
-    heights.push(line.size().height);
-    line.delete();
-
-    const buffer = i.data.buffer;
-    return buffer;
-  });
-  res.linesbase64 = linesbase64;
-  res.widths = widths;
-  res.heights = heights;
 
   source.target.postMessage({ msg: p.msg, payload: res, uid: p.uid }, res.linesbase64);
 }
