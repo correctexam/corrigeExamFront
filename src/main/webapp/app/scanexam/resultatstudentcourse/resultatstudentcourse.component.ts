@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
@@ -74,6 +75,9 @@ export class ResultatStudentcourseComponent implements OnInit {
   faFileCsv = faFileCsv;
   fatemperaturethreequarters = faTemperatureThreeQuarters;
 
+  // completes the subscriptions to application-wide observables when the component is destroyed
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(
     protected applicationConfigService: ApplicationConfigService,
     private http: HttpClient,
@@ -113,7 +117,7 @@ export class ResultatStudentcourseComponent implements OnInit {
           this.loadEtudiants();
           // this.loadLibelle();
         });
-        this.translate.onLangChange.subscribe(() => {
+        this.translate.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
           this.updateTitle();
           this.translate.get('scanexam.mailtemplate').subscribe(data => {
             if (this.exam !== undefined) {

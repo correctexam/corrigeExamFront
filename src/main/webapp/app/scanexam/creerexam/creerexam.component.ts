@@ -1,4 +1,5 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faDownload, faLink } from '@fortawesome/free-solid-svg-icons';
@@ -48,6 +49,9 @@ export class CreerexamComponent implements OnInit, AfterViewInit {
   editForm: UntypedFormGroup;
   errorParsingPdf = false;
 
+  // completes the subscriptions to application-wide observables when the component is destroyed
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
@@ -80,7 +84,7 @@ export class CreerexamComponent implements OnInit, AfterViewInit {
         this.courseService.find(+this.courseid).subscribe(c => {
           this.coursName = c.body?.name ?? '';
           this.updateTitle();
-          this.translateService.onLangChange.subscribe(() => {
+          this.translateService.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
             this.updateTitle();
           });
         });

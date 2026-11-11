@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 import { faMotorcycle as fasMotorcycle } from '@fortawesome/free-solid-svg-icons';
 import { faGraduationCap as faGraduationCap } from '@fortawesome/free-solid-svg-icons';
@@ -99,6 +100,9 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
   correctionFinish = false;
 
   infoExamDetail = { nbrepagenonalign: 0, nbrepagealign: 0, nbrepagetemplate: 0, nbrecopie: 0, cond1: false, cond2: false, cond3: false };
+
+  // completes the subscriptions to application-wide observables when the component is destroyed
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     public courseService: CourseService,
@@ -208,7 +212,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
         this.translateService.get('scanexam.removeexam').subscribe(() => {
           this.initCmpt();
         });
-        this.translateService.onLangChange.subscribe(() => {
+        this.translateService.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
           this.initCmpt();
           this.updateTitle();
         });

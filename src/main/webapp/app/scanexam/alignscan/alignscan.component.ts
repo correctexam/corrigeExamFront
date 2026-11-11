@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/member-ordering */
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ExamService } from '../../entities/exam/service/exam.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService, PrimeTemplate } from 'primeng/api';
@@ -161,6 +162,9 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
   nbreCore = (navigator.hardwareConcurrency - 2) / 2 > 0 ? (navigator.hardwareConcurrency - 2) / 2 : 1;
   nbreCoreMax = navigator.hardwareConcurrency - 2;
   resolves: Map<number, any> = new Map();
+  // completes the subscriptions to application-wide observables when the component is destroyed
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(
     public examService: ExamService,
     protected activatedRoute: ActivatedRoute,
@@ -212,7 +216,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
           if (data.body !== null) {
             this.exam = data.body;
             this.updateTitle();
-            this.translateService.onLangChange.subscribe(() => {
+            this.translateService.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
               this.updateTitle();
             });
 

@@ -1,7 +1,19 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable prefer-const */
 /* eslint-disable no-console */
-import { AfterViewInit, Component, HostListener, OnInit, ViewChild, WritableSignal, effect, signal } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  HostListener,
+  OnInit,
+  ViewChild,
+  WritableSignal,
+  effect,
+  signal,
+  DestroyRef,
+  inject,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ExamService } from '../../../entities/exam/service/exam.service';
 import { ZoneService } from '../../../entities/zone/service/zone.service';
 import { CourseService } from 'app/entities/course/service/course.service';
@@ -124,6 +136,9 @@ export class AssocierNbgraderComponent implements OnInit, AfterViewInit {
   sheetName: string = '';
   shortcuts: ShortcutInput[] = [];
 
+  // completes the subscriptions to application-wide observables when the component is destroyed
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(
     public examService: ExamService,
     public examsheetService: ExamSheetService,
@@ -179,7 +194,7 @@ export class AssocierNbgraderComponent implements OnInit, AfterViewInit {
               this.sheets = value[1].body!;
               this.exam = value[2].body!;
               this.updateTitle();
-              this.translateService.onLangChange.subscribe(() => {
+              this.translateService.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
                 this.updateTitle();
               });
 
