@@ -12,6 +12,7 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { CacheUploadService, CacheUploadNotification, CacheDownloadNotification } from '../exam-detail/cacheUpload.service';
 import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-translate/core';
 import {
+  ScanAlignError,
   ScanAlignService,
   ScanRequestPayload,
   ScanStatusDto,
@@ -23,7 +24,7 @@ import {
 } from '../services/scan-align.service';
 
 import { fromWorkerPool } from 'observable-webworker';
-import { Observable, Subscriber, firstValueFrom } from 'rxjs';
+import { Observable, Subscriber, firstValueFrom, lastValueFrom, tap } from 'rxjs';
 import { worker1 } from '../services/workerimport';
 import { PreferenceService } from '../preference-page/preference.service';
 import { DialogService } from 'primeng/dynamicdialog';
@@ -532,57 +533,55 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
       min_radius: SERVER_ALIGN_MIN_RADIUS,
     };
 
-    await firstValueFrom(this.scanAlignService.launch(payload));
-
-    // Le flux SSE est un hot stream qui ne se termine jamais seul : on le ferme
-    // une fois toutes les pages demandées arrivées à un statut terminal.
-    await new Promise<void>(resolve => {
-      const done = new Set<number>();
-      const expected = pages.length;
-      const source = this.scanAlignService.streamProgress(+this.examId);
-
-      source.onmessage = (ev: MessageEvent) => {
-        let dto: ScanStatusDto;
-        try {
-          dto = JSON.parse(ev.data);
-        } catch {
-          return;
-        }
-
-        const terminal = dto.status === 'DONE' || dto.status === 'SUCCESS' || dto.status === 'finished' || dto.progress >= 100;
-        done.add(dto.page);
-        this.percentavancement.set(dto.progress);
-        this.progress.set(dto.progress);
-        this.submessage.set(this.translateService.instant('scanexam.aveserver', { page: done.size, total: expected }));
-        if (terminal) {
-          source.close();
-          this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, false).then(async () => {
-            this.blocked = false;
-
-            if (this.showMapping) {
-              this.displayBasic = true;
-            } else {
-              this._showVignette = true;
+    // Le service ouvre le flux SSE AVANT de soumettre le job (flux sans rejeu), puis émet
+    // les statuts de page jusqu'à `finished` ; il échoue sur `error`, perte de connexion ou inactivité.
+    const done = new Set<number>();
+    const expected = pages.length;
+    try {
+      await lastValueFrom(
+        this.scanAlignService.runJob(payload).pipe(
+          tap((dto: ScanStatusDto) => {
+            if (dto.page > 0) {
+              done.add(dto.page);
             }
-            this.partialAlign = false;
-            this.showMapping = false;
-            this.startPage = 1;
-            this.processpage = [];
-            this.currentPageAlign = 1;
-            this.percentavancement.set(0);
-            this.endPage = await this.db.countNonAlignImage(+this.examId);
-            this.numberPagesInScan = this.endPage;
-            this.nbPageAlignInCache = await this.db.countAlignImage(+this.examId);
+            this.percentavancement.set(dto.progress);
+            this.progress.set(dto.progress);
+            this.submessage.set(this.translateService.instant('scanexam.aveserver', { page: done.size, total: expected }));
+          }),
+        ),
+        { defaultValue: undefined },
+      );
+    } catch (e) {
+      console.error('server alignment failed', e);
+      this.blocked = false;
+      this.percentavancement.set(0);
+      this.messageService.add({
+        severity: 'error',
+        summary: this.translateService.instant('scanexam.alignementserveurerreur'),
+        detail: e instanceof ScanAlignError ? e.message : String(e),
+        life: 15000,
+      });
+      return;
+    }
 
-            resolve();
-          });
-        }
-        //      }
-      };
-      source.onerror = () => {
-        // L'EventSource se reconnecte automatiquement ; on ne conclut pas ici.
-      };
-    });
+    // Job terminé : le cache cache/{examId}.sqlite3 est sur S3, on l'importe dans le cache local
+    await this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, false);
+    this.blocked = false;
+
+    if (this.showMapping) {
+      this.displayBasic = true;
+    } else {
+      this._showVignette = true;
+    }
+    this.partialAlign = false;
+    this.showMapping = false;
+    this.startPage = 1;
+    this.processpage = [];
+    this.currentPageAlign = 1;
+    this.percentavancement.set(0);
+    this.endPage = await this.db.countNonAlignImage(+this.examId);
+    this.numberPagesInScan = this.endPage;
+    this.nbPageAlignInCache = await this.db.countAlignImage(+this.examId);
 
     // Rapatrie les pages alignées depuis le cache serveur vers le cache local
     // (format identique à l'alignement local : background getAlignPage renvoie `value`).

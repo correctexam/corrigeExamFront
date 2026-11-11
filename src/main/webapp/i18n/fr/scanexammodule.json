@@ -27,6 +27,7 @@
     "localtooltip": "Aligner dans le navigateur avec OpenCV (Wasm)",
     "servertooltip": "Aligner côté serveur via le worker externe",
     "alignementserveur": "Alignement serveur en cours...",
+    "alignementserveurerreur": "Échec de l'alignement serveur",
     "aveserver": "Page {{page}} / {{total}} alignée(s) côté serveur",
     "selectmove": "Sélectionner et déplacer des formes/textes",
     "erase": "Effacer la forme/le texte en cliquant (Si vous supprimer une question, cela supprime au passage l'ensemble des corrections apportées à cette question. ⚠️ Pas de retour en arrière possible)",

@@ -27,6 +27,7 @@
     "localtooltip": "Alinhar no navegador com OpenCV (Wasm)",
     "servertooltip": "Alinhar no servidor via worker externo",
     "alignementserveur": "Alinhamento no servidor em andamento...",
+    "alignementserveurerreur": "Falha no alinhamento no servidor",
     "aveserver": "Página {{page}} / {{total}} alinhada(s) no servidor",
     "selectmove": "Selecionar e mover formas/textos",
     "erase": "Excluir região ou texto (Se você excluir uma pergunta, isto excluirá também todas as correções desta pergunta. ⚠️ Não há como voltar atrás!)",
