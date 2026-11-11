@@ -2524,24 +2524,34 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             t.widthZone = value1.w!;
             t.heightZone = value1.h!;
             t.pages!.push({ imageInput: value1.i, numero: 1 });
-            this.alignImagesService.correctQCM(t).subscribe(res => {
-              this.blocked = false;
-              res.solutions?.forEach(e => {
-                const v: ImageZone = {
-                  i: e.imageSolution!,
-                  w: value1.w!,
-                  h: value1.h!,
-                };
-                this.displayImage(
-                  v,
-                  this.canvassQCM,
-                  b => {
-                    this.showImageQCM = b;
-                  },
-                  index,
-                  false,
-                );
-              });
+            this.alignImagesService.correctQCM(t).subscribe({
+              next: res => {
+                this.blocked = false;
+                res.solutions?.forEach(e => {
+                  const v: ImageZone = {
+                    i: e.imageSolution!,
+                    w: value1.w!,
+                    h: value1.h!,
+                  };
+                  this.displayImage(
+                    v,
+                    this.canvassQCM,
+                    b => {
+                      this.showImageQCM = b;
+                    },
+                    index,
+                    false,
+                  );
+                });
+              },
+              error: (err: Error) => {
+                this.blocked = false;
+                this.messageService.add({
+                  severity: 'error',
+                  summary: this.translateService.instant('scanexam.couldnotcorrectQCM'),
+                  detail: this.translateService.instant('scanexam.couldnotcorrectQCMdetails') + ' ' + err.message,
+                });
+              },
             });
           });
         });

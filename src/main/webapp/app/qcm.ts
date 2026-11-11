@@ -1,4 +1,6 @@
 /* eslint-disable prefer-const */
+import { CvScope, withCvScope } from './shared/opencv/cv-scope';
+
 declare let cv: any;
 export interface IQCMInput {
   imageTemplate?: ImageData;
@@ -41,30 +43,29 @@ export interface IPreference {
 }
 
 function imageDataFromMat(mat: any): any {
-  // convert the mat type to cv.CV_8U
-  const img = new cv.Mat();
-  const depth = mat.type() % 8;
-  const scale = depth <= cv.CV_8S ? 1.0 : depth <= cv.CV_32S ? 1.0 / 256.0 : 255.0;
-  const shift = depth === cv.CV_8S || depth === cv.CV_16S ? 128.0 : 0.0;
-  mat.convertTo(img, cv.CV_8U, scale, shift);
+  return withCvScope(scope => {
+    // convert the mat type to cv.CV_8U
+    const img = scope.track(new cv.Mat());
+    const depth = mat.type() % 8;
+    const scale = depth <= cv.CV_8S ? 1.0 : depth <= cv.CV_32S ? 1.0 / 256.0 : 255.0;
+    const shift = depth === cv.CV_8S || depth === cv.CV_16S ? 128.0 : 0.0;
+    mat.convertTo(img, cv.CV_8U, scale, shift);
 
-  // convert the img type to cv.CV_8UC4
-  switch (img.type()) {
-    case cv.CV_8UC1:
-      cv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);
-      break;
-    case cv.CV_8UC3:
-      cv.cvtColor(img, img, cv.COLOR_RGB2RGBA);
-      break;
-    case cv.CV_8UC4:
-      break;
-    default:
-      img.delete();
-      throw new Error('Bad number of channels (Source image must have 1, 3 or 4 channels)');
-  }
-  const clampedArray = new ImageData(new Uint8ClampedArray(img.data), img.cols, img.rows);
-  img.delete();
-  return clampedArray;
+    // convert the img type to cv.CV_8UC4
+    switch (img.type()) {
+      case cv.CV_8UC1:
+        cv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);
+        break;
+      case cv.CV_8UC3:
+        cv.cvtColor(img, img, cv.COLOR_RGB2RGBA);
+        break;
+      case cv.CV_8UC4:
+        break;
+      default:
+        throw new Error('Bad number of channels (Source image must have 1, 3 or 4 channels)');
+    }
+    return new ImageData(new Uint8ClampedArray(img.data), img.cols, img.rows);
+  });
 }
 
 export function trace(message: any): void {
@@ -94,112 +95,116 @@ export function debugImage(imageData: ImageData): void {
   }
 }
 
+/** Registers the Mats of a trouveCases() result in a scope. */
+function trackCases(scope: CvScope, cases: { cases: any[]; img_cases: any[] }): { cases: any[]; img_cases: any[] } {
+  cases.cases.forEach(c => scope.track(c));
+  cases.img_cases.forEach(c => scope.track(c));
+  return cases;
+}
+
 export function doQCMResolution(p: { msg: any; payload: IQCMInput; uid: string }): void {
   const p1: IQCMOutput = {};
   p1.solutions = [];
-
-  // let src = cv.imread("canvasInput0");
-  let src = cv.matFromImageData(p.payload.imageTemplate);
-  let gray = new cv.Mat();
-  cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
-  const res = trouveCases(gray, p.payload.preference);
-  // drawRectangle(src,res.cases)
-  p.payload.pages?.forEach((srcEE, i) => {
-    let grayE = new cv.Mat();
-    let _srcE = cv.matFromImageData(srcEE.imageInput);
-    let srcE = new cv.Mat();
-    let dsize1 = new cv.Size(src.size().width, src.size().height);
-    // You can try more different parameters
-    cv.resize(_srcE, srcE, dsize1, 0, 0, cv.INTER_AREA);
-
-    let mat1 = new cv.Mat(src.rows, src.cols, src.type(), [255, 255, 255, 255]);
-    // debugImage(imageDataFromMat(mat1))
-    // debugImage(imageDataFromMat(srcE))
-    const boundings = res.cases.map((c: any) => cv.boundingRect(c));
-    let casesvideseleves = undefined;
-    if (boundings.length > 0) {
-      const minX = Math.min(...boundings.map((e: any) => e.x));
-      const minY = Math.min(...boundings.map((e: any) => e.y));
-      const maxX = Math.max(...boundings.map((e: any) => e.x + e.width));
-      const maxY = Math.max(...boundings.map((e: any) => e.y + e.height));
-      let dst1 = decoupe(srcE, { x: minX, y: minY }, { w: maxX - minX, h: maxY - minY });
-      let dst4 = new cv.Mat();
-      let dst6 = new cv.Mat();
-      const s = new cv.Scalar(255, 255, 255, 255);
-      // cv.copyMakeBorder(dst1, dst4, minY,srcE.size().height-maxY , minX,srcE.size().width - maxX , cv.BORDER_CONSTANT, s);
-      const bord = Math.min(5, minX, src.size().width - maxX, minY, src.size().height - maxY);
-      cv.copyMakeBorder(dst1, dst4, bord, bord, bord, bord, cv.BORDER_CONSTANT, s);
-      let dst5 = dst4.clone();
-      cv.copyMakeBorder(
-        dst5,
-        dst6,
-        minY - bord,
-        srcE.size().height - maxY - bord,
-        minX - bord,
-        srcE.size().width - maxX - bord,
-        cv.BORDER_CONSTANT,
-        s,
-      );
-
-      cv.cvtColor(dst6, grayE, cv.COLOR_RGBA2GRAY, 0);
-
-      const elevePref = { ...p.payload.preference };
-      elevePref.qcm_epsilon = Math.max(0.05, elevePref.qcm_epsilon);
-      elevePref.qcm_differences_avec_case_blanche = Math.min(0.1, elevePref.qcm_differences_avec_case_blanche);
-      casesvideseleves = trouveCases(grayE, elevePref);
-
-      dst1.delete();
-      dst4.delete();
-      dst5.delete();
-      dst6.delete();
-    }
-
-    let dstE;
-    if (casesvideseleves !== undefined && casesvideseleves.cases !== undefined && casesvideseleves.cases.length > 0) {
-      const decalage = /* { x: 0, y: 0 }; // */ computeDecallage(casesvideseleves, res);
-      dstE = applyTranslation(srcE, decalage);
-      // dstE = srcE
-    } else {
-      dstE = srcE;
-    }
-
-    const elevePref = { ...p.payload.preference };
-    elevePref.qcm_differences_avec_case_blanche = Math.max(0.1, elevePref.qcm_differences_avec_case_blanche);
-
-    let results = analyseStudentSheet(res, src, dstE, elevePref);
-    let e = imageDataFromMat(dstE);
-
-    let solution: string[] = [];
-
-    results.forEach((v, k) => {
-      if (v.verdict) {
-        solution.push(String.fromCharCode(97 + k));
-      }
+  try {
+    withCvScope(scope => {
+      // let src = cv.imread("canvasInput0");
+      const src = scope.track(cv.matFromImageData(p.payload.imageTemplate));
+      const gray = scope.track(new cv.Mat());
+      cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
+      const res = trackCases(scope, trouveCases(gray, p.payload.preference));
+      // drawRectangle(src,res.cases)
+      p.payload.pages?.forEach((srcEE, i) => {
+        // one scope per page: the memory of a page is released before the next one
+        p1.solutions!.push(withCvScope(pageScope => resolveQCMPage(pageScope, src, res, srcEE, i, p.payload.preference)));
+      });
     });
-    p1.solutions?.push({
-      imageSolution: e,
-      numero: i,
-      solution: solution.join('&'),
-    });
-
-    grayE.delete();
-    srcE.delete();
-    _srcE.delete();
-    mat1.delete();
-
-    if (dstE !== srcE) {
-      dstE.delete();
-    }
-
-    casesvideseleves.cases.forEach((ca: any) => ca.delete());
-    casesvideseleves.img_cases.forEach((ca: any) => ca.delete());
-  });
-
-  src.delete();
-  gray.delete();
-  // res.cases.forEach((ca: any) => ca.delete());
-  res.img_cases.forEach((ca: any) => ca.delete());
+  } catch (e) {
+    // The caller must always get an answer, otherwise the correction screen stays blocked
+    console.error('QCM resolution failed', e);
+    postMessage({ msg: p.msg, uid: p.uid, error: e instanceof Error ? e.message : String(e) });
+    return;
+  }
   postMessage({ msg: p.msg, payload: p1, uid: p.uid });
+}
+
+function resolveQCMPage(scope: CvScope, src: any, res: any, srcEE: IQCMImageInput, i: number, preference: IPreference): IQCMSolution {
+  let grayE = scope.track(new cv.Mat());
+  let _srcE = scope.track(cv.matFromImageData(srcEE.imageInput));
+  let srcE = scope.track(new cv.Mat());
+  let dsize1 = new cv.Size(src.size().width, src.size().height);
+  // You can try more different parameters
+  cv.resize(_srcE, srcE, dsize1, 0, 0, cv.INTER_AREA);
+  scope.release(_srcE);
+
+  const boundings = res.cases.map((c: any) => cv.boundingRect(c));
+  let casesvideseleves = undefined;
+  if (boundings.length > 0) {
+    const minX = Math.min(...boundings.map((e: any) => e.x));
+    const minY = Math.min(...boundings.map((e: any) => e.y));
+    const maxX = Math.max(...boundings.map((e: any) => e.x + e.width));
+    const maxY = Math.max(...boundings.map((e: any) => e.y + e.height));
+    let dst1 = scope.track(decoupe(srcE, { x: minX, y: minY }, { w: maxX - minX, h: maxY - minY }));
+    let dst4 = scope.track(new cv.Mat());
+    let dst6 = scope.track(new cv.Mat());
+    const s = new cv.Scalar(255, 255, 255, 255);
+    // cv.copyMakeBorder(dst1, dst4, minY,srcE.size().height-maxY , minX,srcE.size().width - maxX , cv.BORDER_CONSTANT, s);
+    const bord = Math.min(5, minX, src.size().width - maxX, minY, src.size().height - maxY);
+    cv.copyMakeBorder(dst1, dst4, bord, bord, bord, bord, cv.BORDER_CONSTANT, s);
+    let dst5 = scope.track(dst4.clone());
+    cv.copyMakeBorder(
+      dst5,
+      dst6,
+      minY - bord,
+      srcE.size().height - maxY - bord,
+      minX - bord,
+      srcE.size().width - maxX - bord,
+      cv.BORDER_CONSTANT,
+      s,
+    );
+
+    cv.cvtColor(dst6, grayE, cv.COLOR_RGBA2GRAY, 0);
+
+    const elevePref = { ...preference };
+    elevePref.qcm_epsilon = Math.max(0.05, elevePref.qcm_epsilon);
+    elevePref.qcm_differences_avec_case_blanche = Math.min(0.1, elevePref.qcm_differences_avec_case_blanche);
+    casesvideseleves = trackCases(scope, trouveCases(grayE, elevePref));
+
+    scope.release(dst1);
+    scope.release(dst4);
+    scope.release(dst5);
+    scope.release(dst6);
+  }
+
+  let dstE;
+  if (casesvideseleves !== undefined && casesvideseleves.cases.length > 0) {
+    const decalage = /* { x: 0, y: 0 }; // */ computeDecallage(casesvideseleves, res);
+    dstE = applyTranslation(srcE, decalage);
+    if (dstE !== srcE) {
+      scope.track(dstE);
+    }
+    // dstE = srcE
+  } else {
+    dstE = srcE;
+  }
+
+  const elevePref = { ...preference };
+  elevePref.qcm_differences_avec_case_blanche = Math.max(0.1, elevePref.qcm_differences_avec_case_blanche);
+
+  let results = analyseStudentSheet(res, src, dstE, elevePref);
+  let e = imageDataFromMat(dstE);
+
+  let solution: string[] = [];
+
+  results.forEach((v, k) => {
+    if (v.verdict) {
+      solution.push(String.fromCharCode(97 + k));
+    }
+  });
+  return {
+    imageSolution: e,
+    numero: i,
+    solution: solution.join('&'),
+  };
 }
 
 // Installation/Settup
@@ -245,7 +250,12 @@ export function getPosition(forme: any): any {
 function interpretationForme(contour: any, preference: IPreference): any {
   const eps = preference.qcm_epsilon * cv.arcLength(contour, true);
   const forme = new cv.Mat();
-  cv.approxPolyDP(contour, forme, eps, true);
+  try {
+    cv.approxPolyDP(contour, forme, eps, true);
+  } catch (e) {
+    forme.delete();
+    throw e;
+  }
   let nom = undefined;
   const dims = getDimensions(forme);
 
@@ -271,117 +281,68 @@ function interpretationForme(contour: any, preference: IPreference): any {
 }
 
 export function detectFormes(img: any, nomsFormes: string[] = [], preference: IPreference): any[] {
-  const thrash = new cv.Mat();
-  cv.threshold(img, thrash, 248, 255, cv.THRESH_BINARY);
-  //  cv.adaptiveThreshold(img, thrash, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 3, 2);
-
-  let contours = new cv.MatVector();
-  let hierarchy = new cv.Mat();
-  cv.findContours(thrash, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_NONE);
-  const formes: any[] = [];
-
-  // approximates each contour to polygon
-  for (let i = 0; i < contours.size(); ++i) {
-    let contour = contours.get(i);
-    // contours.forEach(contour=> {
-    const res = interpretationForme(contour, preference);
-    if (nomsFormes.includes(res.nom)) {
-      // affiche(img,forme=forme)
-      formes.push(res.forme);
-    } else {
-      res.forme.delete();
-    }
-  }
-
-  // Tri des formes pour que l'ordre des cases détecté soit intuitif
-  formes.sort(__comparePosition);
-  //    formes.sort(key=functools.cmp_to_key(__comparePosition))
-  // Filtrage des 'doublons' : opencv a souvent tendance à repérer 2 carrés (très proches) au lieu d'un
-  const res: any[] = [];
-  const todelete: any[] = [];
-  const tokeep: any[] = [];
-
-  formes.forEach(x => {
-    if (getPosition(x).x === 0 && getPosition(x).y === 0) {
-      todelete.push(x);
-    } else if (((getDimensions(x).w * 100) / getDimensions(img).w + (getDimensions(x).h * 100) / getDimensions(img).h) / 2 > 80) {
-      todelete.push(x);
-    } else {
-      tokeep.push(x);
-    }
-  });
-  tokeep.forEach((x, i) => {
-    if (!faitDoublon(i, tokeep)) {
-      res.push(x);
-    } else {
-      todelete.push(x);
-    }
-  });
-  todelete.forEach(x => {
-    x.delete();
-  });
-  thrash.delete();
-  contours.delete();
-  hierarchy.delete();
-
-  return res;
+  return detectFormesWithThreshold(img, nomsFormes, preference, 248);
 }
 
 function detectFormesQCM(img: any, nomsFormes: string[] = [], preference: IPreference): any[] {
-  const thrash = new cv.Mat();
-  cv.threshold(img, thrash, 245, 255, cv.THRESH_BINARY);
-  //  cv.adaptiveThreshold(img, thrash, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 3, 2);
+  return detectFormesWithThreshold(img, nomsFormes, preference, 245);
+}
 
-  let contours = new cv.MatVector();
-  let hierarchy = new cv.Mat();
-  cv.findContours(thrash, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_NONE);
-  const formes: any[] = [];
+/**
+ * Detects the shapes of the given kinds. The returned contours are owned by the caller,
+ * every other native object is released, even on failure.
+ */
+function detectFormesWithThreshold(img: any, nomsFormes: string[], preference: IPreference, threshold: number): any[] {
+  return withCvScope(scope => {
+    const thrash = scope.track(new cv.Mat());
+    cv.threshold(img, thrash, threshold, 255, cv.THRESH_BINARY);
+    //  cv.adaptiveThreshold(img, thrash, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 3, 2);
 
-  // approximates each contour to polygon
-  for (let i = 0; i < contours.size(); ++i) {
-    let contour = contours.get(i);
-    // contours.forEach(contour=> {
-    const res = interpretationForme(contour, preference);
-    if (nomsFormes.includes(res.nom)) {
-      // affiche(img,forme=forme)
-      formes.push(res.forme);
-    } else {
-      res.forme.delete();
+    let contours = scope.track(new cv.MatVector());
+    let hierarchy = scope.track(new cv.Mat());
+    cv.findContours(thrash, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_NONE);
+    const formes: any[] = [];
+
+    // approximates each contour to polygon
+    for (let i = 0; i < contours.size(); ++i) {
+      // MatVector.get() returns a new Mat that must be deleted too (it used to leak)
+      let contour = scope.track(contours.get(i));
+      const res = interpretationForme(contour, preference);
+      scope.release(contour);
+      scope.track(res.forme);
+      if (nomsFormes.includes(res.nom)) {
+        // affiche(img,forme=forme)
+        formes.push(res.forme);
+      } else {
+        scope.release(res.forme);
+      }
     }
-  }
 
-  // Tri des formes pour que l'ordre des cases détecté soit intuitif
-  formes.sort(__comparePosition);
-  //    formes.sort(key=functools.cmp_to_key(__comparePosition))
-  // Filtrage des 'doublons' : opencv a souvent tendance à repérer 2 carrés (très proches) au lieu d'un
-  const res: any[] = [];
-  const todelete: any[] = [];
-  const tokeep: any[] = [];
+    // Tri des formes pour que l'ordre des cases détecté soit intuitif
+    formes.sort(__comparePosition);
+    //    formes.sort(key=functools.cmp_to_key(__comparePosition))
+    // Filtrage des 'doublons' : opencv a souvent tendance à repérer 2 carrés (très proches) au lieu d'un
+    const res: any[] = [];
+    const tokeep: any[] = [];
 
-  formes.forEach(x => {
-    if (getPosition(x).x === 0 && getPosition(x).y === 0) {
-      todelete.push(x);
-    } else if (((getDimensions(x).w * 100) / getDimensions(img).w + (getDimensions(x).h * 100) / getDimensions(img).h) / 2 > 80) {
-      todelete.push(x);
-    } else {
-      tokeep.push(x);
-    }
+    formes.forEach(x => {
+      if (getPosition(x).x === 0 && getPosition(x).y === 0) {
+        // dropped: released with the scope
+      } else if (((getDimensions(x).w * 100) / getDimensions(img).w + (getDimensions(x).h * 100) / getDimensions(img).h) / 2 > 80) {
+        // dropped: released with the scope
+      } else {
+        tokeep.push(x);
+      }
+    });
+    tokeep.forEach((x, i) => {
+      if (!faitDoublon(i, tokeep)) {
+        res.push(x);
+      }
+    });
+    // ownership of the kept shapes is transferred to the caller
+    res.forEach(x => scope.keep(x));
+    return res;
   });
-  tokeep.forEach((x, i) => {
-    if (!faitDoublon(i, tokeep)) {
-      res.push(x);
-    } else {
-      todelete.push(x);
-    }
-  });
-  todelete.forEach(x => {
-    x.delete();
-  });
-  thrash.delete();
-  contours.delete();
-  hierarchy.delete();
-
-  return res;
 }
 
 // Comparaison personnalisée de positions (lecture haut-bas,gauche-droite)
@@ -447,6 +408,10 @@ function trouveCases(img: any, preference: IPreference): any {
   return { cases: cases, img_cases: img_cases };
 }
 
+/**
+ * Returns a new Mat header on the given zone of img (sharing its data). The caller owns
+ * the result and must delete it; it is never img itself.
+ */
 export function decoupe(img: any, pos: any, dims: any): any {
   let x = pos.x;
   let y = pos.y;
@@ -470,7 +435,9 @@ export function decoupe(img: any, pos: any, dims: any): any {
   const rect = new cv.Rect(x, y, width, height);
 
   if (width <= 0 || height <= 0) {
-    return img;
+    // Whole image, as before, but as a distinct header: returning img itself made the
+    // callers delete the source image (double delete, then use after free).
+    return img.roi(new cv.Rect(0, 0, img.cols, img.rows));
   } else {
     const dst = img.roi(rect);
     return dst;
@@ -497,114 +464,116 @@ function analyseStudentSheet(casesExamTemplate: any, templateimage: any, student
   let infos_cases: Map<number, any> = new Map<number, any>();
   const imgs_templatediffblank: Map<number, number> = new Map();
   const imgs_templatediffblankAdaptive: Map<number, number> = new Map();
-  const gray = new cv.Mat();
-  cv.cvtColor(templateimage, gray, cv.COLOR_RGBA2GRAY, 0);
-  let thresh = new cv.Mat();
-  let threshAdaptive = new cv.Mat();
+  return withCvScope(scope => {
+    const gray = scope.track(new cv.Mat());
+    cv.cvtColor(templateimage, gray, cv.COLOR_RGBA2GRAY, 0);
+    let thresh = scope.track(new cv.Mat());
+    let threshAdaptive = scope.track(new cv.Mat());
 
-  cv.adaptiveThreshold(gray, threshAdaptive, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 2);
-  cv.threshold(gray, thresh, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
+    cv.adaptiveThreshold(gray, threshAdaptive, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 2);
+    cv.threshold(gray, thresh, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
 
-  const gray_st = new cv.Mat();
-  cv.cvtColor(studentScanImage, gray_st, cv.COLOR_RGBA2GRAY, 0);
-  let thresh_st = new cv.Mat();
-  let thresh_stAdaptive = new cv.Mat();
-  cv.threshold(gray_st, thresh_st, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
-  cv.adaptiveThreshold(gray_st, thresh_stAdaptive, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 2);
+    const gray_st = scope.track(new cv.Mat());
+    cv.cvtColor(studentScanImage, gray_st, cv.COLOR_RGBA2GRAY, 0);
+    let thresh_st = scope.track(new cv.Mat());
+    let thresh_stAdaptive = scope.track(new cv.Mat());
+    cv.threshold(gray_st, thresh_st, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
+    cv.adaptiveThreshold(gray_st, thresh_stAdaptive, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 2);
 
-  for (const [k, case1] of casesExamTemplate.cases.entries()) {
-    const imgTemplate = decoupe(thresh, getPosition(case1), getDimensions(case1));
-    const diff = diffCouleurAvecCaseBlanche(imgTemplate);
-    imgs_templatediffblank.set(k, diff);
-    const imgTemplateAdaptative = decoupe(threshAdaptive, getPosition(case1), getDimensions(case1));
-    const diff1 = diffCouleurAvecCaseBlanche(imgTemplateAdaptative);
-    imgs_templatediffblankAdaptive.set(k, diff1);
-    imgTemplate.delete();
-    imgTemplateAdaptative.delete();
-  }
-
-  gray.delete();
-  thresh.delete();
-  threshAdaptive.delete();
-  for (const [k, case1] of casesExamTemplate.cases.entries()) {
-    // casesExamTemplate.cases.forEach((case1: any, k: number) => {
-    // Pour chaque (x,y) associé à une case du template, on récupère la zone située au même endroit sur la copie
-    // et on la compare avec celle du template
-
-    const img_case_eleve = decoupe(thresh_st, getPosition(case1), getDimensions(case1));
-    const img_case_eleveAdaptive = decoupe(thresh_stAdaptive, getPosition(case1), getDimensions(case1));
-
-    const diff1 = diffCouleurAvecCaseBlanche(img_case_eleve);
-    const diff2 = diffCouleurAvecCaseBlanche(img_case_eleveAdaptive);
-    //    img_case_eleve.delete();
-    let diff = diff1 - imgs_templatediffblank.get(k)!;
-    let diffAdaptive = diff2 - imgs_templatediffblankAdaptive.get(k)!;
-
-    if (diff < 0) {
-      diff = 0;
+    for (const [k, case1] of casesExamTemplate.cases.entries()) {
+      const imgTemplate = scope.track(decoupe(thresh, getPosition(case1), getDimensions(case1)));
+      const diff = diffCouleurAvecCaseBlanche(imgTemplate);
+      imgs_templatediffblank.set(k, diff);
+      const imgTemplateAdaptative = scope.track(decoupe(threshAdaptive, getPosition(case1), getDimensions(case1)));
+      const diff1 = diffCouleurAvecCaseBlanche(imgTemplateAdaptative);
+      imgs_templatediffblankAdaptive.set(k, diff1);
+      scope.release(imgTemplate);
+      scope.release(imgTemplateAdaptative);
     }
-    if (diffAdaptive < 0) {
-      diff = 0;
+
+    scope.release(gray);
+    scope.release(thresh);
+    scope.release(threshAdaptive);
+    for (const [k, case1] of casesExamTemplate.cases.entries()) {
+      // casesExamTemplate.cases.forEach((case1: any, k: number) => {
+      // Pour chaque (x,y) associé à une case du template, on récupère la zone située au même endroit sur la copie
+      // et on la compare avec celle du template
+
+      const img_case_eleve = scope.track(decoupe(thresh_st, getPosition(case1), getDimensions(case1)));
+      const img_case_eleveAdaptive = scope.track(decoupe(thresh_stAdaptive, getPosition(case1), getDimensions(case1)));
+
+      const diff1 = diffCouleurAvecCaseBlanche(img_case_eleve);
+      const diff2 = diffCouleurAvecCaseBlanche(img_case_eleveAdaptive);
+      //    img_case_eleve.delete();
+      let diff = diff1 - imgs_templatediffblank.get(k)!;
+      let diffAdaptive = diff2 - imgs_templatediffblankAdaptive.get(k)!;
+
+      if (diff < 0) {
+        diff = 0;
+      }
+      if (diffAdaptive < 0) {
+        diff = 0;
+      }
+      // console.error('diff',k,diff1-imgs_templatediffblank.get(k)!,diff1, imgs_templatediffblank.get(k));
+      infos_cases.set(k, { prediction: diff, predictionAdaptative: diffAdaptive });
+      scope.release(img_case_eleve);
+      scope.release(img_case_eleveAdaptive);
     }
-    // console.error('diff',k,diff1-imgs_templatediffblank.get(k)!,diff1, imgs_templatediffblank.get(k));
-    infos_cases.set(k, { prediction: diff, predictionAdaptative: diffAdaptive });
-    img_case_eleve.delete();
-    img_case_eleveAdaptive.delete();
-  }
 
-  const diffs = Array.from(infos_cases.values()).map(ee => ee.prediction);
-  const diffsAdaptative = Array.from(infos_cases.values()).map(ee => ee.predictionAdaptative);
-  const km = kMeans(diffs, 100);
-  const kmAdaptative = kMeans(diffsAdaptative, 100);
+    const diffs = Array.from(infos_cases.values()).map(ee => ee.prediction);
+    const diffsAdaptative = Array.from(infos_cases.values()).map(ee => ee.predictionAdaptative);
+    const km = kMeans(diffs, 100);
+    const kmAdaptative = kMeans(diffsAdaptative, 100);
 
-  //  preference.qcm_differences_avec_case_blanche;
+    //  preference.qcm_differences_avec_case_blanche;
 
-  const score1 = scoreKmean(km, diffs);
-  const score2 = scoreKmean(kmAdaptative, diffsAdaptative);
-  //  console.error('score kmean', score1, score2);
-  const maxScore = score1 > score2 ? score1 : score2;
-  for (const [k, case1] of casesExamTemplate.cases.entries()) {
-    const r = infos_cases.get(k);
-    const diff = score1 > score2 ? r.prediction : r.predictionAdaptative;
-    const km1 = score1 > score2 ? km : kmAdaptative;
-    if (km1.clusters[k] === 1 && maxScore > preference.qcm_differences_avec_case_blanche) {
-      infos_cases.set(k, { verdict: true, prediction: diff });
+    const score1 = scoreKmean(km, diffs);
+    const score2 = scoreKmean(kmAdaptative, diffsAdaptative);
+    //  console.error('score kmean', score1, score2);
+    const maxScore = score1 > score2 ? score1 : score2;
+    for (const [k, case1] of casesExamTemplate.cases.entries()) {
+      const r = infos_cases.get(k);
+      const diff = score1 > score2 ? r.prediction : r.predictionAdaptative;
+      const km1 = score1 > score2 ? km : kmAdaptative;
+      if (km1.clusters[k] === 1 && maxScore > preference.qcm_differences_avec_case_blanche) {
+        infos_cases.set(k, { verdict: true, prediction: diff });
 
-      cv.putText(
-        studentScanImage,
-        '' + diff.toFixed(2),
-        { x: getPosition(case1).x + 15, y: getPosition(case1).y + 10 },
-        cv.FONT_HERSHEY_COMPLEX,
-        0.5,
-        new cv.Scalar(255, 0, 0, 128),
-        1,
-      );
-      cases_remplies.push(case1);
-    } else {
-      infos_cases.set(k, { verdict: false, prediction: diff });
+        cv.putText(
+          studentScanImage,
+          '' + diff.toFixed(2),
+          { x: getPosition(case1).x + 15, y: getPosition(case1).y + 10 },
+          cv.FONT_HERSHEY_COMPLEX,
+          0.5,
+          new cv.Scalar(255, 0, 0, 128),
+          1,
+        );
+        cases_remplies.push(case1);
+      } else {
+        infos_cases.set(k, { verdict: false, prediction: diff });
 
-      cv.putText(
-        studentScanImage,
-        '' + diff.toFixed(2),
-        { x: getPosition(case1).x + 15, y: getPosition(case1).y + 10 },
-        cv.FONT_HERSHEY_COMPLEX,
-        0.33,
-        new cv.Scalar(255, 0, 0, 128),
-        1,
-      );
-      cases_vides.push(case1);
+        cv.putText(
+          studentScanImage,
+          '' + diff.toFixed(2),
+          { x: getPosition(case1).x + 15, y: getPosition(case1).y + 10 },
+          cv.FONT_HERSHEY_COMPLEX,
+          0.33,
+          new cv.Scalar(255, 0, 0, 128),
+          1,
+        );
+        cases_vides.push(case1);
+      }
     }
-  }
-  gray_st.delete();
-  thresh_st.delete();
-  thresh_stAdaptive.delete();
+    scope.release(gray_st);
+    scope.release(thresh_st);
+    scope.release(thresh_stAdaptive);
 
-  drawRectangle(studentScanImage, cases_remplies, new cv.Scalar(0, 255, 0, 128), 2);
-  drawRectangle(studentScanImage, cases_vides, new cv.Scalar(0, 0, 255, 128), 2);
-  /* imgs_template.forEach(img=> {
+    drawRectangle(studentScanImage, cases_remplies, new cv.Scalar(0, 255, 0, 128), 2);
+    drawRectangle(studentScanImage, cases_vides, new cv.Scalar(0, 0, 255, 128), 2);
+    /* imgs_template.forEach(img=> {
       //  img.delete();
     })*/
-  return infos_cases;
+    return infos_cases;
+  });
 }
 
 function computeDecallage(casesvideseleves: any, casesvidesexamtemplate: any): any {
@@ -635,13 +604,15 @@ function computeDecallage(casesvideseleves: any, casesvidesexamtemplate: any): a
 
 function applyTranslation(src1: any, decalage: any): any {
   if (decalage.x !== 0 || decalage.y !== 0) {
-    const dst = new cv.Mat();
-    const M = cv.matFromArray(2, 3, cv.CV_64FC1, [1, 0, -decalage.x, 0, 1, -decalage.y]);
-    let dsize = new cv.Size(src1.cols, src1.rows);
-    // You can try more different parameters
-    cv.warpAffine(src1, dst, M, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
-    M.delete();
-    return dst;
+    // returns a new Mat owned by the caller
+    return withCvScope(scope => {
+      const dst = scope.track(new cv.Mat());
+      const M = scope.track(cv.matFromArray(2, 3, cv.CV_64FC1, [1, 0, -decalage.x, 0, 1, -decalage.y]));
+      let dsize = new cv.Size(src1.cols, src1.rows);
+      // You can try more different parameters
+      cv.warpAffine(src1, dst, M, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
+      return scope.keep(dst);
+    });
   } else {
     return src1;
   }
@@ -671,40 +642,35 @@ function diffCouleurAvecCaseBlanche(img_case: any): number {
 }
 
 export function diffGrayAvecCaseBlanche(img_case: any): number {
-  let thresh = new cv.Mat();
-  //     cv.threshold(img_case, thresh, 230, 255, cv.THRESH_BINARY_INV );
-  cv.adaptiveThreshold(img_case, thresh, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 3, 2);
+  return withCvScope(scope => {
+    let thresh = scope.track(new cv.Mat());
+    //     cv.threshold(img_case, thresh, 230, 255, cv.THRESH_BINARY_INV );
+    cv.adaptiveThreshold(img_case, thresh, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 3, 2);
 
-  let contours = new cv.MatVector();
-  let hierarchy = new cv.Mat();
-  cv.findContours(thresh, contours, hierarchy, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE);
+    let contours = scope.track(new cv.MatVector());
+    let hierarchy = scope.track(new cv.Mat());
+    cv.findContours(thresh, contours, hierarchy, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE);
 
-  let finalrect = undefined;
+    let finalrect = undefined;
 
-  for (let i = 0; i < contours.size(); ++i) {
-    let cnt = contours.get(i);
-    let rect = cv.boundingRect(cnt);
-    if (rect.width > 1 && rect.height > 1) {
-      if (!(finalrect !== undefined && (finalrect.width > rect.width || finalrect.height > rect.height))) {
-        finalrect = rect;
+    for (let i = 0; i < contours.size(); ++i) {
+      // MatVector.get() returns a new Mat that must be deleted too (it used to leak)
+      let cnt = scope.track(contours.get(i));
+      let rect = cv.boundingRect(cnt);
+      scope.release(cnt);
+      if (rect.width > 1 && rect.height > 1) {
+        if (!(finalrect !== undefined && (finalrect.width > rect.width || finalrect.height > rect.height))) {
+          finalrect = rect;
+        }
       }
     }
-  }
 
-  if (finalrect !== undefined) {
-    const dst = thresh.roi(finalrect);
-    let nonzerorationforeleve = cv.countNonZero(dst) / (finalrect.width * finalrect.height);
-    dst.delete();
-    thresh.delete();
-    contours.delete();
-    hierarchy.delete();
-    return nonzerorationforeleve;
-  } else {
-    thresh.delete();
-    contours.delete();
-    hierarchy.delete();
-    return 0;
-  }
+    if (finalrect === undefined) {
+      return 0;
+    }
+    const dst = scope.track(thresh.roi(finalrect));
+    return cv.countNonZero(dst) / (finalrect.width * finalrect.height);
+  });
 }
 
 // Fonction pour calculer la distance entre deux nombres
