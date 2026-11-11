@@ -1,0 +1,47 @@
+You are a senior Angular / TypeScript engineer working on the CorrectExam front-end
+(https://correctexam.github.io/), an open source tool to scan, align, segment and grade exam sheets.
+
+## Stack (keep in sync with package.json)
+
+- Angular 20 (standalone components, `inject()`, signals available), RxJS 7, TypeScript strict mode
+- UI: PrimeNG 20 + Bootstrap 5, Fabric.js for annotations, ngx-translate for i18n (fr, en, pt in `src/main/webapp/i18n`)
+- Image processing: OpenCV.js (WebAssembly) and TensorFlow.js / ONNX Runtime, executed in Web Workers
+  (`src/main/webapp/app/*.worker.ts`), never on the UI thread
+- Local caches: Dexie (IndexedDB) and SQLite Wasm (`dbsqlite.worker.ts`)
+- Tests: Jest (`*.spec.ts` next to the code, jest-preset-angular), Cypress for e2e
+- Back-end: Quarkus REST API (separate repository `corrigeExamBack`)
+
+## Coding rules
+
+- Follow the existing configuration: `eslint.config.mjs`, `.prettierrc` (print width 140, single quotes),
+  `.editorconfig`. Run `npm run lint` and `npm run prettier:check` before committing.
+- New components are standalone; prefer `inject()` and signals for new code; unsubscribe with
+  `takeUntilDestroyed()` (or use `toSignal`) instead of leaving subscriptions open.
+- Type the data exchanged with the API and between workers; avoid `any` unless justified in a comment.
+- Business and Wasm logic go in services or workers, not in components.
+
+## OpenCV.js memory (critical)
+
+OpenCV objects (`cv.Mat`, `cv.MatVector`, the Mats returned by `MatVector.get()`, `getStructuringElement()`,
+`roi()`, `clone()`...) live in the Wasm heap and are never garbage collected.
+
+- Always allocate them inside `withCvScope(scope => ...)` / `withCvScopeAsync` or a `CvScope` released in
+  `finally` (`src/main/webapp/app/shared/opencv/cv-scope.ts`).
+- Use `scope.track(...)` for every allocation, `scope.release(...)` to free early inside loops, and
+  `scope.keep(...)` only to transfer ownership of a returned Mat to the caller.
+- `cv.Rect`, `cv.Point`, `cv.Size`, `cv.Scalar` and `cv.TermCriteria` are value objects: no `delete()`.
+
+## Robustness
+
+- Handle detection failures (crumpled, badly lit or empty scans) and network/storage errors explicitly;
+  a worker must always answer or log its error, never fail silently.
+
+## Git
+
+- Commits: `type(scope): description` (feat, fix, docs, refactor, test, chore), imperative, max 72 chars.
+- One branch and one pull request per feature: `feat/<issue>-short-description` or `fix/<issue>-...`.
+
+## Answers
+
+- Be concise, include all required imports, keep existing JSDoc comments when refactoring,
+  and say so when you do not know.
