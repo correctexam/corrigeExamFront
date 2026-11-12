@@ -1,5 +1,38 @@
 <div>
   <p-toast></p-toast>
+  <!-- Alignement serveur en cours : toute la page (dock compris) est bloquée jusqu'à la fin du job -->
+  <p-blockUI [blocked]="serverAlignActive()" [baseZIndex]="1500">
+    <div class="server-align-overlay" role="alertdialog" aria-live="polite">
+      <p-progressSpinner></p-progressSpinner>
+      <h3 [translate]="'scanexam.alignementserveurencours'"></h3>
+      @if (serverAlignQueued()) {
+        <p [translate]="'scanexam.alignementserveurattente'"></p>
+      } @else {
+        <p class="server-align-progress">{{ serverAlignProgress() }} %</p>
+        @if (serverAlignTotal() > 0) {
+          <p>{{ 'scanexam.aveserver' | translate: { page: serverAlignDone(), total: serverAlignTotal() } }}</p>
+        }
+      }
+      <p [translate]="'scanexam.alignementserveurbloque'"></p>
+      <div class="server-align-actions">
+        <button
+          type="button"
+          pButton
+          icon="pi pi-eye"
+          [label]="'scanexam.suivrealignement' | translate"
+          [routerLink]="'/imagealign/' + examId"
+        ></button>
+        <button
+          type="button"
+          pButton
+          class="p-button-outlined"
+          icon="pi pi-arrow-left"
+          [label]="'scanexam.gobacktomodule' | translate"
+          (click)="gobacktomodule()"
+        ></button>
+      </div>
+    </div>
+  </p-blockUI>
   <p-dialog [header]="'scanexam.firsthelpTitle' | translate" [(visible)]="firsthelp" [style]="{ width: '90vw' }">
     <div style="display: flex; justify-content: space-around">
       <span [innerHTML]="'scanexam.firsthelpdetail' | translate"></span>
