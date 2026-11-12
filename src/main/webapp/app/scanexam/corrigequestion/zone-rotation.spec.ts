@@ -1,4 +1,12 @@
-import { QuarterTurn, rotateQuarter, rotatedSize, rotationMatrix, setSceneRotation, svgExportOptions } from './zone-rotation';
+import {
+  QuarterTurn,
+  rotateQuarter,
+  rotationAfterNavigation,
+  rotatedSize,
+  rotationMatrix,
+  setSceneRotation,
+  svgExportOptions,
+} from './zone-rotation';
 
 function apply(m: number[], x: number, y: number): [number, number] {
   return [m[0] * x + m[2] * y + m[4], m[1] * x + m[3] * y + m[5]];
@@ -44,5 +52,13 @@ describe('zone-rotation', () => {
     expect(svgExportOptions(rotated)).toEqual({ width: '200', height: '100', viewBox: { x: 0, y: 0, width: 200, height: 100 } });
     expect(svgExportOptions(straight)).toBeUndefined();
     expect(svgExportOptions({})).toBeUndefined();
+  });
+
+  it('keeps the rotation when changing student on the same question, resets it otherwise', () => {
+    const q2 = { examId: '12', questionIndex: 2 };
+    expect(rotationAfterNavigation(90, q2, { examId: '12', questionIndex: 2 })).toBe(90);
+    expect(rotationAfterNavigation(90, q2, { examId: '12', questionIndex: 3 })).toBe(0);
+    expect(rotationAfterNavigation(270, q2, { examId: '13', questionIndex: 2 })).toBe(0);
+    expect(rotationAfterNavigation(180, { examId: undefined, questionIndex: undefined }, q2)).toBe(0);
   });
 });

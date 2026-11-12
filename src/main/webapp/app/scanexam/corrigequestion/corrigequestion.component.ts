@@ -117,7 +117,7 @@ import Fuse from 'fuse.js';
 import { imagenoanswer } from './noresponse';
 import { computeQuestionNote, gradingRuleOf } from '../grading/question-grading';
 import { defaultCommentShortcut } from './comment-shortcuts';
-import { QuarterTurn, RotationDirection, rotateQuarter, rotatedSize, rotationMatrix } from './zone-rotation';
+import { QuarterTurn, RotationDirection, rotateQuarter, rotatedSize, rotationAfterNavigation, rotationMatrix } from './zone-rotation';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -294,7 +294,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   displayBasic = false;
   images: WritableSignal<any> = signal<any[]>([]);
   pageOffset = 0;
-  /** Display rotation of the answer zones (#653), reset when the student or the question changes. */
+  /** Display rotation of the answer zones (#653): kept from one student to the next, reset when the question changes. */
   rotation: QuarterTurn = 0;
   init = true;
   showSpinner = false;
@@ -409,7 +409,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
 
       this.pageOffset = 0;
-      this.rotation = 0;
+      this.rotation = rotationAfterNavigation(
+        this.rotation,
+        { examId: examId_prev, questionIndex: questionindex4shortcut_prev },
+        { examId: this.examId, questionIndex: this.questionindex4shortcut },
+      );
 
       this.updateTitle();
 

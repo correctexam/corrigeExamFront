@@ -51,6 +51,19 @@ export function rotationMatrix(rotation: QuarterTurn, width: number, height: num
   }
 }
 
+export interface CorrectionPosition {
+  examId: string | undefined;
+  questionIndex: number | undefined;
+}
+
+/**
+ * Rotation to apply after a navigation in the correction view: the corrector's choice is kept while moving from one
+ * student to another on the same question, and reset to 0 when the question (or the exam) changes.
+ */
+export function rotationAfterNavigation(rotation: QuarterTurn, previous: CorrectionPosition, next: CorrectionPosition): QuarterTurn {
+  return previous.examId === next.examId && previous.questionIndex === next.questionIndex ? rotation : 0;
+}
+
 /** Unrotated size of each annotation canvas, needed to export its SVG in zone coordinates. */
 const sceneSizes = new WeakMap<object, Size & { rotation: QuarterTurn }>();
 
