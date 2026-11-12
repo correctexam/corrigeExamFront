@@ -289,6 +289,8 @@
     "resultatsscantooltip": "Etapa para visualizar os resultados e enviar um retorno aos estudantes",
     "removeAllAnnotation": "Tem certeza de querer excluir todas as anotações desta avaliação ?  <BR> Esta ação excluirá também todas as correções feitas nesta avaliação por voce ou por outros corretores. São ({{nbreStudentResponse}} no total). <BR> <b>Não será possível voltar atrás.</b>",
     "removeAnnotationQuestion": "Tem certeza de querer excluir esta questão ?  <BR> Esta ação excluirá também  todas as correções feitas nesta avaliação por voce ou por outros corretores. <BR> <b>Não será possível voltar atrás.</b>",
+    "removeZoneQuestion": "Tem certeza de querer excluir a zona da questão Q{{numero}} ?",
+    "deleteZoneTooltip": "Excluir esta zona de questão",
     "removeAllAnnotation4studentsheet": "Tem certeza que querer excluir todas as anotações desta resposta ?",
     "comparecopie": "Comparar provas",
     "tooltipCompareComment": "Comparar respostas com o mesmo comentário",

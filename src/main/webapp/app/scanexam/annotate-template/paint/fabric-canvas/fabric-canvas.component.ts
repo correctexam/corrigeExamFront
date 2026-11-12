@@ -28,7 +28,7 @@ import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer';
 import { DOCUMENT } from '@angular/common';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
-import { SummaryTemplateComponent } from '../../summary/summary-template.component';
+import { DeleteQuestionRequest, SummaryTemplateComponent } from '../../summary/summary-template.component';
 
 export type CustomZone = IZone & { type: DrawingTools };
 
@@ -261,6 +261,13 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
       this.eventHandler.selectQuestionView(q);
     }
   }
+  /**
+   * Deletes the zone of a question from the summary panel (issue #655).
+   */
+  deleteQuestion(request: DeleteQuestionRequest): void {
+    this.eventHandler.deleteQuestionZone(request.question).finally(() => request.done());
+  }
+
   scrollPageandTop(page: number, top: number): void {
     this.pdfViewerService.scrollPageIntoView(page, { top, left: 0 });
   }

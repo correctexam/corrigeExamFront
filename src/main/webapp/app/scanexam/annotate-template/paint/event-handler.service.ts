@@ -68,6 +68,8 @@ export class EventHandlerService {
   private modelViewpping = new Map<string, number>();
   /** Used to notify about newly selected or unselected question */
   private _selectedQuestion: Subject<IQuestion | undefined> = new Subject();
+  /** Id of the question currently shown in the properties view */
+  private selectedQuestionId: number | undefined;
 
   public constructor(
     private fabricShapeService: FabricShapeService,
@@ -455,7 +457,7 @@ export class EventHandlerService {
     //  this.allcanvas.forEach((v,k)=> console.error(k,v?.selection))
 
     // No more question selected
-    this._selectedQuestion.next(undefined);
+    this.notifySelectedQuestion(undefined);
   }
 
   /**
@@ -475,7 +477,7 @@ export class EventHandlerService {
       // Notifying that this bunch of questions is selected
 
       this.currentSelected = (object as CustomFabricGroup).getObjects()[1];
-      this._selectedQuestion.next(question);
+      this.notifySelectedQuestion(question);
     }
   }
 
@@ -797,6 +799,91 @@ export class EventHandlerService {
   }
 
   public selectQuestionView(q: IQuestion): void {
+    this.notifySelectedQuestion(q);
+  }
+
+  private notifySelectedQuestion(q: IQuestion | undefined): void {
+    this.selectedQuestionId = q?.id;
     this._selectedQuestion.next(q);
+  }
+
+  /**
+   * Deletes the zone of the given question, e.g. from the summary panel (issue #655).
+   * The question (and its corrections, if any) is deleted server-side along with its zone.
+   * A confirmation is always asked: a stronger warning is shown when students answers exist for this zone.
+   * The zone may be on a page that is not displayed (or not rendered yet): the fabric object is looked up in all the canvases.
+   * @returns True if the zone has been deleted, false if the user cancelled or if the deletion failed.
+   */
+  public async deleteQuestionZone(question: IQuestion): Promise<boolean> {
+    const zoneId = question.zoneId;
+    if (zoneId === undefined || zoneId === null) {
+      return false;
+    }
+    try {
+      const nbrAnswer = (await firstValueFrom(this.zoneService.countStudentResponseForZone(zoneId))).body ?? 0;
+      const key = nbrAnswer > 0 ? 'scanexam.removeAnnotationQuestion' : 'scanexam.removeZoneQuestion';
+      const message: string = await firstValueFrom(this.translateService.get(key, { numero: question.numero }));
+      if (!(await this.askConfirmation(message))) {
+        return false;
+      }
+      await firstValueFrom(this.zoneService.delete(zoneId));
+    } catch (err: unknown) {
+      // The HTTP error is displayed by the global error handler (jhi-alert-error): the local state is left untouched
+      console.error(`Cannot delete zone ${zoneId}`, err);
+      return false;
+    }
+    this.removeQuestionZoneLocally(question, zoneId);
+    return true;
+  }
+
+  private askConfirmation(message: string): Promise<boolean> {
+    // The confirmation service is provided by the toolbar, always displayed in the annotation view
+    if (this.confService === undefined) {
+      return Promise.resolve(false);
+    }
+    return new Promise<boolean>(resolve => {
+      this.confService.confirm({
+        message,
+        accept: () => resolve(true),
+        reject: () => resolve(false),
+      });
+    });
+  }
+
+  /**
+   * Removes the question and its zone from the caches and from the canvas that displays it (if rendered).
+   */
+  private removeQuestionZoneLocally(question: IQuestion, zoneId: number): void {
+    if (question.id !== undefined) {
+      this.questions.delete(question.id);
+    } else {
+      [...this.questions.entries()].filter(([, q]) => q.zoneId === zoneId).forEach(([id]) => this.questions.delete(id));
+    }
+
+    this.allcanvas.forEach(canvas => {
+      const objects = canvas.getObjects().filter(o => this.modelViewpping.get((o as CustomFabricObject).id) === zoneId);
+      if (objects.length > 0) {
+        canvas.discardActiveObject();
+        objects.forEach(o => {
+          this.modelViewpping.delete((o as CustomFabricObject).id);
+          canvas.remove(o);
+        });
+        canvas.requestRenderAll();
+      }
+    });
+
+    // Removing the zone from the rendering cache so that it is not drawn again when a page is re-rendered (zoom...)
+    Object.values(this.zonesRendering).forEach((zones: CustomZone[] | undefined) => {
+      if (zones !== undefined) {
+        const idx = zones.findIndex(z => z.id === zoneId);
+        if (idx >= 0) {
+          zones.splice(idx, 1);
+        }
+      }
+    });
+
+    if (question.id !== undefined && this.selectedQuestionId === question.id) {
+      this.notifySelectedQuestion(undefined);
+    }
   }
 }

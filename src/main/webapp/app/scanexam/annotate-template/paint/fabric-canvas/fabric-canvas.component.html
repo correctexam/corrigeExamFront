@@ -1,5 +1,10 @@
 <div class="flex-container">
-  <jhi-summary-template (gotoQ)="goToQuestion($event)" class="summary" [questions]="eventHandler.questions"></jhi-summary-template>
+  <jhi-summary-template
+    (gotoQ)="goToQuestion($event)"
+    (deleteQ)="deleteQuestion($event)"
+    class="summary"
+    [questions]="eventHandler.questions"
+  ></jhi-summary-template>
   <p-blockUI [blocked]="blocked">
     <!--<i class="pi pi-lock" style="font-size: 3rem"></i>-->
     <p-progressSpinner></p-progressSpinner>

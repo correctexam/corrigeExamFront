@@ -1,8 +1,8 @@
 <div>
   <h3 [translate]="'scanexam.resumebareme'">Résumé du sujet</h3>
   <hr />
-  @for (q of getSortedQuestions(); track q; let i = $index) {
-    <div>
+  @for (q of getSortedQuestions(); track q.id; let i = $index) {
+    <div class="summary-question">
       <a (click)="goToQuestion(q)"
         ><b>Q{{ q.numero }}</b></a
       >
@@ -14,6 +14,17 @@
           <span> (ignore)</span>
         }
       }
+      <button
+        type="button"
+        class="summary-delete"
+        [disabled]="isDeleting(q)"
+        [title]="'scanexam.deleteZoneTooltip' | translate"
+        [attr.aria-label]="'scanexam.deleteZoneTooltip' | translate"
+        (click)="deleteQuestion(q)"
+        data-cy="summaryDeleteZoneButton"
+      >
+        <fa-icon icon="trash-alt"></fa-icon>
+      </button>
     </div>
   }
   <br />
