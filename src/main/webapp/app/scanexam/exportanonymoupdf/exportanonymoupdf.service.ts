@@ -24,6 +24,7 @@ import { SVG, Text, G } from '@svgdotjs/svg.js';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { firstValueFrom } from 'rxjs';
 import { svgadapter } from '../svg.util';
+import { computeQuestionNote, gradingRuleOf } from '../grading/question-grading';
 
 const coefficient = 100000;
 
@@ -312,54 +313,19 @@ export class ExportPdfService {
     }
   }
 
+  /** Note of a response on the question scale: steps are divided out, hybrid notes are stored × 100. */
   private computeNote(resp: StudentResponsepdf, currentQ: Questionspdf): number {
-    const noteSteps = currentQ.point! * currentQ.step!;
-    let currentNote = 0;
-    if (currentQ.gradeType === GradeType.POSITIVE && currentQ.typeAlgoName !== 'QCM') {
-      currentNote = 0;
-      resp.gradedcommentspdf?.forEach(g => {
-        if (g.grade !== undefined && g.grade !== null) {
-          currentNote = currentNote + g.grade;
-        }
-      });
-      if (currentNote > noteSteps) {
-        currentNote = noteSteps;
-      }
-    } else if (currentQ.gradeType === GradeType.NEGATIVE && currentQ.typeAlgoName !== 'QCM') {
-      currentNote = noteSteps!;
-      resp.gradedcommentspdf?.forEach(g => {
-        if (g.grade !== undefined && g.grade !== null) {
-          currentNote = currentNote - g.grade;
-        }
-      });
-      if (currentNote < 0) {
-        currentNote = 0;
-      }
-    } else if (currentQ.typeAlgoName === 'QCM' && currentQ.step! > 0) {
-      currentNote = 0;
-      resp.gradedcommentspdf?.forEach(g => {
-        if (g.description?.startsWith('correct')) {
-          currentNote = currentNote + currentQ.point! * currentQ.step!;
-        } else if (g.description?.startsWith('incorrect')) {
-          currentNote = currentNote - currentQ.point!;
-        }
-      });
-    } else if (currentQ.typeAlgoName === 'QCM' && currentQ.step! <= 0) {
-      currentNote = 0;
-      resp.gradedcommentspdf?.forEach(g => {
-        if (g.description?.startsWith('correct')) {
-          currentNote = currentNote + currentQ.point!;
-        }
-      });
-    } else if (currentQ.gradeType === GradeType.HYBRID && currentQ.typeAlgoName !== 'QCM') {
-      currentNote = resp.note!;
-    } else {
-      currentNote = resp.note!;
-    }
+    const rule = gradingRuleOf(currentQ);
+    // Hybrid notes depend on step values that the export does not carry: use the stored note.
+    const graded =
+      rule === 'hybrid'
+        ? undefined
+        : computeQuestionNote(currentQ, { gradedComments: resp.gradedcommentspdf, noteSteps: currentQ.point! * currentQ.step! });
+    const currentNote = graded ? graded.note : resp.note!;
 
-    if (currentQ.step! > 0 && !(currentQ.gradeType === GradeType.HYBRID && currentQ.typeAlgoName !== 'QCM')) {
+    if (currentQ.step! > 0 && rule !== 'hybrid') {
       return currentNote / currentQ.step!;
-    } else if (currentQ.gradeType === GradeType.HYBRID && currentQ.typeAlgoName !== 'QCM') {
+    } else if (rule === 'hybrid') {
       return currentNote / 100.0;
     } else {
       return currentNote;

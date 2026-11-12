@@ -6,6 +6,7 @@ import { KeyboardShortcutsComponent, ShortcutInput, KeyboardShortcutsModule } fr
 import { IGradedComment } from '../../../entities/graded-comment/graded-comment.model';
 import { ITextComment } from '../../../entities/text-comment/text-comment.model';
 import { IHybridGradedComment } from 'app/entities/hybrid-graded-comment/hybrid-graded-comment.model';
+import { defaultCommentShortcut } from '../comment-shortcuts';
 
 @Component({
   selector: 'jhi-keyboardshortcut',
@@ -94,16 +95,10 @@ export class KeyboardshortcutComponent implements AfterViewInit {
     }
     for (const { index, comment } of comments.map((c1, i) => ({ index: i, comment: c1 }))) {
       if (!toRemove.includes(comment.id!)) {
-        let sh = '' + (index + 1);
-        let createShortcut = true;
-        if (index + 1 > 9 && index + 1 < 36) {
-          sh = String.fromCharCode(87 + index + 1);
-        } else if (index + 1 >= 36) {
-          createShortcut = false;
-        }
-        if (createShortcut) {
+        const shortcut = defaultCommentShortcut(index);
+        if (shortcut) {
           this.keyboardShortcuts.push({
-            key: ['ctrl + ' + sh, 'cmd + ' + sh],
+            key: shortcut,
             label: this.translateService.instant('gradeScopeIsticApp.comments.detail.title'),
             description: 'toggle ' + comment.text,
             command: () => {
