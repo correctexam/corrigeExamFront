@@ -253,6 +253,32 @@
     </div>
 
     <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
+      <label><span [translate]="'scanexam.rotation'">Rotation : </span>({{ rotation }}°)</label>
+      <div class="d-flex gap-2">
+        <button
+          type="button"
+          pButton
+          icon="pi pi-replay"
+          [label]="'scanexam.rotatecounterclockwiselabel' | translate"
+          (click)="rotateZones(-1)"
+          [tooltipPosition]="'bottom'"
+          [pTooltip]="'scanexam.rotatecounterclockwiseTooltip' | translate"
+          [tooltipZIndex]="'3000'"
+        ></button>
+        <button
+          type="button"
+          pButton
+          icon="pi pi-refresh"
+          [label]="'scanexam.rotateclockwiselabel' | translate"
+          (click)="rotateZones(1)"
+          [tooltipPosition]="'bottom'"
+          [pTooltip]="'scanexam.rotateclockwiseTooltip' | translate"
+          [tooltipZIndex]="'3000'"
+        ></button>
+      </div>
+    </div>
+
+    <div style="padding-bottom: 1rem" class="col-12 sm:col-12 md:col-12 lg:col-12 xl:col-12">
       <jhi-colour-palette></jhi-colour-palette>
     </div>
 

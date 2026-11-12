@@ -114,6 +114,7 @@ import Fuse from 'fuse.js';
 import { imagenoanswer } from './noresponse';
 import { computeQuestionNote, gradingRuleOf } from '../grading/question-grading';
 import { defaultCommentShortcut } from './comment-shortcuts';
+import { QuarterTurn, RotationDirection, rotateQuarter, rotatedSize, rotationMatrix } from './zone-rotation';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -289,6 +290,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   displayBasic = false;
   images: WritableSignal<any> = signal<any[]>([]);
   pageOffset = 0;
+  /** Display rotation of the answer zones (#653), reset when the student or the question changes. */
+  rotation: QuarterTurn = 0;
   init = true;
   showSpinner = false;
 
@@ -402,6 +405,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       }
 
       this.pageOffset = 0;
+      this.rotation = 0;
 
       this.updateTitle();
 
@@ -646,6 +650,20 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         label: this.translateService.instant('scanexam.togglefocusViewLabel'),
         description: this.translateService.instant('scanexam.hidebar'),
         command: () => (this.layoutsidebarVisible = false),
+        preventDefault: true,
+      },
+      {
+        key: ['alt + shift + r'],
+        label: this.translateService.instant('scanexam.togglefocusViewLabel'),
+        description: this.translateService.instant('scanexam.rotateclockwise'),
+        command: () => this.rotateZones(1),
+        preventDefault: true,
+      },
+      {
+        key: ['alt + shift + t'],
+        label: this.translateService.instant('scanexam.togglefocusViewLabel'),
+        description: this.translateService.instant('scanexam.rotatecounterclockwise'),
+        command: () => this.rotateZones(-1),
         preventDefault: true,
       },
       {
@@ -902,6 +920,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
+  /** Turns the answer zones by a quarter turn (1: clockwise, -1: counter-clockwise). */
+  rotateZones(direction: RotationDirection): void {
+    this.rotation = rotateQuarter(this.rotation, direction);
+    this.reloadImage();
+  }
+
   reloadImageOffset(event: any): void {
     if (event.value !== this.pageOffset) {
       this.pageOffset = event.value;
@@ -931,7 +955,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             this.activeIndex = page - 1;
           }
         }
-        const imagezone = await this.getAllImage4Zone(page, z!, true);
+        const imagezone = await this.getAllImage4Zone(page, z!, true, this.rotation);
         this.displayImage(
           imagezone,
           this.canvass.get(i),
@@ -940,6 +964,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
           },
           i,
           true,
+          this.rotation,
         );
       }
     }
@@ -1874,16 +1899,22 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     show: (s: boolean) => void,
     index: number,
     updateanotationcanvas: boolean,
+    rotation: QuarterTurn = 0,
   ): void {
     if (imageRef !== undefined) {
-      imageRef!.nativeElement.width = v.w * this.scale;
-      imageRef!.nativeElement.height = v.h * this.scale;
+      const sceneWidth = v.w * this.scale;
+      const sceneHeight = v.h * this.scale;
+      const displayed = rotatedSize(sceneWidth, sceneHeight, rotation);
+      imageRef!.nativeElement.width = displayed.width;
+      imageRef!.nativeElement.height = displayed.height;
       const ctx1 = imageRef!.nativeElement.getContext('2d');
       const editedImage: HTMLCanvasElement = <HTMLCanvasElement>document.createElement('canvas');
       editedImage.width = v.w;
       editedImage.height = v.h;
       const ctx2 = editedImage.getContext('2d');
       ctx2!.putImageData(v.i, 0, 0);
+      // Same matrix as the viewport transform of the annotation canvas (see ZoneCorrectionHandler.updateCanvas).
+      ctx1!.transform(...rotationMatrix(rotation, sceneWidth, sceneHeight));
       ctx1!.scale(this.scale, this.scale);
       ctx1!.drawImage(editedImage, 0, 0);
       show(true);
@@ -1898,7 +1929,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             this.eventHandler,
             this.resp?.id,
           );
-          zh.updateCanvas(imageRef!.nativeElement);
+          zh.updateCanvas(imageRef!.nativeElement, rotation, sceneWidth, sceneHeight);
           this.currentZoneCorrectionHandler.set(
             '' + this.examId + '_' + this.sheet.id! + '_' + this.questionNumeros[this.questionindex] + '_' + index,
             zh,
@@ -1906,7 +1937,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         } else {
           this.currentZoneCorrectionHandler
             .get('' + this.examId + '_' + this.sheet.id! + '_' + this.questionNumeros[this.questionindex] + '_' + index)!
-            .updateCanvas(imageRef!.nativeElement);
+            .updateCanvas(imageRef!.nativeElement, rotation, sceneWidth, sceneHeight);
         }
       }
     }
@@ -2052,7 +2083,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
     this.images.set(images);
   }
-  async getAllImage4Zone(pageInscan: number, zone: IZone, computescale: boolean): Promise<ImageZone> {
+  async getAllImage4Zone(pageInscan: number, zone: IZone, computescale: boolean, rotation: QuarterTurn = 0): Promise<ImageZone> {
     if (this.exam?.nbgrader === true) {
       const i = await this.db.getAlignImagesForPageNumbers(+this.examId!, [pageInscan]);
       const pageNumber = pageInscan;
@@ -2081,7 +2112,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       };
       const crop = await firstValueFrom(this.alignImagesService.imageCropFromZone(imageToCrop));
       if (computescale) {
-        this.computeScale(crop.width, crop.height);
+        // The scale fits the displayed box, whose sides are swapped by a quarter turn.
+        const displayed = rotatedSize(crop.width, crop.height, rotation);
+        this.computeScale(displayed.width, displayed.height);
       }
 
       return {
