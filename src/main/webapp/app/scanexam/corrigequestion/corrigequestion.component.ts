@@ -103,7 +103,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
-import { SwipeDirective } from '../swipe.directive';
+import { SwipeDirective, SwipeEvent } from '../swipe.directive';
+import { isAnnotationGesture } from './annotation-swipe';
 import { IPrediction, Prediction } from 'app/entities/prediction/prediction.model';
 import { HttpClient } from '@angular/common/http';
 import { Zone4SameCommentOrSameGrade } from '../comparestudentanswer/comparestudentanswer.component';
@@ -3010,11 +3011,17 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   onSwipeMove(event: any) {
     console.error(`SwipeMove direction: ${event.direction} and distance: ${event.distance}`);
   }
-  async onSwipeEnd(event: any) {
-    let verticalScroll = true;
-    if (document.body.scrollHeight > window.innerHeight) {
-      verticalScroll = false;
-    }
+  /** Issue #657 : pas de navigation par glissement pendant l'annotation (voir `isAnnotationGesture`). */
+  readonly ignoreSwipeOnAnnotation = (event: TouchEvent): boolean =>
+    isAnnotationGesture(event.target, this.eventHandler.selectedTool, () => {
+      const canvas = this.eventHandler.allcanvas.find(c => c?.upperCanvasEl === event.target);
+      // Canvas introuvable : on préfère ne pas naviguer.
+      return canvas === undefined || canvas.findTarget(event) !== undefined;
+    });
+
+  async onSwipeEnd(event: SwipeEvent): Promise<void> {
+    // Le glissement vertical entrerait en conflit avec le défilement de la page.
+    const verticalScroll = document.body.scrollHeight <= window.innerHeight;
     if (event.direction === 'x' && event.distance > 70) {
       await this.previousStudent();
     } else if (event.direction === 'x' && event.distance < -70) {
