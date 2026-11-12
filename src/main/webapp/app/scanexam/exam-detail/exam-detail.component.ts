@@ -1,4 +1,4 @@
-import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { Component, OnInit, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 import { faMotorcycle as fasMotorcycle } from '@fortawesome/free-solid-svg-icons';
@@ -40,6 +40,14 @@ import { ButtonDirective } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
+import {
+  ScanAlignError,
+  ScanAlignJobDto,
+  ScanAlignService,
+  ScanStatusDto,
+  countPages,
+  isFinishedStatus,
+} from '../services/scan-align.service';
 
 @Component({
   selector: 'jhi-exam-detail',
@@ -99,10 +107,23 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
   showInfoExam = false;
   correctionFinish = false;
 
+  /**
+   * Alignement serveur en cours pour cet examen : un overlay bloque les actions, qui liraient
+   * ou réécriraient un cache que le worker est en train de produire.
+   */
+  serverAlignActive = signal(false);
+  serverAlignProgress = signal(0);
+  /** Nombre de pages du job, 0 si inconnu. */
+  serverAlignTotal = signal(0);
+  serverAlignQueued = signal(false);
+  /** Pages alignées, estimées à partir de l'avancement global publié par le worker. */
+  serverAlignDone = computed(() => Math.round((this.serverAlignProgress() * this.serverAlignTotal()) / 100));
+
   infoExamDetail = { nbrepagenonalign: 0, nbrepagealign: 0, nbrepagetemplate: 0, nbrecopie: 0, cond1: false, cond2: false, cond3: false };
 
   // completes the subscriptions to application-wide observables when the component is destroyed
   private readonly destroyRef = inject(DestroyRef);
+  private readonly scanAlignService = inject(ScanAlignService);
 
   constructor(
     public courseService: CourseService,
@@ -162,51 +183,11 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
               this.router.navigateByUrl('/');
             },
           );
-          if (this.exam.nbgrader === true) {
-            this.db.countAlignImage(+this.examId).then(c1 => {
-              if (c1 !== 0) {
-                this.showAlignement = true;
-                this.showAssociation = true;
-                this.showCorrection = true;
-              } else {
-                this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, false);
-              }
-              this.blocked = false;
-            });
-          } else {
-            this.db.countPageTemplate(+this.examId).then(c => {
-              if (c !== 0) {
-                this.blocked = true;
-                this.db.countNonAlignImage(+this.examId).then(c1 => {
-                  if (c1 !== 0) {
-                    this.showAlignement = true;
-
-                    this.checkIfAlreadyAlign().then(res => {
-                      if (res && this.exam?.scanfileId) {
-                        this.showAssociation = true;
-                        this.checkNewCacheAvailable().then(res1 => {
-                          this.initTemplate();
-                          if (res1) {
-                            this.confirmDownloadNewCache();
-                          }
-                        });
-                      } else {
-                        this.blocked = false;
-                      }
-                    });
-                  } else {
-                    this.blocked = false;
-                  }
-                });
-              } else {
-                if (this.exam?.scanfileId) {
-                  this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, true);
-                } else {
-                  this.blocked = false;
-                }
-              }
-            });
-          }
+          this.checkServerAlignment().then(running => {
+            if (!running) {
+              this.loadExamState();
+            }
+          });
         });
 
         this.translateService.get('scanexam.removeexam').subscribe(() => {
@@ -218,6 +199,73 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
         });
       }
     });
+  }
+
+  /** État local de l'examen (cache, alignement, association, correction) et activation des étapes. */
+  loadExamState(): void {
+    this.blocked = true;
+    if (this.exam?.nbgrader === true) {
+      this.db.countAlignImage(+this.examId).then(c1 => {
+        if (c1 !== 0) {
+          this.showAlignement = true;
+          this.showAssociation = true;
+          this.showCorrection = true;
+        } else {
+          this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, false);
+        }
+        this.blocked = false;
+      });
+    } else {
+      this.db.countPageTemplate(+this.examId).then(c => {
+        if (c !== 0) {
+          this.blocked = true;
+          this.db.countNonAlignImage(+this.examId).then(c1 => {
+            if (c1 !== 0) {
+              this.showAlignement = true;
+
+              this.checkIfAlreadyAlign().then(res => {
+                if (res && this.exam?.scanfileId) {
+                  this.showAssociation = true;
+                  this.checkNewCacheAvailable().then(res1 => {
+                    this.initTemplate();
+                    if (res1) {
+                      this.confirmDownloadNewCache();
+                    }
+                  });
+                } else {
+                  this.blocked = false;
+                }
+              });
+            } else {
+              this.blocked = false;
+            }
+          });
+        } else {
+          if (this.exam?.scanfileId) {
+            this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, true);
+          } else {
+            this.blocked = false;
+          }
+        }
+      });
+    }
+  }
+
+  /**
+   * Détecte un alignement serveur en cours pour cet examen et le suit jusqu'à la fin.
+   * @returns true si un job est en cours : le chargement de l'examen attend sa fin
+   */
+  async checkServerAlignment(): Promise<boolean> {
+    if (this.exam?.nbgrader === true) {
+      return false;
+    }
+    const job = await firstValueFrom(this.scanAlignService.getActiveJob(+this.examId));
+    if (job === null) {
+      return false;
+    }
+    this.blocked = false;
+    this.followServerAlignment(job);
+    return true;
   }
 
   async checkNewCacheAvailable(): Promise<boolean> {
@@ -492,5 +540,50 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
     };
 
     this.showInfoExam = true;
+  }
+
+  private followServerAlignment(job: ScanAlignJobDto): void {
+    this.serverAlignTotal.set(countPages(job.pages_to_manage));
+    this.serverAlignProgress.set(job.progress);
+    this.serverAlignQueued.set(job.status === 'submitted');
+    this.serverAlignActive.set(true);
+
+    let last: ScanStatusDto | undefined;
+    this.scanAlignService
+      .followJob(+this.examId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: dto => {
+          last = dto;
+          this.serverAlignQueued.set(false);
+          this.serverAlignProgress.set(dto.progress);
+        },
+        complete: () => {
+          if (!isFinishedStatus(last?.status)) {
+            return; // vue quittée : rien à faire, le job continue sur le serveur
+          }
+          this.serverAlignActive.set(false);
+          this.messageService.add({
+            severity: 'success',
+            summary: this.translateService.instant('scanexam.alignementserveurtermine'),
+          });
+          // le worker vient de réécrire cache/{examId}.sqlite3 : on l'importe, puis on
+          // recalcule l'état de l'examen comme à l'ouverture de la vue
+          this.blocked = true;
+          this.cacheUploadService
+            .importCache(+this.examId, this.translateService, this.messageService, this, true)
+            .finally(() => this.loadExamState());
+        },
+        error: (e: unknown) => {
+          this.serverAlignActive.set(false);
+          this.messageService.add({
+            severity: 'error',
+            summary: this.translateService.instant('scanexam.alignementserveurerreur'),
+            detail: e instanceof ScanAlignError ? e.message : String(e),
+            life: 15000,
+          });
+          this.loadExamState();
+        },
+      });
   }
 }

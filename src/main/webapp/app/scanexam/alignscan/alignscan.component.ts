@@ -20,6 +20,8 @@ import {
   SERVER_ALIGN_CORNER_SQUARE_SIZE,
   SERVER_ALIGN_HEIGHTRESOLUTION,
   SERVER_ALIGN_MIN_RADIUS,
+  countPages,
+  isFinishedStatus,
   pagesToManage,
   serverAlgoFromMode,
 } from '../services/scan-align.service';
@@ -122,6 +124,11 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
     { label: 'scanexam.server', value: true, tooltip: 'scanexam.servertooltip' },
   ];
   serverAlignOptionsDisable = signal(false);
+  /**
+   * Un job d'alignement serveur est suivi : l'overlay propose de quitter la page,
+   * le job continue sur le serveur et sera repris au retour sur cet écran.
+   */
+  serverJobRunning = signal(false);
 
   blocked = false;
   observable: Observable<IImageAlignementInput> | undefined;
@@ -224,6 +231,9 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
               this.nbreFeuilleParCopie = v;
               this.checkIfAlreadyAlign();
               this.loaded = true;
+              // Un alignement serveur lancé plus tôt (onglet fermé, page rechargée, autre
+              // enseignant) est peut-être encore en cours : on s'y raccroche.
+              this.reattachServerJob();
             });
           }
         });
@@ -539,23 +549,51 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
 
     // Le service ouvre le flux SSE AVANT de soumettre le job (flux sans rejeu), puis émet
     // les statuts de page jusqu'à `finished` ; il échoue sur `error`, perte de connexion ou inactivité.
-    const done = new Set<number>();
-    const expected = pages.length;
+    await this.followServerJob(this.scanAlignService.runJob(payload), pages.length, 0);
+  }
+
+  /**
+   * Se raccroche au job d'alignement serveur de l'examen s'il y en a un en cours :
+   * overlay de progression, puis import du cache à la fin comme après un lancement.
+   */
+  public async reattachServerJob(): Promise<void> {
+    const job = await firstValueFrom(this.scanAlignService.getActiveJob(+this.examId));
+    if (job === null) {
+      return;
+    }
+    this.alignementServer = true;
+    this.showMapping = false;
+    this._showVignette = false;
+    this.translateService.get('scanexam.alignementserveurreprise').subscribe(res => this.message.set('' + res));
+    this.blocked = true;
+    await this.followServerJob(this.scanAlignService.followJob(+this.examId), countPages(job.pages_to_manage), job.progress);
+  }
+
+  /**
+   * Suit un job serveur (lancé ou repris) jusqu'à sa fin et importe le cache produit.
+   * Si l'utilisateur quitte la page, le suivi s'arrête mais le job continue sur le serveur.
+   *
+   * @param expected nombre de pages demandées, 0 si inconnu (job soumis avant un redémarrage du back)
+   */
+  private async followServerJob(job$: Observable<ScanStatusDto>, expected: number, initialProgress: number): Promise<void> {
+    this.serverJobRunning.set(true);
+    this.showServerProgress(initialProgress, expected);
+    let last: ScanStatusDto | undefined;
     try {
-      await lastValueFrom(
-        this.scanAlignService.runJob(payload).pipe(
-          tap((dto: ScanStatusDto) => {
-            if (dto.page > 0) {
-              done.add(dto.page);
-            }
-            this.percentavancement.set(dto.progress);
-            this.progress.set(dto.progress);
-            this.submessage.set(this.translateService.instant('scanexam.aveserver', { page: done.size, total: expected }));
-          }),
+      last = await lastValueFrom(
+        job$.pipe(
+          takeUntilDestroyed(this.destroyRef),
+          tap((dto: ScanStatusDto) => this.showServerProgress(dto.progress, expected)),
         ),
         { defaultValue: undefined },
       );
     } catch (e) {
+      this.serverJobRunning.set(false);
+      if (e instanceof ScanAlignError && e.reason === 'conflict') {
+        // un job a été lancé entre-temps pour cet examen (autre onglet, autre enseignant) : on le suit
+        await this.reattachServerJob();
+        return;
+      }
       console.error('server alignment failed', e);
       this.blocked = false;
       this.percentavancement.set(0);
@@ -567,8 +605,26 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
       });
       return;
     }
+    this.serverJobRunning.set(false);
+    if (!isFinishedStatus(last?.status)) {
+      // page quittée avant la fin : le job continue sur le serveur
+      return;
+    }
+    await this.completeServerJob();
+  }
 
-    // Job terminé : le cache cache/{examId}.sqlite3 est sur S3, on l'importe dans le cache local
+  private showServerProgress(progress: number, expected: number): void {
+    this.percentavancement.set(progress);
+    this.progress.set(progress);
+    this.submessage.set(
+      expected > 0
+        ? this.translateService.instant('scanexam.aveserver', { page: Math.round((progress * expected) / 100), total: expected })
+        : '',
+    );
+  }
+
+  /** Job terminé : le cache cache/{examId}.sqlite3 est sur S3, on l'importe dans le cache local. */
+  private async completeServerJob(): Promise<void> {
     await this.cacheUploadService.importCache(+this.examId, this.translateService, this.messageService, this, false);
     this.blocked = false;
 
@@ -586,21 +642,6 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
     this.endPage = await this.db.countNonAlignImage(+this.examId);
     this.numberPagesInScan = this.endPage;
     this.nbPageAlignInCache = await this.db.countAlignImage(+this.examId);
-
-    // Rapatrie les pages alignées depuis le cache serveur vers le cache local
-    // (format identique à l'alignement local : background getAlignPage renvoie `value`).
-    /*    for (const page of pages) {
-      try {
-        const value: string = (await firstValueFrom(this.cacheUploadService.getAlignImage(+this.examId, page))) as string;
-        if (value && value.length > 0) {
-          await this.db.addAligneImage({ examId: +this.examId, pageNumber: page, value });
-        }
-      } catch (e) {
-        console.error('récupération page alignée (serveur) échouée pour la page', page, e);
-      }
-    }*/
-
-    //    await this.saveData();
   }
 
   private reviver(key: any, value: any): any {

@@ -484,3 +484,27 @@ input:checked + .slider1:before {
 .treetableDate .ui-widget-content {
   width: 100%; // or in pixel depends how much width you want.
 }
+
+.server-align-overlay {
+  max-width: 32rem;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  text-align: center;
+  background: var(--p-content-background, #fff);
+  color: var(--p-text-color, #333);
+  box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.3);
+}
+
+.server-align-progress {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+}
+
+.server-align-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
