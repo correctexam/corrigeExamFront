@@ -35,6 +35,10 @@
           <span>{{ progress() }} / 100</span>
         }
         <BR />
+        @if (serverJobRunning()) {
+          <p class="mt-3" [translate]="'scanexam.alignementserveurfond'"></p>
+          <p-button [label]="'scanexam.retourexamen' | translate" icon="pi pi-arrow-left" [outlined]="true" (onClick)="gotoUE()"></p-button>
+        }
       </div>
       <div class="col-4"></div>
     </div>
