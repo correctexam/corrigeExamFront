@@ -1041,9 +1041,6 @@ Apache-2.0
 @tensorflow/tfjs-layers
 Apache-2.0 AND MIT
 
-ag-swipe-core
-ISC
-
 boolbase
 ISC
 
