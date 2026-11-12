@@ -1,7 +1,21 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/member-ordering */
 
-import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren, AfterViewInit, HostListener } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnInit,
+  QueryList,
+  ViewChildren,
+  AfterViewInit,
+  HostListener,
+  inject,
+} from '@angular/core';
+import { SwipeDirective, SwipeEvent } from '../swipe.directive';
+import { NavigationPadComponent } from '../navigation-pad/navigation-pad.component';
+import { NavigationAction } from '../navigation-pad/navigation-pad.model';
+import { PreferenceService } from '../preference-page/preference.service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
 import { ExamService } from 'app/entities/exam/service/exam.service';
@@ -74,9 +88,12 @@ import { ToastModule } from 'primeng/toast';
     TranslateDirective,
     TranslatePipe,
     ArraySortPipe,
+    SwipeDirective,
+    NavigationPadComponent,
   ],
 })
 export class VoirCopieComponent implements OnInit, AfterViewInit {
+  private readonly preferenceService = inject(PreferenceService);
   public href = '';
 
   @ViewChildren('nomImage')
@@ -323,20 +340,53 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   }
 
   @HostListener('window:keydown.shift.ArrowLeft', ['$event'])
-  previousQuestion(event: KeyboardEvent): void {
+  onPreviousQuestionKey(event: KeyboardEvent): void {
     event.preventDefault();
+    this.previousQuestion();
+  }
+
+  @HostListener('window:keydown.shift.ArrowRight', ['$event'])
+  onNextQuestionKey(event: KeyboardEvent): void {
+    event.preventDefault();
+    this.nextQuestion();
+  }
+
+  previousQuestion(): void {
     const q = this.questionindex;
     if (q > 0) {
       this.router.navigateByUrl('/copie/' + this.uuid + '/' + q);
     }
   }
 
-  @HostListener('window:keydown.shift.ArrowRight', ['$event'])
-  nextQuestion(event: KeyboardEvent): void {
-    event.preventDefault();
+  nextQuestion(): void {
     const q = this.questionindex + 2;
     if (q <= this.nbreQuestions) {
       this.router.navigateByUrl('/copie/' + this.uuid + '/' + q);
+    }
+  }
+
+  /** Glissement sur toute la page, selon la préférence de navigation tactile (issue #657). */
+  get swipeOnPage(): boolean {
+    return this.preferenceService.touchNavigation()().swipeOnPage;
+  }
+
+  /** Vue étudiant : seul le glissement horizontal navigue (gauche : question suivante), le vertical fait défiler. */
+  onSwipeEnd(event: SwipeEvent): void {
+    if (event.direction !== 'x') {
+      return;
+    }
+    if (event.distance < 0) {
+      this.nextQuestion();
+    } else {
+      this.previousQuestion();
+    }
+  }
+
+  onNavigationPad(action: NavigationAction): void {
+    if (action === 'nextQuestion' || action === 'nextStudent') {
+      this.nextQuestion();
+    } else {
+      this.previousQuestion();
     }
   }
 

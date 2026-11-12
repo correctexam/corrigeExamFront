@@ -599,6 +599,26 @@
     "coursnonarchive": "Disciplinas ativas",
     "coursarchive": "Disciplinas arquivadas",
     "coursnonarchiveTooltip": "Arquive suas disciplinas arrastando e largando uma disciplina para a seção de disciplinas arquivadas.",
-    "coursarchiveTooltip": "É possível colocar a disciplina nas disciplinas activas arrastando e largando uma disciplina na secção de disciplinas activas."
+    "coursarchiveTooltip": "É possível colocar a disciplina nas disciplinas activas arrastando e largando uma disciplina na secção de disciplinas activas.",
+    "touchnavigation": {
+      "title": "Navegação tátil (tablet, ecrã tátil)",
+      "swipeonpage": "Deslizar na página para mudar de prova ou de questão (nunca durante a anotação)",
+      "padmode": "Zona de navegação",
+      "padauto": "Em ecrã tátil",
+      "padalways": "Sempre",
+      "padnever": "Nunca",
+      "padside": "Lado da zona",
+      "sideleft": "Esquerda",
+      "sideright": "Direita",
+      "pad": "Zona de navegação",
+      "swipehint": "Deslizar: esquerda/direita para mudar de prova, cima/baixo para mudar de questão",
+      "previousQuestion": "Questão anterior",
+      "nextQuestion": "Questão seguinte",
+      "previousStudent": "Prova anterior",
+      "nextStudent": "Prova seguinte",
+      "collapse": "Recolher a zona de navegação",
+      "expand": "Mostrar a zona de navegação",
+      "copy": "Prova"
+    }
   }
 }

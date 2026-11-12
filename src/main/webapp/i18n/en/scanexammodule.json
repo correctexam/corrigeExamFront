@@ -591,6 +591,26 @@
     "coursnonarchive": "Active course",
     "coursarchive": "Archived course",
     "coursnonarchiveTooltip": "It is possible to archive classes by dragging and dropping a class to the archived classes section.",
-    "coursarchiveTooltip": "It is now possible to place the course in the active courses by dragging and dropping a course to the active course section."
+    "coursarchiveTooltip": "It is now possible to place the course in the active courses by dragging and dropping a course to the active course section.",
+    "touchnavigation": {
+      "title": "Touch navigation (tablet, touch screen)",
+      "swipeonpage": "Swipe on the page to change copy or question (never while annotating)",
+      "padmode": "Navigation pad",
+      "padauto": "On touch screens",
+      "padalways": "Always",
+      "padnever": "Never",
+      "padside": "Pad side",
+      "sideleft": "Left",
+      "sideright": "Right",
+      "pad": "Navigation pad",
+      "swipehint": "Swipe: left/right to change copy, up/down to change question",
+      "previousQuestion": "Previous question",
+      "nextQuestion": "Next question",
+      "previousStudent": "Previous copy",
+      "nextStudent": "Next copy",
+      "collapse": "Collapse the navigation pad",
+      "expand": "Show the navigation pad",
+      "copy": "Copy"
+    }
   }
 }

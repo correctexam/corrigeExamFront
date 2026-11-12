@@ -1,0 +1,132 @@
+// Zone de navigation tactile (issue #657).
+// Placée en bas d'un côté, en retrait des bords : iOS et Android captent les gestes
+// qui partent du bord gauche (retour) et du bas de l'écran (barre d'accueil).
+$button-size: 3.25rem; // ≥ 44 px : cible tactile minimale recommandée
+$edge-inset: 1.5rem;
+
+:host {
+  display: contents;
+}
+
+.navigation-pad {
+  position: fixed;
+  right: $edge-inset;
+  bottom: 5rem;
+  z-index: 1000; // sous les dialogues PrimeNG
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+
+  &--left {
+    right: auto;
+    left: $edge-inset;
+  }
+}
+
+.navigation-pad__grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: $button-size 6.5rem $button-size;
+  justify-items: center;
+  align-items: center;
+  grid-template-rows: $button-size 4.5rem $button-size;
+  grid-template-areas:
+    '. up .'
+    'left surface right'
+    '. down .';
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+
+  &--questions-only {
+    grid-template-rows: 4.5rem;
+    grid-template-areas: 'left surface right';
+    padding-top: 1.25rem;
+  }
+}
+
+.navigation-pad__button,
+.navigation-pad__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $button-size;
+  height: $button-size;
+  border: none;
+  border-radius: 0.75rem;
+  background: var(--p-primary-color, #3b82f6);
+  color: var(--p-primary-contrast-color, #fff);
+  font-size: 1.25rem;
+  touch-action: manipulation; // pas de délai ni de zoom au double tap
+
+  &:active,
+  &--pending {
+    filter: brightness(0.8);
+    transform: scale(0.95);
+  }
+}
+
+.navigation-pad__up {
+  grid-area: up;
+}
+.navigation-pad__down {
+  grid-area: down;
+}
+.navigation-pad__left {
+  grid-area: left;
+  align-self: center;
+}
+.navigation-pad__right {
+  grid-area: right;
+  align-self: center;
+}
+
+.navigation-pad__surface {
+  grid-area: surface;
+  align-self: stretch;
+  justify-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 2px dashed rgba(0, 0, 0, 0.2);
+  border-radius: 0.75rem;
+  background: rgba(0, 0, 0, 0.04);
+  touch-action: none; // le navigateur ne fait pas défiler la page depuis cette surface
+}
+
+.navigation-pad__info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.navigation-pad__collapse {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.55);
+  touch-action: manipulation;
+}
+
+.navigation-pad--left .navigation-pad__collapse {
+  right: auto;
+  left: 0.25rem;
+}
+
+.navigation-pad__toggle {
+  border-radius: 50%;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}

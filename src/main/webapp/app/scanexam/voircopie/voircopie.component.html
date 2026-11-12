@@ -1,5 +1,10 @@
-<div class="grid">
+<div class="grid" jhiSwipe [swipeEnabled]="swipeOnPage && !displayBasic" (swipeEnd)="onSwipeEnd($event)">
   <p-toast></p-toast>
+  <jhi-navigation-pad
+    [withStudents]="false"
+    [questionInfo]="'Q ' + (questionindex + 1) + ' / ' + nbreQuestions"
+    (navigate)="onNavigationPad($event)"
+  ></jhi-navigation-pad>
   <p-blockUI [blocked]="blocked">
     <!--<i class="pi pi-lock" style="font-size: 3rem"></i>-->
     <p-progressSpinner></p-progressSpinner>

@@ -605,6 +605,26 @@
     "processfile": "Selectionner ces templates de fichier",
     "listfile": "Liste des templates de fichiers présents dans l'archive",
     "listfiletoanalyse": "Liste des templates de fichiers à analyser",
-    "listfilesheader": "Sélections des templates de fichiers à analyser"
+    "listfilesheader": "Sélections des templates de fichiers à analyser",
+    "touchnavigation": {
+      "title": "Navigation tactile (tablette, écran tactile)",
+      "swipeonpage": "Glisser sur la page pour changer de copie ou de question (jamais pendant l'annotation)",
+      "padmode": "Zone de navigation",
+      "padauto": "Sur écran tactile",
+      "padalways": "Toujours",
+      "padnever": "Jamais",
+      "padside": "Côté de la zone",
+      "sideleft": "Gauche",
+      "sideright": "Droite",
+      "pad": "Zone de navigation",
+      "swipehint": "Glisser : gauche/droite pour changer de copie, haut/bas pour changer de question",
+      "previousQuestion": "Question précédente",
+      "nextQuestion": "Question suivante",
+      "previousStudent": "Copie précédente",
+      "nextStudent": "Copie suivante",
+      "collapse": "Réduire la zone de navigation",
+      "expand": "Afficher la zone de navigation",
+      "copy": "Copie"
+    }
   }
 }

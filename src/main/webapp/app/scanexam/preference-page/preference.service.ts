@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Signal, WritableSignal, signal } from '@angular/core';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { LocalStorageService } from 'ngx-webstorage';
 import { IGradedComment } from 'app/entities/graded-comment/graded-comment.model';
@@ -6,6 +6,7 @@ import { IHybridGradedComment, NewHybridGradedComment } from '../../entities/hyb
 import { ITextComment } from 'app/entities/text-comment/text-comment.model';
 import { IQuestion, IQuestionMark } from 'app/entities/question/question.model';
 import { v4 as uuid } from 'uuid';
+import { ITouchNavigationPreference, withTouchNavigationDefaults } from './touch-navigation.preference';
 
 export interface IPreference {
   qcm_min_width_shape: number;
@@ -43,6 +44,8 @@ interface IPreferenceForQuestion {
   providedIn: 'root',
 })
 export class PreferenceService {
+  private touchNavigationSignal: WritableSignal<ITouchNavigationPreference> | undefined;
+
   constructor(public localStorageService: LocalStorageService) {}
 
   getPreference(): IPreference {
@@ -109,6 +112,22 @@ export class PreferenceService {
     };
     this.localStorageService.store('preferences', defaultvalue);
     return defaultvalue;
+  }
+
+  getTouchNavigation(): ITouchNavigationPreference {
+    return withTouchNavigationDefaults(this.localStorageService.retrieve('touchNavigation'));
+  }
+
+  /** Préférence de navigation tactile, mise à jour à chaque enregistrement. */
+  touchNavigation(): Signal<ITouchNavigationPreference> {
+    this.touchNavigationSignal ??= signal(this.getTouchNavigation());
+    return this.touchNavigationSignal.asReadonly();
+  }
+
+  saveTouchNavigation(pref: ITouchNavigationPreference): void {
+    const value = withTouchNavigationDefaults(pref);
+    this.localStorageService.store('touchNavigation', value);
+    this.touchNavigationSignal?.set(value);
   }
 
   showKeyboardShortcuts(): boolean {
