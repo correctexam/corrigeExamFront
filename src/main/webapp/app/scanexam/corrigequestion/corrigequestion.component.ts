@@ -112,6 +112,8 @@ import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { PredictionStudentResponseService } from '../mlt/prediction-studentresponse-service';
 import Fuse from 'fuse.js';
 import { imagenoanswer } from './noresponse';
+import { computeQuestionNote, gradingRuleOf } from '../grading/question-grading';
+import { defaultCommentShortcut } from './comment-shortcuts';
 
 enum ScalePolicy {
   FitWidth = 1,
@@ -791,15 +793,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
     for (const { index, comment } of comments.map((c1, i) => ({ index: i, comment: c1 }))) {
       if (!toRemove.includes(comment.id!)) {
-        let sh = '' + (index + 1);
-        let createShortcut = true;
-        if (index + 1 > 9 && index + 1 < 36) {
-          sh = String.fromCharCode(87 + index + 1);
-        } else if (index + 1 >= 36) {
-          createShortcut = false;
-        }
-        if (createShortcut) {
-          comment.shortcut = ['ctrl + ' + sh, 'cmd + ' + sh];
+        const shortcut = defaultCommentShortcut(index);
+        if (shortcut) {
+          comment.shortcut = shortcut;
         }
       }
     }
@@ -1494,134 +1490,26 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     return this.computeNote(update, resp, currentQ[0]);
   }
 
+  /**
+   * Computes the note of `resp` with the grading rule of `currentQ` (see `question-grading.ts`),
+   * shows it when `resp` is the response on screen, and saves it when `update` is true.
+   */
   computeNote(update: boolean, resp: IStudentResponse | undefined, currentQ: IQuestion): Promise<IStudentResponse | undefined> {
     return new Promise<IStudentResponse | undefined>((resolve, reject) => {
-      if (currentQ.gradeType === GradeType.POSITIVE && currentQ.typeAlgoName !== 'QCM') {
-        let currentNote = 0;
-        resp?.gradedcomments?.forEach(g => {
-          if (g.grade !== undefined && g.grade !== null) {
-            currentNote = currentNote + g.grade;
-          }
-        });
-        if (currentNote > this.noteSteps) {
-          currentNote = this.noteSteps;
-        }
-        this.currentNote = currentNote;
-        if (resp) {
-          resp.note = currentNote;
-        }
-        if (update && resp?.id) {
-          this.studentResponseService.partialUpdate(resp).subscribe(b => {
-            if (b.body !== null) {
-              resolve(b.body);
-            } else {
-              reject(null);
-            }
-          });
-        } else {
-          resolve(resp);
-        }
-      } else if (currentQ.gradeType === GradeType.NEGATIVE && currentQ.typeAlgoName !== 'QCM') {
-        let currentNote = this.noteSteps;
-        resp?.gradedcomments?.forEach(g => {
-          if (g.grade !== undefined && g.grade !== null) {
-            currentNote = currentNote - g.grade;
-          }
-        });
-        if (currentNote < 0) {
-          currentNote = 0;
-        }
-        this.currentNote = currentNote;
-        if (resp) {
-          resp.note = currentNote;
-        }
-        if (update) {
-          this.studentResponseService.partialUpdate(resp!).subscribe(b => {
-            if (b.body !== null) {
-              resolve(b.body);
-            } else {
-              reject(null);
-            }
-          });
-        } else {
-          resolve(resp);
-        }
-      } else if (currentQ.gradeType === GradeType.HYBRID && currentQ.typeAlgoName !== 'QCM') {
-        let currentNote = 0;
-        let absoluteNote2Add = 0;
-        let pourcentage = currentQ.defaultpoint ? currentQ.defaultpoint : 0;
-        this.currentHybridGradedComment4Question?.forEach(g => {
-          if (this.answer2HybridGradedCommentMap.has(g().id)) {
-            const stepValue = this.answer2HybridGradedCommentMap.get(g().id);
-            if (stepValue! > 0) {
-              if (g().relative) {
-                pourcentage = pourcentage + (stepValue! / g().step!) * g().grade!;
-              } else {
-                absoluteNote2Add = absoluteNote2Add + (stepValue! / g().step!) * g().grade!;
-              }
-            }
-          }
-        });
-        currentNote = (currentQ.point! * pourcentage) / 100.0 + absoluteNote2Add;
-        if (currentNote > currentQ.point! && !currentQ.canExceedTheMax) {
-          currentNote = currentQ.point!;
-        } else if (currentNote < 0 && !currentQ.canBeNegative) {
-          currentNote = 0;
+      const graded = computeQuestionNote(currentQ, {
+        gradedComments: resp?.gradedcomments,
+        noteSteps: this.noteSteps,
+        hybridComments: gradingRuleOf(currentQ) === 'hybrid' ? this.currentHybridGradedComment4Question?.map(g => g()) : undefined,
+        hybridStepValues: this.answer2HybridGradedCommentMap,
+      });
+      if (graded) {
+        const isQcm = graded.rule === 'qcm' || graded.rule === 'qcmWithPenalty';
+        if (!isQcm || resp === this.resp) {
+          this.currentNote = graded.note;
         }
         if (resp) {
-          resp.note = currentNote * 100;
-        }
-        this.currentNote = currentNote;
-        if (update && resp?.id) {
-          this.studentResponseService.partialUpdate(resp).subscribe(b => {
-            if (b.body !== null) {
-              resolve(b.body);
-            } else {
-              reject(null);
-            }
-          });
-        } else {
-          resolve(resp);
-        }
-        resolve(resp);
-      } else if (currentQ.typeAlgoName === 'QCM' && currentQ.step! > 0) {
-        let currentNote = 0;
-        resp?.gradedcomments?.forEach(g => {
-          if (g.description?.startsWith('correct')) {
-            currentNote = currentNote + currentQ.point! * currentQ.step!;
-          } else if (g.description?.startsWith('incorrect')) {
-            currentNote = currentNote - currentQ.point!;
-          }
-        });
-        if (resp === this.resp) {
-          this.currentNote = currentNote;
-        }
-        if (resp) {
-          resp.note = currentNote;
-        }
-        if (update && resp?.id) {
-          this.studentResponseService.partialUpdate(resp).subscribe(b => {
-            if (b.body !== null) {
-              resolve(b.body);
-            } else {
-              reject(null);
-            }
-          });
-        } else {
-          resolve(resp);
-        }
-      } else if (currentQ.typeAlgoName === 'QCM' && currentQ.step! <= 0) {
-        let currentNote = 0;
-        resp?.gradedcomments?.forEach(g => {
-          if (g.description?.startsWith('correct')) {
-            currentNote = currentNote + currentQ.point!;
-          }
-        });
-        if (resp === this.resp) {
-          this.currentNote = currentNote;
-        }
-        if (resp) {
-          resp.note = currentNote;
+          // StudentResponse.note stores hybrid notes in hundredths of a point
+          resp.note = graded.rule === 'hybrid' ? graded.note * 100 : graded.note;
         }
         if (update && resp?.id) {
           this.studentResponseService.partialUpdate(resp).subscribe(b => {
