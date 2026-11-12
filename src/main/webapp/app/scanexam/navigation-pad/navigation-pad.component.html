@@ -1,0 +1,97 @@
+@if (visible()) {
+  <div
+    class="navigation-pad"
+    [class.navigation-pad--left]="preference().padSide === 'left'"
+    role="toolbar"
+    [attr.aria-label]="'scanexam.touchnavigation.pad' | translate"
+    data-cy="navigation-pad"
+  >
+    @if (collapsed()) {
+      <button
+        type="button"
+        class="navigation-pad__toggle"
+        (click)="toggleCollapsed()"
+        [attr.aria-label]="'scanexam.touchnavigation.expand' | translate"
+        [title]="'scanexam.touchnavigation.expand' | translate"
+      >
+        <i class="pi pi-arrows-alt"></i>
+      </button>
+    } @else {
+      <div class="navigation-pad__grid" [class.navigation-pad__grid--questions-only]="!withStudents()">
+        @if (withStudents()) {
+          <button
+            type="button"
+            class="navigation-pad__button navigation-pad__up"
+            [class.navigation-pad__button--pending]="pendingAction() === 'previousQuestion'"
+            (click)="go('previousQuestion')"
+            [attr.aria-label]="'scanexam.touchnavigation.previousQuestion' | translate"
+            [title]="'scanexam.touchnavigation.previousQuestion' | translate"
+          >
+            <i class="pi pi-arrow-up"></i>
+          </button>
+        }
+        <button
+          type="button"
+          class="navigation-pad__button navigation-pad__left"
+          [class.navigation-pad__button--pending]="pendingAction() === (withStudents() ? 'previousStudent' : 'previousQuestion')"
+          (click)="go(withStudents() ? 'previousStudent' : 'previousQuestion')"
+          [attr.aria-label]="'scanexam.touchnavigation.' + (withStudents() ? 'previousStudent' : 'previousQuestion') | translate"
+          [title]="'scanexam.touchnavigation.' + (withStudents() ? 'previousStudent' : 'previousQuestion') | translate"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <div
+          class="navigation-pad__surface"
+          jhiSwipe
+          [swipeAllowPen]="true"
+          [swipeThreshold]="threshold"
+          (swipeMove)="onSwipeMove($event)"
+          (swipeEnd)="onSwipeEnd($event)"
+          (touchend)="resetDrag()"
+          (touchcancel)="resetDrag()"
+          [title]="'scanexam.touchnavigation.swipehint' | translate"
+        >
+          <div class="navigation-pad__info" [style.transform]="dragOffset()">
+            @if (questionInfo()) {
+              <span>{{ questionInfo() }}</span>
+            }
+            @if (withStudents() && studentInfo()) {
+              <span>{{ studentInfo() }}</span>
+            }
+          </div>
+        </div>
+        <button
+          type="button"
+          class="navigation-pad__button navigation-pad__right"
+          [class.navigation-pad__button--pending]="pendingAction() === (withStudents() ? 'nextStudent' : 'nextQuestion')"
+          (click)="go(withStudents() ? 'nextStudent' : 'nextQuestion')"
+          [attr.aria-label]="'scanexam.touchnavigation.' + (withStudents() ? 'nextStudent' : 'nextQuestion') | translate"
+          [title]="'scanexam.touchnavigation.' + (withStudents() ? 'nextStudent' : 'nextQuestion') | translate"
+        >
+          <i class="pi pi-arrow-right"></i>
+        </button>
+        @if (withStudents()) {
+          <button
+            type="button"
+            class="navigation-pad__button navigation-pad__down"
+            [class.navigation-pad__button--pending]="pendingAction() === 'nextQuestion'"
+            (click)="go('nextQuestion')"
+            [attr.aria-label]="'scanexam.touchnavigation.nextQuestion' | translate"
+            [title]="'scanexam.touchnavigation.nextQuestion' | translate"
+          >
+            <i class="pi pi-arrow-down"></i>
+          </button>
+        }
+        <button
+          type="button"
+          class="navigation-pad__collapse"
+          (click)="toggleCollapsed()"
+          [attr.aria-label]="'scanexam.touchnavigation.collapse' | translate"
+          [title]="'scanexam.touchnavigation.collapse' | translate"
+        >
+          <i class="pi pi-minus"></i>
+        </button>
+      </div>
+    }
+  </div>
+}

@@ -105,6 +105,8 @@ import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { SwipeDirective, SwipeEvent } from '../swipe.directive';
 import { isAnnotationGesture } from './annotation-swipe';
+import { NavigationPadComponent } from '../navigation-pad/navigation-pad.component';
+import { NavigationAction } from '../navigation-pad/navigation-pad.model';
 import { IPrediction, Prediction } from 'app/entities/prediction/prediction.model';
 import { HttpClient } from '@angular/common/http';
 import { Zone4SameCommentOrSameGrade } from '../comparestudentanswer/comparestudentanswer.component';
@@ -139,6 +141,7 @@ interface CommentAction {
   standalone: true,
   imports: [
     SwipeDirective,
+    NavigationPadComponent,
     ToastModule,
     DialogModule,
     FormsModule,
@@ -3018,6 +3021,28 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       // Canvas introuvable : on préfère ne pas naviguer.
       return canvas === undefined || canvas.findTarget(event) !== undefined;
     });
+
+  /** Glissement sur toute la page, selon la préférence de navigation tactile. */
+  get swipeOnPage(): boolean {
+    return this.preferenceService.touchNavigation()().swipeOnPage;
+  }
+
+  get numberOfCopies(): number {
+    return this.numberPagesInScan !== undefined && this.nbreFeuilleParCopie ? this.numberPagesInScan / this.nbreFeuilleParCopie : 0;
+  }
+
+  async onNavigationPad(action: NavigationAction): Promise<void> {
+    switch (action) {
+      case 'previousStudent':
+        return this.previousStudent();
+      case 'nextStudent':
+        return this.nextStudent();
+      case 'previousQuestion':
+        return this.previousQuestion();
+      case 'nextQuestion':
+        return this.nextQuestion();
+    }
+  }
 
   async onSwipeEnd(event: SwipeEvent): Promise<void> {
     // Le glissement vertical entrerait en conflit avec le défilement de la page.

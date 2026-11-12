@@ -1,5 +1,10 @@
-<div class="grid" jhiSwipe [swipeIgnore]="ignoreSwipeOnAnnotation" (swipeEnd)="onSwipeEnd($event)">
+<div class="grid" jhiSwipe [swipeEnabled]="swipeOnPage" [swipeIgnore]="ignoreSwipeOnAnnotation" (swipeEnd)="onSwipeEnd($event)">
   <p-toast></p-toast>
+  <jhi-navigation-pad
+    [questionInfo]="'Q ' + (questionindex + 1) + ' / ' + nbreQuestions"
+    [studentInfo]="('scanexam.touchnavigation.copy' | translate) + ' ' + (currentStudent + 1) + ' / ' + numberOfCopies"
+    (navigate)="onNavigationPad($event)"
+  ></jhi-navigation-pad>
   <p-blockUI [blocked]="showSpinner">
     <div class="grid" style="width: 90vw">
       <div class="col-4"></div>
