@@ -45,6 +45,7 @@ import { ConfirmationService } from 'primeng/api';
 import { TranslateService } from '@ngx-translate/core';
 import { PreferenceService } from '../preference-page/preference.service';
 import * as fabric from 'fabric';
+import { svgExportOptions } from './zone-rotation';
 
 const RANGE_AROUND_CENTER = 20;
 
@@ -294,22 +295,27 @@ export class EventCanevascorrectionHandlerService {
     if (this.currentComment === null) {
       const e1 = await firstValueFrom(this.commentsService.query({ zonegeneratedid: (this.canvas as any).zoneid }));
       if (e1!.body === undefined || e1!.body?.length === 0) {
-        const draw = SVG(this.canvas.toSVG().split('\n').splice(2).join('\n'));
+        const draw = SVG(this.canvasToSVG(this.canvas).split('\n').splice(2).join('\n'));
         draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
         const c = { jsonData: draw.svg(), zonegeneratedid: (this.canvas as any).zoneid };
         return this.commentsService.create(c);
       } else {
-        const draw = SVG(this.canvas.toSVG().split('\n').splice(2).join('\n'));
+        const draw = SVG(this.canvasToSVG(this.canvas).split('\n').splice(2).join('\n'));
         draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
         e1!.body![0].jsonData = draw.svg(); // this.canvas.toSVG();
         return this.commentsService.update(e1!.body![0]);
       }
     } else {
-      const draw = SVG(this.canvas.toSVG().split('\n').splice(2).join('\n'));
+      const draw = SVG(this.canvasToSVG(this.canvas).split('\n').splice(2).join('\n'));
       draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
       this.currentComment.jsonData = draw.svg();
       return this.commentsService.update(this.currentComment);
     }
+  }
+
+  /** SVG of the annotations in the coordinates of the unrotated zone, whatever the display rotation (#653). */
+  private canvasToSVG(canvas: fCanvas): string {
+    return canvas.toSVG(svgExportOptions(canvas));
   }
 
   async updateAllComments(canvas: fCanvas) {
@@ -320,12 +326,12 @@ export class EventCanevascorrectionHandlerService {
       //        .pipe()
       //        .toPromise();
       if (e1!.body === undefined || e1!.body?.length === 0) {
-        const draw = SVG(canvas.toSVG().split('\n').splice(2).join('\n'));
+        const draw = SVG(this.canvasToSVG(canvas).split('\n').splice(2).join('\n'));
         draw.scale(1.0 / this.scale, 1.0 / this.scale, 0, 0);
         const c = { jsonData: draw.svg(), zonegeneratedid: (canvas as any).zoneid };
         return this.commentsService.create(c);
       } else {
-        const draw = SVG(canvas.toSVG().split('\n').splice(2).join('\n'));
+        const draw = SVG(this.canvasToSVG(canvas).split('\n').splice(2).join('\n'));
         draw.scale(1 / this.scale, 1.0 / this.scale, 0, 0);
         e1!.body![0].jsonData = draw.svg(); // this.canvas.toSVG();
         return this.commentsService.update(e1!.body![0]);

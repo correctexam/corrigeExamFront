@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { TPointerEvent, Canvas as fCanvas, FabricObject, PencilBrush } from 'fabric';
 import { EventCanevascorrectionHandlerService } from './event-canevascorrection-handler.service';
+import { QuarterTurn, rotationMatrix, setSceneRotation } from './zone-rotation';
 
 export type AnnotationPageRect = {
   page: number;
@@ -28,7 +29,12 @@ export class ZoneCorrectionHandler {
     public respid: number | undefined,
   ) {}
 
-  updateCanvas(canvas1: any): fCanvas {
+  /**
+   * @param rotation display rotation of the zone (#653)
+   * @param sceneWidth width of the unrotated zone, in canvas pixels (only needed when rotation !== 0)
+   * @param sceneHeight height of the unrotated zone, in canvas pixels (only needed when rotation !== 0)
+   */
+  updateCanvas(canvas1: any, rotation: QuarterTurn = 0, sceneWidth?: number, sceneHeight?: number): fCanvas {
     if (this.annotationCanvas && this.annotationCanvas.parentNode) {
       this.annotationCanvas.parentNode.removeChild(this.annotationCanvas);
       if (this.canvas !== undefined) {
@@ -57,6 +63,13 @@ export class ZoneCorrectionHandler {
       selection: false,
       preserveObjectStacking: true,
     });
+    const sceneW = sceneWidth ?? this.annotationCanvas.width;
+    const sceneH = sceneHeight ?? this.annotationCanvas.height;
+    setSceneRotation(canvas, { width: sceneW, height: sceneH }, rotation);
+    if (rotation !== 0) {
+      // Annotations keep the coordinates of the unrotated zone: only the view is turned.
+      canvas.setViewportTransform(rotationMatrix(rotation, sceneW, sceneH));
+    }
     canvas.isDrawingMode = true;
     canvas.freeDrawingBrush = new PencilBrush(canvas);
     canvas.freeDrawingBrush.color = 'red';
