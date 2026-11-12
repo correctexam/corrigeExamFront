@@ -1,4 +1,4 @@
-<div class="grid" jhiSwipe (swipeEnd)="onSwipeEnd($event)">
+<div class="grid" jhiSwipe [swipeIgnore]="ignoreSwipeOnAnnotation" (swipeEnd)="onSwipeEnd($event)">
   <p-toast></p-toast>
   <p-blockUI [blocked]="showSpinner">
     <div class="grid" style="width: 90vw">
