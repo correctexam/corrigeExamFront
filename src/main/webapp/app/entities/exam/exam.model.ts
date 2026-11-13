@@ -1,3 +1,4 @@
+import { StudentAccess } from 'app/entities/enumerations/student-access.model';
 import { IQuestion } from 'app/entities/question/question.model';
 export interface IExam {
   id?: number;
@@ -16,6 +17,8 @@ export interface IExam {
   questions?: IQuestion[];
   courseName?: string;
   courseId?: number;
+  /** Student portal visibility; omitted in an update, the server keeps its value. */
+  studentAccess?: StudentAccess | null;
 }
 
 export class Exam implements IExam {
