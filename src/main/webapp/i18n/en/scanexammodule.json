@@ -275,6 +275,7 @@
     "qcmaddanswerTooltip": "Type the letters of the ticked boxes (a, b, c…). If this answer was never detected, it is created as an option of the MCQ (correct or incorrect according to the valid expression), then applied to this copy instead of the other options.",
     "qcmaddanswerbutton": "Apply",
     "qcmaddanswererror": "Could not add this answer",
+    "qcmdslinvalid": "The grading of this MCQ contains an error: fix it in the question properties before running the autocorrection again.",
     "sqlinsertfile": "Inserting the file into the database (this may take some time)",
     "preference": "Preferences",
     "nomuc1": "Last name",

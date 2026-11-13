@@ -279,6 +279,7 @@
     "qcmaddanswerTooltip": "Escreva as letras das caixas assinaladas (a, b, c…). Se esta resposta nunca foi detetada, é criada como opção da escolha múltipla (correta ou incorreta segundo a expressão válida) e aplicada a esta prova em vez das outras opções.",
     "qcmaddanswerbutton": "Aplicar",
     "qcmaddanswererror": "Não foi possível adicionar esta resposta",
+    "qcmdslinvalid": "A grelha desta escolha múltipla contém um erro: corrija-a nas propriedades da pergunta antes de relançar a correção.",
     "sqlinsertfile": "Inserção do arquivo na base de dados (pode demorar)",
     "preference": "Preferência",
     "nomuc1": "Sobrenome",

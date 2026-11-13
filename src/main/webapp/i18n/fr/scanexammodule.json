@@ -279,6 +279,7 @@
     "qcmaddanswerTooltip": "Saisissez les lettres des cases cochées (a, b, c…). Si cette réponse n'a jamais été détectée, elle est créée comme option du QCM (correcte ou incorrecte selon l'expression valide), puis appliquée à cette copie à la place des autres options.",
     "qcmaddanswerbutton": "Appliquer",
     "qcmaddanswererror": "Impossible d'ajouter cette réponse",
+    "qcmdslinvalid": "Le barème de ce QCM contient une erreur : corrigez-le dans les propriétés de la question avant de relancer la correction.",
     "sqlinsertfile": "Insertion du fichier dans la base de données (cela peut prendre un peu de temps)",
     "preference": "Préférences",
     "nomuc1": "Nom",
