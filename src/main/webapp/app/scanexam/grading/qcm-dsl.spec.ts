@@ -1,6 +1,15 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { evaluateQcmDsl, isQcmDslExpression, parseQcmDsl, qcmDslExactAnswers, QcmDsl, storedPercent } from './qcm-dsl';
+import {
+  describeQcmDsl,
+  evaluateQcmDsl,
+  isQcmDslExpression,
+  isValidQcmExpression,
+  parseQcmDsl,
+  qcmDslExactAnswers,
+  QcmDsl,
+  storedPercent,
+} from './qcm-dsl';
 
 function dsl(text: string): QcmDsl {
   const parsed = parseQcmDsl(text);
@@ -93,5 +102,27 @@ describe('QCM grading DSL', () => {
     expect(storedPercent(33.3333)).toBe(33.25);
     expect(storedPercent(-12.4)).toBe(-12.5);
     expect(storedPercent(50)).toBe(50);
+  });
+});
+describe('QCM expression editing (T20 3/3)', () => {
+  it('accepts a former expression or a DSL without error', () => {
+    expect(isValidQcmExpression('a&b|a&c')).toBe(true);
+    expect(isValidQcmExpression('a&b|a&c=100; *=-33')).toBe(true);
+    expect(isValidQcmExpression('a&b|')).toBe(false);
+    expect(isValidQcmExpression('a&b=100; c-25')).toBe(false);
+    expect(isValidQcmExpression('')).toBe(false);
+    expect(isValidQcmExpression(null)).toBe(false);
+  });
+
+  it('describes what each rule is worth once bounded', () => {
+    const parsed = parseQcmDsl('a&b|a&c=100; a&b+=150; [d]=-25; void=-10; *=-33; min=-20');
+    expect(describeQcmDsl(parsed.dsl!)).toEqual([
+      { kind: 'answers', label: 'a&b | a&c', percent: 100 },
+      { kind: 'answers', label: 'a&b+', percent: 100 },
+      { kind: 'box', label: '[d]', percent: -25 },
+      { kind: 'void', label: '', percent: -10 },
+      { kind: 'other', label: '', percent: -20 },
+      { kind: 'bounds', label: '', percent: -20, max: 100 },
+    ]);
   });
 });

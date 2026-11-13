@@ -3007,6 +3007,25 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   editQuestion(): void {
     this.questionpropertiesviewVisible = true;
   }
+  /** The grading of the QCM changed in the question properties: reload its options and the current answer. */
+  async onQcmRegraded(): Promise<void> {
+    if (this.questions === undefined || this.questions.length === 0) {
+      return;
+    }
+    if (this.sheet !== undefined) {
+      const sr = await firstValueFrom(
+        this.studentResponseService.query({ sheetId: this.sheet.id!, questionsId: this.questions.map(q => q.id) }),
+      );
+      if (sr.body !== null && sr.body.length > 0) {
+        this.resp = sr.body[0];
+      }
+    }
+    await this.reloadQcmOptions(this.questions[0]);
+    if (this.resp !== undefined) {
+      await this.computeNote(false, this.resp, this.questions[0]);
+    }
+  }
+
   updateQuestion(questions: Array<IQuestion>): void {
     for (const q of questions) {
       const q2 = this.questions?.find(q1 => q1.id === q.id);

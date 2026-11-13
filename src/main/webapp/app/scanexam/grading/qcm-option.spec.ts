@@ -10,6 +10,7 @@ import {
   qcmOptionFields,
   qcmOptionForAnswer,
   qcmOptionsToCreate,
+  regradedQcmOption,
 } from './qcm-option';
 
 describe('QCM options', () => {
@@ -102,5 +103,30 @@ describe('QCM options with a grading DSL', () => {
       { text: 'a&b', description: 'correct 2pt', grade: 2 },
       { text: 'd', description: 'incorrect pénalité  - 0.50pt', grade: 4 },
     ]);
+  });
+});
+
+describe('options valued again when the expression changes (T20 3/3)', () => {
+  it('values an option from the new DSL and keeps its text', () => {
+    const q = { point: 2, step: 0, validExpression: 'a&b=100; b=50; *=-25; min=-100' };
+    expect(regradedQcmOption(q, 'b&a')).toEqual({ text: 'b&a', description: 'correct (100 %)', grade: 100 });
+    expect(regradedQcmOption(q, 'b')).toEqual({ text: 'b', description: 'partiel (50 %)', grade: 50 });
+    expect(regradedQcmOption(q, 'c')).toEqual({ text: 'c', description: 'incorrect (-25 %)', grade: -25 });
+    expect(regradedQcmOption({ ...q, validExpression: 'a=100; void=-10; min=-100' }, QCM_VOID_OPTION_TEXT)).toEqual({
+      text: QCM_VOID_OPTION_TEXT,
+      description: 'incorrect (-10 %)',
+      grade: -10,
+    });
+  });
+
+  it('gives back the former descriptions for a former expression', () => {
+    const q = { point: 2, step: 4, validExpression: 'a&b|c' };
+    expect(regradedQcmOption(q, 'a&b')).toEqual({ text: 'a&b', description: 'correct 2pt', grade: 2 });
+    expect(regradedQcmOption(q, 'b')).toEqual({ text: 'b', description: 'incorrect pénalité  - 0.50pt', grade: 4 });
+    expect(regradedQcmOption(q, QCM_VOID_OPTION_TEXT)).toEqual({ text: QCM_VOID_OPTION_TEXT, description: 'void', grade: 0 });
+  });
+
+  it('refuses an invalid DSL', () => {
+    expect(() => regradedQcmOption({ validExpression: 'a=1; c-25' }, 'a')).toThrow(InvalidQcmDslError);
   });
 });

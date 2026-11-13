@@ -235,3 +235,42 @@ export function qcmDslExactAnswers(dsl: QcmDsl): string[] {
 export function storedPercent(percent: number): number {
   return Math.round(percent * 4) / 4;
 }
+
+/** Former valid expression of a QCM: exact valid answers separated by `|` (`a&b|a&c`). */
+export const LEGACY_QCM_EXPRESSION = /^[a-z]([&|][a-z])*$/;
+
+/** Whether the valid expression of a QCM can be saved: a former expression or a DSL without error. */
+export function isValidQcmExpression(validExpression: string | null | undefined): boolean {
+  const text = validExpression ?? '';
+  if (isQcmDslExpression(text)) {
+    return parseQcmDsl(text).dsl !== undefined;
+  }
+  return LEGACY_QCM_EXPRESSION.test(text);
+}
+
+export interface QcmDslPreviewLine {
+  kind: 'answers' | 'box' | 'void' | 'other' | 'bounds';
+  /** `a&b | a&c`, `a&b+`, `[c]`; empty for void, other and bounds. */
+  label: string;
+  /** Percentage after bounds for answers, void and other; value of the box; `min` for bounds. */
+  percent: number;
+  /** `max` for bounds. */
+  max?: number;
+}
+
+/** What each rule of a DSL is worth once bounded, to show the grader how the expression is understood. */
+export function describeQcmDsl(dsl: QcmDsl): QcmDslPreviewLine[] {
+  const bound = (p: number): number => Math.min(dsl.max, Math.max(dsl.min, p));
+  const lines: QcmDslPreviewLine[] = dsl.answerRules.map(r => ({
+    kind: 'answers',
+    label: r.answers.map(a => a.boxes.join('&') + (a.atLeast ? '+' : '')).join(' | '),
+    percent: bound(r.percent),
+  }));
+  [...dsl.boxes.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .forEach(([box, percent]) => lines.push({ kind: 'box', label: '[' + box + ']', percent }));
+  lines.push({ kind: 'void', label: '', percent: bound(dsl.void) });
+  lines.push({ kind: 'other', label: '', percent: bound(dsl.other) });
+  lines.push({ kind: 'bounds', label: '', percent: dsl.min, max: dsl.max });
+  return lines;
+}

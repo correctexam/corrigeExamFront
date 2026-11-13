@@ -162,3 +162,25 @@ export function findQcmOption<T extends { text?: string | null }>(options: T[], 
   }
   return options.find(o => normalizeQcmAnswer(o.text) === normalized);
 }
+
+/**
+ * Values of an existing option once the valid expression of its question changed: percentage and description from
+ * the DSL, or the former descriptions for a former expression. The text is kept. Throws InvalidQcmDslError.
+ */
+export function regradedQcmOption(question: QcmQuestionLike, text: string | null | undefined): QcmOptionFields {
+  const dsl = qcmDslOf(question);
+  const current = text ?? '';
+  if (current === QCM_VOID_OPTION_TEXT) {
+    if (dsl === undefined) {
+      // A former expression gives nothing to a copy without any ticked box
+      return { text: current, description: 'void', grade: 0 };
+    }
+    const percent = storedPercent(evaluateQcmDsl(dsl, ''));
+    return { text: current, description: qcmDslDescription(percent), grade: percent };
+  }
+  if (dsl !== undefined) {
+    return { ...qcmDslOptionFields(dsl, normalizeQcmAnswer(current)), text: current };
+  }
+  const valid = (question.validExpression ?? '').split('|').includes(current);
+  return qcmOptionFields(question, current, valid);
+}
