@@ -1,0 +1,55 @@
+{
+  "studentportal": {
+    "title": "Mes copies",
+    "backtosheets": "Mes copies",
+    "logout": "Se déconnecter",
+    "sessionexpired": "Votre session a expiré : demandez un nouveau lien.",
+    "sheetnotfound": "Cette copie est introuvable ou n'est pas publiée.",
+    "sheetunavailable": "La copie ne peut pas être lue pour le moment. Réessayez plus tard.",
+    "sheetonly": "L'enseignant a publié la copie numérisée seule : la correction et la note ne sont pas encore visibles.",
+    "answernotfound": "Cette réponse n'est pas disponible. Revenez à votre copie pour obtenir un lien à jour.",
+    "request": {
+      "intro": "Indiquez l'adresse e-mail connue de vos enseignants : vous y recevrez un lien vers toutes vos copies.",
+      "email": "Adresse e-mail",
+      "submit": "Recevoir le lien",
+      "solving": "Vérification anti-robot en cours…",
+      "sent": "Si {{ email }} figure dans une liste d'étudiants, un lien vient d'y être envoyé. Il est valable peu de temps et ne sert qu'une fois.",
+      "alreadyopen": "Une session est déjà ouverte.",
+      "gotosheets": "Voir mes copies",
+      "invalidEmail": "Cette adresse e-mail n'est pas valide.",
+      "invalidCaptcha": "La vérification anti-robot a échoué. Réessayez.",
+      "tooManyRequests": "Trop de demandes : réessayez dans quelques minutes.",
+      "disabled": "Le portail étudiant n'est pas activé sur ce serveur.",
+      "error": "La demande n'a pas pu être envoyée. Réessayez plus tard.",
+      "privacy": "Le message n'est envoyé que si l'adresse figure dans une liste d'étudiants ; la réponse affichée est la même dans tous les cas."
+    },
+    "login": {
+      "invalid": "Ce lien a expiré ou a déjà été utilisé.",
+      "askagain": "Demander un nouveau lien"
+    },
+    "sheets": {
+      "mydata": "Mes données",
+      "error": "La liste de vos copies n'a pas pu être chargée.",
+      "course": "Cours",
+      "exam": "Examen",
+      "published": "Publié",
+      "grade": "Note",
+      "accessSheet": "Copie",
+      "accessGraded": "Copie corrigée",
+      "open": "Voir",
+      "none": "Aucune copie publiée pour cette adresse."
+    },
+    "data": {
+      "title": "Mes données",
+      "intro": "Données associées à votre adresse e-mail dans CorrectExam, y compris pour les examens non publiés.",
+      "download": "Télécharger (JSON)",
+      "error": "Vos données n'ont pas pu être chargées.",
+      "ine": "INE",
+      "login": "Identifiant",
+      "courses": "Cours",
+      "groups": "Groupes",
+      "sheets": "Copies numérisées associées : {{ count }}",
+      "contact": "Pour faire rectifier ou supprimer ces données, contactez les enseignants de vos cours."
+    }
+  }
+}

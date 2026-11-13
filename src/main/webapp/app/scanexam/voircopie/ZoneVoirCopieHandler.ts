@@ -13,6 +13,8 @@ export class ZoneVoirCopieHandler {
     public zoneid: string,
     public eventHandler: EventCanevasVoirCopieHandlerService,
     public respid: number | undefined,
+    /** SVG annotations of the graders on this zone, if any. */
+    public annotation?: string,
   ) {}
 
   updateCanvas(canvas1: any): fabric.Canvas {
@@ -45,6 +47,7 @@ export class ZoneVoirCopieHandler {
     });
     (canvas as any).zoneid = this.zoneid;
     (canvas as any).respid = this.respid;
+    (canvas as any).annotation = this.annotation;
 
     this.eventHandler.allcanvas.push(canvas);
     this.eventHandler.canvas = canvas;

@@ -1,0 +1,51 @@
+<div class="grid">
+  <div class="col-12 flex flex-wrap align-items-center justify-content-between gap-2">
+    <h2 class="m-0" [translate]="'studentportal.data.title'">Mes données</h2>
+    <div class="flex gap-2">
+      <a pButton [outlined]="true" icon="pi pi-list" routerLink="/my/sheets" [label]="'studentportal.backtosheets' | translate"></a>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-download"
+        [disabled]="!data()"
+        [label]="'studentportal.data.download' | translate"
+        (click)="download()"
+      ></button>
+    </div>
+  </div>
+  <div class="col-12">
+    <p [translate]="'studentportal.data.intro'">Données associées à votre adresse e-mail dans CorrectExam.</p>
+    @if (failed()) {
+      <p-message severity="error" [text]="'studentportal.data.error' | translate"></p-message>
+    }
+    @if (data(); as d) {
+      <p><strong [translate]="'studentportal.request.email'">Adresse e-mail</strong> : {{ d.email }}</p>
+      @for (r of d.records; track $index) {
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5 class="card-title">{{ r.name }} {{ r.firstname }}</h5>
+            <ul class="m-0">
+              @if (r.ine) {
+                <li><span [translate]="'studentportal.data.ine'">INE</span> : {{ r.ine }}</li>
+              }
+              @if (r.mail) {
+                <li><span [translate]="'studentportal.request.email'">Adresse e-mail</span> : {{ r.mail }}</li>
+              }
+              @if (r.caslogin) {
+                <li><span [translate]="'studentportal.data.login'">Identifiant</span> : {{ r.caslogin }}</li>
+              }
+              <li><span [translate]="'studentportal.data.courses'">Cours</span> : {{ r.courses.join(', ') }}</li>
+              @if (r.groups.length > 0) {
+                <li><span [translate]="'studentportal.data.groups'">Groupes</span> : {{ r.groups.join(', ') }}</li>
+              }
+            </ul>
+          </div>
+        </div>
+      }
+      <p>
+        <span [translate]="'studentportal.data.sheets'" [translateParams]="{ count: d.sheets.length }"></span>
+      </p>
+      <p><small [translate]="'studentportal.data.contact'"></small></p>
+    }
+  </div>
+</div>

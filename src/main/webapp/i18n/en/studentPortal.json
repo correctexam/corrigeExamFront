@@ -1,0 +1,55 @@
+{
+  "studentportal": {
+    "title": "My exam sheets",
+    "backtosheets": "My sheets",
+    "logout": "Sign out",
+    "sessionexpired": "Your session has expired: ask for a new link.",
+    "sheetnotfound": "This sheet cannot be found or is not published.",
+    "sheetunavailable": "The sheet cannot be read right now. Please try again later.",
+    "sheetonly": "Your instructor published the scanned sheet only: the grading and the grade are not visible yet.",
+    "answernotfound": "This answer is not available. Go back to your sheet to get an up-to-date link.",
+    "request": {
+      "intro": "Enter the e-mail address your instructors know: you will receive a link to all your sheets there.",
+      "email": "E-mail address",
+      "submit": "Send me the link",
+      "solving": "Anti-bot check in progress…",
+      "sent": "If {{ email }} is in a list of students, a link has just been sent to it. It is valid for a short time and works once.",
+      "alreadyopen": "A session is already open.",
+      "gotosheets": "See my sheets",
+      "invalidEmail": "This e-mail address is not valid.",
+      "invalidCaptcha": "The anti-bot check failed. Please try again.",
+      "tooManyRequests": "Too many requests: try again in a few minutes.",
+      "disabled": "The student portal is not enabled on this server.",
+      "error": "The request could not be sent. Please try again later.",
+      "privacy": "The message is only sent if the address is in a list of students; the answer shown is the same in every case."
+    },
+    "login": {
+      "invalid": "This link has expired or has already been used.",
+      "askagain": "Ask for a new link"
+    },
+    "sheets": {
+      "mydata": "My data",
+      "error": "The list of your sheets could not be loaded.",
+      "course": "Course",
+      "exam": "Exam",
+      "published": "Published",
+      "grade": "Grade",
+      "accessSheet": "Sheet",
+      "accessGraded": "Graded sheet",
+      "open": "Open",
+      "none": "No published sheet for this address."
+    },
+    "data": {
+      "title": "My data",
+      "intro": "Data linked to your e-mail address in CorrectExam, including for exams that are not published.",
+      "download": "Download (JSON)",
+      "error": "Your data could not be loaded.",
+      "ine": "Student number (INE)",
+      "login": "Login",
+      "courses": "Courses",
+      "groups": "Groups",
+      "sheets": "Scanned sheets linked to you: {{ count }}",
+      "contact": "To have this data corrected or deleted, contact the instructors of your courses."
+    }
+  }
+}
