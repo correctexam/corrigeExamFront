@@ -1,0 +1,73 @@
+<div class="grid justify-content-center">
+  <div class="col-12 md:col-8 lg:col-6">
+    <h2 [translate]="'studentportal.title'">Mes copies</h2>
+    <p [translate]="'studentportal.request.intro'">
+      Indiquez l'adresse e-mail connue de vos enseignants : vous y recevrez un lien vers vos copies.
+    </p>
+
+    @if (expired()) {
+      <p-message severity="warn" [text]="'studentportal.sessionexpired' | translate"></p-message>
+    }
+    @if (session.isActive()) {
+      <p-message severity="info">
+        <span [translate]="'studentportal.request.alreadyopen'">Une session est déjà ouverte.</span>&nbsp;
+        <a routerLink="/my/sheets" [translate]="'studentportal.request.gotosheets'">Voir mes copies</a>
+      </p-message>
+    }
+
+    @if (state() === 'sent') {
+      <p-message severity="success" [text]="'studentportal.request.sent' | translate: { email: email() }"></p-message>
+    } @else {
+      <form class="flex flex-column gap-3 mt-3" (ngSubmit)="submit()">
+        <label for="student-email" [translate]="'studentportal.request.email'">Adresse e-mail</label>
+        <input
+          pInputText
+          id="student-email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          required
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+          [disabled]="busy()"
+        />
+        <button
+          pButton
+          type="submit"
+          icon="pi pi-envelope"
+          [label]="'studentportal.request.submit' | translate"
+          [disabled]="busy() || !emailValid()"
+          [loading]="busy()"
+        ></button>
+        @if (state() === 'solving') {
+          <div>
+            <small [translate]="'studentportal.request.solving'">Vérification anti-robot en cours…</small>
+            <p-progressbar [value]="progress()" [showValue]="false" styleClass="mt-1" [style]="{ height: '6px' }"></p-progressbar>
+          </div>
+        }
+        @switch (state()) {
+          @case ('invalidEmail') {
+            <p-message severity="error" [text]="'studentportal.request.invalidEmail' | translate"></p-message>
+          }
+          @case ('invalidCaptcha') {
+            <p-message severity="error" [text]="'studentportal.request.invalidCaptcha' | translate"></p-message>
+          }
+          @case ('tooManyRequests') {
+            <p-message severity="error" [text]="'studentportal.request.tooManyRequests' | translate"></p-message>
+          }
+          @case ('disabled') {
+            <p-message severity="warn" [text]="'studentportal.request.disabled' | translate"></p-message>
+          }
+          @case ('error') {
+            <p-message severity="error" [text]="'studentportal.request.error' | translate"></p-message>
+          }
+        }
+      </form>
+    }
+    <p class="mt-4">
+      <small [translate]="'studentportal.request.privacy'">
+        Le message n'est envoyé que si l'adresse figure dans une liste d'étudiants ; la réponse est la même dans tous les cas.
+      </small>
+    </p>
+  </div>
+</div>

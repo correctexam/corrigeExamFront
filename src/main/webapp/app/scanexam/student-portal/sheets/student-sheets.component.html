@@ -1,0 +1,70 @@
+<div class="grid">
+  <div class="col-12 flex flex-wrap align-items-center justify-content-between gap-2">
+    <h2 class="m-0">
+      <span [translate]="'studentportal.title'">Mes copies</span>
+      @if (session.email(); as email) {
+        <small class="text-color-secondary"> — {{ email }}</small>
+      }
+    </h2>
+    <div class="flex gap-2">
+      <a pButton [outlined]="true" icon="pi pi-id-card" routerLink="/my/data" [label]="'studentportal.sheets.mydata' | translate"></a>
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        icon="pi pi-sign-out"
+        [label]="'studentportal.logout' | translate"
+        (click)="logout()"
+      ></button>
+    </div>
+  </div>
+
+  <div class="col-12">
+    @if (failed()) {
+      <p-message severity="error" [text]="'studentportal.sheets.error' | translate"></p-message>
+    }
+    <p-table [value]="sheets() ?? []" [loading]="loading()" dataKey="sheetId" styleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th [translate]="'studentportal.sheets.course'">Cours</th>
+          <th [translate]="'studentportal.sheets.exam'">Examen</th>
+          <th [translate]="'studentportal.sheets.published'">Publié</th>
+          <th [translate]="'studentportal.sheets.grade'">Note</th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-sheet>
+        <tr>
+          <td>{{ sheet.courseName }}</td>
+          <td>{{ sheet.examName }}</td>
+          <td>
+            @if (sheet.access === graded) {
+              <p-tag severity="success" [value]="'studentportal.sheets.accessGraded' | translate"></p-tag>
+            } @else {
+              <p-tag severity="info" [value]="'studentportal.sheets.accessSheet' | translate"></p-tag>
+            }
+          </td>
+          <td>
+            @if (sheet.finalNote !== null && sheet.finalNote !== undefined) {
+              {{ sheet.finalNote | number: '1.0-2' }}
+            }
+          </td>
+          <td>
+            <a
+              pButton
+              [text]="true"
+              icon="pi pi-eye"
+              [routerLink]="['/my/sheets', sheet.sheetId, 1]"
+              [label]="'studentportal.sheets.open' | translate"
+            ></a>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" [translate]="'studentportal.sheets.none'">Aucune copie publiée pour cette adresse.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

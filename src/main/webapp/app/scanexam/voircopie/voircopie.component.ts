@@ -4,6 +4,7 @@
 import {
   ChangeDetectorRef,
   Component,
+  DestroyRef,
   ElementRef,
   OnInit,
   QueryList,
@@ -12,43 +13,28 @@ import {
   HostListener,
   inject,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
 import { SwipeDirective, SwipeEvent } from '../swipe.directive';
 import { NavigationPadComponent } from '../navigation-pad/navigation-pad.component';
 import { NavigationAction } from '../navigation-pad/navigation-pad.model';
 import { PreferenceService } from '../preference-page/preference.service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ExamSheetService } from 'app/entities/exam-sheet/service/exam-sheet.service';
-import { ExamService } from 'app/entities/exam/service/exam.service';
-import { StudentService } from 'app/entities/student/service/student.service';
 import { ConfirmationService, MessageService, PrimeTemplate } from 'primeng/api';
 import { AlignImagesService } from '../services/align-images.service';
 import { db } from '../db/dbstudent';
-import { IExam } from '../../entities/exam/exam.model';
-// import { ICourse } from 'app/entities/course/course.model';
-import { IStudent } from '../../entities/student/student.model';
 import { ImageZone, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.model';
 import { IZone } from 'app/entities/zone/zone.model';
-import { QuestionService } from '../../entities/question/service/question.service';
 import { IQuestion } from '../../entities/question/question.model';
 import { IStudentResponse } from '../../entities/student-response/student-response.model';
-import { StudentResponseService } from 'app/entities/student-response/service/student-response.service';
 import { EventCanevasVoirCopieHandlerService } from './event-canevasvoircopie-handler.service';
 import { ZoneVoirCopieHandler } from './ZoneVoirCopieHandler';
 import { GradeType } from '../../entities/enumerations/grade-type.model';
 import { ITextComment } from '../../entities/text-comment/text-comment.model';
 import { IGradedComment } from '../../entities/graded-comment/graded-comment.model';
-import { GradedCommentService } from '../../entities/graded-comment/service/graded-comment.service';
-import { TextCommentService } from 'app/entities/text-comment/service/text-comment.service';
-import { FinalResultService } from '../../entities/final-result/service/final-result.service';
-import { IExamSheet } from '../../entities/exam-sheet/exam-sheet.model';
-import { ApplicationConfigService } from 'app/core/config/application-config.service';
-import { HttpClient } from '@angular/common/http';
-import { CacheUploadService } from '../exam-detail/cacheUpload.service';
 import { TranslateDirective, TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import { IHybridGradedCommentWithStepValue } from '../../entities/hybrid-graded-comment/hybrid-graded-comment.model';
-import { HybridGradedCommentService } from 'app/entities/hybrid-graded-comment/service/hybrid-graded-comment.service';
-import { Answer2HybridGradedCommentService } from 'app/entities/answer-2-hybrid-graded-comment/service/answer-2-hybrid-graded-comment.service';
 import { ArraySortPipe } from '../sort';
 import { SliderModule } from 'primeng/slider';
 import { FormsModule } from '@angular/forms';
@@ -57,12 +43,21 @@ import { HasAnyAuthorityDirective } from '../../shared/auth/has-any-authority.di
 import { PaginatorModule } from 'primeng/paginator';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonDirective } from 'primeng/button';
-import { AsyncPipe, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { GalleriaModule } from 'primeng/galleria';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { ToastModule } from 'primeng/toast';
+import { MessageModule } from 'primeng/message';
+import { StudentSheetSource, StudentSheetSourceFactory } from '../student-portal/student-sheet-source';
+import { IStudentSheetView } from '../student-portal/student-portal.model';
+import { StudentSessionService } from '../student-portal/student-session.service';
+import { parseCachedPage, questionNumerosOf, responseOf } from '../student-portal/student-sheet-view.util';
 
+/**
+ * Sheet of a student, question by question: through the UUID of a /copie link, or through the student portal
+ * (/my/sheets/{sheetId}). Everything comes from one StudentSheetViewDTO and the pages of the sheet (ADR 0003).
+ */
 @Component({
   selector: 'jhi-voircopie',
   templateUrl: './voircopie.component.html',
@@ -83,26 +78,35 @@ import { ToastModule } from 'primeng/toast';
     ToggleSwitchModule,
     FormsModule,
     SliderModule,
-    AsyncPipe,
     DecimalPipe,
     TranslateDirective,
     TranslatePipe,
     ArraySortPipe,
     SwipeDirective,
     NavigationPadComponent,
+    MessageModule,
   ],
 })
 export class VoirCopieComponent implements OnInit, AfterViewInit {
   private readonly preferenceService = inject(PreferenceService);
+  private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly alignImagesService = inject(AlignImagesService);
+  private readonly changeDetector = inject(ChangeDetectorRef);
+  private readonly eventHandler = inject(EventCanevasVoirCopieHandlerService);
+  private readonly translateService = inject(TranslateService);
+  private readonly sources = inject(StudentSheetSourceFactory);
+  private readonly studentSession = inject(StudentSessionService);
+  private readonly destroyRef = inject(DestroyRef);
+
   public href = '';
 
   @ViewChildren('nomImage')
   canvass!: QueryList<ElementRef>;
   showImage: boolean[] = [];
   nbreFeuilleParCopie: number | undefined;
-  exam: IExam | undefined;
   currentStudent = 0;
-  selectionStudents: IStudent[] | undefined;
+  selectionStudents: { name: string; firstname?: string | null }[] | undefined;
   questions: IQuestion[] | undefined;
   blocked = true;
   nbreQuestions = 1;
@@ -116,13 +120,12 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   currentQuestion: IQuestion | undefined;
   noalign = false;
   factor = 1;
-  uuid = '';
-  sheet: IExamSheet | undefined;
-  resolve: any;
+  source: StudentSheetSource | undefined;
+  view: IStudentSheetView | undefined;
+  /** The sheet could not be read (unknown link, closed portal session...). */
+  loadError: 'notFound' | 'unavailable' | undefined;
   correctionLink: string | undefined;
-  note = new Promise<number>(resolve => {
-    this.resolve = resolve;
-  });
+  finalNote: number | null | undefined;
   currentTextComment4Question: ITextComment[] | undefined;
   currentGradedComment4Question: IGradedComment[] | undefined;
   currentHybridGradedComment4Question: IHybridGradedCommentWithStepValue[] | undefined;
@@ -153,148 +156,116 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   displayBasic = false;
   images: any[] = [];
 
-  constructor(
-    protected applicationConfigService: ApplicationConfigService,
-    private http: HttpClient,
-    public examService: ExamService,
-    public studentService: StudentService,
-    protected activatedRoute: ActivatedRoute,
-    public confirmationService: ConfirmationService,
-    public router: Router,
-    private alignImagesService: AlignImagesService,
-    public messageService: MessageService,
-    public sheetService: ExamSheetService,
-    public questionService: QuestionService,
-    public gradedCommentService: GradedCommentService,
-    public textCommentService: TextCommentService,
-    public studentResponseService: StudentResponseService,
-    private changeDetector: ChangeDetectorRef,
-    private eventHandler: EventCanevasVoirCopieHandlerService,
-    public finalResultService: FinalResultService,
-    public cacheUploadService: CacheUploadService,
-    private translateService: TranslateService,
-    private hybridGradedCommentService: HybridGradedCommentService,
-    private answer2HybridGradedCommentService: Answer2HybridGradedCommentService,
-  ) {}
+  /** True in the student portal (links back to the list of sheets). */
+  get inPortal(): boolean {
+    return this.source?.persistentCache === false;
+  }
+
+  /** Answers, comments and grade are shown (false: exam published as the scanned sheet only). */
+  get corrections(): boolean {
+    return this.view?.corrections === true;
+  }
 
   ngOnInit(): void {
     this.href = this.router.url;
     this.windowWidth = window.innerWidth;
-    this.activatedRoute.paramMap.subscribe(params => {
+    this.activatedRoute.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       this.blocked = true;
       this.currentNote = 0;
       this.noteSteps = 0;
       this.maxNote = 0;
       this.resp = undefined;
-      //      'answer/:examid/:questionno/:studentid',
-      if (params.get('uuid') !== null) {
-        this.currentTextComment4Question = [];
-        this.currentGradedComment4Question = [];
-        this.currentHybridGradedComment4Question = [];
-
-        this.uuid = params.get('uuid')!;
-        this.sheetService.query({ name: params.get('uuid') }).subscribe(s => {
-          this.sheet = s.body![0];
-          this.currentStudent = this.sheet.pagemin! / (this.sheet.pagemax! - this.sheet.pagemin! + 1);
-
-          this.studentService.query({ sheetId: this.sheet.id }).subscribe(studentsr => {
-            this.selectionStudents = studentsr.body!;
-            this.examService
-              .query({
-                scanId: this.sheet!.scanId,
-              })
-              .subscribe(ex2 => {
-                this.exam = ex2.body![0];
-                if (
-                  this.selectionStudents !== undefined &&
-                  this.selectionStudents.length > 0 &&
-                  this.selectionStudents[0].id !== undefined
-                ) {
-                  this.finalResultService
-                    .query({ examId: this.exam.id, studentId: this.selectionStudents![0].id })
-
-                    .subscribe(bo => this.resolve(bo.body![0].note! / 100));
-                }
-
-                if (params.get('questionno') !== null) {
-                  this.questionindex = +params.get('questionno')! - 1;
-
-                  // Step 1 Query templates
-                  this.correctionLink = '/answer/' + this.exam.id! + '/' + params.get('questionno') + '/' + (this.currentStudent + 1);
-                  this.nbreFeuilleParCopie = this.sheet!.pagemax! - this.sheet!.pagemin! + 1;
-                  // Step 2 Query Scan in local DB
-                  this.finalize().then(() => {
-                    this.initEmail();
-                    this.populateBestSolutions();
-                  });
-                }
-              });
-          });
-        });
+      this.currentTextComment4Question = [];
+      this.currentGradedComment4Question = [];
+      this.currentHybridGradedComment4Question = [];
+      const source = this.sources.fromRoute(params);
+      if (source === undefined) {
+        this.fail('notFound');
+        return;
       }
+      this.questionindex = Math.max(0, +(params.get('questionno') ?? '1') - 1);
+      this.load(source);
     });
   }
 
-  async finalize() {
-    // this.courseService.find(this.exam!.courseId!).subscribe(e => (this.course = e.body!));
-
-    this.images = [];
-    // Step 4 Query zone 4 questions
-    this.blocked = false;
-    const b = await firstValueFrom(this.questionService.query({ examId: this.exam!.id }));
-    this.questionNumeros = Array.from(new Set(b.body!.map(q => q.numero!))).sort((n1, n2) => n1 - n2);
-    this.nbreQuestions = this.questionNumeros.length;
-
-    const q1 = await firstValueFrom(
-      this.questionService.query({ examId: this.exam!.id, numero: this.questionNumeros[this.questionindex] }),
-    );
-    this.questions = q1.body!;
-    this.showImage = new Array<boolean>(this.questions.length);
-    if (this.questions.length > 0) {
-      this.noteSteps = this.questions[0].point! * this.questions[0].step!;
-      this.questionStep = this.questions[0].step!;
-      this.maxNote = this.questions[0].point!;
-      this.currentQuestion = this.questions[0];
-      const sr = await firstValueFrom(
-        this.studentResponseService.query({
-          sheetId: this.sheet!.id,
-          questionsId: this.questions.map(q => q.id),
-        }),
-      );
-      if (sr.body !== null && sr.body.length > 0) {
-        this.resp = sr.body![0];
-        this.currentNote = this.resp.note!;
-
-        if (this.questions![0].gradeType === GradeType.DIRECT && this.questions![0].typeAlgoName !== 'QCM') {
-          this.currentTextComment4Question = this.resp.textcomments!;
-        } else if (this.questions![0].gradeType === GradeType.HYBRID && this.questions![0].typeAlgoName !== 'QCM') {
-          this.currentTextComment4Question = [];
-          this.currentGradedComment4Question = [];
-          const com = await firstValueFrom(this.hybridGradedCommentService.query({ questionId: this.questions![0].id }));
-          const currentHybridGradedComment4QuestionAll = com.body as IHybridGradedCommentWithStepValue[] | undefined;
-          const answersHybrid = (await firstValueFrom(this.answer2HybridGradedCommentService.query({ answerId: this.resp!.id }))).body;
-          if (answersHybrid !== null) {
-            for (const answerHybrid of answersHybrid) {
-              if (answerHybrid.hybridcommentsId !== undefined && answerHybrid.hybridcommentsId !== null && answerHybrid.stepValue) {
-                const hc = currentHybridGradedComment4QuestionAll?.find(e => answerHybrid.hybridcommentsId! === e.id);
-                if (hc !== undefined) {
-                  hc.stepValue = answerHybrid.stepValue;
-                  if (hc.stepValue > 0) {
-                    this.currentHybridGradedComment4Question?.push(hc);
-                  }
-                }
-              }
-            }
-          }
-        } else {
-          this.currentGradedComment4Question = this.resp.gradedcomments!;
-        }
-      } else {
-        this.currentNote = 0;
-        this.currentTextComment4Question = [];
-        this.currentGradedComment4Question = [];
-        this.currentHybridGradedComment4Question = [];
+  /** Reads the view once per sheet (moving between questions only changes the route parameter). */
+  private async load(source: StudentSheetSource): Promise<void> {
+    if (this.source?.id !== source.id || this.view === undefined) {
+      try {
+        this.view = await firstValueFrom(source.view());
+      } catch (e) {
+        this.onReadError(e, source);
+        return;
       }
+    }
+    this.source = source;
+    this.loadError = undefined;
+    const view = this.view;
+    this.selectionStudents = view.students;
+    this.currentStudent = view.sheetIndex;
+    this.nbreFeuilleParCopie = view.pages;
+    this.finalNote = view.corrections ? view.finalNote : undefined;
+    this.correctionLink = '/answer/' + view.exam.id + '/' + (this.questionindex + 1) + '/' + (view.sheetIndex + 1);
+    this.finalize();
+    this.initEmail();
+    this.populateBestSolutions();
+  }
+
+  private onReadError(e: unknown, source: StudentSheetSource): void {
+    const status = e instanceof HttpErrorResponse ? e.status : 0;
+    if (status === 401 && !source.persistentCache) {
+      // Session of the portal expired on the server
+      this.studentSession.close();
+      this.router.navigate(['/my'], { queryParams: { expired: true } });
+      return;
+    }
+    this.fail(status === 404 || status === 401 || status === 403 ? 'notFound' : 'unavailable');
+  }
+
+  private fail(error: 'notFound' | 'unavailable'): void {
+    this.loadError = error;
+    this.view = undefined;
+    this.questions = [];
+    this.blocked = false;
+  }
+
+  finalize(): void {
+    this.images = [];
+    this.blocked = false;
+    const view = this.view!;
+    this.questionNumeros = questionNumerosOf(view.questions);
+    this.nbreQuestions = this.questionNumeros.length;
+    if (this.questionindex >= this.nbreQuestions) {
+      this.questionindex = Math.max(0, this.nbreQuestions - 1);
+    }
+    const numero = this.questionNumeros[this.questionindex];
+    this.questions = view.questions.filter(q => q.numero === numero);
+    this.showImage = new Array<boolean>(this.questions.length);
+    if (this.questions.length === 0) {
+      return;
+    }
+    this.noteSteps = this.questions[0].point! * this.questions[0].step!;
+    this.questionStep = this.questions[0].step!;
+    this.maxNote = this.questions[0].point!;
+    this.currentQuestion = this.questions[0];
+    this.resp = view.corrections ? responseOf(view.responses, this.questions) : undefined;
+    if (this.resp === undefined) {
+      this.currentNote = 0;
+      this.currentTextComment4Question = [];
+      this.currentGradedComment4Question = [];
+      this.currentHybridGradedComment4Question = [];
+      return;
+    }
+    this.currentNote = this.resp.note!;
+    const first = this.questions[0];
+    if (first.gradeType === GradeType.DIRECT && first.typeAlgoName !== 'QCM') {
+      this.currentTextComment4Question = this.resp.textcomments ?? [];
+    } else if (first.gradeType === GradeType.HYBRID && first.typeAlgoName !== 'QCM') {
+      this.currentTextComment4Question = [];
+      this.currentGradedComment4Question = [];
+      this.currentHybridGradedComment4Question = (view.hybridComments[String(this.resp.id)] ?? []).map(c => ({ ...c }));
+    } else {
+      this.currentGradedComment4Question = this.resp.gradedcomments ?? [];
     }
   }
 
@@ -353,15 +324,15 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
 
   previousQuestion(): void {
     const q = this.questionindex;
-    if (q > 0) {
-      this.router.navigateByUrl('/copie/' + this.uuid + '/' + q);
+    if (q > 0 && this.source) {
+      this.router.navigateByUrl(this.source.questionLink(q));
     }
   }
 
   nextQuestion(): void {
     const q = this.questionindex + 2;
-    if (q <= this.nbreQuestions) {
-      this.router.navigateByUrl('/copie/' + this.uuid + '/' + q);
+    if (q <= this.nbreQuestions && this.source) {
+      this.router.navigateByUrl(this.source.questionLink(q));
     }
   }
 
@@ -392,16 +363,9 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
 
   changeQuestion($event: any): void {
     this.questionindex = $event.page;
-    this.router.navigateByUrl('/copie/' + this.uuid + '/' + (this.questionindex + 1));
-  }
-
-  private reviver(key: any, value: any): any {
-    if (typeof value === 'object' && value !== null) {
-      if (value.dataType === 'Map') {
-        return new Map(value.value);
-      }
+    if (this.source) {
+      this.router.navigateByUrl(this.source.questionLink(this.questionindex + 1));
     }
-    return value;
   }
 
   async loadZone(
@@ -413,10 +377,13 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   ): Promise<IZone | undefined> {
     return new Promise<IZone | undefined>(resolve => {
       if (zone) {
-        this.getAllImage4Zone(currentStudent! * this.nbreFeuilleParCopie! + zone.pageNumber!, zone).then(p => {
-          this.displayImage(p, imageRef, showImageRef, index);
-          resolve(zone);
-        });
+        this.getAllImage4Zone(zone.pageNumber!, zone).then(
+          p => {
+            this.displayImage(p, imageRef, showImageRef, index);
+            resolve(zone);
+          },
+          () => resolve(undefined),
+        );
       } else {
         resolve(undefined);
       }
@@ -437,134 +404,48 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
       ctx1!.drawImage(editedImage, 0, 0);
       show(true);
 
-      if (this.currentZoneVoirCopieHandler === undefined) {
-        const zh = new ZoneVoirCopieHandler(
-          '' +
-            this.exam!.id +
-            '_' +
-            this.sheet!.id +
-            //            this.selectionStudents![0].examSheets![0].id! +
-            '_' +
-            this.questionNumeros[this.questionindex] +
-            '_' +
-            index,
-          this.eventHandler,
-          this.resp?.id,
-        );
-        zh.updateCanvas(imageRef!.nativeElement);
-        this.currentZoneVoirCopieHandler = zh;
+      const numero = this.questionNumeros[this.questionindex];
+      const zoneid = this.source!.id + '_' + numero + '_' + index;
+      if (this.currentZoneVoirCopieHandler?.zoneid === zoneid) {
+        this.currentZoneVoirCopieHandler.updateCanvas(imageRef.nativeElement);
       } else {
-        if (
-          this.currentZoneVoirCopieHandler.zoneid ===
-          '' +
-            this.exam!.id +
-            '_' +
-            this.sheet!.id +
-            //            this.selectionStudents![0].examSheets![0].id! +
-            '_' +
-            this.questionNumeros[this.questionindex] +
-            '_' +
-            index
-        ) {
-          this.currentZoneVoirCopieHandler.updateCanvas(imageRef!.nativeElement);
-        } else {
-          const zh = new ZoneVoirCopieHandler(
-            '' +
-              this.exam!.id +
-              '_' +
-              this.sheet!.id +
-              //            this.selectionStudents![0].examSheets![0].id! +
-              '_' +
-              this.questionNumeros[this.questionindex] +
-              '_' +
-              index,
-            this.eventHandler,
-            this.resp?.id,
-          );
-          zh.updateCanvas(imageRef!.nativeElement);
-          this.currentZoneVoirCopieHandler = zh;
-        }
+        const annotation = this.view?.annotations?.[numero + '_' + index];
+        const zh = new ZoneVoirCopieHandler(zoneid, this.eventHandler, this.resp?.id, annotation);
+        zh.updateCanvas(imageRef.nativeElement);
+        this.currentZoneVoirCopieHandler = zh;
       }
     }
   }
 
-  async getAllImage4Zone(pageInscan: number, zone: IZone): Promise<ImageZone> {
-    if (this.noalign) {
-      return new Promise((resolve, reject) => {
-        db.countNonAlignWithPageNumber(+this.exam!.id!, pageInscan).then(count => {
-          if (count === 0) {
-            this.cacheUploadService.getNoAlignImage(this.exam!.id!, pageInscan).subscribe(body => {
-              const image = JSON.parse(body, this.reviver);
-              this.images.push({
-                src: image.pages,
-                alt: 'Description for Image 2',
-                title: 'Exam',
-              });
+  /** Zone of page `page` (from 1) of the sheet, cropped from the page of the cache. */
+  async getAllImage4Zone(page: number, zone: IZone): Promise<ImageZone> {
+    const body = await this.readPage(page);
+    const image = parseCachedPage(body);
+    this.images.push({
+      src: image.pages,
+      alt: 'Page ' + page,
+      title: 'Exam',
+    });
+    return new Promise(resolve => this.loadImage1(image, page, zone, resolve));
+  }
 
-              db.addNonAligneImage({
-                examId: this.exam!.id!,
-                pageNumber: pageInscan,
-                value: body,
-              }).then(() => {
-                this.loadImage1(image, pageInscan, zone, resolve);
-              });
-            });
-          } else if (count > 0) {
-            db.getFirstNonAlignImage(+this.exam!.id!, pageInscan).then(e2 => {
-              const image = JSON.parse(e2!.value, this.reviver);
-              this.images.push({
-                src: image.pages,
-                alt: 'Description for Image 2',
-                title: 'Exam',
-              });
-              this.loadImage1(image, pageInscan, zone, resolve);
-            });
-          } else {
-            db.resetDatabase().then(() => {
-              reject('no image in cache');
-            });
-          }
-        });
-      });
-    } else {
-      return new Promise((resolve, reject) => {
-        db.countAlignWithPageNumber(+this.exam!.id!, pageInscan).then(count => {
-          if (count === 0) {
-            this.cacheUploadService.getAlignImage(this.exam!.id!, pageInscan).subscribe(body => {
-              const image = JSON.parse(body, this.reviver);
-              this.images.push({
-                src: image.pages,
-                alt: 'Description for Image 2',
-                title: 'Exam',
-              });
-
-              db.addAligneImage({
-                examId: this.exam!.id!,
-                pageNumber: pageInscan,
-                value: body,
-              }).then(() => {
-                this.loadImage1(image, pageInscan, zone, resolve);
-              });
-            });
-          } else if (count > 0) {
-            db.getFirstAlignImage(+this.exam!.id!, pageInscan).then(e2 => {
-              const image = JSON.parse(e2!.value, this.reviver);
-              this.images.push({
-                src: image.pages,
-                alt: 'Description for Image 2',
-                title: 'Exam',
-              });
-
-              this.loadImage1(image, pageInscan, zone, resolve);
-            });
-          } else {
-            db.resetDatabase().then(() => {
-              reject('no image in cache');
-            });
-          }
-        });
-      });
+  /** Page of the sheet; with a /copie link the pages are kept in the IndexedDB of the browser, as before. */
+  private async readPage(page: number): Promise<string> {
+    const source = this.source!;
+    if (!source.persistentCache) {
+      return firstValueFrom(source.page(page, this.noalign));
     }
+    // Same keys as before: exam and page in the scan (from 1)
+    const examId = this.view!.exam.id;
+    const pageInScan = this.currentStudent * this.nbreFeuilleParCopie! + page;
+    const cached = this.noalign ? await db.getFirstNonAlignImage(examId, pageInScan) : await db.getFirstAlignImage(examId, pageInScan);
+    if (cached !== undefined) {
+      return cached.value;
+    }
+    const body = await firstValueFrom(source.page(page, this.noalign));
+    const entry = { examId, pageNumber: pageInScan, value: body };
+    await (this.noalign ? db.addNonAligneImage(entry) : db.addAligneImage(entry));
+    return body;
   }
 
   loadImage1(image: any, pageInscan: number, zone: IZone, resolve: (value: ImageZone | PromiseLike<ImageZone>) => void) {
@@ -654,63 +535,51 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
 
   email: string = '';
 
-  async initEmail() {
-    if (this.selectionStudents !== undefined && this.exam !== undefined && this.questions !== undefined) {
-      const courseid = this.exam.courseId;
-      const emailsObj =
-        this.resp?.correctedByMail && this.resp.correctedByMail.length > 0
-          ? this.resp.correctedByMail
-          : await firstValueFrom(
-              this.http.get<any>(this.applicationConfigService.getEndpointFor('api/getAllEmailProfs4course/' + courseid)),
-            );
-      const emails: (string | undefined)[] =
-        this.resp?.correctedByMail && this.resp.correctedByMail.length > 0 ? [emailsObj] : emailsObj.emails;
-
-      const firsName = this.selectionStudents![0].firstname!;
-      const lastName = this.selectionStudents![0].name!;
-      const examName = this.exam!.name!;
-      const questionNumero = this.questions![0].numero!;
-      const url = window.location.href;
-      let emailSubject: string;
-      let emailBody: string;
-
-      if (this.translateService.currentLang === 'fr') {
-        emailSubject = "Retour sur l'examen ";
-        emailBody = frenchMessageBody(firsName, lastName, examName, questionNumero, url);
-      } else if (this.translateService.currentLang === 'pt') {
-        emailSubject = 'Esclarecimentos sobre a avaliacao ';
-        emailBody = portugueseMessageBody(firsName, lastName, examName, questionNumero, url);
-      } else {
-        emailSubject = 'Review of the on your exam ';
-        emailBody = englishMessageBody(firsName, lastName, examName, questionNumero, url);
-      }
-
-      this.email =
-        'mailto:' +
-        emails.filter(e => e !== undefined && e !== '').join(',') +
-        '?subject=' +
-        emailSubject +
-        this.exam!.name +
-        '&body=' +
-        emailBody;
-    } else {
+  initEmail(): void {
+    const view = this.view;
+    const emails = view?.contactEmails.filter(e => e !== '') ?? [];
+    if (view === undefined || !view.corrections || emails.length === 0 || this.questions === undefined || this.questions.length === 0) {
       this.email = '';
+      return;
     }
+    const firsName = view.students[0]?.firstname ?? '';
+    const lastName = view.students[0]?.name ?? '';
+    const examName = view.exam.name;
+    const questionNumero = this.questions[0].numero!;
+    const url = window.location.href;
+    let emailSubject: string;
+    let emailBody: string;
+
+    if (this.translateService.currentLang === 'fr') {
+      emailSubject = "Retour sur l'examen ";
+      emailBody = frenchMessageBody(firsName, lastName, examName, questionNumero, url);
+    } else if (this.translateService.currentLang === 'pt') {
+      emailSubject = 'Esclarecimentos sobre a avaliacao ';
+      emailBody = portugueseMessageBody(firsName, lastName, examName, questionNumero, url);
+    } else {
+      emailSubject = 'Review of the on your exam ';
+      emailBody = englishMessageBody(firsName, lastName, examName, questionNumero, url);
+    }
+
+    this.email = 'mailto:' + emails.join(',') + '?subject=' + emailSubject + examName + '&body=' + emailBody;
   }
 
   bestSolutions: string[] = [];
 
+  /** Links to the starred answers to the question, by index: the other sheets stay unknown. */
   populateBestSolutions(): void {
-    this.http
-      .get<
-        string[]
-      >(this.applicationConfigService.getEndpointFor('api/getBestAnswer/' + this.exam?.id + '/' + this.questionNumeros[this.questionindex]))
-      .subscribe(s => {
-        const result: string[] = [];
-        s.forEach(s1 => {
-          result.push('/reponse/' + btoa('/' + s1 + '/' + this.questionNumeros[this.questionindex] + '/'));
-        });
-        this.bestSolutions = result;
+    this.bestSolutions = [];
+    const source = this.source;
+    const numero = this.questionNumeros[this.questionindex];
+    if (source === undefined || !this.corrections || numero === undefined) {
+      return;
+    }
+    source
+      .countBestAnswers(numero)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: count => (this.bestSolutions = Array.from({ length: count }, (_, i) => source.bestAnswerLink(numero, i))),
+        error: () => (this.bestSolutions = []),
       });
   }
 

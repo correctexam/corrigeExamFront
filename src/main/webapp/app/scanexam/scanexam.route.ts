@@ -437,6 +437,11 @@ export const CompareAnswer_ROUTE: Route = {
   },
 };
 
+export const STUDENT_PORTAL_ROUTE: Route = {
+  path: 'my',
+  loadChildren: () => import('./student-portal/student-portal.route').then(m => m.STUDENT_PORTAL_ROUTES),
+};
+
 export const SCANEXAM_ROUTES = [
   CREERCOURS_ROUTE,
   COURSMAIN_ROUTE,
@@ -456,6 +461,7 @@ export const SCANEXAM_ROUTES = [
   ShowResults_ROUTE,
   STATS_ROUTE,
   VoirReponseEtudiants_ROUTE,
+  STUDENT_PORTAL_ROUTE,
   VoirReponsesstarunstar_ROUTE,
   CompareTextCommentAnswer_ROUTE,
   CompareGradedCommentAnswer_ROUTE,

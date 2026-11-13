@@ -15,14 +15,22 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
     private stateStorageService: StateStorageService,
     private router: Router,
     private accountService: AccountService,
-    private zone: NgZone
+    private zone: NgZone,
   ) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(
       tap({
         error: (err: HttpErrorResponse) => {
-          if (err.status === 401 && err.url && !err.url.includes('api/account') && this.accountService.isAuthenticated()) {
+          // A 401 of the student portal ends the student session, not the session of the instructor
+          if (
+            err.status === 401 &&
+            err.url &&
+            !err.url.includes('api/account') &&
+            !err.url.includes('api/student/me') &&
+            !err.url.includes('api/public/') &&
+            this.accountService.isAuthenticated()
+          ) {
             this.stateStorageService.storeUrl(this.router.routerState.snapshot.url);
             this.loginService.logout();
             this.zone.run(() => {
@@ -30,7 +38,7 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
             });
           }
         },
-      })
+      }),
     );
   }
 }

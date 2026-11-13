@@ -10,7 +10,7 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(
     private localStorageService: LocalStorageService,
     private sessionStorageService: SessionStorageService,
-    private applicationConfigService: ApplicationConfigService
+    private applicationConfigService: ApplicationConfigService,
   ) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -21,7 +21,8 @@ export class AuthInterceptor implements HttpInterceptor {
 
     const token: string | null =
       this.localStorageService.retrieve('authenticationToken') ?? this.sessionStorageService.retrieve('authenticationToken');
-    if (token) {
+    // A request that carries its own credentials (student portal session) keeps them
+    if (token && !request.headers.has('Authorization')) {
       request = request.clone({
         setHeaders: {
           Authorization: `Bearer ${token}`,
