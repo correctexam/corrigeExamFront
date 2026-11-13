@@ -8,7 +8,7 @@
  *         | "[" letter "]" "=" percent                [c]=-25       per box
  *         | "void" "=" percent                        no box ticked (default 0)
  *         | "*" "=" percent                           anything else (default 0)
- *         | ("min" | "max") "=" percent               bounds (default 0 and 100, within [-100, 100])
+ *         | ("min" | "max") "=" percent               bounds (default -100 and 100, within [-100, 100])
  * answers = answer { "|" answer } ; answer = letter { "&" letter } [ "+" ]
  * percent = [ "+" | "-" ] digits [ "." digits ]
  * ```
@@ -78,7 +78,7 @@ const BOX = /^\[([a-z])\]$/;
 const KEYWORDS = ['void', '*', 'min', 'max'] as const;
 type Keyword = (typeof KEYWORDS)[number];
 
-const DEFAULTS: Record<Keyword, number> = { void: 0, '*': 0, min: 0, max: 100 };
+const DEFAULTS: Record<Keyword, number> = { void: 0, '*': 0, min: -100, max: 100 };
 
 function answerKey(answer: QcmDslAnswer): string {
   return answer.boxes.join('&') + (answer.atLeast ? '+' : '');

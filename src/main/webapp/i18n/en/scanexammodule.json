@@ -276,7 +276,7 @@
     "qcmaddanswerbutton": "Apply",
     "qcmaddanswererror": "Could not add this answer",
     "qcmdslinvalid": "The grading of this MCQ contains an error: fix it in the question properties before running the autocorrection again.",
-    "qcmdslhelp": "Free grading: rules separated by \";\", value in % of the points. E.g.: a&b|a&c=100; a|b=50; c=-25; *=-33. a&b+ = at least a and b; [c]=-25 = value of box c; void = no box ticked (0 by default); * = anything else (0); min=-100 and max=100 bound the note (0 and 100 by default).",
+    "qcmdslhelp": "Free grading: rules separated by \";\", value in % of the points. E.g.: a&b|a&c=100; a|b=50; c=-25; *=-33. a&b+ = at least a and b; [c]=-25 = value of box c; void = no box ticked (0 by default); * = anything else (0); min=-100 and max=100 bound the note (-100 and 100 by default).",
     "qcmdslerror_syntax": "\"{{ rule }}\": only one \"=\" per rule",
     "qcmdslerror_missingEquals": "\"{{ rule }}\": \"=\" is missing (e.g. c=-25)",
     "qcmdslerror_invalidPercent": "\"{{ rule }}\": the value must be a number (e.g. 50, -25, 33.5)",

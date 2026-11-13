@@ -29,16 +29,16 @@ describe('QCM grading DSL', () => {
     const cases: [string, string, number][] = [
       ['a&b|a&c=100; a|b=50; c=-25; *=-33', 'a&b', 100],
       ['a&b|a&c=100; a|b=50; c=-25; *=-33', 'b', 50],
-      ['a&b|a&c=100; a|b=50; c=-25; *=-33', 'c', 0],
-      ['a&b|a&c=100; a|b=50; c=-25; *=-33', 'a&b&c', 0],
-      ['a&b=100; c=-25; *=-33; min=-100', 'c', -25],
+      ['a&b|a&c=100; a|b=50; c=-25; *=-33', 'c', -25],
+      ['a&b|a&c=100; a|b=50; c=-25; *=-33', 'a&b&c', -33],
+      ['a&b=100; c=-25; *=-33; min=0', 'c', 0],
       ['a&b=100; c=-25; *=-33; min=-100', 'a&b&c', -33],
       ['a&b=100; c=-25; *=-33; min=-100', '', 0],
       ['a&b=100; void=-10; min=-100', '', -10],
       ['a&b=100; a&b+=60', 'a&b&d', 60],
       ['a&b=100; a&b+=60', 'a&b', 100],
       ['[a]=50; [b]=50; [c]=-25; [d]=-25', 'a&c', 25],
-      ['[a]=50; [b]=50; [c]=-25; [d]=-25', 'c&d', 0],
+      ['[a]=50; [b]=50; [c]=-25; [d]=-25', 'c&d', -25],
       ['a&b=100; [a]=40; [b]=40; [c]=-30', 'a&b', 100],
       ['a&b=100; [a]=40; [b]=40; [c]=-30', 'a&c', 10],
     ];
@@ -51,7 +51,7 @@ describe('QCM grading DSL', () => {
     const d = dsl('a=100');
     expect(d.void).toBe(0);
     expect(d.other).toBe(0);
-    expect(d.min).toBe(0);
+    expect(d.min).toBe(-100);
     expect(d.max).toBe(100);
     expect(evaluateQcmDsl(d, 'b')).toBe(0);
     expect(evaluateQcmDsl(dsl('a=150; max=100'), 'a')).toBe(100);

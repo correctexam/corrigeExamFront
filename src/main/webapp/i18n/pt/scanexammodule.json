@@ -280,7 +280,7 @@
     "qcmaddanswerbutton": "Aplicar",
     "qcmaddanswererror": "Não foi possível adicionar esta resposta",
     "qcmdslinvalid": "A grelha desta escolha múltipla contém um erro: corrija-a nas propriedades da pergunta antes de relançar a correção.",
-    "qcmdslhelp": "Grelha livre: regras separadas por \";\", valor em % dos pontos. Ex.: a&b|a&c=100; a|b=50; c=-25; *=-33. a&b+ = pelo menos a e b; [c]=-25 = valor da caixa c; void = nenhuma caixa assinalada (0 por omissão); * = qualquer outra resposta (0); min=-100 e max=100 limitam a nota (0 e 100 por omissão).",
+    "qcmdslhelp": "Grelha livre: regras separadas por \";\", valor em % dos pontos. Ex.: a&b|a&c=100; a|b=50; c=-25; *=-33. a&b+ = pelo menos a e b; [c]=-25 = valor da caixa c; void = nenhuma caixa assinalada (0 por omissão); * = qualquer outra resposta (0); min=-100 e max=100 limitam a nota (-100 e 100 por omissão).",
     "qcmdslerror_syntax": "\"{{ rule }}\": apenas um \"=\" por regra",
     "qcmdslerror_missingEquals": "\"{{ rule }}\": falta \"=\" (ex. c=-25)",
     "qcmdslerror_invalidPercent": "\"{{ rule }}\": o valor deve ser um número (ex. 50, -25, 33.5)",
