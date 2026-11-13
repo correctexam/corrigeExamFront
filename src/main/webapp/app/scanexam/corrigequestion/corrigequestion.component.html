@@ -421,7 +421,6 @@
                   [disabled]="blocked"
                 ></button>
                 <button
-                  class="sm:text-xs md:text-xs lg:text-base p-button-danger p-button-outlined"
                   pButton
                   icon="pi pi-refresh"
                   data-cy="qcmCorrectAll"
@@ -429,6 +428,7 @@
                   [pTooltip]="'scanexam.qcmcorrectall' | translate"
                   [tooltipZIndex]="'3000'"
                   [disabled]="blocked"
+                  style="max-height: 3em"
                 ></button>
               }
               @if (this.currentQuestion?.typeAlgoName === 'QCM') {
