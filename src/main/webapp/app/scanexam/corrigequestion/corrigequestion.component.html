@@ -79,6 +79,7 @@
           (updateGradedComment)="updateGradedComment($event)"
           (updateTextComment)="updateTextComment($event)"
           (updateHybridGradedComment)="updateHybridComment($event)"
+          (qcmRegraded)="onQcmRegraded()"
         ></jhi-questionpropertiesview>
       </div>
     }
@@ -1076,6 +1077,7 @@
               <span [translate]="'scanexam.noteattribuee'">Note attribuée : </span>
               @if (
                 (currentQuestion?.typeAlgoName === 'QCM' || currentQuestion?.gradeType !== 'HYBRID') &&
+                !isQcmDsl() &&
                 questionStep > 0 &&
                 resp?.id &&
                 currentNote !== undefined
@@ -1084,13 +1086,19 @@
                   ><b>{{ currentNote! / questionStep | number: '1.0-2' }}</b></span
                 >
               }
-              @if ((currentQuestion?.typeAlgoName === 'QCM' || currentQuestion?.gradeType !== 'HYBRID') && questionStep <= 0 && resp?.id) {
+              @if (
+                (currentQuestion?.typeAlgoName === 'QCM' || currentQuestion?.gradeType !== 'HYBRID') &&
+                !isQcmDsl() &&
+                questionStep <= 0 &&
+                resp?.id
+              ) {
                 <span
                   ><b>{{ currentNote }}</b></span
                 >
               }
               @if (
                 (currentQuestion?.typeAlgoName === 'QCM' || currentQuestion?.gradeType !== 'HYBRID') &&
+                !isQcmDsl() &&
                 resp?.id &&
                 questions !== undefined &&
                 questions!.length > 0
@@ -1100,8 +1108,7 @@
                 >
               }
               @if (
-                currentQuestion?.typeAlgoName !== 'QCM' &&
-                currentQuestion?.gradeType === 'HYBRID' &&
+                ((currentQuestion?.typeAlgoName !== 'QCM' && currentQuestion?.gradeType === 'HYBRID') || isQcmDsl()) &&
                 resp?.id &&
                 questions !== undefined &&
                 questions!.length > 0
@@ -1898,6 +1905,46 @@
                 </div>
               </div>
             }
+          </div>
+        }
+
+        <!-- QCM: answer ticked by the student that the autocorrection never detected -->
+        @if (currentQuestion?.typeAlgoName === 'QCM' && resp) {
+          <div class="grid">
+            <div style="padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 0.8rem" class="sm:col-6 md:col-6 lg:col-12 xl:col-12">
+              <div class="card" data-cy="qcmAddAnswer">
+                <div class="card-body">
+                  <p class="card-title" [translate]="'scanexam.qcmaddanswer'"></p>
+                  <div class="flex align-items-center gap-2">
+                    <input
+                      type="text"
+                      pInputText
+                      maxlength="60"
+                      [style]="{ width: '100%' }"
+                      [placeholder]="'scanexam.qcmaddanswerplaceholder' | translate"
+                      [pTooltip]="'scanexam.qcmaddanswerTooltip' | translate"
+                      [tooltipZIndex]="'3000'"
+                      tooltipPosition="left"
+                      [ngModel]="newQcmAnswer()"
+                      (ngModelChange)="newQcmAnswer.set($event)"
+                      (keydown.enter)="addQcmAnswer()"
+                    />
+                    <button
+                      type="button"
+                      pButton
+                      [label]="'scanexam.qcmaddanswerbutton' | translate"
+                      [disabled]="blocked || !qcmAnswerPreview()"
+                      (click)="addQcmAnswer()"
+                    ></button>
+                  </div>
+                  @if (qcmAnswerPreview(); as preview) {
+                    <p class="card-text mt-2">
+                      <b>{{ preview.text }}</b> : {{ preview.description }}
+                    </p>
+                  }
+                </div>
+              </div>
+            </div>
           </div>
         }
 
