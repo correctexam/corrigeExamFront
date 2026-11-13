@@ -124,6 +124,7 @@ import {
   canAutocorrect,
   emptyReport,
 } from '../grading/qcm-autocorrection';
+import { QcmOptionFields, findQcmOption, qcmOptionFields, qcmOptionForAnswer } from '../grading/qcm-option';
 import { defaultCommentShortcut } from './comment-shortcuts';
 import { QuarterTurn, RotationDirection, rotateQuarter, rotatedSize, rotationAfterNavigation, rotationMatrix } from './zone-rotation';
 
@@ -1124,9 +1125,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     for (const gcv of validToCreate) {
       const comment: IGradedComment = {
         questionId: this.questions![0].id,
-        text: gcv,
-        description: 'correct ' + this.questions![0].point! + 'pt',
-        grade: this.questions![0].point,
+        ...qcmOptionFields(this.questions![0], gcv, true),
         studentResponses: [],
       };
       const c1 = await this.createGradedComment(comment);
@@ -1135,12 +1134,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     for (const gcv of invalidToCreate) {
       const comment: IGradedComment = {
         questionId: this.questions![0].id,
-        text: gcv,
-        description:
-          this.questions![0].step! > 0
-            ? 'incorrect pénalité ' + ' - ' + ((1 / this.questions![0].step!) * this.questions![0].point!).toFixed(2) + 'pt'
-            : 'incorrect pénalité ' + '0 pt',
-        grade: this.questions![0].step,
+        ...qcmOptionFields(this.questions![0], gcv, false),
         studentResponses: [],
       };
       const c1 = await this.createGradedComment(comment);
@@ -1178,19 +1172,23 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   createGradedComment(comment: IGradedComment): Promise<IGradedComment> {
-    return new Promise<IStudentResponse>((resolve, reject) => {
-      this.gradedCommentService.create(comment).subscribe(e1 => {
-        if (e1.body !== null) {
-          this.testdisableAndEnableKeyBoardShortCut.set(false);
-          this.populateDefaultShortCut();
+    return new Promise<IGradedComment>((resolve, reject) => {
+      this.gradedCommentService.create(comment).subscribe({
+        next: e1 => {
+          if (e1.body !== null) {
+            this.testdisableAndEnableKeyBoardShortCut.set(false);
+            this.populateDefaultShortCut();
 
-          setTimeout(() => {
-            this.testdisableAndEnableKeyBoardShortCut.set(true);
-          }, 300);
-          resolve(e1.body!);
-        } else {
-          reject(null);
-        }
+            setTimeout(() => {
+              this.testdisableAndEnableKeyBoardShortCut.set(true);
+            }, 300);
+            resolve(e1.body);
+          } else {
+            reject(new Error('Empty response when creating a graded comment'));
+          }
+        },
+        // Without it, a failed creation would leave the caller waiting (and the screen blocked) forever
+        error: (err: unknown) => reject(err),
       });
     });
   }
@@ -1210,6 +1208,59 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       });
     });
+  }
+
+  /** Answer typed by the grader in "Add the answer ticked by the student" (QCM). */
+  readonly newQcmAnswer = signal('');
+
+  /** Option that addQcmAnswer() would apply, to preview it; undefined while no box is typed. */
+  qcmAnswerPreview(): QcmOptionFields | undefined {
+    if (this.currentQuestion === undefined) {
+      return undefined;
+    }
+    return qcmOptionForAnswer(this.currentQuestion, this.newQcmAnswer());
+  }
+
+  /**
+   * Applies to the current answer the option typed by the grader, creating it when the autocorrection never
+   * detected it. The other options of the answer are removed (one option per QCM answer) and the answer is marked
+   * as corrected by hand (T19a).
+   */
+  async addQcmAnswer(): Promise<void> {
+    const fields = this.qcmAnswerPreview();
+    if (fields === undefined || this.blocked || this.resp === undefined || this.questions === undefined) {
+      return;
+    }
+    let option = findQcmOption(
+      (this.currentGradedComment4Question ?? []).map(c => c()),
+      fields.text,
+    );
+    if (option === undefined) {
+      this.blocked = true;
+      try {
+        option = await this.createGradedComment({ questionId: this.questions[0].id, ...fields, studentResponses: [] });
+      } catch {
+        this.messageService.add({
+          severity: 'error',
+          summary: this.translateService.instant('scanexam.qcmaddanswererror'),
+        });
+        return;
+      } finally {
+        this.blocked = false;
+      }
+      this.currentGradedComment4Question ??= [];
+      this.currentGradedComment4Question.push(signal(option));
+      this.active.set(option.id!, signal(false));
+    }
+    const selected = option;
+    this.currentGradedComment4Question
+      ?.map(c => c())
+      .filter(c => c.id !== selected.id && this.checked(c))
+      .forEach(c => this.toggleGComment(c));
+    if (!this.checked(selected)) {
+      this.toggleGComment(selected);
+    }
+    this.newQcmAnswer.set('');
   }
 
   /** Gives the current answer back to the QCM autocorrection: the next run will set it from the detection. */
