@@ -323,7 +323,10 @@ export class ExportPdfService {
         : computeQuestionNote(currentQ, { gradedComments: resp.gradedcommentspdf, noteSteps: currentQ.point! * currentQ.step! });
     const currentNote = graded ? graded.note : resp.note!;
 
-    if (currentQ.step! > 0 && rule !== 'hybrid') {
+    if (rule === 'qcmDsl') {
+      // QCM graded by DSL (ADR 0002): already in points, from the percentages stored on the options
+      return currentNote;
+    } else if (currentQ.step! > 0 && rule !== 'hybrid') {
       return currentNote / currentQ.step!;
     } else if (rule === 'hybrid') {
       return currentNote / 100.0;
