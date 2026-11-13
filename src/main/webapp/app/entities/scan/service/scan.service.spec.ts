@@ -42,6 +42,26 @@ describe('Scan Service', () => {
       expect(expectedResult).toMatchObject(elemDefault as any);
     });
 
+    it('should get the page count of a scan', () => {
+      let pageCount: number | undefined;
+
+      service.getPageCount(123).subscribe(resp => (pageCount = resp.pageCount));
+
+      const req = httpMock.expectOne({ method: 'GET' });
+      expect(req.request.url).toMatch(/api\/scans\/123\/pagecount$/);
+      req.flush({ scanId: 123, pageCount: 42 });
+      expect(pageCount).toBe(42);
+    });
+
+    it('should propagate a page count error', () => {
+      let status: number | undefined;
+
+      service.getPageCount(123).subscribe({ error: (err: { status: number }) => (status = err.status) });
+
+      httpMock.expectOne({ method: 'GET' }).flush(null, { status: 404, statusText: 'Not Found' });
+      expect(status).toBe(404);
+    });
+
     it('should create a Scan', () => {
       const returnedFromService = Object.assign(
         {

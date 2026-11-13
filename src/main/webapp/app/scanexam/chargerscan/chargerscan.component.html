@@ -55,6 +55,24 @@
         <h2 id="jhi-course-heading" data-cy="CourseCreateUpdateHeading">
           <span [translate]="'scanexam.chargerscan'"> Charger ou mettre à jour un scan de copies pour l'exam : </span> {{ exam.name }}
         </h2>
+        @if (scanPageCount(); as pages) {
+          <div class="flex align-items-center gap-2 text-color-secondary" data-cy="scanPageCount">
+            <i class="pi pi-file-pdf"></i>
+            <span>{{ 'scanexam.scanpagecount' | translate: { pages: pages } }}</span>
+            @if (scanCopyCount(); as copies) {
+              <span>{{ 'scanexam.scanpagecountcopies' | translate: { copies: copies, pagesPerCopy: pageInTemplate } }}</span>
+            } @else if (pageInTemplate > 0) {
+              <span class="text-orange-500" [pTooltip]="'scanexam.scanpagecountnotmultipleTooltip' | translate" tooltipPosition="bottom">
+                <i class="pi pi-exclamation-triangle"></i>
+                {{ 'scanexam.scanpagecountnotmultiple' | translate: { pagesPerCopy: pageInTemplate } }}
+              </span>
+            }
+          </div>
+        } @else if (scanPageCount() === null) {
+          <div class="text-color-secondary" data-cy="scanPageCount">
+            <i class="pi pi-file-pdf"></i>&nbsp;<span [translate]="'scanexam.scanpagecountunavailable'"></span>
+          </div>
+        }
       </div>
       <div class="col-4 flex flex-row-reverse">
         <button

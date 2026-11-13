@@ -6,6 +6,14 @@ export interface IScan {
   contentContentType?: string | null;
   content?: string | null;
   sheets?: IExamSheet[] | null;
+  /** Number of pages of the scan PDF, read-only; null when the server has not computed it yet. */
+  pageCount?: number | null;
+}
+
+/** Response of GET /api/scans/{id}/pagecount. */
+export interface IScanPageCount {
+  scanId: number;
+  pageCount: number;
 }
 
 export class Scan implements IScan {
@@ -14,7 +22,7 @@ export class Scan implements IScan {
     public name?: string,
     public contentContentType?: string | null,
     public content?: string | null,
-    public sheets?: IExamSheet[] | null
+    public sheets?: IExamSheet[] | null,
   ) {}
 }
 
