@@ -16,6 +16,11 @@
       <h4 [translate]="'scanexam.confirmemail'">Confirmation envoi mail</h4>
     </ng-template>
     <div class="grid">
+      @if (currentStudentMail === undefined) {
+        <div class="col-12" data-cy="mailPublishesGraded">
+          <p-message severity="info" [text]="'scanexam.studentaccess_publishonsend' | translate"></p-message>
+        </div>
+      }
       <div class="col-12">
         <label [translate]="'scanexam.mailsubject'">Sujet du mail:</label>
         <input type="text" [(ngModel)]="mailSubject" pInputText [style]="{ width: '100%' }" />

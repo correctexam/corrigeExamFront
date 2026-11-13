@@ -28,6 +28,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { ToastModule } from 'primeng/toast';
 
+import { StudentEmailIssue, studentEmailIssues } from './student-email-check';
+
 /**
  * Used to type to data spreadsheet
  */
@@ -298,6 +300,30 @@ export class ImportStudentComponent implements OnInit {
       this.canImportUniqueINE() &&
       this.canImportUniqueMails()
     );
+  }
+
+  private emailIssuesCache: { rows: Std[]; mails: string[]; issues: Map<Std, StudentEmailIssue> } | undefined;
+
+  /**
+   * Addresses that will keep a student from finding their sheets in the student portal /my: empty, malformed, or
+   * shared with another student (rows to import and students already imported). Warnings only: the import is allowed.
+   */
+  protected emailIssues(): Map<Std, StudentEmailIssue> {
+    const rows = [...this.dataset, ...this.students()];
+    const mails = rows.map(r => r.mail ?? '');
+    const cache = this.emailIssuesCache;
+    if (cache && cache.rows.length === rows.length && cache.rows.every((r, i) => r === rows[i] && cache.mails[i] === mails[i])) {
+      return cache.issues;
+    }
+    const byIndex = studentEmailIssues(mails);
+    const issues = new Map<Std, StudentEmailIssue>();
+    byIndex.forEach((issue, i) => issues.set(rows[i], issue));
+    this.emailIssuesCache = { rows, mails, issues };
+    return issues;
+  }
+
+  protected emailIssueOf(std: Std): StudentEmailIssue | undefined {
+    return this.emailIssues().get(std);
   }
 
   public hasDataSet(): boolean {
