@@ -79,6 +79,7 @@
           (updateGradedComment)="updateGradedComment($event)"
           (updateTextComment)="updateTextComment($event)"
           (updateHybridGradedComment)="updateHybridComment($event)"
+          (qcmRegraded)="onQcmRegraded()"
         ></jhi-questionpropertiesview>
       </div>
     }
@@ -1076,6 +1077,7 @@
               <span [translate]="'scanexam.noteattribuee'">Note attribuée : </span>
               @if (
                 (currentQuestion?.typeAlgoName === 'QCM' || currentQuestion?.gradeType !== 'HYBRID') &&
+                !isQcmDsl() &&
                 questionStep > 0 &&
                 resp?.id &&
                 currentNote !== undefined
@@ -1084,13 +1086,19 @@
                   ><b>{{ currentNote! / questionStep | number: '1.0-2' }}</b></span
                 >
               }
-              @if ((currentQuestion?.typeAlgoName === 'QCM' || currentQuestion?.gradeType !== 'HYBRID') && questionStep <= 0 && resp?.id) {
+              @if (
+                (currentQuestion?.typeAlgoName === 'QCM' || currentQuestion?.gradeType !== 'HYBRID') &&
+                !isQcmDsl() &&
+                questionStep <= 0 &&
+                resp?.id
+              ) {
                 <span
                   ><b>{{ currentNote }}</b></span
                 >
               }
               @if (
                 (currentQuestion?.typeAlgoName === 'QCM' || currentQuestion?.gradeType !== 'HYBRID') &&
+                !isQcmDsl() &&
                 resp?.id &&
                 questions !== undefined &&
                 questions!.length > 0
@@ -1100,8 +1108,7 @@
                 >
               }
               @if (
-                currentQuestion?.typeAlgoName !== 'QCM' &&
-                currentQuestion?.gradeType === 'HYBRID' &&
+                ((currentQuestion?.typeAlgoName !== 'QCM' && currentQuestion?.gradeType === 'HYBRID') || isQcmDsl()) &&
                 resp?.id &&
                 questions !== undefined &&
                 questions!.length > 0

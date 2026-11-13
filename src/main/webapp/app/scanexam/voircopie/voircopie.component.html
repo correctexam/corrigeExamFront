@@ -149,6 +149,7 @@
               questions &&
               questions.length > 0 &&
               (questions[0].gradeType !== 'HYBRID' || questions[0].typeAlgoName === 'QCM') &&
+              !isQcmDsl() &&
               resp
             ) {
               <span>{{ currentNote / questionStep }}</span>
@@ -158,11 +159,17 @@
               questions &&
               questions.length > 0 &&
               (questions[0].gradeType !== 'HYBRID' || questions[0].typeAlgoName === 'QCM') &&
+              !isQcmDsl() &&
               resp
             ) {
               <span>{{ currentNote }}</span>
             }
-            @if (questions && questions.length > 0 && questions[0].gradeType === 'HYBRID' && questions[0].typeAlgoName !== 'QCM' && resp) {
+            @if (
+              questions &&
+              questions.length > 0 &&
+              ((questions[0].gradeType === 'HYBRID' && questions[0].typeAlgoName !== 'QCM') || isQcmDsl()) &&
+              resp
+            ) {
               <span>{{ resp!.note! / 100 | number: '1.0-2' }}</span>
             }
             @if (questions && questions.length > 0 && resp) {
@@ -218,10 +225,11 @@
                         @if (currentQuestion && currentQuestion.gradeType === 'POSITIVE') {
                           <span> + </span>
                         }
-                        @if (questionStep > 0) {
+                        @if (isQcmDsl()) {
+                          <span>{{ comment.grade! }} %</span>
+                        } @else if (questionStep > 0) {
                           <span>{{ comment.grade! / questionStep }}</span>
-                        }
-                        @if (questionStep <= 0) {
+                        } @else {
                           <span>{{ comment.grade! }}</span>
                         }
                       </p>

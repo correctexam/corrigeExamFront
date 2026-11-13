@@ -115,7 +115,7 @@ import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { PredictionStudentResponseService } from '../mlt/prediction-studentresponse-service';
 import Fuse from 'fuse.js';
 import { imagenoanswer } from './noresponse';
-import { computeQuestionNote, gradingRuleOf } from '../grading/question-grading';
+import { computeQuestionNote, gradingRuleOf, isStoredInHundredths } from '../grading/question-grading';
 import {
   QcmAnswerOutcome,
   QcmAutocorrectionMode,
@@ -124,7 +124,14 @@ import {
   canAutocorrect,
   emptyReport,
 } from '../grading/qcm-autocorrection';
-import { QcmOptionFields, findQcmOption, qcmOptionFields, qcmOptionForAnswer } from '../grading/qcm-option';
+import {
+  InvalidQcmDslError,
+  QcmOptionFields,
+  findOptionForSolution,
+  findQcmOption,
+  qcmOptionForAnswer,
+  qcmOptionsToCreate,
+} from '../grading/qcm-option';
 import { defaultCommentShortcut } from './comment-shortcuts';
 import { QuarterTurn, RotationDirection, rotateQuarter, rotatedSize, rotationAfterNavigation, rotationMatrix } from './zone-rotation';
 
@@ -559,7 +566,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
             );
             if (sr.body !== null && sr.body.length > 0) {
               this.resp = sr.body![0];
-              this.currentNote = this.resp.note!;
+              // DSL QCM notes are stored in hundredths of a point
+              this.currentNote = gradingRuleOf(questions![0]) === 'qcmDsl' ? this.resp.note! / 100 : this.resp.note!;
               this.answer2HybridGradedCommentMap.clear();
               const answersHybrid = (await firstValueFrom(this.answer2HybridGradedCommentService.query({ answerId: this.resp.id }))).body;
               if (answersHybrid !== null) {
@@ -1038,6 +1046,14 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         detail: this.translateService.instant('scanexam.qcmautocorrectreport', report),
       });
     } catch (err) {
+      if (err instanceof InvalidQcmDslError) {
+        this.messageService.add({
+          severity: 'error',
+          summary: this.translateService.instant('scanexam.couldnotcorrectQCM'),
+          detail: this.translateService.instant('scanexam.qcmdslinvalid'),
+        });
+        return;
+      }
       this.messageService.add({
         severity: 'error',
         summary: this.translateService.instant('scanexam.couldnotcorrectQCM'),
@@ -1108,37 +1124,22 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   }
 
   async processSolutions(solutions: IQCMSolution[] | undefined, mode: QcmAutocorrectionMode): Promise<QcmAutocorrectionReport> {
-    // Create list of gradedComments
-    const validExp = this.currentQuestion?.validExpression!.split('|');
-    let validToCreate: string[] = [];
-    const invalidExp = solutions!.map(s => s.solution!);
-    let invalidToCreate: string[] = [];
-    if (this.currentGradedComment4Question === undefined) {
-      this.currentGradedComment4Question = [];
-    }
-    validToCreate = validExp!.filter(c => !this.currentGradedComment4Question?.map(v => v().text).includes(c));
-    invalidToCreate = invalidExp!.filter(
-      c => !this.currentGradedComment4Question?.map(v => v().text).includes(c) && !validExp!.includes(c!) && c !== '',
+    // Options of the answers named by the expression and of the detected answers; with a grading DSL (ADR 0002)
+    // each one carries the percentage of the points it is worth. Throws when the DSL is invalid.
+    this.currentGradedComment4Question ??= [];
+    const toCreate = qcmOptionsToCreate(
+      this.questions![0],
+      solutions!.map(s => s.solution),
+      this.currentGradedComment4Question.map(v => v().text),
     );
-    invalidToCreate = [...new Set(invalidToCreate)];
-
-    for (const gcv of validToCreate) {
+    for (const fields of toCreate) {
       const comment: IGradedComment = {
         questionId: this.questions![0].id,
-        ...qcmOptionFields(this.questions![0], gcv, true),
+        ...fields,
         studentResponses: [],
       };
       const c1 = await this.createGradedComment(comment);
-      this.currentGradedComment4Question!.push(signal(c1));
-    }
-    for (const gcv of invalidToCreate) {
-      const comment: IGradedComment = {
-        questionId: this.questions![0].id,
-        ...qcmOptionFields(this.questions![0], gcv, false),
-        studentResponses: [],
-      };
-      const c1 = await this.createGradedComment(comment);
-      this.currentGradedComment4Question!.push(signal(c1));
+      this.currentGradedComment4Question.push(signal(c1));
     }
     // UpdateStudentResponse
     let report = emptyReport();
@@ -1163,8 +1164,12 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     if (this.currentStudent === e.numero) {
       this.currentGradedComment4Question?.forEach(c => ((c() as any).checked = false));
     }
-    // No option when no box is ticked: the answer is emptied (note 0)
-    const option = this.currentGradedComment4Question?.find(c => c().text === e.solution)?.();
+    // No option when no box is ticked (unless a DSL gives `void` a value): the answer is emptied (note 0)
+    const option = findOptionForSolution(
+      this.questions![0],
+      (this.currentGradedComment4Question ?? []).map(c => c()),
+      e.solution,
+    );
     resp.gradedcomments = option !== undefined ? [option] : [];
     resp.manuallyGraded = false;
     await this.updateStudentResponsAndComputeNote4QCM(resp, e.numero!, option);
@@ -1208,6 +1213,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       });
     });
+  }
+
+  /** QCM graded by a DSL (ADR 0002): note in points, stored × 100, shown like a hybrid note. */
+  isQcmDsl(): boolean {
+    return this.currentQuestion !== undefined && gradingRuleOf(this.currentQuestion) === 'qcmDsl';
   }
 
   /** Answer typed by the grader in "Add the answer ticked by the student" (QCM). */
@@ -1386,6 +1396,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     if ((comment as any).checked) {
       if (comment.description?.startsWith('correct')) {
         return { 'background-color': '#7EED92' };
+      } else if (comment.description?.startsWith('partiel')) {
+        // QCM graded by DSL: answer worth part of the points
+        return { 'background-color': '#FFD27F' };
       } else if (comment.description?.startsWith('incorrect')) {
         return { 'background-color': '#FF6961' };
       } else {
@@ -1646,13 +1659,13 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         hybridStepValues: this.answer2HybridGradedCommentMap,
       });
       if (graded) {
-        const isQcm = graded.rule === 'qcm' || graded.rule === 'qcmWithPenalty';
+        const isQcm = graded.rule === 'qcm' || graded.rule === 'qcmWithPenalty' || graded.rule === 'qcmDsl';
         if (!isQcm || resp === this.resp) {
           this.currentNote = graded.note;
         }
         if (resp) {
-          // StudentResponse.note stores hybrid notes in hundredths of a point
-          resp.note = graded.rule === 'hybrid' ? graded.note * 100 : graded.note;
+          // StudentResponse.note stores hybrid and DSL QCM notes in hundredths of a point
+          resp.note = isStoredInHundredths(graded.rule) ? graded.note * 100 : graded.note;
         }
         if (update && resp?.id) {
           this.studentResponseService.partialUpdate(resp).subscribe(b => {
@@ -2994,6 +3007,25 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   editQuestion(): void {
     this.questionpropertiesviewVisible = true;
   }
+  /** The grading of the QCM changed in the question properties: reload its options and the current answer. */
+  async onQcmRegraded(): Promise<void> {
+    if (this.questions === undefined || this.questions.length === 0) {
+      return;
+    }
+    if (this.sheet !== undefined) {
+      const sr = await firstValueFrom(
+        this.studentResponseService.query({ sheetId: this.sheet.id!, questionsId: this.questions.map(q => q.id) }),
+      );
+      if (sr.body !== null && sr.body.length > 0) {
+        this.resp = sr.body[0];
+      }
+    }
+    await this.reloadQcmOptions(this.questions[0]);
+    if (this.resp !== undefined) {
+      await this.computeNote(false, this.resp, this.questions[0]);
+    }
+  }
+
   updateQuestion(questions: Array<IQuestion>): void {
     for (const q of questions) {
       const q2 = this.questions?.find(q1 => q1.id === q.id);
