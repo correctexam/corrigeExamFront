@@ -231,7 +231,7 @@
     "invalidanswerpenalty": "Penalidade se resposta errada",
     "validanswerexpression": "Expressão válida",
     "penaltytooltip": "Penalidade em função do total dos pontos da questão (p. ex. se o total dos pontos da questão = 2 e a seleção 1/5, uma resposta errada custará 0,4 pts",
-    "expressiontooltip": "Une expression válida segue o formato 'a&b|a&c', que signnifica  ou o caso 'a' e o caso 'b' marcados ou o caso 'a' e o caso 'c' marcados ('a' sendo o primeiro caso, 'c' sendo o terceiro, etc.)",
+    "expressiontooltip": "Uma expressão válida terá a forma 'b=100;a&b=50;c=-25;*=-50;min=-100;', significando 'b' marcado → 100% dos pontos, 'a&b' → 50% dos pontos, c → -25% do total de pontos, Nenhuma caixa marcada → 0% dos pontos, Qualquer outra resposta → -50%, Nota limitada entre -100% e 100% ('a' sendo a primeira caixa, 'c' a terceira, …).",
     "steptooltip": "A questão poderá ser avaliada de 0,25pt em 0,25pt ou de 0,5pt em 0,5pt, independentemente da quantidade de pontos da questão.",
     "couldnotcorrectQCM": "Imossível corrigir este QME",
     "couldnotcorrectQCMdetails": "Impossível corrigir este QME",
