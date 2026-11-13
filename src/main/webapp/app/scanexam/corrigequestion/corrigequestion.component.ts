@@ -116,6 +116,14 @@ import { PredictionStudentResponseService } from '../mlt/prediction-studentrespo
 import Fuse from 'fuse.js';
 import { imagenoanswer } from './noresponse';
 import { computeQuestionNote, gradingRuleOf } from '../grading/question-grading';
+import {
+  QcmAnswerOutcome,
+  QcmAutocorrectionMode,
+  QcmAutocorrectionReport,
+  addOutcome,
+  canAutocorrect,
+  emptyReport,
+} from '../grading/qcm-autocorrection';
 import { defaultCommentShortcut } from './comment-shortcuts';
 import { QuarterTurn, RotationDirection, rotateQuarter, rotatedSize, rotationAfterNavigation, rotationMatrix } from './zone-rotation';
 
@@ -980,95 +988,125 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   cleanAllCorrection(q: IQuestion): Observable<HttpResponse<IQuestion>> {
     return this.questionService.cleanAllCorrectionAndComment(q);
   }
-  workOnQCM() {
-    if (this.questions?.length === 1) {
-      this.blocked = true;
-
-      this.questions!.forEach(q => {
-        this.currentGradedComment4Question = [];
-        this.currentTextComment4Question = [];
-
-        this.cleanAllCorrection(q).subscribe(() => {
-          q.gradedcomments = [];
-          q.textcomments = [];
-
-          const z = q.zoneDTO;
-          const promises: Promise<ImageZone>[] = [];
-          const t: IQCMInput = {
-            preference: this.preferenceService.getPreference(),
-          };
-          t.pages = [];
-          this.getTemplateImage4Zone(z!).then(p => {
-            t.imageTemplate = p.i;
-
-            for (let st = 0; st < this.numberPagesInScan! / this.nbreFeuilleParCopie!; st++) {
-              const pagewithoffset = st! * this.nbreFeuilleParCopie! + z!.pageNumber! + this.pageOffset;
-              const pagewithoutoffset = st * this.nbreFeuilleParCopie! + z!.pageNumber!;
-              let page = pagewithoutoffset;
-              if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
-                page = pagewithoffset;
-              }
-              promises.push(this.getAllImage4Zone(page, z!, true));
-            }
-
-            Promise.all(promises).then(value => {
-              value.forEach((value1, index1) => {
-                if (index1 === 1) {
-                  t.widthZone = value1.w!;
-                  t.heightZone = value1.h!;
-                }
-
-                t.pages!.push({ imageInput: value1.i, numero: index1 });
-              });
-              this.alignImagesService.correctQCM(t).subscribe(
-                res => {
-                  this.processSolutions(res.solutions).then(() => {
-                    const qid = this.questions!.map(qq => qq.id);
-                    let sid = 0;
-                    if (this.sheet !== undefined) {
-                      sid = this.sheet.id!;
-                    }
-                    this.studentResponseService
-                      .query({
-                        sheetId: sid,
-                        questionsId: qid,
-                      })
-                      .subscribe(sr => {
-                        if (sr.body !== null && sr.body.length > 0) {
-                          this.resp = sr.body![0];
-                          this.computeNote(false, this.resp, this.currentQuestion!);
-                          this.blocked = false;
-                        } else {
-                          this.blocked = false;
-                        }
-                      });
-                  });
-                },
-                err => {
-                  this.blocked = false;
-                  this.messageService.add({
-                    severity: 'error',
-                    summary: this.translateService.instant('scanexam.couldnotcorrectQCM'),
-                    detail: this.translateService.instant('scanexam.couldnotcorrectQCMdetails') + ' ' + err.message,
-                  });
-                },
-              );
-            });
-          });
-          //    });
-        });
-      });
-    } else {
+  /**
+   * QCM autocorrection. By default (`keepManual`), the options of the question are kept, the missing ones are created
+   * and the answers corrected by hand are left untouched. `all` erases every correction of the question first
+   * (former behaviour, asked for explicitly with confirmQcmFullAutocorrection()).
+   */
+  async workOnQCM(mode: QcmAutocorrectionMode = 'keepManual'): Promise<void> {
+    if (this.questions?.length !== 1) {
       console.log('no support of QCM on multiple pages');
       this.messageService.add({
         severity: 'warning',
         summary: this.translateService.instant('scanexam.nosupportQMCmultiplepage'),
         detail: this.translateService.instant('scanexam.nosupportQMCmultiplepagedetails'),
       });
+      return;
+    }
+    const q = this.questions[0];
+    this.blocked = true;
+    try {
+      if (mode === 'all') {
+        await firstValueFrom(this.cleanAllCorrection(q));
+        q.gradedcomments = [];
+        q.textcomments = [];
+        this.currentGradedComment4Question = [];
+        this.currentTextComment4Question = [];
+      } else {
+        // Options may have been added meanwhile (by a colleague, or by hand): start from the stored ones
+        await this.reloadQcmOptions(q);
+      }
+
+      const input = await this.buildQcmInput(q.zoneDTO!);
+      const res = await firstValueFrom(this.alignImagesService.correctQCM(input));
+      const report = await this.processSolutions(res.solutions, mode);
+
+      const sr = await firstValueFrom(
+        this.studentResponseService.query({
+          sheetId: this.sheet !== undefined ? this.sheet.id! : 0,
+          questionsId: this.questions.map(qq => qq.id),
+        }),
+      );
+      if (sr.body !== null && sr.body.length > 0) {
+        this.resp = sr.body[0];
+        await this.computeNote(false, this.resp, this.currentQuestion!);
+      }
+      this.messageService.add({
+        severity: report.kept > 0 ? 'info' : 'success',
+        summary: this.translateService.instant('scanexam.qcmautocorrectdone'),
+        detail: this.translateService.instant('scanexam.qcmautocorrectreport', report),
+      });
+    } catch (err) {
+      this.messageService.add({
+        severity: 'error',
+        summary: this.translateService.instant('scanexam.couldnotcorrectQCM'),
+        detail:
+          this.translateService.instant('scanexam.couldnotcorrectQCMdetails') + ' ' + (err instanceof Error ? err.message : String(err)),
+      });
+    } finally {
+      this.blocked = false;
     }
   }
 
-  async processSolutions(solutions: IQCMSolution[] | undefined) {
+  /** Asks for confirmation, then erases every correction of the QCM (manual ones included) and corrects it again. */
+  confirmQcmFullAutocorrection(): void {
+    this.confirmationService.confirm({
+      message: this.translateService.instant('scanexam.qcmcorrectallconfirmation'),
+      accept: () => {
+        this.workOnQCM('all');
+      },
+    });
+  }
+
+  /** Reloads the options (graded comments) of the question, keeping the ones of the current answer checked. */
+  private async reloadQcmOptions(q: IQuestion): Promise<void> {
+    const res = await firstValueFrom(this.gradedCommentService.query({ questionId: q.id }));
+    const checkedIds = new Set((this.resp?.gradedcomments ?? []).map(c => c.id));
+    this.currentGradedComment4Question = (res.body ?? []).map(c => {
+      (c as any).checked = checkedIds.has(c.id);
+      if (c.id !== undefined && !this.active.has(c.id)) {
+        this.active.set(c.id, signal(false));
+      }
+      return signal(c);
+    });
+    // Keyboard shortcuts are bound to the options: rebuild them, as when an option is created
+    this.testdisableAndEnableKeyBoardShortCut.set(false);
+    this.populateDefaultShortCut();
+    setTimeout(() => {
+      this.testdisableAndEnableKeyBoardShortCut.set(true);
+    }, 300);
+  }
+
+  /** Images of the QCM zone: template and one per copy. */
+  private async buildQcmInput(z: IZone): Promise<IQCMInput> {
+    const t: IQCMInput = {
+      preference: this.preferenceService.getPreference(),
+      pages: [],
+    };
+    const p = await this.getTemplateImage4Zone(z);
+    t.imageTemplate = p.i;
+    const promises: Promise<ImageZone>[] = [];
+    for (let st = 0; st < this.numberPagesInScan! / this.nbreFeuilleParCopie!; st++) {
+      const pagewithoffset = st * this.nbreFeuilleParCopie! + z.pageNumber! + this.pageOffset;
+      const pagewithoutoffset = st * this.nbreFeuilleParCopie! + z.pageNumber!;
+      let page = pagewithoutoffset;
+      if (pagewithoffset > 0 && pagewithoffset <= this.numberPagesInScan!) {
+        page = pagewithoffset;
+      }
+      promises.push(this.getAllImage4Zone(page, z, true));
+    }
+    const images = await Promise.all(promises);
+    images.forEach((image, index) => {
+      if (index === 1) {
+        t.widthZone = image.w!;
+        t.heightZone = image.h!;
+      }
+      t.pages!.push({ imageInput: image.i, numero: index });
+    });
+    return t;
+  }
+
+  async processSolutions(solutions: IQCMSolution[] | undefined, mode: QcmAutocorrectionMode): Promise<QcmAutocorrectionReport> {
     // Create list of gradedComments
     const validExp = this.currentQuestion?.validExpression!.split('|');
     let validToCreate: string[] = [];
@@ -1109,31 +1147,34 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       this.currentGradedComment4Question!.push(signal(c1));
     }
     // UpdateStudentResponse
+    let report = emptyReport();
     for (const solution of solutions!) {
-      await this.processAnswer(solution);
+      report = addOutcome(report, await this.processAnswer(solution, mode));
     }
+    return report;
   }
 
-  async processAnswer(e: IQCMSolution) {
-    if (e.solution !== undefined /* && e.solution !== '' */) {
-      const resp = await this.getStudentResponse4CurrentStudent(
-        this.questions!.map(q => q.id!),
-        e.numero!,
-      );
-
-      resp.gradedcomments?.forEach(gc => {
-        (gc as any)().checked = false;
-      });
-      resp!.gradedcomments = [];
-      // Check if gradedcomment with good parameters exists
-
-      const gcs = this.currentGradedComment4Question?.filter(c => c().text === e.solution);
-      // Comment already exists
-      if (gcs !== undefined && gcs.length > 0) {
-        resp.gradedcomments.push(gcs[0]());
-        await this.updateStudentResponsAndComputeNote4QCM(resp, e.numero!, gcs[0]());
-      }
+  /** Sets the answer of copy `e.numero` from the detection, unless it was corrected by hand (`keepManual`). */
+  async processAnswer(e: IQCMSolution, mode: QcmAutocorrectionMode): Promise<QcmAnswerOutcome> {
+    if (e.solution === undefined) {
+      return 'ignored';
     }
+    const resp: IStudentResponse = await this.getStudentResponse4CurrentStudent(
+      this.questions!.map(q => q.id!),
+      e.numero!,
+    );
+    if (!canAutocorrect(resp, mode)) {
+      return 'kept';
+    }
+    if (this.currentStudent === e.numero) {
+      this.currentGradedComment4Question?.forEach(c => ((c() as any).checked = false));
+    }
+    // No option when no box is ticked: the answer is emptied (note 0)
+    const option = this.currentGradedComment4Question?.find(c => c().text === e.solution)?.();
+    resp.gradedcomments = option !== undefined ? [option] : [];
+    resp.manuallyGraded = false;
+    await this.updateStudentResponsAndComputeNote4QCM(resp, e.numero!, option);
+    return 'updated';
   }
 
   createGradedComment(comment: IGradedComment): Promise<IGradedComment> {
@@ -1157,11 +1198,11 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   updateStudentResponsAndComputeNote4QCM(
     resp: IStudentResponse,
     numero: number,
-    comment: IGradedComment,
+    comment: IGradedComment | undefined,
   ): Promise<IStudentResponse | undefined> {
     return new Promise<IStudentResponse | undefined>(resolve => {
       this.updateResponseRequest(resp).subscribe(resp1 => {
-        if (this.currentStudent === numero) {
+        if (comment !== undefined && this.currentStudent === numero) {
           (comment as any).checked = true;
         }
         this.computeNote(true, resp1.body!, this.currentQuestion!).then(value => {
@@ -1169,6 +1210,20 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         });
       });
     });
+  }
+
+  /** Gives the current answer back to the QCM autocorrection: the next run will set it from the detection. */
+  async unlockManualGrading(): Promise<void> {
+    if (this.resp?.id === undefined || this.blocked) {
+      return;
+    }
+    this.blocked = true;
+    try {
+      const res = await firstValueFrom(this.updateResponseRequest({ ...this.resp, manuallyGraded: false }));
+      this.resp = res.body!;
+    } finally {
+      this.blocked = false;
+    }
   }
 
   async setNoteZero() {
@@ -1342,6 +1397,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
 
     self.resp?.gradedcomments?.push(comment);
+    // Corrected by hand: a later QCM autocorrection keeps this answer
+    self.resp!.manuallyGraded = true;
 
     const resp1 = await firstValueFrom(self.updateResponseRequest(self.resp!));
     self.resp = resp1.body!;
@@ -1366,6 +1423,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       self.resp = ret!.body!;
     }
     self.resp!.gradedcomments = self.resp?.gradedcomments!.filter(e => e.id !== comment.id);
+    // Corrected by hand: a later QCM autocorrection keeps this answer
+    self.resp!.manuallyGraded = true;
     self.blocked = true;
     const resp1 = await firstValueFrom(self.updateResponseRequest(self.resp!));
     self.resp = resp1.body!;

@@ -420,6 +420,16 @@
                   [label]="'scanexam.qcmcorrectlabel' | translate"
                   [disabled]="blocked"
                 ></button>
+                <button
+                  class="sm:text-xs md:text-xs lg:text-base p-button-danger p-button-outlined"
+                  pButton
+                  icon="pi pi-refresh"
+                  data-cy="qcmCorrectAll"
+                  (click)="confirmQcmFullAutocorrection()"
+                  [pTooltip]="'scanexam.qcmcorrectall' | translate"
+                  [tooltipZIndex]="'3000'"
+                  [disabled]="blocked"
+                ></button>
               }
               @if (this.currentQuestion?.typeAlgoName === 'QCM') {
                 <button
@@ -1317,6 +1327,31 @@
                 </div>
               </div>
             }
+          </div>
+        }
+
+        <!-- answer corrected by hand: kept by the QCM autocorrection -->
+        @if (currentQuestion?.typeAlgoName === 'QCM' && resp?.manuallyGraded) {
+          <div class="flex align-items-center flex-wrap gap-2 p-2" data-cy="qcmManuallyGraded">
+            <span
+              class="font-bold"
+              [pTooltip]="'scanexam.qcmmanuallygradedTooltip' | translate"
+              [tooltipZIndex]="'3000'"
+              tooltipPosition="left"
+            >
+              <i class="pi pi-lock"></i>&nbsp;<span [translate]="'scanexam.qcmmanuallygraded'"></span>
+            </span>
+            <button
+              type="button"
+              pButton
+              class="p-button-sm p-button-text"
+              icon="pi pi-lock-open"
+              [label]="'scanexam.qcmunlock' | translate"
+              [pTooltip]="'scanexam.qcmunlockTooltip' | translate"
+              [tooltipZIndex]="'3000'"
+              [disabled]="blocked"
+              (click)="unlockManualGrading()"
+            ></button>
           </div>
         }
 
