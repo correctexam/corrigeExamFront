@@ -1,3 +1,4 @@
+import { StudentAccessSelectorComponent } from './student-access-selector/student-access-selector.component';
 import { Component, OnInit, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
@@ -73,6 +74,7 @@ import {
     TranslateDirective,
     TranslatePipe,
     DockModule,
+    StudentAccessSelectorComponent,
   ],
 })
 export class ExamDetailComponent implements OnInit, CacheUploadNotification, CacheDownloadNotification {

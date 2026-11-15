@@ -249,6 +249,9 @@
             ><BR />
             <span [translate]="'scanexam.showresult'"> Voir résultats</span>
           </button>
+          @if (exam?.id) {
+            <jhi-student-access-selector [exam]="exam!" (changed)="exam = $event"></jhi-student-access-selector>
+          }
         </div>
       </div>
     </div>

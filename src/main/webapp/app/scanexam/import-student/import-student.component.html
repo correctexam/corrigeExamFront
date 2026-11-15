@@ -30,6 +30,13 @@
         @if (!canImportUniqueINE()) {
           <p-message [severity]="$any('warn')" [text]="'scanexam.liststderrorINE' | translate"></p-message>
         }
+        @if (emailIssues().size > 0) {
+          <p-message
+            severity="warn"
+            data-cy="studentEmailIssues"
+            [text]="'scanexam.studentemail_summary' | translate: { count: emailIssues().size }"
+          ></p-message>
+        }
         @if (canImport() && hasDataSet()) {
           <p-message severity="info" [text]="'scanexam.clickbuttonsauveretudiant' | translate"></p-message>
         }
@@ -225,6 +232,13 @@
                     [(ngModel)]="st.mail"
                     type="text"
                   />
+                  @if (emailIssueOf(st); as issue) {
+                    <i
+                      class="pi pi-exclamation-triangle text-orange-500"
+                      [tooltipZIndex]="'3000'"
+                      [pTooltip]="'scanexam.studentemail_' + issue | translate"
+                    ></i>
+                  }
                 </td>
                 <td>
                   <input
@@ -293,6 +307,13 @@
                     <input type="text" style="width: 90%" [(ngModel)]="student.mail" (change)="updateStudent(student)" pInputText />
                   </ng-template>
                 </p-inplace>
+                @if (emailIssueOf(student); as issue) {
+                  <i
+                    class="pi pi-exclamation-triangle text-orange-500"
+                    [tooltipZIndex]="'3000'"
+                    [pTooltip]="'scanexam.studentemail_' + issue | translate"
+                  ></i>
+                }
               </td>
               <td>
                 <p-inplace [closable]="true">

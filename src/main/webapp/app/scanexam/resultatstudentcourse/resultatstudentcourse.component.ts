@@ -1,3 +1,4 @@
+import { MessageModule } from 'primeng/message';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -36,6 +37,7 @@ import { ToastModule } from 'primeng/toast';
   providers: [MessageService, ConfirmationService],
   standalone: true,
   imports: [
+    MessageModule,
     ToastModule,
     BlockUIModule,
     ProgressSpinnerModule,

@@ -1,3 +1,4 @@
+import { StudentAccess } from 'app/entities/enumerations/student-access.model';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { lastValueFrom, Observable } from 'rxjs';
@@ -33,6 +34,11 @@ export class ExamService {
 
   update(exam: IExam): Observable<EntityResponseType> {
     return this.http.put<IExam>(`${this.resourceUrl}`, exam, { observe: 'response' });
+  }
+
+  /** Sets what the students see of the exam in the student portal (HIDDEN, SHEET or GRADED). */
+  updateStudentAccess(examId: number, access: StudentAccess): Observable<EntityResponseType> {
+    return this.http.put<IExam>(`${this.resourceUrl}/${examId}/student-access/${access}`, null, { observe: 'response' });
   }
 
   partialUpdate(exam: IExam): Observable<EntityResponseType> {
