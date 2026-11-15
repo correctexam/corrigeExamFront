@@ -1,0 +1,55 @@
+{
+  "studentportal": {
+    "title": "Minhas provas",
+    "backtosheets": "Minhas provas",
+    "logout": "Sair",
+    "sessionexpired": "Sua sessão expirou: peça um novo link.",
+    "sheetnotfound": "Esta prova não foi encontrada ou não está publicada.",
+    "sheetunavailable": "A prova não pode ser lida no momento. Tente novamente mais tarde.",
+    "sheetonly": "O professor publicou apenas a prova digitalizada: a correção e a nota ainda não estão visíveis.",
+    "answernotfound": "Esta resposta não está disponível. Volte à sua prova para obter um link atualizado.",
+    "request": {
+      "intro": "Informe o e-mail conhecido pelos seus professores: você receberá nele um link para todas as suas provas.",
+      "email": "E-mail",
+      "submit": "Receber o link",
+      "solving": "Verificação anti-robô em andamento…",
+      "sent": "Se {{ email }} estiver em uma lista de alunos, um link acaba de ser enviado. Ele é válido por pouco tempo e funciona uma única vez.",
+      "alreadyopen": "Uma sessão já está aberta.",
+      "gotosheets": "Ver minhas provas",
+      "invalidEmail": "Este e-mail não é válido.",
+      "invalidCaptcha": "A verificação anti-robô falhou. Tente novamente.",
+      "tooManyRequests": "Pedidos demais: tente novamente em alguns minutos.",
+      "disabled": "O portal do aluno não está ativado neste servidor.",
+      "error": "O pedido não pôde ser enviado. Tente novamente mais tarde.",
+      "privacy": "A mensagem só é enviada se o e-mail estiver em uma lista de alunos; a resposta exibida é a mesma em todos os casos."
+    },
+    "login": {
+      "invalid": "Este link expirou ou já foi utilizado.",
+      "askagain": "Pedir um novo link"
+    },
+    "sheets": {
+      "mydata": "Meus dados",
+      "error": "A lista das suas provas não pôde ser carregada.",
+      "course": "Disciplina",
+      "exam": "Avaliação",
+      "published": "Publicado",
+      "grade": "Nota",
+      "accessSheet": "Prova",
+      "accessGraded": "Prova corrigida",
+      "open": "Ver",
+      "none": "Nenhuma prova publicada para este e-mail."
+    },
+    "data": {
+      "title": "Meus dados",
+      "intro": "Dados associados ao seu e-mail no CorrectExam, inclusive de avaliações não publicadas.",
+      "download": "Baixar (JSON)",
+      "error": "Seus dados não puderam ser carregados.",
+      "ine": "Matrícula (INE)",
+      "login": "Login",
+      "courses": "Disciplinas",
+      "groups": "Grupos",
+      "sheets": "Provas digitalizadas associadas: {{ count }}",
+      "contact": "Para corrigir ou excluir estes dados, contate os professores das suas disciplinas."
+    }
+  }
+}
