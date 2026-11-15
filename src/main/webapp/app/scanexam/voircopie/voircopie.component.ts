@@ -292,6 +292,11 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     });
   }
 
+  /** QCM graded by a DSL (ADR 0002): note in points, stored × 100. */
+  isQcmDsl(): boolean {
+    return this.questions !== undefined && this.questions.length > 0 && gradingRuleOf(this.questions[0]) === 'qcmDsl';
+  }
+
   checked(comment: ITextComment | IGradedComment): boolean {
     return (comment as any).checked;
   }
@@ -300,6 +305,9 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     if ((comment as any).checked) {
       if (comment.description?.startsWith('correct')) {
         return { 'background-color': '#7EED92' };
+      } else if (comment.description?.startsWith('partiel')) {
+        // QCM graded by DSL: answer worth part of the points
+        return { 'background-color': '#FFD27F' };
       } else if (comment.description?.startsWith('incorrect')) {
         return { 'background-color': '#FF6961' };
       } else {

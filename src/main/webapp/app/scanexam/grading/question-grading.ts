@@ -1,4 +1,5 @@
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
+import { isQcmDslExpression } from './qcm-dsl';
 
 /**
  * Grading rules of a question, shared by the correction screen and the PDF export.
@@ -18,7 +19,9 @@ export type GradingRule =
   /** QCM with `step > 0`: `point * step` per correct answer, `-point` per incorrect answer. */
   | 'qcmWithPenalty'
   /** QCM with `step <= 0`: `point` per correct answer. */
-  | 'qcm';
+  | 'qcm'
+  /** QCM graded by DSL (ADR 0002): percentage stored on the options × `point` / 100, in points (stored × 100). */
+  | 'qcmDsl';
 
 export interface GradableQuestion {
   gradeType?: GradeType | string | null;
@@ -28,6 +31,8 @@ export interface GradableQuestion {
   defaultpoint?: number | null;
   canExceedTheMax?: boolean;
   canBeNegative?: boolean;
+  /** QCM: valid answers (`a&b|a&c`) or grading DSL (`a&b=100; c=-25`). */
+  validExpression?: string | null;
 }
 
 export interface GradedCommentLike {
@@ -56,8 +61,8 @@ export interface QuestionNoteInput {
 export interface QuestionNote {
   rule: GradingRule;
   /**
-   * Note of the question: in steps for the positive, negative and QCM rules,
-   * in points for the hybrid rule (stored × 100 in `StudentResponse.note`).
+   * Note of the question: in steps for the positive, negative and former QCM rules,
+   * in points for the hybrid and DSL QCM rules (stored × 100 in `StudentResponse.note`).
    */
   note: number;
 }
@@ -68,6 +73,9 @@ export interface QuestionNote {
  */
 export function gradingRuleOf(question: GradableQuestion): GradingRule | undefined {
   if (question.typeAlgoName === 'QCM') {
+    if (isQcmDslExpression(question.validExpression)) {
+      return 'qcmDsl';
+    }
     // Comparisons kept as in the original code: a null step counts as <= 0, an undefined step matches neither.
     if (question.step! > 0) {
       return 'qcmWithPenalty';
@@ -102,6 +110,8 @@ export function computeQuestionNote(question: GradableQuestion, input: QuestionN
     case 'qcmWithPenalty':
     case 'qcm':
       return { rule, note: qcmNote(question, input.gradedComments, rule === 'qcmWithPenalty') };
+    case 'qcmDsl':
+      return { rule, note: qcmDslNote(question, input.gradedComments) };
     default:
       return undefined;
   }
@@ -137,6 +147,30 @@ export function qcmNote(question: GradableQuestion, comments: GradedCommentLike[
     }
   });
   return note;
+}
+
+/** Lowest and highest percentage of the points a QCM answer graded by DSL can be worth (same as QcmDslGrading). */
+export const QCM_DSL_MIN_PERCENT = -100;
+export const QCM_DSL_MAX_PERCENT = 100;
+
+/**
+ * Note in points of a QCM graded by DSL: sum of the percentages stored on the options (`grade`), bounded to
+ * [-100, 100], times `point` / 100. Same computation as `QcmDslGrading` in the back-end, which does not parse the DSL.
+ */
+export function qcmDslNote(question: GradableQuestion, comments: GradedCommentLike[] | null | undefined): number {
+  let percent = 0;
+  comments?.forEach(c => {
+    if (c.grade !== undefined && c.grade !== null) {
+      percent = percent + c.grade;
+    }
+  });
+  percent = Math.min(QCM_DSL_MAX_PERCENT, Math.max(QCM_DSL_MIN_PERCENT, percent));
+  return (percent * question.point!) / 100;
+}
+
+/** Whether the note of the rule is stored × 100 in `StudentResponse.note` (hybrid and DSL notes, in points). */
+export function isStoredInHundredths(rule: GradingRule | undefined): boolean {
+  return rule === 'hybrid' || rule === 'qcmDsl';
 }
 
 export function hybridNote(

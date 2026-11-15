@@ -26,6 +26,8 @@ export interface Questionspdf {
   typeAlgoName?: string;
   typeID?: number;
   zonepdf?: Zonepdf;
+  /** QCM: valid answers or grading DSL (ADR 0002). */
+  validExpression?: string | null;
 }
 
 export interface Sheetspdf {

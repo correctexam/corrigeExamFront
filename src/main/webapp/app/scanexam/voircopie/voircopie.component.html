@@ -239,10 +239,11 @@
                         @if (currentQuestion && currentQuestion.gradeType === 'POSITIVE') {
                           <span> + </span>
                         }
-                        @if (questionStep > 0) {
+                        @if (isQcmDsl()) {
+                          <span>{{ comment.grade! }} %</span>
+                        } @else if (questionStep > 0) {
                           <span>{{ comment.grade! / questionStep }}</span>
-                        }
-                        @if (questionStep <= 0) {
+                        } @else {
                           <span>{{ comment.grade! }}</span>
                         }
                       </p>

@@ -1,6 +1,13 @@
 import { describe, expect, it } from '@jest/globals';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
-import { computeQuestionNote, gradingRuleOf, GradableQuestion, HybridCommentLike } from './question-grading';
+import {
+  computeQuestionNote,
+  gradingRuleOf,
+  GradableQuestion,
+  HybridCommentLike,
+  isStoredInHundredths,
+  qcmDslNote,
+} from './question-grading';
 
 describe('question-grading', () => {
   describe('gradingRuleOf', () => {
@@ -77,6 +84,33 @@ describe('question-grading', () => {
     it('with step <= 0: point per correct answer, no penalty', () => {
       const note = computeQuestionNote({ typeAlgoName: 'QCM', point: 3, step: 0 }, { gradedComments: answers });
       expect(note).toEqual({ rule: 'qcm', note: 6 });
+    });
+  });
+
+  describe('QCM graded by DSL (ADR 0002)', () => {
+    const question = { typeAlgoName: 'QCM', point: 2, step: 4, validExpression: 'a&b=100; c=-25; *=-33; min=-100' };
+
+    it('is chosen as soon as the valid expression contains =', () => {
+      expect(gradingRuleOf(question)).toBe('qcmDsl');
+      expect(gradingRuleOf({ ...question, validExpression: 'a&b|c' })).toBe('qcmWithPenalty');
+      expect(isStoredInHundredths('qcmDsl')).toBe(true);
+      expect(isStoredInHundredths('qcm')).toBe(false);
+    });
+
+    it('computes the note in points from the percentages of the options, like QcmDslGrading', () => {
+      expect(computeQuestionNote(question, { gradedComments: [{ grade: 100 }] })).toEqual({ rule: 'qcmDsl', note: 2 });
+      expect(computeQuestionNote(question, { gradedComments: [{ grade: 50 }] })?.note).toBe(1);
+      expect(computeQuestionNote(question, { gradedComments: [{ grade: -25 }] })?.note).toBe(-0.5);
+      expect(computeQuestionNote(question, { gradedComments: [{ grade: -33 }] })?.note).toBeCloseTo(-0.66);
+      expect(computeQuestionNote(question, { gradedComments: [] })?.note).toBe(0);
+      // step and description play no part
+      expect(computeQuestionNote(question, { gradedComments: [{ grade: 10, description: 'correct' }] })?.note).toBe(0.2);
+    });
+
+    it('bounds the sum of several options to [-100, 100] %', () => {
+      expect(computeQuestionNote(question, { gradedComments: [{ grade: 100 }, { grade: 50 }] })?.note).toBe(2);
+      expect(computeQuestionNote(question, { gradedComments: [{ grade: -80 }, { grade: -80 }] })?.note).toBe(-2);
+      expect(qcmDslNote(question, [{ grade: null }, { grade: 50 }])).toBe(1);
     });
   });
 
