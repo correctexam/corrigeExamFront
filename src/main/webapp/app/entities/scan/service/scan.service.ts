@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
-import { IScan, getScanIdentifier } from '../scan.model';
+import { IScan, IScanPageCount, getScanIdentifier } from '../scan.model';
 
 export type EntityResponseType = HttpResponse<IScan>;
 export type EntityArrayResponseType = HttpResponse<IScan[]>;
@@ -39,6 +39,14 @@ export class ScanService {
       // observe: 'events',
       responseType: 'blob',
     });
+  }
+
+  /**
+   * Number of pages of the scan PDF. Read from the database by the server (computed once for older scans):
+   * the PDF is not downloaded. Errors: 404 (no scan or no PDF), 422 (unreadable PDF), 503 (storage unavailable).
+   */
+  getPageCount(id: number): Observable<IScanPageCount> {
+    return this.http.get<IScanPageCount>(`${this.resourceUrl}/${id}/pagecount`);
   }
 
   updateWithProgress(scan: IScan): Observable<HttpEvent<IScan>> {

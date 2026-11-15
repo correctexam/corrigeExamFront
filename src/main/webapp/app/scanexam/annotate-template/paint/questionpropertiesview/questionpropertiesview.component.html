@@ -216,24 +216,62 @@
                   <label for="validexp" [translate]="'scanexam.validanswerexpression'" style="display: block; margin-bottom: 4px"
                     >Expression valide</label
                   >
-                  <input
+                  <textarea
                     class="form-control"
                     id="validexp"
-                    type="text"
                     name="validexp"
+                    rows="3"
+                    maxlength="1024"
                     formControlName="validExpression"
-                    pInputText
-                    [pKeyFilter]="validexpRegex()"
-                    [required]="editForm.get(['typeId'])!.value === qcmid"
-                    [pValidateOnly]="editForm.get(['typeId'])!.value === qcmid"
-                    placeholder="a&b|a&c"
-                    style="margin-right: 0.5em"
+                    data-cy="validExpression"
+                    placeholder="a&b|a&c   ou   a&b|a&c=100; a|b=50; c=-25; *=-33"
+                    style="margin-right: 0.5em; font-family: monospace"
                     [pTooltip]="'scanexam.expressiontooltip' | translate"
                     [tooltipPosition]="'left'"
                     (keyup)="contentChangeCheck()"
-                    (change)="contentChangeCheck()"
+                    (change)="contentChangeCheck(true)"
                     [tooltipZIndex]="'3000'"
-                  />
+                  ></textarea>
+                  <small class="text-muted" [translate]="'scanexam.qcmdslhelp'"></small>
+                  @for (error of qcmDslErrors(); track error.position) {
+                    <p-message
+                      severity="error"
+                      size="small"
+                      [text]="'scanexam.qcmdslerror_' + error.code | translate: { rule: error.rule }"
+                    ></p-message>
+                  }
+                  @if (qcmDslPreview().length > 0) {
+                    <ul class="list-unstyled small mt-1 mb-1" data-cy="qcmDslPreview">
+                      @for (line of qcmDslPreview(); track $index) {
+                        <li>
+                          @switch (line.kind) {
+                            @case ('answers') {
+                              <code>{{ line.label }}</code> → {{ line.percent }} %
+                            }
+                            @case ('box') {
+                              <code>{{ line.label }}</code> → {{ line.percent }} % <span [translate]="'scanexam.qcmdslpreviewbox'"></span>
+                            }
+                            @case ('void') {
+                              <span [translate]="'scanexam.qcmdslpreviewvoid'"></span> → {{ line.percent }} %
+                            }
+                            @case ('other') {
+                              <span [translate]="'scanexam.qcmdslpreviewother'"></span> → {{ line.percent }} %
+                            }
+                            @case ('bounds') {
+                              <span>{{ 'scanexam.qcmdslpreviewbounds' | translate: { min: line.percent, max: line.max } }}</span>
+                            }
+                          }
+                        </li>
+                      }
+                    </ul>
+                  }
+                  @if (qcmRegradeReport(); as report) {
+                    @if (report.options > 0) {
+                      <p-message severity="info" size="small" [text]="'scanexam.qcmregradereport' | translate: report"></p-message>
+                    }
+                  } @else if (qcmRegradeReport() === null) {
+                    <p-message severity="error" size="small" [text]="'scanexam.qcmregradeerror' | translate"></p-message>
+                  }
                   <p-message
                     severity="danger"
                     [text]="'scanexam.invalidexpression' | translate"
@@ -242,7 +280,7 @@
                 </div>
               }
 
-              @if (editForm.get(['typeId'])!.value === qcmid) {
+              @if (editForm.get(['typeId'])!.value === qcmid && !isQcmDslMode()) {
                 <div class="row g-0">
                   <label class="form-label" [translate]="'scanexam.invalidanswerpenalty'" for="field_reponsefausse"
                     >Pénalité si réponse fausse</label

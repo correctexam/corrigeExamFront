@@ -21,6 +21,8 @@ export interface IStudentResponse {
   correctedByMail?: string;
   lastModifiedDate?: Date;
   predictions?: IPrediction[] | null;
+  /** Corrected by hand: the QCM autocorrection keeps it. Omitted in an update, the server keeps its value. */
+  manuallyGraded?: boolean | null;
 }
 
 export class StudentResponse implements IStudentResponse {

@@ -4,8 +4,8 @@
 /* eslint-disable no-console */
 
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-import { HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse } from '@angular/common/http';
-import { Component, OnDestroy, OnInit, ViewChild, DestroyRef, inject } from '@angular/core';
+import { HttpErrorResponse, HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse, HttpStatusCode } from '@angular/common/http';
+import { Component, OnDestroy, OnInit, ViewChild, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Validators, UntypedFormBuilder, UntypedFormGroup, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -189,6 +189,12 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
   // completes the subscriptions to application-wide observables when the component is destroyed
   private readonly destroyRef = inject(DestroyRef);
 
+  /**
+   * Number of pages of the scan PDF stored on the server:
+   * undefined = no scan yet (or not loaded), null = could not be obtained, number = page count.
+   */
+  readonly scanPageCount = signal<number | null | undefined>(undefined);
+
   constructor(
     private translate: TranslateService,
     private messageService: MessageService,
@@ -237,6 +243,7 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
         this.examService.find(+this.examid).subscribe(c => {
           this.exam = c.body!;
           // this.exam.scanfileId;
+          this.loadScanPageCount();
           this.updateTitle();
           this.translateService.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
             this.updateTitle();
@@ -258,6 +265,32 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
     this.pageAlreadyScan = p;
     const templatePage = await this.db.countPageTemplate(+this.examid!);
     this.pageInTemplate = templatePage;
+  }
+
+  /** Reads the page count of the current scan from the server; the PDF itself is not downloaded. */
+  loadScanPageCount(): void {
+    const scanId = this.exam.scanfileId;
+    if (scanId === undefined || scanId === null) {
+      this.scanPageCount.set(undefined);
+      return;
+    }
+    this.scanService
+      .getPageCount(scanId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: res => this.scanPageCount.set(res.pageCount),
+        // 404: the scan has no PDF yet; other errors only hide the information, the page stays usable
+        error: (err: HttpErrorResponse) => this.scanPageCount.set(err.status === HttpStatusCode.NotFound ? undefined : null),
+      });
+  }
+
+  /** Number of copies in the scan, when its page count is a multiple of the number of pages of the template. */
+  scanCopyCount(): number | undefined {
+    const pages = this.scanPageCount();
+    if (pages === undefined || pages === null || this.pageInTemplate <= 0 || pages % this.pageInTemplate !== 0) {
+      return undefined;
+    }
+    return pages / this.pageInTemplate;
   }
 
   /* byteSize(base64String: string): string {
@@ -357,6 +390,8 @@ export class ChargerscanComponent implements OnInit, OnDestroy {
   }
 
   protected onSaveSuccess(): void {
+    // The upload (or the merge) changed the PDF: the server has recorded its new page count
+    this.loadScanPageCount();
     if (this.merge) {
       this.initCacheProcessing(false);
     } else {
