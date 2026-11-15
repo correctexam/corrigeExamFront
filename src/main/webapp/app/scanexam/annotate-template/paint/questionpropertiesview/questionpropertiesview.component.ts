@@ -1,8 +1,17 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 
 import { HttpResponse } from '@angular/common/http';
-import { Component, OnInit, EventEmitter, Output, Input, signal } from '@angular/core';
-import { UntypedFormBuilder, Validators, UntypedFormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit, EventEmitter, Output, Input, signal, inject } from '@angular/core';
+import { UntypedFormBuilder, Validators, UntypedFormGroup, FormsModule, ReactiveFormsModule, ValidatorFn } from '@angular/forms';
+import {
+  describeQcmDsl,
+  isQcmDslExpression,
+  isValidQcmExpression,
+  parseQcmDsl,
+  QcmDslError,
+  QcmDslPreviewLine,
+} from '../../../grading/qcm-dsl';
+import { QcmRegradeReport, QcmRegradeService } from '../../../services/qcm-regrade.service';
 import { IQuestionType } from 'app/entities/question-type/question-type.model';
 import { QuestionTypeService } from 'app/entities/question-type/service/question-type.service';
 import { QuestionService } from 'app/entities/question/service/question.service';
@@ -22,7 +31,6 @@ import { Button } from 'primeng/button';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MessageModule } from 'primeng/message';
-import { KeyFilterModule } from 'primeng/keyfilter';
 import { KnobModule } from 'primeng/knob';
 import { ListboxModule } from 'primeng/listbox';
 import { InputTextModule } from 'primeng/inputtext';
@@ -68,7 +76,6 @@ export type EntityResponseType = HttpResponse<IQuestion>;
     InputTextModule,
     ListboxModule,
     KnobModule,
-    KeyFilterModule,
     MessageModule,
     CheckboxModule,
     ToggleSwitchModule,
@@ -111,12 +118,27 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   public questiontypes: IQuestionType[] = [];
   public editForm!: UntypedFormGroup;
   public readonly gradeTypeValues = Object.keys(GradeType);
-  public readonly validexpRegex: () => RegExp = () => {
-    if (this.editForm.get(['typeId'])!.value === this.qcmid) {
-      return /^[a-z]{1}([&|][a-z])*$/;
+  /** QCM: a former expression (`a&b|a&c`) or a grading DSL without error (ADR 0002). */
+  private readonly qcmExpressionValidator: ValidatorFn = control => {
+    if (control.parent?.get('typeId')?.value !== this.qcmid) {
+      return null;
     }
-    return /[\s\S]*/;
+    const value = control.value as string | null;
+    if (value === null || value === '') {
+      return { required: true };
+    }
+    return isValidQcmExpression(value) ? null : { qcmExpression: true };
   };
+
+  private readonly qcmRegradeService = inject(QcmRegradeService);
+  /** Expression last applied to the corrected copies (options and notes). */
+  private lastAppliedExpression: string | null | undefined;
+  /** Result of the last application of the expression to the corrected copies; null when it failed. */
+  public readonly qcmRegradeReport = signal<QcmRegradeReport | null | undefined>(undefined);
+
+  /** Emitted when a new expression changed the options or the notes of the copies already corrected. */
+  @Output()
+  qcmRegraded: EventEmitter<QcmRegradeReport> = new EventEmitter<QcmRegradeReport>();
   public readonly pointmauvaiseReponeOptions = [
     { name: '- 0', value: -1 },
     { name: '- 1', value: 1 },
@@ -199,7 +221,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       numero: [null, [Validators.required]],
       point: [pref.point],
       step: [pref.step],
-      validExpression: [''],
+      validExpression: ['', [this.qcmExpressionValidator]],
       libelle: [''],
       gradeType: [pref.gradeType],
       zoneId: [],
@@ -339,6 +361,8 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
       });
     }
 
+    this.lastAppliedExpression = question.validExpression;
+    this.qcmRegradeReport.set(undefined);
     this.editForm.patchValue(
       {
         numero: question.numero,
@@ -423,9 +447,62 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
   /**
    * When interacting with widgets that change the content of the question (but the number)
    */
-  public contentChangeCheck(): void {
-    if (/^[a-z]{1}([&|][a-z])*$/.test(this.editForm.get(['validExpression'])!.value)) {
-      this.contentChange();
+  public contentChangeCheck(applyToCorrectedCopies = false): void {
+    if (!isValidQcmExpression(this.editForm.get(['validExpression'])!.value)) {
+      return;
+    }
+    this.save()
+      .then(updatedQuestions => {
+        this.onSaveSuccess(updatedQuestions);
+        if (applyToCorrectedCopies) {
+          this.applyExpressionToCorrectedCopies(updatedQuestions);
+        }
+      })
+      .catch(() => {
+        this.onSaveError();
+      });
+  }
+
+  /** The QCM expression is a grading DSL (ADR 0002): the penalty step does not apply. */
+  public isQcmDslMode(): boolean {
+    return this.editForm?.get(['typeId'])?.value === this.qcmid && isQcmDslExpression(this.editForm.get(['validExpression'])?.value);
+  }
+
+  public qcmDslErrors(): QcmDslError[] {
+    return this.isQcmDslMode() ? parseQcmDsl(this.editForm.get(['validExpression'])!.value).errors : [];
+  }
+
+  public qcmDslPreview(): QcmDslPreviewLine[] {
+    if (!this.isQcmDslMode()) {
+      return [];
+    }
+    const parsed = parseQcmDsl(this.editForm.get(['validExpression'])!.value);
+    return parsed.dsl !== undefined ? describeQcmDsl(parsed.dsl) : [];
+  }
+
+  /**
+   * When the expression of a QCM changed (on leaving the field), values its options again and the notes of the
+   * copies already corrected (QcmRegradeService). Nothing to do before the first autocorrection.
+   */
+  private async applyExpressionToCorrectedCopies(questions: IQuestion[]): Promise<void> {
+    const first = questions[0];
+    if (first === undefined || first.typeId !== this.qcmid || first.validExpression === this.lastAppliedExpression) {
+      return;
+    }
+    this.lastAppliedExpression = first.validExpression;
+    const total: QcmRegradeReport = { options: 0, responses: 0 };
+    try {
+      for (const q of questions) {
+        const report = await this.qcmRegradeService.regrade(q);
+        total.options += report.options;
+        total.responses += report.responses;
+      }
+      this.qcmRegradeReport.set(total);
+      if (total.options > 0) {
+        this.qcmRegraded.emit(total);
+      }
+    } catch {
+      this.qcmRegradeReport.set(null);
     }
   }
   public randomContentChange(): void {
@@ -544,7 +621,7 @@ export class QuestionpropertiesviewComponent implements OnInit, OnDestroy {
     this.contentChange();
 
     if (this.editForm.get(['typeId'])!.value === this.qcmid) {
-      this.editForm.controls['validExpression'].setValidators([Validators.required]);
+      this.editForm.controls['validExpression'].setValidators([this.qcmExpressionValidator]);
       this.editForm.controls['validExpression'].updateValueAndValidity();
     } else {
       this.editForm.controls['validExpression'].setValidators(null);
