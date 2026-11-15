@@ -53,6 +53,7 @@ import { StudentSheetSource, StudentSheetSourceFactory } from '../student-portal
 import { IStudentSheetView } from '../student-portal/student-portal.model';
 import { StudentSessionService } from '../student-portal/student-session.service';
 import { parseCachedPage, questionNumerosOf, responseOf } from '../student-portal/student-sheet-view.util';
+import { gradingRuleOf } from '../grading/question-grading';
 
 /**
  * Sheet of a student, question by question: through the UUID of a /copie link, or through the student portal
