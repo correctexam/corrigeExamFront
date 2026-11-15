@@ -286,8 +286,9 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
         case DrawingTools.INEBOX:
           if (this.exam.idzoneId === undefined) {
             promises.push(
-              firstValueFrom(this.zoneService.create(this.createZone(rectFixed, pdfScale))).then(z1 => {
+              firstValueFrom(this.zoneService.create(this.createZone(rectFixed, pdfScale))).then(async z1 => {
                 this.exam.idzoneId = z1.body!.id!;
+                await firstValueFrom(this.examService.setIdentityZone(this.exam.id!, 'INE', z1.body!.id!));
                 this.renderZone(z1.body as CustomZone);
                 this.eventHandler.createRedBox('scanexam.ineuc1', z1.body!, rectFixed.p);
               }),
@@ -298,8 +299,9 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
         case DrawingTools.PRENOMBOX:
           if (this.exam.firstnamezoneId === undefined) {
             promises.push(
-              firstValueFrom(this.zoneService.create(this.createZone(rectFixed, pdfScale))).then(z1 => {
+              firstValueFrom(this.zoneService.create(this.createZone(rectFixed, pdfScale))).then(async z1 => {
                 this.exam.firstnamezoneId = z1.body!.id!;
+                await firstValueFrom(this.examService.setIdentityZone(this.exam.id!, 'FIRSTNAME', z1.body!.id!));
                 this.renderZone(z1.body as CustomZone);
                 this.eventHandler.createRedBox('scanexam.prenomuc1', z1.body!, rectFixed.p);
               }),
@@ -310,8 +312,9 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
         case DrawingTools.NOMBOX:
           if (this.exam.namezoneId === undefined) {
             promises.push(
-              firstValueFrom(this.zoneService.create(this.createZone(rectFixed, pdfScale))).then(z1 => {
+              firstValueFrom(this.zoneService.create(this.createZone(rectFixed, pdfScale))).then(async z1 => {
                 this.exam.namezoneId = z1.body!.id!;
+                await firstValueFrom(this.examService.setIdentityZone(this.exam.id!, 'NAME', z1.body!.id!));
                 this.renderZone(z1.body as CustomZone);
                 this.eventHandler.createRedBox('scanexam.nomuc1', z1.body!, rectFixed.p);
               }),
@@ -329,10 +332,8 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Once all the queries done, updating the exam
-    Promise.all(promises).then(() => {
-      this.updateExam();
-    });
+    // Each identity zone is saved on its own (T24): no full update of the exam, which could erase another zone
+    Promise.all(promises).catch((e: unknown) => console.error('Identity zones of the template not all saved', e));
 
     const arrayquestions = Array.from(this.eventHandler.questions.values());
     for (const [key, value] of Object.entries(qs)) {
@@ -406,12 +407,6 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
       width: Math.trunc(Math.floor((rect.w * ppc * this.eventHandler.coefficient) / width) * scale),
       height: Math.trunc((Math.floor(rect.h * ppc * this.eventHandler.coefficient) / height) * scale),
     };
-  }
-
-  private updateExam(): void {
-    this.examService.update(this.exam).subscribe(e => {
-      this.exam = e.body!;
-    });
   }
 
   public async getCustomPdfProperties(): Promise<Array<Rect>> {

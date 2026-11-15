@@ -19,7 +19,7 @@ import { Injectable } from '@angular/core';
 import { CustomFabricGroup } from './models';
 import { IZone } from '../../../entities/zone/zone.model';
 import { ZoneService } from '../../../entities/zone/service/zone.service';
-import { ExamService } from '../../../entities/exam/service/exam.service';
+import { ExamService, IdentityZoneKind } from '../../../entities/exam/service/exam.service';
 import { IExam } from '../../../entities/exam/exam.model';
 import { IQuestion, Question } from '../../../entities/question/question.model';
 import { QuestionService } from '../../../entities/question/service/question.service';
@@ -372,9 +372,13 @@ export class EventHandlerService {
           });
         });
       } else {
-        this.examService.update(this._exam).subscribe(e => {
-          this._exam = e.body!;
-          this.selectedTool = DrawingTools.SELECT;
+        // One field only: a full update of the exam could erase a zone drawn just before (T24)
+        this.examService.setIdentityZone(this._exam.id!, identityZoneKind(type), z1.body!.id!).subscribe({
+          next: () => (this.selectedTool = DrawingTools.SELECT),
+          error: (e: unknown) => {
+            console.error('Identity zone not saved', type, e);
+            this.selectedTool = DrawingTools.SELECT;
+          },
         });
       }
     });
@@ -885,5 +889,17 @@ export class EventHandlerService {
     if (question.id !== undefined && this.selectedQuestionId === question.id) {
       this.notifySelectedQuestion(undefined);
     }
+  }
+}
+
+/** Kind of identity zone saved for a box of the template editor. */
+export function identityZoneKind(type: DrawingTools.NOMBOX | DrawingTools.PRENOMBOX | DrawingTools.INEBOX): IdentityZoneKind {
+  switch (type) {
+    case DrawingTools.NOMBOX:
+      return 'NAME';
+    case DrawingTools.PRENOMBOX:
+      return 'FIRSTNAME';
+    case DrawingTools.INEBOX:
+      return 'INE';
   }
 }

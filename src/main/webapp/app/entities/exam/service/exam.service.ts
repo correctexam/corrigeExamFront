@@ -11,6 +11,9 @@ import { IExam, getExamIdentifier } from '../exam.model';
 export type EntityResponseType = HttpResponse<IExam>;
 export type EntityArrayResponseType = HttpResponse<IExam[]>;
 
+/** Identity zones of an exam template (PUT /api/exams/{id}/identity-zone/{kind}/{zoneId}). */
+export type IdentityZoneKind = 'NAME' | 'FIRSTNAME' | 'INE';
+
 @Injectable({ providedIn: 'root' })
 export class ExamService {
   protected resourceUrl: string;
@@ -39,6 +42,14 @@ export class ExamService {
   /** Sets what the students see of the exam in the student portal (HIDDEN, SHEET or GRADED). */
   updateStudentAccess(examId: number, access: StudentAccess): Observable<EntityResponseType> {
     return this.http.put<IExam>(`${this.resourceUrl}/${examId}/student-access/${access}`, null, { observe: 'response' });
+  }
+
+  /**
+   * Sets one identity zone of the exam (last name, first name or student number), and nothing else: unlike
+   * update(), two zones drawn in a row cannot erase each other.
+   */
+  setIdentityZone(examId: number, kind: IdentityZoneKind, zoneId: number): Observable<EntityResponseType> {
+    return this.http.put<IExam>(`${this.resourceUrl}/${examId}/identity-zone/${kind}/${zoneId}`, null, { observe: 'response' });
   }
 
   partialUpdate(exam: IExam): Observable<EntityResponseType> {
