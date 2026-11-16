@@ -75,6 +75,15 @@ describe('Exam Service', () => {
       expect(expectedResult).toMatchObject(expected as any);
     });
 
+    it('should set one identity zone only', () => {
+      service.setIdentityZone(12, 'FIRSTNAME', 34).subscribe();
+
+      const req = httpMock.expectOne({ method: 'PUT' });
+      expect(req.request.url).toBe('api/exams/12/identity-zone/FIRSTNAME/34');
+      expect(req.request.body).toBeNull();
+      req.flush({ id: 12, firstnamezoneId: 34 });
+    });
+
     it('should partial update a Exam', () => {
       const patchObject = Object.assign(
         {
