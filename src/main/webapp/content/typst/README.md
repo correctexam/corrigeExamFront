@@ -12,7 +12,7 @@ Décision : `corrigeExamBack/docs/adr/0004-sujets-ecrits-en-typst.md`. Le dépô
 
 ## Essayer en ligne de commande
 
-Le paquet se compile avec Typst 0.15. Les paquets `@preview` doivent être présents localement (la plateforme les embarquera, voir l'ADR) :
+Le paquet se compile avec Typst 0.14 ou plus récent. Les paquets `@preview` doivent être présents localement (la plateforme les embarquera, voir l'ADR) :
 
 ```bash
 mkdir -p ~/.local/share/typst/packages/local/correctexam

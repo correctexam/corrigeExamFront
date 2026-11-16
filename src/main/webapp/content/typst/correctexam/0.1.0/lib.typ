@@ -196,8 +196,9 @@
 }
 
 /// A question corrected by hand. Put one or more `answer` zones in its body. The question is kept on one
-/// page with its zones unless `breakable: true` (long statements).
-#let question(key, points: 1, grade: "positive", breakable: false, body) = block(width: 100%, breakable: breakable, above: 1.4em, {
+/// page with its zones unless `breakable: true` (long statements). `grade`: "direct", "positive", "negative"
+/// or "hybrid" (CorrectExam grading modes); `none` keeps the default of the teacher's preferences.
+#let question(key, points: 1, grade: none, breakable: false, body) = block(width: 100%, breakable: breakable, above: 1.4em, {
   _question-head(key, points, "manual", extra: (grade: grade))
   linebreak()
   body

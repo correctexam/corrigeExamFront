@@ -57,6 +57,11 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/main/webapp/content",
+              {
+                "glob": "typst_ts_web_compiler_bg.wasm",
+                "input": "node_modules/@myriaddreamin/typst-ts-web-compiler/pkg",
+                "output": "content/typst/wasm"
+              },
               "src/main/webapp/favicon.ico",
               "src/main/webapp/manifest.webapp",
               "src/main/webapp/robots.txt",
