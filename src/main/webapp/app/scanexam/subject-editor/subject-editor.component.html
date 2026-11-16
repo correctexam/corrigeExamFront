@@ -1,0 +1,145 @@
+<p-toast></p-toast>
+<div class="subject-editor">
+  <header class="subject-header">
+    <h2 [translate]="'typstsubject.heading'" [translateParams]="{ courseName: courseName() }">Écrire le sujet</h2>
+    <div class="subject-actions">
+      <label for="exam-name" [translate]="'typstsubject.examName'">Nom de l'examen</label>
+      <input
+        id="exam-name"
+        class="form-control"
+        type="text"
+        [ngModel]="examName()"
+        (ngModelChange)="examName.set($event)"
+        data-cy="typst-exam-name"
+      />
+      <button type="button" class="p-button p-button-primary" [disabled]="!canCreate()" (click)="createExam()" data-cy="typst-create-exam">
+        <span [translate]="creating() ? 'typstsubject.creating' : 'typstsubject.create'">Créer l'examen</span>
+      </button>
+      <button type="button" class="p-button p-button-secondary" (click)="backToCourse()">
+        <span [translate]="'scanexam.gobackue'">Retourner au module</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="subject-toolbar">
+    @for (s of snippets; track s.key) {
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="insertSnippet(s.code)">
+        {{ 'typstsubject.snippet.' + s.key | translate }}
+      </button>
+    }
+    <span class="toolbar-spacer"></span>
+    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="download()">
+      <span [translate]="'typstsubject.download'">Télécharger le .typ</span>
+    </button>
+    <label class="btn btn-sm btn-outline-secondary mb-0">
+      <span [translate]="'typstsubject.open'">Ouvrir un .typ</span>
+      <input type="file" accept=".typ,text/plain" hidden (change)="open($event)" />
+    </label>
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="resetToStarter()">
+      <span [translate]="'typstsubject.reset'">Repartir du modèle</span>
+    </button>
+  </div>
+
+  <div class="subject-body">
+    <section class="subject-source">
+      <div #editor class="subject-codemirror" data-cy="typst-editor"></div>
+
+      <div class="subject-status">
+        @switch (compiler.state()) {
+          @case ('loading') {
+            <span [translate]="'typstsubject.loadingCompiler'">Chargement du compilateur…</span>
+          }
+          @case ('failed') {
+            <span class="text-danger" [translate]="'typstsubject.compilerFailed'">Le compilateur ne répond pas.</span>
+          }
+          @default {
+            @if (compiling()) {
+              <span [translate]="'typstsubject.compiling'">Compilation…</span>
+            } @else if (result(); as r) {
+              <span [translate]="'typstsubject.compiled'" [translateParams]="{ ms: r.durationMs }">Compilé</span>
+            }
+          }
+        }
+        @if (failure(); as f) {
+          <span class="text-danger"> — {{ f }}</span>
+        }
+      </div>
+
+      @if (diagnostics().length > 0) {
+        <ul class="subject-diagnostics" data-cy="typst-diagnostics">
+          @for (d of diagnostics(); track $index) {
+            <li [class.text-danger]="d.severity === 'error'" [class.text-warning]="d.severity === 'warning'">
+              <button type="button" class="btn btn-link btn-sm p-0" [disabled]="!isMainFile(d) || d.line === undefined" (click)="goTo(d)">
+                @if (d.line !== undefined) {
+                  {{ isMainFile(d) ? '' : d.path + ' ' }}{{ d.line }}:{{ d.column }}
+                } @else {
+                  {{ d.path }}
+                }
+              </button>
+              {{ d.message }}
+              @for (h of d.hints; track $index) {
+                <div class="hint">{{ h }}</div>
+              }
+            </li>
+          }
+        </ul>
+      }
+
+      <div class="subject-summary" data-cy="typst-summary">
+        <h3 [translate]="'typstsubject.summary'">Ce qui sera créé</h3>
+        @if (layoutError(); as e) {
+          <p class="text-danger">{{ e }}</p>
+        }
+        @if (layout(); as l) {
+          <p>
+            <span [translate]="'typstsubject.identity'">Zones d'identité</span> : {{ l.identity.lastname ? '✓' : '✗' }}
+            <span [translate]="'typstsubject.role.lastname'">nom</span>, {{ l.identity.firstname ? '✓' : '✗' }}
+            <span [translate]="'typstsubject.role.firstname'">prénom</span>, {{ l.identity.stdid ? '✓' : '✗' }}
+            <span [translate]="'typstsubject.role.stdid'">n° étudiant</span>
+          </p>
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>N°</th>
+                <th [translate]="'typstsubject.key'">Identifiant</th>
+                <th [translate]="'typstsubject.kind'">Type</th>
+                <th [translate]="'typstsubject.points'">Points</th>
+                <th [translate]="'typstsubject.zones'">Zones (page)</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (q of l.questions; track q.key) {
+                <tr>
+                  <td>{{ q.number }}</td>
+                  <td>
+                    <code>{{ q.key }}</code>
+                  </td>
+                  <td>{{ 'typstsubject.kinds.' + q.kind | translate }}</td>
+                  <td>{{ q.points }}</td>
+                  <td>
+                    @for (p of q.parts; track p.part) {
+                      <span>p. {{ p.zone.pageNumber }} </span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+        @for (i of issues(); track $index) {
+          <p [class.text-danger]="i.level === 'error'" [class.text-warning]="i.level === 'warning'">
+            {{ 'typstsubject.issue.' + i.key | translate: i.params ?? {} }}
+          </p>
+        }
+      </div>
+    </section>
+
+    <section class="subject-preview">
+      @if (pdfUrl(); as url) {
+        <iframe [src]="url" title="PDF" data-cy="typst-preview"></iframe>
+      } @else {
+        <p class="text-muted" [translate]="'typstsubject.noPreview'">L'aperçu apparaît après la première compilation.</p>
+      }
+    </section>
+  </div>
+</div>

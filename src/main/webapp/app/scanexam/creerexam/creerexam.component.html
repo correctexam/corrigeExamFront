@@ -30,6 +30,15 @@
         </button>
         <button
           [disabled]="!this.courseid"
+          type="button"
+          data-cy="writeTypstSubjectButton"
+          class="p-button p-button-primary"
+          (click)="gotoTypstEditor()"
+        >
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'typstsubject.writeSubject'">Écrire le sujet (Typst)</span>
+        </button>
+        <button
+          [disabled]="!this.courseid"
           type="submit"
           id="save-entity"
           data-cy="entityCreateSaveButton"

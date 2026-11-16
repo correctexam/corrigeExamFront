@@ -1,0 +1,53 @@
+{
+  "typstsubject": {
+    "pageTitle": "Écrire le sujet — {{courseName}}",
+    "heading": "Écrire le sujet d'un examen du cours {{courseName}}",
+    "examName": "Nom de l'examen",
+    "create": "Créer l'examen",
+    "creating": "Création…",
+    "download": "Télécharger le .typ",
+    "open": "Ouvrir un .typ",
+    "reset": "Repartir du modèle",
+    "loadingCompiler": "Chargement du compilateur Typst (première fois : quelques dizaines de Mo)…",
+    "compilerFailed": "Le compilateur Typst ne répond pas.",
+    "compiling": "Compilation…",
+    "compiled": "Compilé en {{ms}} ms",
+    "noPreview": "L'aperçu du PDF à imprimer apparaît après la première compilation.",
+    "summary": "Ce qui sera créé",
+    "identity": "Zones d'identité",
+    "key": "Identifiant",
+    "kind": "Type",
+    "points": "Points",
+    "zones": "Zones (page)",
+    "role": {
+      "lastname": "nom",
+      "firstname": "prénom",
+      "stdid": "n° étudiant"
+    },
+    "kinds": {
+      "manual": "libre",
+      "qcm": "QCM",
+      "numeric": "numérique",
+      "short": "réponse courte"
+    },
+    "snippet": {
+      "question": "+ Question",
+      "qcm": "+ QCM",
+      "numeric": "+ Numérique",
+      "short": "+ Réponse courte",
+      "code": "+ Code",
+      "math": "+ Formule",
+      "section": "+ Partie"
+    },
+    "issue": {
+      "noQuestion": "Le sujet ne contient aucune question.",
+      "noIdentityZone": "Zone d'identité absente ({{role}}) : l'association des copies aux étudiants sera manuelle.",
+      "badPoints": "Question {{question}} : {{points}} point(s). Les points doivent être positifs, par quarts de point.",
+      "qcmWithoutAnswer": "QCM {{question}} : aucune réponse juste ni barème.",
+      "gradedByHand": "Question {{question}} ({{kind}}) : corrigée à la main pour l'instant."
+    },
+    "openFailed": "Impossible d'ouvrir le fichier",
+    "createFailed": "L'examen n'a pas pu être créé",
+    "writeSubject": "Écrire le sujet (Typst)"
+  }
+}

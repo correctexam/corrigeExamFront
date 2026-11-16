@@ -1,0 +1,53 @@
+{
+  "typstsubject": {
+    "pageTitle": "Escrever o enunciado — {{courseName}}",
+    "heading": "Escrever o enunciado de uma avaliação da disciplina {{courseName}}",
+    "examName": "Nome da avaliação",
+    "create": "Criar a avaliação",
+    "creating": "A criar…",
+    "download": "Descarregar o .typ",
+    "open": "Abrir um .typ",
+    "reset": "Recomeçar a partir do modelo",
+    "loadingCompiler": "A carregar o compilador Typst (primeira vez: algumas dezenas de MB)…",
+    "compilerFailed": "O compilador Typst não responde.",
+    "compiling": "A compilar…",
+    "compiled": "Compilado em {{ms}} ms",
+    "noPreview": "A pré-visualização do PDF a imprimir aparece após a primeira compilação.",
+    "summary": "O que será criado",
+    "identity": "Zonas de identificação",
+    "key": "Identificador",
+    "kind": "Tipo",
+    "points": "Pontos",
+    "zones": "Zonas (página)",
+    "role": {
+      "lastname": "apelido",
+      "firstname": "nome",
+      "stdid": "n.º de estudante"
+    },
+    "kinds": {
+      "manual": "livre",
+      "qcm": "escolha múltipla",
+      "numeric": "numérica",
+      "short": "resposta curta"
+    },
+    "snippet": {
+      "question": "+ Pergunta",
+      "qcm": "+ Escolha múltipla",
+      "numeric": "+ Numérica",
+      "short": "+ Resposta curta",
+      "code": "+ Código",
+      "math": "+ Fórmula",
+      "section": "+ Parte"
+    },
+    "issue": {
+      "noQuestion": "O enunciado não tem nenhuma pergunta.",
+      "noIdentityZone": "Falta uma zona de identificação ({{role}}): a associação das provas aos estudantes será manual.",
+      "badPoints": "Pergunta {{question}}: {{points}} ponto(s). Os pontos devem ser positivos, em quartos de ponto.",
+      "qcmWithoutAnswer": "Escolha múltipla {{question}}: nenhuma resposta certa nem grelha.",
+      "gradedByHand": "Pergunta {{question}} ({{kind}}): corrigida à mão por agora."
+    },
+    "openFailed": "Não foi possível abrir o ficheiro",
+    "createFailed": "Não foi possível criar a avaliação",
+    "writeSubject": "Escrever o enunciado (Typst)"
+  }
+}
