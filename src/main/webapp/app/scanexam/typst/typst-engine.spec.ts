@@ -8,6 +8,7 @@ import { TypstCompileResponse } from './typst-worker.protocol';
 import { buildLayout, parseZoneMetadata } from './typst-zones';
 import { checkLayout } from './exam-from-subject';
 import { SUBJECT_STARTER } from '../subject-editor/subject-starter';
+import { DIAGRAM_INPUT, diagramKey, parseDiagramRequests } from './subject-diagrams';
 
 // Real compiler and real vendored assets: the same files as the ones served to the browser.
 const root = join(__dirname, '../../../../../..');
@@ -103,6 +104,56 @@ describe('TypstEngine (real compiler)', () => {
     expect(withPart.ok).toBe(true);
     const without = await compile('#include "part.typ"');
     expect(without.ok).toBe(false);
+  });
+
+  it('asks for the text diagrams and draws them once the platform gives their SVG', async () => {
+    const source = [
+      '#import "@local/correctexam:0.1.0": *',
+      '#show: exam',
+      '#diagram("plantuml", ```',
+      '@startuml',
+      'A -> B',
+      '@enduml',
+      '```, width: 4cm)',
+      '#diagram("plantuml", "@startuml\nA -> B\n@enduml\n")',
+      '#diagram("d2", "a -> b")',
+    ].join('\n');
+    const pending = await compile(source, true);
+    expect(pending.diagnostics.filter(d => d.severity === 'error')).toEqual([]);
+    const requests = parseDiagramRequests(pending.diagrams);
+    expect(requests).toEqual([
+      { kind: 'plantuml', source: '@startuml\nA -> B\n@enduml' },
+      { kind: 'plantuml', source: '@startuml\nA -> B\n@enduml\n' },
+      { kind: 'd2', source: 'a -> b' },
+    ]);
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="20"><rect width="40" height="20"/></svg>';
+    const svgs = Object.fromEntries(requests.map(r => [diagramKey(r), svg]));
+    const drawn = await compile(source, true, { [DIAGRAM_INPUT]: JSON.stringify(svgs) });
+    expect(drawn.diagnostics.filter(d => d.severity === 'error')).toEqual([]);
+    expect(drawn.pdf!.length).not.toBe(pending.pdf!.length);
+  });
+
+  it('refuses a diagram kind that the platform does not render', async () => {
+    const res = await compile('#import "@local/correctexam:0.1.0": *\n#diagram("ditaa", "x")');
+    expect(res.ok).toBe(false);
+    expect(res.diagnostics[0].message).toContain('ditaa');
+  });
+
+  it('maps the images of the subject and forgets the removed ones', async () => {
+    const svg = new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"/>');
+    const req = (binaries: { path: string; key: string; data: Uint8Array }[]): Promise<TypstCompileResponse> =>
+      engine.compile({
+        kind: 'compile',
+        id: ++id,
+        files: [{ path: '/main.typ', content: '#image("img/logo.svg", width: 1cm)' }],
+        binaries,
+        main: '/main.typ',
+        inputs: {},
+        withPdf: false,
+      });
+    expect((await req([{ path: '/img/logo.svg', key: 'a', data: svg }])).ok).toBe(true);
+    expect((await req([{ path: '/img/logo.svg', key: 'a', data: svg }])).ok).toBe(true);
+    expect((await req([])).ok).toBe(false);
   });
 
   it('loads the assets again after a failed start', async () => {

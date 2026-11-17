@@ -52,6 +52,44 @@
     "identityStyle": {
       "cells": "names in cells",
       "free": "names in a free frame"
+    },
+    "storage": {
+      "pageTitle": "Subject — {{examName}}",
+      "heading": "Subject of the exam {{examName}}",
+      "backToExam": "Back to the exam",
+      "loading": "Loading the subject…",
+      "saving": "Saving…",
+      "dirty": "Unsaved changes",
+      "saved": "Saved (revision {{revision}})",
+      "saveFailed": "Cannot save",
+      "retry": "Retry",
+      "lockedBy": "{{login}} is editing this subject (lock until {{until}}): read only. Taking over interrupts their editing; their unsaved changes will be lost.",
+      "takeOver": "Take over",
+      "lockFailed": "Cannot take over",
+      "conflict": "The subject was saved elsewhere (another tab or teacher). Download your changes if needed, then reload.",
+      "reload": "Reload",
+      "noSubject": "This exam has no stored Typst subject.",
+      "storeDraft": "Store the subject kept by this browser",
+      "unavailable": "Subject storage is not available on this server: the subject is only kept in this browser.",
+      "loadFailed": "The subject could not be loaded",
+      "templateUnchanged": "Changing the subject changes neither the template nor the zones of the exam already created.",
+      "open": "Typst subject"
+    },
+    "files": {
+      "add": "New file",
+      "upload": "Add files",
+      "insert": "Insert in main.typ",
+      "remove": "Delete the file",
+      "badPath": "File name refused (letters, digits, . _ -, known extension, at most 5 folders)"
+    },
+    "diagrams": {
+      "pending": "Rendering {{count}} diagram(s)…",
+      "failed": "{{kind}} diagram not rendered",
+      "retry": "Retry the diagrams"
+    },
+    "reuse": {
+      "label": "Start from the subject of another exam",
+      "load": "Copy into the draft"
     }
   }
 }

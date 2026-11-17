@@ -17,6 +17,9 @@
 
 #let _plan = if "ce-plan" in sys.inputs { json(bytes(sys.inputs.at("ce-plan"))) } else { (:) }
 
+// Diagrams rendered by the platform (Kroki, T25c): JSON object "kind\nsource" -> SVG text.
+#let _diagrams = if "ce-diagrams" in sys.inputs { json(bytes(sys.inputs.at("ce-diagrams"))) } else { (:) }
+
 /// Version of the zone metadata. Bump it when the shape of a <ce-zone> value changes.
 #let ZONE_FORMAT = 1
 
@@ -412,6 +415,35 @@
 /// Content shown only in the solution document (`ce-plan.solution = true`).
 #let solution(body) = if _plan.at("solution", default: false) {
   block(width: 100%, inset: 2mm, fill: luma(235), stroke: (left: 2pt + luma(120)), body)
+}
+
+// ---------------------------------------------------------------------------------------------------
+// Diagrams written as text and rendered by the platform (T25c)
+
+/// Kinds rendered by the platform (Kroki). Native packages (fletcher, cetz, chronos, diagraph) need nothing.
+#let DIAGRAM_KINDS = ("plantuml", "c4plantuml", "mermaid", "d2", "nomnoml")
+
+/// A diagram written in a text syntax that Typst cannot draw itself (PlantUML, Mermaid, D2, nomnoml).
+/// The platform reads the `<ce-diagram>` requests, has them rendered once (SVG cached by content) and passes
+/// the SVGs back as the input `ce-diagrams`; until then a dashed frame stands in for the diagram.
+/// `source` is a string or a raw block (```` ```plantuml … ``` ````).
+#let diagram(kind, source, width: auto, height: auto, alt: none) = {
+  assert(kind in DIAGRAM_KINDS, message: "diagram: unknown kind " + repr(kind) + " (expected " + DIAGRAM_KINDS.join(", ") + ")")
+  let src = if type(source) == content and source.func() == raw { source.text } else { source }
+  assert(type(src) == str, message: "diagram: the source must be a string or a raw block")
+  [#metadata((format: ZONE_FORMAT, kind: kind, source: src)) <ce-diagram>]
+  let svg = _diagrams.at(kind + "\n" + src, default: none)
+  if svg == none {
+    block(
+      width: if width == auto { 100% } else { width },
+      height: if height == auto { 3cm } else { height },
+      stroke: (paint: luma(150), dash: "dashed"),
+      inset: 6pt,
+      align(center + horizon, text(size: 9pt, fill: luma(100))[#kind …]),
+    )
+  } else {
+    image(bytes(svg), format: "svg", width: width, height: height, alt: alt)
+  }
 }
 
 // ---------------------------------------------------------------------------------------------------
