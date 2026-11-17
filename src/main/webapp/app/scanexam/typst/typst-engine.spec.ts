@@ -6,6 +6,8 @@ import { join } from 'path';
 import { TypstEngine } from './typst-engine';
 import { TypstCompileResponse } from './typst-worker.protocol';
 import { buildLayout, parseZoneMetadata } from './typst-zones';
+import { checkLayout } from './exam-from-subject';
+import { SUBJECT_STARTER } from '../subject-editor/subject-starter';
 
 // Real compiler and real vendored assets: the same files as the ones served to the browser.
 const root = join(__dirname, '../../../../../..');
@@ -34,6 +36,14 @@ describe('TypstEngine (real compiler)', () => {
     expect(String.fromCharCode(...res.pdf!.slice(0, 5))).toBe('%PDF-');
     expect(parseZoneMetadata(res.zones)).toEqual(parseZoneMetadata(fixtureZones()));
     expect(buildLayout(parseZoneMetadata(res.zones)).questions.length).toBe(7);
+  });
+
+  it('compiles the subject proposed to a new teacher, code and diagram included', async () => {
+    const res = await compile(SUBJECT_STARTER);
+    expect(res.diagnostics.filter(d => d.severity === 'error')).toEqual([]);
+    const layout = buildLayout(parseZoneMetadata(res.zones));
+    expect(layout.questions.map(q => `${q.key}:${q.kind}`)).toEqual(['q1:manual', 'q2:qcm', 'q3:short', 'q4:manual', 'q5:manual']);
+    expect(checkLayout(layout).filter(i => i.level === 'error')).toEqual([]);
   });
 
   it('applies the plan given in the inputs', async () => {
