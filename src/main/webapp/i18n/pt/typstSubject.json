@@ -90,6 +90,22 @@
     "reuse": {
       "label": "Partir do enunciado de outro exame",
       "load": "Copiar para o rascunho"
+    },
+    "print": {
+      "open": "Imprimir as cópias",
+      "title": "Imprimir as cópias — {{examName}}",
+      "intro": "Cada cópia repete o modelo do exame ({{pages}} páginas); cada página tem um código que permite encontrá-la na digitalização.",
+      "odd": "O modelo tem um número ímpar de páginas: imprima só na frente, senão duas cópias partilharão uma folha.",
+      "loading": "A carregar o modelo…",
+      "copies": "Número de cópias",
+      "generate": "Gerar o PDF",
+      "badCopies": "Entre 1 e 2000 cópias.",
+      "progress": "A montar: {{done}} / {{total}} cópias",
+      "failed": "Não foi possível imprimir",
+      "advice": "Imprima em tamanho real (sem ajustar à página). Uma tiragem já criada descarrega-se de novo com os mesmos códigos: não crie uma nova tiragem para reimprimir algumas cópias.",
+      "previous": "Tiragens",
+      "size": "{{copies}} cópias × {{pages}} páginas",
+      "again": "Descarregar de novo"
     }
   }
 }

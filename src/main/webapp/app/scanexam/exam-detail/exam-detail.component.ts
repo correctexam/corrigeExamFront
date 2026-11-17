@@ -28,6 +28,7 @@ import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { firstValueFrom } from 'rxjs';
 import { PreferenceService } from '../preference-page/preference.service';
 import { SubjectService } from '../typst/subject.service';
+import { PrintCopiesComponent } from '../print-copies/print-copies.component';
 import { IExamSheet } from 'app/entities/exam-sheet/exam-sheet.model';
 import { Title } from '@angular/platform-browser';
 import { FaStackComponent, FaIconComponent, FaStackItemSizeDirective } from '@fortawesome/angular-fontawesome';
@@ -58,6 +59,7 @@ import {
   providers: [ConfirmationService, MessageService],
   standalone: true,
   imports: [
+    PrintCopiesComponent,
     ToastModule,
     DialogModule,
     FormsModule,
@@ -116,6 +118,8 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
    */
   /** The exam has a subject written in Typst (T25c): link to its editor. */
   readonly hasSubject = signal(false);
+  /** Print dialog of an exam written in Typst (T25d). */
+  showPrint = false;
   serverAlignActive = signal(false);
   serverAlignProgress = signal(0);
   /** Nombre de pages du job, 0 si inconnu. */

@@ -134,3 +134,32 @@ export function toBase64(bytes: Uint8Array): string {
   }
   return btoa(binary);
 }
+
+/**
+ * Inputs of the compilation that makes the template of a new exam (T25d): the code area is left empty (`stamp`, the
+ * code is stamped on each printed copy) and blank pages are added (`pad`) so that a copy has an even number of
+ * pages and can be printed recto-verso.
+ */
+export function templatePlan(pad: number): string {
+  return JSON.stringify({ stamp: true, pad });
+}
+
+/** Pages of the copy written by the subject (`copy-end` marker of the package), undefined when absent. */
+export function parseCopyPages(raw: unknown): number | undefined {
+  if (!Array.isArray(raw)) {
+    return undefined;
+  }
+  const end = (raw as unknown[]).find(
+    (m): m is { kind: 'copy-end'; pages: number } =>
+      typeof m === 'object' &&
+      m !== null &&
+      (m as { kind?: unknown }).kind === 'copy-end' &&
+      typeof (m as { pages?: unknown }).pages === 'number',
+  );
+  return end?.pages;
+}
+
+/** Blank pages to add for an even number of pages. */
+export function padForRectoVerso(pages: number): number {
+  return pages % 2;
+}

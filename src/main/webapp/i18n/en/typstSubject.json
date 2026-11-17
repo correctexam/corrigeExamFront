@@ -90,6 +90,22 @@
     "reuse": {
       "label": "Start from the subject of another exam",
       "load": "Copy into the draft"
+    },
+    "print": {
+      "open": "Print the copies",
+      "title": "Print the copies — {{examName}}",
+      "intro": "Each copy repeats the template of the exam ({{pages}} pages); each page carries a code that finds it again at scan time.",
+      "odd": "The template has an odd number of pages: print single-sided, otherwise two copies will share a sheet.",
+      "loading": "Loading the template…",
+      "copies": "Number of copies",
+      "generate": "Generate the PDF",
+      "badCopies": "Between 1 and 2000 copies.",
+      "progress": "Assembling: {{done}} / {{total}} copies",
+      "failed": "Cannot print",
+      "advice": "Print at actual size (no fit to page). A print run already created downloads again with the same codes: do not create a new print run to reprint a few copies.",
+      "previous": "Print runs",
+      "size": "{{copies}} copies × {{pages}} pages",
+      "again": "Download again"
     }
   }
 }

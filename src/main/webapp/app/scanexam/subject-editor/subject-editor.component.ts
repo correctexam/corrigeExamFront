@@ -20,7 +20,7 @@ import { PreferenceService } from '../preference-page/preference.service';
 import { TypstCompilerService } from '../typst/typst-compiler.service';
 import { TypstBinaryFile, TypstCompileResponse, TypstDiagnostic } from '../typst/typst-worker.protocol';
 import { buildLayout, GeneratedLayout, parseZoneMetadata, TypstZoneError } from '../typst/typst-zones';
-import { checkLayout, LayoutIssue, planExam } from '../typst/exam-from-subject';
+import { checkLayout, LayoutIssue, padForRectoVerso, parseCopyPages, planExam, templatePlan } from '../typst/exam-from-subject';
 import { ExamFromSubjectService } from '../typst/exam-from-subject.service';
 import { DIAGRAM_INPUT, DiagramError, DiagramRequest, DiagramStore, parseDiagramRequests } from '../typst/subject-diagrams';
 import {
@@ -503,12 +503,20 @@ export class SubjectEditorComponent implements OnInit, AfterViewInit, OnDestroy 
     }
     this.creating.set(true);
     try {
-      // compile again: the exam must match exactly the subject currently written
-      const res = await this.compiler.compile(this.compilerFiles(), {
-        withPdf: true,
-        binaries: this.compilerBinaries(),
-        inputs: { [DIAGRAM_INPUT]: this.diagrams.input() },
-      });
+      // compile again: the exam must match exactly the subject currently written. The template keeps the code area
+      // empty (codes stamped on each printed copy, T25d) and gets an even number of pages (recto-verso).
+      const compileTemplate = (pad: number): Promise<TypstCompileResponse> =>
+        this.compiler.compile(this.compilerFiles(), {
+          withPdf: true,
+          binaries: this.compilerBinaries(),
+          inputs: { [DIAGRAM_INPUT]: this.diagrams.input(), 'ce-plan': templatePlan(pad) },
+        });
+      let res = await compileTemplate(0);
+      const pad = res.ok ? padForRectoVerso(parseCopyPages(res.copies) ?? 0) : 0;
+      if (pad > 0) {
+        // blank pages at the end: the zones of the first compilation stay the same
+        res = await compileTemplate(pad);
+      }
       if (!res.ok || !res.pdf) {
         this.applyResult(res, ++this.sequence);
         return;

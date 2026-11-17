@@ -13,7 +13,15 @@ import { QuestionTypeService } from 'app/entities/question-type/service/question
 import { TemplateService } from 'app/entities/template/service/template.service';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
 import { IQuestion } from 'app/entities/question/question.model';
-import { checkLayout, planExam, resolveQuestionTypeIds, toBase64 } from './exam-from-subject';
+import {
+  checkLayout,
+  padForRectoVerso,
+  parseCopyPages,
+  planExam,
+  resolveQuestionTypeIds,
+  templatePlan,
+  toBase64,
+} from './exam-from-subject';
 import { ExamFromSubjectService } from './exam-from-subject.service';
 import { buildLayout, parseZoneMetadata } from './typst-zones';
 
@@ -91,6 +99,20 @@ describe('exam-from-subject', () => {
       ]),
     ).toEqual({ manual: 7, QCM: 11 });
     expect(() => resolveQuestionTypeIds([{ id: 7, algoName: 'manual' }])).toThrow('QCM');
+  });
+
+  it('makes templates without code and with an even number of pages', () => {
+    expect(JSON.parse(templatePlan(1))).toEqual({ stamp: true, pad: 1 });
+    expect(
+      parseCopyPages([
+        { kind: 'copy-start', copy: null },
+        { kind: 'copy-end', copy: null, pages: 3 },
+      ]),
+    ).toBe(3);
+    expect(parseCopyPages([{ kind: 'copy-start' }])).toBeUndefined();
+    expect(parseCopyPages(undefined)).toBeUndefined();
+    expect(padForRectoVerso(3)).toBe(1);
+    expect(padForRectoVerso(4)).toBe(0);
   });
 
   it('encodes a large PDF in base64', () => {
