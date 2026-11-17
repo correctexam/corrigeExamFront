@@ -11,3 +11,68 @@ button {
   font-weight: bold;
   color: red;
 }
+
+.creer-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.creer-question {
+  color: #6c757d;
+  margin-bottom: 0.75rem;
+}
+
+/* two ways to prepare the subject: PDF (usual) on the left, Typst on the right */
+.creer-paths {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.creer-card {
+  border: 1px solid #dee2e6;
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+
+  h3 {
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .creer-intro {
+    color: #6c757d;
+    font-size: 0.9rem;
+  }
+}
+
+.creer-warning {
+  font-size: 0.85rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.creer-templates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  border-top: 1px solid #dee2e6;
+  padding-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #6c757d;
+
+  a {
+    cursor: pointer;
+  }
+}
+
+.creer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}

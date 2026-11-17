@@ -103,6 +103,18 @@
     "odttemplate": "Modèle de sujet LibreOffice",
     "latextemplate": "Modèle de sujet LaTeX",
     "asciidoctemplate": "Modèle de sujet AsciiDoc",
+    "createpaths": {
+      "question": "Comment voulez-vous préparer le sujet ?",
+      "pdfTitle": "Déposer un sujet PDF",
+      "pdfIntro": "Préparé avec votre traitement de texte ou LaTeX, à partir d'un modèle qui contient les marqueurs. Les zones se placent ensuite sur le sujet.",
+      "pdfTemplates": "Modèles avec marqueurs :",
+      "typstTitle": "Écrire le sujet dans CorrectExam (Typst)",
+      "typstIntro": "Éditeur avec aperçu en direct ; les zones de réponse, les QCM et les zones d'identité sont créées automatiquement.",
+      "typstWarning": "Réservé aux enseignants à l'aise avec un langage de balisage (LaTeX, Markdown…) : le sujet s'écrit en Typst, un langage proche de LaTeX. Sinon, préférez le dépôt d'un PDF.",
+      "typstDoc": "Découvrir Typst",
+      "typstOpen": "Écrire le sujet en Typst",
+      "create": "Créer l'examen"
+    },
     "mdtemplate": "Modèle de sujet MarkDown",
     "enonceexam": "Énoncé de l'examen (au format PDF) :",
     "pdferror": "Fichier PDF invalide ou corrompu",

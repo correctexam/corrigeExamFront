@@ -103,6 +103,18 @@
     "odttemplate": "Modelo de avaliação LibreOffice",
     "latextemplate": "Modelo de avaliação LaTeX",
     "asciidoctemplate": "Modelo de avaliação AsciiDoc",
+    "createpaths": {
+      "question": "Como quer preparar o enunciado?",
+      "pdfTitle": "Carregar um enunciado em PDF",
+      "pdfIntro": "Preparado com o seu processador de texto ou LaTeX, a partir de um modelo com os marcadores. As zonas são depois colocadas no enunciado.",
+      "pdfTemplates": "Modelos com marcadores:",
+      "typstTitle": "Escrever o enunciado no CorrectExam (Typst)",
+      "typstIntro": "Editor com pré-visualização em direto; as zonas de resposta, os QCM e as zonas de identificação são criados automaticamente.",
+      "typstWarning": "Reservado a docentes à vontade com uma linguagem de marcação (LaTeX, Markdown…): o enunciado escreve-se em Typst, uma linguagem próxima do LaTeX. Caso contrário, prefira carregar um PDF.",
+      "typstDoc": "Descobrir o Typst",
+      "typstOpen": "Escrever o enunciado em Typst",
+      "create": "Criar o exame"
+    },
     "mdtemplate": "Modelo de avaliação MarkDown",
     "enonceexam": "Enunciado de avaliação (no formato PDF) :",
     "pdferror": "Arquivo PDF inválido ou corrompido",

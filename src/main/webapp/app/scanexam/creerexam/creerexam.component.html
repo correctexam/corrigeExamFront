@@ -6,118 +6,50 @@
   </p-blockUI>
 
   <div class="sm:col-12 md:col-12 lg:col-8 xl:col-8">
-    <div class="grid grid-nogutter">
-      <div class="col-4">
-        <h2
-          id="jhi-course-heading"
-          data-cy="CourseCreateUpdateHeading"
-          [translate]="'scanexam.creeexamcours'"
-          [translateParams]="{ coursName: coursName }"
-        >
-          Créer un examen pour le cours {{ coursName }}
-        </h2>
-      </div>
-      <div class="col-8 flex flex-row-reverse">
-        <button
-          [disabled]="!this.courseid"
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          class="p-button p-button-primary"
-          (click)="gotoUE()"
-        >
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'scanexam.gobackue'">Retourner au module</span>
-        </button>
-        <button
-          [disabled]="!this.courseid"
-          type="button"
-          data-cy="writeTypstSubjectButton"
-          class="p-button p-button-primary"
-          (click)="gotoTypstEditor()"
-        >
-          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'typstsubject.writeSubject'">Écrire le sujet (Typst)</span>
-        </button>
-        <button
-          [disabled]="!this.courseid"
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          class="p-button p-button-primary"
-          (click)="gotToMd()"
-        >
-          <fa-icon [icon]="faLink"></fa-icon>&nbsp;<span [translate]="'scanexam.mdtemplate'">Modèle de sujet en markdown</span>
-        </button>
-        <button
-          [disabled]="!this.courseid"
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          class="p-button p-button-primary"
-          (click)="gotToAsciiDoc()"
-        >
-          <fa-icon [icon]="faLink"></fa-icon>&nbsp;<span [translate]="'scanexam.asciidoctemplate'">Modèle de sujet en asciidoc</span>
-        </button>
-
-        <button
-          [disabled]="!this.courseid"
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          class="p-button p-button-primary"
-          (click)="downloadTemplateWord()"
-        >
-          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span [translate]="'scanexam.wordtemplate'">Modèle de sujet Word</span>
-        </button>
-        <button
-          [disabled]="!this.courseid"
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          class="p-button p-button-primary"
-          (click)="downloadTemplateOdt()"
-        >
-          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span [translate]="'scanexam.odttemplate'">Modèle de sujet LibreOffice</span>
-        </button>
-
-        <button
-          [disabled]="!this.courseid"
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          class="p-button p-button-primary"
-          (click)="downloadTemplateLatex()"
-        >
-          <fa-icon [icon]="faDownload"></fa-icon>&nbsp;<span [translate]="'scanexam.latextemplate'">Modèle de sujet LaTeX</span>
-        </button>
-      </div>
+    <div class="creer-header">
+      <h2
+        id="jhi-course-heading"
+        data-cy="CourseCreateUpdateHeading"
+        [translate]="'scanexam.creeexamcours'"
+        [translateParams]="{ coursName: coursName }"
+      >
+        Créer un examen pour le cours {{ coursName }}
+      </h2>
+      <button type="button" class="btn btn-link" data-cy="gotoCourseButton" [disabled]="!this.courseid" (click)="gotoUE()">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span [translate]="'scanexam.gobackue'">Retourner au module</span>
+      </button>
     </div>
-    <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <div class="col-12 md:col-12">
-        <div class="row">
-          <label class="form-label col-2" [translate]="'gradeScopeIsticApp.exam.name'" for="field_name">Name</label>
-          <input type="text" class="form-control col-6" name="name" id="field_name" data-cy="name" formControlName="name" />
-          @if (editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)) {
-            <div class="col-2">
+    <p class="creer-question" [translate]="'scanexam.createpaths.question'">Comment voulez-vous préparer le sujet ?</p>
+
+    <div class="creer-paths">
+      <!-- usual path: a PDF prepared outside the platform -->
+      <section class="creer-card" data-cy="pdfSubjectCard">
+        <h3><fa-icon [icon]="faUpload"></fa-icon>&nbsp;<span [translate]="'scanexam.createpaths.pdfTitle'">Déposer un sujet PDF</span></h3>
+        <p class="creer-intro" [translate]="'scanexam.createpaths.pdfIntro'"></p>
+
+        <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+          <div class="mb-2">
+            <label class="form-label" [translate]="'gradeScopeIsticApp.exam.name'" for="field_name">Name</label>
+            <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" />
+            @if (editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)) {
               @if (editForm.get('name')?.errors?.required) {
                 <small class="form-text text-danger" [translate]="'entity.validation.required'"> This field is required. </small>
               }
-            </div>
-          }
-        </div>
+            }
+          </div>
 
-        <div class="row">
-          <label class="form-label col-3" for="field_content" [translate]="'scanexam.enonceexam'"></label>
-          <div class="col-6">
+          <div class="mb-2">
+            <label class="form-label" for="file_content" [translate]="'scanexam.enonceexam'"></label>
             @if (editForm.get('content')!.value) {
-              <div class="form-text text-danger clearfix">
+              <div class="form-text clearfix">
                 <a
                   class="pull-start"
                   (click)="openFile(editForm.get('content')!.value, editForm.get('contentContentType')!.value)"
                   [translate]="'entity.action.open'"
                   >open</a
-                ><br />
+                >
                 <span class="pull-start"
-                  >{{ editForm.get('contentContentType')!.value }}, {{ byteSize(editForm.get('content')!.value) }}</span
+                  >&nbsp;{{ editForm.get('contentContentType')!.value }}, {{ byteSize(editForm.get('content')!.value) }}</span
                 >
                 <button
                   type="button"
@@ -132,55 +64,83 @@
               type="file"
               accept=".pdf"
               id="file_content"
+              class="form-control"
               data-cy="content"
               (change)="setFileData($event, 'content', false)"
-              [translate]="'entity.action.addblob'"
             />
+            <input type="hidden" name="content" id="field_content" formControlName="content" />
+            <input type="hidden" name="contentContentType" id="field_contentContentType" formControlName="contentContentType" />
           </div>
-          <input type="hidden" class="form-control" name="content" id="field_content" data-cy="content" formControlName="content" />
-          <input
-            type="hidden"
-            class="form-control"
-            name="contentContentType"
-            id="field_contentContentType"
-            formControlName="contentContentType"
-          />
-        </div>
 
-        <div class="row">
-          <label class="form-label col-4" [translate]="'gradeScopeIsticApp.template.mark'" for="field_mark">Mark</label>
-          <input type="checkbox" class="form-check col-1" name="mark" id="field_mark" data-cy="mark" formControlName="mark" />
-        </div>
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" name="mark" id="field_mark" data-cy="mark" formControlName="mark" />
+            <label class="form-check-label" [translate]="'gradeScopeIsticApp.template.mark'" for="field_mark">Mark</label>
+          </div>
+          <div class="form-check mb-2">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              name="caseBoxName"
+              id="field_caseBoxName"
+              data-cy="caseBoxName"
+              formControlName="caseBoxName"
+            />
+            <label class="form-check-label" [translate]="'gradeScopeIsticApp.template.caseBoxName'" for="field_caseBoxName"
+              >Box for name</label
+            >
+          </div>
 
-        <div class="row">
-          <label class="form-label col-4" [translate]="'gradeScopeIsticApp.template.caseBoxName'" for="field_caseBoxName"
-            >Box for name</label
+          <div class="creer-templates" data-cy="subjectTemplates">
+            <span [translate]="'scanexam.createpaths.pdfTemplates'">Modèles avec marqueurs :</span>
+            <a href="javascript:void(0)" (click)="downloadTemplateWord()"><fa-icon [icon]="faDownload"></fa-icon>&nbsp;Word</a>
+            <a href="javascript:void(0)" (click)="downloadTemplateOdt()"><fa-icon [icon]="faDownload"></fa-icon>&nbsp;LibreOffice</a>
+            <a href="javascript:void(0)" (click)="downloadTemplateLatex()"><fa-icon [icon]="faDownload"></fa-icon>&nbsp;LaTeX</a>
+            <a href="javascript:void(0)" (click)="gotToMd()"><fa-icon [icon]="faLink"></fa-icon>&nbsp;Markdown</a>
+            <a href="javascript:void(0)" (click)="gotToAsciiDoc()"><fa-icon [icon]="faLink"></fa-icon>&nbsp;AsciiDoc</a>
+          </div>
+
+          <div class="creer-actions">
+            <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="gotoUE()">
+              <fa-icon icon="ban"></fa-icon>&nbsp;<span [translate]="'entity.action.cancel'">Cancel</span>
+            </button>
+            <button
+              type="submit"
+              id="save-entity"
+              data-cy="entityCreateSaveButton"
+              [disabled]="editForm.invalid || isSaving"
+              class="p-button p-button-primary"
+            >
+              <fa-icon icon="save"></fa-icon>&nbsp;<span [translate]="'scanexam.createpaths.create'">Créer l'examen</span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- subject written in the platform (T25): for teachers used to a markup language -->
+      <section class="creer-card" data-cy="typstSubjectCard">
+        <h3>
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span [translate]="'scanexam.createpaths.typstTitle'">Écrire le sujet (Typst)</span>
+        </h3>
+        <p class="creer-intro" [translate]="'scanexam.createpaths.typstIntro'"></p>
+        <div class="alert alert-warning creer-warning" role="note" data-cy="typstWarning">
+          <fa-icon [icon]="faTriangleExclamation"></fa-icon>&nbsp;<span [translate]="'scanexam.createpaths.typstWarning'"></span>
+        </div>
+        <div class="creer-actions">
+          <a href="https://typst.app/docs/tutorial/" target="_blank" rel="noopener noreferrer" class="btn btn-link">
+            <fa-icon [icon]="faLink"></fa-icon>&nbsp;<span [translate]="'scanexam.createpaths.typstDoc'">Découvrir Typst</span>
+          </a>
+          <button
+            [disabled]="!this.courseid"
+            type="button"
+            data-cy="writeTypstSubjectButton"
+            class="btn btn-outline-secondary"
+            (click)="gotoTypstEditor()"
           >
-          <input
-            type="checkbox"
-            class="form-check col-1"
-            name="caseBoxName"
-            id="field_caseBoxName"
-            data-cy="caseBoxName"
-            formControlName="caseBoxName"
-          />
+            <span [translate]="'scanexam.createpaths.typstOpen'">Écrire le sujet en Typst</span>
+          </button>
         </div>
-
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="gotoUE()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span [translate]="'entity.action.cancel'">Cancel</span>
-        </button>
-
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving"
-          class="p-button p-button-primary"
-        >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span [translate]="'entity.action.save'">Save</span>
-        </button>
-      </div>
-    </form>
+      </section>
+    </div>
     @if (errorParsingPdf) {
       <div class="row err" [translate]="'scanexam.pdferror'"></div>
     }

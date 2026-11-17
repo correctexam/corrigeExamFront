@@ -2,7 +2,7 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnInit, DestroyRef, inject
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { faDownload, faLink } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faLink, faTriangleExclamation, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { Exam } from 'app/entities/exam/exam.model';
@@ -46,6 +46,8 @@ export class CreerexamComponent implements OnInit, AfterViewInit {
   coursName = '';
   faDownload = faDownload;
   faLink = faLink;
+  faUpload = faUpload;
+  faTriangleExclamation = faTriangleExclamation;
   editForm: UntypedFormGroup;
   errorParsingPdf = false;
 
