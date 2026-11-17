@@ -142,13 +142,17 @@ export class SubjectService {
     return new Uint8Array(buffer);
   }
 
-  /** Writes a file; `revision` = revision known by the editor (409 `REVISION_CONFLICT` if it changed). */
-  writeFile(examId: number, path: string, content: string | Uint8Array, contentType: string, revision?: number): Promise<ExamSubject> {
-    let headers = new HttpHeaders({ 'Content-Type': contentType });
+  /**
+   * Writes a file; `revision` = revision known by the editor (409 `REVISION_CONFLICT` if it changed). The body is
+   * always sent as bytes: the server derives the type from the path, and no JSON or text reader may transform it.
+   */
+  writeFile(examId: number, path: string, content: string | Uint8Array, revision?: number): Promise<ExamSubject> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/octet-stream' });
     if (revision !== undefined) {
       headers = headers.set('If-Match', String(revision));
     }
-    const body: string | Blob = typeof content === 'string' ? content : new Blob([content], { type: contentType });
+    const bytes = typeof content === 'string' ? new TextEncoder().encode(content) : content;
+    const body = new Blob([bytes], { type: 'application/octet-stream' });
     return this.call(this.http.put<ExamSubject>(`${this.url(examId)}/files/${encodePath(path)}`, body, { headers }));
   }
 
