@@ -61,6 +61,8 @@ export interface TypstCompileResponse {
   zones?: unknown;
   /** Raw result of `query(<ce-diagram>)` (T25c), read with `parseDiagramRequests`. */
   diagrams?: unknown;
+  /** Raw result of `query(<ce-copy>)` (T25d): start and end of each copy, read with `parseCopyPages`. */
+  copies?: unknown;
   durationMs: number;
 }
 

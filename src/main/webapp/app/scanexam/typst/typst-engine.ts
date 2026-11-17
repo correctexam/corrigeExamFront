@@ -103,8 +103,9 @@ export class TypstEngine {
       }
       const zones: unknown = await world.query({ selector: '<ce-zone>', field: 'value' });
       const diagrams: unknown = await world.query({ selector: '<ce-diagram>', field: 'value' });
+      const copies: unknown = await world.query({ selector: '<ce-copy>', field: 'value' });
       const pdf = req.withPdf ? (await world.pdf({ diagnostics: 'full' })).result : undefined;
-      return { kind: 'compiled', id: req.id, ok: true, diagnostics, pdf, zones, diagrams, durationMs: Date.now() - start };
+      return { kind: 'compiled', id: req.id, ok: true, diagnostics, pdf, zones, diagrams, copies, durationMs: Date.now() - start };
     });
   }
 

@@ -1,0 +1,94 @@
+@if (visible()) {
+  <section class="page-codes" data-cy="page-codes">
+    <h5 [translate]="'scanexam.pagecodes.title'">Codes de page</h5>
+    <p class="text-muted small" [translate]="'scanexam.pagecodes.intro'"></p>
+
+    <button
+      type="button"
+      class="p-button p-button-outlined p-button-sm"
+      [disabled]="busy() !== undefined"
+      (click)="check()"
+      data-cy="page-codes-read"
+    >
+      <span [translate]="'scanexam.pagecodes.read'">Lire les codes</span>
+    </button>
+    @if (progress(); as p) {
+      <span class="ms-2" data-cy="page-codes-progress">
+        {{
+          (busy() === 'reading' ? 'scanexam.pagecodes.reading' : 'scanexam.pagecodes.ordering')
+            | translate: { done: p.done, total: p.total }
+        }}
+      </span>
+    }
+    @if (error(); as e) {
+      <p class="text-danger">{{ 'scanexam.pagecodes.failed' | translate }} — {{ e }}</p>
+    }
+
+    @if (report(); as r) {
+      <div class="page-codes-report" data-cy="page-codes-report">
+        <p>
+          {{ 'scanexam.pagecodes.summary' | translate: { pages: r.pages.length, copies: r.copies.length, complete: complete() } }}
+        </p>
+        @if (r.inOrder && incomplete().length === 0 && r.duplicates.length === 0 && r.foreign.length === 0 && r.unreadable.length === 0) {
+          <p class="text-success" data-cy="page-codes-ok" [translate]="'scanexam.pagecodes.allgood'">
+            Toutes les pages sont lues et dans l'ordre.
+          </p>
+        }
+        <ul>
+          @for (c of incomplete(); track c.edition * 100000 + c.copy) {
+            <li class="text-warning">
+              {{ 'scanexam.pagecodes.missing' | translate: { copy: c.copy, edition: c.edition, pages: list(c.missing) } }}
+            </li>
+          }
+          @if (r.upsideDown.length > 0) {
+            <li>{{ 'scanexam.pagecodes.upsidedown' | translate: { count: r.upsideDown.length, pages: list(r.upsideDown) } }}</li>
+          }
+          @if (r.duplicates.length > 0) {
+            <li class="text-warning">
+              {{ 'scanexam.pagecodes.duplicates' | translate: { count: r.duplicates.length, pages: list(r.duplicates) } }}
+            </li>
+          }
+          @if (r.foreign.length > 0) {
+            <li class="text-warning">
+              {{ 'scanexam.pagecodes.foreign' | translate: { count: r.foreign.length, pages: list(r.foreign) } }}
+            </li>
+          }
+          @if (r.unreadable.length > 0) {
+            <li class="text-danger">
+              {{ 'scanexam.pagecodes.unreadable' | translate: { count: r.unreadable.length, pages: list(r.unreadable) } }}
+            </li>
+          }
+          @if (r.inferred.length > 0) {
+            <li>{{ 'scanexam.pagecodes.inferred' | translate: { count: r.inferred.length, pages: list(r.inferred) } }}</li>
+          }
+        </ul>
+
+        @if (!r.inOrder) {
+          <div class="page-codes-actions">
+            <ul class="small text-muted">
+              @if (blanks() > 0) {
+                <li>{{ 'scanexam.pagecodes.blanks' | translate: { count: blanks() } }}</li>
+              }
+              @if (r.duplicates.length + r.foreign.length + r.unreadable.length > 0) {
+                <li [translate]="'scanexam.pagecodes.setaside'"></li>
+              }
+              @if (aligned() > 0) {
+                <li class="text-danger" [translate]="'scanexam.pagecodes.alignedremoved'"></li>
+              }
+              <li [translate]="'scanexam.pagecodes.localonly'"></li>
+            </ul>
+            <button
+              type="button"
+              class="p-button p-button-primary p-button-sm"
+              [disabled]="busy() !== undefined"
+              (click)="reorder()"
+              data-cy="page-codes-reorder"
+            >
+              <span [translate]="'scanexam.pagecodes.reorder'">Remettre dans l'ordre</span>
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </section>
+}

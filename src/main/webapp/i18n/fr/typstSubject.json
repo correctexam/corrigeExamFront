@@ -90,6 +90,22 @@
     "reuse": {
       "label": "Partir du sujet d'un autre examen",
       "load": "Copier dans le brouillon"
+    },
+    "print": {
+      "open": "Imprimer les copies",
+      "title": "Imprimer les copies — {{examName}}",
+      "intro": "Chaque copie reprend le modèle de l'examen ({{pages}} pages) ; chaque page porte un code qui permet de la retrouver au scan.",
+      "odd": "Le modèle a un nombre impair de pages : imprimez en recto seul, sinon deux copies se partageront une feuille.",
+      "loading": "Chargement du modèle…",
+      "copies": "Nombre de copies",
+      "generate": "Générer le PDF",
+      "badCopies": "Entre 1 et 2000 copies.",
+      "progress": "Assemblage : {{done}} / {{total}} copies",
+      "failed": "Impression impossible",
+      "advice": "Imprimez à taille réelle (sans ajustement à la page). Un tirage déjà créé se retélécharge avec les mêmes codes : ne créez pas un nouveau tirage pour réimprimer quelques copies.",
+      "previous": "Tirages",
+      "size": "{{copies}} copies × {{pages}} pages",
+      "again": "Retélécharger"
     }
   }
 }
