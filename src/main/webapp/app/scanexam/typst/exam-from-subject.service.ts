@@ -34,9 +34,9 @@ export class ExamFromSubjectService {
     template.name = `${req.name}Template`;
     template.content = toBase64(req.pdf);
     template.contentContentType = 'application/pdf';
-    // the generated sheets carry the alignment circles and the identity cells
+    // the generated sheets carry the alignment circles; names in cells or in a free frame (cursive handwriting)
     template.mark = true;
-    template.caseboxname = true;
+    template.caseboxname = req.plan.caseBoxName;
     template.autoMapStudentCopyToList = true;
     const templateId = (await firstValueFrom(this.templateService.create(template))).body?.id;
     if (templateId === undefined) {

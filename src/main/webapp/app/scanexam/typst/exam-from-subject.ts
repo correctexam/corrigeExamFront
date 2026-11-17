@@ -31,6 +31,8 @@ export interface PlannedQuestion {
 }
 
 export interface ExamPlan {
+  /** `Template.caseboxname`: names written in cells (recognised letter by letter) rather than in a free frame. */
+  caseBoxName: boolean;
   identity: PlannedIdentityZone[];
   questions: PlannedQuestion[];
 }
@@ -104,7 +106,7 @@ export function planExam(layout: GeneratedLayout, defaults: QuestionDefaults): E
       },
     })),
   );
-  return { identity, questions };
+  return { caseBoxName: layout.identityStyle === 'cells', identity, questions };
 }
 
 /** Base64 of a PDF, for `Template.content`. Chunked: a whole document does not fit in one call's arguments. */

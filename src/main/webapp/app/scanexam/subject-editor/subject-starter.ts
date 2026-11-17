@@ -5,6 +5,8 @@ export const SUBJECT_STARTER = `#import "@local/correctexam:0.1.0": *
   title: [Titre de l'examen],
   subtitle: [Formation — année],
   duration: "2 h",
+  // nom et prénom : "cells" (une lettre par case) ou "free" (cadre libre, écriture attachée)
+  identity-style: "cells",
   instructions: [Répondez dans les cadres. Ce qui dépasse n'est pas lu.],
 )
 

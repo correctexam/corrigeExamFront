@@ -48,6 +48,10 @@
     },
     "openFailed": "The file could not be opened",
     "createFailed": "The exam could not be created",
-    "writeSubject": "Write the subject (Typst)"
+    "writeSubject": "Write the subject (Typst)",
+    "identityStyle": {
+      "cells": "names in cells",
+      "free": "names in a free frame"
+    }
   }
 }

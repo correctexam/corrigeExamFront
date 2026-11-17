@@ -24,6 +24,15 @@ typst eval 'query(<ce-zone>).map(m => (value: m.value))' --in genie-logiciel.typ
 typst compile genie-logiciel.typ --input ce-plan='{"edition":"E1","version":"B","copies":["c001","c002"],"pad":1,"order":{"p2":[2,0,1]},"choices":{"q-patterns":[2,0,1,3]}}'
 ```
 
+## Options de mise en page
+
+- `exam(marks-top: 22mm)` : centre des deux ronds du haut, à 22 mm du bord supérieur (bas : 9 mm), pour qu'un coin coupé au massicot après dégrafage les laisse intacts (vérifié : coupe jusqu'à 25 mm le long de chaque bord). Bornes 9 à 40 mm : au-delà, le worker serveur ne trouve plus le rond dans son carré de coin (300 px sur une page de 2000 px, soit 44,6 mm).
+- `exam(identity-style: "cells")` : nom et prénom en cases (une lettre par case, reconnaissance lettre à lettre, `Template.caseboxname = true`) ou `"free"` (cadre libre pour l'écriture attachée, reconnaissance de la ligne entière, `caseboxname = false`). Le numéro étudiant reste en cases. Cadres d'identité en gris clair (`luma(185)`) : toujours détectés par `trouveCases` sur le modèle (18 / 18 / 8 cases à 144 et 300 dpi).
+
+## En développement
+
+Le cache de build Angular est dans `target/angular/` (`angular.json`). S'il a été rempli pendant un `npm ci`, il peut garder une copie tronquée du compilateur Wasm (erreur « section … extends past end of the module ») : `npx ng cache clean`, puis relancer `npm start`.
+
 ## Contrat `ce-plan` (entrée JSON, tout est facultatif)
 
 | Clé                  | Rôle                                                                                                                             |

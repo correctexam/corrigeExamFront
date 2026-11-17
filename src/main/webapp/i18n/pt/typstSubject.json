@@ -48,6 +48,10 @@
     },
     "openFailed": "Não foi possível abrir o ficheiro",
     "createFailed": "Não foi possível criar a avaliação",
-    "writeSubject": "Escrever o enunciado (Typst)"
+    "writeSubject": "Escrever o enunciado (Typst)",
+    "identityStyle": {
+      "cells": "nome e apelido em quadrículas",
+      "free": "nome e apelido em moldura livre"
+    }
   }
 }

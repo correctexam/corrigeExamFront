@@ -48,6 +48,10 @@
     },
     "openFailed": "Impossible d'ouvrir le fichier",
     "createFailed": "L'examen n'a pas pu être créé",
-    "writeSubject": "Écrire le sujet (Typst)"
+    "writeSubject": "Écrire le sujet (Typst)",
+    "identityStyle": {
+      "cells": "nom et prénom en cases",
+      "free": "nom et prénom en cadre libre"
+    }
   }
 }

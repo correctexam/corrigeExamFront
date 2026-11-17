@@ -28,6 +28,11 @@ describe('exam-from-subject', () => {
       expect(plan.identity.map(i => i.kind)).toEqual(['NAME', 'FIRSTNAME', 'INE']);
     });
 
+    it('recognises names letter by letter only when they are written in cells', () => {
+      expect(plan.caseBoxName).toBe(true);
+      expect(planExam({ ...layout, identityStyle: 'free' }, defaults).caseBoxName).toBe(false);
+    });
+
     it('plans one question per zone, with the canonical number and the key as label', () => {
       expect(plan.questions.map(p => [p.question.numero, p.question.libelle, p.question.typeId])).toEqual([
         [1, 'q-classes', QUESTION_TYPE_MANUAL],
@@ -125,7 +130,13 @@ describe('exam-from-subject', () => {
       const id = await service().create({ courseId: 3, name: 'GL', pdf: new Uint8Array([37, 80, 68, 70]), plan });
       expect(id).toBe(42);
       expect(templateService.create).toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'GLTemplate', content: 'JVBERg==', contentContentType: 'application/pdf', mark: true }),
+        expect.objectContaining({
+          name: 'GLTemplate',
+          content: 'JVBERg==',
+          contentContentType: 'application/pdf',
+          mark: true,
+          caseboxname: true,
+        }),
       );
       expect(examService.create).toHaveBeenCalledWith(expect.objectContaining({ name: 'GL', templateId: 7, courseId: 3, nbgrader: false }));
       expect(calls).toEqual(['identity NAME', 'identity FIRSTNAME', 'identity INE']);

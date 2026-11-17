@@ -13,7 +13,8 @@
       "h": 24.094488188976378,
       "page-width": 595.2755905511812,
       "page-height": 841.8897637795276,
-      "role": "lastname"
+      "role": "lastname",
+      "style": "cells"
     }
   },
   {
@@ -30,7 +31,8 @@
       "h": 24.094488188976378,
       "page-width": 595.2755905511812,
       "page-height": 841.8897637795276,
-      "role": "firstname"
+      "role": "firstname",
+      "style": "cells"
     }
   },
   {
@@ -47,7 +49,8 @@
       "h": 24.094488188976378,
       "page-width": 595.2755905511812,
       "page-height": 841.8897637795276,
-      "role": "stdid"
+      "role": "stdid",
+      "style": "cells"
     }
   },
   {

@@ -23,9 +23,14 @@
 // Geometry shared with the scan pipeline. Changing it requires checking the alignment (circles) and the
 // MCQ detection (squares) again: see content/typst/README.md.
 #let _geom = (
-  // filled circles, center at `mark-inset` from both edges of each corner
+  // filled circles, center at `mark-inset` from the side edges and from the bottom edge; the top circles are
+  // lower (`exam(marks-top: …)`) so that a corner cut with a guillotine to remove the staples leaves them intact
   mark-radius: 2.5mm,
   mark-inset: 9mm,
+  marks-top: 22mm,
+  // the server worker looks for each circle in a corner square of 300 px on a page 2000 px high (44,6 mm):
+  // the whole circle must stay inside it
+  marks-top-max: 40mm,
   // page code (Data Matrix) at the bottom center
   code-size: 11mm,
   // MCQ and numeric bubbles: squares, drawn with a dark thin stroke (detected as CARRE)
@@ -36,6 +41,9 @@
   cell-height: 8.5mm,
   cell-gap: 1.2mm,
   cell-stroke: 0.6pt + luma(90),
+  // identity: light grey, so that the frames disturb the reading of the handwriting as little as possible
+  identity-stroke: 0.6pt + luma(185),
+  identity-free-height: 11mm,
 )
 
 // ---------------------------------------------------------------------------------------------------
@@ -127,12 +135,12 @@
   }
 }
 
-#let _background() = {
+#let _background(marks-top) = {
   let r = _geom.mark-radius
   let i = _geom.mark-inset
   for (ax, ay) in ((left, top), (right, top), (left, bottom), (right, bottom)) {
     let dx = if ax == left { i - r } else { -(i - r) }
-    let dy = if ay == top { i - r } else { -(i - r) }
+    let dy = if ay == top { marks-top - r } else { -(i - r) }
     place(ax + ay, dx: dx, dy: dy, circle(radius: r, fill: black))
   }
   place(bottom + center, dy: -(_geom.mark-inset - _geom.code-size / 2), _page-code())
@@ -142,30 +150,47 @@
 // Identity header
 
 // One row of handwritten cells; the zone covers the cells only (the label stays outside).
-#let _cells-zone(kind, count, ..extra) = {
+#let _cells-zone(kind, count, stroke: _geom.cell-stroke, ..extra) = {
   let w = count * _geom.cell-width + (count - 1) * _geom.cell-gap
   _zone-box(kind, w, _geom.cell-height, ..extra, body: stack(
     dir: ltr,
     spacing: _geom.cell-gap,
-    ..range(count).map(_ => box(width: _geom.cell-width, height: _geom.cell-height, stroke: _geom.cell-stroke)),
+    ..range(count).map(_ => box(width: _geom.cell-width, height: _geom.cell-height, stroke: stroke)),
   ))
 }
 
-/// Last name, first name and student number, read by the existing identity association (OCR).
-/// Nothing about the student is ever printed (T25 decision): the student fills these cells.
-#let identity(name-cells: 18, firstname-cells: 18, id-cells: 8, id-label: [N° étudiant]) = block(
-  width: 100%,
-  breakable: false,
-  grid(
-    columns: (auto, 1fr),
-    column-gutter: 3mm,
-    row-gutter: 2.5mm,
-    align: (right + horizon, left + horizon),
-    text(weight: "bold", size: 9pt)[NOM], _cells-zone("identity", name-cells, role: "lastname"),
-    text(weight: "bold", size: 9pt)[PRÉNOM], _cells-zone("identity", firstname-cells, role: "firstname"),
-    text(weight: "bold", size: 9pt, id-label), _cells-zone("identity", id-cells, role: "stdid"),
-  ),
-)
+// One free frame, as wide as `count` cells, for cursive handwriting.
+#let _free-zone(kind, count, ..extra) = {
+  let w = count * _geom.cell-width + (count - 1) * _geom.cell-gap
+  _zone-box(kind, w, _geom.identity-free-height, stroke: _geom.identity-stroke, ..extra)
+}
+
+/// Last name, first name and student number, read by the existing identity association.
+/// `style`: "cells" (one letter per cell, recognised letter by letter) or "free" (one frame per line, for
+/// cursive handwriting, recognised as a whole). The student number always uses cells (digits).
+/// Nothing about the student is ever printed (T25 decision): the student fills these zones.
+#let identity(style: "cells", name-cells: 18, firstname-cells: 18, id-cells: 8, id-label: [N° étudiant]) = {
+  assert(style in ("cells", "free"), message: "identity: style must be \"cells\" or \"free\"")
+  let line(role, count) = if style == "cells" {
+    _cells-zone("identity", count, stroke: _geom.identity-stroke, role: role, style: style)
+  } else {
+    _free-zone("identity", count, role: role, style: style)
+  }
+  block(
+    width: 100%,
+    breakable: false,
+    grid(
+      columns: (auto, 1fr),
+      column-gutter: 3mm,
+      row-gutter: 2.5mm,
+      align: (right + horizon, left + horizon),
+      text(weight: "bold", size: 9pt)[NOM], line("lastname", name-cells),
+      text(weight: "bold", size: 9pt)[PRÉNOM], line("firstname", firstname-cells),
+      text(weight: "bold", size: 9pt, id-label),
+      _cells-zone("identity", id-cells, stroke: _geom.identity-stroke, role: "stdid", style: "cells"),
+    ),
+  )
+}
 
 // ---------------------------------------------------------------------------------------------------
 // Questions
@@ -390,15 +415,21 @@
   duration: none,
   instructions: none,
   identity-header: true,
+  identity-style: "cells",
+  marks-top: _geom.marks-top,
   lang: "fr",
   doc,
 ) = {
+  assert(
+    marks-top >= _geom.mark-inset and marks-top <= _geom.marks-top-max,
+    message: "exam: marks-top must be between 9mm and 40mm",
+  )
   set document(title: title)
   set text(lang: lang, size: 10.5pt)
   set page(
     paper: "a4",
     margin: (top: 18mm, bottom: 24mm, left: 18mm, right: 18mm),
-    background: _background(),
+    background: _background(marks-top),
   )
   set par(justify: true)
   // printed in black and white: no information carried by color alone
@@ -420,7 +451,7 @@
       if duration != none { linebreak(); text(size: 9pt, fill: luma(80))[Durée : #duration] }
     })
     v(4mm)
-    if identity-header { identity() }
+    if identity-header { identity(style: identity-style) }
     if instructions != none {
       v(3mm)
       block(width: 100%, inset: 2.5mm, stroke: 0.6pt, text(size: 9pt, instructions))

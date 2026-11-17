@@ -18,6 +18,7 @@ const engine = new TypstEngine({
     ),
 });
 const example = readFileSync(join(content, 'examples/genie-logiciel.typ'), 'utf8');
+const fixtureZones = (): unknown => JSON.parse(readFileSync(join(__dirname, 'fixtures/genie-logiciel.preview.json'), 'utf8')) as unknown;
 let id = 0;
 const compile = (source: string, withPdf = false, inputs: Record<string, string> = {}): Promise<TypstCompileResponse> =>
   engine.compile({ kind: 'compile', id: ++id, files: [{ path: '/main.typ', content: source }], main: '/main.typ', inputs, withPdf });
@@ -31,8 +32,7 @@ describe('TypstEngine (real compiler)', () => {
     expect(res.ok).toBe(true);
     expect(res.pdf!.length).toBeGreaterThan(10000);
     expect(String.fromCharCode(...res.pdf!.slice(0, 5))).toBe('%PDF-');
-    const fixture = JSON.parse(readFileSync(join(__dirname, 'fixtures/genie-logiciel.preview.json'), 'utf8')) as unknown;
-    expect(parseZoneMetadata(res.zones)).toEqual(parseZoneMetadata(fixture));
+    expect(parseZoneMetadata(res.zones)).toEqual(parseZoneMetadata(fixtureZones()));
     expect(buildLayout(parseZoneMetadata(res.zones)).questions.length).toBe(7);
   });
 
@@ -42,6 +42,17 @@ describe('TypstEngine (real compiler)', () => {
     const qcm = buildLayout(parseZoneMetadata(res.zones)).questions.find(q => q.key === 'q-patterns')!;
     expect(qcm.parts[0].boxes).toEqual(['c', 'a', 'b', 'd']);
     expect(res.pdf).toBeUndefined();
+  });
+
+  it('offers a free frame for cursive names and keeps the top circles in a valid range', async () => {
+    const free = await compile(example.replace('#show: exam.with(', '#show: exam.with(\n  identity-style: "free",'));
+    expect(free.ok).toBe(true);
+    const layout = buildLayout(parseZoneMetadata(free.zones));
+    expect(layout.identityStyle).toBe('free');
+    expect(layout.identity.lastname!.height! > buildLayout(parseZoneMetadata(fixtureZones())).identity.lastname!.height!).toBe(true);
+    const tooLow = await compile(example.replace('#show: exam.with(', '#show: exam.with(\n  marks-top: 60mm,'));
+    expect(tooLow.ok).toBe(false);
+    expect(tooLow.diagnostics[0].message).toContain('marks-top');
   });
 
   it('reports errors with 1-based positions', async () => {
