@@ -3,6 +3,50 @@
     <h5 [translate]="'scanexam.pagecodes.title'">Codes de page</h5>
     <p class="text-muted small" [translate]="'scanexam.pagecodes.intro'"></p>
 
+    @if (serverSummary(); as sv) {
+      <div class="page-codes-report" data-cy="page-codes-server">
+        <p>
+          <strong [translate]="'scanexam.pagecodes.server'">Codes lus par le serveur pendant l'alignement</strong> —
+          {{ 'scanexam.pagecodes.summary' | translate: { pages: sv.pages, copies: sv.copies, complete: sv.complete } }}
+          @if (sv.reordered) {
+            <span [translate]="'scanexam.pagecodes.serverreordered'">Les pages ont été remises dans l'ordre.</span>
+          }
+        </p>
+        <ul>
+          @for (c of sv.incomplete; track c.edition * 100000 + c.copy) {
+            <li class="text-warning">
+              {{ 'scanexam.pagecodes.missing' | translate: { copy: c.copy, edition: c.edition, pages: list(c.missing) } }}
+            </li>
+          }
+          @if (sv.blanks > 0) {
+            <li>{{ 'scanexam.pagecodes.blanks' | translate: { count: sv.blanks } }}</li>
+          }
+          @if (sv.upside_down.length > 0) {
+            <li>{{ 'scanexam.pagecodes.serverupsidedown' | translate: { count: sv.upside_down.length, pages: list(sv.upside_down) } }}</li>
+          }
+          @if (sv.duplicates.length > 0) {
+            <li class="text-warning">
+              {{ 'scanexam.pagecodes.duplicates' | translate: { count: sv.duplicates.length, pages: list(sv.duplicates) } }}
+            </li>
+          }
+          @if (sv.foreign.length > 0) {
+            <li class="text-warning">
+              {{ 'scanexam.pagecodes.foreign' | translate: { count: sv.foreign.length, pages: list(sv.foreign) } }}
+            </li>
+          }
+          @if (sv.unreadable.length > 0) {
+            <li class="text-danger">
+              {{ 'scanexam.pagecodes.unreadable' | translate: { count: sv.unreadable.length, pages: list(sv.unreadable) } }}
+            </li>
+          }
+          @if (sv.inferred.length > 0) {
+            <li>{{ 'scanexam.pagecodes.inferred' | translate: { count: sv.inferred.length, pages: list(sv.inferred) } }}</li>
+          }
+        </ul>
+        <p class="small text-muted" [translate]="'scanexam.pagecodes.serverscanpages'"></p>
+      </div>
+    }
+
     <button
       type="button"
       class="p-button p-button-outlined p-button-sm"

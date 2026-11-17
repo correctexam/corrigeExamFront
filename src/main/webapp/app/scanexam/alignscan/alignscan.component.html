@@ -176,7 +176,11 @@
         [showButtons]="true"
       ></p-inputNumber>
     </div>
-    <jhi-page-codes-check [examId]="+examId!" (reordered)="checkIfAlreadyAlign()"></jhi-page-codes-check>
+    <jhi-page-codes-check
+      [examId]="+examId!"
+      [serverSummary]="serverPageCodes()"
+      (reordered)="checkIfAlreadyAlign()"
+    ></jhi-page-codes-check>
     @if (_showVignette && allowPartialAlign) {
       <jhi-viewandreorderpages [alignPage]="true" #viewpage [examId]="+examId!"></jhi-viewandreorderpages>
     }

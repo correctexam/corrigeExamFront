@@ -104,6 +104,10 @@
     "latextemplate": "Modelo de avaliação LaTeX",
     "asciidoctemplate": "Modelo de avaliação AsciiDoc",
     "pagecodes": {
+      "serverupsidedown": "{{count}} página(s) virada(s), endireitada(s) (páginas do scan {{pages}})",
+      "server": "Códigos lidos pelo servidor durante o alinhamento",
+      "serverreordered": "As páginas foram repostas por ordem e alinhadas nessa ordem.",
+      "serverscanpages": "Os números de página citados são os do scan original. Volte a ler os códigos para verificar a cache atual.",
       "title": "Códigos de página",
       "intro": "As cópias impressas a partir do CorrectExam têm um código em cada página. Leia-os antes do alinhamento: as páginas misturadas ou viradas são repostas no lugar, as páginas em falta, duplicadas ou estranhas ao exame são assinaladas.",
       "read": "Ler os códigos",
@@ -121,7 +125,7 @@
       "blanks": "{{count}} página(s) em branco inserida(s) no lugar das páginas em falta, para que cada cópia mantenha o número de páginas do modelo",
       "setaside": "As páginas duplicadas, estranhas ou ilegíveis são postas no fim do lote.",
       "alignedremoved": "As páginas já alinhadas serão apagadas: volte a alinhar depois.",
-      "localonly": "A ordem é corrigida neste navegador. O alinhamento no servidor recomeça a partir do scan original: alinhe localmente.",
+      "localonly": "A ordem é corrigida neste navegador. Um alinhamento no servidor recomeça a partir do scan original e repõe ele próprio a ordem das páginas.",
       "reorder": "Repor a ordem"
     },
     "createpaths": {

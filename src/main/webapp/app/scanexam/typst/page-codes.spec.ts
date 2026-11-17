@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import { analyseScan, EditionInfo, moveSequence, parsePageCode, ScannedPage } from './page-codes';
+import { analyseScan, EditionInfo, moveSequence, parsePageCode, parseServerSummary, ScannedPage } from './page-codes';
 
 const editions: EditionInfo[] = [{ id: 12, copies: 30, pagesPerCopy: 2 }];
 const scan = (...texts: (string | undefined)[]): ScannedPage[] => texts.map((text, i) => ({ scanPage: i + 1, text }));
@@ -103,6 +103,29 @@ describe('page codes', () => {
     for (let n = 0; n < 200; n++) {
       const target = [...current].sort(() => Math.random() - 0.5);
       expect(applyMoves(current, moveSequence(current, target))).toEqual(target);
+    }
+  });
+
+  it('reads the summary sent by the alignment worker', () => {
+    // as written by the Rust worker (finished_details)
+    const details = JSON.stringify({
+      pagecodes: {
+        pages: 5,
+        copies: 3,
+        complete: 2,
+        incomplete: [{ edition: 41, copy: 1, missing: [2] }],
+        upside_down: [3],
+        duplicates: [],
+        foreign: [],
+        unreadable: [],
+        inferred: [],
+        blanks: 1,
+        reordered: true,
+      },
+    });
+    expect(parseServerSummary(details)).toEqual(expect.objectContaining({ copies: 3, blanks: 1, upside_down: [3] }));
+    for (const d of [undefined, null, '', 'Traitement complet terminé', '{"pagecodes": {"pages": 1}}', '{not json', '{"other": 1}']) {
+      expect(parseServerSummary(d)).toBeUndefined();
     }
   });
 });

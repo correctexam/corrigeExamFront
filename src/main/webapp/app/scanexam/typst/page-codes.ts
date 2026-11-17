@@ -281,3 +281,48 @@ function longestIncreasing(values: number[]): number[] {
   }
   return out;
 }
+
+/**
+ * Summary of the page codes read by the alignment worker (T25d3): `details` of the `finished` status, JSON
+ * `{"pagecodes": …}` written by the Rust worker (`Summary` in `pagecodes.rs`). Scan pages are those of the original
+ * scan; the cache is already in print order.
+ */
+export interface ServerPageCodeSummary {
+  pages: number;
+  copies: number;
+  complete: number;
+  incomplete: { edition: number; copy: number; missing: number[] }[];
+  upside_down: number[];
+  duplicates: number[];
+  foreign: number[];
+  unreadable: number[];
+  inferred: number[];
+  blanks: number;
+  reordered: boolean;
+}
+
+/** The summary in the `details` of a `finished` status, undefined for the other details (plain text). */
+export function parseServerSummary(details: string | null | undefined): ServerPageCodeSummary | undefined {
+  if (!details?.trim().startsWith('{')) {
+    return undefined;
+  }
+  try {
+    const value = (JSON.parse(details) as { pagecodes?: unknown }).pagecodes;
+    const numbers = (v: unknown): v is number[] => Array.isArray(v) && v.every(n => typeof n === 'number');
+    if (typeof value !== 'object' || value === null) {
+      return undefined;
+    }
+    const s = value as Partial<ServerPageCodeSummary>;
+    const valid =
+      typeof s.pages === 'number' &&
+      typeof s.copies === 'number' &&
+      typeof s.complete === 'number' &&
+      typeof s.blanks === 'number' &&
+      typeof s.reordered === 'boolean' &&
+      Array.isArray(s.incomplete) &&
+      [s.upside_down, s.duplicates, s.foreign, s.unreadable, s.inferred].every(numbers);
+    return valid ? (s as ServerPageCodeSummary) : undefined;
+  } catch {
+    return undefined;
+  }
+}
