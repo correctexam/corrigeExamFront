@@ -52,6 +52,44 @@
     "identityStyle": {
       "cells": "nom et prénom en cases",
       "free": "nom et prénom en cadre libre"
+    },
+    "storage": {
+      "pageTitle": "Sujet — {{examName}}",
+      "heading": "Sujet de l'examen {{examName}}",
+      "backToExam": "Retour à l'examen",
+      "loading": "Chargement du sujet…",
+      "saving": "Enregistrement…",
+      "dirty": "Modifications non enregistrées",
+      "saved": "Enregistré (révision {{revision}})",
+      "saveFailed": "Enregistrement impossible",
+      "retry": "Réessayer",
+      "lockedBy": "{{login}} modifie ce sujet (verrou jusqu'à {{until}}) : lecture seule. Prendre la main interrompt son édition ; ses modifications non enregistrées seront perdues.",
+      "takeOver": "Prendre la main",
+      "lockFailed": "Impossible de prendre la main",
+      "conflict": "Le sujet a été enregistré ailleurs (autre onglet ou autre enseignant). Téléchargez vos modifications si besoin, puis rechargez.",
+      "reload": "Recharger",
+      "noSubject": "Cet examen n'a pas de sujet Typst enregistré.",
+      "storeDraft": "Enregistrer le sujet gardé par ce navigateur",
+      "unavailable": "Le stockage des sujets n'est pas disponible sur ce serveur : le sujet n'est gardé que dans ce navigateur.",
+      "loadFailed": "Le sujet n'a pas pu être chargé",
+      "templateUnchanged": "Modifier le sujet ne modifie ni le modèle ni les zones de l'examen déjà créé.",
+      "open": "Sujet Typst"
+    },
+    "files": {
+      "add": "Nouveau fichier",
+      "upload": "Ajouter des fichiers",
+      "insert": "Insérer dans main.typ",
+      "remove": "Supprimer le fichier",
+      "badPath": "Nom de fichier refusé (lettres, chiffres, . _ -, extension connue, 5 dossiers au plus)"
+    },
+    "diagrams": {
+      "pending": "Rendu de {{count}} diagramme(s)…",
+      "failed": "Diagramme {{kind}} non rendu",
+      "retry": "Réessayer les diagrammes"
+    },
+    "reuse": {
+      "label": "Partir du sujet d'un autre examen",
+      "load": "Copier dans le brouillon"
     }
   }
 }

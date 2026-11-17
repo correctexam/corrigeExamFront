@@ -109,6 +109,17 @@
       </jhi-usable-text-input>
       <div id="form-total" #formTotal>
         <div class="inner" [style]="{ 'text-align': 'center' }">
+          @if (hasSubject()) {
+            <div>
+              <a
+                class="p-button p-button-outlined p-button-sm"
+                [routerLink]="'/exam/' + this.examId + '/subject'"
+                data-cy="exam-typst-subject"
+              >
+                <span [translate]="'typstsubject.storage.open'">Sujet Typst</span>
+              </a>
+            </div>
+          }
           @if (exam?.nbgrader === false) {
             <button
               [routerLink]="'/exam/annotate/' + this.examId"

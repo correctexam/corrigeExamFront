@@ -52,6 +52,44 @@
     "identityStyle": {
       "cells": "nome e apelido em quadrículas",
       "free": "nome e apelido em moldura livre"
+    },
+    "storage": {
+      "pageTitle": "Enunciado — {{examName}}",
+      "heading": "Enunciado do exame {{examName}}",
+      "backToExam": "Voltar ao exame",
+      "loading": "A carregar o enunciado…",
+      "saving": "A guardar…",
+      "dirty": "Alterações não guardadas",
+      "saved": "Guardado (revisão {{revision}})",
+      "saveFailed": "Não foi possível guardar",
+      "retry": "Tentar novamente",
+      "lockedBy": "{{login}} está a editar este enunciado (bloqueio até {{until}}): só leitura. Assumir a edição interrompe a edição dele; as alterações não guardadas serão perdidas.",
+      "takeOver": "Assumir a edição",
+      "lockFailed": "Não foi possível assumir a edição",
+      "conflict": "O enunciado foi guardado noutro lado (outro separador ou docente). Descarregue as suas alterações se necessário e recarregue.",
+      "reload": "Recarregar",
+      "noSubject": "Este exame não tem enunciado Typst guardado.",
+      "storeDraft": "Guardar o enunciado mantido por este navegador",
+      "unavailable": "O armazenamento de enunciados não está disponível neste servidor: o enunciado só fica neste navegador.",
+      "loadFailed": "Não foi possível carregar o enunciado",
+      "templateUnchanged": "Alterar o enunciado não altera o modelo nem as zonas do exame já criado.",
+      "open": "Enunciado Typst"
+    },
+    "files": {
+      "add": "Novo ficheiro",
+      "upload": "Adicionar ficheiros",
+      "insert": "Inserir em main.typ",
+      "remove": "Apagar o ficheiro",
+      "badPath": "Nome de ficheiro recusado (letras, algarismos, . _ -, extensão conhecida, 5 pastas no máximo)"
+    },
+    "diagrams": {
+      "pending": "A desenhar {{count}} diagrama(s)…",
+      "failed": "Diagrama {{kind}} não desenhado",
+      "retry": "Tentar de novo os diagramas"
+    },
+    "reuse": {
+      "label": "Partir do enunciado de outro exame",
+      "load": "Copiar para o rascunho"
     }
   }
 }

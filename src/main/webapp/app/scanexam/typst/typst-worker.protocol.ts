@@ -1,6 +1,7 @@
 /**
  * Messages exchanged with `typst.worker.ts` (T25b, ADR 0004). The worker compiles a Typst subject with the
- * vendored packages only, and returns the PDF, the diagnostics and the `<ce-zone>` metadata.
+ * vendored packages only, and returns the PDF, the diagnostics, the `<ce-zone>` metadata and the diagrams to render
+ * (`<ce-diagram>`, T25c).
  * Pure module: shared by the worker and the Angular service.
  */
 
@@ -10,10 +11,20 @@ export interface TypstSourceFile {
   content: string;
 }
 
+/** A binary file of the subject (image), path absolute from the root (T25c). */
+export interface TypstBinaryFile {
+  path: string;
+  /** Identity of the content (SHA-256): the worker maps the file again only when it changes. */
+  key: string;
+  data: Uint8Array;
+}
+
 export interface TypstCompileRequest {
   kind: 'compile';
   id: number;
   files: TypstSourceFile[];
+  /** Images and other binary files of the subject (T25c); absent = none. */
+  binaries?: TypstBinaryFile[];
   /** Path of the main file, e.g. `/main.typ`. */
   main: string;
   /** `sys.inputs` (e.g. `ce-plan`). */
@@ -48,6 +59,8 @@ export interface TypstCompileResponse {
   pdf?: Uint8Array;
   /** Raw result of `query(<ce-zone>)`, read with `parseZoneMetadata`. */
   zones?: unknown;
+  /** Raw result of `query(<ce-diagram>)` (T25c), read with `parseDiagramRequests`. */
+  diagrams?: unknown;
   durationMs: number;
 }
 

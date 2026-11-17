@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy, signal } from '@angular/core';
 import { createTypstWorker } from './typst-worker-factory';
-import { TypstCompileRequest, TypstCompileResponse, TypstSourceFile, TypstWorkerResponse } from './typst-worker.protocol';
+import { TypstBinaryFile, TypstCompileRequest, TypstCompileResponse, TypstSourceFile, TypstWorkerResponse } from './typst-worker.protocol';
 
 export type TypstCompilerState = 'idle' | 'loading' | 'ready' | 'failed';
 
@@ -8,6 +8,8 @@ export interface TypstCompileOptions {
   main?: string;
   inputs?: Record<string, string>;
   withPdf?: boolean;
+  /** Images of the subject (T25c). */
+  binaries?: TypstBinaryFile[];
 }
 
 /**
@@ -30,6 +32,7 @@ export class TypstCompilerService implements OnDestroy {
       kind: 'compile',
       id: ++this.nextId,
       files,
+      binaries: options.binaries,
       main: options.main ?? '/main.typ',
       inputs: options.inputs ?? {},
       withPdf: options.withPdf ?? true,

@@ -132,6 +132,17 @@ export const CREERSUJETTYPST_ROUTE: Route = {
   },
 };
 
+/** Subject stored with an exam (T25c): edited with a lock, saved with its revision. */
+export const EXAMSUBJECT_ROUTE: Route = {
+  path: 'exam/:examid/subject',
+  canActivate: [UserRouteAccessService],
+  loadComponent: () => import('./subject-editor/subject-editor.component').then(m => m.SubjectEditorComponent),
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'typstsubject.storage.open',
+  },
+};
+
 export const CREEREXAMNBGRADER_ROUTE: Route = {
   path: 'creerexamnbgrader/:courseid',
   canActivate: [UserRouteAccessService],
@@ -459,6 +470,7 @@ export const SCANEXAM_ROUTES = [
   REGISTERSTUDENT_ROUTE,
   CREEREXAM_ROUTE,
   CREERSUJETTYPST_ROUTE,
+  EXAMSUBJECT_ROUTE,
   CREEREXAMNBGRADER_ROUTE,
   EXAMDETAIL_ROUTE,
   ANNOTATETEMPLATE_ROUTE,
