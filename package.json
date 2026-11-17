@@ -126,7 +126,8 @@
     "unzipit": "1.4.3",
     "uuid": "11.1.0",
     "xlsx": "0.18.5",
-    "zone.js": "0.15.1"
+    "zone.js": "0.15.1",
+    "zxing-wasm": "^3.1.7"
   },
   "devDependencies": {
     "@angular-builders/custom-webpack": "20.0.0",

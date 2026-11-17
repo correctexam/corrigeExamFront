@@ -32,6 +32,7 @@ import { worker1 } from '../services/workerimport';
 import { PreferenceService } from '../preference-page/preference.service';
 import { DialogService } from 'primeng/dynamicdialog';
 import { PartialAlignModalComponent } from './partial-align-modal/partial-align-modal.component';
+import { PageCodesCheckComponent } from '../page-codes-check/page-codes-check.component';
 // import { db as dbsqlite } from '../db/dbsqlite';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { QuestionService } from '../../entities/question/service/question.service';
@@ -69,6 +70,7 @@ export interface IPage {
   providers: [MessageService, DialogService],
   standalone: true,
   imports: [
+    PageCodesCheckComponent,
     GalleriaModule,
     PrimeTemplate,
     ToastModule,
