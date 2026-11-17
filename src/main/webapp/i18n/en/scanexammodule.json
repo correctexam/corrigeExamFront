@@ -102,6 +102,18 @@
     "odttemplate": "LibreOffice template",
     "latextemplate": "LaTeX template",
     "asciidoctemplate": "AsciiDoc template",
+    "createpaths": {
+      "question": "How do you want to prepare the subject?",
+      "pdfTitle": "Upload a PDF subject",
+      "pdfIntro": "Prepared with your word processor or LaTeX, from a template that contains the markers. The zones are then placed on the subject.",
+      "pdfTemplates": "Templates with markers:",
+      "typstTitle": "Write the subject in CorrectExam (Typst)",
+      "typstIntro": "Editor with live preview; answer zones, MCQs and identity zones are created automatically.",
+      "typstWarning": "For teachers comfortable with a markup language (LaTeX, Markdown…): the subject is written in Typst, a language close to LaTeX. Otherwise, upload a PDF.",
+      "typstDoc": "Discover Typst",
+      "typstOpen": "Write the subject in Typst",
+      "create": "Create the exam"
+    },
     "mdtemplate": "MarkDown template",
     "enonceexam": "Exam statement (PDF format):",
     "pdferror": "Invalid or corrupted PDF file",
