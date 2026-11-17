@@ -76,4 +76,31 @@ describe('TypstEngine (real compiler)', () => {
     const without = await compile('#include "part.typ"');
     expect(without.ok).toBe(false);
   });
+
+  it('loads the assets again after a failed start', async () => {
+    let calls = 0;
+    const flaky = new TypstEngine({
+      bytes: path => Promise.resolve(new Uint8Array(readFileSync(join(content, path)))),
+      compilerWasm() {
+        calls++;
+        return calls === 1
+          ? Promise.reject(new Error('incomplete download'))
+          : Promise.resolve(
+              new Uint8Array(
+                readFileSync(join(root, 'node_modules/@myriaddreamin/typst-ts-web-compiler/pkg/typst_ts_web_compiler_bg.wasm')),
+              ),
+            );
+      },
+    });
+    const req = {
+      kind: 'compile' as const,
+      id: 1,
+      files: [{ path: '/main.typ', content: 'Hello' }],
+      main: '/main.typ',
+      inputs: {},
+      withPdf: false,
+    };
+    await expect(flaky.compile(req)).rejects.toThrow('incomplete download');
+    await expect(flaky.compile(req)).resolves.toEqual(expect.objectContaining({ ok: true }));
+  });
 });

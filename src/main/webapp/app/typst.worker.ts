@@ -7,22 +7,17 @@
  * `content/typst/`; they are cached by the browser and the service worker.
  */
 
+import { fetchAsset, FetchFn } from './scanexam/typst/typst-assets';
 import { TypstEngine } from './scanexam/typst/typst-engine';
 import { TypstWorkerRequest, TypstWorkerResponse } from './scanexam/typst/typst-worker.protocol';
 
 const base = new URL('content/typst/', self.location.href);
 
-async function fetchBytes(url: URL): Promise<Uint8Array> {
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`${url.pathname}: HTTP ${res.status}`);
-  }
-  return new Uint8Array(await res.arrayBuffer());
-}
+const fetchFn: FetchFn = (input, init) => fetch(input, init);
 
 const engine = new TypstEngine({
-  bytes: path => fetchBytes(new URL(path, base)),
-  compilerWasm: () => fetchBytes(new URL('wasm/typst_ts_web_compiler_bg.wasm', base)),
+  bytes: path => fetchAsset(fetchFn, new URL(path, base)),
+  compilerWasm: () => fetchAsset(fetchFn, new URL('wasm/typst_ts_web_compiler_bg.wasm', base), true),
 });
 
 addEventListener('message', ({ data }: MessageEvent<TypstWorkerRequest>) => {

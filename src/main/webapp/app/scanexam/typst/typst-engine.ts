@@ -54,7 +54,14 @@ export class TypstEngine {
 
   /** Loads the compiler, the fonts and the packages once; later calls return the same compiler. */
   init(): Promise<TypstCompiler> {
-    this.initializing ??= this.load().then(c => (this.compiler = c));
+    this.initializing ??= this.load().then(
+      c => (this.compiler = c),
+      (e: unknown) => {
+        // a failed load (network, incomplete asset) is tried again by the next compilation
+        this.initializing = undefined;
+        throw e;
+      },
+    );
     return this.initializing;
   }
 
