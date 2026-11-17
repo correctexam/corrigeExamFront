@@ -1,0 +1,93 @@
+.subject-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: calc(100vh - 8rem);
+}
+
+.subject-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.subject-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  input {
+    width: 18rem;
+  }
+}
+
+.subject-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+
+  .toolbar-spacer {
+    flex: 1;
+  }
+}
+
+.subject-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.subject-source {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: auto;
+}
+
+.subject-codemirror {
+  flex: 1 0 24rem;
+  border: 1px solid #ced4da;
+  font-size: 0.85rem;
+
+  ::ng-deep .cm-editor {
+    height: 100%;
+  }
+
+  ::ng-deep .cm-scroller {
+    font-family: 'DejaVu Sans Mono', monospace;
+  }
+}
+
+.subject-status {
+  font-size: 0.8rem;
+  color: #6c757d;
+  padding: 0.25rem 0;
+}
+
+.subject-diagnostics {
+  font-size: 0.85rem;
+  padding-left: 1rem;
+
+  .hint {
+    color: #6c757d;
+    padding-left: 1rem;
+  }
+}
+
+.subject-summary h3 {
+  font-size: 1rem;
+}
+
+.subject-preview {
+  min-height: 0;
+
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: 1px solid #ced4da;
+  }
+}

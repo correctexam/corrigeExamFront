@@ -91,9 +91,13 @@ export interface NumericBubbleMeta extends MetaBase {
   value: number;
 }
 
+export type IdentityStyle = 'cells' | 'free';
+
 export interface IdentityMeta extends MetaBase {
   kind: 'identity';
   role: IdentityRole;
+  /** `cells`: one letter per cell; `free`: one frame for cursive handwriting (absent before the option existed). */
+  style?: IdentityStyle;
 }
 
 export type ZoneMeta = QuestionMeta | AnswerMeta | QcmBoxMeta | NumericCellMeta | NumericBubbleMeta | IdentityMeta;
@@ -140,6 +144,8 @@ export interface GeneratedQuestion {
 export interface GeneratedLayout {
   copy: string | null;
   identity: Partial<Record<IdentityRole, IZone>>;
+  /** How the student writes the last and first names (`Template.caseboxname` is true for `cells`). */
+  identityStyle: IdentityStyle;
   identityRects: Partial<Record<IdentityRole, PtRect>>;
   questions: GeneratedQuestion[];
 }
@@ -220,10 +226,14 @@ export function buildLayout(metas: ZoneMeta[], copy?: string | null): GeneratedL
 
   const identity: GeneratedLayout['identity'] = {};
   const identityRects: GeneratedLayout['identityRects'] = {};
+  let identityStyle: IdentityStyle = 'cells';
   for (const m of ms) {
     if (m.kind === 'identity') {
       identityRects[m.role] = rectOf(m);
       identity[m.role] = toZone(rectOf(m));
+      if (m.role !== 'stdid' && m.style === 'free') {
+        identityStyle = 'free';
+      }
     }
   }
 
@@ -280,7 +290,7 @@ export function buildLayout(metas: ZoneMeta[], copy?: string | null): GeneratedL
     numbers.add(q.number);
   }
 
-  return { copy: selected, identity, identityRects, questions };
+  return { copy: selected, identity, identityStyle, identityRects, questions };
 }
 
 function buildPart(q: GeneratedQuestion, part: number, zs: ZoneMeta[]): GeneratedPart {
