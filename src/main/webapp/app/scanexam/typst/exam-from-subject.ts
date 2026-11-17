@@ -6,12 +6,26 @@
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { IdentityZoneKind } from 'app/entities/exam/service/exam.service';
 import { IQuestion } from 'app/entities/question/question.model';
+import { IQuestionType } from 'app/entities/question-type/question-type.model';
 import { IZone } from 'app/entities/zone/zone.model';
 import { GeneratedLayout, GeneratedQuestion, IdentityRole } from './typst-zones';
 
-/** `question_type` rows (Liquibase): `manual` and `QCM`. */
-export const QUESTION_TYPE_MANUAL = 2;
-export const QUESTION_TYPE_QCM = 3;
+/** Question types used by a generated exam, by `question_type.algo_name` (ids differ between databases). */
+export type PlannedQuestionType = 'manual' | 'QCM';
+
+export type QuestionTypeIds = Record<PlannedQuestionType, number>;
+
+/** Ids of the question types of this database, as the template editor finds them (by `algoName`). */
+export function resolveQuestionTypeIds(types: IQuestionType[]): QuestionTypeIds {
+  const id = (algoName: PlannedQuestionType): number => {
+    const type = types.find(t => t.algoName === algoName && t.id !== undefined);
+    if (type?.id === undefined) {
+      throw new Error(`question type "${algoName}" missing from the database (table question_type)`);
+    }
+    return type.id;
+  };
+  return { manual: id('manual'), QCM: id('QCM') };
+}
 
 /** Defaults of the teacher (`PreferenceService.getPreferenceForQuestion()`). */
 export interface QuestionDefaults {
@@ -26,7 +40,9 @@ export interface PlannedIdentityZone {
 
 export interface PlannedQuestion {
   zone: IZone;
-  /** Question without zone nor exam: both are known once created. */
+  /** Type of the question; its id is set when the exam is created (`resolveQuestionTypeIds`). */
+  type: PlannedQuestionType;
+  /** Question without zone, exam nor type id: they are known once created. */
   question: IQuestion;
 }
 
@@ -92,12 +108,12 @@ export function planExam(layout: GeneratedLayout, defaults: QuestionDefaults): E
   const questions: PlannedQuestion[] = layout.questions.flatMap(q =>
     q.parts.map(part => ({
       zone: part.zone,
+      type: q.kind === 'qcm' ? ('QCM' as const) : ('manual' as const),
       question: {
         numero: q.number,
         point: q.points,
         step: defaults.step,
         gradeType: q.kind === 'qcm' ? defaults.gradeType : gradeTypeOf(q, defaults),
-        typeId: q.kind === 'qcm' ? QUESTION_TYPE_QCM : QUESTION_TYPE_MANUAL,
         validExpression: q.kind === 'qcm' ? q.validExpression : undefined,
         libelle: q.key,
         canBeNegative: false,
