@@ -1,5 +1,6 @@
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
+import globals from 'globals';
 
 export default [
   {
@@ -23,6 +24,11 @@ export default [
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
+  {
+    // Node scripts run by hand during development (vendoring of the Typst packages, T25)
+    files: ['src/main/typst/**/*.mjs'],
+    languageOptions: { globals: globals.node },
+  },
   {
     files: ['src/**/*.ts'],
 
