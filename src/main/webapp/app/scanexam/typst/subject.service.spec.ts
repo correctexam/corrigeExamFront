@@ -34,18 +34,26 @@ describe('SubjectService', () => {
   });
 
   it('writes a file with the known revision and encodes the path', async () => {
-    const written = service.writeFile(7, 'code/Main Test.java', 'class A {}', 'text/plain', 3);
+    const written = service.writeFile(7, 'code/Main Test.java', 'class A {}', 3);
     const req = http.expectOne('api/exams/7/subject/files/code/Main%20Test.java');
     expect(req.request.method).toBe('PUT');
     expect(req.request.headers.get('If-Match')).toBe('3');
-    expect(req.request.headers.get('Content-Type')).toBe('text/plain');
-    expect(req.request.body).toBe('class A {}');
+    expect(req.request.headers.get('Content-Type')).toBe('application/octet-stream');
+    expect(req.request.body).toBeInstanceOf(Blob);
+    expect(await (req.request.body as Blob).text()).toBe('class A {}');
     req.flush({ ...subject, revision: 4 });
     await expect(written).resolves.toEqual(expect.objectContaining({ revision: 4 }));
   });
 
+  it('returns the whole subject when taking the lock', async () => {
+    const locked = service.lock(7, true);
+    const req = http.expectOne('api/exams/7/subject/lock?force=true');
+    req.flush(subject);
+    await expect(locked).resolves.toEqual(subject);
+  });
+
   it('reports the reason given by the server', async () => {
-    const written = service.writeFile(7, 'main.typ', 'x', 'text/plain', 2);
+    const written = service.writeFile(7, 'main.typ', 'x', 2);
     http
       .expectOne('api/exams/7/subject/files/main.typ')
       .flush({ error: 'REVISION_CONFLICT', message: 'revision 3, not 2' }, { status: 409, statusText: 'Conflict' });

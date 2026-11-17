@@ -31,7 +31,6 @@ import {
   sortSubjectPaths,
   SUBJECT_FILE_ACCEPT,
   SUBJECT_MAIN_FILE,
-  subjectContentType,
   suggestSubjectPath,
   toCompilerPath,
 } from '../typst/subject-files';
@@ -653,7 +652,7 @@ export class SubjectEditorComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private write(examId: number, path: string, revision: number | undefined): Promise<ExamSubject> {
     const binary = this.binaries.get(path);
-    return this.subjects.writeFile(examId, path, binary ? binary.data : this.text(path), subjectContentType(path), revision);
+    return this.subjects.writeFile(examId, path, binary ? binary.data : this.text(path), revision);
   }
 
   /** Creates the subject of a new exam and writes every file. */
