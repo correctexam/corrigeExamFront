@@ -16,7 +16,7 @@
   title: [Génie logiciel — examen terminal],
   subtitle: [Master 1 informatique],
   duration: "2 h",
-  instructions: [Répondez directement dans les cadres. Tout débordement n'est pas lu. Documents interdits.],
+  instructions: [Documents et calculatrice interdits.],
 )
 
 #section("p1", title: [Partie 1 — Modélisation])[

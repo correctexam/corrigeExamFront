@@ -7,7 +7,9 @@ export const SUBJECT_STARTER = `#import "@local/correctexam:0.1.0": *
   duration: "2 h",
   // nom et prénom : "cells" (une lettre par case) ou "free" (cadre libre, écriture attachée)
   identity-style: "cells",
-  instructions: [Répondez dans les cadres. Ce qui dépasse n'est pas lu.],
+  // un avertissement « seules les réponses dans les cadres sont corrigées » est imprimé par défaut ;
+  // notice: none le retire, notice: [...] le remplace
+  instructions: [Documents interdits.],
 )
 
 #section("p1", title: [Partie 1])[

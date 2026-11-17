@@ -44,6 +44,15 @@
   // identity: light grey, so that the frames disturb the reading of the handwriting as little as possible
   identity-stroke: 0.6pt + luma(185),
   identity-free-height: 11mm,
+  // guide lines and grid of the free answer zones: light grey, the frame of the zone stays dark
+  guide-stroke: 0.4pt + luma(205),
+  grid-stroke: 0.3pt + luma(220),
+)
+
+/// Default notice printed under the header (`exam(notice: …)`; `none` to remove it).
+#let _default-notice = (
+  fr: [*Important :* seules les réponses écrites dans les cadres et les cases prévus sont lues et corrigées. Ce qui est écrit en dehors (marges, verso, brouillon) n'est pas pris en compte.],
+  en: [*Important:* only the answers written inside the frames and boxes are read and graded. Anything written elsewhere (margins, back of the page, draft paper) is ignored.],
 )
 
 // ---------------------------------------------------------------------------------------------------
@@ -236,14 +245,14 @@
     let part = _parts.get().at(_current.get(), default: 1)
     let lines = if style == "lines" {
       for k in range(1, int(height / spacing) + 1) {
-        place(top + left, dy: k * spacing - 1mm, line(length: size.width, stroke: 0.4pt + luma(170)))
+        place(top + left, dy: k * spacing - 1mm, line(length: size.width, stroke: _geom.guide-stroke))
       }
     } else if style == "grid" {
       for k in range(1, int(height / 5mm)) {
-        place(top + left, dy: k * 5mm, line(length: size.width, stroke: 0.3pt + luma(200)))
+        place(top + left, dy: k * 5mm, line(length: size.width, stroke: _geom.grid-stroke))
       }
       for k in range(1, int(size.width / 5mm)) {
-        place(top + left, dx: k * 5mm, line(angle: 90deg, length: height, stroke: 0.3pt + luma(200)))
+        place(top + left, dx: k * 5mm, line(angle: 90deg, length: height, stroke: _geom.grid-stroke))
       }
     }
     block(above: 0.8em, _zone-box("answer", size.width, height, stroke: 0.6pt + luma(60), part: part, body: lines))
@@ -294,15 +303,16 @@
     v(0.4em)
     context {
       let part = _parts.get().at(_current.get(), default: 1)
+      // no letter printed before the boxes: the student ticks the box of the answer; the letters (displayed and
+      // canonical) only live in the zone metadata
       grid(
-        columns: (5mm, _geom.box-size, 1fr),
-        column-gutter: (1.5mm, 3.5mm),
+        columns: (_geom.box-size, 1fr),
+        column-gutter: 3.5mm,
         row-gutter: 2.4mm,
-        align: (right + horizon, left + horizon, left + horizon),
+        align: (left + horizon, left + horizon),
         ..order
           .enumerate()
           .map(((displayed, canonical)) => (
-            text(size: 9pt)[#_letters.at(displayed).],
             _zone-box(
               "qcm-box",
               _geom.box-size,
@@ -416,6 +426,7 @@
   instructions: none,
   identity-header: true,
   identity-style: "cells",
+  notice: auto,
   marks-top: _geom.marks-top,
   lang: "fr",
   doc,
@@ -452,8 +463,13 @@
     })
     v(4mm)
     if identity-header { identity(style: identity-style) }
-    if instructions != none {
+    let warning = if notice == auto { _default-notice.at(lang, default: _default-notice.fr) } else { notice }
+    if warning != none {
       v(3mm)
+      block(width: 100%, inset: 2.5mm, stroke: (left: 2pt + black, rest: 0.6pt + black), text(size: 9pt, warning))
+    }
+    if instructions != none {
+      v(2mm)
       block(width: 100%, inset: 2.5mm, stroke: 0.6pt, text(size: 9pt, instructions))
     }
     v(3mm)

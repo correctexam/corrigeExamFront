@@ -55,6 +55,13 @@ describe('TypstEngine (real compiler)', () => {
     expect(tooLow.diagnostics[0].message).toContain('marks-top');
   });
 
+  it('lets the teacher remove or replace the default notice about the answer frames', async () => {
+    for (const notice of ['none', '[Seules les cases comptent.]']) {
+      const res = await compile(example.replace('#show: exam.with(', `#show: exam.with(\n  notice: ${notice},`));
+      expect(res.diagnostics.filter(d => d.severity === 'error')).toEqual([]);
+    }
+  });
+
   it('reports errors with 1-based positions', async () => {
     const res = await compile(
       '#import "@local/correctexam:0.1.0": *\n#show: exam\n#question("q", points: 1)[\n  #answer(height: oops)\n]\n',
