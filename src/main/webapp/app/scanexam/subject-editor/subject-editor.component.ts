@@ -10,6 +10,7 @@ import { ToastModule } from 'primeng/toast';
 import { EditorState } from '@codemirror/state';
 import { EditorView, highlightActiveLine, keymap, lineNumbers } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
+import { completionKeymap } from '@codemirror/autocomplete';
 import { Diagnostic as CmDiagnostic, lintGutter, setDiagnostics } from '@codemirror/lint';
 
 import { CourseService } from 'app/entities/course/service/course.service';
@@ -20,6 +21,7 @@ import { buildLayout, GeneratedLayout, parseZoneMetadata, TypstZoneError } from 
 import { checkLayout, LayoutIssue, planExam } from '../typst/exam-from-subject';
 import { ExamFromSubjectService } from '../typst/exam-from-subject.service';
 import { SUBJECT_SNIPPETS, SUBJECT_STARTER } from './subject-starter';
+import { typstEditorLanguage } from './typst-editor-language';
 
 const MAIN = '/main.typ';
 const COMPILE_DELAY_MS = 600;
@@ -106,11 +108,12 @@ export class SubjectEditorComponent implements OnInit, AfterViewInit, OnDestroy 
         doc: this.loadDraft(),
         extensions: [
           lineNumbers(),
+          ...typstEditorLanguage(),
           history(),
           highlightActiveLine(),
           lintGutter(),
           EditorView.lineWrapping,
-          keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
+          keymap.of([...completionKeymap, ...defaultKeymap, ...historyKeymap, indentWithTab]),
           EditorView.updateListener.of(update => {
             if (update.docChanged) {
               this.saveDraft();
