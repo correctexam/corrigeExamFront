@@ -121,6 +121,17 @@ export const CREEREXAM_ROUTE: Route = {
   },
 };
 
+/** Exam subject written in Typst (T25b, ADR 0004): the Typst compiler is loaded with this page only. */
+export const CREERSUJETTYPST_ROUTE: Route = {
+  path: 'creerexam/:courseid/typst',
+  canActivate: [UserRouteAccessService],
+  loadComponent: () => import('./subject-editor/subject-editor.component').then(m => m.SubjectEditorComponent),
+  data: {
+    authorities: ['ROLE_USER'],
+    pageTitle: 'typstsubject.pageTitle',
+  },
+};
+
 export const CREEREXAMNBGRADER_ROUTE: Route = {
   path: 'creerexamnbgrader/:courseid',
   canActivate: [UserRouteAccessService],
@@ -447,6 +458,7 @@ export const SCANEXAM_ROUTES = [
   COURSMAIN_ROUTE,
   REGISTERSTUDENT_ROUTE,
   CREEREXAM_ROUTE,
+  CREERSUJETTYPST_ROUTE,
   CREEREXAMNBGRADER_ROUTE,
   EXAMDETAIL_ROUTE,
   ANNOTATETEMPLATE_ROUTE,

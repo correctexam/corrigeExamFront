@@ -52,6 +52,15 @@ describe('typst-zones', () => {
   describe('buildLayout (preview, source order)', () => {
     const layout = buildLayout(preview);
 
+    it('reads the way names are written (cells by default)', () => {
+      expect(layout.identityStyle).toBe('cells');
+      const free = preview.map(m => (m.kind === 'identity' && m.role !== 'stdid' ? { ...m, style: 'free' as const } : m));
+      expect(buildLayout(free).identityStyle).toBe('free');
+      // the student number is always in cells: it does not decide the style
+      const idOnly = preview.map(m => (m.kind === 'identity' && m.role === 'stdid' ? { ...m, style: 'free' as const } : m));
+      expect(buildLayout(idOnly).identityStyle).toBe('cells');
+    });
+
     it('finds the three identity zones', () => {
       expect(Object.keys(layout.identity).sort()).toEqual(['firstname', 'lastname', 'stdid']);
       const name = layout.identity.lastname!;

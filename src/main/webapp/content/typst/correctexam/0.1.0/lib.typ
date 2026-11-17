@@ -23,9 +23,14 @@
 // Geometry shared with the scan pipeline. Changing it requires checking the alignment (circles) and the
 // MCQ detection (squares) again: see content/typst/README.md.
 #let _geom = (
-  // filled circles, center at `mark-inset` from both edges of each corner
+  // filled circles, center at `mark-inset` from the side edges and from the bottom edge; the top circles are
+  // lower (`exam(marks-top: …)`) so that a corner cut with a guillotine to remove the staples leaves them intact
   mark-radius: 2.5mm,
   mark-inset: 9mm,
+  marks-top: 22mm,
+  // the server worker looks for each circle in a corner square of 300 px on a page 2000 px high (44,6 mm):
+  // the whole circle must stay inside it
+  marks-top-max: 40mm,
   // page code (Data Matrix) at the bottom center
   code-size: 11mm,
   // MCQ and numeric bubbles: squares, drawn with a dark thin stroke (detected as CARRE)
@@ -36,6 +41,18 @@
   cell-height: 8.5mm,
   cell-gap: 1.2mm,
   cell-stroke: 0.6pt + luma(90),
+  // identity: light grey, so that the frames disturb the reading of the handwriting as little as possible
+  identity-stroke: 0.6pt + luma(185),
+  identity-free-height: 11mm,
+  // guide lines and grid of the free answer zones: light grey, the frame of the zone stays dark
+  guide-stroke: 0.4pt + luma(205),
+  grid-stroke: 0.3pt + luma(220),
+)
+
+/// Default notice printed under the header (`exam(notice: …)`; `none` to remove it).
+#let _default-notice = (
+  fr: [*Important :* seules les réponses écrites dans les cadres et les cases prévus sont lues et corrigées. Ce qui est écrit en dehors (marges, verso, brouillon) n'est pas pris en compte.],
+  en: [*Important:* only the answers written inside the frames and boxes are read and graded. Anything written elsewhere (margins, back of the page, draft paper) is ignored.],
 )
 
 // ---------------------------------------------------------------------------------------------------
@@ -127,12 +144,12 @@
   }
 }
 
-#let _background() = {
+#let _background(marks-top) = {
   let r = _geom.mark-radius
   let i = _geom.mark-inset
   for (ax, ay) in ((left, top), (right, top), (left, bottom), (right, bottom)) {
     let dx = if ax == left { i - r } else { -(i - r) }
-    let dy = if ay == top { i - r } else { -(i - r) }
+    let dy = if ay == top { marks-top - r } else { -(i - r) }
     place(ax + ay, dx: dx, dy: dy, circle(radius: r, fill: black))
   }
   place(bottom + center, dy: -(_geom.mark-inset - _geom.code-size / 2), _page-code())
@@ -142,30 +159,47 @@
 // Identity header
 
 // One row of handwritten cells; the zone covers the cells only (the label stays outside).
-#let _cells-zone(kind, count, ..extra) = {
+#let _cells-zone(kind, count, stroke: _geom.cell-stroke, ..extra) = {
   let w = count * _geom.cell-width + (count - 1) * _geom.cell-gap
   _zone-box(kind, w, _geom.cell-height, ..extra, body: stack(
     dir: ltr,
     spacing: _geom.cell-gap,
-    ..range(count).map(_ => box(width: _geom.cell-width, height: _geom.cell-height, stroke: _geom.cell-stroke)),
+    ..range(count).map(_ => box(width: _geom.cell-width, height: _geom.cell-height, stroke: stroke)),
   ))
 }
 
-/// Last name, first name and student number, read by the existing identity association (OCR).
-/// Nothing about the student is ever printed (T25 decision): the student fills these cells.
-#let identity(name-cells: 18, firstname-cells: 18, id-cells: 8, id-label: [N° étudiant]) = block(
-  width: 100%,
-  breakable: false,
-  grid(
-    columns: (auto, 1fr),
-    column-gutter: 3mm,
-    row-gutter: 2.5mm,
-    align: (right + horizon, left + horizon),
-    text(weight: "bold", size: 9pt)[NOM], _cells-zone("identity", name-cells, role: "lastname"),
-    text(weight: "bold", size: 9pt)[PRÉNOM], _cells-zone("identity", firstname-cells, role: "firstname"),
-    text(weight: "bold", size: 9pt, id-label), _cells-zone("identity", id-cells, role: "stdid"),
-  ),
-)
+// One free frame, as wide as `count` cells, for cursive handwriting.
+#let _free-zone(kind, count, ..extra) = {
+  let w = count * _geom.cell-width + (count - 1) * _geom.cell-gap
+  _zone-box(kind, w, _geom.identity-free-height, stroke: _geom.identity-stroke, ..extra)
+}
+
+/// Last name, first name and student number, read by the existing identity association.
+/// `style`: "cells" (one letter per cell, recognised letter by letter) or "free" (one frame per line, for
+/// cursive handwriting, recognised as a whole). The student number always uses cells (digits).
+/// Nothing about the student is ever printed (T25 decision): the student fills these zones.
+#let identity(style: "cells", name-cells: 18, firstname-cells: 18, id-cells: 8, id-label: [N° étudiant]) = {
+  assert(style in ("cells", "free"), message: "identity: style must be \"cells\" or \"free\"")
+  let line(role, count) = if style == "cells" {
+    _cells-zone("identity", count, stroke: _geom.identity-stroke, role: role, style: style)
+  } else {
+    _free-zone("identity", count, role: role, style: style)
+  }
+  block(
+    width: 100%,
+    breakable: false,
+    grid(
+      columns: (auto, 1fr),
+      column-gutter: 3mm,
+      row-gutter: 2.5mm,
+      align: (right + horizon, left + horizon),
+      text(weight: "bold", size: 9pt)[NOM], line("lastname", name-cells),
+      text(weight: "bold", size: 9pt)[PRÉNOM], line("firstname", firstname-cells),
+      text(weight: "bold", size: 9pt, id-label),
+      _cells-zone("identity", id-cells, stroke: _geom.identity-stroke, role: "stdid", style: "cells"),
+    ),
+  )
+}
 
 // ---------------------------------------------------------------------------------------------------
 // Questions
@@ -196,8 +230,9 @@
 }
 
 /// A question corrected by hand. Put one or more `answer` zones in its body. The question is kept on one
-/// page with its zones unless `breakable: true` (long statements).
-#let question(key, points: 1, grade: "positive", breakable: false, body) = block(width: 100%, breakable: breakable, above: 1.4em, {
+/// page with its zones unless `breakable: true` (long statements). `grade`: "direct", "positive", "negative"
+/// or "hybrid" (CorrectExam grading modes); `none` keeps the default of the teacher's preferences.
+#let question(key, points: 1, grade: none, breakable: false, body) = block(width: 100%, breakable: breakable, above: 1.4em, {
   _question-head(key, points, "manual", extra: (grade: grade))
   linebreak()
   body
@@ -210,14 +245,14 @@
     let part = _parts.get().at(_current.get(), default: 1)
     let lines = if style == "lines" {
       for k in range(1, int(height / spacing) + 1) {
-        place(top + left, dy: k * spacing - 1mm, line(length: size.width, stroke: 0.4pt + luma(170)))
+        place(top + left, dy: k * spacing - 1mm, line(length: size.width, stroke: _geom.guide-stroke))
       }
     } else if style == "grid" {
       for k in range(1, int(height / 5mm)) {
-        place(top + left, dy: k * 5mm, line(length: size.width, stroke: 0.3pt + luma(200)))
+        place(top + left, dy: k * 5mm, line(length: size.width, stroke: _geom.grid-stroke))
       }
       for k in range(1, int(size.width / 5mm)) {
-        place(top + left, dx: k * 5mm, line(angle: 90deg, length: height, stroke: 0.3pt + luma(200)))
+        place(top + left, dx: k * 5mm, line(angle: 90deg, length: height, stroke: _geom.grid-stroke))
       }
     }
     block(above: 0.8em, _zone-box("answer", size.width, height, stroke: 0.6pt + luma(60), part: part, body: lines))
@@ -268,15 +303,16 @@
     v(0.4em)
     context {
       let part = _parts.get().at(_current.get(), default: 1)
+      // no letter printed before the boxes: the student ticks the box of the answer; the letters (displayed and
+      // canonical) only live in the zone metadata
       grid(
-        columns: (5mm, _geom.box-size, 1fr),
-        column-gutter: (1.5mm, 3.5mm),
+        columns: (_geom.box-size, 1fr),
+        column-gutter: 3.5mm,
         row-gutter: 2.4mm,
-        align: (right + horizon, left + horizon, left + horizon),
+        align: (left + horizon, left + horizon),
         ..order
           .enumerate()
           .map(((displayed, canonical)) => (
-            text(size: 9pt)[#_letters.at(displayed).],
             _zone-box(
               "qcm-box",
               _geom.box-size,
@@ -389,15 +425,22 @@
   duration: none,
   instructions: none,
   identity-header: true,
+  identity-style: "cells",
+  notice: auto,
+  marks-top: _geom.marks-top,
   lang: "fr",
   doc,
 ) = {
+  assert(
+    marks-top >= _geom.mark-inset and marks-top <= _geom.marks-top-max,
+    message: "exam: marks-top must be between 9mm and 40mm",
+  )
   set document(title: title)
   set text(lang: lang, size: 10.5pt)
   set page(
     paper: "a4",
     margin: (top: 18mm, bottom: 24mm, left: 18mm, right: 18mm),
-    background: _background(),
+    background: _background(marks-top),
   )
   set par(justify: true)
   // printed in black and white: no information carried by color alone
@@ -419,9 +462,14 @@
       if duration != none { linebreak(); text(size: 9pt, fill: luma(80))[Durée : #duration] }
     })
     v(4mm)
-    if identity-header { identity() }
-    if instructions != none {
+    if identity-header { identity(style: identity-style) }
+    let warning = if notice == auto { _default-notice.at(lang, default: _default-notice.fr) } else { notice }
+    if warning != none {
       v(3mm)
+      block(width: 100%, inset: 2.5mm, stroke: (left: 2pt + black, rest: 0.6pt + black), text(size: 9pt, warning))
+    }
+    if instructions != none {
+      v(2mm)
       block(width: 100%, inset: 2.5mm, stroke: 0.6pt, text(size: 9pt, instructions))
     }
     v(3mm)

@@ -111,6 +111,13 @@ export class CreerexamComponent implements OnInit, AfterViewInit {
     }
   }
 
+  /** Subject written in the platform (T25b): the exam is created from the compiled subject, without drawing zones. */
+  gotoTypstEditor(): void {
+    if (this.courseid !== undefined) {
+      this.router.navigateByUrl(`/creerexam/${this.courseid}/typst`);
+    }
+  }
+
   byteSize(base64String: string): string {
     return this.dataUtils.byteSize(base64String);
   }

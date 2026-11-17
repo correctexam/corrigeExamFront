@@ -1,0 +1,57 @@
+{
+  "typstsubject": {
+    "pageTitle": "Write the subject — {{courseName}}",
+    "heading": "Write the subject of an exam of the course {{courseName}}",
+    "examName": "Exam name",
+    "create": "Create the exam",
+    "creating": "Creating…",
+    "download": "Download the .typ",
+    "open": "Open a .typ",
+    "reset": "Start again from the template",
+    "loadingCompiler": "Loading the Typst compiler (first time: a few tens of MB)…",
+    "compilerFailed": "The Typst compiler does not answer.",
+    "compiling": "Compiling…",
+    "compiled": "Compiled in {{ms}} ms",
+    "noPreview": "The preview of the PDF to print appears after the first compilation.",
+    "summary": "What will be created",
+    "identity": "Identity zones",
+    "key": "Key",
+    "kind": "Kind",
+    "points": "Points",
+    "zones": "Zones (page)",
+    "role": {
+      "lastname": "last name",
+      "firstname": "first name",
+      "stdid": "student number"
+    },
+    "kinds": {
+      "manual": "free",
+      "qcm": "MCQ",
+      "numeric": "numeric",
+      "short": "short answer"
+    },
+    "snippet": {
+      "question": "+ Question",
+      "qcm": "+ MCQ",
+      "numeric": "+ Numeric",
+      "short": "+ Short answer",
+      "code": "+ Code",
+      "math": "+ Formula",
+      "section": "+ Part"
+    },
+    "issue": {
+      "noQuestion": "The subject has no question.",
+      "noIdentityZone": "Missing identity zone ({{role}}): sheets will be matched to students by hand.",
+      "badPoints": "Question {{question}}: {{points}} point(s). Points must be positive, in quarters of a point.",
+      "qcmWithoutAnswer": "MCQ {{question}}: no right answer and no grading.",
+      "gradedByHand": "Question {{question}} ({{kind}}): graded by hand for now."
+    },
+    "openFailed": "The file could not be opened",
+    "createFailed": "The exam could not be created",
+    "writeSubject": "Write the subject (Typst)",
+    "identityStyle": {
+      "cells": "names in cells",
+      "free": "names in a free frame"
+    }
+  }
+}
