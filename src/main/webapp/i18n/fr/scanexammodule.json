@@ -744,7 +744,13 @@
         "missingPart": "zone {{ question }} (partie {{ part }}) absente de la version",
         "missingBox": "case {{ letter }} de {{ question }} absente de la version",
         "missingPage": "page de la zone {{ question }} absente de la copie"
-      }
+      },
+      "badge": "Version {{ label }}",
+      "copyTooltip": "Copie imprimée en version {{ label }}, reconstruite dans la mise en page de la version A pour la correction. Cliquer pour voir la copie originale.",
+      "variants": "Formulations de cette version :",
+      "wording": "{{ key }} n° {{ n }}",
+      "studentNotice": "Votre copie (version {{ label }}) est présentée dans la mise en page de la version A, celle de la correction. Vos réponses n'ont pas changé.",
+      "showOriginal": "Voir ma copie originale"
     }
   }
 }

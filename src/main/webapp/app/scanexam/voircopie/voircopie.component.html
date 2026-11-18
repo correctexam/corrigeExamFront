@@ -195,10 +195,19 @@
               <!--  <p-button icon="pi pi-refresh"></p-button>-->
             </div>
           }
-          <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
-            <label [translate]="'scanexam.removealignement'">Supprimer alignement: </label>
-            <p-toggleSwitch [(ngModel)]="noalign" (onChange)="changeAlign()"></p-toggleSwitch>
-          </div>
+          @if (rebuiltVersion) {
+            <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12" data-cy="copy-version">
+              <p class="small">{{ 'scanexam.versions.studentNotice' | translate: { label: rebuiltVersion } }}</p>
+              <button type="button" class="p-button p-button-outlined p-button-sm" [disabled]="blocked" (click)="showOriginal()">
+                <span [translate]="'scanexam.versions.showOriginal'">Voir la copie originale</span>
+              </button>
+            </div>
+          } @else {
+            <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
+              <label [translate]="'scanexam.removealignement'">Supprimer alignement: </label>
+              <p-toggleSwitch [(ngModel)]="noalign" (onChange)="changeAlign()"></p-toggleSwitch>
+            </div>
+          }
           <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
             <label [translate]="'scanexam.zoomfactor'">Facteur agrandissement: </label>
             @if (noteSteps > 0) {
