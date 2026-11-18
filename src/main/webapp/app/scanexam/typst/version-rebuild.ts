@@ -244,6 +244,16 @@ export interface RebuildSummary {
   alreadyRebuilt: number;
   rebuilt: { firstPage: number; edition: number; copy: number; label: string; issues: RebuildIssue[] }[];
   notRebuilt: { firstPage: number; reason: string; detail?: string }[];
+  /** Version of every copy whose version is known (T25e6b), recorded in the back for the statistics per version. */
+  copyVersions: CopyVersionRecord[];
+}
+
+/** Version of the copy starting at page `firstPage` of the scan (from 1), as recorded by the back (T25e6b). */
+export interface CopyVersionRecord {
+  firstPage: number;
+  label: string;
+  edition?: number;
+  copy?: number;
 }
 
 /**
@@ -281,7 +291,15 @@ export function parseServerVersions(details: string | null | undefined): Rebuild
       reason: String(n['reason']),
       ...(typeof n['detail'] === 'string' ? { detail: n['detail'] } : {}),
     }));
-    return { copies: v['copies'], versionA: v['version_a'], alreadyRebuilt: v['already_rebuilt'], rebuilt, notRebuilt };
+    const copyVersions: CopyVersionRecord[] = (
+      Array.isArray(v['copy_versions']) ? (v['copy_versions'] as Record<string, unknown>[]) : []
+    ).map(c => ({
+      firstPage: Number(c['first_page']),
+      label: String(c['label']),
+      ...(typeof c['edition'] === 'number' ? { edition: c['edition'] } : {}),
+      ...(typeof c['copy'] === 'number' ? { copy: c['copy'] } : {}),
+    }));
+    return { copies: v['copies'], versionA: v['version_a'], alreadyRebuilt: v['already_rebuilt'], rebuilt, notRebuilt, copyVersions };
   } catch {
     return undefined;
   }

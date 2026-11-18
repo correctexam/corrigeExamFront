@@ -104,6 +104,11 @@ describe('VersionRebuildService', () => {
       [5, 3, 'C'],
     ]);
     expect(progress).toEqual([1, 2, 3]);
+    expect(report.copyVersions).toEqual([
+      { firstPage: 1, label: 'A', edition: 12, copy: 1 },
+      { firstPage: 3, label: 'B', edition: 12, copy: 2 },
+      { firstPage: 5, label: 'C', edition: 12, copy: 3 },
+    ]);
     expect(rebuildImages.mock.calls[0][0]).toMatchObject({
       copy: ['img:3', 'img:4'],
       templates: ['tpl:1', 'tpl:2'],
@@ -117,6 +122,11 @@ describe('VersionRebuildService', () => {
     rebuildImages.mockClear();
     const again = await service.rebuild(7);
     expect(again).toMatchObject({ versionA: 1, alreadyRebuilt: 2, rebuilt: [] });
+    expect(again.copyVersions.map(c => [c.firstPage, c.label])).toEqual([
+      [1, 'A'],
+      [3, 'B'],
+      [5, 'C'],
+    ]);
     expect(rebuildImages).not.toHaveBeenCalled();
   });
 

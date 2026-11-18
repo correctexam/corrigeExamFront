@@ -78,6 +78,20 @@ describe('ExamVersionsService', () => {
     await expect(stored).rejects.toMatchObject({ status: 409 });
   });
 
+  it('records the version of each copy', async () => {
+    const saved = service.saveCopyVersions(7, [
+      { firstPage: 1, label: 'A', edition: 41, copy: 1 },
+      { firstPage: 3, label: 'B' },
+    ]);
+    const req = http.expectOne({ method: 'PUT', url: 'api/exams/7/copy-versions' });
+    expect(req.request.body).toEqual([
+      { firstPage: 1, label: 'A', edition: 41, copy: 1 },
+      { firstPage: 3, label: 'B', edition: null, copy: null },
+    ]);
+    req.flush([]);
+    await expect(saved).resolves.toEqual([]);
+  });
+
   it('reads the PDF of a version', async () => {
     const pdf = service.pdf(7, 1);
     http.expectOne('api/exams/7/versions/1/pdf').flush(new Uint8Array([1, 2, 3]).buffer);

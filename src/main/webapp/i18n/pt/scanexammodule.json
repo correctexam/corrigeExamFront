@@ -739,6 +739,14 @@
         "missingBox": "caixa {{ letter }} de {{ question }} ausente da versão",
         "missingPage": "página da zona {{ question }} ausente da prova"
       },
+      "copyVersionsNotSaved": "Não foi possível registar a versão das provas (estatísticas por versão)",
+      "statsTitle": "Resultados por versão",
+      "statsIntro": "Médias das provas de cada versão do enunciado. Uma célula colorida assinala uma questão em que a versão se afasta mais de 15 % da cotação da média de todas as provas.",
+      "statsVersion": "Versão",
+      "statsCopies": "Provas",
+      "statsGap": "Diferença em relação à média de todas as provas: {{ delta }} ponto(s)",
+      "statsGaps": "{{ n }} diferença(s) notável(is) entre versões: verifique o enunciado ou a correção destas questões nas versões em causa.",
+      "statsUnknown": "{{ n }} prova(s) sem versão conhecida (código de página ilegível) não são contadas."
       "badge": "Versão {{ label }}",
       "copyTooltip": "Prova impressa na versão {{ label }}, reconstruída na paginação da versão A para a correção. Clique para ver a prova original.",
       "variants": "Formulações desta versão:",

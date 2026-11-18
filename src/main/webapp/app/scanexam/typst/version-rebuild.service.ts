@@ -53,7 +53,15 @@ export class VersionRebuildService {
   private readonly translate = inject(TranslateService);
 
   async rebuild(examId: number, onProgress?: (p: RebuildProgress) => void): Promise<RebuildReport> {
-    const report: RebuildReport = { applicable: false, copies: 0, versionA: 0, alreadyRebuilt: 0, rebuilt: [], notRebuilt: [] };
+    const report: RebuildReport = {
+      applicable: false,
+      copies: 0,
+      versionA: 0,
+      alreadyRebuilt: 0,
+      rebuilt: [],
+      notRebuilt: [],
+      copyVersions: [],
+    };
     const editions = await this.printService.listEditions(examId);
     if (!editions.some(e => (e.versions ?? 1) > 1)) {
       return report;
@@ -115,6 +123,7 @@ export class VersionRebuildService {
     const marked = values.filter(v => v.rebuilt !== undefined).length;
     if (marked === values.length) {
       report.alreadyRebuilt++;
+      report.copyVersions.push({ firstPage, label: values[0].rebuilt! });
       return;
     }
     if (marked > 0) {
@@ -137,6 +146,7 @@ export class VersionRebuildService {
     }
     if (found.version === 0) {
       report.versionA++;
+      report.copyVersions.push({ firstPage, label: canonical.label, edition: found.edition, copy: found.copy });
       return;
     }
     const version = versions.find(v => v.index === found.version);
@@ -160,6 +170,7 @@ export class VersionRebuildService {
         value: JSON.stringify({ pages: images[j], rebuilt: version.label } satisfies AlignedValue),
       });
     }
+    report.copyVersions.push({ firstPage, label: version.label, edition: found.edition, copy: found.copy });
     report.rebuilt.push({ firstPage, edition: found.edition, copy: found.copy, label: version.label, issues });
   }
 

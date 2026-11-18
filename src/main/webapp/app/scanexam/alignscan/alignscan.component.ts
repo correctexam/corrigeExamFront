@@ -35,7 +35,8 @@ import { PartialAlignModalComponent } from './partial-align-modal/partial-align-
 import { PageCodesCheckComponent } from '../page-codes-check/page-codes-check.component';
 import { parseServerSummary, ServerPageCodeSummary } from '../typst/page-codes';
 import { VersionRebuildService } from '../typst/version-rebuild.service';
-import { parseServerVersions, RebuildSummary } from '../typst/version-rebuild';
+import { CopyVersionRecord, parseServerVersions, RebuildSummary } from '../typst/version-rebuild';
+import { ExamVersionsService } from '../typst/exam-versions.service';
 // import { db as dbsqlite } from '../db/dbsqlite';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { QuestionService } from '../../entities/question/service/question.service';
@@ -181,6 +182,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
   // completes the subscriptions to application-wide observables when the component is destroyed
   private readonly destroyRef = inject(DestroyRef);
   private readonly versionRebuild = inject(VersionRebuildService);
+  private readonly examVersions = inject(ExamVersionsService);
 
   constructor(
     public examService: ExamService,
@@ -504,6 +506,23 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
    * version A before the cache is sent, so that the zones of the exam fall in the right place. A failure leaves the
    * aligned pages as they are and is reported: the alignment itself is kept.
    */
+  /**
+   * Version of each copy, recorded in the back for the statistics per version (T25e6b). A failure leaves the
+   * alignment as it is: the statistics will not tell the versions apart until the next alignment.
+   */
+  private async saveCopyVersions(copies: CopyVersionRecord[]): Promise<void> {
+    try {
+      await this.examVersions.saveCopyVersions(+this.examId, copies);
+    } catch (e) {
+      console.warn('versions of the copies not recorded', e);
+      this.messageService.add({
+        severity: 'warn',
+        summary: this.translateService.instant('scanexam.versions.copyVersionsNotSaved'),
+        detail: e instanceof Error ? e.message : String(e),
+      });
+    }
+  }
+
   private async rebuildVersions(): Promise<void> {
     this.versionReport.set(undefined);
     this.message.set(this.translateService.instant('scanexam.versions.rebuilding') as string);
@@ -512,6 +531,7 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
       const report = await this.versionRebuild.rebuild(+this.examId, p => this.percentavancement.set((p.done * 100) / p.total));
       if (report.applicable) {
         this.versionReport.set(report);
+        await this.saveCopyVersions(report.copyVersions);
         if (report.notRebuilt.length > 0) {
           this.messageService.add({
             severity: 'warn',
@@ -657,6 +677,9 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
     // les copies des versions B, C… ont pu être reconstruites par le worker (T25e5)
     const versions = parseServerVersions(last?.details);
     this.versionReport.set(versions);
+    if (versions) {
+      await this.saveCopyVersions(versions.copyVersions);
+    }
     if (versions && versions.notRebuilt.length > 0) {
       this.messageService.add({
         severity: 'warn',

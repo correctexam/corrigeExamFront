@@ -39,6 +39,58 @@
     </button>
   </div>
 </div>
+@if (versionComparison; as vc) {
+  <div class="versions-card" id="statsversions" data-cy="stats-versions">
+    <p-card [header]="'scanexam.versions.statsTitle' | translate">
+      <p class="small text-muted" [translate]="'scanexam.versions.statsIntro'"></p>
+      <div class="versions-table">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th [translate]="'scanexam.versions.statsVersion'">Version</th>
+              <th [translate]="'scanexam.versions.statsCopies'">Copies</th>
+              <th [translate]="'scanexam.average'">Moyenne</th>
+              @for (q of q_notees; track q.numero) {
+                <th [pTooltip]="q.label">
+                  Q{{ q.numero }} <span class="text-muted small">/{{ q.bareme }}</span>
+                </th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (v of vc.versions; track v.label) {
+              <tr>
+                <td>
+                  <strong>{{ v.label }}</strong>
+                </td>
+                <td>{{ v.copies }}</td>
+                <td>{{ v.mean.toFixed(2) }}</td>
+                @for (q of q_notees; track q.numero) {
+                  @let gap = versionGap(v.label, q.numero);
+                  <td
+                    [class.version-gap-low]="gap !== undefined && gap < 0"
+                    [class.version-gap-high]="gap !== undefined && gap > 0"
+                    [pTooltip]="gap !== undefined ? ('scanexam.versions.statsGap' | translate: { delta: gap.toFixed(2) }) : ''"
+                  >
+                    {{ v.questions[q.numero] !== undefined ? v.questions[q.numero]!.toFixed(2) : '–' }}
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (vc.gaps.length > 0) {
+        <p class="text-warning small" data-cy="stats-versions-gaps">
+          {{ 'scanexam.versions.statsGaps' | translate: { n: vc.gaps.length } }}
+        </p>
+      }
+      @if (vc.unknown > 0) {
+        <p class="text-muted small">{{ 'scanexam.versions.statsUnknown' | translate: { n: vc.unknown } }}</p>
+      }
+    </p-card>
+  </div>
+}
 <div class="cards">
   <div class="card" id="statgen">
     <p-card [header]="'scanexam.statexam2' | translate">

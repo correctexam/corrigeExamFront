@@ -931,7 +931,7 @@
     }
   ],
   "finishedDetails": {
-    "details": "{\"versions\":{\"copies\":4,\"version_a\":1,\"already_rebuilt\":1,\"rebuilt\":[{\"first_page\":3,\"edition\":41,\"copy\":2,\"label\":\"B\",\"issues\":[{\"key\":\"missingBox\",\"question\":\"q2\",\"part\":1,\"letter\":\"c\"}]}],\"not_rebuilt\":[{\"first_page\":7,\"reason\":\"disordered\",\"detail\":\"41|4|1 @ 2\"}]}}",
+    "details": "{\"versions\":{\"copies\":4,\"version_a\":1,\"already_rebuilt\":1,\"rebuilt\":[{\"first_page\":3,\"edition\":41,\"copy\":2,\"label\":\"B\",\"issues\":[{\"key\":\"missingBox\",\"question\":\"q2\",\"part\":1,\"letter\":\"c\"}]}],\"not_rebuilt\":[{\"first_page\":7,\"reason\":\"disordered\",\"detail\":\"41|4|1 @ 2\"}],\"copy_versions\":[{\"first_page\":1,\"label\":\"A\",\"edition\":41,\"copy\":1},{\"first_page\":3,\"label\":\"B\",\"edition\":41,\"copy\":2},{\"first_page\":5,\"label\":\"B\"}]}}",
     "expected": {
       "copies": 4,
       "versionA": 1,
@@ -957,6 +957,24 @@
           "firstPage": 7,
           "reason": "disordered",
           "detail": "41|4|1 @ 2"
+        }
+      ],
+      "copyVersions": [
+        {
+          "firstPage": 1,
+          "label": "A",
+          "edition": 41,
+          "copy": 1
+        },
+        {
+          "firstPage": 3,
+          "label": "B",
+          "edition": 41,
+          "copy": 2
+        },
+        {
+          "firstPage": 5,
+          "label": "B"
         }
       ]
     }
