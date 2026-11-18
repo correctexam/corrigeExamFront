@@ -309,10 +309,102 @@
           </p>
         }
       </div>
+
+      <div class="subject-versions" data-cy="typst-versions">
+        <h3 [translate]="'typstsubject.versions.title'">Versions</h3>
+        <p class="text-muted small" [translate]="'typstsubject.versions.intro'"></p>
+        <div class="versions-controls">
+          <label for="version-count" [translate]="'typstsubject.versions.count'">Nombre de versions</label>
+          <select
+            id="version-count"
+            class="form-select form-select-sm"
+            [ngModel]="versionCount()"
+            (ngModelChange)="setVersionCount($event)"
+            data-cy="typst-version-count"
+          >
+            @for (n of [1, 2, 3, 4, 5, 6].slice(0, maxVersions); track n) {
+              <option [ngValue]="n">{{ n }}</option>
+            }
+          </select>
+          <label for="version-seed" [translate]="'typstsubject.versions.seed'">Tirage</label>
+          <input
+            id="version-seed"
+            class="form-control form-control-sm"
+            type="number"
+            min="0"
+            [ngModel]="versionSeed()"
+            (ngModelChange)="setVersionSeed($event)"
+          />
+          <button type="button" class="btn btn-sm btn-outline-secondary" (click)="newVersionSeed()">
+            <span [translate]="'typstsubject.versions.newSeed'">Nouveau tirage</span>
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-primary"
+            [disabled]="versionsBuilding() || result()?.ok !== true"
+            (click)="buildVersions()"
+            data-cy="typst-build-versions"
+          >
+            <span [translate]="versionsBuilding() ? 'typstsubject.versions.building' : 'typstsubject.versions.build'">Générer</span>
+          </button>
+        </div>
+
+        @if (versions(); as v) {
+          @if (versionsStale()) {
+            <p class="text-warning small" [translate]="'typstsubject.versions.stale'">Le sujet a changé : régénérez les versions.</p>
+          }
+          @if (v.diagnostics; as d) {
+            <p class="text-danger" data-cy="typst-versions-error">
+              {{ 'typstsubject.versions.doesNotCompile' | translate: { version: d.version } }}
+              @for (x of d.diagnostics.slice(0, 3); track $index) {
+                <br />{{ x.line ?? '' }}{{ x.line !== undefined ? ':' : '' }} {{ x.message }}
+              }
+            </p>
+          }
+          @if (v.versions.length > 0) {
+            <table class="table table-sm" data-cy="typst-versions-list">
+              <tbody>
+                @for (version of v.versions; track version.plan.index) {
+                  <tr [class.table-active]="previewVersion() === version.plan.index">
+                    <td>
+                      <strong>{{ version.plan.label }}</strong>
+                      @if (version.plan.index === 0) {
+                        <span class="text-muted small"> — {{ 'typstsubject.versions.canonical' | translate }}</span>
+                      }
+                    </td>
+                    <td>{{ 'typstsubject.versions.pages' | translate: { pages: version.layout.pages } }}</td>
+                    <td>
+                      <button type="button" class="btn btn-sm btn-link p-0" (click)="showVersion(version.plan.index)">
+                        <span [translate]="'typstsubject.versions.preview'">Aperçu</span>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+          @if (v.issues.length === 0 && v.versions.length > 0 && !v.diagnostics) {
+            <p class="text-success small" data-cy="typst-versions-ok" [translate]="'typstsubject.versions.ok'">
+              Les versions sont compatibles : leurs copies pourront être reconstruites dans la mise en page de la version A.
+            </p>
+          }
+          @for (i of v.issues; track $index) {
+            <p class="text-danger small">{{ i.version }} — {{ 'typstsubject.versions.issue.' + i.key | translate: i.params ?? {} }}</p>
+          }
+        }
+      </div>
     </section>
 
     <section class="subject-preview">
-      @if (pdfUrl(); as url) {
+      @if (previewLabel(); as label) {
+        <p class="preview-version" data-cy="typst-preview-version">
+          {{ 'typstsubject.versions.previewing' | translate: { label: label } }}
+          <button type="button" class="btn btn-sm btn-link p-0" (click)="showVersion(undefined)">
+            <span [translate]="'typstsubject.versions.backToSubject'">Revenir au sujet</span>
+          </button>
+        </p>
+      }
+      @if (previewUrl(); as url) {
         <iframe [src]="url" title="PDF" data-cy="typst-preview"></iframe>
       } @else {
         <p class="text-muted" [translate]="'typstsubject.noPreview'">L'aperçu apparaît après la première compilation.</p>

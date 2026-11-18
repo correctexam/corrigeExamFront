@@ -89,4 +89,5 @@ export const SUBJECT_SNIPPETS: { key: string; code: string }[] = [
   { key: 'code', code: '```java\nclass A {\n}\n```\n' },
   { key: 'math', code: '$ integral_0^1 x^2 dif x = 1 / 3 $\n' },
   { key: 'section', code: '#section("pX", title: [Partie], shuffle: false)[\n  // questions\n]\n' },
+  { key: 'variant', code: '#variant("vX")[Première formulation][Deuxième formulation]\n' },
 ];

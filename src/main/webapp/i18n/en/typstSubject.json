@@ -37,7 +37,8 @@
       "short": "+ Short answer",
       "code": "+ Code",
       "math": "+ Formula",
-      "section": "+ Part"
+      "section": "+ Part",
+      "variant": "+ Wording variant"
     },
     "issue": {
       "noQuestion": "The subject has no question.",
@@ -106,6 +107,33 @@
       "previous": "Print runs",
       "size": "{{copies}} copies × {{pages}} pages",
       "again": "Download again"
+    },
+    "versions": {
+      "title": "Subject versions",
+      "intro": "Each version shuffles the questions of sections marked shuffle, the order of QCM choices, and picks a wording variant. Copies of every version will be rebuilt in the layout of version A for grading.",
+      "count": "Number of versions",
+      "seed": "Draw",
+      "newSeed": "New draw",
+      "build": "Generate and check",
+      "building": "Generating…",
+      "stale": "The subject changed since generation: regenerate the versions.",
+      "doesNotCompile": "Version {{ version }} does not compile:",
+      "canonical": "reference version (grading)",
+      "pages": "{{ pages }} pages",
+      "preview": "Preview",
+      "previewing": "Preview of version {{ label }}",
+      "backToSubject": "Back to the subject",
+      "ok": "The versions are compatible: their copies can be rebuilt in the layout of version A.",
+      "failed": "The versions could not be generated",
+      "issue": {
+        "missingZone": "zone {{ question }} (part {{ part }}) is missing",
+        "zoneSize": "zone {{ question }} (part {{ part }}) does not have the same size as in version A; do not put an answer zone inside a variant of different height",
+        "extraZone": "zone {{ question }} (part {{ part }}) does not exist in version A",
+        "qcmLetters": "QCM {{ question }} does not have the same boxes as in version A",
+        "identity": "identification zone “{{ role }}” differs from version A",
+        "pages": "the version has {{ pages }} pages instead of {{ expected }}",
+        "nothingVaries": "nothing varies: add shuffle: true to a section, QCM choices or a #variant"
+      }
     }
   }
 }

@@ -22,6 +22,7 @@ import { TypstBinaryFile, TypstCompileResponse, TypstDiagnostic } from '../typst
 import { buildLayout, GeneratedLayout, parseZoneMetadata, TypstZoneError } from '../typst/typst-zones';
 import { checkLayout, LayoutIssue, padForRectoVerso, parseCopyPages, planExam, templatePlan } from '../typst/exam-from-subject';
 import { ExamFromSubjectService } from '../typst/exam-from-subject.service';
+import { buildVersions, BuiltVersions, MAX_VERSIONS, newSeed } from '../typst/subject-versions';
 import { DIAGRAM_INPUT, DiagramError, DiagramRequest, DiagramStore, parseDiagramRequests } from '../typst/subject-diagrams';
 import {
   fromCompilerPath,
@@ -92,6 +93,22 @@ export class SubjectEditorComponent implements OnInit, AfterViewInit, OnDestroy 
   readonly layoutError = signal<string | undefined>(undefined);
   readonly failure = signal<string | undefined>(undefined);
   readonly pdfUrl = signal<SafeResourceUrl | undefined>(undefined);
+
+  /** Versions of the subject (T25e): number, seed of the draw, last result. */
+  readonly maxVersions = MAX_VERSIONS;
+  readonly versionCount = signal(1);
+  readonly versionSeed = signal(newSeed());
+  readonly versionsBuilding = signal(false);
+  readonly versions = signal<BuiltVersions | undefined>(undefined);
+  /** The subject changed since the versions were built. */
+  readonly versionsStale = signal(false);
+  /** Version shown in the preview instead of the subject (index), undefined for the subject. */
+  readonly previewVersion = signal<number | undefined>(undefined);
+  readonly previewLabel = computed(() => {
+    const i = this.previewVersion();
+    return i === undefined ? undefined : this.versions()?.versions[i]?.plan.label;
+  });
+  readonly previewUrl = computed(() => (this.previewVersion() === undefined ? this.pdfUrl() : this.versionPdfUrl()));
 
   /** Files of the subject, main file first. */
   readonly paths = signal<string[]>([SUBJECT_MAIN_FILE]);
@@ -170,6 +187,8 @@ export class SubjectEditorComponent implements OnInit, AfterViewInit, OnDestroy 
   private readonly diagrams = new DiagramStore(r => this.subjects.renderDiagram(r));
   private diagramRequests: DiagramRequest[] = [];
   private objectUrl?: string;
+  private versionObjectUrl?: string;
+  private readonly versionPdfUrl = signal<SafeResourceUrl | undefined>(undefined);
   private compileTimer?: ReturnType<typeof setTimeout>;
   private saveTimer?: ReturnType<typeof setTimeout>;
   private lockTimer?: ReturnType<typeof setInterval>;
@@ -232,6 +251,9 @@ export class SubjectEditorComponent implements OnInit, AfterViewInit, OnDestroy 
     this.view?.destroy();
     if (this.objectUrl) {
       URL.revokeObjectURL(this.objectUrl);
+    }
+    if (this.versionObjectUrl) {
+      URL.revokeObjectURL(this.versionObjectUrl);
     }
   }
 
@@ -546,6 +568,73 @@ export class SubjectEditorComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
+  // ------------------------------------------------------------------------------------------------
+  // Versions (T25e)
+
+  setVersionCount(value: unknown): void {
+    const n = Number(value);
+    this.versionCount.set(Number.isInteger(n) ? Math.min(MAX_VERSIONS, Math.max(1, n)) : 1);
+  }
+
+  setVersionSeed(value: unknown): void {
+    const n = Number(value);
+    if (Number.isInteger(n) && n >= 0) {
+      this.versionSeed.set(n);
+    }
+  }
+
+  newVersionSeed(): void {
+    this.versionSeed.set(newSeed());
+  }
+
+  /** Compiles every version with its plan, checks that their copies can be rebuilt in the layout of version A. */
+  async buildVersions(): Promise<void> {
+    if (this.versionsBuilding()) {
+      return;
+    }
+    this.versionsBuilding.set(true);
+    this.showVersion(undefined);
+    try {
+      const files = this.compilerFiles();
+      const binaries = this.compilerBinaries();
+      const diagrams = this.diagrams.input();
+      const built = await buildVersions(
+        cePlan =>
+          this.compiler.compile(files, {
+            withPdf: true,
+            binaries,
+            inputs: { [DIAGRAM_INPUT]: diagrams, 'ce-plan': JSON.stringify(cePlan) },
+          }),
+        this.versionCount(),
+        this.versionSeed(),
+      );
+      this.versions.set(built);
+      this.versionsStale.set(false);
+    } catch (e) {
+      this.showError('typstsubject.versions.failed', e);
+    } finally {
+      this.versionsBuilding.set(false);
+    }
+  }
+
+  /** Shows a version in the preview (index), or the subject (undefined). */
+  showVersion(index: number | undefined): void {
+    if (this.versionObjectUrl) {
+      URL.revokeObjectURL(this.versionObjectUrl);
+      this.versionObjectUrl = undefined;
+    }
+    const version = index === undefined ? undefined : this.versions()?.versions[index];
+    if (version === undefined) {
+      this.previewVersion.set(undefined);
+      this.versionPdfUrl.set(undefined);
+      return;
+    }
+    this.versionObjectUrl = URL.createObjectURL(new Blob([version.pdf], { type: 'application/pdf' }));
+    // URL created here from a compiled version: safe to show in the frame
+    this.versionPdfUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(this.versionObjectUrl));
+    this.previewVersion.set(index);
+  }
+
   back(): void {
     const examId = this.examId();
     if (examId !== undefined) {
@@ -623,6 +712,9 @@ export class SubjectEditorComponent implements OnInit, AfterViewInit, OnDestroy 
   /** A file changed (typed, added, uploaded): compiled again, saved a moment later. */
   private changed(path: string): void {
     this.scheduleCompile();
+    if (this.versions() !== undefined) {
+      this.versionsStale.set(true);
+    }
     if (!this.stored()) {
       this.saveDraft();
       return;

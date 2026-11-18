@@ -299,6 +299,8 @@
       grading: grading,
       correct: rights.join("&"),
       choices: cs.len(),
+      // choices that keep their place when the platform mixes the choices of a version (T25e)
+      fixed: cs.enumerate().filter(((i, c)) => c.fixed).map(((i, c)) => i),
     ))
     linebreak()
     stem
@@ -407,6 +409,18 @@
   [#metadata((format: ZONE_FORMAT, kind: "section", key: key, shuffle: shuffle, items: its.len())) <ce-section>]
   if title != none { heading(level: 1, title) }
   for i in order { its.at(i) }
+}
+
+/// Wording variants of a statement (T25e): each version of the subject prints one of `bodies`, chosen by the
+/// platform (`ce-plan.variants.<key>`, the first one by default). A `solution` inside a variant is the solution
+/// of that variant. The answer zones should not be inside a variant: they must be the same in every version.
+#let variant(key, ..bodies) = {
+  let bs = bodies.pos()
+  assert(bs.len() >= 1, message: "variant " + repr(key) + ": at least one wording")
+  [#metadata((format: ZONE_FORMAT, kind: "variant", key: key, count: bs.len())) <ce-variant>]
+  let i = _plan.at("variants", default: (:)).at(key, default: 0)
+  assert(i >= 0 and i < bs.len(), message: "ce-plan: bad variant for " + repr(key))
+  bs.at(i)
 }
 
 /// Questions that stay together and in this order when their section is shuffled (case study).
