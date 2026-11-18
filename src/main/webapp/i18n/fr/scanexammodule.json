@@ -721,6 +721,30 @@
       "collapse": "Réduire la zone de navigation",
       "expand": "Afficher la zone de navigation",
       "copy": "Copie"
+    },
+    "versions": {
+      "mention": "Version {{ label }} — page reconstruite",
+      "rebuilding": "Reconstruction des copies des versions B, C…",
+      "title": "Copies des versions B, C…",
+      "summary": "{{ copies }} copies : {{ rebuilt }} reconstruites dans la mise en page de la version A, {{ a }} en version A, {{ before }} déjà reconstruites.",
+      "notRebuiltTitle": "Copies non reconstruites",
+      "notRebuiltDetail": "{{ n }} copie(s) n'ont pas pu être reconstruites : voir le détail sous la vérification des codes de page.",
+      "notRebuiltHelp": "Ces copies gardent la mise en page de leur version : leurs zones ne tombent pas au bon endroit. Vérifiez les codes de page (et remettez les pages dans l'ordre), puis relancez l'alignement.",
+      "copyAt": "Copie commençant page {{ page }}",
+      "failed": "Les copies des versions n'ont pas pu être reconstruites",
+      "reason": {
+        "unknown": "aucun code de page lisible",
+        "disordered": "code de page qui n'est pas à sa place : pages dans le désordre",
+        "incomplete": "copie incomplète (moins de pages que le modèle)",
+        "partial": "copie en partie reconstruite : réalignez toute la copie",
+        "noLayout": "mise en page de la version absente",
+        "failed": "erreur pendant la reconstruction"
+      },
+      "issue": {
+        "missingPart": "zone {{ question }} (partie {{ part }}) absente de la version",
+        "missingBox": "case {{ letter }} de {{ question }} absente de la version",
+        "missingPage": "page de la zone {{ question }} absente de la copie"
+      }
     }
   }
 }

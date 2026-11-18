@@ -715,6 +715,30 @@
       "collapse": "Recolher a zona de navegação",
       "expand": "Mostrar a zona de navegação",
       "copy": "Prova"
+    },
+    "versions": {
+      "mention": "Versão {{ label }} — página reconstruída",
+      "rebuilding": "Reconstrução das provas das versões B, C…",
+      "title": "Provas das versões B, C…",
+      "summary": "{{ copies }} provas: {{ rebuilt }} reconstruídas na paginação da versão A, {{ a }} na versão A, {{ before }} já reconstruídas.",
+      "notRebuiltTitle": "Provas não reconstruídas",
+      "notRebuiltDetail": "{{ n }} prova(s) não puderam ser reconstruídas: ver o detalhe sob a verificação dos códigos de página.",
+      "notRebuiltHelp": "Estas provas mantêm a paginação da sua versão: as zonas não ficam no sítio certo. Verifique os códigos de página (e reordene as páginas) e volte a alinhar.",
+      "copyAt": "Prova que começa na página {{ page }}",
+      "failed": "Não foi possível reconstruir as provas das versões",
+      "reason": {
+        "unknown": "nenhum código de página legível",
+        "disordered": "código de página fora do lugar: páginas desordenadas",
+        "incomplete": "prova incompleta (menos páginas que o modelo)",
+        "partial": "prova parcialmente reconstruída: volte a alinhar a prova inteira",
+        "noLayout": "paginação da versão em falta",
+        "failed": "erro durante a reconstrução"
+      },
+      "issue": {
+        "missingPart": "zona {{ question }} (parte {{ part }}) ausente da versão",
+        "missingBox": "caixa {{ letter }} de {{ question }} ausente da versão",
+        "missingPage": "página da zona {{ question }} ausente da prova"
+      }
     }
   }
 }

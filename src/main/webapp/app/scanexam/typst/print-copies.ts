@@ -11,6 +11,7 @@
 
 import { PDFDocument, PDFEmbeddedPage, PDFFont, PDFPage, rgb, StandardFonts } from 'pdf-lib';
 import bwipjs from 'bwip-js';
+import { versionOfCopy } from './version-rebuild';
 
 export const PAGE_CODE_FORMAT = 'CE1';
 const MM = 72 / 25.4;
@@ -37,11 +38,7 @@ export function pageCode(edition: number, copy: number, page: number): string {
   return `${PAGE_CODE_FORMAT}|${edition}|${copy}|${page}`;
 }
 
-/** Version of copy `copy` (from 1) in a print run of `versions` versions: the versions are taken in turn. */
-export function versionOfCopy(copy: number, versions: number): number {
-  const k = Math.max(1, versions);
-  return (((copy - 1) % k) + k) % k;
-}
+export { versionOfCopy };
 
 /** Label printed next to the code: `3 · p. 2`, or `B · 3 · p. 2` with several versions. */
 export function pageLabel(copy: number, page: number, version?: string): string {
