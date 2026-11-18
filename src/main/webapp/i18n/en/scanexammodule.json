@@ -135,6 +135,8 @@
       "typstOpen": "Write the subject in Typst",
       "create": "Create the exam"
     },
+    "templatemetadatainvalid": "The zones described in this PDF are inconsistent and were not created: the LaTeX subject was probably compiled only once. Compile it again until LaTeX no longer asks for a rerun (two runs, or latexmk), then upload the template again. You can also place the zones by hand.",
+    "templatemetadatadetails": "Details ({{count}} problem(s))",
     "mdtemplate": "MarkDown template",
     "enonceexam": "Exam statement (PDF format):",
     "pdferror": "Invalid or corrupted PDF file",

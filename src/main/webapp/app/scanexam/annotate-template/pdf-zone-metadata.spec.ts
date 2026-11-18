@@ -2,7 +2,15 @@
  * @jest-environment node
  */
 import { DrawingTools } from './paint/models';
-import { metadataRectToZone, pageSizeCm, parsePdfZoneMetadata, questionTypeFor, toMetadataRect, ZONE_SCALE } from './pdf-zone-metadata';
+import {
+  metadataProblems,
+  metadataRectToZone,
+  pageSizeCm,
+  parsePdfZoneMetadata,
+  questionTypeFor,
+  toMetadataRect,
+  ZONE_SCALE,
+} from './pdf-zone-metadata';
 
 /** A4 portrait, as returned by pdf.js at scale 1. */
 const A4 = pageSizeCm(595.276, 841.89);
@@ -74,5 +82,36 @@ describe('zones described in the metadata of a template PDF', () => {
     // a preference from another database (default 2): the manual type
     expect(questionTypeFor(free, types, 2)).toBe(7);
     expect(questionTypeFor(qcm, [{ id: 7, algoName: 'manual' }], 2)).toBeUndefined();
+  });
+
+  it('accepts the zones of a LaTeX document compiled until the positions are stable', () => {
+    // values of exam-example.tex after three runs of pdflatex
+    const rects = parsePdfZoneMetadata({
+      'correctexam-lastname': '{ "x": 3.169, "y": 2.389, "w": 15.854, "h": 0.928, "p": 1}',
+      'correctexam-answer-2-1-2': '{ "x": 1.3, "y": 16.8, "w": 18.4, "h": 1.839, "p": 1}',
+      'correctexam-answer-11-4-4': '{ "x": 1.3, "y": 26.755, "w": 18.4, "h": 7.449, "p": 6}',
+    });
+    expect(metadataProblems(rects, p => (p >= 1 && p <= 6 ? A4 : undefined))).toEqual([]);
+  });
+
+  it('refuses the zones of a LaTeX document compiled only once', () => {
+    // values of the same document after a single run: positions not computed yet
+    const rects = parsePdfZoneMetadata({
+      'correctexam-lastname': '{ "x": 0, "y": 29.725, "w": 15.854, "h": 0.928, "p": 1}',
+      'correctexam-answer-2-1-2': '{ "x": 0, "y": 30.618, "w": 18.4, "h": 1.837, "p": 0}',
+      'correctexam-answer-7-1-4': '{ "x": 0, "y": 29.9, "h": 0, "w": 18.4, "p": 3}',
+      'correctexam-answer-10-1-4': '{ "x": 0, "y": 36.222, "w": 18.4, "h": 13.044, "p": 9}',
+    });
+    const problems = metadataProblems(rects, p => (p >= 1 && p <= 8 ? A4 : undefined));
+    expect(problems).toEqual([
+      'question 2-1: page 0 does not exist',
+      'question 7-1: empty zone (18.4 × 0 cm)',
+      'question 10-1: page 9 does not exist',
+    ]);
+    // the identity zone looks valid (bottom of page 1): one problem is enough to ignore it with the others
+    expect(problems.length).toBeGreaterThan(0);
+    expect(metadataProblems(parsePdfZoneMetadata({ 'correctexam-stdid': '{"x":2,"y":31,"w":5,"h":1,"p":1}' }), () => A4)).toEqual([
+      'stdid: outside page 1',
+    ]);
   });
 });

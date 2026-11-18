@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/member-ordering */
-import { Component, Inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
 import {
   NgxExtendedPdfViewerService,
   PageRenderedEvent,
@@ -23,12 +23,21 @@ import { ExamService } from 'app/entities/exam/service/exam.service';
 import { PreferenceService } from 'app/scanexam/preference-page/preference.service';
 import { QuestionTypeService } from 'app/entities/question-type/service/question-type.service';
 import { IdentityZoneKind } from 'app/entities/exam/service/exam.service';
-import { MetadataRect, metadataRectToZone, PageSizeCm, pageSizeCm, parsePdfZoneMetadata, questionTypeFor } from '../../pdf-zone-metadata';
+import {
+  MetadataRect,
+  metadataProblems,
+  metadataRectToZone,
+  PageSizeCm,
+  pageSizeCm,
+  parsePdfZoneMetadata,
+  questionTypeFor,
+} from '../../pdf-zone-metadata';
 // const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 //  suppressScrollX: true,
 // };
 import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer';
 import { DOCUMENT } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { DeleteQuestionRequest, SummaryTemplateComponent } from '../../summary/summary-template.component';
@@ -47,7 +56,7 @@ export type CustomZone = IZone & { type: DrawingTools };
     //    },
   ],
   standalone: true,
-  imports: [SummaryTemplateComponent, BlockUIModule, ProgressSpinnerModule, NgxExtendedPdfViewerModule],
+  imports: [SummaryTemplateComponent, BlockUIModule, ProgressSpinnerModule, NgxExtendedPdfViewerModule, TranslatePipe],
 })
 export class FabricCanvasComponent implements OnInit, OnDestroy {
   @Input()
@@ -64,6 +73,8 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
   // For locking the page during the pdf rendering
   protected blocked = false;
   public processpdf = false;
+  /** Why the zones described in the PDF were ignored (empty: none ignored). */
+  readonly metadataProblems = signal<string[]>([]);
 
   constructor(
     public eventHandler: EventHandlerService,
@@ -292,28 +303,32 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
     if (rects.length === 0) {
       return;
     }
+    // size of the pages the zones refer to; a page out of the document has no size
     const sizes = new Map<number, PageSizeCm>();
-    const zoneOf = async (rect: MetadataRect): Promise<IZone> => {
-      let size = sizes.get(rect.p);
-      if (size === undefined) {
-        const viewport = (await pdfDocument.getPage(rect.p)).getViewport({ scale: 1 });
-        size = pageSizeCm(viewport.width, viewport.height);
-        sizes.set(rect.p, size);
+    for (const p of new Set(rects.map(r => r.p))) {
+      if (Number.isInteger(p) && p >= 1 && p <= pdfDocument.numPages) {
+        const viewport = (await pdfDocument.getPage(p)).getViewport({ scale: 1 });
+        sizes.set(p, pageSizeCm(viewport.width, viewport.height));
       }
-      return metadataRectToZone(rect, size);
-    };
+    }
+    const problems = metadataProblems(rects, p => sizes.get(p));
+    if (problems.length > 0) {
+      // positions not computed (LaTeX compiled once) or stale: none of the zones can be trusted
+      console.warn('Zones of the template metadata ignored', problems);
+      this.metadataProblems.set(problems);
+      return;
+    }
+    const zoneOf = (rect: MetadataRect): IZone => metadataRectToZone(rect, sizes.get(rect.p)!);
     const qs: Record<number, MetadataRect[]> = {};
     const promises: Promise<void>[] = [];
     const identity = (rect: MetadataRect, kind: IdentityZoneKind, label: string, assign: (id: number) => void): void => {
       promises.push(
-        zoneOf(rect)
-          .then(zone => firstValueFrom(this.zoneService.create(zone)))
-          .then(async z1 => {
-            assign(z1.body!.id!);
-            await firstValueFrom(this.examService.setIdentityZone(this.exam.id!, kind, z1.body!.id!));
-            this.renderZone(z1.body as CustomZone);
-            this.eventHandler.createRedBox(label, z1.body!, rect.p);
-          }),
+        firstValueFrom(this.zoneService.create(zoneOf(rect))).then(async z1 => {
+          assign(z1.body!.id!);
+          await firstValueFrom(this.examService.setIdentityZone(this.exam.id!, kind, z1.body!.id!));
+          this.renderZone(z1.body as CustomZone);
+          this.eventHandler.createRedBox(label, z1.body!, rect.p);
+        }),
       );
     };
 
@@ -358,7 +373,7 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
           console.error(`Question ${subq.q}: question type ${subq.t === 'qcm' ? 'QCM' : 'manual'} missing from the database`);
           continue;
         }
-        const zone = (await firstValueFrom(this.zoneService.create(await zoneOf(subq)))).body as CustomZone;
+        const zone = (await firstValueFrom(this.zoneService.create(zoneOf(subq)))).body as CustomZone;
         zone.type = DrawingTools.QUESTIONBOX;
         const q = new Question();
         q.zoneId = zone.id!;

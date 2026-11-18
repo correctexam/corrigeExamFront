@@ -101,6 +101,43 @@ export function pageSizeCm(widthPt: number, heightPt: number): PageSizeCm {
   return { width: widthPt * CM_PER_PT, height: heightPt * CM_PER_PT };
 }
 
+/** Names of the identity zones in the keys of the PDF, for the messages. */
+const KEY_OF: Partial<Record<DrawingTools, string>> = {
+  [DrawingTools.NOMBOX]: 'lastname',
+  [DrawingTools.PRENOMBOX]: 'firstname',
+  [DrawingTools.INEBOX]: 'stdid',
+};
+
+/** Tolerance on the edges of the page, in centimetres (rounding of the LaTeX class, frames drawn on the margin). */
+const EDGE_TOLERANCE_CM = 0.5;
+
+/**
+ * Reasons why the zones of a PDF cannot be trusted, empty when they all lie inside existing pages. A LaTeX document
+ * compiled only once writes positions that are not computed yet (page 0, x = 0, y below the bottom of the page): the
+ * zones that look right in such a file are wrong too, so one problem is enough to ignore all of them.
+ * `pageSize` gives the size of a page of the document, undefined for a page that does not exist.
+ */
+export function metadataProblems(rects: MetadataRect[], pageSize: (page: number) => PageSizeCm | undefined): string[] {
+  const problems: string[] = [];
+  for (const r of rects) {
+    const name = r.type === DrawingTools.QUESTIONBOX ? `question ${r.q}-${r.subq}` : (KEY_OF[r.type] ?? r.type);
+    const page = Number.isInteger(r.p) ? pageSize(r.p) : undefined;
+    if (page === undefined) {
+      problems.push(`${name}: page ${r.p} does not exist`);
+    } else if (r.w <= 0 || r.h <= 0) {
+      problems.push(`${name}: empty zone (${r.w} × ${r.h} cm)`);
+    } else if (
+      r.x < -EDGE_TOLERANCE_CM ||
+      r.x + r.w > page.width + EDGE_TOLERANCE_CM ||
+      r.y - r.h < -EDGE_TOLERANCE_CM ||
+      r.y > page.height + EDGE_TOLERANCE_CM
+    ) {
+      problems.push(`${name}: outside page ${r.p}`);
+    }
+  }
+  return problems;
+}
+
 /** The zone of a rectangle, in 1/100000 of its page, kept inside the page. */
 export function metadataRectToZone(rect: MetadataRect, page: PageSizeCm): IZone {
   const ratio = (cm: number, size: number): number => Math.min(ZONE_SCALE, Math.max(0, Math.round((cm / size) * ZONE_SCALE)));
