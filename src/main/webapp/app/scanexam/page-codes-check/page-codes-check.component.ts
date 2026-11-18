@@ -1,6 +1,6 @@
 import { Component, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import { TranslateDirective, TranslatePipe } from '@ngx-translate/core';
-import { CodeReport } from '../typst/page-codes';
+import { CodeReport, ServerPageCodeSummary } from '../typst/page-codes';
 import { CheckProgress, PageCodeCheckService } from '../typst/page-code-check.service';
 
 /** At most this many page numbers in a list; the count is always given. */
@@ -20,6 +20,8 @@ const LIST_MAX = 40;
 })
 export class PageCodesCheckComponent implements OnInit {
   readonly examId = input.required<number>();
+  /** Codes read by the alignment worker during the last server alignment (T25d3). */
+  readonly serverSummary = input<ServerPageCodeSummary | undefined>(undefined);
   /** Emitted after the pages were put back in order. */
   readonly reordered = output<void>();
 

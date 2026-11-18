@@ -33,6 +33,7 @@ import { PreferenceService } from '../preference-page/preference.service';
 import { DialogService } from 'primeng/dynamicdialog';
 import { PartialAlignModalComponent } from './partial-align-modal/partial-align-modal.component';
 import { PageCodesCheckComponent } from '../page-codes-check/page-codes-check.component';
+import { parseServerSummary, ServerPageCodeSummary } from '../typst/page-codes';
 // import { db as dbsqlite } from '../db/dbsqlite';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { QuestionService } from '../../entities/question/service/question.service';
@@ -97,6 +98,8 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
   exam!: IExam;
   currentStudent = 0;
   nbreFeuilleParCopie = 2;
+  /** Page codes read by the worker during the last server alignment (T25d3). */
+  readonly serverPageCodes = signal<ServerPageCodeSummary | undefined>(undefined);
   numberPagesInScan = 0;
   // Change if partial update
   currentPageAlign = 1;
@@ -612,6 +615,8 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
       // page quittée avant la fin : le job continue sur le serveur
       return;
     }
+    // les pages ont pu être lues et ordonnées par leurs codes (T25d3)
+    this.serverPageCodes.set(parseServerSummary(last?.details));
     await this.completeServerJob();
   }
 

@@ -103,6 +103,10 @@
     "latextemplate": "LaTeX template",
     "asciidoctemplate": "AsciiDoc template",
     "pagecodes": {
+      "serverupsidedown": "{{count}} upside-down page(s), turned (scan pages {{pages}})",
+      "server": "Codes read by the server during the alignment",
+      "serverreordered": "The pages were put back in order and aligned in that order.",
+      "serverscanpages": "The page numbers are those of the original scan. Read the codes again to check the current cache.",
       "title": "Page codes",
       "intro": "Copies printed from CorrectExam carry a code on every page. Read them before the alignment: mixed or upside-down pages are put back in place, missing, doubled or foreign pages are reported.",
       "read": "Read the codes",
@@ -120,7 +124,7 @@
       "blanks": "{{count}} blank page(s) inserted in place of the missing pages, so that every copy keeps the number of pages of the template",
       "setaside": "Doubled, foreign or unreadable pages are moved to the end of the batch.",
       "alignedremoved": "The pages already aligned will be removed: run the alignment again afterwards.",
-      "localonly": "The order is fixed in this browser. The alignment on the server starts again from the original scan: align locally.",
+      "localonly": "The order is fixed in this browser. An alignment on the server starts again from the original scan and puts the pages back in order itself.",
       "reorder": "Put back in order"
     },
     "createpaths": {

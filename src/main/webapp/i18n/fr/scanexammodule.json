@@ -104,6 +104,10 @@
     "latextemplate": "Modèle de sujet LaTeX",
     "asciidoctemplate": "Modèle de sujet AsciiDoc",
     "pagecodes": {
+      "serverupsidedown": "{{count}} page(s) retournée(s), redressée(s) (pages du scan {{pages}})",
+      "server": "Codes lus par le serveur pendant l'alignement",
+      "serverreordered": "Les pages ont été remises dans l'ordre et alignées dans cet ordre.",
+      "serverscanpages": "Les numéros de page cités sont ceux du scan d'origine. Relisez les codes pour vérifier le cache actuel.",
       "title": "Codes de page",
       "intro": "Les copies imprimées depuis CorrectExam portent un code sur chaque page. Lisez-les avant l'alignement : les pages mélangées ou retournées sont remises en place, les pages manquantes, en double ou étrangères à l'examen sont signalées.",
       "read": "Lire les codes",
@@ -121,7 +125,7 @@
       "blanks": "{{count}} page(s) blanche(s) insérée(s) à la place des pages manquantes, pour que chaque copie garde le nombre de pages du modèle",
       "setaside": "Les pages en double, étrangères ou illisibles sont mises à la fin du lot.",
       "alignedremoved": "Les pages déjà alignées seront supprimées : relancez l'alignement ensuite.",
-      "localonly": "L'ordre est corrigé dans ce navigateur. L'alignement sur le serveur repart du scan d'origine : alignez en local.",
+      "localonly": "L'ordre est corrigé dans ce navigateur. Un alignement sur le serveur repart du scan d'origine et remet lui-même les pages dans l'ordre.",
       "reorder": "Remettre dans l'ordre"
     },
     "createpaths": {
