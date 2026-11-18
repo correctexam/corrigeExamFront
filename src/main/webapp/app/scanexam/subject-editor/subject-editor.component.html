@@ -392,6 +392,15 @@
             <p class="text-danger small">{{ i.version }} — {{ 'typstsubject.versions.issue.' + i.key | translate: i.params ?? {} }}</p>
           }
         }
+        @if (stored()) {
+          @if (versionCount() > 1) {
+            <p class="text-muted small" data-cy="typst-versions-stored" [translate]="'typstsubject.versions.storedExam'"></p>
+          }
+        } @else if (versionsReady()) {
+          <p class="small" data-cy="typst-versions-ready">{{ 'typstsubject.versions.ready' | translate: { k: versionCount() } }}</p>
+        } @else if (versionsBlocking()) {
+          <p class="text-warning small" data-cy="typst-versions-blocking" [translate]="'typstsubject.versions.blocking'"></p>
+        }
       </div>
     </section>
 

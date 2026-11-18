@@ -3,7 +3,10 @@
 export interface PrintWorkerRequest {
   kind: 'print';
   id: number;
-  template: Uint8Array;
+  /** One template per version (T25e); copy c uses template (c - 1) mod templates.length. */
+  templates: Uint8Array[];
+  /** Letters of the versions, one per template. */
+  labels?: string[];
   edition: number;
   copies: number;
 }

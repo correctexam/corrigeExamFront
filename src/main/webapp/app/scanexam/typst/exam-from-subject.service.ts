@@ -14,6 +14,11 @@ export interface CreateExamFromSubject {
   name: string;
   pdf: Uint8Array;
   plan: ExamPlan;
+  /**
+   * Last step of the creation (T25e: versions of the subject). If it fails, the exam is deleted like for any other
+   * step.
+   */
+  afterCreate?: (examId: number) => Promise<unknown>;
 }
 
 /**
@@ -66,6 +71,9 @@ export class ExamFromSubjectService {
       for (const planned of req.plan.questions) {
         const zoneId = await this.createZone(planned.zone);
         await firstValueFrom(this.questionService.create({ ...planned.question, typeId: typeIds[planned.type], zoneId, examId }));
+      }
+      if (req.afterCreate) {
+        await req.afterCreate(examId);
       }
       return examId;
     } catch (e) {

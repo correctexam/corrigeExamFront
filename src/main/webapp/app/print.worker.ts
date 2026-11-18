@@ -10,7 +10,7 @@ import { assemblePrint } from './scanexam/typst/print-copies';
 import { PrintWorkerRequest, PrintWorkerResponse } from './scanexam/typst/print-worker.protocol';
 
 addEventListener('message', ({ data }: MessageEvent<PrintWorkerRequest>) => {
-  assemblePrint(data.template, { edition: data.edition, copies: data.copies }, p => {
+  assemblePrint(data.templates, { edition: data.edition, copies: data.copies, labels: data.labels }, p => {
     const progress: PrintWorkerResponse = { kind: 'progress', id: data.id, done: p.done, total: p.total };
     postMessage(progress);
   })

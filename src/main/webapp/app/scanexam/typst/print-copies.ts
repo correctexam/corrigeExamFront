@@ -1,13 +1,15 @@
 /**
  * Print PDF of an exam written in Typst (T25d, ADR 0004): the template of the exam repeated once per copy, each page
  * stamped with its code `CE1|<print run>|<copy>|<page>` (Data Matrix) and a label readable by a human.
+ * With several versions (T25e, ADR 0005), copy `c` is printed from version `(c − 1) mod K` and its label starts with
+ * the letter of the version (`B · 3 · p. 2`); the code is the same as with one version.
  * Pure module (no DOM): run in `print.worker.ts`, tested with Node.
  *
  * Geometry shared with the Typst package (`_geom` in `content/typst/correctexam/0.1.0/lib.typ`): code 11 mm wide,
  * centred horizontally, its centre 9 mm above the bottom edge (the height of the bottom alignment circles).
  */
 
-import { PDFDocument, PDFFont, PDFPage, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, PDFEmbeddedPage, PDFFont, PDFPage, rgb, StandardFonts } from 'pdf-lib';
 import bwipjs from 'bwip-js';
 
 export const PAGE_CODE_FORMAT = 'CE1';
@@ -22,6 +24,8 @@ export interface PrintRequest {
   /** Identifier of the print run (`exam_edition.id`). */
   edition: number;
   copies: number;
+  /** Letters of the versions (A, B…), one per template; unused with a single template. */
+  labels?: string[];
 }
 
 export interface PrintProgress {
@@ -31,6 +35,17 @@ export interface PrintProgress {
 
 export function pageCode(edition: number, copy: number, page: number): string {
   return `${PAGE_CODE_FORMAT}|${edition}|${copy}|${page}`;
+}
+
+/** Version of copy `copy` (from 1) in a print run of `versions` versions: the versions are taken in turn. */
+export function versionOfCopy(copy: number, versions: number): number {
+  const k = Math.max(1, versions);
+  return (((copy - 1) % k) + k) % k;
+}
+
+/** Label printed next to the code: `3 · p. 2`, or `B · 3 · p. 2` with several versions. */
+export function pageLabel(copy: number, page: number, version?: string): string {
+  return `${version ? `${version} · ` : ''}${copy} · p. ${page}`;
 }
 
 /** Modules of the Data Matrix of a text: `rows[y][x]` true for a dark module. */
@@ -91,22 +106,39 @@ export async function countPages(pdf: Uint8Array): Promise<number> {
 }
 
 /**
- * The print PDF: `copies` times the template, copy `c` page `p` stamped with `pageCode(edition, c, p)`.
- * The pages of the template are embedded once and drawn on every copy: the file grows with the codes only.
+ * The print PDF: `copies` copies, copy `c` taken from template `versionOfCopy(c, templates.length)`, its page `p`
+ * stamped with `pageCode(edition, c, p)`. The pages of each template are embedded once and drawn on every copy: the
+ * file grows with the codes only. All the templates must have the same number of pages.
  */
-export async function assemblePrint(template: Uint8Array, req: PrintRequest, onProgress?: (p: PrintProgress) => void): Promise<Uint8Array> {
-  const source = await PDFDocument.load(template);
+export async function assemblePrint(
+  templates: Uint8Array[],
+  req: PrintRequest,
+  onProgress?: (p: PrintProgress) => void,
+): Promise<Uint8Array> {
+  if (templates.length === 0) {
+    throw new Error('no template');
+  }
   const out = await PDFDocument.create();
   out.setTitle(`CorrectExam — ${req.copies} copies`);
   out.setProducer('CorrectExam');
   const font = await out.embedFont(StandardFonts.Helvetica);
-  const pages = await out.embedPages(source.getPages());
-  const sizes = source.getPages().map(p => p.getSize());
+  const versions: { pages: PDFEmbeddedPage[]; sizes: { width: number; height: number }[] }[] = [];
+  for (const template of templates) {
+    const source = await PDFDocument.load(template);
+    versions.push({ pages: await out.embedPages(source.getPages()), sizes: source.getPages().map(p => p.getSize()) });
+  }
+  if (versions.some(v => v.pages.length !== versions[0].pages.length)) {
+    throw new Error(`versions with different page counts: ${versions.map(v => v.pages.length).join(', ')}`);
+  }
+  const several = templates.length > 1;
   for (let copy = 1; copy <= req.copies; copy++) {
+    const index = versionOfCopy(copy, templates.length);
+    const { pages, sizes } = versions[index];
+    const letter = several ? (req.labels?.[index] ?? String.fromCharCode(65 + index)) : undefined;
     pages.forEach((embedded, i) => {
       const page = out.addPage([sizes[i].width, sizes[i].height]);
       page.drawPage(embedded, { x: 0, y: 0, width: sizes[i].width, height: sizes[i].height });
-      stamp(page, pageCode(req.edition, copy, i + 1), `${copy} · p. ${i + 1}`, font);
+      stamp(page, pageCode(req.edition, copy, i + 1), pageLabel(copy, i + 1, letter), font);
     });
     onProgress?.({ done: copy, total: req.copies });
   }

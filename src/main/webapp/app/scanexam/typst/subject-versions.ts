@@ -69,7 +69,11 @@ export interface VersionIssue {
 
 export interface BuiltVersion {
   plan: VersionPlan;
+  /** `ce-plan` input of the final compilation (stored with the version: it can be compiled again). */
+  cePlan: Record<string, unknown>;
   pdf: Uint8Array;
+  /** Raw zone metadata of the final compilation (version A: zones and questions of the exam). */
+  zones: unknown;
   layout: VersionLayout;
   /** Pages written by the subject, before the blank pages added for an even and common number of pages. */
   pages: number;
@@ -304,6 +308,7 @@ export async function buildVersions(compile: CompileWithPlan, count: number, see
 
   const compiled: { plan: VersionPlan; res: TypstCompileResponse; pages: number }[] = [];
   for (const plan of plans) {
+    // version A: the identity plan, compiled first (same output as cePlan(plan A, 0))
     const res = plan.index === 0 ? first : await compile(cePlan(plan, 0));
     if (!res.ok) {
       return { seed, versions: [], issues: [], diagnostics: { version: plan.label, diagnostics: res.diagnostics } };
@@ -316,15 +321,20 @@ export async function buildVersions(compile: CompileWithPlan, count: number, see
   const built: (BuiltVersion & { rects: GeneratedLayout })[] = [];
   for (const c of compiled) {
     const pad = pages - c.pages;
-    const res = pad > 0 ? await compile(cePlan(c.plan, pad)) : c.res;
+    const plan = cePlan(c.plan, pad);
+    const res = pad > 0 ? await compile(plan) : c.res;
     if (!res.ok || !res.pdf) {
       return { seed, versions: [], issues: [], diagnostics: { version: c.plan.label, diagnostics: res.diagnostics } };
     }
     const { layout, rects } = versionLayout(res.zones, c.plan, pages);
-    built.push({ plan: c.plan, pdf: res.pdf, layout, pages: c.pages, rects });
+    built.push({ plan: c.plan, cePlan: plan, pdf: res.pdf, zones: res.zones, layout, pages: c.pages, rects });
   }
   const issues = checkVersions(built.map(b => ({ label: b.plan.label, pages: b.layout.pages, rects: b.rects, layout: b.layout })));
-  return { seed, versions: built.map(b => ({ plan: b.plan, pdf: b.pdf, layout: b.layout, pages: b.pages })), issues };
+  return {
+    seed,
+    versions: built.map(b => ({ plan: b.plan, cePlan: b.cePlan, pdf: b.pdf, zones: b.zones, layout: b.layout, pages: b.pages })),
+    issues,
+  };
 }
 
 /** A new seed for a draw of versions. */

@@ -106,7 +106,10 @@
       "advice": "Print at actual size (no fit to page). A print run already created downloads again with the same codes: do not create a new print run to reprint a few copies.",
       "previous": "Print runs",
       "size": "{{copies}} copies × {{pages}} pages",
-      "again": "Download again"
+      "again": "Download again",
+      "versions": "Versions",
+      "versionsHelp": "Copies take the versions in turn ({{ letters }}, …). The first print run of several versions freezes them: they can no longer be changed.",
+      "editionVersions": "{{ k }} versions"
     },
     "versions": {
       "title": "Subject versions",
@@ -133,7 +136,10 @@
         "identity": "identification zone “{{ role }}” differs from version A",
         "pages": "the version has {{ pages }} pages instead of {{ expected }}",
         "nothingVaries": "nothing varies: add shuffle: true to a section, QCM choices or a #variant"
-      }
+      },
+      "storedExam": "Versions are recorded when the exam is created; they cannot be added to an existing exam yet.",
+      "ready": "The exam will be created with its {{ k }} versions: version A is the template (zones and grading), the others will be rebuilt at scan time.",
+      "blocking": "Generate and check the versions (without problems) before creating the exam, or go back to a single version."
     }
   }
 }

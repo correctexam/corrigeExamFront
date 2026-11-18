@@ -23,6 +23,7 @@ import { buildLayout, GeneratedLayout, parseZoneMetadata, TypstZoneError } from 
 import { checkLayout, LayoutIssue, padForRectoVerso, parseCopyPages, planExam, templatePlan } from '../typst/exam-from-subject';
 import { ExamFromSubjectService } from '../typst/exam-from-subject.service';
 import { buildVersions, BuiltVersions, MAX_VERSIONS, newSeed } from '../typst/subject-versions';
+import { ExamVersionsService } from '../typst/exam-versions.service';
 import { DIAGRAM_INPUT, DiagramError, DiagramRequest, DiagramStore, parseDiagramRequests } from '../typst/subject-diagrams';
 import {
   fromCompilerPath,
@@ -104,6 +105,20 @@ export class SubjectEditorComponent implements OnInit, AfterViewInit, OnDestroy 
   readonly versionsStale = signal(false);
   /** Version shown in the preview instead of the subject (index), undefined for the subject. */
   readonly previewVersion = signal<number | undefined>(undefined);
+  /** Versions built from the current subject, without any problem: the exam is created with them. */
+  readonly versionsReady = computed(() => {
+    const v = this.versions();
+    return (
+      this.versionCount() > 1 &&
+      v !== undefined &&
+      !this.versionsStale() &&
+      v.versions.length === this.versionCount() &&
+      v.issues.length === 0 &&
+      v.diagnostics === undefined
+    );
+  });
+  /** Several versions asked for, but not (or no longer) built and checked: no exam can be created. */
+  readonly versionsBlocking = computed(() => this.versionCount() > 1 && !this.versionsReady());
   readonly previewLabel = computed(() => {
     const i = this.previewVersion();
     return i === undefined ? undefined : this.versions()?.versions[i]?.plan.label;
@@ -160,6 +175,7 @@ export class SubjectEditorComponent implements OnInit, AfterViewInit, OnDestroy 
       this.result()?.ok === true &&
       this.layout() !== undefined &&
       this.diagramsReady() &&
+      !this.versionsBlocking() &&
       !this.issues().some(i => i.level === 'error'),
   );
 
@@ -176,6 +192,7 @@ export class SubjectEditorComponent implements OnInit, AfterViewInit, OnDestroy 
   private readonly examService = inject(ExamService);
   private readonly preferences = inject(PreferenceService);
   private readonly examFromSubject = inject(ExamFromSubjectService);
+  private readonly examVersions = inject(ExamVersionsService);
   private readonly subjects = inject(SubjectService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -525,6 +542,13 @@ export class SubjectEditorComponent implements OnInit, AfterViewInit, OnDestroy 
     }
     this.creating.set(true);
     try {
+      const built = this.versionsReady() ? this.versions() : undefined;
+      if (built) {
+        // T25e: version A (identity plan, common number of pages) is the template; the versions are stored with the exam
+        const a = built.versions[0];
+        await this.createFrom(courseId, a.pdf, a.zones, examId => this.examVersions.store(examId, built));
+        return;
+      }
       // compile again: the exam must match exactly the subject currently written. The template keeps the code area
       // empty (codes stamped on each printed copy, T25d) and gets an even number of pages (recto-verso).
       const compileTemplate = (pad: number): Promise<TypstCompileResponse> =>
@@ -543,24 +567,7 @@ export class SubjectEditorComponent implements OnInit, AfterViewInit, OnDestroy 
         this.applyResult(res, ++this.sequence);
         return;
       }
-      const layout = buildLayout(parseZoneMetadata(res.zones));
-      const examId = await this.examFromSubject.create({
-        courseId,
-        name: this.examName().trim(),
-        pdf: res.pdf,
-        plan: planExam(layout, this.preferences.getPreferenceForQuestion()),
-      });
-      try {
-        await this.storeSubject(examId);
-        this.storage.clear(this.draftKey());
-        await this.router.navigateByUrl(`/exam/${examId}`);
-      } catch (e) {
-        // the exam exists: keep the subject in this browser for this exam and offer to store it again
-        console.warn('Typst subject not stored with the exam', e);
-        this.saveDraftTo(this.examDraftKey(examId));
-        this.storage.clear(this.draftKey());
-        await this.router.navigateByUrl(`/exam/${examId}/subject`);
-      }
+      await this.createFrom(courseId, res.pdf, res.zones);
     } catch (e) {
       this.showError('typstsubject.createFailed', e);
     } finally {
@@ -1032,5 +1039,33 @@ export class SubjectEditorComponent implements OnInit, AfterViewInit, OnDestroy 
       detail: e instanceof Error ? e.message : String(e),
       life: 10000,
     });
+  }
+
+  /** Creates the exam from its template and zones, stores the subject with it and opens the exam. */
+  private async createFrom(
+    courseId: number,
+    pdf: Uint8Array,
+    zones: unknown,
+    afterCreate?: (examId: number) => Promise<unknown>,
+  ): Promise<void> {
+    const layout = buildLayout(parseZoneMetadata(zones));
+    const examId = await this.examFromSubject.create({
+      courseId,
+      name: this.examName().trim(),
+      pdf,
+      plan: planExam(layout, this.preferences.getPreferenceForQuestion()),
+      afterCreate,
+    });
+    try {
+      await this.storeSubject(examId);
+      this.storage.clear(this.draftKey());
+      await this.router.navigateByUrl(`/exam/${examId}`);
+    } catch (e) {
+      // the exam exists: keep the subject in this browser for this exam and offer to store it again
+      console.warn('Typst subject not stored with the exam', e);
+      this.saveDraftTo(this.examDraftKey(examId));
+      this.storage.clear(this.draftKey());
+      await this.router.navigateByUrl(`/exam/${examId}/subject`);
+    }
   }
 }
