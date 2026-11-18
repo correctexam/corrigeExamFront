@@ -140,6 +140,8 @@
       "typstOpen": "Escrever o enunciado em Typst",
       "create": "Criar o exame"
     },
+    "templatemetadatainvalid": "As zonas descritas neste PDF são incoerentes e não foram criadas: o enunciado LaTeX foi provavelmente compilado uma só vez. Compile-o de novo até o LaTeX deixar de pedir nova execução (duas passagens, ou latexmk) e volte a carregar o modelo. Também pode colocar as zonas à mão.",
+    "templatemetadatadetails": "Detalhe ({{count}} problema(s))",
     "mdtemplate": "Modelo de avaliação MarkDown",
     "enonceexam": "Enunciado de avaliação (no formato PDF) :",
     "pdferror": "Arquivo PDF inválido ou corrompido",

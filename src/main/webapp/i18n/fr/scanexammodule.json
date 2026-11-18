@@ -140,6 +140,8 @@
       "typstOpen": "Écrire le sujet en Typst",
       "create": "Créer l'examen"
     },
+    "templatemetadatainvalid": "Les zones décrites dans ce PDF sont incohérentes et n'ont pas été créées : le sujet LaTeX a probablement été compilé une seule fois. Recompilez-le jusqu'à ce que LaTeX ne demande plus de relancer (deux passes, ou latexmk), puis déposez à nouveau le modèle. Vous pouvez aussi placer les zones à la main.",
+    "templatemetadatadetails": "Détail ({{count}} problème(s))",
     "mdtemplate": "Modèle de sujet MarkDown",
     "enonceexam": "Énoncé de l'examen (au format PDF) :",
     "pdferror": "Fichier PDF invalide ou corrompu",

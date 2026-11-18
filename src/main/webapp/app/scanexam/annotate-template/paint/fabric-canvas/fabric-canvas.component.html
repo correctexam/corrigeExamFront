@@ -12,6 +12,19 @@
 
   @if (processpdf) {
     <div class="canvas-wrapper foo">
+      @if (metadataProblems().length > 0) {
+        <div class="alert alert-warning metadata-problems" role="alert" data-cy="template-metadata-problems">
+          {{ 'scanexam.templatemetadatainvalid' | translate }}
+          <details>
+            <summary>{{ 'scanexam.templatemetadatadetails' | translate: { count: metadataProblems().length } }}</summary>
+            <ul>
+              @for (p of metadataProblems(); track $index) {
+                <li>{{ p }}</li>
+              }
+            </ul>
+          </details>
+        </div>
+      }
       <ngx-extended-pdf-viewer
         [src]="content"
         style="flex: 1 1 90%"

@@ -15,3 +15,14 @@
   padding: 10px;
   border-radius: 5px;
 }
+
+.metadata-problems {
+  margin: 0.5rem;
+  font-size: 0.9rem;
+
+  ul {
+    margin: 0.25rem 0 0;
+    font-family: monospace;
+    font-size: 0.8rem;
+  }
+}
