@@ -738,7 +738,13 @@
         "missingPart": "zona {{ question }} (parte {{ part }}) ausente da versão",
         "missingBox": "caixa {{ letter }} de {{ question }} ausente da versão",
         "missingPage": "página da zona {{ question }} ausente da prova"
-      }
+      },
+      "badge": "Versão {{ label }}",
+      "copyTooltip": "Prova impressa na versão {{ label }}, reconstruída na paginação da versão A para a correção. Clique para ver a prova original.",
+      "variants": "Formulações desta versão:",
+      "wording": "{{ key }} n.º {{ n }}",
+      "studentNotice": "A sua prova (versão {{ label }}) é apresentada na paginação da versão A, a usada na correção. As suas respostas não mudaram.",
+      "showOriginal": "Ver a minha prova original"
     }
   }
 }

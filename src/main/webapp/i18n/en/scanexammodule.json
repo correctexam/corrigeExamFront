@@ -728,7 +728,13 @@
         "missingPart": "zone {{ question }} (part {{ part }}) missing from the version",
         "missingBox": "box {{ letter }} of {{ question }} missing from the version",
         "missingPage": "page of zone {{ question }} missing from the copy"
-      }
+      },
+      "badge": "Version {{ label }}",
+      "copyTooltip": "Copy printed in version {{ label }}, rebuilt in the layout of version A for grading. Click to see the original copy.",
+      "variants": "Wordings of this version:",
+      "wording": "{{ key }} no. {{ n }}",
+      "studentNotice": "Your copy (version {{ label }}) is shown in the layout of version A, the one used for grading. Your answers have not changed.",
+      "showOriginal": "See my original copy"
     }
   }
 }

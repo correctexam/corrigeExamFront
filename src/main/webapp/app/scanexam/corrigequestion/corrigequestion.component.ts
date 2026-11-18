@@ -133,6 +133,8 @@ import {
   qcmOptionsToCreate,
 } from '../grading/qcm-option';
 import { defaultCommentShortcut } from './comment-shortcuts';
+import { rebuiltLabel, zoneInVersion } from '../typst/copy-version';
+import { CopyVersionInfo, CopyVersionService } from '../typst/copy-version.service';
 import { QuarterTurn, RotationDirection, rotateQuarter, rotatedSize, rotationAfterNavigation, rotationMatrix } from './zone-rotation';
 
 enum ScalePolicy {
@@ -309,6 +311,8 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
   ];
   displayBasic = false;
   images: WritableSignal<any> = signal<any[]>([]);
+  /** Version of the current copy when it was rebuilt in the layout of version A (T25e6). */
+  readonly copyVersion = signal<CopyVersionInfo | undefined>(undefined);
   pageOffset = 0;
   /** Display rotation of the answer zones (#653): kept from one student to the next, reset when the question changes. */
   rotation: QuarterTurn = 0;
@@ -343,6 +347,9 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
 
   // completes the subscriptions to application-wide observables when the component is destroyed
   private readonly destroyRef = inject(DestroyRef);
+  private readonly copyVersionService = inject(CopyVersionService);
+  /** Copy whose version is in `copyVersion` (index of the copy in the scan). */
+  private copyVersionOf?: number;
 
   constructor(
     public examService: ExamService,
@@ -963,10 +970,15 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
       ? this.preferenceService.getPreference().maxNumberOfPredictionToShow
       : 30;
 
+    const version = await this.updateCopyVersion();
     if (this.questions) {
       for (const { i, q } of this.questions.map((value, index) => ({ i: index, q: value }))) {
         this.showImage[i] = false;
-        const z = q.zoneDTO; // await this.loadZone(q.zoneId);
+        let z = q.zoneDTO; // await this.loadZone(q.zoneId);
+        if (this.noalign && z && version?.canonical && version.layout) {
+          // scanned page of a copy of version B, C…: the zone is at its place in that version (T25e6)
+          z = zoneInVersion(z, version.canonical, version.layout) ?? z;
+        }
         const pagewithoffset = this.currentStudent! * this.nbreFeuilleParCopie! + z!.pageNumber! + this.pageOffset;
         const pagewithoutoffset = this.currentStudent! * this.nbreFeuilleParCopie! + z!.pageNumber!;
         let page = pagewithoutoffset;
@@ -2074,14 +2086,59 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async loadAllPages(): Promise<void> {
+  /**
+   * Version of the current copy (T25e6): letter written on its aligned pages when they were rebuilt in the layout of
+   * version A, with the wordings and the layouts of that version. Read once per copy.
+   */
+  private async updateCopyVersion(): Promise<CopyVersionInfo | undefined> {
+    if (this.copyVersionOf === this.currentStudent || this.exam?.nbgrader === true || !this.examId) {
+      return this.copyVersion();
+    }
+    const copy = this.currentStudent;
+    let info: CopyVersionInfo | undefined;
+    try {
+      const first = await this.db.getFirstAlignImage(+this.examId, copy * this.nbreFeuilleParCopie! + 1);
+      const label = rebuiltLabel(first?.value);
+      info = label ? await this.copyVersionService.info(+this.examId, label) : undefined;
+    } catch (e) {
+      console.warn('version of the copy not read', e);
+    }
+    if (copy === this.currentStudent) {
+      this.copyVersionOf = copy;
+      this.copyVersion.set(info);
+    }
+    return info;
+  }
+
+  /** Tooltip of the version of the copy: what was rebuilt, the wordings of the version, how to see the original. */
+  copyVersionTooltip(v: CopyVersionInfo): string {
+    const text: string = this.translateService.instant('scanexam.versions.copyTooltip', { label: v.label });
+    if (v.variants.length === 0) {
+      return text;
+    }
+    const wordings = v.variants
+      .map(w => this.translateService.instant('scanexam.versions.wording', { key: w.key, n: w.wording }) as string)
+      .join(', ');
+    return `${text} ${this.translateService.instant('scanexam.versions.variants') as string} ${wordings}.`;
+  }
+
+  /** Pages of the copy as they were scanned (T25e6: the original of a copy rebuilt in the layout of version A). */
+  showOriginal(): void {
+    this.blocked = true;
+    this.loadAllPages(true).then(() => {
+      this.blocked = false;
+      this.displayBasic = true;
+    });
+  }
+
+  async loadAllPages(noalign = this.noalign): Promise<void> {
     this.images.set([]);
     const images: any[] = [];
 
     const page = await this.db.countAlignImage(+this.examId!);
     if (page > 30) {
       const page1 = this.nbreFeuilleParCopie!;
-      if (this.noalign) {
+      if (noalign) {
         const e1 = await this.db.getNonAlignImageBetweenAndSortByPageNumber(
           +this.examId!,
           this.currentStudent * page1 + 1,
@@ -2149,7 +2206,7 @@ export class CorrigequestionComponent implements OnInit, AfterViewInit {
         }
       }
     } else {
-      if (this.noalign) {
+      if (noalign) {
         const e1 = await this.db.getNonAlignSortByPageNumber(+this.examId!);
 
         // eslint-disable-next-line @typescript-eslint/no-shadow

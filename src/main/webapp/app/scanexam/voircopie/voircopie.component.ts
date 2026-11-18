@@ -22,6 +22,7 @@ import { PreferenceService } from '../preference-page/preference.service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ConfirmationService, MessageService, PrimeTemplate } from 'primeng/api';
 import { AlignImagesService } from '../services/align-images.service';
+import { rebuiltLabel } from '../typst/copy-version';
 import { db } from '../db/dbstudent';
 import { ImageZone, IPage } from '../associer-copies-etudiants/associer-copies-etudiants.model';
 import { IZone } from 'app/entities/zone/zone.model';
@@ -120,6 +121,8 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   resp: IStudentResponse | undefined;
   currentQuestion: IQuestion | undefined;
   noalign = false;
+  /** Letter of the version of this copy when it was rebuilt in the layout of version A (T25e6). */
+  rebuiltVersion?: string;
   factor = 1;
   source: StudentSheetSource | undefined;
   view: IStudentSheetView | undefined;
@@ -430,6 +433,9 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
   async getAllImage4Zone(page: number, zone: IZone): Promise<ImageZone> {
     const body = await this.readPage(page);
     const image = parseCachedPage(body);
+    if (!this.noalign) {
+      this.rebuiltVersion = rebuiltLabel(body) ?? this.rebuiltVersion;
+    }
     this.images.push({
       src: image.pages,
       alt: 'Page ' + page,
@@ -438,22 +444,42 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
     return new Promise(resolve => this.loadImage1(image, page, zone, resolve));
   }
 
+  /**
+   * The copy as it was scanned (T25e6): a copy of version B, C… is shown in the layout of version A for the
+   * correction; its original pages are shown whole, its zones would not be at the places of version A.
+   */
+  async showOriginal(): Promise<void> {
+    this.blocked = true;
+    try {
+      const images: { src: string; alt: string; title: string }[] = [];
+      for (let page = 1; page <= (this.nbreFeuilleParCopie ?? 1); page++) {
+        images.push({ src: parseCachedPage(await this.readPage(page, true)).pages, alt: 'Page ' + page, title: 'Exam' });
+      }
+      this.images = images;
+      this.displayBasic = true;
+    } catch (e) {
+      console.warn('original copy not read', e);
+    } finally {
+      this.blocked = false;
+    }
+  }
+
   /** Page of the sheet; with a /copie link the pages are kept in the IndexedDB of the browser, as before. */
-  private async readPage(page: number): Promise<string> {
+  private async readPage(page: number, noalign = this.noalign): Promise<string> {
     const source = this.source!;
     if (!source.persistentCache) {
-      return firstValueFrom(source.page(page, this.noalign));
+      return firstValueFrom(source.page(page, noalign));
     }
     // Same keys as before: exam and page in the scan (from 1)
     const examId = this.view!.exam.id;
     const pageInScan = this.currentStudent * this.nbreFeuilleParCopie! + page;
-    const cached = this.noalign ? await db.getFirstNonAlignImage(examId, pageInScan) : await db.getFirstAlignImage(examId, pageInScan);
+    const cached = noalign ? await db.getFirstNonAlignImage(examId, pageInScan) : await db.getFirstAlignImage(examId, pageInScan);
     if (cached !== undefined) {
       return cached.value;
     }
-    const body = await firstValueFrom(source.page(page, this.noalign));
+    const body = await firstValueFrom(source.page(page, noalign));
     const entry = { examId, pageNumber: pageInScan, value: body };
-    await (this.noalign ? db.addNonAligneImage(entry) : db.addAligneImage(entry));
+    await (noalign ? db.addNonAligneImage(entry) : db.addAligneImage(entry));
     return body;
   }
 
