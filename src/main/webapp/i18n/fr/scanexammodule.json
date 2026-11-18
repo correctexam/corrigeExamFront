@@ -744,7 +744,15 @@
         "missingPart": "zone {{ question }} (partie {{ part }}) absente de la version",
         "missingBox": "case {{ letter }} de {{ question }} absente de la version",
         "missingPage": "page de la zone {{ question }} absente de la copie"
-      }
+      },
+      "copyVersionsNotSaved": "La version des copies n'a pas pu être enregistrée (statistiques par version)",
+      "statsTitle": "Résultats par version",
+      "statsIntro": "Moyennes des copies de chaque version du sujet. Une case colorée signale une question où la version s'écarte de plus de 15 % du barème de la moyenne de toutes les copies.",
+      "statsVersion": "Version",
+      "statsCopies": "Copies",
+      "statsGap": "Écart à la moyenne de toutes les copies : {{ delta }} point(s)",
+      "statsGaps": "{{ n }} écart(s) notable(s) entre versions : vérifiez l'énoncé ou le corrigé de ces questions dans les versions concernées.",
+      "statsUnknown": "{{ n }} copie(s) sans version connue (code de page illisible) ne sont pas comptées."
     }
   }
 }

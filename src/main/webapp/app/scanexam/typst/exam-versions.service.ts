@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import type { BuiltVersions, VersionLayout } from './subject-versions';
+import type { CopyVersionRecord } from './version-rebuild';
 
 /** Version of an exam as stored by the server (T25e2, `ExamVersionResource`). */
 export interface ExamVersion {
@@ -69,6 +70,12 @@ export class ExamVersionsService {
   async pdf(examId: number, index: number): Promise<Uint8Array> {
     const buffer = await firstValueFrom(this.http.get(`${this.url(examId)}/${index}/pdf`, { responseType: 'arraybuffer' }));
     return new Uint8Array(buffer);
+  }
+
+  /** Version of each copy of the scan (T25e6b): replaces the list recorded by the back, for the statistics. */
+  saveCopyVersions(examId: number, copies: CopyVersionRecord[]): Promise<CopyVersionRecord[]> {
+    const body = copies.map(c => ({ firstPage: c.firstPage, label: c.label, edition: c.edition ?? null, copy: c.copy ?? null }));
+    return firstValueFrom(this.http.put<CopyVersionRecord[]>(this.config.getEndpointFor(`api/exams/${examId}/copy-versions`), body));
   }
 
   private url(examId: number): string {

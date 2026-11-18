@@ -40,6 +40,8 @@ const BLEU_AERO = 'rgb(142, 184, 229)';
 const BLEU_AERO_TIEDE = 'rgb(142, 184, 229,0.6)';
 const TRANSPARENT = 'rgba(255,255,255,0.0)';
 
+import { compareVersions, VersionComparison } from '../typst/version-stats';
+
 @Component({
   selector: 'jhi-statsexam',
   templateUrl: './statsexam.component.html',
@@ -76,6 +78,8 @@ export class StatsExamComponent implements OnInit {
   questionNumeros: Array<number> = [];
   protected infosStudents: StudentRes[] = [];
   protected q_notees: QuestionNotee[] = [];
+  /** Results compared version by version, for an exam printed in several versions (T25e6b). */
+  protected versionComparison?: VersionComparison;
   protected studentsMarks: number[] = [];
   protected choixTri = true;
   protected nbStdABI = 0;
@@ -298,6 +302,12 @@ export class StatsExamComponent implements OnInit {
         }
       });
     this.q_notees = qn.sort((a, b) => a.numero - b.numero);
+    this.versionComparison = compareVersions(this.infosStudents, this.q_notees);
+  }
+
+  /** True when version `label` differs notably from the others on question `numero`. */
+  protected versionGap(label: string, numero: number): number | undefined {
+    return this.versionComparison?.gaps.find(g => g.label === label && g.numero === numero)?.delta;
   }
 
   public s2f(str: string): number {
@@ -832,6 +842,8 @@ interface QuestionNotee {
 }
 
 interface StudentRes {
+  /** Version of the subject of the copy (T25e6b), when the exam was printed in several versions. */
+  version?: string | null;
   ine: string;
   mail: string;
   nom: string;

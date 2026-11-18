@@ -728,7 +728,15 @@
         "missingPart": "zone {{ question }} (part {{ part }}) missing from the version",
         "missingBox": "box {{ letter }} of {{ question }} missing from the version",
         "missingPage": "page of zone {{ question }} missing from the copy"
-      }
+      },
+      "copyVersionsNotSaved": "The versions of the copies could not be recorded (statistics per version)",
+      "statsTitle": "Results per version",
+      "statsIntro": "Means of the copies of each version of the subject. A coloured cell shows a question where the version differs by more than 15 % of the points from the mean of all the copies.",
+      "statsVersion": "Version",
+      "statsCopies": "Copies",
+      "statsGap": "Difference from the mean of all the copies: {{ delta }} point(s)",
+      "statsGaps": "{{ n }} notable difference(s) between versions: check the wording or the solution of these questions in the versions concerned.",
+      "statsUnknown": "{{ n }} copy(ies) without a known version (unreadable page code) are not counted."
     }
   }
 }

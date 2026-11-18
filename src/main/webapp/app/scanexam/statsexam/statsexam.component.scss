@@ -227,3 +227,32 @@ a {
     flex-direction: row;
   }
 }
+
+.versions-table {
+  overflow-x: auto;
+
+  table {
+    width: auto;
+  }
+
+  td,
+  th {
+    text-align: right;
+    white-space: nowrap;
+    padding: 0.2rem 0.5rem;
+  }
+}
+
+.version-gap-low {
+  background: #f8d7da;
+  font-weight: bold;
+}
+
+.version-gap-high {
+  background: #d1e7dd;
+  font-weight: bold;
+}
+
+.versions-card {
+  margin: 0.5rem 1rem;
+}
