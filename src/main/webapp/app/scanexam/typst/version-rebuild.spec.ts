@@ -1,9 +1,21 @@
 /**
  * @jest-environment node
  */
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import type { IZone } from 'app/entities/zone/zone.model';
 import type { VersionLayout } from './subject-versions';
-import { blit, codeBand, copySlots, Raster, rebuildCopy, versionFromCode, versionOfCopy, zoneToPixels } from './version-rebuild';
+import {
+  blit,
+  codeBand,
+  copySlots,
+  parseServerVersions,
+  Raster,
+  rebuildCopy,
+  versionFromCode,
+  versionOfCopy,
+  zoneToPixels,
+} from './version-rebuild';
 
 const W = 210;
 const H = 297;
@@ -146,5 +158,95 @@ describe('rebuilt copies (T25e4)', () => {
     expect(versionFromCode({ edition: 12, copy: 31, page: 2 }, 2, editions).kind).toBe('unknown');
     expect(versionFromCode(undefined, 1, editions).kind).toBe('unknown');
     expect(versionFromCode({ edition: 12, copy: 5, page: 1 }, 1, [{ id: 12, copies: 30, pagesPerCopy: 2 }])).toMatchObject({ version: 0 });
+  });
+
+  /**
+   * Cases shared with the alignment worker (`versions.rs` in pdf_to_webp, `tests/fixtures/version-rebuild-cases.json`):
+   * both implementations must give the same pixels. Regenerate the file when the algorithm changes, and copy it to
+   * the worker.
+   */
+  describe('cases shared with the Rust worker', () => {
+    interface Shared {
+      zoneToPixels: { zone: IZone; width: number; height: number; marginPt: number; expected: unknown }[];
+      codeBand: { width: number; height: number; expected: unknown }[];
+      versionOfCopy: [number, number, number][];
+      copySlots: { total: number; pagesPerCopy: number; expected: [number, number][] }[];
+      versionFromCode: {
+        code: { edition: number; copy: number; page: number } | null;
+        page: number;
+        editions: { id: number; copies: number; pages_per_copy: number; versions?: number }[];
+        expected: { kind: string; version?: number };
+      }[];
+      rebuild: {
+        name: string;
+        width: number;
+        height: number;
+        pages: number;
+        template: number;
+        paper: number;
+        canonical: VersionLayout;
+        layout: VersionLayout;
+        ink: { page: number; x: number; y: number; w: number; h: number }[];
+        probes: { page: number; x: number; y: number; value: number }[];
+        issues: unknown[];
+      }[];
+      finishedDetails: { details: string; expected: unknown };
+    }
+    const shared = JSON.parse(readFileSync(join(__dirname, 'fixtures/version-rebuild-cases.json'), 'utf8')) as Shared;
+
+    it('converts the zones and the code band', () => {
+      for (const c of shared.zoneToPixels) {
+        expect(zoneToPixels(c.zone, c.width, c.height, c.marginPt)).toEqual(c.expected);
+      }
+      for (const c of shared.codeBand) {
+        expect(codeBand(c.width, c.height)).toEqual(c.expected);
+      }
+    });
+
+    it('finds the versions and the copies', () => {
+      for (const [copy, k, expected] of shared.versionOfCopy) {
+        expect(versionOfCopy(copy, k)).toBe(expected);
+      }
+      for (const c of shared.copySlots) {
+        expect(copySlots(c.total, c.pagesPerCopy).map(s => [s.firstPage, s.pages])).toEqual(c.expected);
+      }
+      for (const c of shared.versionFromCode) {
+        const editions = c.editions.map(e => ({ id: e.id, copies: e.copies, pagesPerCopy: e.pages_per_copy, versions: e.versions }));
+        const r = versionFromCode(c.code ?? undefined, c.page, editions);
+        expect(r.kind === 'version' ? { kind: r.kind, version: r.version } : { kind: r.kind }).toEqual(c.expected);
+      }
+    });
+
+    it('reads the bilan of the worker in its finished status', () => {
+      expect(parseServerVersions(shared.finishedDetails.details)).toEqual(shared.finishedDetails.expected);
+      expect(parseServerVersions('Traitement complet terminé')).toBeUndefined();
+      expect(parseServerVersions('{"pagecodes":{}}')).toBeUndefined();
+      expect(parseServerVersions('{"versions":{"copies":"x"}}')).toBeUndefined();
+      expect(parseServerVersions('{broken')).toBeUndefined();
+    });
+
+    it('rebuilds the same pixels', () => {
+      for (const c of shared.rebuild) {
+        const plain = (level: number): Raster => ({
+          width: c.width,
+          height: c.height,
+          data: new Uint8ClampedArray(c.width * c.height * 4).fill(level),
+        });
+        const copy = Array.from({ length: c.pages }, () => plain(c.paper));
+        for (const ink of c.ink) {
+          fill(copy[ink.page - 1], ink, 0);
+        }
+        const { pages, issues } = rebuildCopy(
+          copy,
+          Array.from({ length: c.pages }, () => plain(c.template)),
+          c.canonical,
+          c.layout,
+        );
+        expect(issues).toEqual(c.issues);
+        for (const p of c.probes) {
+          expect([c.name, p, at(pages[p.page - 1], p.x, p.y)]).toEqual([c.name, p, p.value]);
+        }
+      }
+    });
   });
 });

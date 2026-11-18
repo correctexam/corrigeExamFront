@@ -34,7 +34,8 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { PartialAlignModalComponent } from './partial-align-modal/partial-align-modal.component';
 import { PageCodesCheckComponent } from '../page-codes-check/page-codes-check.component';
 import { parseServerSummary, ServerPageCodeSummary } from '../typst/page-codes';
-import { RebuildReport, VersionRebuildService } from '../typst/version-rebuild.service';
+import { VersionRebuildService } from '../typst/version-rebuild.service';
+import { parseServerVersions, RebuildSummary } from '../typst/version-rebuild';
 // import { db as dbsqlite } from '../db/dbsqlite';
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { QuestionService } from '../../entities/question/service/question.service';
@@ -101,8 +102,8 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
   nbreFeuilleParCopie = 2;
   /** Page codes read by the worker during the last server alignment (T25d3). */
   readonly serverPageCodes = signal<ServerPageCodeSummary | undefined>(undefined);
-  /** Copies of the versions B, C… rebuilt in the layout of version A after the last local alignment (T25e4). */
-  readonly versionReport = signal<RebuildReport | undefined>(undefined);
+  /** Copies of the versions B, C… rebuilt in the layout of version A after the last alignment (T25e4, T25e5 server). */
+  readonly versionReport = signal<RebuildSummary | undefined>(undefined);
   numberPagesInScan = 0;
   // Change if partial update
   currentPageAlign = 1;
@@ -653,6 +654,16 @@ export class AlignScanComponent implements OnInit, CacheUploadNotification, Cach
     }
     // les pages ont pu être lues et ordonnées par leurs codes (T25d3)
     this.serverPageCodes.set(parseServerSummary(last?.details));
+    // les copies des versions B, C… ont pu être reconstruites par le worker (T25e5)
+    const versions = parseServerVersions(last?.details);
+    this.versionReport.set(versions);
+    if (versions && versions.notRebuilt.length > 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: this.translateService.instant('scanexam.versions.notRebuiltTitle'),
+        detail: this.translateService.instant('scanexam.versions.notRebuiltDetail', { n: versions.notRebuilt.length }),
+      });
+    }
     await this.completeServerJob();
   }
 

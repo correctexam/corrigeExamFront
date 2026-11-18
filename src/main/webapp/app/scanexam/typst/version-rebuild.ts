@@ -236,3 +236,53 @@ export function versionFromCode(
   }
   return { kind: 'version', edition: code.edition, copy: code.copy, version: versionOfCopy(code.copy, edition.versions ?? 1) };
 }
+
+/** Bilan of the rebuilding, as the front shows it (`VersionRebuildService` locally, the worker on the server). */
+export interface RebuildSummary {
+  copies: number;
+  versionA: number;
+  alreadyRebuilt: number;
+  rebuilt: { firstPage: number; edition: number; copy: number; label: string; issues: RebuildIssue[] }[];
+  notRebuilt: { firstPage: number; reason: string; detail?: string }[];
+}
+
+/**
+ * Bilan written by the alignment worker (T25e5) in the `details` of its `finished` status: JSON `{"versions": …}`
+ * (`RebuildSummary` in `versions.rs`, snake_case). Undefined for any other details.
+ */
+export function parseServerVersions(details: string | null | undefined): RebuildSummary | undefined {
+  if (!details?.trim().startsWith('{')) {
+    return undefined;
+  }
+  try {
+    const v = (JSON.parse(details) as { versions?: Record<string, unknown> }).versions;
+    if (typeof v !== 'object' || v === null) {
+      return undefined;
+    }
+    const num = (x: unknown): x is number => typeof x === 'number';
+    if (
+      !num(v['copies']) ||
+      !num(v['version_a']) ||
+      !num(v['already_rebuilt']) ||
+      !Array.isArray(v['rebuilt']) ||
+      !Array.isArray(v['not_rebuilt'])
+    ) {
+      return undefined;
+    }
+    const rebuilt = (v['rebuilt'] as Record<string, unknown>[]).map(r => ({
+      firstPage: Number(r['first_page']),
+      edition: Number(r['edition']),
+      copy: Number(r['copy']),
+      label: String(r['label']),
+      issues: Array.isArray(r['issues']) ? (r['issues'] as RebuildIssue[]) : [],
+    }));
+    const notRebuilt = (v['not_rebuilt'] as Record<string, unknown>[]).map(n => ({
+      firstPage: Number(n['first_page']),
+      reason: String(n['reason']),
+      ...(typeof n['detail'] === 'string' ? { detail: n['detail'] } : {}),
+    }));
+    return { copies: v['copies'], versionA: v['version_a'], alreadyRebuilt: v['already_rebuilt'], rebuilt, notRebuilt };
+  } catch {
+    return undefined;
+  }
+}
