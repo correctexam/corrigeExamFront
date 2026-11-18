@@ -6,6 +6,8 @@ import { Observable, Subscription, catchError, map, of } from 'rxjs';
 /**
  * Contrat d'alignement serveur (POST /api/scansalign + suivi SSE GET /api/scansalign/{examId}/events).
  * Le nommage des champs suit exactement ScanRequestDto (snake_case via @JsonProperty côté back).
+ * `page_codes` (tirages, T25d3) et `versions` (mises en page des versions, T25e5) ne sont jamais envoyés par le
+ * front : le back les renseigne à partir de `exam_edition` et `exam_version` (contrat : ADR 0001 du back).
  */
 export interface ScanRequestPayload {
   pages_to_manage: string;

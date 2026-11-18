@@ -5,7 +5,7 @@ import { ExamPrintService } from './exam-print.service';
 import { ExamVersion, ExamVersionsService } from './exam-versions.service';
 import { PageCodeCheckService } from './page-code-check.service';
 import { parsePageCode } from './page-codes';
-import { CopyVersion, copySlots, RebuildIssue, versionFromCode } from './version-rebuild';
+import { CopyVersion, copySlots, RebuildSummary, versionFromCode } from './version-rebuild';
 
 export interface RebuildProgress {
   done: number;
@@ -26,15 +26,9 @@ export type NotRebuiltReason =
   /** The rebuilding failed (image that cannot be decoded…). */
   | 'failed';
 
-export interface RebuildReport {
+export interface RebuildReport extends RebuildSummary {
   /** False when the exam has no print run of several versions: nothing to do. */
   applicable: boolean;
-  copies: number;
-  /** Copies of version A: nothing to rebuild. */
-  versionA: number;
-  /** Copies rebuilt during an earlier alignment, left as they are. */
-  alreadyRebuilt: number;
-  rebuilt: { firstPage: number; edition: number; copy: number; label: string; issues: RebuildIssue[] }[];
   notRebuilt: { firstPage: number; reason: NotRebuiltReason; detail?: string }[];
 }
 
