@@ -12,6 +12,26 @@
     <p class="text-muted" [translate]="'typstsubject.print.loading'">Chargement du modèle…</p>
   }
 
+  @if (versions().length > 1) {
+    <div class="print-versions" data-cy="print-versions">
+      <label for="print-version-count" [translate]="'typstsubject.print.versions'">Versions</label>
+      <select
+        id="print-version-count"
+        class="form-select form-select-sm"
+        [ngModel]="versionCount()"
+        (ngModelChange)="versionCount.set(+$event)"
+        data-cy="print-version-count"
+      >
+        @for (n of versionChoices(); track n) {
+          <option [ngValue]="n">{{ n }}</option>
+        }
+      </select>
+      <small class="text-muted">
+        {{ 'typstsubject.print.versionsHelp' | translate: { letters: versionLetters() } }}
+      </small>
+    </div>
+  }
+
   <div class="print-new">
     <label for="print-copies" [translate]="'typstsubject.print.copies'">Nombre de copies</label>
     <input
@@ -57,7 +77,12 @@
         @for (e of editions(); track e.id) {
           <tr>
             <td>n° {{ e.id }}</td>
-            <td>{{ 'typstsubject.print.size' | translate: { copies: e.copies, pages: e.pagesPerCopy } }}</td>
+            <td>
+              {{ 'typstsubject.print.size' | translate: { copies: e.copies, pages: e.pagesPerCopy } }}
+              @if ((e.versions ?? 1) > 1) {
+                — {{ 'typstsubject.print.editionVersions' | translate: { k: e.versions } }}
+              }
+            </td>
             <td>{{ e.createdAt | date: 'short' }}</td>
             <td>{{ e.createdBy }}</td>
             <td>

@@ -13,6 +13,8 @@ export interface ExamEdition {
   examId: number;
   copies: number;
   pagesPerCopy: number;
+  /** Versions of the subject in the print run (T25e): copy c is printed in version (c - 1) mod versions. */
+  versions?: number;
   createdAt?: string | null;
   createdBy?: string | null;
 }
@@ -33,8 +35,10 @@ export class ExamPrintService {
     return firstValueFrom(this.http.get<ExamEdition[]>(this.url(examId)));
   }
 
-  createEdition(examId: number, copies: number, pagesPerCopy: number): Promise<ExamEdition> {
-    return firstValueFrom(this.http.post<ExamEdition>(this.url(examId), { copies, pagesPerCopy }));
+  /** Records a print run; with `versions` > 1 the server checks the stored versions and freezes them. */
+  createEdition(examId: number, copies: number, pagesPerCopy: number, versions = 1): Promise<ExamEdition> {
+    const body = versions > 1 ? { copies, pagesPerCopy, versions } : { copies, pagesPerCopy };
+    return firstValueFrom(this.http.post<ExamEdition>(this.url(examId), body));
   }
 
   /** PDF of the template of the exam (the sheets the zones were made from). */
@@ -49,10 +53,20 @@ export class ExamPrintService {
     return countPages(pdf);
   }
 
-  /** Assembles the PDF of a print run off the UI thread. */
-  assemble(template: Uint8Array, edition: ExamEdition, onProgress?: (p: PrintProgress) => void): Promise<Uint8Array> {
+  /**
+   * Assembles the PDF of a print run off the UI thread: one template per version of the print run (version A first),
+   * copy c printed from template (c - 1) mod templates.length.
+   */
+  assemble(templates: Uint8Array[], edition: ExamEdition, onProgress?: (p: PrintProgress) => void, labels?: string[]): Promise<Uint8Array> {
     const worker = this.createWorker();
-    const request: PrintWorkerRequest = { kind: 'print', id: ++this.nextId, template, edition: edition.id, copies: edition.copies };
+    const request: PrintWorkerRequest = {
+      kind: 'print',
+      id: ++this.nextId,
+      templates,
+      labels,
+      edition: edition.id,
+      copies: edition.copies,
+    };
     return new Promise<Uint8Array>((resolve, reject) => {
       worker.onmessage = ({ data }: MessageEvent<PrintWorkerResponse>) => {
         if (data.kind === 'progress') {

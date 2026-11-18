@@ -106,7 +106,10 @@
       "advice": "Imprimez à taille réelle (sans ajustement à la page). Un tirage déjà créé se retélécharge avec les mêmes codes : ne créez pas un nouveau tirage pour réimprimer quelques copies.",
       "previous": "Tirages",
       "size": "{{copies}} copies × {{pages}} pages",
-      "again": "Retélécharger"
+      "again": "Retélécharger",
+      "versions": "Versions",
+      "versionsHelp": "Les copies alternent les versions ({{ letters }}, …). Le premier tirage à plusieurs versions les fige : elles ne pourront plus être modifiées.",
+      "editionVersions": "{{ k }} versions"
     },
     "versions": {
       "title": "Versions du sujet",
@@ -133,7 +136,10 @@
         "identity": "la zone d'identification « {{ role }} » diffère de la version A",
         "pages": "la version a {{ pages }} pages au lieu de {{ expected }}",
         "nothingVaries": "rien ne varie : ajoutez shuffle: true à une section, des choix de QCM ou une #variant"
-      }
+      },
+      "storedExam": "Les versions s'enregistrent à la création de l'examen ; elles ne peuvent pas encore être ajoutées à un examen déjà créé.",
+      "ready": "L'examen sera créé avec ses {{ k }} versions : la version A sert de modèle (zones et correction), les autres seront reconstruites au scan.",
+      "blocking": "Générez et vérifiez les versions (sans problème) avant de créer l'examen, ou revenez à une seule version."
     }
   }
 }

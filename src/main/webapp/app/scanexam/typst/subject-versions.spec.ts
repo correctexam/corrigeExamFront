@@ -96,6 +96,9 @@ describe('versions compiled by the real compiler', () => {
     for (const v of built.versions) {
       expect(v.layout.pages).toBe(pages);
       expect(await countPages(v.pdf)).toBe(pages);
+      // stored with the version: compiling its ce-plan again gives the same version (same pages, same layout)
+      expect(v.cePlan).toMatchObject({ version: v.plan.label, stamp: true, pad: pages - v.pages });
+      expect(Array.isArray(v.zones)).toBe(true);
       expect(v.layout.parts.map(p => `${p.key}#${p.part}`).sort()).toEqual(['q-court#1', 'q-long#1', 'q-moyen#1', 'q-qcm#1']);
       expect(
         v.layout.boxes

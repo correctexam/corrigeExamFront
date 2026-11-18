@@ -106,7 +106,10 @@
       "advice": "Imprima em tamanho real (sem ajustar à página). Uma tiragem já criada descarrega-se de novo com os mesmos códigos: não crie uma nova tiragem para reimprimir algumas cópias.",
       "previous": "Tiragens",
       "size": "{{copies}} cópias × {{pages}} páginas",
-      "again": "Descarregar de novo"
+      "again": "Descarregar de novo",
+      "versions": "Versões",
+      "versionsHelp": "As provas alternam as versões ({{ letters }}, …). A primeira tiragem com várias versões fixa-as: deixam de poder ser alteradas.",
+      "editionVersions": "{{ k }} versões"
     },
     "versions": {
       "title": "Versões do enunciado",
@@ -133,7 +136,10 @@
         "identity": "a zona de identificação « {{ role }} » difere da versão A",
         "pages": "a versão tem {{ pages }} páginas em vez de {{ expected }}",
         "nothingVaries": "nada varia: adicione shuffle: true a uma secção, escolhas de QCM ou uma #variant"
-      }
+      },
+      "storedExam": "As versões são registadas na criação do exame; ainda não podem ser adicionadas a um exame já criado.",
+      "ready": "O exame será criado com as suas {{ k }} versões: a versão A serve de modelo (zonas e correção), as outras serão reconstruídas no scan.",
+      "blocking": "Gere e verifique as versões (sem problemas) antes de criar o exame, ou volte a uma única versão."
     }
   }
 }

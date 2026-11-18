@@ -63,6 +63,21 @@ describe('ExamPrintService', () => {
     await expect(created).resolves.toEqual(edition);
   });
 
+  it('records a print run of several versions', async () => {
+    const created = service.createEdition(7, 30, 4, 3);
+    const req = http.expectOne('api/exams/7/editions');
+    expect(req.request.body).toEqual({ copies: 30, pagesPerCopy: 4, versions: 3 });
+    req.flush({ ...edition, versions: 3 });
+    await expect(created).resolves.toEqual({ ...edition, versions: 3 });
+  });
+
+  it('sends one template per version to the worker', async () => {
+    worker = new FakeWorker();
+    const posted = jest.spyOn(worker, 'postMessage');
+    await service.assemble([new Uint8Array([1]), new Uint8Array([2])], { ...edition, versions: 2 }, undefined, ['A', 'B']);
+    expect(posted.mock.calls[0][0]).toMatchObject({ templates: [new Uint8Array([1]), new Uint8Array([2])], labels: ['A', 'B'], copies: 3 });
+  });
+
   it('reads the template PDF', async () => {
     await expect(service.templatePdf(5)).resolves.toEqual(new Uint8Array([37, 80, 68, 70]));
   });
@@ -70,14 +85,14 @@ describe('ExamPrintService', () => {
   it('assembles off the UI thread and reports the progress', async () => {
     worker = new FakeWorker();
     const progress: number[] = [];
-    await expect(service.assemble(new Uint8Array([1]), edition, p => progress.push(p.done))).resolves.toEqual(new Uint8Array([12]));
+    await expect(service.assemble([new Uint8Array([1])], edition, p => progress.push(p.done))).resolves.toEqual(new Uint8Array([12]));
     expect(progress).toEqual([1, 2, 3]);
     expect(worker.terminated).toBe(true);
   });
 
   it('rejects when the worker fails', async () => {
     worker = new FakeWorker(true);
-    await expect(service.assemble(new Uint8Array([1]), edition)).rejects.toThrow('broken template');
+    await expect(service.assemble([new Uint8Array([1])], edition)).rejects.toThrow('broken template');
     expect(worker.terminated).toBe(true);
   });
 });
