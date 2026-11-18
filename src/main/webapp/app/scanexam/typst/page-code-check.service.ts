@@ -5,6 +5,7 @@ import { ExamPrintService } from './exam-print.service';
 import { analyseScan, CodeReport, moveSequence, ScannedPage } from './page-codes';
 import { createPageCodeWorker } from './page-code-worker-factory';
 import { PageCodeWorkerRequest, PageCodeWorkerResponse } from './page-code-worker.protocol';
+import type { RebuildIssue } from './version-rebuild';
 
 export interface CheckProgress {
   done: number;
@@ -106,6 +107,39 @@ export class PageCodeCheckService {
     }
   }
 
+  /** Code read on a page image (data URL); empty when none was found or the image cannot be decoded. */
+  async readImage(image: string): Promise<{ text?: string; upsideDown?: boolean }> {
+    try {
+      const res = await this.send({ kind: 'read', image });
+      return res.kind === 'read' ? { text: res.text, upsideDown: res.upsideDown } : {};
+    } catch (e) {
+      console.warn('page code not read', e);
+      return {};
+    }
+  }
+
+  /** Rebuilds the pages of a copy in the layout of version A (T25e4), in the worker. */
+  async rebuildImages(
+    req: Omit<Extract<PageCodeWorkerRequest, { kind: 'rebuild' }>, 'id' | 'kind'>,
+  ): Promise<{ images: string[]; issues: RebuildIssue[] }> {
+    const res = await this.send({ kind: 'rebuild', ...req });
+    if (res.kind !== 'rebuilt') {
+      throw new Error('unexpected answer of the page code worker');
+    }
+    return { images: res.images, issues: res.issues };
+  }
+
+  /** Stops the worker (its decoder holds memory) once a series of reads or rebuilds is over. */
+  release(): void {
+    this.stopWorker();
+  }
+
+  /** Type of the images written in the cache (preference of the teacher). */
+  imageType(): string {
+    const type = this.preferences.getPreference().imageTypeExport;
+    return ['image/webp', 'image/png', 'image/jpg'].includes(type) ? type : 'image/webp';
+  }
+
   /** Creates the worker; isolated so that tests can provide a fake one. */
   protected createWorker(): Worker {
     return createPageCodeWorker();
@@ -136,11 +170,6 @@ export class PageCodeCheckService {
       throw new Error('unexpected answer of the page code worker');
     }
     return res.image;
-  }
-
-  private imageType(): string {
-    const type = this.preferences.getPreference().imageTypeExport;
-    return ['image/webp', 'image/png', 'image/jpg'].includes(type) ? type : 'image/webp';
   }
 
   private send(req: WorkerRequest): Promise<PageCodeWorkerResponse> {

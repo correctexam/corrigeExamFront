@@ -9,3 +9,9 @@ p-galleria ::ng-deep .p-galleria {
   border-color: var(--p-galleria-border-color);
   border-radius: var(--p-galleria-border-radius);
 }
+
+.version-report {
+  margin: 1rem 0;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid #6c757d;
+}

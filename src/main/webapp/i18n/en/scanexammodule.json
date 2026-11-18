@@ -172,7 +172,6 @@
     "uploadstudentsheetencoursdetail": "(This may take a while)",
     "uploadcacheencours": "Upload of the image cache to the server in progress",
     "uploadcacheencoursdetail": "(This may take a while)",
-
     "confirmdownloadcache": "Are sure you want to download the cache from the server to the browser. This will remove your local image database to that equipment previously aligned.",
     "confirmdownloadnewcache": "A more up-to-date cache is available on the server. Do you want to download the cache from the server to the browser? This will delete your local image database on this device that you have previously aligned or downloaded.",
     "downloadcacheok": "Download file from server",
@@ -388,7 +387,6 @@
     "courseexport": "Export",
     "examexport": "Export {{examName}}",
     "exportexamtooltip": "Export exam's data for reusing them",
-
     "courseimporttooltip": "Import course's data using json format",
     "courseexporttooltip": "Export course's data using json format",
     "importexportcoursetooltip": "Import/Export course's data for reusing them",
@@ -707,6 +705,30 @@
       "collapse": "Collapse the navigation pad",
       "expand": "Show the navigation pad",
       "copy": "Copy"
+    },
+    "versions": {
+      "mention": "Version {{ label }} — rebuilt page",
+      "rebuilding": "Rebuilding the copies of versions B, C…",
+      "title": "Copies of versions B, C…",
+      "summary": "{{ copies }} copies: {{ rebuilt }} rebuilt in the layout of version A, {{ a }} in version A, {{ before }} already rebuilt.",
+      "notRebuiltTitle": "Copies not rebuilt",
+      "notRebuiltDetail": "{{ n }} copy(ies) could not be rebuilt: see the details under the page code check.",
+      "notRebuiltHelp": "These copies keep the layout of their version: their zones are not in the right place. Check the page codes (and put the pages back in order), then align again.",
+      "copyAt": "Copy starting at page {{ page }}",
+      "failed": "The copies of the versions could not be rebuilt",
+      "reason": {
+        "unknown": "no readable page code",
+        "disordered": "page code not at its place: pages out of order",
+        "incomplete": "incomplete copy (fewer pages than the template)",
+        "partial": "copy partly rebuilt: align the whole copy again",
+        "noLayout": "layout of the version missing",
+        "failed": "error while rebuilding"
+      },
+      "issue": {
+        "missingPart": "zone {{ question }} (part {{ part }}) missing from the version",
+        "missingBox": "box {{ letter }} of {{ question }} missing from the version",
+        "missingPage": "page of zone {{ question }} missing from the copy"
+      }
     }
   }
 }

@@ -181,6 +181,39 @@
       [serverSummary]="serverPageCodes()"
       (reordered)="checkIfAlreadyAlign()"
     ></jhi-page-codes-check>
+    @if (versionReport(); as r) {
+      <div class="version-report" data-cy="version-report">
+        <h5 [translate]="'scanexam.versions.title'">Copies des versions B, C…</h5>
+        <p>
+          {{
+            'scanexam.versions.summary'
+              | translate: { copies: r.copies, rebuilt: r.rebuilt.length, a: r.versionA, before: r.alreadyRebuilt }
+          }}
+        </p>
+        @if (r.notRebuilt.length > 0) {
+          <p class="text-warning" [translate]="'scanexam.versions.notRebuiltHelp'"></p>
+          <ul class="small" data-cy="version-not-rebuilt">
+            @for (n of r.notRebuilt; track n.firstPage) {
+              <li>
+                {{ 'scanexam.versions.copyAt' | translate: { page: n.firstPage } }} —
+                {{ 'scanexam.versions.reason.' + n.reason | translate }}
+                @if (n.detail) {
+                  <span class="text-muted">({{ n.detail }})</span>
+                }
+              </li>
+            }
+          </ul>
+        }
+        @for (c of r.rebuilt; track c.firstPage) {
+          @for (i of c.issues; track $index) {
+            <p class="small text-danger">
+              {{ 'scanexam.versions.copyAt' | translate: { page: c.firstPage } }} ({{ c.label }}) —
+              {{ 'scanexam.versions.issue.' + i.key | translate: { question: i.question, part: i.part, letter: i.letter ?? '' } }}
+            </p>
+          }
+        }
+      </div>
+    }
     @if (_showVignette && allowPartialAlign) {
       <jhi-viewandreorderpages [alignPage]="true" #viewpage [examId]="+examId!"></jhi-viewandreorderpages>
     }

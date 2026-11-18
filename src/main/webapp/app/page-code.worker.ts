@@ -10,6 +10,7 @@
 import { prepareZXingModule, readBarcodes } from 'zxing-wasm/reader';
 import { pickCode } from './scanexam/typst/page-codes';
 import { PageCodeWorkerRequest, PageCodeWorkerResponse } from './scanexam/typst/page-code-worker.protocol';
+import { Raster, rebuildCopy } from './scanexam/typst/version-rebuild';
 
 const base = new URL('content/zxing/', self.location.href);
 prepareZXingModule({
@@ -44,7 +45,50 @@ async function toDataUrl(canvas: OffscreenCanvas, type: string): Promise<string>
   return new FileReaderSync().readAsDataURL(blob);
 }
 
+async function raster(image: string): Promise<Raster> {
+  const img = await bitmap(image);
+  const canvas = new OffscreenCanvas(img.width, img.height);
+  const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
+  ctx.drawImage(img, 0, 0);
+  img.close();
+  const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  return { width: data.width, height: data.height, data: data.data };
+}
+
+/** A rebuilt page, with its mention in the top margin (left of the title, away from the alignment marks). */
+async function rebuiltImage(page: Raster, mention: string, type: string): Promise<string> {
+  const canvas = new OffscreenCanvas(page.width, page.height);
+  const ctx = canvas.getContext('2d')!;
+  ctx.putImageData(new ImageData(new Uint8ClampedArray(page.data), page.width, page.height), 0, 0);
+  const mm = page.width / 210;
+  ctx.font = `${Math.max(8, Math.round(3 * mm))}px sans-serif`;
+  ctx.fillStyle = '#555555';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(mention, 22 * mm, 7 * mm);
+  return toDataUrl(canvas, type);
+}
+
+async function rebuild(req: Extract<PageCodeWorkerRequest, { kind: 'rebuild' }>): Promise<PageCodeWorkerResponse> {
+  const copy: Raster[] = [];
+  for (const image of req.copy) {
+    copy.push(await raster(image));
+  }
+  const templates: Raster[] = [];
+  for (const image of req.templates) {
+    templates.push(await raster(image));
+  }
+  const { pages, issues } = rebuildCopy(copy, templates, req.canonical, req.layout);
+  const images: string[] = [];
+  for (const page of pages) {
+    images.push(await rebuiltImage(page, req.mention, req.type));
+  }
+  return { kind: 'rebuilt', id: req.id, images, issues };
+}
+
 async function handle(req: PageCodeWorkerRequest): Promise<PageCodeWorkerResponse> {
+  if (req.kind === 'rebuild') {
+    return rebuild(req);
+  }
   if (req.kind === 'read') {
     const img = await bitmap(req.image);
     const bottom = await readBand(img, false);
