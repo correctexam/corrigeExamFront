@@ -37,7 +37,8 @@
       "short": "+ Réponse courte",
       "code": "+ Code",
       "math": "+ Formule",
-      "section": "+ Partie"
+      "section": "+ Partie",
+      "variant": "+ Variante d'énoncé"
     },
     "issue": {
       "noQuestion": "Le sujet ne contient aucune question.",
@@ -106,6 +107,33 @@
       "previous": "Tirages",
       "size": "{{copies}} copies × {{pages}} pages",
       "again": "Retélécharger"
+    },
+    "versions": {
+      "title": "Versions du sujet",
+      "intro": "Chaque version mélange les questions des sections marquées shuffle, l'ordre des choix de QCM et choisit une variante d'énoncé. Les copies de toutes les versions seront reconstruites dans la mise en page de la version A pour la correction.",
+      "count": "Nombre de versions",
+      "seed": "Tirage",
+      "newSeed": "Nouveau tirage",
+      "build": "Générer et vérifier",
+      "building": "Génération…",
+      "stale": "Le sujet a changé depuis la génération : régénérez les versions.",
+      "doesNotCompile": "La version {{ version }} ne compile pas :",
+      "canonical": "version de référence (correction)",
+      "pages": "{{ pages }} pages",
+      "preview": "Aperçu",
+      "previewing": "Aperçu de la version {{ label }}",
+      "backToSubject": "Revenir au sujet",
+      "ok": "Les versions sont compatibles : leurs copies pourront être reconstruites dans la mise en page de la version A.",
+      "failed": "Les versions n'ont pas pu être générées",
+      "issue": {
+        "missingZone": "la zone {{ question }} (partie {{ part }}) est absente",
+        "zoneSize": "la zone {{ question }} (partie {{ part }}) n'a pas la même taille que dans la version A ; ne placez pas de zone de réponse dans une variante de hauteur différente",
+        "extraZone": "la zone {{ question }} (partie {{ part }}) n'existe pas dans la version A",
+        "qcmLetters": "le QCM {{ question }} n'a pas les mêmes cases que dans la version A",
+        "identity": "la zone d'identification « {{ role }} » diffère de la version A",
+        "pages": "la version a {{ pages }} pages au lieu de {{ expected }}",
+        "nothingVaries": "rien ne varie : ajoutez shuffle: true à une section, des choix de QCM ou une #variant"
+      }
     }
   }
 }

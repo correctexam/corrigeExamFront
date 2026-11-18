@@ -37,7 +37,8 @@
       "short": "+ Resposta curta",
       "code": "+ Código",
       "math": "+ Fórmula",
-      "section": "+ Parte"
+      "section": "+ Parte",
+      "variant": "+ Variante de enunciado"
     },
     "issue": {
       "noQuestion": "O enunciado não tem nenhuma pergunta.",
@@ -106,6 +107,33 @@
       "previous": "Tiragens",
       "size": "{{copies}} cópias × {{pages}} páginas",
       "again": "Descarregar de novo"
+    },
+    "versions": {
+      "title": "Versões do enunciado",
+      "intro": "Cada versão baralha as questões das secções marcadas shuffle, a ordem das escolhas de QCM e escolhe uma variante de enunciado. As provas de todas as versões serão reconstruídas na paginação da versão A para a correção.",
+      "count": "Número de versões",
+      "seed": "Sorteio",
+      "newSeed": "Novo sorteio",
+      "build": "Gerar e verificar",
+      "building": "A gerar…",
+      "stale": "O enunciado mudou desde a geração: gere novamente as versões.",
+      "doesNotCompile": "A versão {{ version }} não compila:",
+      "canonical": "versão de referência (correção)",
+      "pages": "{{ pages }} páginas",
+      "preview": "Pré-visualização",
+      "previewing": "Pré-visualização da versão {{ label }}",
+      "backToSubject": "Voltar ao enunciado",
+      "ok": "As versões são compatíveis: as provas poderão ser reconstruídas na paginação da versão A.",
+      "failed": "Não foi possível gerar as versões",
+      "issue": {
+        "missingZone": "a zona {{ question }} (parte {{ part }}) está ausente",
+        "zoneSize": "a zona {{ question }} (parte {{ part }}) não tem o mesmo tamanho que na versão A; não coloque uma zona de resposta numa variante de altura diferente",
+        "extraZone": "a zona {{ question }} (parte {{ part }}) não existe na versão A",
+        "qcmLetters": "o QCM {{ question }} não tem as mesmas caixas que na versão A",
+        "identity": "a zona de identificação « {{ role }} » difere da versão A",
+        "pages": "a versão tem {{ pages }} páginas em vez de {{ expected }}",
+        "nothingVaries": "nada varia: adicione shuffle: true a uma secção, escolhas de QCM ou uma #variant"
+      }
     }
   }
 }

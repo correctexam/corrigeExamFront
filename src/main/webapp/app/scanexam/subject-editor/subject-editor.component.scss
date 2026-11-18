@@ -136,3 +136,28 @@
     }
   }
 }
+
+.subject-versions {
+  margin-top: 1rem;
+
+  .versions-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+
+    select {
+      width: 4.5rem;
+    }
+
+    input {
+      width: 8rem;
+    }
+  }
+}
+
+.preview-version {
+  margin: 0 0 0.25rem;
+  font-weight: bold;
+}

@@ -63,6 +63,9 @@ export interface TypstCompileResponse {
   diagrams?: unknown;
   /** Raw result of `query(<ce-copy>)` (T25d): start and end of each copy, read with `parseCopyPages`. */
   copies?: unknown;
+  /** Raw results of `query(<ce-section>)` and `query(<ce-variant>)` (T25e): what can vary between versions. */
+  sections?: unknown;
+  variants?: unknown;
   durationMs: number;
 }
 

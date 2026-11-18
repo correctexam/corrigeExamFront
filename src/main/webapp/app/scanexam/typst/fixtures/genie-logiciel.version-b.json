@@ -676,6 +676,7 @@
       "type": "qcm",
       "points": 2,
       "displayed": 6,
+      "fixed": [3],
       "number": 4,
       "grading": "a&c=100;a+=50;*=-25",
       "correct": "a&c",
