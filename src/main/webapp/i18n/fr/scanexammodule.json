@@ -753,6 +753,12 @@
       "statsGap": "Écart à la moyenne de toutes les copies : {{ delta }} point(s)",
       "statsGaps": "{{ n }} écart(s) notable(s) entre versions : vérifiez l'énoncé ou le corrigé de ces questions dans les versions concernées.",
       "statsUnknown": "{{ n }} copie(s) sans version connue (code de page illisible) ne sont pas comptées."
+      "badge": "Version {{ label }}",
+      "copyTooltip": "Copie imprimée en version {{ label }}, reconstruite dans la mise en page de la version A pour la correction. Cliquer pour voir la copie originale.",
+      "variants": "Formulations de cette version :",
+      "wording": "{{ key }} n° {{ n }}",
+      "studentNotice": "Votre copie (version {{ label }}) est présentée dans la mise en page de la version A, celle de la correction. Vos réponses n'ont pas changé.",
+      "showOriginal": "Voir ma copie originale"
     }
   }
 }

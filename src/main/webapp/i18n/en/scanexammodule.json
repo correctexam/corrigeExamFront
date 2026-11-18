@@ -737,6 +737,12 @@
       "statsGap": "Difference from the mean of all the copies: {{ delta }} point(s)",
       "statsGaps": "{{ n }} notable difference(s) between versions: check the wording or the solution of these questions in the versions concerned.",
       "statsUnknown": "{{ n }} copy(ies) without a known version (unreadable page code) are not counted."
+      "badge": "Version {{ label }}",
+      "copyTooltip": "Copy printed in version {{ label }}, rebuilt in the layout of version A for grading. Click to see the original copy.",
+      "variants": "Wordings of this version:",
+      "wording": "{{ key }} no. {{ n }}",
+      "studentNotice": "Your copy (version {{ label }}) is shown in the layout of version A, the one used for grading. Your answers have not changed.",
+      "showOriginal": "See my original copy"
     }
   }
 }
