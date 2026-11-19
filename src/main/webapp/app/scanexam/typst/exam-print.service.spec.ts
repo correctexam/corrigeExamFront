@@ -1,3 +1,6 @@
+/**
+ * @jest-environment node
+ */
 import { DOCUMENT } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
