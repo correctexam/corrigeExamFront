@@ -3,16 +3,22 @@ import { firstValueFrom } from 'rxjs';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { Exam } from 'app/entities/exam/exam.model';
 import { QuestionService } from 'app/entities/question/service/question.service';
+import { QuestionTypeService } from 'app/entities/question-type/service/question-type.service';
 import { Template } from 'app/entities/template/template.model';
 import { TemplateService } from 'app/entities/template/service/template.service';
 import { ZoneService } from 'app/entities/zone/service/zone.service';
-import { ExamPlan, toBase64 } from './exam-from-subject';
+import { ExamPlan, resolveQuestionTypeIds, toBase64 } from './exam-from-subject';
 
 export interface CreateExamFromSubject {
   courseId: number;
   name: string;
   pdf: Uint8Array;
   plan: ExamPlan;
+  /**
+   * Last step of the creation (T25e: versions of the subject). If it fails, the exam is deleted like for any other
+   * step.
+   */
+  afterCreate?: (examId: number) => Promise<unknown>;
 }
 
 /**
@@ -27,9 +33,12 @@ export class ExamFromSubjectService {
   private readonly examService = inject(ExamService);
   private readonly zoneService = inject(ZoneService);
   private readonly questionService = inject(QuestionService);
+  private readonly questionTypeService = inject(QuestionTypeService);
 
   /** Returns the id of the new exam. */
   async create(req: CreateExamFromSubject): Promise<number> {
+    // before creating anything: a database without these types cannot receive the questions
+    const typeIds = resolveQuestionTypeIds((await firstValueFrom(this.questionTypeService.query())).body ?? []);
     const template = new Template();
     template.name = `${req.name}Template`;
     template.content = toBase64(req.pdf);
@@ -61,7 +70,10 @@ export class ExamFromSubjectService {
       }
       for (const planned of req.plan.questions) {
         const zoneId = await this.createZone(planned.zone);
-        await firstValueFrom(this.questionService.create({ ...planned.question, zoneId, examId }));
+        await firstValueFrom(this.questionService.create({ ...planned.question, typeId: typeIds[planned.type], zoneId, examId }));
+      }
+      if (req.afterCreate) {
+        await req.afterCreate(examId);
       }
       return examId;
     } catch (e) {

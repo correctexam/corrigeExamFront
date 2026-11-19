@@ -1143,12 +1143,11 @@ class DB {
   getNonAlignImagesForPageNumbers(sqlite3: any, data: any) {
     const payload = data.payload;
 
-    if (payload.pages !== undefined && payload.pages.joins !== undefined) {
+    const pages = pageNumbers(payload.pages);
+    if (pages.length > 0) {
       this.initDb(sqlite3);
       try {
-        const value = this.db.selectArrays(
-          'select page,imageData from nonalign where page in (' + payload.pages.join(',') + ') order by page asc',
-        );
+        const value = this.db.selectArrays('select page,imageData from nonalign where page in (' + pages.join(',') + ') order by page asc');
         const res: any[] = [];
         const enc = new TextEncoder(); // always utf-8
         const transfarable: any[] = [];
@@ -1175,9 +1174,11 @@ class DB {
         this.close();
       }
     } else {
+      // no page asked: an empty list, the caller reads a list
       postMessage({
         msg: data.msg,
         uid: data.uid,
+        payload: [],
       });
     }
   }
@@ -1185,12 +1186,11 @@ class DB {
   getAlignImagesForPageNumbers(sqlite3: any, data: any) {
     const payload = data.payload;
 
-    if (payload.pages !== undefined && payload.pages.joins !== undefined) {
+    const pages = pageNumbers(payload.pages);
+    if (pages.length > 0) {
       this.initDb(sqlite3);
       try {
-        const value = this.db.selectArrays(
-          'select page,imageData from align where page in (' + payload.pages.join(',') + ') order by page asc',
-        );
+        const value = this.db.selectArrays('select page,imageData from align where page in (' + pages.join(',') + ') order by page asc');
         const res: any[] = [];
         const enc = new TextEncoder(); // always utf-8
         const transfarable: any[] = [];
@@ -1218,9 +1218,11 @@ class DB {
         this.close();
       }
     } else {
+      // no page asked: an empty list, the caller reads a list
       postMessage({
         msg: data.msg,
         uid: data.uid,
+        payload: [],
       });
     }
   }
@@ -1603,4 +1605,9 @@ class DB {
       this.close();
     }
   }
+}
+
+/** Page numbers of a request, integers only: they are written into the SQL query. */
+function pageNumbers(pages: unknown): number[] {
+  return Array.isArray(pages) ? pages.filter((p): p is number => Number.isInteger(p)) : [];
 }

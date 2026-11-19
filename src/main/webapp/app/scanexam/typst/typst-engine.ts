@@ -3,7 +3,8 @@
  *
  * - Offline: fonts and packages are vendored assets (`content/typst/`); a package that is not in the allow list
  *   is not found, nothing is ever downloaded during a compilation.
- * - One compilation gives the PDF, the diagnostics and the `<ce-zone>` metadata of the same document.
+ * - One compilation gives the PDF, the diagnostics, the `<ce-zone>` metadata and the `<ce-diagram>` requests of the
+ *   same document; images of the subject are mapped as binary files (T25c).
  * Independent from the worker so that it can be tested with the real compiler (Node).
  */
 
@@ -49,6 +50,7 @@ export class TypstEngine {
   private readonly archives = new Map<string, Uint8Array>();
   private readonly extracted = new Map<string, string>();
   private previousFiles: string[] = [];
+  private previousBinaries = new Map<string, string>();
 
   constructor(private readonly assets: TypstAssets) {}
 
@@ -78,6 +80,20 @@ export class TypstEngine {
       compiler.addSource(f.path, f.content);
     }
     this.previousFiles = req.files.map(f => f.path);
+    const binaries = new Map<string, string>();
+    for (const b of req.binaries ?? []) {
+      // same content as for the previous compilation: not copied into the compiler again
+      if (this.previousBinaries.get(b.path) !== b.key) {
+        compiler.mapShadow(b.path, b.data);
+      }
+      binaries.set(b.path, b.key);
+    }
+    for (const path of this.previousBinaries.keys()) {
+      if (!binaries.has(path) && !req.files.some(f => f.path === path)) {
+        compiler.unmapShadow(path);
+      }
+    }
+    this.previousBinaries = binaries;
 
     return compiler.runWithWorld({ mainFilePath: req.main, inputs: req.inputs }, async world => {
       const compiled = await world.compile({ diagnostics: 'full' });
@@ -86,8 +102,24 @@ export class TypstEngine {
         return { kind: 'compiled', id: req.id, ok: false, diagnostics, durationMs: Date.now() - start };
       }
       const zones: unknown = await world.query({ selector: '<ce-zone>', field: 'value' });
+      const diagrams: unknown = await world.query({ selector: '<ce-diagram>', field: 'value' });
+      const copies: unknown = await world.query({ selector: '<ce-copy>', field: 'value' });
+      const sections: unknown = await world.query({ selector: '<ce-section>', field: 'value' });
+      const variants: unknown = await world.query({ selector: '<ce-variant>', field: 'value' });
       const pdf = req.withPdf ? (await world.pdf({ diagnostics: 'full' })).result : undefined;
-      return { kind: 'compiled', id: req.id, ok: true, diagnostics, pdf, zones, durationMs: Date.now() - start };
+      return {
+        kind: 'compiled',
+        id: req.id,
+        ok: true,
+        diagnostics,
+        pdf,
+        zones,
+        diagrams,
+        copies,
+        sections,
+        variants,
+        durationMs: Date.now() - start,
+      };
     });
   }
 

@@ -1,29 +1,129 @@
 <p-toast></p-toast>
 <div class="subject-editor">
   <header class="subject-header">
-    <h2 [translate]="'typstsubject.heading'" [translateParams]="{ courseName: courseName() }">Écrire le sujet</h2>
+    @if (stored()) {
+      <h2 [translate]="'typstsubject.storage.heading'" [translateParams]="{ examName: examName() }">Sujet de l'examen</h2>
+    } @else {
+      <h2 [translate]="'typstsubject.heading'" [translateParams]="{ courseName: courseName() }">Écrire le sujet</h2>
+    }
     <div class="subject-actions">
-      <label for="exam-name" [translate]="'typstsubject.examName'">Nom de l'examen</label>
-      <input
-        id="exam-name"
-        class="form-control"
-        type="text"
-        [ngModel]="examName()"
-        (ngModelChange)="examName.set($event)"
-        data-cy="typst-exam-name"
-      />
-      <button type="button" class="p-button p-button-primary" [disabled]="!canCreate()" (click)="createExam()" data-cy="typst-create-exam">
-        <span [translate]="creating() ? 'typstsubject.creating' : 'typstsubject.create'">Créer l'examen</span>
-      </button>
-      <button type="button" class="p-button p-button-secondary" (click)="backToCourse()">
-        <span [translate]="'scanexam.gobackue'">Retourner au module</span>
+      @if (stored()) {
+        <span class="subject-save-state" data-cy="typst-save-state">
+          @switch (saveState()) {
+            @case ('saving') {
+              <span [translate]="'typstsubject.storage.saving'">Enregistrement…</span>
+            }
+            @case ('dirty') {
+              <span [translate]="'typstsubject.storage.dirty'">Modifications non enregistrées</span>
+            }
+            @case ('error') {
+              <span class="text-danger">{{ 'typstsubject.storage.saveFailed' | translate }} — {{ saveError() }}</span>
+              <button type="button" class="btn btn-sm btn-link" (click)="flush()">
+                <span [translate]="'typstsubject.storage.retry'">Réessayer</span>
+              </button>
+            }
+            @default {
+              @if (subject(); as s) {
+                <span [translate]="'typstsubject.storage.saved'" [translateParams]="{ revision: s.revision }">Enregistré</span>
+              }
+            }
+          }
+        </span>
+      } @else {
+        <label for="exam-name" [translate]="'typstsubject.examName'">Nom de l'examen</label>
+        <input
+          id="exam-name"
+          class="form-control"
+          type="text"
+          [ngModel]="examName()"
+          (ngModelChange)="examName.set($event)"
+          data-cy="typst-exam-name"
+        />
+        <button
+          type="button"
+          class="p-button p-button-primary"
+          [disabled]="!canCreate()"
+          (click)="createExam()"
+          data-cy="typst-create-exam"
+        >
+          <span [translate]="creating() ? 'typstsubject.creating' : 'typstsubject.create'">Créer l'examen</span>
+        </button>
+      }
+      <button type="button" class="p-button p-button-secondary" (click)="back()">
+        <span [translate]="stored() ? 'typstsubject.storage.backToExam' : 'scanexam.gobackue'">Retourner au module</span>
       </button>
     </div>
   </header>
 
+  @if (stored()) {
+    <div class="subject-banners">
+      @if (loading()) {
+        <p class="alert alert-info" [translate]="'typstsubject.storage.loading'">Chargement du sujet…</p>
+      }
+      @if (lock(); as l) {
+        @if (l.held && !l.mine) {
+          <p class="alert alert-warning" data-cy="typst-locked">
+            {{ 'typstsubject.storage.lockedBy' | translate: { login: l.lockedBy, until: lockUntil() } }}
+            <button type="button" class="btn btn-sm btn-warning ms-2" (click)="takeOver()">
+              <span [translate]="'typstsubject.storage.takeOver'">Prendre la main</span>
+            </button>
+          </p>
+        }
+      }
+      @if (conflict()) {
+        <p class="alert alert-danger" data-cy="typst-conflict">
+          <span [translate]="'typstsubject.storage.conflict'">Le sujet a été modifié ailleurs.</span>
+          <button type="button" class="btn btn-sm btn-outline-secondary ms-2" (click)="download()">
+            <span [translate]="'typstsubject.download'">Télécharger le .typ</span>
+          </button>
+          <button type="button" class="btn btn-sm btn-danger ms-2" (click)="reload()">
+            <span [translate]="'typstsubject.storage.reload'">Recharger</span>
+          </button>
+        </p>
+      }
+      @if (noSubject()) {
+        <p class="alert alert-info">
+          <span [translate]="'typstsubject.storage.noSubject'">Cet examen n'a pas de sujet Typst.</span>
+          @if (hasLocalDraft()) {
+            <button type="button" class="btn btn-sm btn-primary ms-2" [disabled]="loading()" (click)="storeLocalDraft()">
+              <span [translate]="'typstsubject.storage.storeDraft'">Enregistrer le sujet gardé par ce navigateur</span>
+            </button>
+          }
+        </p>
+      }
+      @if (storageUnavailable()) {
+        <p class="alert alert-danger" [translate]="'typstsubject.storage.unavailable'">Stockage indisponible.</p>
+      }
+      @if (subject()) {
+        <p class="text-muted small" [translate]="'typstsubject.storage.templateUnchanged'">
+          Modifier le sujet ne modifie ni le modèle ni les zones de l'examen.
+        </p>
+      }
+    </div>
+  } @else if (reusable().length > 0) {
+    <div class="subject-reuse">
+      <label for="reuse-from" [translate]="'typstsubject.reuse.label'">Partir du sujet d'un autre examen</label>
+      <select
+        id="reuse-from"
+        class="form-select form-select-sm"
+        [ngModel]="reuseFrom()"
+        (ngModelChange)="reuseFrom.set($event)"
+        data-cy="typst-reuse"
+      >
+        <option [ngValue]="undefined"></option>
+        @for (r of reusable(); track r.examId) {
+          <option [ngValue]="r.examId">{{ r.courseName }} — {{ r.examName }}</option>
+        }
+      </select>
+      <button type="button" class="btn btn-sm btn-outline-primary" [disabled]="reuseFrom() === undefined || loading()" (click)="reuse()">
+        <span [translate]="'typstsubject.reuse.load'">Copier dans le brouillon</span>
+      </button>
+    </div>
+  }
+
   <div class="subject-toolbar">
     @for (s of snippets; track s.key) {
-      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="insertSnippet(s.code)">
+      <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="!editable()" (click)="insertSnippet(s.code)">
         {{ 'typstsubject.snippet.' + s.key | translate }}
       </button>
     }
@@ -33,15 +133,69 @@
     </button>
     <label class="btn btn-sm btn-outline-secondary mb-0">
       <span [translate]="'typstsubject.open'">Ouvrir un .typ</span>
-      <input type="file" accept=".typ,text/plain" hidden (change)="open($event)" />
+      <input type="file" accept=".typ,text/plain" hidden [disabled]="!editable()" (change)="open($event)" />
     </label>
-    <button type="button" class="btn btn-sm btn-outline-danger" (click)="resetToStarter()">
+    <button type="button" class="btn btn-sm btn-outline-danger" [disabled]="!editable()" (click)="resetToStarter()">
       <span [translate]="'typstsubject.reset'">Repartir du modèle</span>
     </button>
   </div>
 
   <div class="subject-body">
     <section class="subject-source">
+      <div class="subject-files" data-cy="typst-files">
+        @for (p of paths(); track p) {
+          <span class="subject-file" [class.active]="p === current()">
+            @if (isText(p)) {
+              <button type="button" class="btn btn-sm btn-link p-0" (click)="select(p)">{{ p }}</button>
+            } @else {
+              <span>{{ p }}</span>
+            }
+            @if (p !== mainFile) {
+              <button
+                type="button"
+                class="btn btn-sm btn-link p-0"
+                [disabled]="!editable()"
+                [title]="'typstsubject.files.insert' | translate"
+                (click)="insertReference(p)"
+              >
+                ⤷
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-link p-0 text-danger"
+                [disabled]="!editable()"
+                [title]="'typstsubject.files.remove' | translate"
+                (click)="remove(p)"
+              >
+                ×
+              </button>
+            }
+          </span>
+        }
+        <span class="subject-file-add">
+          <input
+            class="form-control form-control-sm"
+            type="text"
+            placeholder="code/Main.java"
+            [disabled]="!editable()"
+            [ngModel]="newFilePath()"
+            (ngModelChange)="newFilePath.set($event)"
+            (keydown.enter)="addFile()"
+          />
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            [disabled]="!editable() || newFilePath().trim() === ''"
+            (click)="addFile()"
+          >
+            <span [translate]="'typstsubject.files.add'">Nouveau fichier</span>
+          </button>
+          <label class="btn btn-sm btn-outline-secondary mb-0" [class.disabled]="!editable()">
+            <span [translate]="'typstsubject.files.upload'">Ajouter des fichiers</span>
+            <input type="file" multiple hidden [accept]="accept" [disabled]="!editable()" (change)="upload($event)" />
+          </label>
+        </span>
+      </div>
       <div #editor class="subject-codemirror" data-cy="typst-editor"></div>
 
       <div class="subject-status">
@@ -69,9 +223,14 @@
         <ul class="subject-diagnostics" data-cy="typst-diagnostics">
           @for (d of diagnostics(); track $index) {
             <li [class.text-danger]="d.severity === 'error'" [class.text-warning]="d.severity === 'warning'">
-              <button type="button" class="btn btn-link btn-sm p-0" [disabled]="!isMainFile(d) || d.line === undefined" (click)="goTo(d)">
+              <button
+                type="button"
+                class="btn btn-link btn-sm p-0"
+                [disabled]="pathOf(d) === undefined || d.line === undefined"
+                (click)="goTo(d)"
+              >
                 @if (d.line !== undefined) {
-                  {{ isMainFile(d) ? '' : d.path + ' ' }}{{ d.line }}:{{ d.column }}
+                  {{ pathOf(d) === mainFile ? '' : d.path + ' ' }}{{ d.line }}:{{ d.column }}
                 } @else {
                   {{ d.path }}
                 }
@@ -82,6 +241,24 @@
               }
             </li>
           }
+        </ul>
+      }
+
+      @if (diagramsPending() > 0) {
+        <p class="text-muted" [translate]="'typstsubject.diagrams.pending'" [translateParams]="{ count: diagramsPending() }">
+          Rendu des diagrammes…
+        </p>
+      }
+      @if (diagramErrors().length > 0) {
+        <ul class="subject-diagnostics" data-cy="typst-diagram-errors">
+          @for (e of diagramErrors(); track $index) {
+            <li class="text-danger">{{ 'typstsubject.diagrams.failed' | translate: { kind: e.request.kind } }} — {{ e.message }}</li>
+          }
+          <li>
+            <button type="button" class="btn btn-sm btn-link p-0" (click)="retryDiagrams()">
+              <span [translate]="'typstsubject.diagrams.retry'">Réessayer</span>
+            </button>
+          </li>
         </ul>
       }
 
@@ -132,10 +309,111 @@
           </p>
         }
       </div>
+
+      <div class="subject-versions" data-cy="typst-versions">
+        <h3 [translate]="'typstsubject.versions.title'">Versions</h3>
+        <p class="text-muted small" [translate]="'typstsubject.versions.intro'"></p>
+        <div class="versions-controls">
+          <label for="version-count" [translate]="'typstsubject.versions.count'">Nombre de versions</label>
+          <select
+            id="version-count"
+            class="form-select form-select-sm"
+            [ngModel]="versionCount()"
+            (ngModelChange)="setVersionCount($event)"
+            data-cy="typst-version-count"
+          >
+            @for (n of [1, 2, 3, 4, 5, 6].slice(0, maxVersions); track n) {
+              <option [ngValue]="n">{{ n }}</option>
+            }
+          </select>
+          <label for="version-seed" [translate]="'typstsubject.versions.seed'">Tirage</label>
+          <input
+            id="version-seed"
+            class="form-control form-control-sm"
+            type="number"
+            min="0"
+            [ngModel]="versionSeed()"
+            (ngModelChange)="setVersionSeed($event)"
+          />
+          <button type="button" class="btn btn-sm btn-outline-secondary" (click)="newVersionSeed()">
+            <span [translate]="'typstsubject.versions.newSeed'">Nouveau tirage</span>
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-primary"
+            [disabled]="versionsBuilding() || result()?.ok !== true"
+            (click)="buildVersions()"
+            data-cy="typst-build-versions"
+          >
+            <span [translate]="versionsBuilding() ? 'typstsubject.versions.building' : 'typstsubject.versions.build'">Générer</span>
+          </button>
+        </div>
+
+        @if (versions(); as v) {
+          @if (versionsStale()) {
+            <p class="text-warning small" [translate]="'typstsubject.versions.stale'">Le sujet a changé : régénérez les versions.</p>
+          }
+          @if (v.diagnostics; as d) {
+            <p class="text-danger" data-cy="typst-versions-error">
+              {{ 'typstsubject.versions.doesNotCompile' | translate: { version: d.version } }}
+              @for (x of d.diagnostics.slice(0, 3); track $index) {
+                <br />{{ x.line ?? '' }}{{ x.line !== undefined ? ':' : '' }} {{ x.message }}
+              }
+            </p>
+          }
+          @if (v.versions.length > 0) {
+            <table class="table table-sm" data-cy="typst-versions-list">
+              <tbody>
+                @for (version of v.versions; track version.plan.index) {
+                  <tr [class.table-active]="previewVersion() === version.plan.index">
+                    <td>
+                      <strong>{{ version.plan.label }}</strong>
+                      @if (version.plan.index === 0) {
+                        <span class="text-muted small"> — {{ 'typstsubject.versions.canonical' | translate }}</span>
+                      }
+                    </td>
+                    <td>{{ 'typstsubject.versions.pages' | translate: { pages: version.layout.pages } }}</td>
+                    <td>
+                      <button type="button" class="btn btn-sm btn-link p-0" (click)="showVersion(version.plan.index)">
+                        <span [translate]="'typstsubject.versions.preview'">Aperçu</span>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+          @if (v.issues.length === 0 && v.versions.length > 0 && !v.diagnostics) {
+            <p class="text-success small" data-cy="typst-versions-ok" [translate]="'typstsubject.versions.ok'">
+              Les versions sont compatibles : leurs copies pourront être reconstruites dans la mise en page de la version A.
+            </p>
+          }
+          @for (i of v.issues; track $index) {
+            <p class="text-danger small">{{ i.version }} — {{ 'typstsubject.versions.issue.' + i.key | translate: i.params ?? {} }}</p>
+          }
+        }
+        @if (stored()) {
+          @if (versionCount() > 1) {
+            <p class="text-muted small" data-cy="typst-versions-stored" [translate]="'typstsubject.versions.storedExam'"></p>
+          }
+        } @else if (versionsReady()) {
+          <p class="small" data-cy="typst-versions-ready">{{ 'typstsubject.versions.ready' | translate: { k: versionCount() } }}</p>
+        } @else if (versionsBlocking()) {
+          <p class="text-warning small" data-cy="typst-versions-blocking" [translate]="'typstsubject.versions.blocking'"></p>
+        }
+      </div>
     </section>
 
     <section class="subject-preview">
-      @if (pdfUrl(); as url) {
+      @if (previewLabel(); as label) {
+        <p class="preview-version" data-cy="typst-preview-version">
+          {{ 'typstsubject.versions.previewing' | translate: { label: label } }}
+          <button type="button" class="btn btn-sm btn-link p-0" (click)="showVersion(undefined)">
+            <span [translate]="'typstsubject.versions.backToSubject'">Revenir au sujet</span>
+          </button>
+        </p>
+      }
+      @if (previewUrl(); as url) {
         <iframe [src]="url" title="PDF" data-cy="typst-preview"></iframe>
       } @else {
         <p class="text-muted" [translate]="'typstsubject.noPreview'">L'aperçu apparaît après la première compilation.</p>

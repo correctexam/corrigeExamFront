@@ -6,12 +6,26 @@
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import { IdentityZoneKind } from 'app/entities/exam/service/exam.service';
 import { IQuestion } from 'app/entities/question/question.model';
+import { IQuestionType } from 'app/entities/question-type/question-type.model';
 import { IZone } from 'app/entities/zone/zone.model';
 import { GeneratedLayout, GeneratedQuestion, IdentityRole } from './typst-zones';
 
-/** `question_type` rows (Liquibase): `manual` and `QCM`. */
-export const QUESTION_TYPE_MANUAL = 2;
-export const QUESTION_TYPE_QCM = 3;
+/** Question types used by a generated exam, by `question_type.algo_name` (ids differ between databases). */
+export type PlannedQuestionType = 'manual' | 'QCM';
+
+export type QuestionTypeIds = Record<PlannedQuestionType, number>;
+
+/** Ids of the question types of this database, as the template editor finds them (by `algoName`). */
+export function resolveQuestionTypeIds(types: IQuestionType[]): QuestionTypeIds {
+  const id = (algoName: PlannedQuestionType): number => {
+    const type = types.find(t => t.algoName === algoName && t.id !== undefined);
+    if (type?.id === undefined) {
+      throw new Error(`question type "${algoName}" missing from the database (table question_type)`);
+    }
+    return type.id;
+  };
+  return { manual: id('manual'), QCM: id('QCM') };
+}
 
 /** Defaults of the teacher (`PreferenceService.getPreferenceForQuestion()`). */
 export interface QuestionDefaults {
@@ -26,7 +40,9 @@ export interface PlannedIdentityZone {
 
 export interface PlannedQuestion {
   zone: IZone;
-  /** Question without zone nor exam: both are known once created. */
+  /** Type of the question; its id is set when the exam is created (`resolveQuestionTypeIds`). */
+  type: PlannedQuestionType;
+  /** Question without zone, exam nor type id: they are known once created. */
   question: IQuestion;
 }
 
@@ -92,12 +108,12 @@ export function planExam(layout: GeneratedLayout, defaults: QuestionDefaults): E
   const questions: PlannedQuestion[] = layout.questions.flatMap(q =>
     q.parts.map(part => ({
       zone: part.zone,
+      type: q.kind === 'qcm' ? ('QCM' as const) : ('manual' as const),
       question: {
         numero: q.number,
         point: q.points,
         step: defaults.step,
         gradeType: q.kind === 'qcm' ? defaults.gradeType : gradeTypeOf(q, defaults),
-        typeId: q.kind === 'qcm' ? QUESTION_TYPE_QCM : QUESTION_TYPE_MANUAL,
         validExpression: q.kind === 'qcm' ? q.validExpression : undefined,
         libelle: q.key,
         canBeNegative: false,
@@ -117,4 +133,33 @@ export function toBase64(bytes: Uint8Array): string {
     binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
   }
   return btoa(binary);
+}
+
+/**
+ * Inputs of the compilation that makes the template of a new exam (T25d): the code area is left empty (`stamp`, the
+ * code is stamped on each printed copy) and blank pages are added (`pad`) so that a copy has an even number of
+ * pages and can be printed recto-verso.
+ */
+export function templatePlan(pad: number): string {
+  return JSON.stringify({ stamp: true, pad });
+}
+
+/** Pages of the copy written by the subject (`copy-end` marker of the package), undefined when absent. */
+export function parseCopyPages(raw: unknown): number | undefined {
+  if (!Array.isArray(raw)) {
+    return undefined;
+  }
+  const end = (raw as unknown[]).find(
+    (m): m is { kind: 'copy-end'; pages: number } =>
+      typeof m === 'object' &&
+      m !== null &&
+      (m as { kind?: unknown }).kind === 'copy-end' &&
+      typeof (m as { pages?: unknown }).pages === 'number',
+  );
+  return end?.pages;
+}
+
+/** Blank pages to add for an even number of pages. */
+export function padForRectoVerso(pages: number): number {
+  return pages % 2;
 }

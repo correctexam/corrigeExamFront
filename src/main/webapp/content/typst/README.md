@@ -4,11 +4,11 @@ Décision : `corrigeExamBack/docs/adr/0004-sujets-ecrits-en-typst.md`. Le dépô
 
 ## Contenu
 
-| Chemin                              | Rôle                                                                                                                                                                                               |
-| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `correctexam/0.1.0/`                | Paquet Typst : en-tête d'identité, `question`, `answer`, `qcm` (`ok` / `ko` / `fixed`), `numeric` (`cells` ou `grid`), `short`, `section` (mélange), `group`, `solution`, repères et code par page |
-| `examples/genie-logiciel.typ`       | Sujet d'exemple : tous les types de zones, maths (natives et LaTeX via `mitex`), code (`codly`), Graphviz (`diagraph`), séquence (`chronos`)                                                       |
-| `app/scanexam/typst/typst-zones.ts` | Lecture des métadonnées `<ce-zone>` → zones CorrectExam (1/100000 de page), lettres canoniques des QCM, propriétés PDF compatibles avec la classe LaTeX                                            |
+| Chemin                              | Rôle                                                                                                                                                                                                                               |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `correctexam/0.1.0/`                | Paquet Typst : en-tête d'identité, `question`, `answer`, `qcm` (`ok` / `ko` / `fixed`), `numeric` (`cells` ou `grid`), `short`, `section` (mélange), `variant` (variantes d'énoncé), `group`, `solution`, repères et code par page |
+| `examples/genie-logiciel.typ`       | Sujet d'exemple : tous les types de zones, maths (natives et LaTeX via `mitex`), code (`codly`), Graphviz (`diagraph`), séquence (`chronos`)                                                                                       |
+| `app/scanexam/typst/typst-zones.ts` | Lecture des métadonnées `<ce-zone>` → zones CorrectExam (1/100000 de page), lettres canoniques des QCM, propriétés PDF compatibles avec la classe LaTeX                                                                            |
 
 ## Essayer en ligne de commande
 
@@ -46,10 +46,13 @@ Le cache de build Angular est dans `target/angular/` (`angular.json`). S'il a é
 | `pad`                | Pages blanches ajoutées à la fin de chaque copie (calculées par la plateforme après une première compilation : `copy-end.pages`) |
 | `order.<section>`    | Ordre des éléments d'une section `shuffle: true` (indices)                                                                       |
 | `choices.<question>` | Ordre d'affichage des choix d'un QCM (indices canoniques)                                                                        |
+| `variants.<clé>`     | Indice de la formulation retenue pour `#variant("<clé>")[…][…]` (0 par défaut)                                                   |
 | `numbers.<question>` | Numéro canonique (`Question.numero`) quand l'ordre affiché diffère                                                               |
 | `solution`           | `true` : affiche les blocs `solution` (corrigé)                                                                                  |
 
-Les métadonnées `<ce-zone>` portent `format: 1` ; `typst-zones.ts` refuse un autre format.
+Les métadonnées `<ce-zone>` portent `format: 1` ; `typst-zones.ts` refuse un autre format. Les QCM indiquent leurs choix `fixed` (indices) ; `<ce-section>` et `<ce-variant>` (`key`, `count`) décrivent ce qui peut varier entre versions (`subject-versions.ts`).
+
+**Versions (T25e, ADR 0005)** : la version A est le plan identité et porte la correction ; les autres versions doivent garder les mêmes zones (même taille, même nombre de pages, mêmes cases de QCM), seule leur position change. Une zone de réponse placée dans une `variant` doit donc avoir la même hauteur dans toutes les formulations.
 
 ## Mesures du prototype (16/11/2026, Typst 0.15.1 natif, 2 cœurs)
 

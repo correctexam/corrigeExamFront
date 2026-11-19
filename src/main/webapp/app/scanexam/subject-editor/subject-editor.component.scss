@@ -91,3 +91,73 @@
     border: 1px solid #ced4da;
   }
 }
+
+.subject-banners p {
+  margin-bottom: 0.25rem;
+}
+
+.subject-reuse {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  select {
+    width: auto;
+    max-width: 30rem;
+  }
+}
+
+.subject-files {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+  padding: 0.25rem 0;
+  font-size: 0.85rem;
+
+  .subject-file {
+    display: inline-flex;
+    gap: 0.25rem;
+    align-items: center;
+
+    &.active > button:first-child {
+      font-weight: bold;
+      text-decoration: underline;
+    }
+  }
+
+  .subject-file-add {
+    display: inline-flex;
+    gap: 0.25rem;
+    align-items: center;
+
+    input {
+      width: 11rem;
+    }
+  }
+}
+
+.subject-versions {
+  margin-top: 1rem;
+
+  .versions-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+
+    select {
+      width: 4.5rem;
+    }
+
+    input {
+      width: 8rem;
+    }
+  }
+}
+
+.preview-version {
+  margin: 0 0 0.25rem;
+  font-weight: bold;
+}

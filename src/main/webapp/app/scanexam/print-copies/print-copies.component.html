@@ -1,0 +1,98 @@
+<div class="print-copies" data-cy="print-copies">
+  @if (pages(); as p) {
+    <p class="text-muted" [translate]="'typstsubject.print.intro'" [translateParams]="{ pages: p }">
+      Chaque copie reprend le modèle de l'examen ; chaque page porte un code qui permet de la retrouver au scan.
+    </p>
+    @if (p % 2 === 1) {
+      <p class="alert alert-warning" data-cy="print-odd" [translate]="'typstsubject.print.odd'">
+        Nombre impair de pages : imprimez en recto seul.
+      </p>
+    }
+  } @else if (!error()) {
+    <p class="text-muted" [translate]="'typstsubject.print.loading'">Chargement du modèle…</p>
+  }
+
+  @if (versions().length > 1) {
+    <div class="print-versions" data-cy="print-versions">
+      <label for="print-version-count" [translate]="'typstsubject.print.versions'">Versions</label>
+      <select
+        id="print-version-count"
+        class="form-select form-select-sm"
+        [ngModel]="versionCount()"
+        (ngModelChange)="versionCount.set(+$event)"
+        data-cy="print-version-count"
+      >
+        @for (n of versionChoices(); track n) {
+          <option [ngValue]="n">{{ n }}</option>
+        }
+      </select>
+      <small class="text-muted">
+        {{ 'typstsubject.print.versionsHelp' | translate: { letters: versionLetters() } }}
+      </small>
+    </div>
+  }
+
+  <div class="print-new">
+    <label for="print-copies" [translate]="'typstsubject.print.copies'">Nombre de copies</label>
+    <input
+      id="print-copies"
+      class="form-control"
+      type="number"
+      min="1"
+      max="2000"
+      step="1"
+      [ngModel]="copies()"
+      (ngModelChange)="copies.set(+$event)"
+      data-cy="print-copies-count"
+    />
+    <button
+      type="button"
+      class="p-button p-button-primary"
+      [disabled]="busy() || !validCopies() || pages() === undefined"
+      (click)="printNew()"
+      data-cy="print-new"
+    >
+      <span [translate]="'typstsubject.print.generate'">Générer le PDF</span>
+    </button>
+  </div>
+  @if (!validCopies()) {
+    <small class="text-danger" [translate]="'typstsubject.print.badCopies'">Entre 1 et 2000 copies.</small>
+  }
+
+  @if (progress(); as pr) {
+    <p data-cy="print-progress">{{ 'typstsubject.print.progress' | translate: { done: pr.done, total: pr.total } }}</p>
+  }
+  @if (error(); as e) {
+    <p class="text-danger">{{ 'typstsubject.print.failed' | translate }} — {{ e }}</p>
+  }
+
+  <p class="small text-muted" [translate]="'typstsubject.print.advice'">
+    Imprimez à taille réelle (sans ajustement à la page) ; ne pas mélanger les tirages.
+  </p>
+
+  @if (editions().length > 0) {
+    <h4 [translate]="'typstsubject.print.previous'">Tirages précédents</h4>
+    <table class="table table-sm">
+      <tbody>
+        @for (e of editions(); track e.id) {
+          <tr>
+            <td>n° {{ e.id }}</td>
+            <td>
+              {{ 'typstsubject.print.size' | translate: { copies: e.copies, pages: e.pagesPerCopy } }}
+              @if ((e.versions ?? 1) > 1) {
+                — {{ 'typstsubject.print.editionVersions' | translate: { k: e.versions } }}
+              }
+            </td>
+            <td>{{ e.createdAt | date: 'short' }}</td>
+            <td>{{ e.createdBy }}</td>
+            <td>
+              <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="busy()" (click)="printAgain(e)">
+                <span [translate]="'typstsubject.print.again'">Retélécharger</span>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

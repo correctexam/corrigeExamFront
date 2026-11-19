@@ -495,6 +495,20 @@
                 @if (studentName !== undefined) {
                   <fa-icon [size]="'2x'" [tooltipZIndex]="'3000'" [pTooltip]="studentName" tooltipPosition="left" icon="eye"></fa-icon>
                 }
+                @if (copyVersion(); as v) {
+                  <button
+                    type="button"
+                    class="p-button p-button-text p-button-sm copy-version"
+                    data-cy="copy-version"
+                    [disabled]="blocked"
+                    (click)="showOriginal()"
+                    [pTooltip]="copyVersionTooltip(v)"
+                    [tooltipZIndex]="'3000'"
+                    tooltipPosition="left"
+                  >
+                    {{ 'scanexam.versions.badge' | translate: { label: v.label } }}
+                  </button>
+                }
               </div>
             }
             @if (!focusView) {

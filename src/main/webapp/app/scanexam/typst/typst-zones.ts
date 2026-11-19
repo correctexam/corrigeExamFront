@@ -56,6 +56,8 @@ export interface QuestionMeta extends MetaBase {
   /** Right choices of an MCQ, in canonical letters (`a&c`). */
   correct?: string;
   choices?: number;
+  /** MCQ choices that keep their place in every version (T25e). */
+  fixed?: number[];
   digits?: number;
   decimals?: number;
   signed?: boolean;

@@ -53,6 +53,8 @@ export class SqliteCacheService implements CacheService {
             }
             case 'getAllTemplate': {
               const enc = new TextDecoder('utf-8');
+              // a list is always expected; an answer without payload must not break the caller
+              data.payload ??= [];
               data.payload.forEach((res: any) => {
                 const arr = new Uint8Array(res.value);
                 res.value = enc.decode(arr);
@@ -67,6 +69,8 @@ export class SqliteCacheService implements CacheService {
             }
             case 'getNonAlignImageBetweenAndSortByPageNumber': {
               const enc = new TextDecoder('utf-8');
+              // a list is always expected; an answer without payload must not break the caller
+              data.payload ??= [];
               data.payload.forEach((res: any) => {
                 const arr = new Uint8Array(res.value);
                 res.value = enc.decode(arr);
@@ -80,6 +84,8 @@ export class SqliteCacheService implements CacheService {
             }
             case 'getAlignImageBetweenAndSortByPageNumber': {
               const enc = new TextDecoder('utf-8');
+              // a list is always expected; an answer without payload must not break the caller
+              data.payload ??= [];
               data.payload.forEach((res: any) => {
                 const arr = new Uint8Array(res.value);
                 res.value = enc.decode(arr);
@@ -91,6 +97,8 @@ export class SqliteCacheService implements CacheService {
             }
             case 'getNonAlignImagesForPageNumbers': {
               const enc = new TextDecoder('utf-8');
+              // a list is always expected; an answer without payload must not break the caller
+              data.payload ??= [];
               data.payload.forEach((res: any) => {
                 const arr = new Uint8Array(res.value);
                 res.value = enc.decode(arr);
@@ -102,6 +110,8 @@ export class SqliteCacheService implements CacheService {
             }
             case 'getAlignImagesForPageNumbers': {
               const enc = new TextDecoder('utf-8');
+              // a list is always expected; an answer without payload must not break the caller
+              data.payload ??= [];
               data.payload.forEach((res: any) => {
                 const arr = new Uint8Array(res.value);
                 res.value = enc.decode(arr);
@@ -113,6 +123,8 @@ export class SqliteCacheService implements CacheService {
             }
             case 'getNonAlignSortByPageNumber': {
               const enc = new TextDecoder('utf-8');
+              // a list is always expected; an answer without payload must not break the caller
+              data.payload ??= [];
               data.payload.forEach((res: any) => {
                 const arr = new Uint8Array(res.value);
                 res.value = enc.decode(arr);
@@ -124,6 +136,8 @@ export class SqliteCacheService implements CacheService {
             }
             case 'getAlignSortByPageNumber': {
               const enc = new TextDecoder('utf-8');
+              // a list is always expected; an answer without payload must not break the caller
+              data.payload ??= [];
               data.payload.forEach((res: any) => {
                 const arr = new Uint8Array(res.value);
                 res.value = enc.decode(arr);

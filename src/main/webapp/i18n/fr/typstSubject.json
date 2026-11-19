@@ -37,7 +37,8 @@
       "short": "+ Réponse courte",
       "code": "+ Code",
       "math": "+ Formule",
-      "section": "+ Partie"
+      "section": "+ Partie",
+      "variant": "+ Variante d'énoncé"
     },
     "issue": {
       "noQuestion": "Le sujet ne contient aucune question.",
@@ -52,6 +53,93 @@
     "identityStyle": {
       "cells": "nom et prénom en cases",
       "free": "nom et prénom en cadre libre"
+    },
+    "storage": {
+      "pageTitle": "Sujet — {{examName}}",
+      "heading": "Sujet de l'examen {{examName}}",
+      "backToExam": "Retour à l'examen",
+      "loading": "Chargement du sujet…",
+      "saving": "Enregistrement…",
+      "dirty": "Modifications non enregistrées",
+      "saved": "Enregistré (révision {{revision}})",
+      "saveFailed": "Enregistrement impossible",
+      "retry": "Réessayer",
+      "lockedBy": "{{login}} modifie ce sujet (verrou jusqu'à {{until}}) : lecture seule. Prendre la main interrompt son édition ; ses modifications non enregistrées seront perdues.",
+      "takeOver": "Prendre la main",
+      "lockFailed": "Impossible de prendre la main",
+      "conflict": "Le sujet a été enregistré ailleurs (autre onglet ou autre enseignant). Téléchargez vos modifications si besoin, puis rechargez.",
+      "reload": "Recharger",
+      "noSubject": "Cet examen n'a pas de sujet Typst enregistré.",
+      "storeDraft": "Enregistrer le sujet gardé par ce navigateur",
+      "unavailable": "Le stockage des sujets n'est pas disponible sur ce serveur : le sujet n'est gardé que dans ce navigateur.",
+      "loadFailed": "Le sujet n'a pas pu être chargé",
+      "templateUnchanged": "Modifier le sujet ne modifie ni le modèle ni les zones de l'examen déjà créé.",
+      "open": "Sujet Typst"
+    },
+    "files": {
+      "add": "Nouveau fichier",
+      "upload": "Ajouter des fichiers",
+      "insert": "Insérer dans main.typ",
+      "remove": "Supprimer le fichier",
+      "badPath": "Nom de fichier refusé (lettres, chiffres, . _ -, extension connue, 5 dossiers au plus)"
+    },
+    "diagrams": {
+      "pending": "Rendu de {{count}} diagramme(s)…",
+      "failed": "Diagramme {{kind}} non rendu",
+      "retry": "Réessayer les diagrammes"
+    },
+    "reuse": {
+      "label": "Partir du sujet d'un autre examen",
+      "load": "Copier dans le brouillon"
+    },
+    "print": {
+      "open": "Imprimer les copies",
+      "title": "Imprimer les copies — {{examName}}",
+      "intro": "Chaque copie reprend le modèle de l'examen ({{pages}} pages) ; chaque page porte un code qui permet de la retrouver au scan.",
+      "odd": "Le modèle a un nombre impair de pages : imprimez en recto seul, sinon deux copies se partageront une feuille.",
+      "loading": "Chargement du modèle…",
+      "copies": "Nombre de copies",
+      "generate": "Générer le PDF",
+      "badCopies": "Entre 1 et 2000 copies.",
+      "progress": "Assemblage : {{done}} / {{total}} copies",
+      "failed": "Impression impossible",
+      "advice": "Imprimez à taille réelle (sans ajustement à la page). Un tirage déjà créé se retélécharge avec les mêmes codes : ne créez pas un nouveau tirage pour réimprimer quelques copies.",
+      "previous": "Tirages",
+      "size": "{{copies}} copies × {{pages}} pages",
+      "again": "Retélécharger",
+      "versions": "Versions",
+      "versionsHelp": "Les copies alternent les versions ({{ letters }}, …). Le premier tirage à plusieurs versions les fige : elles ne pourront plus être modifiées.",
+      "editionVersions": "{{ k }} versions"
+    },
+    "versions": {
+      "title": "Versions du sujet",
+      "intro": "Chaque version mélange les questions des sections marquées shuffle, l'ordre des choix de QCM et choisit une variante d'énoncé. Les copies de toutes les versions seront reconstruites dans la mise en page de la version A pour la correction.",
+      "count": "Nombre de versions",
+      "seed": "Tirage",
+      "newSeed": "Nouveau tirage",
+      "build": "Générer et vérifier",
+      "building": "Génération…",
+      "stale": "Le sujet a changé depuis la génération : régénérez les versions.",
+      "doesNotCompile": "La version {{ version }} ne compile pas :",
+      "canonical": "version de référence (correction)",
+      "pages": "{{ pages }} pages",
+      "preview": "Aperçu",
+      "previewing": "Aperçu de la version {{ label }}",
+      "backToSubject": "Revenir au sujet",
+      "ok": "Les versions sont compatibles : leurs copies pourront être reconstruites dans la mise en page de la version A.",
+      "failed": "Les versions n'ont pas pu être générées",
+      "issue": {
+        "missingZone": "la zone {{ question }} (partie {{ part }}) est absente",
+        "zoneSize": "la zone {{ question }} (partie {{ part }}) n'a pas la même taille que dans la version A ; ne placez pas de zone de réponse dans une variante de hauteur différente",
+        "extraZone": "la zone {{ question }} (partie {{ part }}) n'existe pas dans la version A",
+        "qcmLetters": "le QCM {{ question }} n'a pas les mêmes cases que dans la version A",
+        "identity": "la zone d'identification « {{ role }} » diffère de la version A",
+        "pages": "la version a {{ pages }} pages au lieu de {{ expected }}",
+        "nothingVaries": "rien ne varie : ajoutez shuffle: true à une section, des choix de QCM ou une #variant"
+      },
+      "storedExam": "Les versions s'enregistrent à la création de l'examen ; elles ne peuvent pas encore être ajoutées à un examen déjà créé.",
+      "ready": "L'examen sera créé avec ses {{ k }} versions : la version A sert de modèle (zones et correction), les autres seront reconstruites au scan.",
+      "blocking": "Générez et vérifiez les versions (sans problème) avant de créer l'examen, ou revenez à une seule version."
     }
   }
 }

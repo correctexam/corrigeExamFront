@@ -27,6 +27,8 @@ import { TranslateService, TranslateDirective, TranslatePipe } from '@ngx-transl
 import { CacheServiceImpl } from '../db/CacheServiceImpl';
 import { firstValueFrom } from 'rxjs';
 import { PreferenceService } from '../preference-page/preference.service';
+import { SubjectService } from '../typst/subject.service';
+import { PrintCopiesComponent } from '../print-copies/print-copies.component';
 import { IExamSheet } from 'app/entities/exam-sheet/exam-sheet.model';
 import { Title } from '@angular/platform-browser';
 import { FaStackComponent, FaIconComponent, FaStackItemSizeDirective } from '@fortawesome/angular-fontawesome';
@@ -57,6 +59,7 @@ import {
   providers: [ConfirmationService, MessageService],
   standalone: true,
   imports: [
+    PrintCopiesComponent,
     ToastModule,
     DialogModule,
     FormsModule,
@@ -113,6 +116,10 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
    * Alignement serveur en cours pour cet examen : un overlay bloque les actions, qui liraient
    * ou réécriraient un cache que le worker est en train de produire.
    */
+  /** The exam has a subject written in Typst (T25c): link to its editor. */
+  readonly hasSubject = signal(false);
+  /** Print dialog of an exam written in Typst (T25d). */
+  showPrint = false;
   serverAlignActive = signal(false);
   serverAlignProgress = signal(0);
   /** Nombre de pages du job, 0 si inconnu. */
@@ -126,6 +133,7 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
   // completes the subscriptions to application-wide observables when the component is destroyed
   private readonly destroyRef = inject(DestroyRef);
   private readonly scanAlignService = inject(ScanAlignService);
+  private readonly subjectService = inject(SubjectService);
 
   constructor(
     public courseService: CourseService,
@@ -175,6 +183,10 @@ export class ExamDetailComponent implements OnInit, CacheUploadNotification, Cac
       if (params.get('examid') !== null) {
         this.blocked = true;
         this.examId = params.get('examid')!;
+        this.subjectService
+          .find(+this.examId)
+          .then(subject => this.hasSubject.set(subject !== undefined))
+          .catch(() => this.hasSubject.set(false));
         this.examService.find(+this.examId).subscribe(ex => {
           this.exam = ex.body!;
           console.error(this.exam);

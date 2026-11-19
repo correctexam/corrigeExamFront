@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/member-ordering */
-import { Component, Inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
 import {
   NgxExtendedPdfViewerService,
   PageRenderedEvent,
@@ -21,11 +21,23 @@ import { Question } from 'app/entities/question/question.model';
 import { ActivatedRoute } from '@angular/router';
 import { ExamService } from 'app/entities/exam/service/exam.service';
 import { PreferenceService } from 'app/scanexam/preference-page/preference.service';
+import { QuestionTypeService } from 'app/entities/question-type/service/question-type.service';
+import { IdentityZoneKind } from 'app/entities/exam/service/exam.service';
+import {
+  MetadataRect,
+  metadataProblems,
+  metadataRectToZone,
+  PageSizeCm,
+  pageSizeCm,
+  parsePdfZoneMetadata,
+  questionTypeFor,
+} from '../../pdf-zone-metadata';
 // const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 //  suppressScrollX: true,
 // };
 import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer';
 import { DOCUMENT } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BlockUIModule } from 'primeng/blockui';
 import { DeleteQuestionRequest, SummaryTemplateComponent } from '../../summary/summary-template.component';
@@ -44,7 +56,7 @@ export type CustomZone = IZone & { type: DrawingTools };
     //    },
   ],
   standalone: true,
-  imports: [SummaryTemplateComponent, BlockUIModule, ProgressSpinnerModule, NgxExtendedPdfViewerModule],
+  imports: [SummaryTemplateComponent, BlockUIModule, ProgressSpinnerModule, NgxExtendedPdfViewerModule, TranslatePipe],
 })
 export class FabricCanvasComponent implements OnInit, OnDestroy {
   @Input()
@@ -61,6 +73,8 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
   // For locking the page during the pdf rendering
   protected blocked = false;
   public processpdf = false;
+  /** Why the zones described in the PDF were ignored (empty: none ignored). */
+  readonly metadataProblems = signal<string[]>([]);
 
   constructor(
     public eventHandler: EventHandlerService,
@@ -69,6 +83,7 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
     private questionService: QuestionService,
     private examService: ExamService,
     private preferenceService: PreferenceService,
+    private questionTypeService: QuestionTypeService,
     private pdfViewerService: NgxExtendedPdfViewerService,
     private pdfNotificationService: PDFNotificationService,
     @Inject(DOCUMENT) private document: Document,
@@ -175,7 +190,7 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
         });
       }
       if (this.pdfViewerService.isRenderQueueEmpty()) {
-        this.loadingPdfMetadata(evt.source.scale);
+        this.loadingPdfMetadata().catch((e: unknown) => console.error('Zones of the template metadata not created', e));
       }
     } else {
       this.eventHandler.pages[page].updateCanvas(evt.source, this.document);
@@ -205,7 +220,7 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
       const c = this.eventHandler.getCanvasForPage(page);
       if (c === undefined) {
         if (this.pdfViewerService.isRenderQueueEmpty()) {
-          this.loadingPdfMetadata(evt.source.scale);
+          this.loadingPdfMetadata().catch((e: unknown) => console.error('Zones of the template metadata not created', e));
         }
       }
     }
@@ -272,62 +287,70 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
     this.pdfViewerService.scrollPageIntoView(page, { top, left: 0 });
   }
 
-  public async loadingPdfMetadata(pdfScale: number): Promise<void> {
-    const rects = await this.getCustomPdfProperties();
-    const qs: Record<number, Array<Rect>> = {};
-    let qnum = 0;
-    const promises: Array<Promise<void>> = [];
-    const zoomRatio = window.devicePixelRatio;
+  /**
+   * Zones described in the information dictionary of the template PDF (`correctexam-*` entries, see
+   * `pdf-zone-metadata.ts`), created when the template is opened: identity zones the exam does not have yet, answer
+   * zones and questions whose number does not exist yet. Positions come from the size of the PDF page, never from
+   * the screen; question types are found by name.
+   */
+  public async loadingPdfMetadata(): Promise<void> {
+    const app = this.pdfNotificationService.onPDFJSInitSignal();
+    if (!app) {
+      return;
+    }
+    const pdfDocument = app.pdfDocument;
+    const rects = parsePdfZoneMetadata(((await pdfDocument.getMetadata()).info as { Custom?: unknown }).Custom);
+    if (rects.length === 0) {
+      return;
+    }
+    // size of the pages the zones refer to; a page out of the document has no size
+    const sizes = new Map<number, PageSizeCm>();
+    for (const p of new Set(rects.map(r => r.p))) {
+      if (Number.isInteger(p) && p >= 1 && p <= pdfDocument.numPages) {
+        const viewport = (await pdfDocument.getPage(p)).getViewport({ scale: 1 });
+        sizes.set(p, pageSizeCm(viewport.width, viewport.height));
+      }
+    }
+    const problems = metadataProblems(rects, p => sizes.get(p));
+    if (problems.length > 0) {
+      // positions not computed (LaTeX compiled once) or stale: none of the zones can be trusted
+      console.warn('Zones of the template metadata ignored', problems);
+      this.metadataProblems.set(problems);
+      return;
+    }
+    const zoneOf = (rect: MetadataRect): IZone => metadataRectToZone(rect, sizes.get(rect.p)!);
+    const qs: Record<number, MetadataRect[]> = {};
+    const promises: Promise<void>[] = [];
+    const identity = (rect: MetadataRect, kind: IdentityZoneKind, label: string, assign: (id: number) => void): void => {
+      promises.push(
+        firstValueFrom(this.zoneService.create(zoneOf(rect))).then(async z1 => {
+          assign(z1.body!.id!);
+          await firstValueFrom(this.examService.setIdentityZone(this.exam.id!, kind, z1.body!.id!));
+          this.renderZone(z1.body as CustomZone);
+          this.eventHandler.createRedBox(label, z1.body!, rect.p);
+        }),
+      );
+    };
 
     rects.forEach(rect => {
-      const rectFixed = scaleRect(rect, zoomRatio);
-
-      switch (rectFixed.type) {
+      switch (rect.type) {
         case DrawingTools.INEBOX:
           if (this.exam.idzoneId === undefined) {
-            promises.push(
-              firstValueFrom(this.zoneService.create(this.createZone(rectFixed, pdfScale))).then(async z1 => {
-                this.exam.idzoneId = z1.body!.id!;
-                await firstValueFrom(this.examService.setIdentityZone(this.exam.id!, 'INE', z1.body!.id!));
-                this.renderZone(z1.body as CustomZone);
-                this.eventHandler.createRedBox('scanexam.ineuc1', z1.body!, rectFixed.p);
-              }),
-            );
+            identity(rect, 'INE', 'scanexam.ineuc1', id => (this.exam.idzoneId = id));
           }
           break;
-
         case DrawingTools.PRENOMBOX:
           if (this.exam.firstnamezoneId === undefined) {
-            promises.push(
-              firstValueFrom(this.zoneService.create(this.createZone(rectFixed, pdfScale))).then(async z1 => {
-                this.exam.firstnamezoneId = z1.body!.id!;
-                await firstValueFrom(this.examService.setIdentityZone(this.exam.id!, 'FIRSTNAME', z1.body!.id!));
-                this.renderZone(z1.body as CustomZone);
-                this.eventHandler.createRedBox('scanexam.prenomuc1', z1.body!, rectFixed.p);
-              }),
-            );
+            identity(rect, 'FIRSTNAME', 'scanexam.prenomuc1', id => (this.exam.firstnamezoneId = id));
           }
           break;
-
         case DrawingTools.NOMBOX:
           if (this.exam.namezoneId === undefined) {
-            promises.push(
-              firstValueFrom(this.zoneService.create(this.createZone(rectFixed, pdfScale))).then(async z1 => {
-                this.exam.namezoneId = z1.body!.id!;
-                await firstValueFrom(this.examService.setIdentityZone(this.exam.id!, 'NAME', z1.body!.id!));
-                this.renderZone(z1.body as CustomZone);
-                this.eventHandler.createRedBox('scanexam.nomuc1', z1.body!, rectFixed.p);
-              }),
-            );
+            identity(rect, 'NAME', 'scanexam.nomuc1', id => (this.exam.namezoneId = id));
           }
           break;
-
         case DrawingTools.QUESTIONBOX:
-          qnum = rectFixed.q!;
-          if (qs[qnum] === undefined) {
-            qs[qnum] = [];
-          }
-          qs[qnum][rectFixed.subq! - 1] = rectFixed;
+          (qs[rect.q!] ??= [])[rect.subq! - 1] = rect;
           break;
       }
     });
@@ -336,163 +359,42 @@ export class FabricCanvasComponent implements OnInit, OnDestroy {
     Promise.all(promises).catch((e: unknown) => console.error('Identity zones of the template not all saved', e));
 
     const arrayquestions = Array.from(this.eventHandler.questions.values());
-    for (const [key, value] of Object.entries(qs)) {
-      qnum = parseInt(key, 10);
-
-      if (arrayquestions.findIndex(q => q.numero === qnum) === -1) {
-        value
-          .filter(subq => subq !== undefined)
-          .forEach(subq => {
-            this.zoneService.create(this.createZone(subq, pdfScale)).subscribe(resz => {
-              const zone = resz.body as CustomZone;
-              zone.type = DrawingTools.QUESTIONBOX;
-              const pref = this.preferenceService.getPreferenceForQuestion();
-              const q = new Question();
-              q.zoneId = zone.id!;
-              q.examId = this.exam.id;
-              q.typeId = pref.typeId;
-              q.numero = subq.q;
-              q.point = pref.point;
-              q.step = pref.step;
-              q.gradeType = pref.gradeType;
-              q.canBeNegative = false;
-              q.canExceedTheMax = false;
-              q.mustBeIgnoreInGlobalScale = false;
-
-              if (subq.t === 'qcm') {
-                q.typeId = 3;
-              }
-              this.questionService.create(q).subscribe(resq => {
-                if (resq.body?.id !== undefined) {
-                  this.eventHandler.questions.set(resq.body.id, resq.body);
-                  this.renderZone(zone);
-                  if (this.eventHandler.pages[subq.p] !== undefined) {
-                    this.eventHandler.createRedQuestionBox(zone, subq.p);
-                  }
-                }
-              });
-            });
-          });
+    const missing = Object.entries(qs).filter(([key]) => arrayquestions.findIndex(q => q.numero === parseInt(key, 10)) === -1);
+    if (missing.length === 0) {
+      return;
+    }
+    // ids of the question types differ between databases: found by name, as in the question properties
+    const types = (await firstValueFrom(this.questionTypeService.query())).body ?? [];
+    const pref = this.preferenceService.getPreferenceForQuestion();
+    for (const [, value] of missing) {
+      for (const subq of value.filter(r => r !== undefined)) {
+        const typeId = questionTypeFor(subq, types, pref.typeId);
+        if (typeId === undefined) {
+          console.error(`Question ${subq.q}: question type ${subq.t === 'qcm' ? 'QCM' : 'manual'} missing from the database`);
+          continue;
+        }
+        const zone = (await firstValueFrom(this.zoneService.create(zoneOf(subq)))).body as CustomZone;
+        zone.type = DrawingTools.QUESTIONBOX;
+        const q = new Question();
+        q.zoneId = zone.id!;
+        q.examId = this.exam.id;
+        q.typeId = typeId;
+        q.numero = subq.q;
+        q.point = pref.point;
+        q.step = pref.step;
+        q.gradeType = pref.gradeType;
+        q.canBeNegative = false;
+        q.canExceedTheMax = false;
+        q.mustBeIgnoreInGlobalScale = false;
+        const resq = await firstValueFrom(this.questionService.create(q));
+        if (resq.body?.id !== undefined) {
+          this.eventHandler.questions.set(resq.body.id, resq.body);
+          this.renderZone(zone);
+          if (this.eventHandler.pages[subq.p] !== undefined) {
+            this.eventHandler.createRedQuestionBox(zone, subq.p);
+          }
+        }
       }
     }
   }
-
-  private createZone(rect: Rect, scale: number): IZone {
-    const ppc = 37.795275591;
-    const canvas =
-      this.eventHandler.getCanvasForPage(rect.p) !== undefined
-        ? this.eventHandler.getCanvasForPage(rect.p)
-        : this.eventHandler.getCanvasForPage(1);
-    if (canvas === undefined) {
-      return {
-        pageNumber: rect.p,
-        xInit: 0,
-        yInit: 0,
-        width: 1000,
-        height: 1000,
-      };
-    }
-
-    const width = canvas.width;
-    const height = canvas.height;
-
-    return {
-      pageNumber: rect.p,
-      xInit: Math.trunc(Math.floor((rect.x * ppc * this.eventHandler.coefficient) / width) * scale),
-      yInit: Math.trunc(
-        (Math.floor(rect.y * ppc * this.eventHandler.coefficient) / height -
-          Math.floor(rect.h * ppc * this.eventHandler.coefficient) / height) *
-          scale,
-      ),
-      width: Math.trunc(Math.floor((rect.w * ppc * this.eventHandler.coefficient) / width) * scale),
-      height: Math.trunc((Math.floor(rect.h * ppc * this.eventHandler.coefficient) / height) * scale),
-    };
-  }
-
-  public async getCustomPdfProperties(): Promise<Array<Rect>> {
-    if (this.pdfNotificationService.onPDFJSInitSignal()) {
-      const md = await this.pdfNotificationService.onPDFJSInitSignal().pdfDocument.getMetadata();
-      const info = md.info;
-      if ((info as any).Custom === undefined) {
-        return Promise.resolve([]);
-      }
-
-      return Object.keys((info as any).Custom)
-        .map(key => toRect(key, (info as any).Custom[key]))
-        .filter((rect): rect is Rect => rect !== undefined);
-    } else {
-      return await [];
-    }
-  }
-}
-
-interface Rect {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  p: number;
-  type: DrawingTools;
-  t?: string;
-  q: number | undefined;
-  subq: number | undefined;
-}
-
-function scaleRect(rect: Rect, ratio: number): Rect {
-  return {
-    x: rect.x,
-    y: rect.y * ratio,
-    w: rect.w,
-    h: rect.h * ratio,
-    p: rect.p,
-    type: rect.type,
-    q: rect.q,
-    t: rect.t,
-    subq: rect.subq,
-  };
-  // return rect;
-}
-
-function toRect(key: string, value: unknown): Rect | undefined {
-  if (typeof value !== 'string') {
-    return undefined;
-  }
-  try {
-    const r = JSON.parse(value) as Rect;
-    const infos = key.split('-');
-    const type = getDrawingTool(infos[1] ?? '');
-    const q = parseInt(infos[2] ?? '', 10);
-    const subq = parseInt(infos[3] ?? '', 10);
-
-    if (
-      type !== undefined &&
-      infos[0] === 'correctexam' &&
-      Number.isFinite(r.p) &&
-      Number.isFinite(r.x) &&
-      Number.isFinite(r.y) &&
-      Number.isFinite(r.w) &&
-      Number.isFinite(r.h)
-    ) {
-      return { ...r, type, q: Number.isFinite(q) ? q : undefined, subq: Number.isFinite(subq) ? subq : undefined };
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (ignore: unknown) {
-    // nothing to do
-  }
-  return undefined;
-}
-
-function getDrawingTool(str: string): DrawingTools | undefined {
-  switch (str) {
-    case 'answer':
-      return DrawingTools.QUESTIONBOX;
-    case 'firstname':
-      return DrawingTools.PRENOMBOX;
-    case 'lastname':
-      return DrawingTools.NOMBOX;
-    case 'stdid':
-      return DrawingTools.INEBOX;
-  }
-
-  return undefined;
 }

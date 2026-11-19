@@ -17,6 +17,9 @@
 
 #let _plan = if "ce-plan" in sys.inputs { json(bytes(sys.inputs.at("ce-plan"))) } else { (:) }
 
+// Diagrams rendered by the platform (Kroki, T25c): JSON object "kind\nsource" -> SVG text.
+#let _diagrams = if "ce-diagrams" in sys.inputs { json(bytes(sys.inputs.at("ce-diagrams"))) } else { (:) }
+
 /// Version of the zone metadata. Bump it when the shape of a <ce-zone> value changes.
 #let ZONE_FORMAT = 1
 
@@ -296,6 +299,8 @@
       grading: grading,
       correct: rights.join("&"),
       choices: cs.len(),
+      // choices that keep their place when the platform mixes the choices of a version (T25e)
+      fixed: cs.enumerate().filter(((i, c)) => c.fixed).map(((i, c)) => i),
     ))
     linebreak()
     stem
@@ -406,12 +411,53 @@
   for i in order { its.at(i) }
 }
 
+/// Wording variants of a statement (T25e): each version of the subject prints one of `bodies`, chosen by the
+/// platform (`ce-plan.variants.<key>`, the first one by default). A `solution` inside a variant is the solution
+/// of that variant. The answer zones should not be inside a variant: they must be the same in every version.
+#let variant(key, ..bodies) = {
+  let bs = bodies.pos()
+  assert(bs.len() >= 1, message: "variant " + repr(key) + ": at least one wording")
+  [#metadata((format: ZONE_FORMAT, kind: "variant", key: key, count: bs.len())) <ce-variant>]
+  let i = _plan.at("variants", default: (:)).at(key, default: 0)
+  assert(i >= 0 and i < bs.len(), message: "ce-plan: bad variant for " + repr(key))
+  bs.at(i)
+}
+
 /// Questions that stay together and in this order when their section is shuffled (case study).
 #let group(..items) = items.pos().join()
 
 /// Content shown only in the solution document (`ce-plan.solution = true`).
 #let solution(body) = if _plan.at("solution", default: false) {
   block(width: 100%, inset: 2mm, fill: luma(235), stroke: (left: 2pt + luma(120)), body)
+}
+
+// ---------------------------------------------------------------------------------------------------
+// Diagrams written as text and rendered by the platform (T25c)
+
+/// Kinds rendered by the platform (Kroki). Native packages (fletcher, cetz, chronos, diagraph) need nothing.
+#let DIAGRAM_KINDS = ("plantuml", "c4plantuml", "mermaid", "d2", "nomnoml")
+
+/// A diagram written in a text syntax that Typst cannot draw itself (PlantUML, Mermaid, D2, nomnoml).
+/// The platform reads the `<ce-diagram>` requests, has them rendered once (SVG cached by content) and passes
+/// the SVGs back as the input `ce-diagrams`; until then a dashed frame stands in for the diagram.
+/// `source` is a string or a raw block (```` ```plantuml … ``` ````).
+#let diagram(kind, source, width: auto, height: auto, alt: none) = {
+  assert(kind in DIAGRAM_KINDS, message: "diagram: unknown kind " + repr(kind) + " (expected " + DIAGRAM_KINDS.join(", ") + ")")
+  let src = if type(source) == content and source.func() == raw { source.text } else { source }
+  assert(type(src) == str, message: "diagram: the source must be a string or a raw block")
+  [#metadata((format: ZONE_FORMAT, kind: kind, source: src)) <ce-diagram>]
+  let svg = _diagrams.at(kind + "\n" + src, default: none)
+  if svg == none {
+    block(
+      width: if width == auto { 100% } else { width },
+      height: if height == auto { 3cm } else { height },
+      stroke: (paint: luma(150), dash: "dashed"),
+      inset: 6pt,
+      align(center + horizon, text(size: 9pt, fill: luma(100))[#kind …]),
+    )
+  } else {
+    image(bytes(svg), format: "svg", width: width, height: height, alt: alt)
+  }
 }
 
 // ---------------------------------------------------------------------------------------------------

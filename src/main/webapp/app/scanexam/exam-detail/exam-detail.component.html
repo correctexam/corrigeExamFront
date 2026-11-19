@@ -48,6 +48,17 @@
     </ng-template>
   </p-dialog>
 
+  @if (showPrint && exam?.templateId) {
+    <p-dialog
+      [header]="'typstsubject.print.title' | translate: { examName: exam?.name }"
+      [(visible)]="showPrint"
+      [modal]="true"
+      [style]="{ width: '50rem', maxWidth: '95vw' }"
+    >
+      <jhi-print-copies [examId]="+examId" [templateId]="exam!.templateId!" [examName]="exam?.name ?? ''"></jhi-print-copies>
+    </p-dialog>
+  }
+
   <p-dialog [header]="'scanexam.showInfoExamTitle' | translate" [(visible)]="showInfoExam" [style]="{ width: '50vw' }">
     <div [innerHTML]="'scanexam.infoExamDetails' | translate: infoExamDetail"></div>
     <ng-template pTemplate="footer">
@@ -109,6 +120,27 @@
       </jhi-usable-text-input>
       <div id="form-total" #formTotal>
         <div class="inner" [style]="{ 'text-align': 'center' }">
+          @if (hasSubject()) {
+            <div>
+              <a
+                class="p-button p-button-outlined p-button-sm"
+                [routerLink]="'/exam/' + this.examId + '/subject'"
+                data-cy="exam-typst-subject"
+              >
+                <span [translate]="'typstsubject.storage.open'">Sujet Typst</span>
+              </a>
+              @if (exam?.templateId) {
+                <button
+                  type="button"
+                  class="p-button p-button-outlined p-button-sm ms-2"
+                  (click)="showPrint = true"
+                  data-cy="exam-print-copies"
+                >
+                  <span [translate]="'typstsubject.print.open'">Imprimer les copies</span>
+                </button>
+              }
+            </div>
+          }
           @if (exam?.nbgrader === false) {
             <button
               [routerLink]="'/exam/annotate/' + this.examId"
