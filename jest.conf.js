@@ -19,7 +19,7 @@ module.exports = {
   },
   roots: ['<rootDir>', `<rootDir>/${baseUrl}`],
   modulePaths: [`<rootDir>/${baseUrl}`],
-  setupFiles: ['jest-date-mock'],
+  setupFiles: ['jest-date-mock', `<rootDir>/${baseUrl}__tests__/zone-flags.ts`],
   setupFilesAfterEnv: [`<rootDir>/${baseUrl}__tests__/setup.ts`],
   cacheDirectory: '<rootDir>/target/jest-cache',
   coverageDirectory: '<rootDir>/target/test-results/',
