@@ -1,0 +1,18 @@
+{
+  "source": "https://github.com/typst/typst-assets (94dcb990), licences : NOTICE-typst-assets.txt",
+  "fonts": [
+    "DejaVuSansMono-Bold.ttf",
+    "DejaVuSansMono-BoldOblique.ttf",
+    "DejaVuSansMono-Oblique.ttf",
+    "DejaVuSansMono.ttf",
+    "LibertinusSerif-Bold.otf",
+    "LibertinusSerif-BoldItalic.otf",
+    "LibertinusSerif-Italic.otf",
+    "LibertinusSerif-Regular.otf",
+    "NewCM10-Bold.otf",
+    "NewCM10-BoldItalic.otf",
+    "NewCM10-Italic.otf",
+    "NewCM10-Regular.otf",
+    "NewCMMath-Regular.otf"
+  ]
+}
