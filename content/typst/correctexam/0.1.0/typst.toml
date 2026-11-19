@@ -1,0 +1,8 @@
+[package]
+name = "correctexam"
+version = "0.1.0"
+entrypoint = "lib.typ"
+compiler = "0.14.0"
+authors = ["CorrectExam contributors"]
+license = "MIT"
+description = "Exam sheets for CorrectExam: answer zones, MCQ boxes, alignment marks and page codes, with the zone positions exposed as metadata."
