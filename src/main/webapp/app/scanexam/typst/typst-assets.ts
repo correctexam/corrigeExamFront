@@ -48,3 +48,27 @@ export async function fetchAsset(fetchFn: FetchFn, url: URL, wasm = false): Prom
       'Clear the browser cache for this site (or unregister its service worker) and reload.',
   );
 }
+
+/**
+ * Where the worker takes the compiler (`content/typst/compiler.json`, `{"wasm": …}`): by default the copy served
+ * with the application (`wasm/typst_ts_web_compiler_bg.wasm`). A deployment that cannot serve a file of 28 Mo
+ * (Cloudflare Pages: 25 MiB per file) replaces the file with the URL of the same package on a CDN, same version
+ * (the JavaScript glue of the compiler must match its Wasm). An unreadable or missing file means the default.
+ */
+export async function compilerWasmUrl(fetchFn: FetchFn, base: URL): Promise<URL> {
+  const fallback = new URL('wasm/typst_ts_web_compiler_bg.wasm', base);
+  try {
+    const res = await fetchFn(new URL('compiler.json', base), { cache: 'no-cache' });
+    if (!res.ok) {
+      return fallback;
+    }
+    const wasm = ((await res.json()) as { wasm?: unknown }).wasm;
+    if (typeof wasm !== 'string' || wasm.trim() === '') {
+      return fallback;
+    }
+    const url = new URL(wasm, base);
+    return url.protocol === 'https:' || url.origin === base.origin ? url : fallback;
+  } catch {
+    return fallback;
+  }
+}
