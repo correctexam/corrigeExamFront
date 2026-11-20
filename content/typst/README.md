@@ -34,6 +34,8 @@ typst compile genie-logiciel.typ --input ce-plan='{"edition":"E1","version":"B",
 
 ## En développement
 
+Le compilateur (`wasm/typst_ts_web_compiler_bg.wasm`, ~27 Mo, copié depuis `node_modules` au build) est lu par le worker à l'adresse donnée par `compiler.json` (`{"wasm": …}`, par défaut la copie de l'application). Un déploiement qui ne peut pas servir un fichier de cette taille (Cloudflare Pages : 25 Mio par fichier, `.github/workflows/cloudfare.yml`) supprime la copie et écrit dans `compiler.json` l'URL du **même paquet, même version** sur jsDelivr : la colle JavaScript du compilateur dépend de son Wasm (un autre paquet, même de même numéro de version, ne convient pas).
+
 Le cache de build Angular est dans `target/angular/` (`angular.json`). S'il a été rempli pendant un `npm ci`, il peut garder une copie tronquée du compilateur Wasm (erreur « section … extends past end of the module ») : `npx ng cache clean`, puis relancer `npm start`.
 
 ## Contrat `ce-plan` (entrée JSON, tout est facultatif)
