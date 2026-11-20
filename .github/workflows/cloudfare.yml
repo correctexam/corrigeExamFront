@@ -53,6 +53,22 @@ jobs:
       - name: Copy 404
         run: |
           npm run copy:404
+      - name: Typst compiler from a CDN (Cloudflare Pages serves files up to 25 MiB, the compiler is 27 MiB)
+        run: |
+          STATIC=target/classes/static
+          WASM="$STATIC/content/typst/wasm/typst_ts_web_compiler_bg.wasm"
+          # same package and version as the build: the JavaScript glue of the compiler must match its Wasm
+          VERSION=$(node -p "require('./node_modules/@myriaddreamin/typst-ts-web-compiler/package.json').version")
+          URL="https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-ts-web-compiler@${VERSION}/pkg/typst_ts_web_compiler_bg.wasm"
+          curl -sSfL --retry 3 "$URL" -o /tmp/typst_ts_web_compiler_bg.wasm
+          cmp /tmp/typst_ts_web_compiler_bg.wasm "$WASM"
+          rm "$WASM"
+          echo "{\"wasm\": \"$URL\"}" > "$STATIC/content/typst/compiler.json"
+          cat "$STATIC/content/typst/compiler.json"
+          # the service worker checks the hashes of the assets: manifest made again (wasm removed, compiler.json changed)
+          npx ngsw-config "$STATIC" ngsw-config.json /
+          # nothing left above the limit of Cloudflare Pages
+          if find "$STATIC" -type f -size +25M | grep .; then echo "files above 25 MiB" && exit 1; fi
       - name: prepare header fire sharearraybuffer support
         run: |
           echo "/*" > ./target/classes/static/_headers
