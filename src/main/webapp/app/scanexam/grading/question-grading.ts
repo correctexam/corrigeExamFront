@@ -173,6 +173,20 @@ export function isStoredInHundredths(rule: GradingRule | undefined): boolean {
   return rule === 'hybrid' || rule === 'qcmDsl';
 }
 
+/**
+ * Note of a response in points, as shown to the student, from `StudentResponse.note`:
+ * `/ 100` for the hybrid and DSL QCM rules, `/ step` when the question has a positive step
+ * (positive, negative and former QCM rules), unchanged otherwise.
+ */
+export function displayedNote(question: GradableQuestion, storedNote: number | null | undefined): number {
+  const note = storedNote ?? 0;
+  if (isStoredInHundredths(gradingRuleOf(question))) {
+    return note / 100;
+  }
+  const step = question.step ?? 0;
+  return step > 0 ? note / step : note;
+}
+
 export function hybridNote(
   question: GradableQuestion,
   comments: HybridCommentLike[] | undefined,

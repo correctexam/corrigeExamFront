@@ -54,7 +54,7 @@ import { StudentSheetSource, StudentSheetSourceFactory } from '../student-portal
 import { IStudentSheetView } from '../student-portal/student-portal.model';
 import { StudentSessionService } from '../student-portal/student-session.service';
 import { parseCachedPage, questionNumerosOf, responseOf } from '../student-portal/student-sheet-view.util';
-import { gradingRuleOf } from '../grading/question-grading';
+import { displayedNote, gradingRuleOf } from '../grading/question-grading';
 
 /**
  * Sheet of a student, question by question: through the UUID of a /copie link, or through the student portal
@@ -294,6 +294,11 @@ export class VoirCopieComponent implements OnInit, AfterViewInit {
         i,
       );
     });
+  }
+
+  /** Note of the current answer in points (`StudentResponse.note` is stored in steps or in hundredths of points). */
+  currentDisplayedNote(): number {
+    return this.questions && this.questions.length > 0 ? displayedNote(this.questions[0], this.resp?.note) : 0;
   }
 
   /** QCM graded by a DSL (ADR 0002): note in points, stored × 100. */
