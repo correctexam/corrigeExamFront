@@ -162,30 +162,8 @@
           @if (corrections) {
             <div style="padding-bottom: 1rem" class="col-3 sm:col-3 md:col-3 lg:col-12 xl:col-12">
               <span [translate]="'scanexam.noteattribuee'">Note attribuée :</span>
-              @if (
-                questionStep > 0 &&
-                questions &&
-                questions.length > 0 &&
-                (questions[0].gradeType !== 'HYBRID' || questions[0].typeAlgoName === 'QCM') &&
-                resp
-              ) {
-                <span>{{ currentNote / questionStep }}</span>
-              }
-              @if (
-                questionStep <= 0 &&
-                questions &&
-                questions.length > 0 &&
-                (questions[0].gradeType !== 'HYBRID' || questions[0].typeAlgoName === 'QCM') &&
-                resp
-              ) {
-                <span>{{ currentNote }}</span>
-              }
-              @if (
-                questions && questions.length > 0 && questions[0].gradeType === 'HYBRID' && questions[0].typeAlgoName !== 'QCM' && resp
-              ) {
-                <span>{{ resp!.note! / 100 | number: '1.0-2' }}</span>
-              }
               @if (questions && questions.length > 0 && resp) {
+                <span>{{ currentDisplayedNote() | number: '1.0-2' }}</span>
                 <span> / {{ questions[0].point }} </span>
               }
               @if (resp === undefined) {

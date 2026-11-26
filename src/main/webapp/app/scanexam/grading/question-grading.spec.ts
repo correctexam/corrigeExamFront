@@ -2,6 +2,7 @@ import { describe, expect, it } from '@jest/globals';
 import { GradeType } from 'app/entities/enumerations/grade-type.model';
 import {
   computeQuestionNote,
+  displayedNote,
   gradingRuleOf,
   GradableQuestion,
   HybridCommentLike,
@@ -164,5 +165,30 @@ describe('question-grading', () => {
 
   it('returns undefined for a question graded directly', () => {
     expect(computeQuestionNote({ gradeType: GradeType.DIRECT }, { noteSteps: 4, gradedComments: [{ grade: 1 }] })).toBeUndefined();
+  });
+
+  describe('displayedNote', () => {
+    it('divides the DSL QCM note by 100 (stored in hundredths of points)', () => {
+      const question = { typeAlgoName: 'QCM', validExpression: 'a&b=100; a=50', point: 0.5, step: 1 };
+      expect(displayedNote(question, 25)).toBe(0.25);
+    });
+
+    it('divides the hybrid note by 100', () => {
+      expect(displayedNote({ gradeType: GradeType.HYBRID, point: 4, step: 2 }, 350)).toBe(3.5);
+    });
+
+    it('divides the former QCM and positive notes by a positive step', () => {
+      expect(displayedNote({ typeAlgoName: 'QCM', validExpression: 'a&b', point: 1, step: 4 }, 2)).toBe(0.5);
+      expect(displayedNote({ gradeType: GradeType.POSITIVE, point: 2, step: 2 }, 3)).toBe(1.5);
+    });
+
+    it('keeps the note when the step is not positive', () => {
+      expect(displayedNote({ typeAlgoName: 'QCM', validExpression: 'a', point: 1, step: 0 }, 1)).toBe(1);
+      expect(displayedNote({ gradeType: GradeType.DIRECT }, 7)).toBe(7);
+    });
+
+    it('treats a missing note as 0', () => {
+      expect(displayedNote({ gradeType: GradeType.HYBRID, point: 4 }, undefined)).toBe(0);
+    });
   });
 });
